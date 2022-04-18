@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.messaging.MessageHistoryRelation
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.messaging.MessageHistoryRelation
+import net.pantasystem.milktea.model.messaging.UnReadMessages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

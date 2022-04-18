@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.notes.poll
 
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.notes.poll.Poll
 import org.junit.Assert
 import org.junit.Test
 import kotlin.time.Duration.Companion.minutes

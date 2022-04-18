@@ -13,8 +13,8 @@ import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemHasReplyToNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.view.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.HasReplyToNoteViewData

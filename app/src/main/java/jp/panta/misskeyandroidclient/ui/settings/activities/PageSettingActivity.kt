@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
-import jp.panta.misskeyandroidclient.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.settings.page.EditTabNameDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PagesAdapter

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionChoiceBinding
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 
 class ReactionChoicesAdapter(
     val reactionSelection: ReactionSelection

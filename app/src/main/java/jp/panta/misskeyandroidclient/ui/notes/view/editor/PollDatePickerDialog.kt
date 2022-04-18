@@ -7,8 +7,8 @@ import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
-import jp.panta.misskeyandroidclient.model.notes.expiresAt
+import net.pantasystem.milktea.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.notes.expiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant

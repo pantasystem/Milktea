@@ -4,10 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.group.GroupDataSource
-import jp.panta.misskeyandroidclient.model.group.GroupRepository
-import jp.panta.misskeyandroidclient.model.group.impl.GroupRepositoryImpl
-import jp.panta.misskeyandroidclient.model.group.impl.InMemoryGroupDataSource
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.data.infrastructure.group.impl.GroupRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.group.impl.InMemoryGroupDataSource
 import javax.inject.Singleton
 
 @Module

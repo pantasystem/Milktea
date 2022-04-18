@@ -6,15 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
-import jp.panta.misskeyandroidclient.api.misskey.users.UserDTO
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -24,6 +23,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.model.account.page.PageableTemplate
 import java.lang.IllegalStateException
 
 class PageSettingViewModel(
@@ -138,9 +139,11 @@ class PageSettingViewModel(
 
     private fun addUserPage(user: UserDTO) {
         val page = if (settingStore.isUserNameDefault) {
-            PageableTemplate(account!!).user(user.id, title = user.getShortDisplayName())
+            PageableTemplate(account!!)
+                .user(user.id, title = user.getShortDisplayName())
         } else {
-            PageableTemplate(account!!).user(user.id, title = user.getDisplayName())
+            PageableTemplate(account!!)
+                .user(user.id, title = user.getDisplayName())
         }
         addPage(page)
     }
@@ -194,10 +197,26 @@ class PageSettingViewModel(
             PageType.MENTION -> {
                 addPage(PageableTemplate(account!!).mention(name))
             }
-            PageType.GALLERY_FEATURED -> addPage(account!!.newPage(Pageable.Gallery.Featured, name))
-            PageType.GALLERY_POPULAR -> addPage(account!!.newPage(Pageable.Gallery.Popular, name))
-            PageType.GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.Posts, name))
-            PageType.MY_GALLERY_POSTS -> addPage(account!!.newPage(Pageable.Gallery.MyPosts, name))
+            PageType.GALLERY_FEATURED -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.Featured, name
+                )
+            )
+            PageType.GALLERY_POPULAR -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.Popular, name
+                )
+            )
+            PageType.GALLERY_POSTS -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.Posts, name
+                )
+            )
+            PageType.MY_GALLERY_POSTS -> addPage(
+                account!!.newPage(
+                    Pageable.Gallery.MyPosts, name
+                )
+            )
             PageType.I_LIKED_GALLERY_POSTS -> addPage(
                 account!!.newPage(
                     Pageable.Gallery.ILikedPosts,

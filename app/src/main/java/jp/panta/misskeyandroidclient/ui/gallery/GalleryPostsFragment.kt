@@ -13,16 +13,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.api.misskey.APIError
+import net.pantasystem.milktea.api.misskey.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
+import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.account.page.Pageable
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -78,7 +79,7 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
                     binding.refresh.visibility = View.VISIBLE
                     binding.timelineEmptyView.visibility = View.GONE
                     binding.timelineProgressBar.visibility = View.GONE
-                    galleryPostsListAdapter.submitList(state.content.rawContent)
+                    galleryPostsListAdapter.submitList((state.content as StateContent.Exist<List<GalleryPostState>>).rawContent)
                     binding.refresh.isRefreshing = state is PageableState.Loading
                 }else{
                     // エラーメッセージやプログレスバーなどを表示する

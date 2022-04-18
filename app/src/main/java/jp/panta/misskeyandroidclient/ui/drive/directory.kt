@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import jp.panta.misskeyandroidclient.model.drive.Directory
+import net.pantasystem.milktea.model.drive.Directory
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
 import androidx.compose.runtime.getValue
 

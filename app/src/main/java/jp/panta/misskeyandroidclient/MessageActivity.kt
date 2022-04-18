@@ -10,8 +10,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter

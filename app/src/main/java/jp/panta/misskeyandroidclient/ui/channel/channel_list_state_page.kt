@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.channel.ChannelListType
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.channel.Channel
 
 @Composable
 fun ChannelListStateScreen(

@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.emojis.viewmodel
 
 import androidx.lifecycle.ViewModel
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 
 

@@ -1,25 +1,23 @@
 package jp.panta.misskeyandroidclient.api
 
-import jp.panta.misskeyandroidclient.api.misskey.APIError
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.notes.CreateNote
-import jp.panta.misskeyandroidclient.model.I
+import net.pantasystem.milktea.api.misskey.APIError
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.notes.CreateNote
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.api.misskey.I
 import org.junit.Assert.*
 import org.junit.Test
 
 class APIErrorTest {
 
-    private val  misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
-
+    private val misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
 
 
     @Test(expected = APIError.ForbiddenException::class)
     fun testClientError(): Unit = runBlocking {
         misskeyAPI.create(CreateNote("", text = null)).throwIfHasError()
     }
-
 
 
     //@Test(expected = APIError.AuthenticationException::class)
@@ -36,14 +34,13 @@ class APIErrorTest {
     }
 
 
-
     @Test
     fun testHasErrorBody(): Unit = runBlocking {
         val res = misskeyAPI.i(I(null))
 
-        try{
+        try {
             res.throwIfHasError()
-        }catch(e: APIError) {
+        } catch (e: APIError) {
             assertNotNull(e.error)
         }
     }

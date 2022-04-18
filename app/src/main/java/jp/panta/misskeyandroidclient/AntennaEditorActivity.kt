@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaEditorBinding
-import jp.panta.misskeyandroidclient.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel

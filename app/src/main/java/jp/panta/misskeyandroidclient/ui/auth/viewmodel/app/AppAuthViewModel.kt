@@ -4,26 +4,27 @@ import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.BuildConfig
-import jp.panta.misskeyandroidclient.api.mastodon.MastodonAPIProvider
-import jp.panta.misskeyandroidclient.api.mastodon.instance.Instance
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.misskey.app.CreateApp
-import jp.panta.misskeyandroidclient.api.misskey.auth.AppSecret
-import jp.panta.misskeyandroidclient.api.misskey.auth.Session
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.auth.Authorization
-import jp.panta.misskeyandroidclient.model.auth.custom.*
-import jp.panta.misskeyandroidclient.model.instance.Meta
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.api.mastodon.instance.Instance
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.app.CreateApp
+import net.pantasystem.milktea.api.misskey.auth.AppSecret
+import net.pantasystem.milktea.api.misskey.auth.Session
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.*
 import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.util.*
+import net.pantasystem.milktea.api.misskey.auth.fromDTO
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.model.app.AppType
+import net.pantasystem.milktea.common.State
 import java.util.regex.Pattern
 import javax.inject.Inject
-import jp.panta.misskeyandroidclient.api.mastodon.apps.CreateApp as CreateTootApp
+import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.instance.Meta
 
 sealed interface AuthErrors {
     val throwable: Throwable
@@ -60,9 +61,11 @@ class AppAuthViewModel @Inject constructor(
     val instanceDomain = MutableStateFlow("")
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(
+        StateContent.NotExist()))
 
-    private val _generatingTokenState = MutableStateFlow<State<Session>>(State.Fixed(StateContent.NotExist()))
+    private val _generatingTokenState = MutableStateFlow<State<Session>>(
+        State.Fixed(StateContent.NotExist()))
     private val generatingTokenState: StateFlow<State<Session>> = _generatingTokenState
     private val generateTokenError = generatingTokenState.map {
         it as? State.Error
@@ -115,7 +118,7 @@ class AppAuthViewModel @Inject constructor(
     }
 
     private fun getMeta(instanceDomain: String): Flow<State<InstanceType>> {
-        return flow<State<InstanceType>> {
+        return flow {
             val url = toEnableUrl(instanceDomain)
             emit(State.Fixed(StateContent.NotExist()))
             if(urlPattern.matcher(url).find()){
@@ -150,7 +153,8 @@ class AppAuthViewModel @Inject constructor(
                     emit(State.Error(StateContent.NotExist(), it))
                 }.onSuccess {
                     Log.d("AppAuthVM", "meta:$it")
-                    emit(State.Fixed(
+                    emit(
+                        State.Fixed(
                         StateContent.Exist(it)
                     ))
                 }
@@ -184,7 +188,11 @@ class AppAuthViewModel @Inject constructor(
                     is AppType.Misskey -> {
                         val secret = app.secret
                         val authApi = MisskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
-                        val session = authApi.generateSession(AppSecret(secret!!)).body()
+                        val session = authApi.generateSession(
+                            AppSecret(
+                                secret!!
+                            )
+                        ).body()
                             ?: throw IllegalStateException("セッションの作成に失敗しました。")
                         customAuthStore.setCustomAuthBridge(
                             app.createAuth(instanceBase, session)

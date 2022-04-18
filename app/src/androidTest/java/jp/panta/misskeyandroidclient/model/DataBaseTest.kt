@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.runner.AndroidJUnit4
-import jp.panta.misskeyandroidclient.model.auth.KeyStoreSystemEncryption
-import jp.panta.misskeyandroidclient.model.core.*
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.Page
+import net.pantasystem.milktea.data.infrastructure.auth.KeyStoreSystemEncryption
+import net.pantasystem.milktea.data.infrastructure.core.*
 import org.hamcrest.Matchers.*
 import org.junit.Assert
 import org.junit.Before

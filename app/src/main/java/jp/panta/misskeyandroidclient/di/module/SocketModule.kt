@@ -1,21 +1,21 @@
-package jp.panta.misskeyandroidclient.di.module.streaming
+package jp.panta.misskeyandroidclient.di.module
 
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProviderImpl
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.streaming.SocketWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.impl.SocketWithAccountProviderImpl
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
+import net.pantasystem.milktea.data.streaming.impl.SocketWithAccountProviderImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import net.pantasystem.milktea.common.Logger
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

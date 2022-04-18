@@ -1,7 +1,8 @@
 package jp.panta.misskeyandroidclient.model.users
 
-import jp.panta.misskeyandroidclient.model.account.Account
 import junit.framework.TestCase
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.User
 
 class UserTest : TestCase() {
 

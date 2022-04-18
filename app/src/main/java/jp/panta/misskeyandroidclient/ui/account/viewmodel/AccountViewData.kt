@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.account.viewmodel
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.*

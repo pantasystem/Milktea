@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionHistoryPagerBinding
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -71,7 +71,12 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         lifecycleScope.launchWhenCreated {
             pagerViewModel.types.collect { list ->
                 val types = list.toMutableList().also {
-                    it.add(0, ReactionHistoryRequest(noteId, null))
+                    it.add(0,
+                        ReactionHistoryRequest(
+                            noteId,
+                            null
+                        )
+                    )
                 }
                 val index = showCurrentReaction.let { type ->
 

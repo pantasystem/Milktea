@@ -24,22 +24,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import jp.panta.misskeyandroidclient.model.CreateNoteTaskExecutor
-import jp.panta.misskeyandroidclient.model.TaskState
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.streaming.stateEvent
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
@@ -64,6 +57,14 @@ import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
 import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.CreateNoteTaskExecutor
+import net.pantasystem.milktea.model.TaskState
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 @AndroidEntryPoint

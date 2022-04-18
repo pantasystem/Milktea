@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")

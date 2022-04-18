@@ -2,16 +2,12 @@ package jp.panta.misskeyandroidclient.di.module
 
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
-import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.notification.impl.InMemoryNotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.impl.MediatorNotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.impl.NotificationRepositoryImpl
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.data.infrastructure.notification.impl.MediatorNotificationDataSource
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationRepositoryImpl
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

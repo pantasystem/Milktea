@@ -11,7 +11,7 @@
 
         <variable
                 name="emoji"
-                type="jp.panta.misskeyandroidclient.model.emoji.Emoji" />
+                type="net.pantasystem.milktea.model.emoji.Emoji" />
 
     </data>
     <ImageView

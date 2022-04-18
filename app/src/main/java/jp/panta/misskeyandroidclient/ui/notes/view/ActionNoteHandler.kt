@@ -6,19 +6,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.model.confirm.ConfirmCommand
-import jp.panta.misskeyandroidclient.model.confirm.ConfirmEvent
-import jp.panta.misskeyandroidclient.model.confirm.ResultType
-import jp.panta.misskeyandroidclient.model.settings.ReactionPickerType
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.report.Report
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmEvent
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.Report
+import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
@@ -154,12 +153,12 @@ class ActionNoteHandler(
         when (it.eventType) {
             "delete_note" -> {
                 if (it.args is Note) {
-                    mNotesViewModel.removeNote(it.args.id)
+                    mNotesViewModel.removeNote((it.args as Note).id)
                 }
             }
             "delete_and_edit_note" -> {
                 if (it.args is NoteRelation) {
-                    mNotesViewModel.removeAndEditNote(it.args)
+                    mNotesViewModel.removeAndEditNote(it.args as NoteRelation)
                 }
             }
         }

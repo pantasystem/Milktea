@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSelectPageToAddBinding
-import jp.panta.misskeyandroidclient.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.SelectPageTypeToAdd
 
 /**

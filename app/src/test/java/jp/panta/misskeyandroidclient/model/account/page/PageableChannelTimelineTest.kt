@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.model.account.page
 
+import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.Pageable
 import org.junit.Assert.*
 
 import org.junit.Test

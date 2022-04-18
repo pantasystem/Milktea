@@ -8,7 +8,7 @@
 
         <variable
                 name="list"
-                type="jp.panta.misskeyandroidclient.model.list.UserList" />
+                type="net.pantasystem.milktea.model.list.UserList" />
 
         <variable
                 name="listListViewModel"

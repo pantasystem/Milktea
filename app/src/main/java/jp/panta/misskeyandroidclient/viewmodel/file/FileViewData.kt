@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.file
 
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.model.file.File
 
 class FileViewData(val file: File) {
     enum class Type{
@@ -9,9 +9,9 @@ class FileViewData(val file: File) {
     }
     val type = when{
         file.type == null -> Type.OTHER
-        file.type.startsWith("image") -> Type.IMAGE
-        file.type.startsWith("video") -> Type.VIDEO
-        file.type.startsWith("audio") -> Type.SOUND
+        file.type!!.startsWith("image") -> Type.IMAGE
+        file.type!!.startsWith("video") -> Type.VIDEO
+        file.type!!.startsWith("audio") -> Type.SOUND
         else -> Type.OTHER
     }
 

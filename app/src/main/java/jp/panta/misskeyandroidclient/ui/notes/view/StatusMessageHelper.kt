@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteRelation
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 

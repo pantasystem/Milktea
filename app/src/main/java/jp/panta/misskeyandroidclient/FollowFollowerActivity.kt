@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel

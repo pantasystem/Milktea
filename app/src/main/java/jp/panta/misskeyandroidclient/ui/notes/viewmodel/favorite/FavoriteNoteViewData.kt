@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.fevorite.Favorite
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.api.misskey.favorite.Favorite
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 
 class FavoriteNoteViewData(
     private val favorite: Favorite,

@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient
 
 import android.content.Context
@@ -15,11 +16,11 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
-import jp.panta.misskeyandroidclient.model.list.UserList
+import net.pantasystem.milktea.model.list.UserList
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
@@ -62,7 +63,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     private val accountViewModel: AccountViewModel by viewModels()
 
 
-
     @FlowPreview
     @ExperimentalCoroutinesApi
     val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
@@ -88,27 +88,30 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         mListId = listId
 
 
-        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        ActionNoteHandler(
+            this,
+            notesViewModel,
+            ViewModelProvider(this)[ConfirmViewModel::class.java]
+        ).initViewModelListener()
 
         binding.userListDetailViewPager.adapter = PagerAdapter(listId)
         binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
 
-        mUserListDetailViewModel.userList.observe(this, { ul ->
+        mUserListDetailViewModel.userList.observe(this) { ul ->
             supportActionBar?.title = ul.name
             mUserListName = ul.name
 
 
 
-            if(intent.action == ACTION_EDIT_NAME){
+            if (intent.action == ACTION_EDIT_NAME) {
                 intent.action = ACTION_SHOW
                 showEditUserListDialog()
             }
-        })
+        }
 
-        mUserListDetailViewModel.userList.observe(this, {
+        mUserListDetailViewModel.userList.observe(this) {
             invalidateOptionsMenu()
-        })
-
+        }
 
 
     }
@@ -123,9 +126,9 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         val page = account?.pages?.firstOrNull {
             (it.pageable() as? Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
         }
-        if(page == null){
+        if (page == null) {
             addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
-        }else{
+        } else {
             addToTabItem?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
         setMenuTint(menu)
@@ -133,17 +136,17 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.action_add_to_tab ->{
+        when (item.itemId) {
+            R.id.action_add_to_tab -> {
                 toggleAddToTab()
             }
-            R.id.action_update_list_user ->{
+            R.id.action_update_list_user -> {
                 showEditUserListDialog()
             }
-            android.R.id.home ->{
+            android.R.id.home -> {
                 finish()
             }
-            R.id.action_add_user ->{
+            R.id.action_add_user -> {
                 val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
                     it.userId
                 } ?: return false
@@ -157,64 +160,73 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    val requestSelectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val resultCode = result.resultCode
-        val data = result.data
-        if(resultCode == RESULT_OK){
-            val changedDiff = data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-            val added = changedDiff?.added
-            val removed = changedDiff?.removed
-            Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
-            added?.forEach{
-                mUserListDetailViewModel.pushUser(it)
-            }
-            removed?.forEach{
-                mUserListDetailViewModel.pullUser(it)
+    val requestSelectUserResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val resultCode = result.resultCode
+            val data = result.data
+            if (resultCode == RESULT_OK) {
+                val changedDiff =
+                    data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                val added = changedDiff?.added
+                val removed = changedDiff?.removed
+                Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")
+                added?.forEach {
+                    mUserListDetailViewModel.pushUser(it)
+                }
+                removed?.forEach {
+                    mUserListDetailViewModel.pullUser(it)
+                }
             }
         }
-    }
 
-    private fun showEditUserListDialog(){
-        val listId = mListId?: return
+    private fun showEditUserListDialog() {
+        val listId = mListId ?: return
         val dialog = UserListEditorDialog.newInstance(listId.userListId, mUserListName)
         dialog.show(supportFragmentManager, "")
     }
 
 
-    private fun toggleAddToTab(){
+    private fun toggleAddToTab() {
         val page = account?.pages?.firstOrNull {
             val pageable = it.pageable()
-            if(pageable is Pageable.UserListTimeline){
+            if (pageable is Pageable.UserListTimeline) {
                 pageable.listId == mListId?.userListId && mListId != null
-            }else{
+            } else {
                 false
             }
         }
-        if(page == null){
+        if (page == null) {
             accountViewModel.addPage(
-                Page(account?.accountId?: - 1, mUserListName, weight = -1, pageable = Pageable.UserListTimeline(mListId?.userListId!!))
+                Page(
+                    account?.accountId ?: -1,
+                    mUserListName,
+                    weight = -1,
+                    pageable = Pageable.UserListTimeline(
+                        mListId?.userListId!!
+                    )
+                )
             )
-        }else{
+        } else {
             accountViewModel.removePage(page)
         }
     }
 
 
-
-    inner class PagerAdapter(val listId: UserList.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class PagerAdapter(val listId: UserList.Id) :
+        FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
         override fun getCount(): Int {
             return titles.size
         }
 
         override fun getItem(position: Int): Fragment {
-            return when(position){
-                0 ->{
+            return when (position) {
+                0 -> {
                     TimelineFragment.newInstance(
                         Pageable.UserListTimeline(listId = listId.userListId)
                     )
                 }
-                1 ->{
+                1 -> {
                     UserListDetailFragment()
                 }
                 else -> throw IllegalArgumentException("max 2 page")
@@ -225,9 +237,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             return titles[position]
         }
     }
-
-
-
 
 
 }

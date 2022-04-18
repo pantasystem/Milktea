@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.util
 
-import jp.panta.misskeyandroidclient.model.Encryption
+import net.pantasystem.milktea.common.Encryption
 
-class EncryptionStub : Encryption{
+class EncryptionStub : Encryption {
     override fun decrypt(alias: String, encryptedText: String): String {
         return encryptedText
     }

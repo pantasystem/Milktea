@@ -3,24 +3,23 @@ package jp.panta.misskeyandroidclient.ui.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.FuturePagingController
-import jp.panta.misskeyandroidclient.model.PreviousPagingController
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.channel.ChannelListType
-import jp.panta.misskeyandroidclient.model.channel.ChannelPagingModel
-import jp.panta.misskeyandroidclient.model.channel.ChannelRepository
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.newPage
-import jp.panta.misskeyandroidclient.util.PageableState
+import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.ChannelRepository
 import javax.inject.Inject
 
 @HiltViewModel

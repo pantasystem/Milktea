@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 
 class EmojiElement(
     val emoji: Emoji,

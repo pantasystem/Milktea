@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentFollowFollwerBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

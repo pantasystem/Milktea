@@ -2,22 +2,22 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.misskey.v12.antenna.AntennaQuery
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.antenna.Antenna
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageableTemplate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.PageableTemplate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -109,7 +109,8 @@ class AntennaListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (paged == null) {
                 accountStore.addPage(
-                    PageableTemplate(accountStore.currentAccount!!).antenna(
+                    PageableTemplate(accountStore.currentAccount!!)
+                        .antenna(
                         antenna
                     )
                 )

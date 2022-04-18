@@ -4,16 +4,16 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.instance.MediatorFetchMeta
-import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.model.instance.FetchMeta
-import jp.panta.misskeyandroidclient.model.instance.db.InMemoryMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.db.MediatorMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.db.RoomMetaRepository
-import jp.panta.misskeyandroidclient.model.instance.remote.RemoteFetchMeta
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.model.instance.MediatorFetchMeta
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.data.infrastructure.instance.db.InMemoryMetaRepository
+import net.pantasystem.milktea.data.infrastructure.instance.db.MediatorMetaRepository
+import net.pantasystem.milktea.api.Instance.db.RoomMetaRepository
+import net.pantasystem.milktea.api.Instance.remote.RemoteFetchMeta
+import net.pantasystem.milktea.common.Logger
 import javax.inject.Singleton
 
 @Module

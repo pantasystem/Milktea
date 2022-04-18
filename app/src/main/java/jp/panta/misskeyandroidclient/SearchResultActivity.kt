@@ -16,9 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.Account
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
@@ -118,9 +118,24 @@ class SearchResultActivity : AppCompatActivity() {
         val samePage = getSamePage()
         if(samePage == null){
             val page = if(mIsTag == true){
-                Page(mAccountRelation?.accountId?: - 1, word, 0, pageable = Pageable.SearchByTag(tag = word.replace("#", "")))
+                Page(
+                    mAccountRelation?.accountId ?: -1,
+                    word,
+                    0,
+                    pageable = Pageable.SearchByTag(
+                        tag = word.replace(
+                            "#",
+                            ""
+                        )
+                    )
+                )
             }else{
-                Page(mAccountRelation?.accountId?: - 1, mSearchWord?: "", -1, pageable = Pageable.Search(word))
+                Page(
+                    mAccountRelation?.accountId ?: -1,
+                    mSearchWord ?: "",
+                    -1,
+                    pageable = Pageable.Search(word)
+                )
             }
             accountViewModel.addPage(
                 page

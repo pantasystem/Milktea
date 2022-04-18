@@ -4,12 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.databinding.ActivitySortedUsesBinding
 import jp.panta.misskeyandroidclient.ui.users.SortedUsersFragment
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.api.misskey.users.RequestUser
 
 @FlowPreview
 @ExperimentalCoroutinesApi

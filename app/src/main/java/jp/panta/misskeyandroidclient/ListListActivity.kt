@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel

@@ -14,9 +14,9 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.channel.ChannelListType
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.account.AccountStore
 
 data class ChannelTypeWithTitle(
     val type: ChannelListType,

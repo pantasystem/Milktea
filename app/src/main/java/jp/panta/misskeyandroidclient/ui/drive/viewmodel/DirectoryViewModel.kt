@@ -4,18 +4,18 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.drive.CreateFolder
-import jp.panta.misskeyandroidclient.api.misskey.drive.RequestFolder
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.CurrentAccountWatcher
-import jp.panta.misskeyandroidclient.model.drive.DriveStore
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.api.misskey.drive.CreateFolder
+import net.pantasystem.milktea.common.Encryption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.api.misskey.drive.RequestFolder
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.drive.DriveStore
 
 class DirectoryViewModel(
     private val accountWatcher: CurrentAccountWatcher,
@@ -23,13 +23,12 @@ class DirectoryViewModel(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
     val loggerFactory: Logger.Factory
-) : ViewModel(){
+) : ViewModel() {
 
 
     val foldersLiveData = MutableLiveData<List<DirectoryViewData>>()
 
     val isRefreshing = MutableLiveData(false)
-
 
 
     private var isLoading = false
@@ -38,6 +37,7 @@ class DirectoryViewModel(
     val error: StateFlow<Throwable?> = _error
 
     private val logger = loggerFactory.create("DirectoryVM")
+
     init {
         driveStore.state.map {
             it.accountId to it.path.path
@@ -49,8 +49,8 @@ class DirectoryViewModel(
 
     }
 
-    fun loadInit(){
-        if(isLoading){
+    fun loadInit() {
+        if (isLoading) {
             return
         }
         isLoading = true
@@ -60,10 +60,16 @@ class DirectoryViewModel(
             runCatching {
                 val account = accountWatcher.getAccount()
                 val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                val rawList = misskeyAPI.getFolders(RequestFolder(i = account.getI(encryption), folderId = driveStore.state.value.path.path.lastOrNull()?.id, limit = 20)).throwIfHasError().body()
+                val rawList = misskeyAPI.getFolders(
+                    RequestFolder(
+                        i = account.getI(encryption),
+                        folderId = driveStore.state.value.path.path.lastOrNull()?.id,
+                        limit = 20
+                    )
+                ).throwIfHasError().body()
                 requireNotNull(rawList)
                 require(rawList.isNotEmpty())
-                rawList.map{
+                rawList.map {
                     DirectoryViewData(it)
                 }
             }.onSuccess {
@@ -77,14 +83,14 @@ class DirectoryViewModel(
         }
     }
 
-    fun loadNext(){
-        if(isLoading){
+    fun loadNext() {
+        if (isLoading) {
             return
         }
         isLoading = true
         val beforeList = foldersLiveData.value
         val untilId = beforeList?.lastOrNull()?.id
-        if(beforeList == null || untilId == null){
+        if (beforeList == null || untilId == null) {
             isLoading = false
             return
         }
@@ -93,7 +99,12 @@ class DirectoryViewModel(
             runCatching {
                 val account = accountWatcher.getAccount()
                 val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                val request = RequestFolder(i = account.getI(encryption), folderId = driveStore.state.value.path.path.lastOrNull()?.id, limit = 20, untilId = untilId)
+                val request = RequestFolder(
+                    i = account.getI(encryption),
+                    folderId = driveStore.state.value.path.path.lastOrNull()?.id,
+                    limit = 20,
+                    untilId = untilId
+                )
 
                 misskeyAPI.getFolders(request).throwIfHasError().body()?.map {
                     DirectoryViewData(it)
@@ -101,7 +112,7 @@ class DirectoryViewModel(
 
             }.onSuccess { viewDataList ->
                 requireNotNull(viewDataList)
-                val newList = ArrayList<DirectoryViewData>(beforeList).apply{
+                val newList = ArrayList<DirectoryViewData>(beforeList).apply {
                     addAll(viewDataList)
                 }
                 foldersLiveData.postValue(newList)
@@ -113,17 +124,19 @@ class DirectoryViewModel(
 
     }
 
-    fun createFolder(folderName: String){
-        if(folderName.isNotBlank()){
+    fun createFolder(folderName: String) {
+        if (folderName.isNotBlank()) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
                     val account = accountWatcher.getAccount()
                     val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                    misskeyAPI.createFolder(CreateFolder(
-                        i = account.getI(encryption),
-                        name = folderName,
-                        parentId = driveStore.state.value.path.path.lastOrNull()?.id
-                    )).throwIfHasError().body()
+                    misskeyAPI.createFolder(
+                        CreateFolder(
+                            i = account.getI(encryption),
+                            name = folderName,
+                            parentId = driveStore.state.value.path.path.lastOrNull()?.id
+                        )
+                    ).throwIfHasError().body()
 
                 }.onFailure {
                     Log.e("FolderViewModel", "error create folder", it)

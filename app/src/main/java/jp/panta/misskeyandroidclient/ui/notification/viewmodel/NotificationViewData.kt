@@ -1,14 +1,19 @@
 package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
-import jp.panta.misskeyandroidclient.model.notification.*
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.user.User
 
-class NotificationViewData(val notification: NotificationRelation, account: Account, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) {
-    enum class Type(val default: String){
+class NotificationViewData(
+    val notification: NotificationRelation,
+    account: Account,
+    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    translationStore: NoteTranslationStore
+) {
+    enum class Type(val default: String) {
         FOLLOW("follow"),
         MENTION("mention"),
         REPLY("reply"),
@@ -22,10 +27,17 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
         UNKNOWN("unknown"),
 
     }
-    val id = notification.notification.id
-    val noteViewData: PlaneNoteViewData? = if(notification.notification is HasNote) PlaneNoteViewData(notification.note!!, account, noteCaptureAPIAdapter, translationStore) else null
 
-    val type: Type = when(notification.notification){
+    val id = notification.notification.id
+    val noteViewData: PlaneNoteViewData? =
+        if (notification.notification is HasNote) PlaneNoteViewData(
+            notification.note!!,
+            account,
+            noteCaptureAPIAdapter,
+            translationStore
+        ) else null
+
+    val type: Type = when (notification.notification) {
         is FollowNotification -> Type.FOLLOW
         is MentionNotification -> Type.MENTION
         is ReplyNotification -> Type.REPLY
@@ -45,7 +57,8 @@ class NotificationViewData(val notification: NotificationRelation, account: Acco
     val name = notification.user?.name
     val userName = notification.user?.userName
 
-    val reaction =  (notification.notification as? ReactionNotification)?.reaction
+    val reaction =
+        (notification.notification as? ReactionNotification)?.reaction
 
 
     override fun equals(other: Any?): Boolean {

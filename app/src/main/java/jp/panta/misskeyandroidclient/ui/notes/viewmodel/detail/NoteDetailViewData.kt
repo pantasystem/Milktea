@@ -1,14 +1,19 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 
 /**
  * ノートの詳細表示となる一つのオブジェクト
  * 基本的にはPlaneNoteViewDataとは変わらないが
  * ListAdapterで詳細ビューの対象か判定する
  */
-class NoteDetailViewData(note: NoteRelation, account: Account, noteCaptureAPIAdapter: NoteCaptureAPIAdapter, translationStore: NoteTranslationStore) : PlaneNoteViewData(note, account, noteCaptureAPIAdapter, translationStore)
+class NoteDetailViewData(
+    note: NoteRelation,
+    account: Account,
+    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    translationStore: NoteTranslationStore
+) : PlaneNoteViewData(note, account, noteCaptureAPIAdapter, translationStore)

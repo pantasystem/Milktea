@@ -4,18 +4,18 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.gettters.Getters
-import jp.panta.misskeyandroidclient.gettters.MessageRelationGetter
-import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
-import jp.panta.misskeyandroidclient.gettters.NotificationRelationGetter
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.group.GroupDataSource
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

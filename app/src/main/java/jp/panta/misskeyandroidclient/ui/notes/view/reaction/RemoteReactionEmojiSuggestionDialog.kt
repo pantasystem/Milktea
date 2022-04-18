@@ -13,8 +13,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogRemoteReactionEmojiSuggestionBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.RemoteReactionEmojiSuggestionViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
 
 private const val EXTRA_REACTION = "EXTRA_REACTION"
 private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"

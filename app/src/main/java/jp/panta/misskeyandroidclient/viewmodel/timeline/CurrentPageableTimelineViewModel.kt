@@ -2,10 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel.timeline
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.account.page.Pageable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -36,7 +33,8 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _currentType = MutableStateFlow<Pageable>(Pageable.HomeTimeline())
+    private val _currentType = MutableStateFlow<Pageable>(
+        Pageable.HomeTimeline())
 
     val currentType: StateFlow<Pageable> = _currentType
 

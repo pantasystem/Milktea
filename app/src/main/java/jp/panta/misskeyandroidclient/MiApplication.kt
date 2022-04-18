@@ -7,54 +7,64 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.gettters.Getters
-import jp.panta.misskeyandroidclient.model.*
-import jp.panta.misskeyandroidclient.model.account.*
-import jp.panta.misskeyandroidclient.model.drive.*
-import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
-import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.group.GroupDataSource
-import jp.panta.misskeyandroidclient.model.group.GroupRepository
-import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.instance.MetaRepository
-import jp.panta.misskeyandroidclient.model.instance.FetchMeta
-import jp.panta.misskeyandroidclient.model.instance.MetaCache
-import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
-import jp.panta.misskeyandroidclient.model.messaging.MessageRepository
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
-import jp.panta.misskeyandroidclient.model.messaging.impl.MessageDataSource
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryDataSource
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryPaginator
-import jp.panta.misskeyandroidclient.model.notes.reaction.impl.ReactionHistoryPaginatorImpl
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
-import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
-import jp.panta.misskeyandroidclient.model.notification.NotificationDataSource
-import jp.panta.misskeyandroidclient.model.notification.NotificationRepository
-import jp.panta.misskeyandroidclient.model.notification.db.UnreadNotificationDAO
-import jp.panta.misskeyandroidclient.model.settings.ColorSettingStore
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.model.settings.UrlPreviewSourceSetting
-import jp.panta.misskeyandroidclient.model.streaming.ChannelAPIMainEventDispatcherAdapter
-import jp.panta.misskeyandroidclient.model.streaming.MediatorMainEventDispatcher
-import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionRegistration
-import jp.panta.misskeyandroidclient.model.sw.register.SubscriptionUnRegistration
-import jp.panta.misskeyandroidclient.model.url.*
-import jp.panta.misskeyandroidclient.model.url.db.UrlPreviewDAO
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
-import jp.panta.misskeyandroidclient.model.users.UserRepository
-import jp.panta.misskeyandroidclient.model.users.UserRepositoryEventToFlow
-import jp.panta.misskeyandroidclient.streaming.*
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.infrastructure.*
+import net.pantasystem.milktea.data.infrastructure.drive.*
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
+import net.pantasystem.milktea.data.infrastructure.notes.*
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting
+import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
+import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
+import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
+import net.pantasystem.milktea.data.infrastructure.url.*
+import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
+import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
+import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaCache
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.messaging.MessageRepository
+import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -103,23 +113,31 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mNoteDataSource: NoteDataSource
+
     @Inject
     lateinit var mUserDataSource: UserDataSource
+
     @Inject
     lateinit var mNotificationDataSource: NotificationDataSource
+
     @Inject
     lateinit var mMessageDataSource: MessageDataSource
+
     @Inject
     lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
+
     @Inject
     lateinit var mGroupDataSource: GroupDataSource
+
     @Inject
     lateinit var mFilePropertyDataSource: FilePropertyDataSource
+
     @Inject
     lateinit var mGalleryDataSource: GalleryDataSource
 
     @Inject
     lateinit var mNoteRepository: NoteRepository
+
     @Inject
     lateinit var mUserRepository: UserRepository
 
@@ -130,6 +148,7 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+
     @Inject
     lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
 
@@ -145,6 +164,7 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mMessageRepository: MessageRepository
+
     @Inject
     lateinit var mGroupRepository: GroupRepository
 
@@ -213,7 +233,10 @@ class MiApplication : Application(), MiCore {
             getEncryption(),
             getMisskeyAPIProvider(),
             lang = Locale.getDefault().language,
-            loggerFactory
+            loggerFactory,
+            auth = BuildConfig.PUSH_TO_FCM_AUTH,
+            publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
+            endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
         )
     }
 
@@ -222,7 +245,10 @@ class MiApplication : Application(), MiCore {
             getAccountRepository(),
             getEncryption(),
             lang = Locale.getDefault().language,
-            misskeyAPIProvider = getMisskeyAPIProvider()
+            misskeyAPIProvider = getMisskeyAPIProvider(),
+            endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
+            auth = BuildConfig.PUSH_TO_FCM_AUTH,
+            publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
         )
     }
 
@@ -241,7 +267,11 @@ class MiApplication : Application(), MiCore {
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
         mUserRepositoryEventToFlow =
-            UserRepositoryEventToFlow(mUserDataSource, applicationScope, loggerFactory)
+            UserRepositoryEventToFlow(
+                mUserDataSource,
+                applicationScope,
+                loggerFactory
+            )
 
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(
@@ -377,7 +407,10 @@ class MiApplication : Application(), MiCore {
 
     override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
-    private fun getUrlPreviewStore(account: Account, isReplace: Boolean): UrlPreviewStore {
+    private fun getUrlPreviewStore(
+        account: Account,
+        isReplace: Boolean
+    ): UrlPreviewStore {
         return account.instanceDomain.let { accountUrl ->
             val url = mSettingStore.urlPreviewSetting.getSummalyUrl() ?: accountUrl
 

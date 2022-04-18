@@ -1,0 +1,827 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "786087deeceb0d1e04244116153de219",
+    "entities": [
+      {
+        "tableName": "connection_information",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`updatedAt` TEXT NOT NULL, `accountId` TEXT NOT NULL, `instanceBaseUrl` TEXT NOT NULL, `encryptedI` TEXT NOT NULL, `viaName` TEXT, `createdAt` TEXT NOT NULL, `isDirect` INTEGER NOT NULL, PRIMARY KEY(`accountId`, `encryptedI`, `instanceBaseUrl`), FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "instanceBaseUrl",
+            "columnName": "instanceBaseUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedI",
+            "columnName": "encryptedI",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "viaName",
+            "columnName": "viaName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDirect",
+            "columnName": "isDirect",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "accountId",
+            "encryptedI",
+            "instanceBaseUrl"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "Account",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "accountId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "reaction_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `reaction` TEXT NOT NULL, `instance_domain` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "reaction",
+            "columnName": "reaction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "instanceDomain",
+            "columnName": "instance_domain",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Account",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "reaction_user_setting",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`reaction` TEXT NOT NULL, `instance_domain` TEXT NOT NULL, `weight` INTEGER NOT NULL, PRIMARY KEY(`reaction`, `instance_domain`))",
+        "fields": [
+          {
+            "fieldPath": "reaction",
+            "columnName": "reaction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "instanceDomain",
+            "columnName": "instance_domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "reaction",
+            "instance_domain"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "page",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `accountId` TEXT, `title` TEXT NOT NULL, `pageNumber` INTEGER, `global_timeline_with_files` INTEGER, `global_timeline_type` TEXT, `local_timeline_with_files` INTEGER, `local_timeline_exclude_nsfw` INTEGER, `local_timeline_type` TEXT, `hybrid_timeline_withFiles` INTEGER, `hybrid_timeline_includeLocalRenotes` INTEGER, `hybrid_timeline_includeMyRenotes` INTEGER, `hybrid_timeline_includeRenotedMyRenotes` INTEGER, `hybrid_timeline_type` TEXT, `home_timeline_withFiles` INTEGER, `home_timeline_includeLocalRenotes` INTEGER, `home_timeline_includeMyRenotes` INTEGER, `home_timeline_includeRenotedMyRenotes` INTEGER, `home_timeline_type` TEXT, `user_list_timeline_listId` TEXT, `user_list_timeline_withFiles` INTEGER, `user_list_timeline_includeLocalRenotes` INTEGER, `user_list_timeline_includeMyRenotes` INTEGER, `user_list_timeline_includeRenotedMyRenotes` INTEGER, `user_list_timeline_type` TEXT, `mention_following` INTEGER, `mention_visibility` TEXT, `mention_type` TEXT, `show_noteId` TEXT, `show_type` TEXT, `tag_tag` TEXT, `tag_reply` INTEGER, `tag_renote` INTEGER, `tag_withFiles` INTEGER, `tag_poll` INTEGER, `tag_type` TEXT, `featured_offset` INTEGER, `featured_type` TEXT, `notification_following` INTEGER, `notification_markAsRead` INTEGER, `notification_type` TEXT, `user_userId` TEXT, `user_includeReplies` INTEGER, `user_includeMyRenotes` INTEGER, `user_withFiles` INTEGER, `user_type` TEXT, `search_query` TEXT, `search_host` TEXT, `search_userId` TEXT, `search_type` TEXT, `favorite_type` TEXT, `antenna_antennaId` TEXT, `antenna_type` TEXT, FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageNumber",
+            "columnName": "pageNumber",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "globalTimeline.withFiles",
+            "columnName": "global_timeline_with_files",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "globalTimeline.type",
+            "columnName": "global_timeline_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localTimeline.withFiles",
+            "columnName": "local_timeline_with_files",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localTimeline.excludeNsfw",
+            "columnName": "local_timeline_exclude_nsfw",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localTimeline.type",
+            "columnName": "local_timeline_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hybridTimeline.withFiles",
+            "columnName": "hybrid_timeline_withFiles",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hybridTimeline.includeLocalRenotes",
+            "columnName": "hybrid_timeline_includeLocalRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hybridTimeline.includeMyRenotes",
+            "columnName": "hybrid_timeline_includeMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hybridTimeline.includeRenotedMyRenotes",
+            "columnName": "hybrid_timeline_includeRenotedMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hybridTimeline.type",
+            "columnName": "hybrid_timeline_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "homeTimeline.withFiles",
+            "columnName": "home_timeline_withFiles",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "homeTimeline.includeLocalRenotes",
+            "columnName": "home_timeline_includeLocalRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "homeTimeline.includeMyRenotes",
+            "columnName": "home_timeline_includeMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "homeTimeline.includeRenotedMyRenotes",
+            "columnName": "home_timeline_includeRenotedMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "homeTimeline.type",
+            "columnName": "home_timeline_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userListTimeline.listId",
+            "columnName": "user_list_timeline_listId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userListTimeline.withFiles",
+            "columnName": "user_list_timeline_withFiles",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userListTimeline.includeLocalRenotes",
+            "columnName": "user_list_timeline_includeLocalRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userListTimeline.includeMyRenotes",
+            "columnName": "user_list_timeline_includeMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userListTimeline.includeRenotedMyRenotes",
+            "columnName": "user_list_timeline_includeRenotedMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userListTimeline.type",
+            "columnName": "user_list_timeline_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mention.following",
+            "columnName": "mention_following",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mention.visibility",
+            "columnName": "mention_visibility",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mention.type",
+            "columnName": "mention_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "show.noteId",
+            "columnName": "show_noteId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "show.type",
+            "columnName": "show_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchByTag.tag",
+            "columnName": "tag_tag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchByTag.reply",
+            "columnName": "tag_reply",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchByTag.renote",
+            "columnName": "tag_renote",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchByTag.withFiles",
+            "columnName": "tag_withFiles",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchByTag.poll",
+            "columnName": "tag_poll",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchByTag.type",
+            "columnName": "tag_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "featured.offset",
+            "columnName": "featured_offset",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "featured.type",
+            "columnName": "featured_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notification.following",
+            "columnName": "notification_following",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notification.markAsRead",
+            "columnName": "notification_markAsRead",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notification.type",
+            "columnName": "notification_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userTimeline.userId",
+            "columnName": "user_userId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userTimeline.includeReplies",
+            "columnName": "user_includeReplies",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userTimeline.includeMyRenotes",
+            "columnName": "user_includeMyRenotes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userTimeline.withFiles",
+            "columnName": "user_withFiles",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userTimeline.type",
+            "columnName": "user_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "search.query",
+            "columnName": "search_query",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "search.host",
+            "columnName": "search_host",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "search.userId",
+            "columnName": "search_userId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "search.type",
+            "columnName": "search_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "favorite.type",
+            "columnName": "favorite_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "antenna.antennaId",
+            "columnName": "antenna_antennaId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "antenna.type",
+            "columnName": "antenna_type",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "Account",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "accountId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "poll_choice",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`choice` TEXT NOT NULL, `draft_note_id` INTEGER NOT NULL, `weight` INTEGER NOT NULL, PRIMARY KEY(`choice`, `weight`, `draft_note_id`), FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "choice",
+            "columnName": "choice",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "draftNoteId",
+            "columnName": "draft_note_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "choice",
+            "weight",
+            "draft_note_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_poll_choice_draft_note_id_choice",
+            "unique": false,
+            "columnNames": [
+              "draft_note_id",
+              "choice"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_poll_choice_draft_note_id_choice` ON `${TABLE_NAME}` (`draft_note_id`, `choice`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "draft_note",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "draft_note_id"
+            ],
+            "referencedColumns": [
+              "draft_note_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "user_id",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `draft_note_id` INTEGER NOT NULL, PRIMARY KEY(`userId`, `draft_note_id`), FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "draftNoteId",
+            "columnName": "draft_note_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "userId",
+            "draft_note_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_user_id_draft_note_id",
+            "unique": false,
+            "columnNames": [
+              "draft_note_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_id_draft_note_id` ON `${TABLE_NAME}` (`draft_note_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "draft_note",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "draft_note_id"
+            ],
+            "referencedColumns": [
+              "draft_note_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "draft_file",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`file_id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL DEFAULT 'name none', `remote_file_id` TEXT, `file_path` TEXT, `is_sensitive` INTEGER, `type` TEXT, `thumbnailUrl` TEXT, `draft_note_id` INTEGER NOT NULL, `folder_id` TEXT, FOREIGN KEY(`draft_note_id`) REFERENCES `draft_note`(`draft_note_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "fileId",
+            "columnName": "file_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'name none'"
+          },
+          {
+            "fieldPath": "remoteFileId",
+            "columnName": "remote_file_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "filePath",
+            "columnName": "file_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isSensitive",
+            "columnName": "is_sensitive",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnailUrl",
+            "columnName": "thumbnailUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "draftNoteId",
+            "columnName": "draft_note_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "folderId",
+            "columnName": "folder_id",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "file_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_draft_file_draft_note_id",
+            "unique": false,
+            "columnNames": [
+              "draft_note_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_file_draft_note_id` ON `${TABLE_NAME}` (`draft_note_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "draft_note",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "draft_note_id"
+            ],
+            "referencedColumns": [
+              "draft_note_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "draft_note",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draft_note_id` INTEGER PRIMARY KEY AUTOINCREMENT, `accountId` TEXT NOT NULL, `visibility` TEXT NOT NULL, `text` TEXT, `cw` TEXT, `viaMobile` INTEGER, `localOnly` INTEGER, `noExtractMentions` INTEGER, `noExtractHashtags` INTEGER, `noExtractEmojis` INTEGER, `replyId` TEXT, `renoteId` TEXT, `multiple` INTEGER, `expiresAt` INTEGER, FOREIGN KEY(`accountId`) REFERENCES `Account`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "draftNoteId",
+            "columnName": "draft_note_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "visibility",
+            "columnName": "visibility",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cw",
+            "columnName": "cw",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "viaMobile",
+            "columnName": "viaMobile",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localOnly",
+            "columnName": "localOnly",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noExtractMentions",
+            "columnName": "noExtractMentions",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noExtractHashtags",
+            "columnName": "noExtractHashtags",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noExtractEmojis",
+            "columnName": "noExtractEmojis",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "replyId",
+            "columnName": "replyId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "renoteId",
+            "columnName": "renoteId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "poll.multiple",
+            "columnName": "multiple",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "poll.expiresAt",
+            "columnName": "expiresAt",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "draft_note_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_draft_note_accountId_text",
+            "unique": false,
+            "columnNames": [
+              "accountId",
+              "text"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_note_accountId_text` ON `${TABLE_NAME}` (`accountId`, `text`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Account",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "accountId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '786087deeceb0d1e04244116153de219')"
+    ]
+  }
+}

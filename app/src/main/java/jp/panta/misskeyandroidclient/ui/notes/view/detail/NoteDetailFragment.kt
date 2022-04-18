@@ -18,9 +18,9 @@ import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModelFactory
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.notes.Note
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.*
 

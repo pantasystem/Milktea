@@ -12,7 +12,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessageBinding
-import jp.panta.misskeyandroidclient.model.messaging.MessagingId
+import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewData
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel

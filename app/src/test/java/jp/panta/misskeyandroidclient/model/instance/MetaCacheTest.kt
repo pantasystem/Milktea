@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.instance
 
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaCache
 import org.junit.Assert.*
 import org.junit.Before
 

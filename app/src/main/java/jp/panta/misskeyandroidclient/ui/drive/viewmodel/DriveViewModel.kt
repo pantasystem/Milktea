@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
 import androidx.lifecycle.ViewModel
-import jp.panta.misskeyandroidclient.model.drive.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.model.drive.*
 import java.io.Serializable
 
 data class DriveSelectableMode(
@@ -15,18 +15,19 @@ class DriveViewModel(
     val selectable: DriveSelectableMode?
 ) : ViewModel(){
 
-    val driveStore: DriveStore = DriveStore(
-        DriveState(
-            accountId = selectable?.accountId,
-            path = DirectoryPath(emptyList()),
-            selectedFilePropertyIds = selectable?.let {
-                SelectedFilePropertyIds(
-                    selectableMaxCount = it.selectableMaxSize,
-                    selectedIds = it.selectedFilePropertyIds.toSet()
-                )
-            }
+    val driveStore: DriveStore =
+        DriveStore(
+            DriveState(
+                accountId = selectable?.accountId,
+                path = DirectoryPath(emptyList()),
+                selectedFilePropertyIds = selectable?.let {
+                    SelectedFilePropertyIds(
+                        selectableMaxCount = it.selectableMaxSize,
+                        selectedIds = it.selectedFilePropertyIds.toSet()
+                    )
+                }
+            )
         )
-    )
 
 
 

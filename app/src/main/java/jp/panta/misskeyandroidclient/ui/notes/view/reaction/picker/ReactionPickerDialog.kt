@@ -15,7 +15,7 @@ import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
-import jp.panta.misskeyandroidclient.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
@@ -28,13 +28,20 @@ import java.io.Serializable
 @AndroidEntryPoint
 class SearchAndSelectUserActivity : AppCompatActivity() {
 
-    companion object{
-        private const val EXTRA_SELECTABLE_MAXIMUM_SIZE = "jp.panta.misskeyandroidclient.EXTRA_SELECTABLE_MAXIMUM_SIZE"
-        private const val EXTRA_SELECTED_USER_IDS = "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_IDS"
+    companion object {
+        private const val EXTRA_SELECTABLE_MAXIMUM_SIZE =
+            "jp.panta.misskeyandroidclient.EXTRA_SELECTABLE_MAXIMUM_SIZE"
+        private const val EXTRA_SELECTED_USER_IDS =
+            "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_IDS"
 
-        const val EXTRA_SELECTED_USER_CHANGED_DIFF = "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_CHANGED_DIFF"
+        const val EXTRA_SELECTED_USER_CHANGED_DIFF =
+            "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_CHANGED_DIFF"
 
-        fun newIntent(context: Context, selectableMaximumSize: Int = Int.MAX_VALUE, selectedUserIds: List<User.Id> = emptyList()) : Intent{
+        fun newIntent(
+            context: Context,
+            selectableMaximumSize: Int = Int.MAX_VALUE,
+            selectedUserIds: List<User.Id> = emptyList()
+        ): Intent {
             return Intent(context, SearchAndSelectUserActivity::class.java).apply {
                 putExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, selectableMaximumSize)
                 putExtra(EXTRA_SELECTED_USER_IDS, ArrayList<Serializable>(selectedUserIds))
@@ -54,8 +61,11 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        val activitySearchAndSelectUserBinding
-                = DataBindingUtil.setContentView<ActivitySearchAndSelectUserBinding>(this, R.layout.activity_search_and_select_user)
+        val activitySearchAndSelectUserBinding =
+            DataBindingUtil.setContentView<ActivitySearchAndSelectUserBinding>(
+                this,
+                R.layout.activity_search_and_select_user
+            )
 
         setSupportActionBar(activitySearchAndSelectUserBinding.searchAndSelectUsersToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -76,7 +86,15 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
 
         val selectedUserViewModel =
-            ViewModelProvider(this, SelectedUserViewModel.Factory(miCore, selectableMaximumSize, selectedUserIdList, null))[SelectedUserViewModel::class.java]
+            ViewModelProvider(
+                this,
+                SelectedUserViewModel.Factory(
+                    miCore,
+                    selectableMaximumSize,
+                    selectedUserIdList,
+                    null
+                )
+            )[SelectedUserViewModel::class.java]
         val selectableUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
 
 
@@ -87,23 +105,26 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         activitySearchAndSelectUserBinding.lifecycleOwner = this
 
         val selectedUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
-        activitySearchAndSelectUserBinding.selectedUsersView.selectedUserViewModel = selectedUserViewModel
-        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter = selectedUsersAdapter
-        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager = LinearLayoutManager(this)
+        activitySearchAndSelectUserBinding.selectedUsersView.selectedUserViewModel =
+            selectedUserViewModel
+        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter =
+            selectedUsersAdapter
+        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager =
+            LinearLayoutManager(this)
 
-        searchUserViewModel.users.observe(this, {
+        searchUserViewModel.users.observe(this) {
             selectableUsersAdapter.submitList(it)
-        })
+        }
 
-        selectedUserViewModel.selectedUsers.observe(this, {
+        selectedUserViewModel.selectedUsers.observe(this) {
             selectedUsersAdapter.submitList(it)
-        })
+        }
         mSelectedUserViewModel = selectedUserViewModel
 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home -> setResultFinish()
         }
         return super.onOptionsItemSelected(item)
@@ -114,10 +135,10 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     }
 
 
-    private fun setResultFinish(){
+    private fun setResultFinish() {
         val selectedDiff = mSelectedUserViewModel?.getSelectedUserIdsChangedDiff()
 
-        if(selectedDiff == null){
+        if (selectedDiff == null) {
             setResult(Activity.RESULT_CANCELED)
             finish()
             return

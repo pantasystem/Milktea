@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionHistoryListBinding
-import jp.panta.misskeyandroidclient.model.notes.Note
+import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.users.SimpleUserListAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryViewModel

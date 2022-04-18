@@ -13,7 +13,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData

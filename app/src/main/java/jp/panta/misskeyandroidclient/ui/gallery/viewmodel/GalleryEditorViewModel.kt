@@ -4,22 +4,22 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.CreateGalleryTaskExecutor
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.drive.DriveFileRepository
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.gallery.CreateGalleryPost
-import jp.panta.misskeyandroidclient.model.gallery.GalleryPost
-import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.toTask
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.gallery.CreateGalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.model.gallery.toTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
 import java.io.Serializable
 
 
@@ -79,7 +79,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
     private suspend fun fetchWithApply(postId: GalleryPost.Id) {
         val galleryPost = galleryRepository.find(postId)
         _title.postValue(galleryPost.title)
-        _description.postValue(galleryPost.description)
+        _description.postValue(galleryPost.description ?: "")
         val files = filePropertyDataSource.findIn(galleryPost.fileIds)
 
         _pickedImages.postValue(
@@ -164,7 +164,7 @@ class GalleryEditorViewModel @AssistedInject constructor(
 
     private var _accountId: Long? = null
     private val _accountLock = Mutex()
-    private suspend fun getAccount() : Account{
+    private suspend fun getAccount() : Account {
         _accountLock.withLock {
             if(_accountId == null) {
                 return accountRepository.getCurrentAccount().also {

@@ -4,10 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.gallery.GalleryDataSource
-import jp.panta.misskeyandroidclient.model.gallery.GalleryRepository
-import jp.panta.misskeyandroidclient.model.gallery.impl.GalleryRepositoryImpl
-import jp.panta.misskeyandroidclient.model.gallery.impl.InMemoryGalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryRepository
+import net.pantasystem.milktea.data.infrastructure.gallery.impl.GalleryRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.gallery.impl.InMemoryGalleryDataSource
 import javax.inject.Singleton
 
 @Module

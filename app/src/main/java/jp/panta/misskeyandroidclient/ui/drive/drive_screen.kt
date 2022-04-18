@@ -21,7 +21,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.PathViewData
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel

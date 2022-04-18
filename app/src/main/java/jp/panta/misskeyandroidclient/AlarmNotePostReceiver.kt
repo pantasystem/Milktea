@@ -4,18 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.task
-import jp.panta.misskeyandroidclient.model.notes.toCreateNote
-import jp.panta.misskeyandroidclient.model.notes.toNoteEditingState
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.notes.toCreateNote
+import net.pantasystem.milktea.model.notes.toNoteEditingState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 @AndroidEntryPoint
 class AlarmNotePostReceiver : BroadcastReceiver() {

@@ -1,13 +1,14 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.Socket
-import jp.panta.misskeyandroidclient.streaming.network.SocketImpl
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.data.streaming.network.SocketImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import okhttp3.OkHttpClient
 import org.junit.Assert
 import org.junit.Test

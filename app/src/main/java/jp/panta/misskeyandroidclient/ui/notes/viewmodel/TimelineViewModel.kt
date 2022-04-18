@@ -2,21 +2,23 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.settings.SettingStore
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
-import jp.panta.misskeyandroidclient.streaming.channel.connectUserTimeline
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite.FavoriteNotePagingStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.data.infrastructure.notes.*
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite.FavoriteNotePagingStore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 

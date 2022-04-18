@@ -3,21 +3,20 @@ package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationDTO
-import jp.panta.misskeyandroidclient.api.misskey.notification.NotificationRequest
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.notification.Notification
-import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
-import jp.panta.misskeyandroidclient.model.notification.ReceiveFollowRequestNotification
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationRelation
+import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import java.util.*
+import net.pantasystem.milktea.api.misskey.throwIfHasError
 import kotlin.collections.ArrayList
 
 @ExperimentalCoroutinesApi

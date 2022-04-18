@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemPageSettingBinding
-import jp.panta.misskeyandroidclient.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Page
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 
 class PagesAdapter(private val pageSettingViewModel: PageSettingViewModel) : ListAdapter<Page, PagesAdapter.VH>(ItemDiffUtil()){

@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.settings.viewmodel.page
 
-import jp.panta.misskeyandroidclient.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Page
 
 interface PageSettingAction {
 

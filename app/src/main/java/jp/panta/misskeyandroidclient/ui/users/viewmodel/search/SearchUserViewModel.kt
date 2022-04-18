@@ -2,19 +2,19 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.users.UserRepository
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
-import jp.panta.misskeyandroidclient.util.asLoadingStateFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.user.UserRepository
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -29,6 +29,7 @@ data class SearchUser(
             .find()
 
 }
+
 /**
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
  * SelectedUserViewModelに分離する予定
@@ -41,7 +42,7 @@ class SearchUserViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     private val miCore: MiCore,
-) : ViewModel(){
+) : ViewModel() {
 
     private val logger = loggerFactory.create("SearchUserViewModel")
 
@@ -83,7 +84,11 @@ class SearchUserViewModel @Inject constructor(
         .catch { error ->
             logger.info("ユーザー検索処理に失敗しました", e = error)
         }
-        .stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(StateContent.NotExist()))
+        .stateIn(
+            viewModelScope, SharingStarted.Lazily, State.Fixed(
+                StateContent.NotExist()
+            )
+        )
 
     val isLoading = searchState.map {
         it is State.Loading
@@ -108,8 +113,8 @@ class SearchUserViewModel @Inject constructor(
         }
     }
 
-    fun search(){
-        val userName = this.userName.value?: return
+    fun search() {
+        val userName = this.userName.value ?: return
         val host = this.host.value
 
         val request = SearchUser(

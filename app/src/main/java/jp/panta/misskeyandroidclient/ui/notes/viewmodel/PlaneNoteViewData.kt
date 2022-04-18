@@ -4,18 +4,19 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
-import jp.panta.misskeyandroidclient.model.url.UrlPreview
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.data.infrastructure.notes.*
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.onEach
-import java.util.*
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.user.User
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -93,7 +94,7 @@ open class PlaneNoteViewData (
     val urls = textNode?.getUrls()
 
 
-    val translateState = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
+    val translateState: LiveData<State<Translation?>?> = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
 
     var emojis = toShowNote.note.emojis?: emptyList()
 

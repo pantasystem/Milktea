@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.model.account.page.Pageable
 
 interface NotePagedStore {
     //val timelineRequestBase: NoteRequest.Setting

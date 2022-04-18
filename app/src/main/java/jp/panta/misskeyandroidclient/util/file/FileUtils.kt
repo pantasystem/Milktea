@@ -4,8 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
-import jp.panta.misskeyandroidclient.model.file.AppFile
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.File
 import java.lang.IllegalArgumentException
 
 fun Uri.toAppFile(context: Context): AppFile.Local {
@@ -29,7 +29,7 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
         folderId = null
     )
 }
-fun Uri.toFile(context: Context): File{
+fun Uri.toFile(context: Context): File {
     val fileName = try{
         context.getFileName(this)
     }catch(e: Exception){
@@ -42,9 +42,9 @@ fun Uri.toFile(context: Context): File{
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
     return File(
-        fileName?: "name none",
+        fileName ?: "name none",
         this.toString(),
-        type  = mimeType,
+        type = mimeType,
         remoteFileId = null,
         localFileId = null,
         thumbnailUrl = thumbnail,

@@ -3,23 +3,24 @@ package jp.panta.misskeyandroidclient.ui.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.mastodon.MastodonAPIProvider
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.misskey.auth.UserKey
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.model.account.newAccount
-import jp.panta.misskeyandroidclient.model.auth.Authorization
-import jp.panta.misskeyandroidclient.model.auth.custom.AccessToken
-import jp.panta.misskeyandroidclient.model.auth.custom.toModel
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.auth.UserKey
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
+import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.api.misskey.auth.createObtainToken
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.infrastructure.account.newAccount
+import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.model.user.User
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
@@ -29,7 +30,7 @@ class AuthViewModel @Inject constructor(
     private val miCore: MiCore,
     private val mastodonAPIProvider: MastodonAPIProvider,
     loggerFactory: Logger.Factory
-) : ViewModel(){
+) : ViewModel() {
     private val logger = loggerFactory.create("AuthViewModel")
 
     val error = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
@@ -41,23 +42,28 @@ class AuthViewModel @Inject constructor(
         authorization.flatMapLatest { a ->
             (0..Int.MAX_VALUE).asFlow().map {
                 delay(4000)
-                if(a is Authorization.Waiting4UserAuthorization.Misskey) {
+                if (a is Authorization.Waiting4UserAuthorization.Misskey) {
                     try {
                         val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
-                            .getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
+                            .getAccessToken(
+                                UserKey(
+                                    appSecret = a.appSecret,
+                                    a.session.token
+                                )
+                            )
                             .throwIfHasError()
                             .body()
-                                ?: throw IllegalStateException("response bodyがありません。")
+                            ?: throw IllegalStateException("response bodyがありません。")
 
                         val authenticated = Authorization.Approved(
                             a.instanceBaseURL,
                             accessToken = token.toModel(a.appSecret)
                         )
                         State.Fixed(StateContent.Exist(authenticated))
-                    }catch (e: Throwable) {
+                    } catch (e: Throwable) {
                         State.Error(StateContent.NotExist(), e)
                     }
-                }else{
+                } else {
                     State.Fixed(StateContent.NotExist())
                 }
             }
@@ -79,9 +85,15 @@ class AuthViewModel @Inject constructor(
             runCatching {
                 when (a) {
                     is Authorization.Waiting4UserAuthorization.Misskey -> {
-                        val accessToken = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(UserKey(appSecret = a.appSecret, a.session.token))
-                            .throwIfHasError().body()
-                            ?: throw IllegalStateException("response bodyがありません。")
+                        val accessToken =
+                            MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                                UserKey(
+                                    appSecret = a.appSecret,
+                                    a.session.token
+                                )
+                            )
+                                .throwIfHasError().body()
+                                ?: throw IllegalStateException("response bodyがありません。")
                         accessToken.toModel(a.appSecret)
                     }
                     is Authorization.Waiting4UserAuthorization.Mastodon -> {
@@ -137,12 +149,15 @@ class AuthViewModel @Inject constructor(
                     a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption()),
                     false
                 )
-                val user = when(a.accessToken) {
+                val user = when (a.accessToken) {
                     is AccessToken.Mastodon -> {
-                        a.accessToken.account.toModel(account)
+                        (a.accessToken as AccessToken.Mastodon).account.toModel(account)
                     }
                     is AccessToken.Misskey -> {
-                        a.accessToken.user.toUser(account, true) as User.Detail
+                        (a.accessToken as AccessToken.Misskey).user.toUser(
+                            account,
+                            true
+                        ) as User.Detail
                     }
                 }
                 miCore.getUserDataSource().add(user)

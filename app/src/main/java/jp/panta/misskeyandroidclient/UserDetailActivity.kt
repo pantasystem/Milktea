@@ -12,13 +12,12 @@ import androidx.activity.viewModels
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
@@ -27,11 +26,6 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import java.lang.IllegalArgumentException
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.users.User
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
@@ -41,6 +35,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 
@@ -278,8 +277,8 @@ class UserDetailActivity : AppCompatActivity() {
         val unmute = menu.findItem(R.id.unmute)
         val report = menu.findItem(R.id.report_user)
         mute?.isVisible = !(state?.isMuting ?: false)
-        block?.isVisible = !(state?.isBlocking?: false)
-        unblock?.isVisible = (state?.isBlocking?: false)
+        block?.isVisible = !(state?.isBlocking ?: false)
+        unblock?.isVisible = (state?.isBlocking ?: false)
         unmute?.isVisible = (state?.isMuting ?: false)
         if (mViewModel.isMine.value == true) {
             block?.isVisible = false
@@ -408,7 +407,9 @@ class UserDetailActivity : AppCompatActivity() {
                     accountStore.currentAccountId ?: -1,
                     title = user.getDisplayUserName(),
                     weight = -1,
-                    pageable = Pageable.UserTimeline(userId = user.id.id)
+                    pageable = Pageable.UserTimeline(
+                        userId = user.id.id
+                    )
                 )
             )
 

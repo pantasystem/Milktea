@@ -3,16 +3,16 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.file.File
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 class DraftNotesViewModel(
     val draftNoteDao: DraftNoteDao,
@@ -83,7 +83,7 @@ class DraftNotesViewModel(
 
             viewModelScope.launch(Dispatchers.IO){
                 try{
-                    draftNoteDao.deleteFile(targetNote.draftNoteId!!, file.localFileId)
+                    draftNoteDao.deleteFile(targetNote.draftNoteId!!, file.localFileId!!)
 
                     loadDraftNotes()
                 }catch(e: Exception){

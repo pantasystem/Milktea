@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.api.misskey.users.RequestUser
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.model.notes.getNoteDataSourceAdder
+import jp.panta.misskeyandroidclient.di.module.getNoteDataSourceAdder
+import net.pantasystem.milktea.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.data.infrastructure.toUser
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
@@ -17,14 +17,18 @@ class SortedUsersViewModel(
     val miCore: MiCore,
     type: Type?,
     orderBy: UserRequestConditions?
-) : ViewModel(){
-    private val orderBy: UserRequestConditions = type?.conditions?: orderBy!!
+) : ViewModel() {
+    private val orderBy: UserRequestConditions = type?.conditions ?: orderBy!!
 
     val logger = miCore.loggerFactory.create("SortedUsersViewModel")
 
     val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
 
-    class Factory(val miCore: MiCore, val type: Type?, private val orderBy: UserRequestConditions?) : ViewModelProvider.Factory{
+    class Factory(
+        val miCore: MiCore,
+        val type: Type?,
+        private val orderBy: UserRequestConditions?
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SortedUsersViewModel(
                 miCore,
@@ -38,7 +42,7 @@ class SortedUsersViewModel(
         val origin: RequestUser.Origin?,
         val sort: String?,
         val state: RequestUser.State?
-    ): Serializable{
+    ) : Serializable {
         fun toRequestUser(i: String): RequestUser {
             return RequestUser(
                 i = i,
@@ -49,7 +53,7 @@ class SortedUsersViewModel(
         }
     }
 
-    enum class Type(val conditions: UserRequestConditions){
+    enum class Type(val conditions: UserRequestConditions) {
         TRENDING_USER(
             UserRequestConditions(
                 origin = RequestUser.Origin.LOCAL,
@@ -97,9 +101,9 @@ class SortedUsersViewModel(
     }
 
 
-    val users = object : MediatorLiveData<List<UserViewData>>(){
+    val users = object : MediatorLiveData<List<UserViewData>>() {
 
-    }.apply{
+    }.apply {
         miCore.getAccountStore().observeCurrentAccount.onEach {
             loadUsers()
         }.launchIn(viewModelScope + Dispatchers.Main)
@@ -107,31 +111,34 @@ class SortedUsersViewModel(
 
     val isRefreshing = MutableLiveData<Boolean>()
 
-    fun loadUsers(){
+    fun loadUsers() {
 
         val account = miCore.getAccountStore().currentAccount
         val i = account?.getI(miCore.getEncryption())
 
-        if(i == null){
+        if (i == null) {
             isRefreshing.value = false
             return
-        }else{
+        } else {
             isRefreshing.value = true
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { miCore.getMisskeyAPIProvider().get(account).getUsers(orderBy.toRequestUser(i)).body() }
+            runCatching {
+                miCore.getMisskeyAPIProvider().get(account).getUsers(orderBy.toRequestUser(i))
+                    .body()
+            }
                 .map {
-                    it?.map{ dto ->
+                    it?.map { dto ->
                         dto.pinnedNotes?.map { noteDTO ->
                             noteDataSourceAdder.addNoteDtoToDataSource(account, noteDTO)
                         }
-                        dto.toUser(account, true).also{ u ->
+                        dto.toUser(account, true).also { u ->
                             miCore.getUserDataSource().add(u)
                         }
-                    }?.map{ u->
+                    }?.map { u ->
                         UserViewData(u, miCore, viewModelScope, Dispatchers.IO)
-                    }?: emptyList()
+                    } ?: emptyList()
                 }.onFailure { t ->
                     logger.error("ユーザーを取得しようとしたところエラーが発生しました", t)
                 }.onSuccess {

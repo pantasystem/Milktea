@@ -5,10 +5,8 @@ import android.util.TypedValue
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import jp.panta.misskeyandroidclient.util.getPreferenceName
+import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.data.infrastructure.KeyStore
 
 fun AppCompatActivity.setTheme(){
     val preference = this.getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)

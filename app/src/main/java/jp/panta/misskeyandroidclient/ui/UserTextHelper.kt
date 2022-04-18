@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 
 object UserTextHelper{

@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.media
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.model.file.File
 
 class MediaViewData(files: List<File>) {
 

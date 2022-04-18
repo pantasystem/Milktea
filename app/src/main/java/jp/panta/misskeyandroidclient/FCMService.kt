@@ -15,12 +15,11 @@ import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notification.PushNotification
-import jp.panta.misskeyandroidclient.model.notification.toPushNotification
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notification.PushNotification
+import net.pantasystem.milktea.model.notification.toPushNotification
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

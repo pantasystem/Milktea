@@ -2,33 +2,29 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.api.misskey.groups.toGroup
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.api.misskey.users.toUser
-import jp.panta.misskeyandroidclient.gettters.Getters
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.group.GroupDataSource
-import jp.panta.misskeyandroidclient.model.group.GroupRepository
-import jp.panta.misskeyandroidclient.model.messaging.MessageObserver
-import jp.panta.misskeyandroidclient.model.messaging.RequestMessageHistory
-import jp.panta.misskeyandroidclient.model.messaging.UnReadMessages
-import jp.panta.misskeyandroidclient.model.messaging.toHistory
-import jp.panta.misskeyandroidclient.model.users.UserDataSource
-import jp.panta.misskeyandroidclient.model.users.UserRepository
-import jp.panta.misskeyandroidclient.util.State
-import jp.panta.misskeyandroidclient.util.StateContent
-import jp.panta.misskeyandroidclient.util.asLoadingStateFlow
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.toGroup
+import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.messaging.RequestMessageHistory
+import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.messaging.toHistory
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -138,8 +134,11 @@ class MessageHistoryViewModel @Inject constructor(
 
     private suspend fun fetchHistory(isGroup: Boolean, account: Account): List<HistoryViewData> {
         logger.debug("fetchHistory")
-        val request =
-            RequestMessageHistory(i = account.getI(encryption), group = isGroup, limit = 100)
+        val request = RequestMessageHistory(
+                i = account.getI(
+                    encryption
+                ), group = isGroup, limit = 100
+            )
 
         return runCatching {
             val res = getMisskeyAPI(account).getMessageHistory(request)

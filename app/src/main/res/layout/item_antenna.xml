@@ -6,7 +6,7 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
         <variable
                 name="antenna"
-                type="jp.panta.misskeyandroidclient.model.antenna.Antenna" />
+                type="net.pantasystem.milktea.model.antenna.Antenna" />
         <variable
                 name="antennaListViewModel"
                 type="jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel" />

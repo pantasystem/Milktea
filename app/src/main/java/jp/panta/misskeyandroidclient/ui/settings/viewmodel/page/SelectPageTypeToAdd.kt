@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.settings.viewmodel.page
 
-import jp.panta.misskeyandroidclient.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.PageType
 
 interface SelectPageTypeToAdd {
 

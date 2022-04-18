@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.api.mastodon.emojis
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import org.junit.Assert.*
 import org.junit.Test
 

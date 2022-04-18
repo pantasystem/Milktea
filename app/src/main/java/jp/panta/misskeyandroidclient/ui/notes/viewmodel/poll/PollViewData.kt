@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Poll
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import java.lang.IndexOutOfBoundsException
 

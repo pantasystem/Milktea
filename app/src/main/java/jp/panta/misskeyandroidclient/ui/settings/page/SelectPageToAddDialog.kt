@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.account.page.PageType
-import jp.panta.misskeyandroidclient.api.misskey.v12.MisskeyAPIV12
-import jp.panta.misskeyandroidclient.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.DialogSelectPageToAddBinding
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.account.page.galleryTypes
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.galleryTypes
 import javax.inject.Inject
 
 /**
@@ -36,9 +36,9 @@ class SelectPageToAddDialog : BottomSheetDialogFragment(){
         val miCore = view.context.applicationContext as MiCore
 
         val viewModel = ViewModelProvider(requireActivity())[PageSettingViewModel::class.java]
-        viewModel.pageAddedEvent.observe(requireActivity(), {
+        viewModel.pageAddedEvent.observe(requireActivity()) {
             dismiss()
-        })
+        }
 
         var pageTypeList = PageType.values().toList().toMutableList()
         val api = miCore.getMisskeyAPIProvider().get(accountStore.state.value.currentAccount!!)

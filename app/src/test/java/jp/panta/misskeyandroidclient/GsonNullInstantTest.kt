@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient
 
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.common.GsonFactory
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import org.junit.Test
 
 class GsonNullInstantTest {

@@ -6,13 +6,12 @@ import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
-import jp.panta.misskeyandroidclient.model.notes.CanLocalOnly
-import jp.panta.misskeyandroidclient.model.notes.Visibility
+import net.pantasystem.milktea.model.notes.CanLocalOnly
+import net.pantasystem.milktea.model.notes.Visibility
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import java.util.*
 
@@ -64,7 +63,12 @@ class VisibilitySelectionDialog : AppCompatDialogFragment(){
                         else -> "public"
                     }
                 val localOnly = viewModel.isLocalOnly.value
-                viewModel.setVisibility(Visibility(type, localOnly))
+                viewModel.setVisibility(
+                    Visibility(
+                        type,
+                        localOnly
+                    )
+                )
 
             }
             .setView(view)

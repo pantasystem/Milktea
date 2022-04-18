@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.drive
 
 import junit.framework.TestCase
+import net.pantasystem.milktea.model.drive.Directory
+import net.pantasystem.milktea.model.drive.DirectoryPath
 
 class DirectoryPathTest : TestCase() {
 

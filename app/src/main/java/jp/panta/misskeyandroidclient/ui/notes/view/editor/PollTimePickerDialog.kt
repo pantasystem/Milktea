@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.model.notes.PollExpiresAt
+import net.pantasystem.milktea.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import kotlinx.datetime.Instant
 import java.util.*

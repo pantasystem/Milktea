@@ -3,16 +3,16 @@
     <data>
         <variable
                 name="translationState"
-                type="State&lt;Translation>" />
+                type="net.pantasystem.milktea.common.State&lt;net.pantasystem.milktea.model.notes.Translation>" />
         <variable
                 name="emojis"
-                type="List&lt;Emoji>" />
+                type="List&lt;net.pantasystem.milktea.model.emoji.Emoji>" />
         <import type="android.view.View" />
-        <import type="jp.panta.misskeyandroidclient.util.State" />
-        <import type="jp.panta.misskeyandroidclient.model.notes.Translation" />
-        <import type="jp.panta.misskeyandroidclient.util.StateContent"/>
+        <import type="net.pantasystem.milktea.common.State" />
+        <import type="net.pantasystem.milktea.model.notes.Translation" />
+        <import type="net.pantasystem.milktea.common.StateContent"/>
         <import type="java.util.List" />
-        <import type="jp.panta.misskeyandroidclient.model.emoji.Emoji" />
+        <import type="net.pantasystem.milktea.model.emoji.Emoji" />
     </data>
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"

@@ -13,15 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi

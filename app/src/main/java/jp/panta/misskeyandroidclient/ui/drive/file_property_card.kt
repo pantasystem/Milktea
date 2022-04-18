@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import jp.panta.misskeyandroidclient.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.components.SensitiveIcon
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 

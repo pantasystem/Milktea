@@ -10,7 +10,7 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentImageBinding
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.model.file.File
 
 class ImageFragment : Fragment(R.layout.fragment_image){
 

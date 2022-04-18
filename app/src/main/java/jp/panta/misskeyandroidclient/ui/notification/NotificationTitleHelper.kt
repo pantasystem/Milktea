@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.notification
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.notification.NotificationRelation
-import jp.panta.misskeyandroidclient.model.notification.PollEndedNotification
+import net.pantasystem.milktea.model.notification.NotificationRelation
+import net.pantasystem.milktea.model.notification.PollEndedNotification
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 
 object NotificationTitleHelper {

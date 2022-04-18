@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.ui
 
 import androidx.fragment.app.Fragment
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment

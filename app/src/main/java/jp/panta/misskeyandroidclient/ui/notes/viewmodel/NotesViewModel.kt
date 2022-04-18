@@ -5,28 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteRequest
-import jp.panta.misskeyandroidclient.api.misskey.notes.NoteState
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.notes.*
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNote
-import jp.panta.misskeyandroidclient.model.notes.draft.DraftNoteDao
-import jp.panta.misskeyandroidclient.model.notes.draft.toDraftNote
-import jp.panta.misskeyandroidclient.model.notes.poll.Poll
-import jp.panta.misskeyandroidclient.model.notes.poll.Vote
-import jp.panta.misskeyandroidclient.model.notes.reaction.CreateReaction
-import jp.panta.misskeyandroidclient.model.notes.reaction.Reaction
-import jp.panta.misskeyandroidclient.model.notes.reaction.ReactionHistoryRequest
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistory
-import jp.panta.misskeyandroidclient.model.notes.reaction.history.ReactionHistoryDao
-import jp.panta.misskeyandroidclient.model.users.User
-import jp.panta.misskeyandroidclient.model.users.report.Report
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.model.user.report.Report
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
@@ -34,6 +17,23 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.api.misskey.notes.NoteState
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.toDraftNote
+import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Vote
+import net.pantasystem.milktea.model.notes.reaction.CreateReaction
+import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 
@@ -127,7 +127,8 @@ class NotesViewModel @Inject constructor(
 
     fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
         noteId?.let {
-            showReactionHistoryEvent.event = ReactionHistoryRequest(noteId, type)
+            showReactionHistoryEvent.event =
+                ReactionHistoryRequest(noteId, type)
         }
     }
 

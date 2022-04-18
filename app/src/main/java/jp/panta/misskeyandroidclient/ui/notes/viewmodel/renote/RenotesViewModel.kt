@@ -3,20 +3,20 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.gettters.NoteRelationGetter
-import jp.panta.misskeyandroidclient.model.notes.Note
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.model.notes.renote.Renote
-import jp.panta.misskeyandroidclient.model.notes.renote.RenotesPagingService
-import jp.panta.misskeyandroidclient.model.notes.renote.createRenotesPagingService
-import jp.panta.misskeyandroidclient.util.PageableState
+import jp.panta.misskeyandroidclient.di.module.createRenotesPagingService
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.data.infrastructure.notes.renote.Renote
+import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
 
 class RenotesViewModel(
     private val renotesPagingService: RenotesPagingService,

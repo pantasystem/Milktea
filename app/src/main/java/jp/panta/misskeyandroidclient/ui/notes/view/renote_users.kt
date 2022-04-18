@@ -9,19 +9,19 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.asLiveData
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteRelation
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import androidx.lifecycle.asLiveData
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.notes.NoteRelation
 
 
 @ExperimentalCoroutinesApi
@@ -32,7 +32,8 @@ fun RenoteUsersScreen(
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
 
-    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(StateContent.NotExist()))
+    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
+        StateContent.NotExist()))
 
     LaunchedEffect(true) {
         renotesViewModel.refresh()

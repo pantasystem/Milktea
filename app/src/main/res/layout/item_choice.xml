@@ -5,13 +5,13 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
         <variable
                 name="poll"
-                type="jp.panta.misskeyandroidclient.model.notes.poll.Poll" />
+                type="net.pantasystem.milktea.model.notes.poll.Poll" />
         <variable
                 name="choice"
-                type="jp.panta.misskeyandroidclient.model.notes.poll.Poll.Choice" />
+                type="net.pantasystem.milktea.model.notes.poll.Poll.Choice" />
         <variable
                 name="noteId"
-                type="jp.panta.misskeyandroidclient.model.notes.Note.Id" />
+                type="net.pantasystem.milktea.model.notes.Note.Id" />
         <variable
                 name="notesViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />

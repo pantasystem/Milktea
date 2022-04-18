@@ -11,7 +11,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData

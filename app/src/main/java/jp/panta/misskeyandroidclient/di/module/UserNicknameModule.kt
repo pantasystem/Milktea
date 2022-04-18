@@ -4,10 +4,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameDAO
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameRepositoryOnMemoryImpl
-import jp.panta.misskeyandroidclient.model.users.impl.UserNicknameRepositorySQLiteImpl
-import jp.panta.misskeyandroidclient.model.users.nickname.UserNicknameRepository
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDAO
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameRepositoryOnMemoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameRepositorySQLiteImpl
+import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
 import javax.inject.Singleton
 
 @Module

@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view.editor
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.model.file.File
+import net.pantasystem.milktea.model.file.File
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
 
 object FileHelper{

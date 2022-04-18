@@ -1,11 +1,39 @@
 package jp.panta.misskeyandroidclient.model.account
 
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountNotFoundException
+import net.pantasystem.milktea.model.account.AccountRepository
+
 class TestAccountRepository : AccountRepository {
 
     val accounts = mutableMapOf(
-        1L to Account("remote1", "test.misskey.jp", "test1", "token", emptyList(), Account.InstanceType.MISSKEY,1),
-        2L to Account("remote2", "test.misskey.jp", "test2", "token", emptyList(), Account.InstanceType.MISSKEY,2),
-        3L to Account("remote3", "test.misskey.jp", "test1", "token", emptyList(), Account.InstanceType.MISSKEY,3)
+        1L to Account(
+            "remote1",
+            "test.misskey.jp",
+            "test1",
+            "token",
+            emptyList(),
+            Account.InstanceType.MISSKEY,
+            1
+        ),
+        2L to Account(
+            "remote2",
+            "test.misskey.jp",
+            "test2",
+            "token",
+            emptyList(),
+            Account.InstanceType.MISSKEY,
+            2
+        ),
+        3L to Account(
+            "remote3",
+            "test.misskey.jp",
+            "test1",
+            "token",
+            emptyList(),
+            Account.InstanceType.MISSKEY,
+            3
+        )
     )
 
     private var currentAccountId = 1L

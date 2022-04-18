@@ -7,17 +7,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import jp.panta.misskeyandroidclient.api.misskey.MisskeyAPIProvider
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.api.misskey.list.ListUserOperation
-import jp.panta.misskeyandroidclient.api.misskey.throwIfHasError
-import jp.panta.misskeyandroidclient.model.Encryption
-import jp.panta.misskeyandroidclient.model.account.AccountStore
-import jp.panta.misskeyandroidclient.model.list.UserList
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.common.Encryption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.api.misskey.list.ListUserOperation
+import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.account.AccountStore
 import javax.inject.Inject
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.User
 
 @HiltViewModel
 class UserListPullPushUserViewModel @Inject constructor(

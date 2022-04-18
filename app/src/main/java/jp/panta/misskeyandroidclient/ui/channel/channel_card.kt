@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.model.channel.Channel
-import jp.panta.misskeyandroidclient.model.users.User
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.user.User
 import kotlinx.datetime.Clock
 
 sealed interface ChannelCardAction {
@@ -114,7 +114,7 @@ fun ChannelCard(
                         fontSize = 18.sp
                     )
                     if (!channel.description.isNullOrBlank()) {
-                        Text(channel.description, maxLines = 3)
+                        Text(channel.description ?: "", maxLines = 3)
                     }
                 }
                 Row {
@@ -137,7 +137,7 @@ fun ChannelCard(
 
                     }
                     if (channel.isFollowing != null) {
-                        if (channel.isFollowing) {
+                        if (channel.isFollowing!!) {
                             Button(onClick = {
                                 onAction.invoke(
                                     ChannelCardAction.OnUnFollowButtonClicked(

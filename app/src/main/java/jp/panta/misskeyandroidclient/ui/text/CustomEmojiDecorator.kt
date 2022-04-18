@@ -4,7 +4,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.View
 import com.bumptech.glide.Glide
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.Emoji
 import jp.panta.misskeyandroidclient.util.glide.GlideApp
 import java.util.regex.Pattern
 

@@ -3,12 +3,13 @@ package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
-import jp.panta.misskeyandroidclient.model.gallery.*
-import jp.panta.misskeyandroidclient.util.PageableState
-import jp.panta.misskeyandroidclient.util.StateContent
+import jp.panta.misskeyandroidclient.di.module.createGalleryPostsStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.gallery.*
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,11 +47,14 @@ class GalleryPostsViewModel(
     private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
 
     private val _galleryPosts =
-        MutableStateFlow<PageableState<List<GalleryPostState>>>(PageableState.Fixed(StateContent.NotExist()))
+        MutableStateFlow<PageableState<List<GalleryPostState>>>(
+            PageableState.Fixed(
+                StateContent.NotExist()))
     val galleryPosts: StateFlow<PageableState<List<GalleryPostState>>> = _galleryPosts
     val lock = Mutex()
 
-    private val galleryPostSendFavoriteStore = GalleryPostSendFavoriteStore(galleryRepository)
+    private val galleryPostSendFavoriteStore =
+        GalleryPostSendFavoriteStore(galleryRepository)
 
     private val _error = MutableSharedFlow<Throwable>(
         extraBufferCapacity = 100,

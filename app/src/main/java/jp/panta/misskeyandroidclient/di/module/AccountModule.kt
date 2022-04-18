@@ -6,14 +6,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
-import jp.panta.misskeyandroidclient.model.account.MakeDefaultPagesUseCase
-import jp.panta.misskeyandroidclient.model.account.PageDefaultStringsOnAndroid
-import jp.panta.misskeyandroidclient.model.account.db.MediatorAccountRepository
-import jp.panta.misskeyandroidclient.model.account.db.RoomAccountRepository
-import jp.panta.misskeyandroidclient.util.getPreferenceName
-import jp.panta.misskeyandroidclient.util.getPreferences
+import jp.panta.misskeyandroidclient.impl.PageDefaultStringsOnAndroid
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
+import net.pantasystem.milktea.data.infrastructure.account.db.MediatorAccountRepository
+import net.pantasystem.milktea.data.infrastructure.account.db.RoomAccountRepository
+import net.pantasystem.milktea.common.getPreferences
 import javax.inject.Singleton
 
 @Module
@@ -36,6 +35,8 @@ object AccountModule {
     fun provideMakeDefaultPagesUseCase(
         @ApplicationContext context: Context
     ) : MakeDefaultPagesUseCase {
-        return MakeDefaultPagesUseCase(PageDefaultStringsOnAndroid(context))
+        return MakeDefaultPagesUseCase(
+            PageDefaultStringsOnAndroid(context)
+        )
     }
 }

@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="pageType"
-                type="jp.panta.misskeyandroidclient.model.account.page.PageType" />
+                type="net.pantasystem.milktea.model.account.page.PageType" />
         <variable
                 name="selectPageTypeToAdd"
                 type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.SelectPageTypeToAdd" />
