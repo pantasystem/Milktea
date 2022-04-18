@@ -8,6 +8,7 @@ import net.pantasystem.milktea.data.model.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.data.model.settings.SettingStore
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.Logger
@@ -153,7 +154,7 @@ class NoteRepositoryImpl @Inject constructor(
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
         val account = accountRepository.get(createReaction.noteId.accountId)
         val res = misskeyAPIProvider.get(account).createReaction(
-            net.pantasystem.milktea.api.misskey.notes.CreateReaction(
+            CreateReactionDTO(
                 i = account.getI(encryption),
                 noteId = createReaction.noteId.noteId,
                 reaction = createReaction.reaction

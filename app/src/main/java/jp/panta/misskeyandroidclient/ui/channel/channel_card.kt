@@ -181,7 +181,7 @@ fun PreviewChannelCard() {
                     name = "はるのんしすてむどっとこむ",
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
-                    userId = net.pantasystem.milktea.model.user.User.Id(0, "userId"),
+                    userId = User.Id(0, "userId"),
                     usersCount = 4,
                     isFollowing = true,
                     hasUnreadNote = true
@@ -199,7 +199,7 @@ fun PreviewChannelCard() {
                     name = "パン太は人間だよ",
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
-                    userId = net.pantasystem.milktea.model.user.User.Id(0, "userId"),
+                    userId = User.Id(0, "userId"),
                     usersCount = 4,
                     isFollowing = false,
                     hasUnreadNote = false
@@ -217,7 +217,7 @@ fun PreviewChannelCard() {
                     name = "a",
                     lastNotedAt = Clock.System.now(),
                     notesCount = 10,
-                    userId = net.pantasystem.milktea.model.user.User.Id(0, "userId"),
+                    userId = User.Id(0, "userId"),
                     usersCount = 4,
                     isFollowing = false,
                     hasUnreadNote = false

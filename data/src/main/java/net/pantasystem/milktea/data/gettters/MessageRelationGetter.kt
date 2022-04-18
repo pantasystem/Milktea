@@ -9,11 +9,12 @@ import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.data.model.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.model.toGroup
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.UserDataSource
 import kotlin.jvm.Throws
 
 class MessageRelationGetter(
     private val messageDataSource: MessageDataSource,
-    private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    private val userDataSource: UserDataSource,
     private val groupDataSource: GroupDataSource
 ) {
 

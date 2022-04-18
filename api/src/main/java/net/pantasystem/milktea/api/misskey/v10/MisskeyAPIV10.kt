@@ -50,7 +50,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun createMessage(messageAction: MessageAction) = misskey.createMessage(messageAction)
 
-    override suspend fun createReaction(reaction: CreateReaction) = misskey.createReaction(reaction)
+    override suspend fun createReaction(reaction: CreateReactionDTO) = misskey.createReaction(reaction)
 
     override suspend fun mentions(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.mentions(noteRequest)
 

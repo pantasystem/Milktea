@@ -45,7 +45,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun createFolder(createFolder: CreateFolder): Response<Unit> = misskeyAPI.createFolder(createFolder)
     override suspend fun createList(createList: CreateList): Response<UserListDTO> = misskeyAPI.createList(createList)
     override suspend fun createMessage(messageAction: MessageAction): Response<MessageDTO> = misskeyAPI.createMessage(messageAction)
-    override suspend fun createReaction(reaction: CreateReaction): Response<Unit> = misskeyAPI.createReaction(reaction)
+    override suspend fun createReaction(reaction: CreateReactionDTO): Response<Unit> = misskeyAPI.createReaction(reaction)
     override suspend fun delete(deleteNote: DeleteNote): Response<Unit> = misskeyAPI.delete(deleteNote)
     override suspend fun deleteFavorite(noteRequest: NoteRequest): Response<Unit> = misskeyAPI.deleteFavorite(noteRequest)
     override suspend fun deleteList(listId: ListId): Response<Unit> = misskeyAPI.deleteList(listId)

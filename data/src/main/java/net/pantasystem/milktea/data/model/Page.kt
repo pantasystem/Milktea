@@ -4,6 +4,7 @@ import androidx.room.*
 import androidx.room.ForeignKey.NO_ACTION
 import androidx.room.Entity
 import net.pantasystem.milktea.data.model.core.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 
 @Deprecated("model.account.pages.Pageへ移行")
 @Entity(tableName = "page", foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = NO_ACTION, onUpdate = NO_ACTION)])
@@ -64,8 +65,8 @@ data class Page(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         override val type: PageType = PageType.GLOBAL
     ): PageableOld, Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.GlobalTimeline(
+        override fun toPageable(): Pageable {
+            return Pageable.GlobalTimeline(
                 withFiles = withFiles
             )
         }
@@ -76,8 +77,8 @@ data class Page(
         @ColumnInfo(name = "exclude_nsfw") var excludeNsfw: Boolean? = null,
         override val type: PageType = PageType.LOCAL
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.LocalTimeline(
+        override fun toPageable(): Pageable {
+            return Pageable.LocalTimeline(
                 withFiles = withFiles,
                 excludeNsfw = excludeNsfw
             )
@@ -96,8 +97,8 @@ data class Page(
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.SOCIAL
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.HybridTimeline(
+        override fun toPageable(): Pageable {
+            return Pageable.HybridTimeline(
                 withFiles = withFiles,
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes,
@@ -113,8 +114,8 @@ data class Page(
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.HOME
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.HomeTimeline(
+        override fun toPageable(): Pageable {
+            return Pageable.HomeTimeline(
                 withFiles = withFiles,
                 includeRenotedMyRenotes = includeRenotedMyRenotes,
                 includeLocalRenotes = includeLocalRenotes,
@@ -133,8 +134,8 @@ data class Page(
         override val type: PageType = PageType.USER_LIST
     ) : Timeline(){
 
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.UserListTimeline(
+        override fun toPageable(): Pageable {
+            return Pageable.UserListTimeline(
                 listId = listId,
                 withFiles = withFiles,
                 includeMyRenotes = includeMyRenotes,
@@ -149,8 +150,8 @@ data class Page(
         visibility: String? = null,
         override val type: PageType = PageType.MENTION
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Mention(
+        override fun toPageable(): Pageable {
+            return Pageable.Mention(
                 following = following,
                 visibility = visibility
             )
@@ -160,8 +161,8 @@ data class Page(
         val noteId: String,
         override val type: PageType = PageType.DETAIL
     ) : PageableOld{
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Show(
+        override fun toPageable(): Pageable {
+            return Pageable.Show(
                 noteId = noteId
             )
         }
@@ -170,8 +171,8 @@ data class Page(
         val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null,
         override val type: PageType = PageType.SEARCH_HASH
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.SearchByTag(
+        override fun toPageable(): Pageable {
+            return Pageable.SearchByTag(
                 tag = tag,
                 reply = reply,
                 renote = renote,
@@ -184,15 +185,15 @@ data class Page(
         val offset: Int?,
         override val type: PageType = PageType.FEATURED
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Featured(
+        override fun toPageable(): Pageable {
+            return Pageable.Featured(
                 offset = offset
             )
         }
     }
     data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, override val type: PageType = PageType.NOTIFICATION) : PageableOld{
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Notification(
+        override fun toPageable(): Pageable {
+            return Pageable.Notification(
                 following = following,
                 markAsRead = markAsRead
             )
@@ -202,8 +203,8 @@ data class Page(
         val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null,
         override val type: PageType = PageType.USER
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.UserTimeline(
+        override fun toPageable(): Pageable {
+            return Pageable.UserTimeline(
                 userId = userId,
                 includeMyRenotes = includeMyRenotes,
                 includeReplies = includeReplies,
@@ -215,8 +216,8 @@ data class Page(
         var query: String, var host: String? = null, var userId: String? = null,
         override val type: PageType = PageType.SEARCH
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Search(
+        override fun toPageable(): Pageable {
+            return Pageable.Search(
                 query = query, host = host, userId = userId
             )
         }
@@ -225,16 +226,16 @@ data class Page(
         val antennaId: String,
         override val type: PageType = PageType.ANTENNA
     ) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Antenna(
+        override fun toPageable(): Pageable {
+            return Pageable.Antenna(
                 antennaId = antennaId
             )
         }
     }
 
     class Favorite(override val type: PageType = PageType.FAVORITE) : Timeline(){
-        override fun toPageable(): net.pantasystem.milktea.model.account.page.Pageable {
-            return net.pantasystem.milktea.model.account.page.Pageable.Favorite
+        override fun toPageable(): Pageable {
+            return Pageable.Favorite
         }
     }
 }

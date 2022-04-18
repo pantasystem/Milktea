@@ -120,7 +120,7 @@ interface MisskeyAPI {
     suspend fun reactions(@Body body: RequestReactionHistoryDTO): Response<List<ReactionHistoryDTO>>
 
     @POST("api/notes/reactions/create")
-    suspend fun createReaction(@Body reaction: CreateReaction): Response<Unit>
+    suspend fun createReaction(@Body reaction: CreateReactionDTO): Response<Unit>
     @POST("api/notes/reactions/delete")
     suspend fun deleteReaction(@Body deleteNote: DeleteNote): Response<Unit>
 
