@@ -79,8 +79,6 @@ dependencies {
     implementation project(path: ':model')
     implementation project(path: ':api')
     implementation project(path: ':features:auth')
-    implementation project(path: ':features:auth')
-    implementation project(path: ':features:auth')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     //noinspection GradleCompatible
