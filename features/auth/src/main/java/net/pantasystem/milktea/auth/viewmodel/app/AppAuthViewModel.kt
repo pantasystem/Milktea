@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient.ui.auth.viewmodel.app
+package net.pantasystem.milktea.auth.viewmodel.app
 
 import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.BuildConfig
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
@@ -12,18 +11,20 @@ import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.*
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.Permissions
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import net.pantasystem.milktea.auth.viewmodel.Permissions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.common.State
 import java.util.regex.Pattern
 import javax.inject.Inject
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
 
 sealed interface AuthErrors {
@@ -49,7 +50,8 @@ sealed interface InstanceType {
 class AppAuthViewModel @Inject constructor(
     private val customAuthStore: CustomAuthStore,
     private val mastodonAPIProvider: MastodonAPIProvider,
-    miCore: MiCore
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val metaStore: FetchMeta,
 ) : ViewModel(){
     companion object{
         const val CALL_BACK_URL = "misskey://app_auth_callback"
@@ -100,8 +102,6 @@ class AppAuthViewModel @Inject constructor(
     val waiting4UserAuthorization = MutableLiveData<Authorization.Waiting4UserAuthorization?>()
 
 
-    private val metaStore = miCore.getMetaStore()
-    private val misskeyAPIProvider = miCore.getMisskeyAPIProvider()
 
     val errors = combine(generateTokenError, fetchingMetaError) { generateTokenError, fetchingMetaError ->
         when {
