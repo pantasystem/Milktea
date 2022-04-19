@@ -22,7 +22,7 @@ import java.lang.IllegalStateException
 @AndroidEntryPoint
 class AuthorizationActivity : AppCompatActivity() {
 
-    private val mViewModel: net.pantasystem.milktea.auth.viewmodel.AuthViewModel by viewModels()
+    private val mViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +48,13 @@ class AuthorizationActivity : AppCompatActivity() {
         val fragment = when(authorization) {
 
             is Authorization.BeforeAuthentication -> {
-                net.pantasystem.milktea.auth.AuthFragment()
+                AuthFragment()
             }
             is Authorization.Waiting4UserAuthorization -> {
-                net.pantasystem.milktea.auth.Waiting4userAuthorizationFragment()
+                Waiting4userAuthorizationFragment()
             }
             is Authorization.Approved -> {
-                net.pantasystem.milktea.auth.AuthResultFragment()
+                AuthResultFragment()
             }
             is Authorization.Finish -> {
                 throw IllegalStateException("Finishは期待されていません")
