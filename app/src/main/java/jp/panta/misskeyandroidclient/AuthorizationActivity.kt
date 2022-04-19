@@ -9,10 +9,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.from
-import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
-import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
-import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.AuthFragment
+import net.pantasystem.milktea.auth.AuthResultFragment
+import net.pantasystem.milktea.auth.Waiting4userAuthorizationFragment
+import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalStateException

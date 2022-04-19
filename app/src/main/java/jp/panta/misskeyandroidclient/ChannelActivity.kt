@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.channel.ChannelScreen
+import net.pantasystem.milktea.channel.ChannelViewModel
 import net.pantasystem.milktea.model.account.AccountStore
-import jp.panta.misskeyandroidclient.ui.channel.ChannelScreen
-import jp.panta.misskeyandroidclient.ui.channel.ChannelViewModel
 import javax.inject.Inject
 
 

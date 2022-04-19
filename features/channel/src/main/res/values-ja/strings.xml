@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="n_people">%d人</string>
+    <string name="n_posts">%d投稿</string>
+    <string name="owned">私の</string>
+    <string name="channel">チャンネル</string>
+    <string name="following">フォロー中</string>
+    <string name="follow">フォロー</string>
+    <string name="unfollow">フォロー解除</string>
+    <string name="featured">ハイライト</string>
+
+</resources>

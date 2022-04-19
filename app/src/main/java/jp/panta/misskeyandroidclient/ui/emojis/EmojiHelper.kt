@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.ui.emojis
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.util.glide.GlideApp
 
 object EmojiHelper{
 

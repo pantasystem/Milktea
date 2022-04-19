@@ -6,13 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
@@ -24,7 +21,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.throwIfHasError
-import net.pantasystem.milktea.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.account.page.*
 import java.lang.IllegalStateException
 
 class PageSettingViewModel(

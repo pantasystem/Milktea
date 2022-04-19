@@ -54,3 +54,7 @@ class PageableTemplate(val account: Account?) {
         return Page(antenna.id.accountId, antenna.name, 0, Pageable.Antenna(antenna.id.antennaId))
     }
 }
+
+fun Account.newPage(pageable: Pageable, name: String): Page {
+    return Page(this.accountId, name, 0, pageable)
+}
