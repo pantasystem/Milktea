@@ -18,8 +18,8 @@
     <string name="message">メッセージ</string>
     <string name="start_auth">認証する</string>
     <string name="selecting_instance">選択中のインスタンス</string>
-    <string name="welcome">ようこそ</string>
-    <string name="san">さん</string>
+<!--    <string name="welcome">ようこそ</string>-->
+<!--    <string name="san">さん</string>-->
     <string name="following">フォロー中</string>
     <string name="follower">フォロワー</string>
     <string name="renote">リノート</string>
@@ -327,8 +327,8 @@
     <string name="add_to_list">リストに追加する</string>
     <string name="promotion">プロモーション</string>
     <string name="waiting_4_approval">認可されるのを待っています。</string>
-    <string name="i_have_approved">私は認可をしました</string>
-    <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>
+<!--    <string name="i_have_approved">私は認可をしました</string>-->
+<!--    <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>-->
     <string name="learn_note_visibility">ノートの公開範囲を記憶する</string>
     <string name="accept">承認</string>
     <string name="reject">拒否</string>
@@ -353,9 +353,9 @@
     <string name="pick_image_from_drive">ドライブから画像を選択</string>
     <string name="successfully_created_note">ノートの作成に成功しました</string>
     <string name="sensitive">センシティブ</string>
-    <string name="authentication_url">認証URL</string>
-    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする
-    </string>
+<!--    <string name="authentication_url">認証URL</string>-->
+<!--    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする-->
+<!--    </string>-->
     <string name="copied_to_clipboard">クリップボードにコピーしました</string>
     <string name="follow_approval_pending">フォロー承認待ち</string>
     <string name="request_follow_from_u">フォロー申請</string>

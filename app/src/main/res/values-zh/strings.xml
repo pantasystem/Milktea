@@ -18,8 +18,8 @@
     <string name="message">讯息</string>
     <string name="start_auth">用户身份验证</string>
     <string name="selecting_instance">选中的实例</string>
-    <string name="welcome">欢迎</string>
-    <string name="san">先生 / 女士</string>
+<!--    <string name="welcome">欢迎</string>-->
+<!--    <string name="san">先生 / 女士</string>-->
     <string name="following">关注中的</string>
     <string name="follower">关注者</string>
     <string name="renote">笔记</string>
@@ -321,8 +321,8 @@
     <string name="add_to_list">添加至列表</string>
     <string name="promotion">晋升</string>
     <string name="waiting_4_approval">正在等待同意</string>
-    <string name="i_have_approved">我已批准的</string>
-    <string name="waiting_4_u_to_approve">正在等待您的同意</string>
+<!--    <string name="i_have_approved">我已批准的</string>-->
+<!--    <string name="waiting_4_u_to_approve">正在等待您的同意</string>-->
     <string name="learn_note_visibility">学习笔记可见性</string>
     <string name="accept">接受</string>
     <string name="reject">拒绝</string>
@@ -348,8 +348,8 @@
     <string name="pick_image_from_drive">从云盘中选取图片</string>
     <string name="successfully_created_note">成功创建笔记</string>
     <string name="sensitive">敏感的</string>
-    <string name="authentication_url">用户身份验证 URL</string>
-    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">将身份验证目标的 URL 复制到剪贴板。</string>
+<!--    <string name="authentication_url">用户身份验证 URL</string>-->
+<!--    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">将身份验证目标的 URL 复制到剪贴板。</string>-->
     <string name="request_follow">%s 请求关注您</string>
 
     <string name="copied_to_clipboard">已复制到剪贴板</string>

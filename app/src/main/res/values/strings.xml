@@ -18,8 +18,8 @@
     <string name="message">Messages</string>
     <string name="start_auth">Authenticate</string>
     <string name="selecting_instance">Selected instance</string>
-    <string name="welcome">Welcome</string>
-    <string name="san">-san</string>
+<!--    <string name="welcome">Welcome</string>-->
+<!--    <string name="san">-san</string>-->
     <string name="following">Following</string>
     <string name="follower">Followers</string>
     <string name="renote">Renote</string>
@@ -323,8 +323,8 @@
     <string name="add_to_list">Add to list</string>
     <string name="promotion">Promotion</string>
     <string name="waiting_4_approval">Waiting for approval</string>
-    <string name="i_have_approved">Approved</string>
-    <string name="waiting_4_u_to_approve">Waiting for you to approve</string>
+<!--    <string name="i_have_approved">Approved</string>-->
+<!--    <string name="waiting_4_u_to_approve">Waiting for you to approve</string>-->
     <string name="learn_note_visibility">Learn note visibility</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
@@ -351,10 +351,10 @@
     <string name="successfully_created_note">Successfully created the note</string>
     <string name="note_creation_failure">Note creation failure</string>
     <string name="sensitive">Sensitive</string>
-    <string name="authentication_url">Authentication URL</string>
-    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy authentication
-        destination URL to clipboard.
-    </string>
+<!--    <string name="authentication_url">Authentication URL</string>-->
+<!--    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy authentication-->
+<!--        destination URL to clipboard.-->
+<!--    </string>-->
     <string name="request_follow">%s wants to follow to you</string>
 
     <string name="copied_to_clipboard">Copied to clipboard</string>
