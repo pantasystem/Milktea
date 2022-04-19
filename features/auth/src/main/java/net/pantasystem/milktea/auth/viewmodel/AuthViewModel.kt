@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.auth.viewmodel
+package net.pantasystem.milktea.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,25 +10,32 @@ import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.api.misskey.auth.createObtainToken
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import java.lang.IllegalStateException
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val miCore: MiCore,
     private val mastodonAPIProvider: MastodonAPIProvider,
+    private val accountStore: AccountStore,
+    private val userDataSource: UserDataSource,
+    private val accountRepository: AccountRepository,
+    val encryption: Encryption,
+
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger = loggerFactory.create("AuthViewModel")
@@ -145,8 +152,8 @@ class AuthViewModel @Inject constructor(
             ?: throw IllegalStateException("confirmApproveは状態がApprovedの時以外呼び出すことはできません。")
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = miCore.getAccountRepository().add(
-                    a.accessToken.newAccount(a.instanceBaseURL, miCore.getEncryption()),
+                val account = accountRepository.add(
+                    a.accessToken.newAccount(a.instanceBaseURL, encryption),
                     false
                 )
                 val user = when (a.accessToken) {
@@ -160,9 +167,9 @@ class AuthViewModel @Inject constructor(
                         ) as User.Detail
                     }
                 }
-                miCore.getUserDataSource().add(user)
-                miCore.getAccountRepository().add(account)
-                miCore.setCurrentAccount(account)
+                userDataSource.add(user)
+                accountRepository.add(account)
+                accountStore.setCurrent(account)
 
                 account to user
             }.onSuccess {
