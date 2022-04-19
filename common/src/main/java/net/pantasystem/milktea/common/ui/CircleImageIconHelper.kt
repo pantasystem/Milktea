@@ -1,13 +1,10 @@
-package jp.panta.misskeyandroidclient.ui.notes.view
+package net.pantasystem.milktea.common.ui
 
-import android.graphics.Bitmap
 import android.widget.ImageView
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.BitmapImageViewTarget
-import jp.panta.misskeyandroidclient.R
+import net.pantasystem.milktea.common.R
 
 object CircleImageIconHelper {
 
