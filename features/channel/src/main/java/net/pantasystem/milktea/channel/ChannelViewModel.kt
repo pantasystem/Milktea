@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient.ui.channel
+package net.pantasystem.milktea.channel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.newPage
 import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
@@ -18,6 +17,7 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.newPage
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelRepository
 import javax.inject.Inject

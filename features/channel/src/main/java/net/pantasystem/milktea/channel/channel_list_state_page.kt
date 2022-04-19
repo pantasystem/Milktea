@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.channel
+package net.pantasystem.milktea.channel
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.channel
+package net.pantasystem.milktea.channel
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.user.User
 import kotlinx.datetime.Clock

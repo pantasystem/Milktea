@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.channel
+package net.pantasystem.milktea.channel
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.AccountStore
