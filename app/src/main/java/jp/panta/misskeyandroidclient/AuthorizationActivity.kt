@@ -9,10 +9,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.from
-import jp.panta.misskeyandroidclient.ui.auth.AuthFragment
-import jp.panta.misskeyandroidclient.ui.auth.AuthResultFragment
-import jp.panta.misskeyandroidclient.ui.auth.Waiting4userAuthorizationFragment
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.AuthFragment
+import net.pantasystem.milktea.auth.AuthResultFragment
+import net.pantasystem.milktea.auth.Waiting4userAuthorizationFragment
+import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import java.lang.IllegalStateException
@@ -22,7 +22,7 @@ import java.lang.IllegalStateException
 @AndroidEntryPoint
 class AuthorizationActivity : AppCompatActivity() {
 
-    private val mViewModel: AuthViewModel by viewModels()
+    private val mViewModel: net.pantasystem.milktea.auth.viewmodel.AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +48,13 @@ class AuthorizationActivity : AppCompatActivity() {
         val fragment = when(authorization) {
 
             is Authorization.BeforeAuthentication -> {
-                AuthFragment()
+                net.pantasystem.milktea.auth.AuthFragment()
             }
             is Authorization.Waiting4UserAuthorization -> {
-                Waiting4userAuthorizationFragment()
+                net.pantasystem.milktea.auth.Waiting4userAuthorizationFragment()
             }
             is Authorization.Approved -> {
-                AuthResultFragment()
+                net.pantasystem.milktea.auth.AuthResultFragment()
             }
             is Authorization.Finish -> {
                 throw IllegalStateException("Finishは期待されていません")
