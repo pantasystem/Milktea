@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient.ui.auth
+package net.pantasystem.milktea.auth
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentAppAuthBinding
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AppAuthViewModel
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.app.AuthErrors
+import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.app.AuthErrors
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.auth.databinding.FragmentAppAuthBinding
 
 @FlowPreview
 @ExperimentalCoroutinesApi

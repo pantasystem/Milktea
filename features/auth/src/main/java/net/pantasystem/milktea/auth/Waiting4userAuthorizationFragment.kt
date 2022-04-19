@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.auth
+package net.pantasystem.milktea.auth
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -11,15 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentWaiting4UserAuthorizationBinding
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import jp.panta.misskeyandroidclient.ui.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.auth.databinding.FragmentWaiting4UserAuthorizationBinding
 
 @FlowPreview
 @ExperimentalCoroutinesApi

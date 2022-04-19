@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.auth.viewmodel
+package net.pantasystem.milktea.auth.viewmodel
 
 import net.pantasystem.milktea.model.instance.Version
 
