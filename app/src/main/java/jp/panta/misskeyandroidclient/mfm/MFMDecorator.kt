@@ -12,10 +12,10 @@ import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.util.glide.GlideApp
 import jp.panta.misskeyandroidclient.ui.text.DrawableEmojiSpan
 import jp.panta.misskeyandroidclient.ui.text.EmojiAdapter
 import jp.panta.misskeyandroidclient.ui.text.EmojiSpan
+import net.pantasystem.milktea.common.glide.GlideApp
 import java.lang.ref.WeakReference
 
 object MFMDecorator {

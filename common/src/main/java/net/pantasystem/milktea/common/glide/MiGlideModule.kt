@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.glide
+package net.pantasystem.milktea.common.glide
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -10,11 +10,11 @@ import com.bumptech.glide.module.AppGlideModule
 import com.caverock.androidsvg.SVG
 import com.bumptech.glide.annotation.GlideModule
 import com.github.penfeizhou.animation.decode.FrameSeqDecoder
-import jp.panta.misskeyandroidclient.util.glide.apng.ByteBufferApngDecoder
-import jp.panta.misskeyandroidclient.util.glide.apng.FrameSeqDecoderBitmapTranscoder
-import jp.panta.misskeyandroidclient.util.glide.apng.FrameSeqDecoderDrawableTranscoder
-import jp.panta.misskeyandroidclient.util.glide.svg.SvgBitmapTransCoder
-import jp.panta.misskeyandroidclient.util.glide.svg.SvgDecoder
+import net.pantasystem.milktea.common.glide.apng.ByteBufferApngDecoder
+import net.pantasystem.milktea.common.glide.apng.FrameSeqDecoderBitmapTranscoder
+import net.pantasystem.milktea.common.glide.apng.FrameSeqDecoderDrawableTranscoder
+import net.pantasystem.milktea.common.glide.svg.SvgBitmapTransCoder
+import net.pantasystem.milktea.common.glide.svg.SvgDecoder
 import java.io.InputStream
 import java.nio.ByteBuffer
 

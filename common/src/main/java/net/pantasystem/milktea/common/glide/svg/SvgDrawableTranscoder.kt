@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.glide.svg
+package net.pantasystem.milktea.common.glide.svg
 
 import android.content.Context
 import android.graphics.Bitmap

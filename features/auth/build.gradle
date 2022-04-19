@@ -30,7 +30,6 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
-        compose true
         dataBinding true
     }
 }
@@ -88,5 +87,11 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
     // EmojiCompat
     implementation "androidx.emoji:emoji-bundled:1.2.0-alpha03"
+
+    def retrofit = '2.9.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
 
 }

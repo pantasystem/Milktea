@@ -21,7 +21,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/i_have_approved"
-                app:icon="@drawable/ic_chevron_right_black_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="32dp"
@@ -73,8 +72,6 @@
                 app:layout_constraintTop_toTopOf="@id/authUrlView"
                 app:layout_constraintBottom_toBottomOf="@id/authUrlView"
                 style="?android:attr/borderlessButtonStyle"
-                app:tint="?attr/colorNoteActionButtonTint"
-                app:srcCompat="@drawable/ic_content_copy_black_24dp"
                 android:contentDescription="@string/copy_the_url_of_the_authentication_destination_to_the_clipboard"
 
         />

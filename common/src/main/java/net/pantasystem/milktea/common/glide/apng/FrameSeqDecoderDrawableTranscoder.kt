@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.glide.apng
+package net.pantasystem.milktea.common.glide.apng
 
 import android.graphics.drawable.Drawable
 import com.bumptech.glide.load.Options
