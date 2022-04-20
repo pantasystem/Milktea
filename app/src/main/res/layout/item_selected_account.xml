@@ -70,7 +70,7 @@
                     android:layout_centerVertical="true"
                     app:srcCompat="@drawable/ic_chevron_right_black_24dp"
                     tools:ignore="ContentDescription"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <androidx.emoji.widget.EmojiTextView
                     android:layout_width="wrap_content"

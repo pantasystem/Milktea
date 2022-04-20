@@ -79,7 +79,7 @@
                         app:srcCompat="@drawable/ic_cloud_black_24dp"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         tools:ignore="ContentDescription"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
                 <TextView
                         android:id="@+id/selecting_file_name"
                         android:layout_width="0dp"
@@ -102,7 +102,7 @@
                         style="@style/Widget.AppCompat.Button.Borderless"
                         tools:ignore="ContentDescription"
                         android:onClick="@{()-> actionViewModel.send()}"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
 
 
             </LinearLayout>

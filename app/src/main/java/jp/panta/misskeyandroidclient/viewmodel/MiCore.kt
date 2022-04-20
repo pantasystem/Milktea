@@ -90,7 +90,6 @@ interface MiCore {
 
     fun getSubscriptionUnRegstration(): SubscriptionUnRegistration
 
-    suspend fun setCurrentAccount(account: Account)
 
 
     fun getEncryption(): Encryption

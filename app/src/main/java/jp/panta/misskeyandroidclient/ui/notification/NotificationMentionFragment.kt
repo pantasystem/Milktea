@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.ui.notification
 
 import android.os.Bundle

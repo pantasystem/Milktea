@@ -37,7 +37,7 @@
                         android:layout_height="40dp"
                         app:srcCompat="@drawable/ic_person_black_24dp"
                         tools:ignore="ContentDescription"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
                 <ImageView
                         android:layout_width="16dp"
                         android:layout_height="16dp"

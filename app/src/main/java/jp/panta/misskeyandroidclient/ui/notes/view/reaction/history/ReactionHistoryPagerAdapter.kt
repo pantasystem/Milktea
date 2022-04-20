@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.ui.notes.view.reaction.history
 
 import androidx.fragment.app.Fragment
@@ -8,7 +10,7 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 
 class ReactionHistoryPagerAdapter(
     fragmentManager: FragmentManager,
-    val types: List<ReactionHistoryRequest>,
+    private val types: List<ReactionHistoryRequest>,
     val noteId: Note.Id
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 

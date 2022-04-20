@@ -427,16 +427,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override suspend fun setCurrentAccount(account: Account) {
-        try {
-            mAccountRepository.setCurrentAccount(account)
-            mAccountStore.initialize()
-//            loadAndInitializeAccounts()
-        } catch (e: Exception) {
-            logger.error("switchAccount error", e)
-        }
-    }
-
     override fun getDraftNoteDAO(): DraftNoteDao {
         return draftNoteDao
     }

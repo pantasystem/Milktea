@@ -305,7 +305,7 @@
                     android:layout_below="@id/contentMain"
                     android:layout_marginEnd="4dp"
                     tools:ignore="ContentDescription"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <TextView
                     android:id="@+id/elapsed_time"
@@ -372,7 +372,7 @@
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_reply_black_24dp"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/textView3"
@@ -394,7 +394,7 @@
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_re_note"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:id="@+id/textView4"
@@ -420,7 +420,7 @@
                         android:scaleType="centerCrop"
                         app:isReacted="@{note.myReaction != null}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
 
                 <androidx.emoji.widget.EmojiTextView
                         android:layout_width="50dp"
@@ -444,7 +444,7 @@
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_more_horiz_black_24dp"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

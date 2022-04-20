@@ -16,7 +16,7 @@
             app:srcCompat="@drawable/ic_expand_more_black_24dp"
             android:layout_gravity="center"
             tools:ignore="ContentDescription"
-            app:tint="?attr/colorNoteActionButtonTint" />
+            app:tint="?attr/normalIconTint" />
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/accounts_view"
             android:layout_width="match_parent"

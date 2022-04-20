@@ -112,7 +112,7 @@ class UserListDetailViewModel @AssistedInject constructor(
             runCatching {
                 userListStore.removeUser(listId, userId)
             }.onFailure { t ->
-                logger.warning("ユーザーの除去に失敗")
+                logger.warning("ユーザーの除去に失敗", e = t)
             }.onSuccess {
                 logger.info("ユーザーの除去に成功")
             }

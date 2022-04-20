@@ -29,7 +29,7 @@
                     app:srcCompat="@drawable/ic_info_black_24dp"
                     android:contentDescription="@string/show_detail"
                     android:layout_gravity="center"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
             <Button
                     android:id="@+id/show_detail"
                     android:layout_width="0dp"
@@ -51,7 +51,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/copy_url"
                     app:srcCompat="@drawable/ic_content_copy_black_24dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/copy_content"
@@ -74,7 +74,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/copy_url"
                     app:srcCompat="@drawable/ic_insert_link_black_24dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/copy_url"
@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/share"
                     app:srcCompat="@drawable/ic_menu_share"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
             <Button
                     android:id="@+id/share_note"
                     android:layout_width="0dp"
@@ -121,7 +121,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/favorite"
                     app:srcCompat="@drawable/ic_baseline_translate_24"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/translateText"
@@ -149,7 +149,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/favorite"
                     app:srcCompat="@drawable/ic_star_black_24dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/add_favorite"
@@ -173,7 +173,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/remove_favorite"
                     app:srcCompat="@drawable/ic_star_black_24dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/remove_favorite"
@@ -204,7 +204,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/remove_note"
                     app:srcCompat="@drawable/ic_mode_edit_black_24dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/delete_and_edit_note_button"
@@ -229,7 +229,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/remove_note"
                     app:srcCompat="@drawable/ic_delete_black_24dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/remove_my_note"
@@ -262,7 +262,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="@string/remove_note"
                     app:srcCompat="@drawable/ic_baseline_report_problem_24"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <Button
                     android:id="@+id/reportButton"

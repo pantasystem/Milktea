@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.channelFlow
 import net.pantasystem.milktea.data.streaming.Socket
 
 
-@ExperimentalCoroutinesApi
 fun Socket.stateEvent() : Flow<Socket.State>{
     return channelFlow {
         val listener: (Socket.State)->Unit = { state: Socket.State ->

@@ -15,7 +15,7 @@
         <attr name="colorBottomNavigationSelected" format="color" />
         <attr name="colorBottomNavigationNotSelect" format="color" />
 
-        <attr name="colorNoteActionButtonTint" format="color" />
+        <attr name="normalIconTint" format="color" />
 
         <attr name="colorMessageSelf" format="color" />
         <attr name="colorMessageRecipient" format="color" />
