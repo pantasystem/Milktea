@@ -35,16 +35,13 @@ class AccountViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @FlowPreview
-    val accounts = MediatorLiveData<List<AccountViewData>>().apply {
-        accountStore.observeAccounts.onEach { accounts ->
-            val viewDataList = accounts.map { ac ->
-                AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
-            }
-            postValue(viewDataList)
-        }.catch { e ->
-            logger.debug("アカウントロードエラー", e = e)
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
+    val accounts = accountStore.observeAccounts.map { accounts ->
+        accounts.map { ac ->
+            AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
+        }
+    }.catch { e ->
+        logger.debug("アカウントロードエラー", e = e)
+    }.asLiveData()
 
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
@@ -82,7 +79,7 @@ class AccountViewModel @Inject constructor(
     fun setSwitchTargetConnectionInstance(account: Account) {
         switchTargetConnectionInstanceEvent.event = Unit
         viewModelScope.launch(Dispatchers.IO) {
-            miCore.setCurrentAccount(account)
+            accountStore.setCurrent(account)
         }
     }
 
