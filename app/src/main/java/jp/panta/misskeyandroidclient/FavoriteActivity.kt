@@ -16,8 +16,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 @AndroidEntryPoint
 class FavoriteActivity : AppCompatActivity() {
 

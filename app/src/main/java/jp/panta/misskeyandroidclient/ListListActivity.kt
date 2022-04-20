@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallback, UserListEditorDialog.OnSubmittedListener{
 
@@ -57,6 +55,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     private lateinit var mBinding: ActivityListListBinding
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -118,6 +117,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     }
 
+    @OptIn(FlowPreview::class)
     @ExperimentalCoroutinesApi
     private val showUserListDetail = Observer<UserList>{ ul ->
         val intent = UserListDetailActivity.newIntent(this, ul.id)
@@ -126,6 +126,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
 
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onEdit(userList: UserList?) {
         userList?: return
 
@@ -135,6 +136,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onSubmit(name: String) {
         mListListViewModel.createUserList(name)
     }

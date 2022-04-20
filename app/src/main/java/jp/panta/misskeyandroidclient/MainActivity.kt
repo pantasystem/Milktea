@@ -115,43 +115,13 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
         binding.navView.setNavigationItemSelectedListener { item ->
-            val activity = when (item.itemId) {
-                R.id.nav_setting -> SettingsActivity::class.java
-                R.id.nav_drive -> DriveActivity::class.java
-                R.id.nav_favorite -> FavoriteActivity::class.java
-                R.id.nav_list -> ListListActivity::class.java
-                R.id.nav_antenna -> AntennaListActivity::class.java
-                R.id.nav_draft -> DraftNotesActivity::class.java
-                R.id.nav_gallery -> GalleryPostsActivity::class.java
-                R.id.nav_channel -> ChannelActivity::class.java
-                else -> throw IllegalStateException("未定義なNavigation Itemです")
-            }
-            startActivity(Intent(this, activity))
+            showNavDrawersActivityBy(item)
             binding.drawerLayout.closeDrawerWhenOpened()
             false
         }
 
         binding.appBarMain.fab.setOnClickListener {
-
-            when (val type = currentPageableTimelineViewModel.currentType.value.suitableType()) {
-                is SuitableType.Other -> {
-                    startActivity(Intent(this, NoteEditorActivity::class.java))
-                }
-                is SuitableType.Gallery -> {
-                    val intent = Intent(this, GalleryPostsActivity::class.java)
-                    intent.action = Intent.ACTION_EDIT
-                    startActivity(intent)
-                }
-                is SuitableType.Channel -> {
-                    val accountId = accountStore.currentAccountId!!
-                    startActivity(
-                        NoteEditorActivity.newBundle(
-                            this,
-                            channelId = Channel.Id(accountId, type.channelId)
-                        )
-                    )
-                }
-            }
+            onFabClicked()
         }
 
         val miApplication = application as MiApplication
@@ -171,21 +141,14 @@ class MainActivity : AppCompatActivity() {
         }.map {
             it.size
         }.flowOn(Dispatchers.IO).onEach { count ->
-            binding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_message_list).let {
-                it.isVisible = count > 0
-                it.number = count
-            }
+            showUnreadMessageCountBadge(count)
         }.catch { e ->
             logger.error("メッセージ既読数取得エラー", e = e)
         }.launchIn(lifecycleScope)
 
         // NOTE: 各ばーしょんに合わせMenuを制御している
         miApplication.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
-            binding.navView.menu.also { menu ->
-                menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
-                menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
-                menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
-            }
+            changeMenuVisibilityFrom(api)
         }.launchIn(lifecycleScope)
 
 
@@ -207,15 +170,7 @@ class MainActivity : AppCompatActivity() {
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
         }.flowOn(Dispatchers.IO).onEach { count ->
-            if (count <= 0) {
-                binding.appBarMain.bottomNavigation.getBadge(R.id.navigation_notification)
-                    ?.clearNumber()
-            }
-            binding.appBarMain.bottomNavigation.getOrCreateBadge(R.id.navigation_notification)
-                .apply {
-                    isVisible = count > 0
-                    number = count
-                }
+            showNotificationCountBadge(count)
         }.catch { e ->
             logger.error("通知既読数取得エラー", e = e)
         }.launchIn(lifecycleScope)
@@ -556,6 +511,75 @@ class MainActivity : AppCompatActivity() {
             is TaskState.Executing -> {
             }
         }
+    }
+
+    private fun showNotificationCountBadge(count: Int) {
+        val bottomNav = binding.appBarMain.bottomNavigation
+        if (count <= 0) {
+            bottomNav.getBadge(R.id.navigation_notification)
+                ?.clearNumber()
+        }
+        bottomNav.getOrCreateBadge(R.id.navigation_notification)
+            .apply {
+                isVisible = count > 0
+                number = count
+            }
+    }
+
+    private fun showUnreadMessageCountBadge(count: Int) {
+        val bottomNav = binding.appBarMain.bottomNavigation
+        if (count <= 0) {
+            bottomNav.getBadge(R.id.navigation_message_list)?.clearNumber()
+        }
+        bottomNav.getOrCreateBadge(R.id.navigation_message_list).apply {
+            isVisible = count > 0
+            number = count
+        }
+    }
+
+    private fun onFabClicked() {
+        when (val type = currentPageableTimelineViewModel.currentType.value.suitableType()) {
+            is SuitableType.Other -> {
+                startActivity(Intent(this, NoteEditorActivity::class.java))
+            }
+            is SuitableType.Gallery -> {
+                val intent = Intent(this, GalleryPostsActivity::class.java)
+                intent.action = Intent.ACTION_EDIT
+                startActivity(intent)
+            }
+            is SuitableType.Channel -> {
+                val accountId = accountStore.currentAccountId!!
+                startActivity(
+                    NoteEditorActivity.newBundle(
+                        this,
+                        channelId = Channel.Id(accountId, type.channelId)
+                    )
+                )
+            }
+        }
+    }
+
+    private fun changeMenuVisibilityFrom(api: MisskeyAPI) {
+        binding.navView.menu.also { menu ->
+            menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
+            menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
+            menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
+        }
+    }
+
+    private fun showNavDrawersActivityBy(item: MenuItem) {
+        val activity = when (item.itemId) {
+            R.id.nav_setting -> SettingsActivity::class.java
+            R.id.nav_drive -> DriveActivity::class.java
+            R.id.nav_favorite -> FavoriteActivity::class.java
+            R.id.nav_list -> ListListActivity::class.java
+            R.id.nav_antenna -> AntennaListActivity::class.java
+            R.id.nav_draft -> DraftNotesActivity::class.java
+            R.id.nav_gallery -> GalleryPostsActivity::class.java
+            R.id.nav_channel -> ChannelActivity::class.java
+            else -> throw IllegalStateException("未定義なNavigation Itemです")
+        }
+        startActivity(Intent(this, activity))
     }
 
     @ExperimentalCoroutinesApi
