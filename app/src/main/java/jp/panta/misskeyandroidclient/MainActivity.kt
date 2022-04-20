@@ -30,9 +30,6 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
@@ -52,6 +49,7 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
 import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
@@ -94,6 +92,8 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var noteTaskExecutor: CreateNoteTaskExecutor
 
+    val mainViewModel: MainViewModel by viewModels()
+
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by viewModels()
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -135,16 +135,6 @@ class MainActivity : AppCompatActivity() {
             ViewModelProvider(this)[ConfirmViewModel::class.java]
         ).initViewModelListener()
 
-        // NOTE: メッセージの既読数をバッジに表示する
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getUnreadMessages().findByAccountId(it.accountId)
-        }.map {
-            it.size
-        }.flowOn(Dispatchers.IO).onEach { count ->
-            showUnreadMessageCountBadge(count)
-        }.catch { e ->
-            logger.error("メッセージ既読数取得エラー", e = e)
-        }.launchIn(lifecycleScope)
 
         // NOTE: 各ばーしょんに合わせMenuを制御している
         miApplication.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
@@ -166,25 +156,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // NOTE: メッセージの既読数をバッジに表示する
+        mainViewModel.unreadMessageCount.onEach {
+            showUnreadMessageCountBadge(it)
+        }.launchIn(lifecycleScope)
+
         // NOTE: 通知の既読数を表示する
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getNotificationRepository().countUnreadNotification(it.accountId)
-        }.flowOn(Dispatchers.IO).onEach { count ->
-            showNotificationCountBadge(count)
-        }.catch { e ->
-            logger.error("通知既読数取得エラー", e = e)
+        mainViewModel.unreadNotificationCount.onEach {
+            showNotificationCountBadge(it)
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            miApplication.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map { body ->
-                body as? ChannelBody.Main.Notification
-            }.filterNotNull().map {
-                ac to it
-            }
-        }.map {
-            miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
-        }.flowOn(Dispatchers.IO).onEach { notificationRelation ->
+        mainViewModel.newNotifications.onEach { notificationRelation ->
             notificationMessageScope {
                 notificationRelation.showSnackBarMessage(binding.appBarMain.simpleNotification)
             }
@@ -192,16 +175,10 @@ class MainActivity : AppCompatActivity() {
             logger.error("通知取得エラー", e = e)
         }.launchIn(lifecycleScope + Dispatchers.Main)
 
-        if (BuildConfig.DEBUG) {
-            lifecycleScope.launchWhenResumed {
-                accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-                    miApplication.getSocket(it).stateEvent()
-                }.catch { e ->
-                    logger.error("WebSocket　状態取得エラー", e)
-                }.collect {
-                    webSocketStateMessageScope {
-                        it.showToastMessage()
-                    }
+        lifecycleScope.launchWhenResumed {
+            mainViewModel.currentAccountSocketStateEvent.collect {
+                webSocketStateMessageScope {
+                    it.showToastMessage()
                 }
             }
         }
@@ -211,7 +188,6 @@ class MainActivity : AppCompatActivity() {
             noteTaskExecutor.tasks.collect { taskState ->
                 showCreateNoteTaskStatusSnackBar(taskState)
             }
-
         }
 
         ViewModelProvider(
@@ -223,19 +199,7 @@ class MainActivity : AppCompatActivity() {
                     it is ReportState.Sending.Success
                             || it is ReportState.Sending.Failed
                 }.collect { state ->
-                    if (state is ReportState.Sending.Success) {
-                        Snackbar.make(
-                            binding.appBarMain.simpleNotification,
-                            R.string.successful_report,
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    } else if (state is ReportState.Sending.Failed) {
-                        Snackbar.make(
-                            binding.appBarMain.simpleNotification,
-                            R.string.report_failed,
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }
+                    showSendReportStateFrom(state)
                 }
             }
         }
@@ -580,6 +544,22 @@ class MainActivity : AppCompatActivity() {
             else -> throw IllegalStateException("未定義なNavigation Itemです")
         }
         startActivity(Intent(this, activity))
+    }
+
+    private fun showSendReportStateFrom(state: ReportState) {
+        if (state is ReportState.Sending.Success) {
+            Snackbar.make(
+                binding.appBarMain.simpleNotification,
+                R.string.successful_report,
+                Snackbar.LENGTH_SHORT
+            ).show()
+        } else if (state is ReportState.Sending.Failed) {
+            Snackbar.make(
+                binding.appBarMain.simpleNotification,
+                R.string.report_failed,
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
     }
 
     @ExperimentalCoroutinesApi
