@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var noteTaskExecutor: CreateNoteTaskExecutor
 
-    val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by viewModels()
 
