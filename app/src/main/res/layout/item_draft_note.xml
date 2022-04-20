@@ -113,7 +113,7 @@
                         android:layout_marginEnd="8dp"
                         tools:ignore="ContentDescription"
                         android:onClick="@{ ()-> draftNoteAction.onSelect(note.note) }"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
                 <ImageButton
                         android:layout_width="40dp"
                         android:layout_height="40dp"
@@ -121,7 +121,7 @@
                         android:src="@drawable/ic_delete_black_24dp"
                         tools:ignore="ContentDescription"
                         android:onClick="@{ ()-> draftNoteAction.onDelete(note.note) }"
-                        app:tint="?attr/colorNoteActionButtonTint" />
+                        app:tint="?attr/normalIconTint" />
             </LinearLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

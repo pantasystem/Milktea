@@ -12,6 +12,9 @@ object ViewBackgroundColorHelper {
     @BindingAdapter("setCardViewSurfaceColor")
     @JvmStatic
     fun CardView.setSurfaceColor(setCardViewSurfaceColor: Int?){
+        if (setCardViewSurfaceColor != null) {
+            this.setCardBackgroundColor(setCardViewSurfaceColor)
+        }
         val cardView = this
         val miApp = cardView.context.applicationContext as MiApplication
         val store = miApp.colorSettingStore

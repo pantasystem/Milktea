@@ -13,7 +13,7 @@
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
-        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+        <item name="normalIconTint">@color/colorItemNotSelected</item>
         <item name="colorMessageSelf">#808EDD</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
 
@@ -60,7 +60,7 @@
 
         <item name="colorSurface">#1E1E1E</item>
 
-        <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
+        <item name="normalIconTint">@color/colorDarkTextColor</item>
         <item name="actionBarSize">53dp</item>
 
         <item name="colorNormalReactionCounterBackground">#3A3A3A</item>
@@ -80,7 +80,7 @@
         <item name="android:windowBackground">@color/colorBlackPrimary</item>
         <item name="colorSurface">#000000</item>
 
-        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
+        <item name="normalIconTint">@color/colorItemNotSelected</item>
         <item name="actionBarSize">53dp</item>
         
         <item name="colorSeparator">@color/colorSeparator</item>

@@ -100,7 +100,7 @@
                                 tools:ignore="ContentDescription"
                                 style="@style/Widget.AppCompat.Button.Borderless"
                                 android:src="@drawable/ic_close_black_24dp"
-                                app:tint="?attr/colorNoteActionButtonTint"
+                                app:tint="?attr/normalIconTint"
                                 android:onClick="@{()-> viewModel.toggleReservationAt() }"/>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -182,7 +182,7 @@
                     android:adjustViewBounds="true"
                     tools:ignore="ContentDescription"
                     android:layout_margin="4dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <ImageButton
                     android:id="@+id/selectFileFromDrive"
@@ -194,7 +194,7 @@
                     android:adjustViewBounds="true"
                     tools:ignore="ContentDescription"
                     android:layout_margin="4dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <ImageButton
                     android:id="@+id/makePoll"
@@ -207,7 +207,7 @@
                     android:adjustViewBounds="true"
                     tools:ignore="ContentDescription"
                     android:layout_margin="4dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <ImageButton
                     android:id="@+id/setCw"
@@ -221,7 +221,7 @@
                     android:adjustViewBounds="true"
                     tools:ignore="ContentDescription"
                     android:layout_margin="4dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
             <ImageButton
                     android:id="@+id/mentionButton"
                     android:layout_width="wrap_content"
@@ -235,7 +235,7 @@
                     android:padding="12dp"
                     android:layout_margin="4dp"
 
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
             <ImageButton
                     android:id="@+id/showEmojisButton"
                     android:layout_width="wrap_content"
@@ -248,7 +248,7 @@
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:padding="12dp"
                     android:layout_margin="4dp"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
 
         </LinearLayout>

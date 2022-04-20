@@ -14,7 +14,7 @@
                 android:layout_height="wrap_content"
                 app:tabMode="scrollable"
                 android:layout_toStartOf="@id/reaction_input_keyboard"
-                app:tabTextColor="?attr/colorNoteActionButtonTint"
+                app:tabTextColor="?attr/normalIconTint"
 
                 >
 
@@ -28,7 +28,7 @@
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:src="@drawable/ic_keyboard_black_24dp"
                 tools:ignore="ContentDescription"
-                app:tint="?attr/colorNoteActionButtonTint" />
+                app:tint="?attr/normalIconTint" />
 
         <jp.panta.misskeyandroidclient.ui.BottomSheetViewPager
                 android:id="@+id/reaction_choices_view_pager"

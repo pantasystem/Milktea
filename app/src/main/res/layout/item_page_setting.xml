@@ -39,7 +39,7 @@
                     style="@style/Widget.AppCompat.Button.Borderless"
                     app:srcCompat="@drawable/ic_more_vert_black_24dp"
                     android:onClick="@{()-> pageSettingAction.action(page)}"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
         </LinearLayout>
 
