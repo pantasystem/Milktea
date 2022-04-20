@@ -168,8 +168,7 @@ class AuthViewModel @Inject constructor(
                     }
                 }
                 userDataSource.add(user)
-                accountRepository.add(account)
-                accountStore.setCurrent(account)
+                accountStore.addAccount(account)
 
                 account to user
             }.onSuccess {
