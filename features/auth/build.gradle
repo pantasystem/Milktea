@@ -65,8 +65,7 @@ dependencies {
     kaptTest libs.hilt.compiler
     implementation 'com.github.wada811:DataBinding-ktx:5.0.2'
 
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
+    implementation libs.bundles.androidx.lifecycle
 
     // hilt
     implementation libs.hilt.android
