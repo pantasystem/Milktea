@@ -53,6 +53,12 @@ dependencyResolutionManagement {
             bundle('androidx-lifecycle', ['androidx-lifecycle-extenstions', 'androidx-lifecycle-lifecycle-viewmodel', 'androidx-lifecycle-livedata'])
 
             library('emoji-bundled', 'androidx.emoji:emoji-bundled:1.2.0-alpha03')
+
+            library('room-runtime', "androidx.room:room-runtime:2.4.2")
+            library('room-compiler', 'androidx.room:room-compiler:2.4.2')
+            library('room-ktx', 'androidx.room:room-ktx:2.4.2')
+            library('room-testing', 'androidx.room:room-testing:2.4.2')
         }
     }
 }
+
