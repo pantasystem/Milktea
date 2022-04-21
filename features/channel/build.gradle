@@ -52,20 +52,17 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // compose
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
-    implementation "androidx.compose.foundation:foundation:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.material:material-icons-core:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "com.google.android.material:compose-theme-adapter:1.1.6"
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
-    implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation "com.google.accompanist:accompanist-pager:0.14.0"
-    implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
-    implementation "io.coil-kt:coil-compose:1.4.0"
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
 
     // hilt
     implementation libs.hilt.android

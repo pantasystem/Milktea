@@ -23,22 +23,32 @@ dependencyResolutionManagement {
 
             library('kotlinx.coroutines.android', 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0')
             library('kotlinx-coroutines-test', 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0')
+
+            // compose libs
+            library('compose-ui-ui', 'androidx.compose.ui:ui:1.1.1')
+            library('compose-ui-ui-tooling', 'androidx.compose.ui:ui-tooling:1.1.1')
+            bundle('compose-ui', ['compose-ui-ui-tooling', 'compose-ui-ui'])
+
+            library('compose-foundation-foundation', 'androidx.compose.foundation:foundation:1.1.1')
+            bundle('compose-foundation', ['compose-foundation-foundation'])
+
+            library('compose-material-material', 'androidx.compose.material:material:1.1.1')
+            library('compose-material-material-icons-core', 'androidx.compose.material:material-icons-core:1.1.1')
+            library('compose-material-material-icons-extended', 'androidx.compose.material:material-icons-extended:1.1.1')
+            bundle('compose-material', ['compose-material-material', 'compose-material-material-icons-core', 'compose-material-material-icons-extended'])
+
+            library('compose-ui-ui-test-junit4', 'androidx.compose.ui:ui-test-junit4:1.1.1')
+            library('compose-runtime-runtime-livedata', 'androidx.compose.runtime:runtime-livedata:1.1.1')
+            library('android-material-compose-theme-adapter', "com.google.android.material:compose-theme-adapter:1.1.6")
+            library('accompanist-swiperefresh', 'com.google.accompanist:accompanist-swiperefresh:0.14.0')
+            library('activity-compose', 'androidx.activity:activity-compose:1.4.0')
+            library('accompanist-pager', "com.google.accompanist:accompanist-pager:0.14.0")
+            library('accompanist-pager-indicators','com.google.accompanist:accompanist-pager-indicators:0.14.0')
+            library('coil-compose', 'io.coil-kt:coil-compose:1.4.0')
+
         }
     }
 }
 
 //// compose
-//implementation "androidx.compose.ui:ui:$compose_version"
 //implementation "androidx.compose.ui:ui-tooling:$compose_version"
-//implementation "androidx.compose.foundation:foundation:$compose_version"
-//implementation "androidx.compose.material:material:$compose_version"
-//implementation "androidx.compose.material:material-icons-core:$compose_version"
-//implementation "androidx.compose.material:material-icons-extended:$compose_version"
-//androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-//implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-//implementation "com.google.android.material:compose-theme-adapter:1.1.6"
-//implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
-//implementation 'androidx.activity:activity-compose:1.4.0'
-//implementation "com.google.accompanist:accompanist-pager:0.14.0"
-//implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
-//implementation "io.coil-kt:coil-compose:1.4.0"
