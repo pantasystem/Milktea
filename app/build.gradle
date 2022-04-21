@@ -163,16 +163,14 @@ dependencies {
     // ViewPager2
     implementation "androidx.viewpager2:viewpager2:1.1.0-beta01"
 
-    implementation 'org.jsoup:jsoup:1.13.1'
 
     // EmojiCompat
     implementation libs.emoji.bundled
 
     implementation libs.kotlinx.serialization.json
 
-    implementation 'com.github.wada811:DataBinding-ktx:5.0.2'
-
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation libs.databinding.ktx
+    implementation libs.fragment.ktx
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.google.firebase:firebase-messaging'
     implementation "androidx.core:core-ktx:1.7.0"

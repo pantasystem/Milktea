@@ -58,6 +58,10 @@ dependencyResolutionManagement {
             library('room-compiler', 'androidx.room:room-compiler:2.4.2')
             library('room-ktx', 'androidx.room:room-ktx:2.4.2')
             library('room-testing', 'androidx.room:room-testing:2.4.2')
+
+            library('fragment-ktx', 'androidx.fragment:fragment-ktx:1.4.1')
+
+            library('databinding-ktx', 'com.github.wada811:DataBinding-ktx:5.0.2')
         }
     }
 }
