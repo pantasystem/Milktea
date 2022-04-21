@@ -5,3 +5,20 @@ include ':api'
 include ':model'
 include ':features:auth'
 include ':features:channel'
+
+enableFeaturePreview("VERSION_CATALOGS")
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            library('kotlin-datetime', 'org.jetbrains.kotlinx:kotlinx-datetime:0.3.1')
+            library('hilt-android', 'com.google.dagger:hilt-android:2.40.5')
+            library('hilt-compiler', 'com.google.dagger:hilt-compiler:2.40.5')
+            library('hilt-lifecycle-viewmodel', 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03')
+            library('hilt-android-testing', 'com.google.dagger:hilt-android-testing:2.40.5')
+
+        }
+    }
+}
+
+

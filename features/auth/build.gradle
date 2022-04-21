@@ -52,36 +52,36 @@ dependencies {
 
 
     // hilt
-    implementation 'com.google.dagger:hilt-android:2.40.5'
-    kapt 'com.google.dagger:hilt-compiler:2.40.5'
-    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    implementation libs.hilt.lifecycle.viewmodel
 
     // For instrumentation tests
-    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.40.5'
+    androidTestImplementation  libs.hilt.android.testing
+    kaptAndroidTest libs.hilt.compiler
 
     // For local unit tests
-    testImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
+    testImplementation libs.hilt.android.testing
+    kaptTest libs.hilt.compiler
     implementation 'com.github.wada811:DataBinding-ktx:5.0.2'
 
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
 
     // hilt
-    implementation 'com.google.dagger:hilt-android:2.40.5'
-    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'
+    implementation libs.hilt.android
+    implementation libs.hilt.lifecycle.viewmodel
 
-    kapt 'com.google.dagger:hilt-compiler:2.40.5'
+    kapt libs.hilt.compiler
 
 
     // For instrumentation tests
-    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.40.5'
+    androidTestImplementation  libs.hilt.android.testing
+    kaptAndroidTest libs.hilt.compiler
 
     // For local unit tests
-    testImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
+    testImplementation libs.hilt.android.testing
+    kaptTest libs.hilt.compiler
 
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
     // EmojiCompat
