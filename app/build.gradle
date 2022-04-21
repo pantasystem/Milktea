@@ -120,8 +120,8 @@ dependencies {
 
 
     //Kotlin coroutines用ライブラリ(async, await)
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+    implementation libs.kotlinx.coroutines.android
+    implementation libs.kotlinx.coroutines.test
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
     implementation 'androidx.recyclerview:recyclerview:1.2.1'

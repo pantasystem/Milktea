@@ -20,12 +20,25 @@ dependencyResolutionManagement {
             library('retrofit2-retrofit', 'com.squareup.retrofit2:retrofit:2.9.0')
             library('retrofit2-converter-gson', 'com.squareup.retrofit2:converter-gson:2.3.0')
             library('retrofit2-kotlinx-serialization-converter', "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
+            library('kotlinx.coroutines.android', 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0')
+            library('kotlinx-coroutines-test', 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0')
         }
     }
 }
-//
-//def retrofit = '2.9.0'
-////retrofit
-//implementation "com.squareup.retrofit2:retrofit:$retrofit"
-//implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-//    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
+//// compose
+//implementation "androidx.compose.ui:ui:$compose_version"
+//implementation "androidx.compose.ui:ui-tooling:$compose_version"
+//implementation "androidx.compose.foundation:foundation:$compose_version"
+//implementation "androidx.compose.material:material:$compose_version"
+//implementation "androidx.compose.material:material-icons-core:$compose_version"
+//implementation "androidx.compose.material:material-icons-extended:$compose_version"
+//androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+//implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
+//implementation "com.google.android.material:compose-theme-adapter:1.1.6"
+//implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
+//implementation 'androidx.activity:activity-compose:1.4.0'
+//implementation "com.google.accompanist:accompanist-pager:0.14.0"
+//implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
+//implementation "io.coil-kt:coil-compose:1.4.0"

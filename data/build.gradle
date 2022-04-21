@@ -83,8 +83,8 @@ dependencies {
     implementation libs.kotlinx.serialization.json
 
     //Kotlin coroutines用ライブラリ(async, await)
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+    implementation libs.kotlinx.coroutines.android
+    implementation libs.kotlinx.coroutines.test
 
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
     implementation 'org.jsoup:jsoup:1.13.1'
