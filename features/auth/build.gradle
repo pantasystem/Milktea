@@ -87,9 +87,8 @@ dependencies {
     // EmojiCompat
     implementation "androidx.emoji:emoji-bundled:1.2.0-alpha03"
 
-    implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
-
+    implementation libs.retrofit2.retrofit
+    implementation libs.retrofit2.converter.gson
+    implementation libs.retrofit2.kotlinx.serialization.converter
 
 }
