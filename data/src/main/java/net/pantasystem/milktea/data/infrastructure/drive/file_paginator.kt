@@ -75,6 +75,18 @@ class FilePropertyPagingStore @AssistedInject constructor(
         this.currentDirectoryId = directory?.id
     }
 
+    /**
+     * DriveFileが作成されたタイミングで呼び出される
+     */
+    fun onCreated(id: FileProperty.Id) {
+        filePropertyPagingImpl.setState(
+            filePropertyPagingImpl.getState().convert {
+                it.toMutableList().also { list ->
+                    list.add(0, id)
+                }
+            }
+        )
+    }
 }
 
 

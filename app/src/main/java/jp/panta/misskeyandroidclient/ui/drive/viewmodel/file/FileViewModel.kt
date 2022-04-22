@@ -142,7 +142,8 @@ class FileViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = currentAccountWatcher.getAccount()
-                filePropertyRepository.create(account.accountId, file)
+                val e = filePropertyRepository.create(account.accountId, file).getOrThrow()
+                filePropertiesPagingStore.onCreated(e.id)
             } catch (e: Exception) {
                 logger.info("ファイルアップロードに失敗した")
             }
