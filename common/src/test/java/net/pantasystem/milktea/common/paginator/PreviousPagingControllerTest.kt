@@ -12,6 +12,58 @@ import org.junit.Test
 class PreviousPagingControllerTest {
 
     @Test
+    fun loadPrevious_throwsError() {
+        val stateEvents = mutableListOf<PageableState<List<Int>>>()
+        val store = object : PaginationState<Int>, IdGetter<String>, PreviousLoader<String> {
+            private val localState =
+                MutableStateFlow<PageableState<List<Int>>>(PageableState.Loading.Init())
+            override val state: Flow<PageableState<List<Int>>>
+                get() = localState
+
+            override fun getState(): PageableState<List<Int>> {
+                return localState.value
+            }
+
+            override fun setState(state: PageableState<List<Int>>) {
+                stateEvents.add(state)
+                localState.value = state
+            }
+
+            override suspend fun getSinceId(): String? {
+                return null
+            }
+
+            override suspend fun getUntilId(): String? {
+                return (localState.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()
+                    ?.toString()
+            }
+
+            override suspend fun loadPrevious(): Result<List<String>> {
+                throw Exception()
+            }
+        }
+        val previousPagingController = PreviousPagingController<String, Int>(
+            entityConverter = object : EntityConverter<String, Int> {
+                override suspend fun convertAll(list: List<String>): List<Int> {
+                    return list.map { it.toInt() }
+                }
+            },
+            locker = object : StateLocker {
+                override val mutex: Mutex = Mutex()
+            },
+            previousLoader = store,
+            state = store
+        )
+
+        runBlocking {
+            previousPagingController.loadPrevious()
+        }
+        assertEquals(2, stateEvents.size)
+        assertEquals(PageableState.Loading.Previous::class.java,stateEvents[0].javaClass)
+        assertEquals(PageableState.Error::class.java,stateEvents[1].javaClass)
+    }
+
+    @Test
     fun loadPrevious() {
         val stateEvents = mutableListOf<PageableState<List<Int>>>()
         val store = object : PaginationState<Int>, IdGetter<String>, PreviousLoader<String> {
@@ -75,6 +127,6 @@ class PreviousPagingControllerTest {
         assertEquals(PageableState.Loading.Previous::class.java,stateEvents[4].javaClass)
         assertEquals(PageableState.Fixed::class.java,stateEvents[5].javaClass)
 
-
+        assertEquals((1..60).toList(), (store.getState().content as StateContent.Exist).rawContent)
     }
 }
