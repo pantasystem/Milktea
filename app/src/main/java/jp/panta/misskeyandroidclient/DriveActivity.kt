@@ -21,10 +21,10 @@ import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.*
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModelFactory
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.data.infrastructure.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.model.drive.*
 import javax.inject.Inject
 
@@ -39,9 +39,6 @@ class DriveActivity : AppCompatActivity() {
     }
 
     private lateinit var _driveViewModel: DriveViewModel
-
-    @ExperimentalCoroutinesApi
-    private lateinit var _fileViewModel: FileViewModel
 
 
     @Inject
@@ -94,13 +91,22 @@ class DriveActivity : AppCompatActivity() {
             }
         ))
     }
+
     @Inject
     lateinit var directoryViewModelFactory: DirectoryViewModel.ViewModelAssistedFactory
     private val _directoryViewModel: DirectoryViewModel by viewModels {
         DirectoryViewModel.provideViewModel(directoryViewModelFactory, driveStore)
     }
 
+    @Inject
+    lateinit var filePropertyPagingFactory: FilePropertyPagingStore.AssistedStoreFactory
+    @Inject
+    lateinit var fileViewModelFactory: FileViewModel.AssistedViewModelFactory
 
+    @ExperimentalCoroutinesApi
+    private val _fileViewModel: FileViewModel by viewModels {
+        FileViewModel.provideFactory(fileViewModelFactory, filePropertyPagingFactory, driveStore)
+    }
 
     @OptIn(
         ExperimentalPagerApi::class,
@@ -116,28 +122,10 @@ class DriveActivity : AppCompatActivity() {
 
 
 
-        val miCore = applicationContext as MiCore
-
-
         _driveViewModel = ViewModelProvider(
             this,
             DriveViewModelFactory(driveSelectableMode)
         )[DriveViewModel::class.java]
-        _fileViewModel = ViewModelProvider(
-            this, FileViewModelFactory(
-                accountId ?: accountIds.lastOrNull(),
-                miCore,
-                driveStore
-            )
-        )[FileViewModel::class.java]
-
-        _fileViewModel = ViewModelProvider(
-            this, FileViewModelFactory(
-                accountId ?: accountIds.lastOrNull(),
-                miCore,
-                driveStore
-            )
-        )[FileViewModel::class.java]
 
 
 
