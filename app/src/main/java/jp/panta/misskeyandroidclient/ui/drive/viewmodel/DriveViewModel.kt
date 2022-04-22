@@ -1,35 +1,33 @@
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.model.drive.*
 import java.io.Serializable
+
 
 data class DriveSelectableMode(
     val selectableMaxSize: Int,
     val selectedFilePropertyIds: List<FileProperty.Id>,
     val accountId: Long
 ) : Serializable
-class DriveViewModel(
-    val selectable: DriveSelectableMode?
-) : ViewModel(){
 
-    val driveStore: DriveStore =
-        DriveStore(
-            DriveState(
-                accountId = selectable?.accountId,
-                path = DirectoryPath(emptyList()),
-                selectedFilePropertyIds = selectable?.let {
-                    SelectedFilePropertyIds(
-                        selectableMaxCount = it.selectableMaxSize,
-                        selectedIds = it.selectedFilePropertyIds.toSet()
-                    )
-                }
-            )
-        )
+class DriveViewModel @AssistedInject constructor(
+    @Assisted val driveStore: DriveStore,
+    @Assisted val selectable: DriveSelectableMode?,
+) : ViewModel() {
 
+    companion object;
 
+    @AssistedFactory
+    interface AssistedViewModelFactory {
+        fun create(driveStore: DriveStore, selectable: DriveSelectableMode?): DriveViewModel
+    }
 
     val path: Flow<List<PathViewData>> = driveStore.state.map { state ->
         mutableListOf(
@@ -49,11 +47,9 @@ class DriveViewModel(
     }
 
 
-
-    fun getSelectedFileIds(): Set<FileProperty.Id>?{
+    fun getSelectedFileIds(): Set<FileProperty.Id>? {
         return this.driveStore.state.value.selectedFilePropertyIds?.selectedIds
     }
-
 
 
     fun push(directory: Directory) {
@@ -61,9 +57,9 @@ class DriveViewModel(
     }
 
 
-    fun pop() : Boolean{
+    fun pop(): Boolean {
         val path = driveStore.state.value.path.path
-        if(path.isEmpty()) {
+        if (path.isEmpty()) {
             return false
         }
 
@@ -74,5 +70,17 @@ class DriveViewModel(
         driveStore.popUntil(directory)
     }
 
+
+}
+
+@Suppress("UNCHECKED_CAST")
+fun DriveViewModel.Companion.provideViewModel(
+    factory: DriveViewModel.AssistedViewModelFactory,
+    driveStore: DriveStore,
+    selectable: DriveSelectableMode?,
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return factory.create(driveStore, selectable) as T
+    }
 
 }

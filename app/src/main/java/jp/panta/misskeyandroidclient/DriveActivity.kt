@@ -11,7 +11,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -38,7 +37,6 @@ class DriveActivity : AppCompatActivity() {
         const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
     }
 
-    private lateinit var _driveViewModel: DriveViewModel
 
 
     @Inject
@@ -108,6 +106,12 @@ class DriveActivity : AppCompatActivity() {
         FileViewModel.provideFactory(fileViewModelFactory, filePropertyPagingFactory, driveStore)
     }
 
+    @Inject
+    lateinit var driveViewModelFactory: DriveViewModel.AssistedViewModelFactory
+    private val _driveViewModel: DriveViewModel by viewModels {
+        DriveViewModel.provideViewModel(driveViewModelFactory, driveStore, driveSelectableMode)
+    }
+
     @OptIn(
         ExperimentalPagerApi::class,
         ExperimentalMaterialApi::class,
@@ -120,12 +124,6 @@ class DriveActivity : AppCompatActivity() {
         setTheme()
         ViewTreeLifecycleOwner.set(window.decorView, this)
 
-
-
-        _driveViewModel = ViewModelProvider(
-            this,
-            DriveViewModelFactory(driveSelectableMode)
-        )[DriveViewModel::class.java]
 
 
 
