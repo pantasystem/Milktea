@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

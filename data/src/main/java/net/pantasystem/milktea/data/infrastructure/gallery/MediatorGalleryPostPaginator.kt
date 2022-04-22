@@ -2,9 +2,9 @@ package net.pantasystem.milktea.data.infrastructure.gallery
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.infrastructure.FuturePagingController
-import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
-import net.pantasystem.milktea.data.infrastructure.StateLocker
+import net.pantasystem.milktea.common.FuturePagingController
+import net.pantasystem.milktea.common.PreviousPagingController
+import net.pantasystem.milktea.common.StateLocker
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex

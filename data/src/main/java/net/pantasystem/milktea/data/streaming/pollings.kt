@@ -13,70 +13,19 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
 
-@Serializable
-data class Pong(val pong: Long)
-
-@Serializable
-data class Error(val message: String)
-
-/**
- * {"type": "api", "body": {"id": "3", "endpoint": "notes/create", "data":{"text":"test", "visibility":"public"}}}
- */
-@Serializable
-data class PingRequest(
-    val type: String,
-    val body: Body
-)
-
-
-@Serializable
-data class Body(
-    val id: String,
-    val endpoint: String,
-)
-
-
-fun createPingRequest(): PingRequest {
-    return PingRequest(
-        "api",
-        Body(
-            UUID.randomUUID().toString().substring(0..4),
-            endpoint = "ping"
-        )
-    )
-}
-
-@Serializable
-data class PongRes(
-    val type: String,
-    val body: Body
-) {
-    @Serializable
-    data class Body(val res: Pong? = null, val error: Error? = null)
-
-
-    val id: String get() = type.split(":")[1]
-}
-
 const val TTL_COUNT = 3
-
-
 internal class PollingJob(
     private val socket: Socket,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
     private val job = SupervisorJob()
     private val scope = CoroutineScope(job + dispatcher)
-    private val pongs = MutableSharedFlow<PongRes>(
+    private val pongs = MutableSharedFlow<String>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
         extraBufferCapacity = 1024
     )
 
 
-    val isPolling: Boolean get() = job.isActive
     fun startPolling(interval: Long, count: Long, timeout: Long) {
 
         // NOTE: pingに一定回数以上失敗すると再接続するそのためのカウント
@@ -85,15 +34,15 @@ internal class PollingJob(
             (0 until count).asSequence().asFlow().onEach {
                 delay(interval)
             }.collect {
-                val ping = createPingRequest()
                 val sendTime = Clock.System.now()
-                if (!socket.send(json.encodeToString(ping))) {
+
+                if (!socket.send("ping")) {
                     Log.d("PollingJob", "sendしたらfalse帰ってきた")
                 }
                 try {
                     val pong = withTimeout(timeout) {
                         pongs.first {
-                            it.id == ping.body.id
+                            it == "pong"
                         }
                     }
                     val resTime = Clock.System.now()
@@ -112,9 +61,12 @@ internal class PollingJob(
         }
     }
 
-
-    fun onReceive(res: PongRes) {
-        pongs.tryEmit(res)
+    fun onReceive(msg: String) {
+        if (msg.lowercase() == "pong") {
+            pongs.tryEmit(msg)
+        } else {
+            throw IllegalArgumentException()
+        }
     }
 
     fun cancel() {

@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.group.impl
 
 
 import net.pantasystem.milktea.api.misskey.groups.*
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.Encryption

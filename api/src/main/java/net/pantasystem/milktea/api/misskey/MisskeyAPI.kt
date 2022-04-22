@@ -193,7 +193,7 @@ interface MisskeyAPI {
     suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 
     @POST("api/drive/folders/create")
-    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Unit>
+    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Directory>
 
 
     //meta

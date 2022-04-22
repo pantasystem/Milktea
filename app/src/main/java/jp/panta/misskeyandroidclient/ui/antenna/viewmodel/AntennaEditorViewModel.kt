@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
