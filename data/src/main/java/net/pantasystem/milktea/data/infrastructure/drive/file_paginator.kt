@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.*
 
@@ -20,33 +23,38 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import retrofit2.Response
 
 
-class FilePropertyPagingStore(
-    private var currentDirectoryId: String?,
-    private val getAccount: suspend () -> Account,
+class FilePropertyPagingStore @AssistedInject constructor(
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
     encryption: Encryption,
+    @Assisted private var currentDirectoryId: String?,
+    @Assisted private val getAccount: suspend () -> Account,
+) {
 
-    ) {
-
+    @AssistedFactory
+    interface AssistedStoreFactory {
+        fun create(currentDirectoryId: String?, getAccount: suspend () -> Account): FilePropertyPagingStore
+    }
+    companion object;
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,
+        encryption,
+        filePropertyDataSource,
         {
             getAccount.invoke()
         },
         {
             currentDirectoryId
         },
-        encryption,
-        filePropertyDataSource
     )
 
-    private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> = PreviousPagingController(
-        filePropertyPagingImpl,
-        filePropertyPagingImpl,
-        filePropertyPagingImpl,
-        filePropertyPagingImpl
-    )
+    private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> =
+        PreviousPagingController(
+            filePropertyPagingImpl,
+            filePropertyPagingImpl,
+            filePropertyPagingImpl,
+            filePropertyPagingImpl
+        )
 
     val state = this.filePropertyPagingImpl.state
 
@@ -72,18 +80,20 @@ class FilePropertyPagingStore(
 
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getAccount: suspend ()-> Account,
-    private val getCurrentFolderId: ()-> String?,
     private val encryption: Encryption,
-    private val filePropertyDataSource: FilePropertyDataSource
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val getAccount: suspend () -> Account,
+    private val getCurrentFolderId: () -> String?,
 ) : PaginationState<FileProperty.Id>,
     IdGetter<String>, PreviousLoader<FilePropertyDTO>,
     EntityConverter<FilePropertyDTO, FileProperty.Id>,
-    StateLocker
-{
+    StateLocker {
 
-    private val _state = MutableStateFlow<PageableState<List<FileProperty.Id>>>(PageableState.Fixed(
-        StateContent.NotExist()))
+    private val _state = MutableStateFlow<PageableState<List<FileProperty.Id>>>(
+        PageableState.Fixed(
+            StateContent.NotExist()
+        )
+    )
     override val state: Flow<PageableState<List<FileProperty.Id>>>
         get() = _state
 
