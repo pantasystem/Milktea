@@ -3,7 +3,7 @@ package net.pantasystem.milktea.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
+import net.pantasystem.milktea.common.PreviousPagingController
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
 import kotlinx.coroutines.Dispatchers

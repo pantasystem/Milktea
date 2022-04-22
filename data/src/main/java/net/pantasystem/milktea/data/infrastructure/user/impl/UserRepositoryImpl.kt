@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.user.impl
 
 
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider

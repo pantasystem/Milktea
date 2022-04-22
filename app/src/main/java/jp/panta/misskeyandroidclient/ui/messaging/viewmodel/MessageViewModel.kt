@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import kotlin.collections.ArrayList
 
 @ExperimentalCoroutinesApi

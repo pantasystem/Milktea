@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.gallery.impl
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.instance.IllegalVersionException
 

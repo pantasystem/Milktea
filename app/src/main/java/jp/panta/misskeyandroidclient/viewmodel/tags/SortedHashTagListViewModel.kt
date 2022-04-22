@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.viewmodel.tags
 
 import androidx.lifecycle.*
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
 import jp.panta.misskeyandroidclient.viewmodel.MiCore

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.api.misskey
+package net.pantasystem.milktea.common
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
