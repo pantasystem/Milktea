@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
