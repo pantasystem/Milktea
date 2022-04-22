@@ -13,6 +13,7 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import net.pantasystem.milktea.api.misskey.v12.channel.FindPageable
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 
 import net.pantasystem.milktea.model.account.AccountRepository

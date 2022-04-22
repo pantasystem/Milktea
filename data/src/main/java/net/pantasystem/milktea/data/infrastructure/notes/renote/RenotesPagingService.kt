@@ -11,6 +11,7 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.FindRenotes
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.model.account.AccountRepository
 
 interface RenotesPagingService {
