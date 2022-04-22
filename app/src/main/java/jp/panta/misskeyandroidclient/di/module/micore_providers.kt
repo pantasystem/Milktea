@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient.di.module
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.data.infrastructure.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStore
 import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStoreImpl
 import net.pantasystem.milktea.data.infrastructure.gallery.LikedGalleryPostStoreImpl

@@ -1,4 +1,3 @@
-
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel.file
 
 import androidx.lifecycle.ViewModel
@@ -33,7 +32,10 @@ class FileViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface AssistedViewModelFactory {
-        fun create(filePropertyPagingStoreFactory: FilePropertyPagingStore.AssistedStoreFactory, driveStore: DriveStore): FileViewModel
+        fun create(
+            filePropertyPagingStoreFactory: FilePropertyPagingStore.AssistedStoreFactory,
+            driveStore: DriveStore
+        ): FileViewModel
     }
 
     companion object;
@@ -141,8 +143,12 @@ class FileViewModel @AssistedInject constructor(
     fun uploadFile(file: AppFile.Local) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val currentDir = driveStore.state.value.path.path.lastOrNull()?.id
                 val account = currentAccountWatcher.getAccount()
-                val e = filePropertyRepository.create(account.accountId, file).getOrThrow()
+                val e = filePropertyRepository.create(
+                    account.accountId,
+                    file.copy(folderId = currentDir)
+                ).getOrThrow()
                 filePropertiesPagingStore.onCreated(e.id)
             } catch (e: Exception) {
                 logger.info("ファイルアップロードに失敗した")
