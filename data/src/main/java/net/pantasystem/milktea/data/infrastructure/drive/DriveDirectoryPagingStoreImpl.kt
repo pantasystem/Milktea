@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -27,6 +28,13 @@ class DriveDirectoryPagingStoreImpl @Inject constructor(
         )
     }
 
+    private val controller = PreviousPagingController(
+        pagingImpl,
+        pagingImpl,
+        pagingImpl,
+        pagingImpl,
+    )
+
     override val state: Flow<PageableState<List<Directory>>>
         get() = pagingImpl.state
 
@@ -35,7 +43,7 @@ class DriveDirectoryPagingStoreImpl @Inject constructor(
     }
 
     override suspend fun loadPrevious() {
-        pagingImpl.loadPrevious()
+        controller.loadPrevious()
     }
 
     override suspend fun setAccount(account: Account?) {
@@ -91,17 +99,17 @@ class DriveDirectoryPagingImpl(
     }
 
     override suspend fun getSinceId(): String? {
-        return (_state.value.content as StateContent.Exist).rawContent.firstOrNull()?.id
+        return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()?.id
     }
 
     override suspend fun getUntilId(): String? {
-        return (_state.value.content as StateContent.Exist).rawContent.lastOrNull()?.id
+        return (_state.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.id
     }
 
     override suspend fun loadPrevious(): Response<List<Directory>> {
         val account = account ?: throw UnauthorizedException()
         return misskeyAPIProvider.get(account)
-            .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId(), parentId = directory?.id))
+            .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId(), folderId = directory?.id))
             .throwIfHasError()
     }
 
