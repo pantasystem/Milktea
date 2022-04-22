@@ -13,12 +13,12 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import net.pantasystem.milktea.api.misskey.v12.channel.FindPageable
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelStateModel
-import retrofit2.Response
 
 enum class ChannelListType {
     OWNED, FOLLOWED, FEATURED
@@ -106,7 +106,7 @@ class ChannelPagingModel @AssistedInject constructor(
 //        return res.throwIfHasError()
 //    }
 
-    override suspend fun loadPrevious(): Response<List<ChannelDTO>> {
+    override suspend fun loadPrevious(): Result<List<ChannelDTO>> {
         val account = accountRepository.get(accountId)
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
         val i = account.getI(encryption)
@@ -150,7 +150,9 @@ class ChannelPagingModel @AssistedInject constructor(
             }
         }
         logger.debug("loadPrevious res:${res.code()}")
-        return res.throwIfHasError()
+        return runCatching {
+            res.throwIfHasError().body()!!
+        }
     }
 
 

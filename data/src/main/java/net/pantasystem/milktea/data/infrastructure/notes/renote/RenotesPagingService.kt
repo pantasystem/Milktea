@@ -4,13 +4,13 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
-import retrofit2.Response
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.FindRenotes
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.model.account.AccountRepository
 
 interface RenotesPagingService {
@@ -27,10 +27,17 @@ class RenotesPagingServiceImpl(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val encryption: Encryption,
 
-    ) : RenotesPagingService{
+    ) : RenotesPagingService {
 
-    private val pagingImpl = RenotesPagingImpl(targetNoteId, misskeyAPIProvider, accountRepository, noteDataSourceAdder, encryption)
-    private val controller = PreviousPagingController(pagingImpl, pagingImpl, pagingImpl, pagingImpl)
+    private val pagingImpl = RenotesPagingImpl(
+        targetNoteId,
+        misskeyAPIProvider,
+        accountRepository,
+        noteDataSourceAdder,
+        encryption
+    )
+    private val controller =
+        PreviousPagingController(pagingImpl, pagingImpl, pagingImpl, pagingImpl)
 
     override val state: Flow<PageableState<List<Renote>>>
         get() = pagingImpl.state
@@ -50,6 +57,7 @@ class RenotesPagingServiceImpl(
         this.next()
     }
 }
+
 class RenotesPagingImpl(
     private val targetNoteId: Note.Id,
     val misskeyAPIProvider: MisskeyAPIProvider,
@@ -60,20 +68,24 @@ class RenotesPagingImpl(
     EntityConverter<NoteDTO, Renote>,
     StateLocker,
     PaginationState<Renote>,
-    IdGetter<String>
-{
+    IdGetter<String> {
 
-    private val _state: MutableStateFlow<PageableState<List<Renote>>> = MutableStateFlow(PageableState.Fixed(StateContent.NotExist()))
+    private val _state: MutableStateFlow<PageableState<List<Renote>>> =
+        MutableStateFlow(PageableState.Fixed(StateContent.NotExist()))
     override val state: Flow<PageableState<List<Renote>>>
         get() = _state
 
     override val mutex: Mutex = Mutex()
 
-    override suspend fun loadPrevious(): Response<List<NoteDTO>> {
-        val account = accountRepository.get(targetNoteId.accountId)
-        val i = account.getI(encryption)
+    override suspend fun loadPrevious(): Result<List<NoteDTO>> {
+        return runCatching {
+            val account = accountRepository.get(targetNoteId.accountId)
+            val i = account.getI(encryption)
 
-        return misskeyAPIProvider.get(account.instanceDomain).renotes(FindRenotes(i = i, noteId = targetNoteId.noteId, untilId = getUntilId()))
+            misskeyAPIProvider.get(account.instanceDomain)
+                .renotes(FindRenotes(i = i, noteId = targetNoteId.noteId, untilId = getUntilId()))
+                .throwIfHasError().body()!!
+        }
     }
 
     override suspend fun convertAll(list: List<NoteDTO>): List<Renote> {
@@ -81,9 +93,9 @@ class RenotesPagingImpl(
         return list.map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }.map {
-            if(it.isQuote()) {
+            if (it.isQuote()) {
                 Renote.Quote(it.id)
-            }else{
+            } else {
                 Renote.Normal(it.id)
             }
         }

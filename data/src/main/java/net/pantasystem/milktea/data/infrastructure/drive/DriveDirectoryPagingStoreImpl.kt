@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.misskey.drive.RequestFolder
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore
-import retrofit2.Response
 import javax.inject.Inject
 
 class DriveDirectoryPagingStoreImpl @Inject constructor(
@@ -107,11 +107,14 @@ class DriveDirectoryPagingImpl(
         return (_state.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.id
     }
 
-    override suspend fun loadPrevious(): Response<List<Directory>> {
-        val account = account ?: throw UnauthorizedException()
-        return misskeyAPIProvider.get(account)
-            .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId(), folderId = directory?.id))
-            .throwIfHasError()
+    override suspend fun loadPrevious(): Result<List<Directory>> {
+        return runCatching {
+            val account = account ?: throw UnauthorizedException()
+            misskeyAPIProvider.get(account)
+                .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId(), folderId = directory?.id))
+                .throwIfHasError()
+                .body()!!
+        }
     }
 
     override fun getState(): PageableState<List<Directory>> {

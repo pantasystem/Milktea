@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.infrastructure.*
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.user.UserDataSource
-import retrofit2.Response
 
 data class LikedGalleryPostId(
     val id: String,
@@ -90,25 +90,31 @@ class LikedGalleryPostsLoader(
     private val encryption: Encryption
 ) : FutureLoader<LikedGalleryPost>, PreviousLoader<LikedGalleryPost> {
 
-    override suspend fun loadFuture(): Response<List<LikedGalleryPost>> {
-        val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
-            ?: throw IllegalVersionException()
-        return api.likedGalleryPosts(
-            GetPosts(
-           sinceId = idGetter.getSinceId(),
-            i = getAccount.invoke().getI(encryption)
-        )
-        )
+    override suspend fun loadFuture(): Result<List<LikedGalleryPost>> {
+        return runCatching {
+            val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
+                ?: throw IllegalVersionException()
+            api.likedGalleryPosts(
+                GetPosts(
+                    sinceId = idGetter.getSinceId(),
+                    i = getAccount.invoke().getI(encryption)
+                )
+            ).throwIfHasError().body()!!
+        }
+
     }
 
-    override suspend fun loadPrevious(): Response<List<LikedGalleryPost>> {
-        val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
-            ?: throw IllegalVersionException()
-        return api.likedGalleryPosts(
-            GetPosts(
-            untilId = idGetter.getUntilId(),
-            i = getAccount.invoke().getI(encryption)
-        )
-        )
+    override suspend fun loadPrevious(): Result<List<LikedGalleryPost>> {
+        return runCatching {
+            val api = misskeyAPIProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
+                ?: throw IllegalVersionException()
+            api.likedGalleryPosts(
+                GetPosts(
+                    untilId = idGetter.getUntilId(),
+                    i = getAccount.invoke().getI(encryption)
+                )
+            ).throwIfHasError().body()!!
+        }
+
     }
 }
