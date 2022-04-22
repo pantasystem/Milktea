@@ -86,12 +86,16 @@ class GalleryPostsLoader (
         }
     }
 
-    override suspend fun loadFuture(): Response<List<GalleryPostDTO>> {
-        return api(untilId = idGetter.getSinceId()).invoke()
+    override suspend fun loadFuture(): Result<List<GalleryPostDTO>> {
+        return runCatching {
+            api(untilId = idGetter.getSinceId()).invoke().throwIfHasError().body()!!
+        }
     }
 
-    override suspend fun loadPrevious(): Response<List<GalleryPostDTO>> {
-        return api(untilId = idGetter.getUntilId()).invoke()
+    override suspend fun loadPrevious(): Result<List<GalleryPostDTO>> {
+        return runCatching {
+            api(untilId = idGetter.getUntilId()).invoke().throwIfHasError().body()!!
+        }
     }
 
 

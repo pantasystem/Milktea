@@ -17,7 +17,6 @@ import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
-import retrofit2.Response
 import javax.inject.Inject
 
 
@@ -129,15 +128,17 @@ class FilePropertyPagingImpl(
         return (getState().content as? StateContent.Exist<List<FileProperty.Id>>)?.rawContent?.lastOrNull()?.fileId
     }
 
-    override suspend fun loadPrevious(): Response<List<FilePropertyDTO>> {
-        return misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
-            RequestFile(
-                folderId = getCurrentFolderId.invoke(),
-                untilId = this.getUntilId(),
-                i = getAccount.invoke().getI(encryption),
-                limit = 20
-            )
-        ).throwIfHasError()
+    override suspend fun loadPrevious(): Result<List<FilePropertyDTO>> {
+        return runCatching {
+            misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
+                RequestFile(
+                    folderId = getCurrentFolderId.invoke(),
+                    untilId = this.getUntilId(),
+                    i = getAccount.invoke().getI(encryption),
+                    limit = 20
+                )
+            ).throwIfHasError().body()!!
+        }
     }
 
     override suspend fun convertAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {

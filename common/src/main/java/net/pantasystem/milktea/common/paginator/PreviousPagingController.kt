@@ -3,7 +3,6 @@ package net.pantasystem.milktea.common.paginator
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.common.throwIfHasError
 
 class PreviousPagingController<DTO, E>(
     private val entityConverter: EntityConverter<DTO, E>,
@@ -19,8 +18,8 @@ class PreviousPagingController<DTO, E>(
             )
             state.setState(loading)
             runCatching {
-                val res = previousLoader.loadPrevious().throwIfHasError()
-                entityConverter.convertAll(res.body()!!)
+                val res = previousLoader.loadPrevious().getOrThrow()
+                entityConverter.convertAll(res)
             }.onFailure {
                 val errorState = PageableState.Error(
                     state.getState().content,
