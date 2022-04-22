@@ -1,8 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.*
 
@@ -14,31 +11,32 @@ import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.drive.RequestFile
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
 import retrofit2.Response
+import javax.inject.Inject
 
 
-class FilePropertyPagingStore @AssistedInject constructor(
+class FilePropertyPagingStoreImpl @Inject constructor(
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
     encryption: Encryption,
-    @Assisted private var currentDirectoryId: String?,
-    @Assisted private val getAccount: suspend () -> Account,
-) {
+) : FilePropertyPagingStore {
 
-    @AssistedFactory
-    interface AssistedStoreFactory {
-        fun create(currentDirectoryId: String?, getAccount: suspend () -> Account): FilePropertyPagingStore
-    }
+    private var currentDirectoryId: String? = null
+
+    private var currentAccount: Account? = null
+
     companion object;
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,
         encryption,
         filePropertyDataSource,
         {
-            getAccount.invoke()
+            currentAccount?: throw UnauthorizedException()
         },
         {
             currentDirectoryId
@@ -53,29 +51,34 @@ class FilePropertyPagingStore @AssistedInject constructor(
             filePropertyPagingImpl
         )
 
-    val state = this.filePropertyPagingImpl.state
+    override val state = this.filePropertyPagingImpl.state
 
-    val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
+    override val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
 
-    suspend fun loadPrevious() {
+    override suspend fun loadPrevious() {
         previousPagingController.loadPrevious()
     }
 
-    suspend fun clear() {
+    override suspend fun clear() {
         this.filePropertyPagingImpl.mutex.withLock {
             this.filePropertyPagingImpl.setState(PageableState.Loading.Init())
         }
     }
 
-    suspend fun setCurrentDirectory(directory: Directory?) {
+    override suspend fun setCurrentDirectory(directory: Directory?) {
         this.clear()
         this.currentDirectoryId = directory?.id
+    }
+
+    override suspend fun setCurrentAccount(account: Account?) {
+        this.clear()
+        this.currentAccount = account
     }
 
     /**
      * DriveFileが作成されたタイミングで呼び出される
      */
-    fun onCreated(id: FileProperty.Id) {
+    override fun onCreated(id: FileProperty.Id) {
         filePropertyPagingImpl.setState(
             filePropertyPagingImpl.getState().convert {
                 it.toMutableList().also { list ->
@@ -84,6 +87,7 @@ class FilePropertyPagingStore @AssistedInject constructor(
             }
         )
     }
+
 }
 
 
