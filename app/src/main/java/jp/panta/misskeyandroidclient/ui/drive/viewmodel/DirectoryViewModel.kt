@@ -21,6 +21,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.CreateDirectory
+import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import net.pantasystem.milktea.model.drive.DriveStore
 
@@ -31,6 +32,7 @@ class DirectoryViewModel @AssistedInject constructor(
     loggerFactory: Logger.Factory,
     private val accountRepository: AccountRepository,
     private val driveDirectoryRepository: DriveDirectoryRepository,
+    private val driveDirectoryPagingStore: DriveDirectoryPagingStore,
     @Assisted private val driveStore: DriveStore,
 ) : ViewModel() {
 
@@ -64,6 +66,13 @@ class DirectoryViewModel @AssistedInject constructor(
         }.catch { e ->
             logger.warning("アカウント変更伝達処理中にエラー", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+        driveStore.state.map {
+            it.path.path.lastOrNull()
+        }.onEach {
+            driveDirectoryPagingStore.setCurrentDirectory(it)
+        }.launchIn(viewModelScope)
+
 
     }
 
