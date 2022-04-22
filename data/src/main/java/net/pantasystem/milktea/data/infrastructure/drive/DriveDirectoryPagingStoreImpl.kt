@@ -56,13 +56,15 @@ class DriveDirectoryPagingStoreImpl @Inject constructor(
     }
 
     override fun onCreated(directory: Directory) {
-        pagingImpl.setState(
-            pagingImpl.getState().convert {
-                it.toMutableList().also { list ->
-                    list.add(0, directory)
+        if (pagingImpl.directory?.id == directory.parentId) {
+            pagingImpl.setState(
+                pagingImpl.getState().convert {
+                    it.toMutableList().also { list ->
+                        list.add(0, directory)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     override fun onDeleted(directory: Directory) {
@@ -84,7 +86,7 @@ class DriveDirectoryPagingImpl(
     StateLocker {
 
     private var account: Account? = null
-    private var directory: Directory? = null
+    var directory: Directory? = null
 
     override val mutex: Mutex = Mutex()
 

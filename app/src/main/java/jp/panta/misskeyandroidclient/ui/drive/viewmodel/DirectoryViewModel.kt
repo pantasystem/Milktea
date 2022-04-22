@@ -102,11 +102,14 @@ class DirectoryViewModel @AssistedInject constructor(
                 driveDirectoryRepository.create(
                     CreateDirectory(
                         accountId = accountWatcher.getAccount().accountId,
-                        directoryName = folderName
+                        directoryName = folderName,
+                        parentId = driveStore.state.value.path.path.lastOrNull()?.id
                     )
                 ).onFailure {
                     Log.e("FolderViewModel", "error create folder", it)
                     _error.value = it
+                }.onSuccess {
+                    driveDirectoryPagingStore.onCreated(it)
                 }
             }
 
