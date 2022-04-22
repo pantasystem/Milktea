@@ -1,11 +1,15 @@
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
+
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.api.misskey.drive.CreateFolder
 import net.pantasystem.milktea.common.Encryption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -14,18 +18,32 @@ import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.drive.RequestFolder
 import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.drive.CreateDirectory
+import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import net.pantasystem.milktea.model.drive.DriveStore
 
-class DirectoryViewModel(
-    private val accountWatcher: CurrentAccountWatcher,
-    private val driveStore: DriveStore,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
-    val loggerFactory: Logger.Factory
+
+class DirectoryViewModel @AssistedInject constructor(
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val encryption: Encryption,
+    loggerFactory: Logger.Factory,
+    private val accountRepository: AccountRepository,
+    private val driveDirectoryRepository: DriveDirectoryRepository,
+    @Assisted private val driveStore: DriveStore,
 ) : ViewModel() {
 
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(driveStore: DriveStore): DirectoryViewModel
+    }
 
+    companion object;
+
+    private val accountWatcher by lazy {
+        CurrentAccountWatcher(driveStore.state.value.accountId, accountRepository)
+    }
     val foldersLiveData = MutableLiveData<List<DirectoryViewData>>()
 
     val isRefreshing = MutableLiveData(false)
@@ -124,21 +142,15 @@ class DirectoryViewModel(
 
     }
 
-    fun createFolder(folderName: String) {
+    fun createDirectory(folderName: String) {
         if (folderName.isNotBlank()) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
-                    val account = accountWatcher.getAccount()
-                    val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                    misskeyAPI.createFolder(
-                        CreateFolder(
-                            i = account.getI(encryption),
-                            name = folderName,
-                            parentId = driveStore.state.value.path.path.lastOrNull()?.id
-                        )
-                    ).throwIfHasError().body()
-
-                }.onFailure {
+                driveDirectoryRepository.create(
+                    CreateDirectory(
+                        accountId = accountWatcher.getAccount().accountId,
+                        directoryName = folderName
+                    )
+                ).onFailure {
                     Log.e("FolderViewModel", "error create folder", it)
                     _error.value = it
                 }
@@ -147,4 +159,15 @@ class DirectoryViewModel(
         }
 
     }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun DirectoryViewModel.Companion.provideViewModel(
+    assistedFactory: DirectoryViewModel.ViewModelAssistedFactory,
+    driveStore: DriveStore,
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return assistedFactory.create(driveStore) as T
+    }
+
 }

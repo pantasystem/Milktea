@@ -19,7 +19,7 @@ class CreateFolderDialog : AppCompatDialogFragment(){
         binding.okButton.setOnClickListener {
             val name = binding.editFolderName.text.toString()
             if(name.isNotBlank()){
-                directoryViewModel.createFolder(name)
+                directoryViewModel.createDirectory(name)
                 dismiss()
 
             }
