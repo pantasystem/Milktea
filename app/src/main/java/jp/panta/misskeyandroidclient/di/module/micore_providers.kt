@@ -12,18 +12,6 @@ import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingSer
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
 import net.pantasystem.milktea.model.notes.Note
 
-fun MiCore.filePropertyPagingStore(
-    getAccount: suspend () -> Account,
-    currentDirectoryId: String?
-): FilePropertyPagingStore {
-    return FilePropertyPagingStore(
-        currentDirectoryId,
-        getAccount,
-        this.getMisskeyAPIProvider(),
-        this.getFilePropertyDataSource(),
-        this.getEncryption()
-    )
-}
 
 fun MiCore.createGalleryPostsStore(
     pageable: Pageable.Gallery,
