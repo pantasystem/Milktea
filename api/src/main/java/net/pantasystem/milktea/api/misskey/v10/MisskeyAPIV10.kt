@@ -80,7 +80,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun getFolders(folderRequest: RequestFolder): Response<List<Directory>> = misskey.getFolders(folderRequest)
 
-    override suspend fun createFolder(createFolder: CreateFolder): Response<Unit> = misskey.createFolder(createFolder)
+    override suspend fun createFolder(createFolder: CreateFolder): Response<Directory> = misskey.createFolder(createFolder)
 
     override suspend fun getMessageHistory(requestMessageHistory: RequestMessageHistory): Response<List<MessageDTO>> = misskey.getMessageHistory(requestMessageHistory)
 
