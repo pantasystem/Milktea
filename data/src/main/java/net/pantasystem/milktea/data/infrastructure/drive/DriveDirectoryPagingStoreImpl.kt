@@ -101,7 +101,7 @@ class DriveDirectoryPagingImpl(
     override suspend fun loadPrevious(): Response<List<Directory>> {
         val account = account ?: throw UnauthorizedException()
         return misskeyAPIProvider.get(account)
-            .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId()))
+            .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId(), parentId = directory?.id))
             .throwIfHasError()
     }
 
