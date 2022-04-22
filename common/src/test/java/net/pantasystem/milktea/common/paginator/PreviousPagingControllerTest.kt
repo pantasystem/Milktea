@@ -1,0 +1,80 @@
+package net.pantasystem.milktea.common.paginator
+
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import org.junit.Assert.*
+
+import org.junit.Test
+
+class PreviousPagingControllerTest {
+
+    @Test
+    fun loadPrevious() {
+        val stateEvents = mutableListOf<PageableState<List<Int>>>()
+        val store = object : PaginationState<Int>, IdGetter<String>, PreviousLoader<String> {
+            private val localState =
+                MutableStateFlow<PageableState<List<Int>>>(PageableState.Loading.Init<List<Int>>())
+            override val state: Flow<PageableState<List<Int>>>
+                get() = localState
+
+            override fun getState(): PageableState<List<Int>> {
+                return localState.value
+            }
+
+            override fun setState(state: PageableState<List<Int>>) {
+                stateEvents.add(state)
+                localState.value = state
+            }
+
+            override suspend fun getSinceId(): String? {
+                return null
+            }
+
+            override suspend fun getUntilId(): String? {
+                return (localState.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()
+                    ?.toString()
+            }
+
+            override suspend fun loadPrevious(): Result<List<String>> {
+                val next = (getUntilId()?.toInt()?: 0) + 1
+                return runCatching {
+                    (next until (next + 20)).map { it.toString() }
+                }
+            }
+        }
+        val previousPagingController = PreviousPagingController<String, Int>(
+            entityConverter = object : EntityConverter<String, Int> {
+                override suspend fun convertAll(list: List<String>): List<Int> {
+                    return list.map { it.toInt() }
+                }
+            },
+            locker = object : StateLocker {
+                override val mutex: Mutex = Mutex()
+            },
+            previousLoader = store,
+            state = store
+        )
+
+        runBlocking {
+            previousPagingController.loadPrevious()
+            previousPagingController.loadPrevious()
+            previousPagingController.loadPrevious()
+            assertEquals(60, (store.getState().content as StateContent.Exist).rawContent.size)
+        }
+        assertEquals(6, stateEvents.size)
+        assertEquals(PageableState.Loading.Previous::class.java,stateEvents[0].javaClass)
+
+        assertEquals(PageableState.Fixed::class.java,stateEvents[1].javaClass)
+
+        assertEquals(PageableState.Loading.Previous::class.java,stateEvents[2].javaClass)
+        assertEquals(PageableState.Fixed::class.java,stateEvents[3].javaClass)
+
+        assertEquals(PageableState.Loading.Previous::class.java,stateEvents[4].javaClass)
+        assertEquals(PageableState.Fixed::class.java,stateEvents[5].javaClass)
+
+
+    }
+}
