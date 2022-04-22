@@ -11,12 +11,9 @@ import net.pantasystem.milktea.model.file.AppFile
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.infrastructure.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.DriveStore
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.*
 
 /**
  * 選択状態とFileの読み込み＆表示を担当する
@@ -25,15 +22,15 @@ class FileViewModel @AssistedInject constructor(
     private val accountRepository: AccountRepository,
     loggerFactory: Logger.Factory,
     filePropertyDataSource: FilePropertyDataSource,
+    private val filePropertyPagingStore: FilePropertyPagingStore,
     private val filePropertyRepository: DriveFileRepository,
-    @Assisted filePropertyPagingStoreFactory: FilePropertyPagingStore.AssistedStoreFactory,
+    private val accountStore: AccountStore,
     @Assisted private val driveStore: DriveStore,
 ) : ViewModel() {
 
     @AssistedFactory
     interface AssistedViewModelFactory {
         fun create(
-            filePropertyPagingStoreFactory: FilePropertyPagingStore.AssistedStoreFactory,
             driveStore: DriveStore
         ): FileViewModel
     }
@@ -48,11 +45,6 @@ class FileViewModel @AssistedInject constructor(
         loggerFactory.create("FileViewModel")
     }
 
-    private val filePropertiesPagingStore by lazy {
-        filePropertyPagingStoreFactory.create(
-            driveStore.state.value.path.path.lastOrNull()?.id,
-        ) { currentAccountWatcher.getAccount() }
-    }
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> get() = _error
 
@@ -67,7 +59,7 @@ class FileViewModel @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state = filePropertyDataSource.state.flatMapLatest { state ->
-        filePropertiesPagingStore.state.map { pageable ->
+        filePropertyPagingStore.state.map { pageable ->
             pageable.convert {
                 state.findIn(it)
             }
@@ -92,9 +84,14 @@ class FileViewModel @AssistedInject constructor(
         }.distinctUntilChangedBy {
             it.path.lastOrNull()?.id
         }.onEach {
-            filePropertiesPagingStore.setCurrentDirectory(it.path.lastOrNull())
-            filePropertiesPagingStore.loadPrevious()
+            filePropertyPagingStore.setCurrentAccount(
+                accountStore.currentAccount
+            )
+            filePropertyPagingStore.setCurrentDirectory(it.path.lastOrNull())
+            filePropertyPagingStore.loadPrevious()
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+
 
         /**
          * アカウントの状態をDirectoryPath, FilePropertiesPagingStoreへ伝達します。
@@ -102,23 +99,22 @@ class FileViewModel @AssistedInject constructor(
         account.distinctUntilChangedBy {
             it.accountId
         }.onEach {
-
             driveStore.setAccount(it)
-            filePropertiesPagingStore.clear()
-            filePropertiesPagingStore.loadPrevious()
+            filePropertyPagingStore.setCurrentAccount(it)
+            filePropertyPagingStore.loadPrevious()
         }.launchIn(viewModelScope + Dispatchers.IO)
 
 
     }
 
     fun loadInit() {
-        if (filePropertiesPagingStore.isLoading) {
+        if (filePropertyPagingStore.isLoading) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                filePropertiesPagingStore.clear()
-                filePropertiesPagingStore.loadPrevious()
+                filePropertyPagingStore.clear()
+                filePropertyPagingStore.loadPrevious()
             }.onFailure {
                 _error.value = it
             }
@@ -127,12 +123,12 @@ class FileViewModel @AssistedInject constructor(
     }
 
     fun loadNext() {
-        if (filePropertiesPagingStore.isLoading) {
+        if (filePropertyPagingStore.isLoading) {
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                filePropertiesPagingStore.loadPrevious()
+                filePropertyPagingStore.loadPrevious()
             }.onFailure {
                 _error.value = it
             }
@@ -149,7 +145,7 @@ class FileViewModel @AssistedInject constructor(
                     account.accountId,
                     file.copy(folderId = currentDir)
                 ).getOrThrow()
-                filePropertiesPagingStore.onCreated(e.id)
+                filePropertyPagingStore.onCreated(e.id)
             } catch (e: Exception) {
                 logger.info("ファイルアップロードに失敗した")
             }
@@ -182,11 +178,10 @@ class FileViewModel @AssistedInject constructor(
 @Suppress("UNCHECKED_CAST")
 fun FileViewModel.Companion.provideFactory(
     factory: FileViewModel.AssistedViewModelFactory,
-    filePropertyPagingStoreFactory: FilePropertyPagingStore.AssistedStoreFactory,
     driveStore: DriveStore
 ) = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return factory.create(filePropertyPagingStoreFactory, driveStore) as T
+        return factory.create(driveStore) as T
     }
 
 }
