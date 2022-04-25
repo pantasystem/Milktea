@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import java.util.*
@@ -74,6 +75,10 @@ data class Note(
      */
     fun hasContent(): Boolean {
         return !(text == null && fileIds.isNullOrEmpty() && poll == null)
+    }
+
+    fun isOwnReaction(reaction: Reaction): Boolean {
+        return myReaction != null && myReaction == reaction.getName()
     }
 }
 
