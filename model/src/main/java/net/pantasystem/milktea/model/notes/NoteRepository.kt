@@ -16,7 +16,10 @@ interface NoteRepository {
      * 既に選択されているリアクションが選択されている時はtoggleされる。
      * 既に選択されているリアクションとは異なるリアクションを選択した時は解除してリアクションが作成される。
      */
+    @Deprecated("UseCase層の責務なので切り出す")
     suspend fun toggleReaction(createReaction: CreateReaction): Boolean
+
+    suspend fun reaction(createReaction: CreateReaction): Boolean
 
     suspend fun unreaction(noteId: Note.Id): Boolean
 }

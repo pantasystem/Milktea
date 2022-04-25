@@ -113,6 +113,7 @@ class NoteRepositoryImpl @Inject constructor(
         return note
     }
 
+    @Deprecated("UseCase層の責務なので切り出す")
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun toggleReaction(createReaction: CreateReaction): Boolean {
         val account = accountRepository.get(createReaction.noteId.accountId)
@@ -140,6 +141,25 @@ class NoteRepositoryImpl @Inject constructor(
         }.getOrThrow()
 
 
+    }
+
+    override suspend fun reaction(createReaction: CreateReaction): Boolean {
+        val account = accountRepository.get(createReaction.noteId.accountId)
+        val note = find(createReaction.noteId)
+        if (note.myReaction?.isNotBlank() == true) {
+            logger.debug("同一のリアクションが選択されています。")
+            return false
+        }
+        if (note.myReaction == createReaction.reaction) {
+            return true
+        }
+        return runCatching {
+            if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
+                    .isCaptured(createReaction.noteId.noteId)) {
+                noteDataSource.add(note.onIReacted(createReaction.reaction))
+            }
+            true
+        }.getOrThrow()
     }
 
     override suspend fun unreaction(noteId: Note.Id): Boolean {
