@@ -73,7 +73,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/authUrlView"
                 style="?android:attr/borderlessButtonStyle"
                 android:contentDescription="@string/copy_the_url_of_the_authentication_destination_to_the_clipboard"
-
+                android:src="@drawable/ic_content_copy_black_24dp"
         />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
