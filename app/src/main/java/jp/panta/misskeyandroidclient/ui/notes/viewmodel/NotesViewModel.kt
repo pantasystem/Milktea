@@ -31,6 +31,7 @@ import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.user.User
@@ -41,13 +42,13 @@ data class SelectedReaction(val noteId: Note.Id, val reaction: String)
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val reactionHistoryDao: ReactionHistoryDao,
     private val encryption: Encryption,
     private val translationStore: NoteTranslationStore,
     private val draftNoteDAO: DraftNoteDao,
     private val noteRepository: NoteRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val toggleReactionUseCase: ToggleReactionUseCase,
     val accountStore: AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
@@ -211,18 +212,11 @@ class NotesViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
 
-            runCatching {
-                val result = noteRepository.toggleReaction(
-                    CreateReaction(
-                        noteId = id,
-                        reaction = reaction
-                    )
-                )
-                if (result) {
-                    syncAddReactionHistory(reaction)
-                }
-            }
+            toggleReactionUseCase(id, reaction).onFailure {
 
+            }.onSuccess {
+
+            }
 
         }
     }
@@ -236,20 +230,6 @@ class NotesViewModel @Inject constructor(
             return
         }
         noteRepository.unreaction(planeNoteViewData.toShowNote.note.id)
-    }
-
-    private fun syncAddReactionHistory(reaction: String) {
-        try {
-            val domain = getAccount()?.instanceDomain
-            reactionHistoryDao.insert(
-                ReactionHistory(
-                    instanceDomain = domain!!,
-                    reaction = reaction
-                )
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "reaction追加中にエラー発生", e)
-        }
     }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {

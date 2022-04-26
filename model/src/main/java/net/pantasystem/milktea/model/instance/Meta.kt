@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.instance
 import androidx.room.Ignore
 import com.google.gson.annotations.SerializedName
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.notes.reaction.Reaction
 
 data class Meta(
     @SerializedName("uri") var uri: String,
@@ -44,4 +45,10 @@ data class Meta(
         return Version(version)
     }
 
+
+    fun isOwnEmojiBy(emoji: Reaction): Boolean {
+        return emojis?.any {
+            it.name == emoji.getName()
+        } == true
+    }
 }
