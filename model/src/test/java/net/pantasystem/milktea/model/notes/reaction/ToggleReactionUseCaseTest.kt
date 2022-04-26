@@ -11,6 +11,7 @@ import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.generateEmptyNote
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -208,6 +209,7 @@ class ToggleReactionUseCaseTest {
         }
     }
 
+    @Ignore("絵文字判定機能は無効化中")
     @Test
     fun giveUnknownCharacter() {
         val targetNote = generateEmptyNote().copy(
@@ -264,7 +266,7 @@ class ToggleReactionUseCaseTest {
             insert(ReactionHistory("👍", "misskey.io"))
         }
     }
-
+    @Ignore("絵文字判定機能は無効化中")
     @Test
     fun giveMultiByteEmoji() {
         val targetNote = generateEmptyNote().copy(

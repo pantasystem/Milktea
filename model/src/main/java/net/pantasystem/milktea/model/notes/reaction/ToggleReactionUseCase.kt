@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.model.notes.reaction
 
-import com.vdurmont.emoji.EmojiManager
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.instance.FetchMeta
@@ -23,14 +22,15 @@ class ToggleReactionUseCase @Inject constructor(
         return runCatching {
             val account = getAccount.get(noteId.accountId)
             val reactionObj = Reaction(reaction)
-            val sendReaction =
-                if (EmojiManager.isEmoji(reaction) || fetchMeta.fetch(account.instanceDomain)
-                        .isOwnEmojiBy(reactionObj)
-                ) {
-                    reaction
-                } else {
-                    "👍"
-                }
+//            val sendReaction =
+//                if (fetchMeta.fetch(account.instanceDomain)
+//                        .isOwnEmojiBy(reactionObj)
+//                ) {
+//                    reaction
+//                } else {
+//                    "👍"
+//                }
+            val sendReaction = reactionObj.reaction
             val note = noteRepository.find(noteId)
             if (note.myReaction.isNullOrBlank()) {
                 if (noteRepository.reaction(CreateReaction(noteId, sendReaction))) {
