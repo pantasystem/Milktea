@@ -2,7 +2,7 @@ package net.pantasystem.milktea.model.notes.reaction
 
 import com.vdurmont.emoji.EmojiManager
 import net.pantasystem.milktea.model.UseCase
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -15,13 +15,13 @@ import javax.inject.Singleton
 class ToggleReactionUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
     private val reactionHistoryDao: ReactionHistoryDao,
-    private val accountRepository: AccountRepository,
+    private val getAccount: GetAccount,
     private val fetchMeta: FetchMeta,
 ) : UseCase {
 
     suspend operator fun invoke(noteId: Note.Id, reaction: String): Result<Unit> {
         return runCatching {
-            val account = accountRepository.get(noteId.accountId)
+            val account = getAccount.get(noteId.accountId)
             val reactionObj = Reaction(reaction)
             val sendReaction =
                 if (EmojiManager.isEmoji(reaction) || fetchMeta.fetch(account.instanceDomain)
