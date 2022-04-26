@@ -7,7 +7,6 @@ import net.pantasystem.milktea.data.infrastructure.notes.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import kotlinx.coroutines.*
 import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -113,35 +112,6 @@ class NoteRepositoryImpl @Inject constructor(
         return note
     }
 
-    @Deprecated("UseCase層の責務なので切り出す")
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun toggleReaction(createReaction: CreateReaction): Boolean {
-        val account = accountRepository.get(createReaction.noteId.accountId)
-        var note = find(createReaction.noteId)
-        if (note.myReaction?.isNotBlank() == true) {
-            if (!unreaction(createReaction.noteId)) {
-                return false
-            }
-
-            if (note.myReaction == createReaction.reaction) {
-                logger.debug("同一のリアクションが選択されています。")
-                return true
-            }
-            note = noteDataSource.get(createReaction.noteId)
-        }
-
-
-        return runCatching {
-            if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
-                    .isCaptured(createReaction.noteId.noteId)
-            ) {
-                noteDataSource.add(note.onIReacted(createReaction.reaction))
-            }
-            true
-        }.getOrThrow()
-
-
-    }
 
     override suspend fun reaction(createReaction: CreateReaction): Boolean {
         val account = accountRepository.get(createReaction.noteId.accountId)
