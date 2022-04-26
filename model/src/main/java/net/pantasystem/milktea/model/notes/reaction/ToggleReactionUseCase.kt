@@ -38,7 +38,9 @@ class ToggleReactionUseCase @Inject constructor(
                 }
             } else if (note.myReaction != sendReaction) {
                 noteRepository.unreaction(noteId)
-                noteRepository.reaction(CreateReaction(noteId, sendReaction))
+                if (noteRepository.reaction(CreateReaction(noteId, sendReaction))) {
+                    reactionHistoryDao.insert(ReactionHistory(sendReaction, account.instanceDomain))
+                }
             } else {
                 noteRepository.unreaction(noteId)
             }
