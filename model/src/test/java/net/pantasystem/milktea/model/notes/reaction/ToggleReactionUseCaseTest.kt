@@ -61,11 +61,14 @@ class ToggleReactionUseCaseTest {
             } doReturn meta
         }
 
+        val checkEmoji = mock<CheckEmoji>()
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao
+            reactionHistoryDao = reactionHistoryDao,
+            checkEmoji = checkEmoji
         )
         runBlocking {
             useCase(targetNote.id, ":kawaii:").getOrThrow()
@@ -128,7 +131,8 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao
+            reactionHistoryDao = reactionHistoryDao,
+            checkEmoji = mock()
         )
         runBlocking {
             useCase(targetNote.id, ":wakaranai:").getOrThrow()
@@ -194,7 +198,8 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao
+            reactionHistoryDao = reactionHistoryDao,
+            checkEmoji = mock()
         )
 
         runBlocking {
@@ -252,7 +257,8 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao
+            reactionHistoryDao = reactionHistoryDao,
+            checkEmoji = mock()
         )
 
         runBlocking {
@@ -309,7 +315,8 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao
+            reactionHistoryDao = reactionHistoryDao,
+            checkEmoji = mock()
         )
 
         runBlocking {
