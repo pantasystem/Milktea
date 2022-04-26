@@ -264,4 +264,61 @@ class ToggleReactionUseCaseTest {
             insert(ReactionHistory("👍", "misskey.io"))
         }
     }
+
+    @Test
+    fun giveMultiByteEmoji() {
+        val targetNote = generateEmptyNote().copy(
+            text = "test",
+            id = Note.Id(accountId = 0L, "testId")
+        )
+        val createReactionDTO = CreateReaction(targetNote.id, "🥺")
+
+        val noteRepository = mock<NoteRepository> {
+            onBlocking {
+                reaction(createReactionDTO)
+            } doReturn true
+            onBlocking {
+                find(targetNote.id)
+            } doReturn targetNote
+        }
+
+        val meta = Meta(uri = "misskey.io",)
+        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val account = Account(
+            "testId",
+            "misskey.io",
+            instanceType = Account.InstanceType.MISSKEY,
+            encryptedToken = "test",
+            userName = "test",
+            accountId = 0L,
+            pages = emptyList(),
+        )
+        val getAccount = mock<GetAccount> {
+            onBlocking {
+                get(any())
+            } doReturn account
+        }
+        val fetchMeta = mock<FetchMeta> {
+            onBlocking {
+                fetch(account.instanceDomain)
+            } doReturn meta
+        }
+        val useCase = ToggleReactionUseCase(
+            getAccount = getAccount,
+            noteRepository = noteRepository,
+            fetchMeta = fetchMeta,
+            reactionHistoryDao = reactionHistoryDao
+        )
+
+        runBlocking {
+            useCase(targetNote.id, "🥺").getOrThrow()
+        }
+        verifyBlocking(noteRepository) {
+            reaction(createReactionDTO)
+        }
+
+        verifyBlocking(reactionHistoryDao) {
+            insert(ReactionHistory("🥺", "misskey.io"))
+        }
+    }
 }
