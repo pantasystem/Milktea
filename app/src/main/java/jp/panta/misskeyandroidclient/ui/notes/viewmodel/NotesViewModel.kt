@@ -42,7 +42,6 @@ data class SelectedReaction(val noteId: Note.Id, val reaction: String)
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val reactionHistoryDao: ReactionHistoryDao,
     private val encryption: Encryption,
     private val translationStore: NoteTranslationStore,
     private val draftNoteDAO: DraftNoteDao,
