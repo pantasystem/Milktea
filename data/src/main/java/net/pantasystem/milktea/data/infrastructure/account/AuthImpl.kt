@@ -2,8 +2,9 @@ package net.pantasystem.milktea.data.infrastructure.account
 
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.*
+import javax.inject.Inject
 
-class AuthImpl(
+class AuthImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val encryption: Encryption,
 ) : Auth, AuthById, GetAccount {
