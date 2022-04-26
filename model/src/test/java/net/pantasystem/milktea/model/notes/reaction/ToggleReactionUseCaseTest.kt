@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.notes.reaction
 
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
@@ -14,10 +15,7 @@ import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import org.junit.Assert
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.*
 
 interface MyClass {
     suspend fun num(): Int
@@ -57,18 +55,13 @@ class ToggleReactionUseCaseTest {
         )
         val createReactionDTO = CreateReaction(targetNote.id, ":kawaii:")
 
-
-        var isCalledReaction = false
-        val noteRepository = object : NoteRepository {
-            override suspend fun create(createNote: CreateNote) = throw NoSuchMethodException()
-            override suspend fun delete(noteId: Note.Id) = true
-            override suspend fun find(noteId: Note.Id) = targetNote
-            override suspend fun reaction(createReaction: CreateReaction): Boolean {
-                Assert.assertEquals(createReactionDTO, createReaction)
-                isCalledReaction = true
-                return true
-            }
-            override suspend fun unreaction(noteId: Note.Id) = true
+        val noteRepository = mock<NoteRepository> {
+            onBlocking {
+                reaction(createReactionDTO)
+            } doReturn true
+            onBlocking {
+                find(targetNote.id)
+            } doReturn targetNote
         }
 
         val meta = Meta(
@@ -77,34 +70,42 @@ class ToggleReactionUseCaseTest {
                 Emoji(name = "kawaii")
             )
         )
-        val reactionHistoryDao = object : ReactionHistoryDao {
-            override fun findAll(): List<ReactionHistory>? = null
-            override fun insert(reactionHistory: ReactionHistory) = Unit
-            override fun sumReactions(instanceDomain: String): List<ReactionHistoryCount> = emptyList()
+        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val account = Account(
+            "testId",
+            "misskey.io",
+            instanceType = Account.InstanceType.MISSKEY,
+            encryptedToken = "test",
+            userName = "test",
+            accountId = 0L,
+            pages = emptyList(),
+        )
+        val getAccount = mock<GetAccount> {
+            onBlocking {
+                get(any())
+            } doReturn account
+        }
+        val fetchMeta = mock<FetchMeta> {
+            onBlocking {
+                fetch(account.instanceDomain)
+            } doReturn meta
         }
         val useCase = ToggleReactionUseCase(
-            getAccount = {
-                Account(
-                    "testId",
-                    "misskey.io",
-                    instanceType = Account.InstanceType.MISSKEY,
-                    encryptedToken = "test",
-                    userName = "test",
-                    accountId = 0L,
-                    pages = emptyList(),
-                )
-            },
+            getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = object : FetchMeta {
-                override suspend fun fetch(instanceDomain: String, isForceFetch: Boolean) = meta
-            },
+            fetchMeta = fetchMeta,
             reactionHistoryDao = reactionHistoryDao
         )
 
         runBlocking {
             useCase(targetNote.id, ":kawaii:").getOrThrow()
         }
-        Assert.assertTrue(isCalledReaction)
+        verifyBlocking(noteRepository) {
+            reaction(createReactionDTO)
+        }
 
+        verifyBlocking(reactionHistoryDao) {
+            insert(ReactionHistory(":kawaii:", "misskey.io"))
+        }
     }
 }
