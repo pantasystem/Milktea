@@ -214,7 +214,6 @@ class ToggleReactionUseCaseTest {
         }
     }
 
-    @Ignore("絵文字判定機能は無効化中")
     @Test
     fun giveUnknownCharacter() {
         val targetNote = generateEmptyNote().copy(
@@ -258,7 +257,11 @@ class ToggleReactionUseCaseTest {
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
-            checkEmoji = mock()
+            checkEmoji = mock {
+                on {
+                    checkEmoji(any())
+                } doReturn false
+            }
         )
 
         runBlocking {
@@ -272,7 +275,6 @@ class ToggleReactionUseCaseTest {
             insert(ReactionHistory("👍", "misskey.io"))
         }
     }
-    @Ignore("絵文字判定機能は無効化中")
     @Test
     fun giveMultiByteEmoji() {
         val targetNote = generateEmptyNote().copy(
@@ -316,7 +318,11 @@ class ToggleReactionUseCaseTest {
             noteRepository = noteRepository,
             fetchMeta = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
-            checkEmoji = mock()
+            checkEmoji = mock {
+                on {
+                    checkEmoji(any())
+                } doReturn true
+            }
         )
 
         runBlocking {
