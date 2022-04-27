@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
+import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
+import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -237,7 +239,7 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 getMisskeyAPI()?.createFavorite(
-                    NoteRequest(
+                    CreateFavorite(
                         i = getAccount()?.getI(encryption)!!,
                         noteId = note.toShowNote.note.id.noteId
                     )
@@ -262,7 +264,7 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val result = runCatching {
                 val res = getMisskeyAPI()?.deleteFavorite(
-                    NoteRequest(
+                    DeleteFavorite(
                         i = getAccount()?.getI(encryption)!!,
                         noteId = note.toShowNote.note.id.noteId
                     )

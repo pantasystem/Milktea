@@ -15,6 +15,8 @@ import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
 import net.pantasystem.milktea.api.misskey.notes.*
+import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
+import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
@@ -46,7 +48,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
     override suspend fun create(createNote: CreateNote): Response<CreateNote.Response> = misskey.create(createNote)
     override suspend fun createApp(createApp: CreateApp) = misskey.createApp(createApp)
 
-    override suspend fun createFavorite(noteRequest: NoteRequest) = misskey.createFavorite(noteRequest)
+    override suspend fun createFavorite(noteRequest: CreateFavorite) = misskey.createFavorite(noteRequest)
 
     override suspend fun createMessage(messageAction: MessageAction) = misskey.createMessage(messageAction)
 
@@ -56,7 +58,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun delete(deleteNote: DeleteNote) = misskey.delete(deleteNote)
 
-    override suspend fun deleteFavorite(noteRequest: NoteRequest): Response<Unit> = misskey.deleteFavorite(noteRequest)
+    override suspend fun deleteFavorite(noteRequest: DeleteFavorite): Response<Unit> = misskey.deleteFavorite(noteRequest)
 
     override suspend fun deleteMessage(messageAction: MessageAction): Response<Unit> = misskey.deleteMessage(messageAction)
 
