@@ -26,14 +26,12 @@ import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
+import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -49,6 +47,7 @@ class NotesViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val toggleReactionUseCase: ToggleReactionUseCase,
+    private val favoriteRepository: FavoriteRepository,
     val accountStore: AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
@@ -235,15 +234,7 @@ class NotesViewModel @Inject constructor(
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
         note ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                getMisskeyAPI()?.createFavorite(
-                    NoteRequest(
-                        i = getAccount()?.getI(encryption)!!,
-                        noteId = note.toShowNote.note.id.noteId
-                    )
-                )
-            }.onSuccess {
-                requireNotNull(it)
+            favoriteRepository.create(note.toShowNote.note.id).onSuccess {
                 Log.d(TAG, "お気に入りに追加しました")
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "お気に入りに追加しました"
@@ -260,16 +251,7 @@ class NotesViewModel @Inject constructor(
     fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event) {
         note ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            val result = runCatching {
-                val res = getMisskeyAPI()?.deleteFavorite(
-                    NoteRequest(
-                        i = getAccount()?.getI(encryption)!!,
-                        noteId = note.toShowNote.note.id.noteId
-                    )
-                )
-                requireNotNull(res)
-                res
-            }.getOrNull() != null
+            val result = favoriteRepository.delete(note.toShowNote.note.id).getOrNull() != null
             withContext(Dispatchers.Main) {
                 statusMessage.event = if (result) {
                     "お気に入りから削除しました"
@@ -278,8 +260,6 @@ class NotesViewModel @Inject constructor(
                 }
             }
         }
-
-
     }
 
 
@@ -362,7 +342,7 @@ class NotesViewModel @Inject constructor(
 
     fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
         if (noteId == null || poll == null || choice == null) {
-             return
+            return
         }
         if (SafeUnbox.unbox(poll.canVote)) {
             viewModelScope.launch(Dispatchers.IO) {
