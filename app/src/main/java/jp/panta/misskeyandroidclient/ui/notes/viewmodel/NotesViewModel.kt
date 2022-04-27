@@ -342,7 +342,7 @@ class NotesViewModel @Inject constructor(
 
     fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
         if (noteId == null || poll == null || choice == null) {
-             return
+            return
         }
         if (SafeUnbox.unbox(poll.canVote)) {
             viewModelScope.launch(Dispatchers.IO) {

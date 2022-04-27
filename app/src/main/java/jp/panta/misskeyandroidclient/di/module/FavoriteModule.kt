@@ -7,13 +7,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.notes.favorite.FavoriteRepositoryImpl
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
+import javax.inject.Singleton
 
-@Module
 @InstallIn(SingletonComponent::class)
+@Module
 abstract class FavoriteModule {
 
     @Binds
-    @Provides
+    @Singleton
     abstract fun provideFavoriteRepository(
         impl: FavoriteRepositoryImpl
     ): FavoriteRepository
