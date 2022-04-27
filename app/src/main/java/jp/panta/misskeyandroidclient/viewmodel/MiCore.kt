@@ -72,13 +72,10 @@ interface MiCore {
 
     fun getUserRepository(): UserRepository
 
-    fun getNotificationDataSource(): NotificationDataSource
 
-    fun getNotificationRepository(): NotificationRepository
 
     fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow
 
-    fun getGroupDataSource(): GroupDataSource
 
     fun getGroupRepository(): GroupRepository
 
@@ -99,9 +96,7 @@ interface MiCore {
 
     fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter
 
-    fun getSocket(account: Account): Socket
 
-    fun getNoteCaptureAPI(account: Account): NoteCaptureAPI
 
     fun getCurrentInstanceMeta(): Meta?
 
@@ -112,18 +107,11 @@ interface MiCore {
 
     fun getMessageRepository(): MessageRepository
 
-    fun getMessageDataSource(): MessageDataSource
-
-    fun getUnreadMessages(): UnReadMessages
-
-
-    fun getDraftNoteDAO(): DraftNoteDao
 
     fun getUnreadNotificationDAO(): UnreadNotificationDAO
 
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
-    fun getMetaStore(): FetchMeta
 
     fun getMetaRepository(): MetaRepository
 
@@ -135,7 +123,6 @@ interface MiCore {
 
     fun getGalleryRepository(): GalleryRepository
 
-    fun getFileUploaderProvider(): FileUploaderProvider
 
     fun getTranslationStore(): NoteTranslationStore
 

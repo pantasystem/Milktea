@@ -127,9 +127,6 @@ class MiApplication : Application(), MiCore {
     lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
 
     @Inject
-    lateinit var mGroupDataSource: GroupDataSource
-
-    @Inject
     lateinit var mFilePropertyDataSource: FilePropertyDataSource
 
     @Inject
@@ -369,33 +366,15 @@ class MiApplication : Application(), MiCore {
         return mAccountRepository
     }
 
-    override fun getNotificationDataSource(): NotificationDataSource {
-        return mNotificationDataSource
-    }
-
-    override fun getNotificationRepository(): NotificationRepository {
-        return mNotificationRepository
-    }
-
-    override fun getMessageDataSource(): MessageDataSource {
-        return mMessageDataSource
-    }
-
     override fun getMessageRepository(): MessageRepository {
         return mMessageRepository
     }
 
-    override fun getGroupDataSource(): GroupDataSource {
-        return mGroupDataSource
-    }
 
     override fun getGroupRepository(): GroupRepository {
         return mGroupRepository
     }
 
-    override fun getUnreadMessages(): UnReadMessages {
-        return mUnreadMessages
-    }
 
     override fun getGetters(): Getters {
         return mGetters
@@ -427,10 +406,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override fun getDraftNoteDAO(): DraftNoteDao {
-        return draftNoteDao
-    }
-
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
@@ -460,21 +435,10 @@ class MiApplication : Application(), MiCore {
         return mChannelAPIWithAccountProvider.get(account)
     }
 
-    override fun getSocket(account: Account): Socket {
-        return mSocketWithAccountProvider.get(account)
-    }
-
-    override fun getMetaStore(): FetchMeta {
-        return mFetchMeta
-    }
-
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
         return mFilePropertyDataSource
     }
 
-    override fun getFileUploaderProvider(): FileUploaderProvider {
-        return mFileUploaderProvider
-    }
 
     override fun getGalleryDataSource(): GalleryDataSource {
         return mGalleryDataSource
@@ -540,9 +504,6 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
-    override fun getNoteCaptureAPI(account: Account): NoteCaptureAPI {
-        return mNoteCaptureAPIWithAccountProvider.get(account)
-    }
 
     override fun getReactionHistoryDataSource(): ReactionHistoryDataSource {
         return mReactionHistoryDataSource
