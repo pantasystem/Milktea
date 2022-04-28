@@ -11,9 +11,11 @@ import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.generateEmptyNote
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import org.junit.Ignore
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyBlocking
 
 class ToggleReactionUseCaseTest {
 
@@ -334,6 +336,68 @@ class ToggleReactionUseCaseTest {
 
         verifyBlocking(reactionHistoryDao) {
             insert(ReactionHistory("🥺", "misskey.io"))
+        }
+    }
+
+    @Test
+    fun giveLegacyReaction() {
+        val targetNote = generateEmptyNote().copy(
+            text = "test",
+            id = Note.Id(accountId = 0L, "testId")
+        )
+        val createReactionDTO = CreateReaction(targetNote.id, "like")
+
+        val noteRepository = mock<NoteRepository> {
+            onBlocking {
+                reaction(createReactionDTO)
+            } doReturn true
+            onBlocking {
+                find(targetNote.id)
+            } doReturn targetNote
+        }
+
+        val meta = Meta(uri = "misskey.io",)
+        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val account = Account(
+            "testId",
+            "misskey.io",
+            instanceType = Account.InstanceType.MISSKEY,
+            encryptedToken = "test",
+            userName = "test",
+            accountId = 0L,
+            pages = emptyList(),
+        )
+        val getAccount = mock<GetAccount> {
+            onBlocking {
+                get(any())
+            } doReturn account
+        }
+        val fetchMeta = mock<FetchMeta> {
+            onBlocking {
+                fetch(account.instanceDomain)
+            } doReturn meta
+        }
+        val useCase = ToggleReactionUseCase(
+            getAccount = getAccount,
+            noteRepository = noteRepository,
+            fetchMeta = fetchMeta,
+            reactionHistoryDao = reactionHistoryDao,
+            checkEmoji = mock {
+                on {
+                    checkEmoji(any())
+                } doReturn true
+            }
+        )
+
+        runBlocking {
+            useCase(targetNote.id, "like").getOrThrow()
+        }
+        verifyBlocking(noteRepository) {
+            reaction(createReactionDTO)
+        }
+
+        verifyBlocking(reactionHistoryDao) {
+            insert(ReactionHistory("like", "misskey.io"))
         }
     }
 }
