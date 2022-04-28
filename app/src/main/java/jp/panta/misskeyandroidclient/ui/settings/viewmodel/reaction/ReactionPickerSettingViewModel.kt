@@ -7,17 +7,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
-import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import net.pantasystem.milktea.common.getPreferenceName
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 
 class ReactionPickerSettingViewModel(
     private val account: Account,
@@ -54,9 +54,9 @@ class ReactionPickerSettingViewModel(
                     .findByInstanceDomain(account.instanceDomain)
                 mExistingSettingList = rawSettings?: emptyList()
                 var settingReactions = rawSettings
-                    ?: ReactionResourceMap.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
+                    ?: LegacyReaction.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
                 if(settingReactions.isEmpty()){
-                    settingReactions = ReactionResourceMap.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
+                    settingReactions = LegacyReaction.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
                 }
                 mReactionSettingReactionNameMap.clear()
                 mReactionSettingReactionNameMap.putAll(settingReactions.map{
