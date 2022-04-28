@@ -11,6 +11,7 @@ import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 
 object ReactionViewHelper {
     @BindingAdapter("reactionImageView", "reactionStringView", "reaction")
@@ -59,7 +60,7 @@ object ReactionViewHelper {
 
         }
 
-        val constantReaction = ReactionResourceMap.reactionMap[reaction]
+        val constantReaction = LegacyReaction.reactionMap[reaction]
         if(constantReaction != null){
 
             reactionStringView.text = constantReaction
@@ -82,7 +83,7 @@ object ReactionViewHelper {
 
     @JvmStatic
     fun setReactionCount(context: Context, reactionTextTypeView: TextView, reactionImageTypeView: ImageView,reaction: String, note: PlaneNoteViewData){
-        val textReaction = ReactionResourceMap.reactionMap[reaction]?: reaction
+        val textReaction = LegacyReaction.reactionMap[reaction]?: reaction
         val metaEmojis = (context.applicationContext as MiApplication).getCurrentInstanceMeta()?.emojis
         val emoji = note.emojiMap[textReaction.replace(":", "")]?: metaEmojis?.firstOrNull{
             textReaction.replace(":", "") == it.name

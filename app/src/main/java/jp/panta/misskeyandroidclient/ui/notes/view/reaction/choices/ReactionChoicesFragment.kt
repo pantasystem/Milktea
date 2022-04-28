@@ -14,14 +14,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
-import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -193,9 +194,9 @@ class ReactionChoicesFragment : Fragment() {
                 var reactions =
                     reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
                         it.reaction
-                    } ?: ReactionResourceMap.defaultReaction
+                    } ?: LegacyReaction.defaultReaction
                 if (reactions.isEmpty()) {
-                    reactions = ReactionResourceMap.defaultReaction
+                    reactions = LegacyReaction.defaultReaction
                 }
                 Handler(Looper.getMainLooper()).post {
                     adapter.submitList(reactions)
