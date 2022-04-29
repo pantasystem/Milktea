@@ -5,17 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.notes.view.RenoteUsersScreen
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.notes.Note
 
 class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
@@ -35,6 +38,8 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
     private lateinit var viewModel: RenotesViewModel
 
+    private val bottomSheetDialogBehavior: BottomSheetBehavior<FrameLayout>?
+        get() = (dialog as? BottomSheetDialog)?.behavior
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -66,7 +71,10 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
                             val intent = UserDetailActivity.newInstance(requireContext(), nr.user.id)
                             startActivity(intent)
                         },
-                        noteCaptureAPIAdapter = miCore.getNoteCaptureAdapter()
+                        noteCaptureAPIAdapter = miCore.getNoteCaptureAdapter(),
+                        onScrollState = { state ->
+                            bottomSheetDialogBehavior?.isDraggable = state
+                        }
                     )
                 }
             }
