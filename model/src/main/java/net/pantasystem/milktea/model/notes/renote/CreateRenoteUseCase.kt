@@ -4,6 +4,7 @@ import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,12 +18,15 @@ class CreateRenoteUseCase @Inject constructor(
         return runCatching {
             val note = noteRepository.find(noteId)
             val account = getAccount.get(noteId.accountId)
-            noteRepository.create(CreateNote(
-                author = account,
-                text = null,
-                visibility = note.visibility,
-            ))
+            if (note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))) {
+                noteRepository.create(CreateNote(
+                    author = account,
+                    text = null,
+                    visibility = note.visibility,
+                ))
+            } else {
+                throw IllegalArgumentException()
+            }
         }
-
     }
 }
