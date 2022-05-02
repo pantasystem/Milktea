@@ -5,25 +5,27 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.model.user.report.Report
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
@@ -32,7 +34,9 @@ import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
+import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
 
@@ -48,6 +52,7 @@ class NotesViewModel @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val toggleReactionUseCase: ToggleReactionUseCase,
     private val favoriteRepository: FavoriteRepository,
+    private val renoteUseCase: CreateRenoteUseCase,
     val accountStore: AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
@@ -140,17 +145,7 @@ class NotesViewModel @Inject constructor(
         val renoteId = reNoteTarget.event?.toShowNote?.note?.id
             ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val author = accountRepository.get(renoteId.accountId)
-                noteRepository.create(
-                    CreateNote(
-                        renoteId = renoteId,
-                        text = null,
-                        visibility = Visibility.Public(true),
-                        author = author
-                    )
-                )
-            }.onSuccess {
+            renoteUseCase(renoteId).onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "renoteしました"
                 }
@@ -159,7 +154,6 @@ class NotesViewModel @Inject constructor(
                     errorStatusMessage.event = "renote失敗しました"
                 }
             }
-
         }
 
     }
