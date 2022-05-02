@@ -49,7 +49,7 @@ class CreateRenoteUseCaseTest {
             useCase.invoke(target.id)
         }
         verifyBlocking(noteRepository) {
-            create(CreateNote(account, target.visibility, text = null))
+            create(CreateNote(account, target.visibility, text = null, renoteId = target.id))
         }
     }
 
