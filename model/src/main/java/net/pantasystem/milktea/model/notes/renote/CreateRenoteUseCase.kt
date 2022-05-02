@@ -23,6 +23,7 @@ class CreateRenoteUseCase @Inject constructor(
                     author = account,
                     text = null,
                     visibility = note.visibility,
+                    renoteId = noteId,
                 ))
             } else {
                 throw IllegalArgumentException()
