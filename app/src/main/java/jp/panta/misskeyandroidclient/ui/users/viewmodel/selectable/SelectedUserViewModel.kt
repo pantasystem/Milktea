@@ -47,7 +47,7 @@ class SelectedUserViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
-    val selectedUsersViewData = MediatorLiveData<List<UserViewData>>()
+    private val selectedUsersViewData = MediatorLiveData<List<UserViewData>>()
 
     val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
         addSource(selectedUsersViewData){
