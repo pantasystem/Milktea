@@ -63,8 +63,8 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    fun showUserDetail(userId: User.Id) {
-        startActivity(UserDetailActivity.newInstance(this, userId))
+    fun showUserDetail(user: User) {
+        startActivity(UserDetailActivity.newInstance(this, user.id))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

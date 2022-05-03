@@ -6,15 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
-import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
+import jp.panta.misskeyandroidclient.ui.users.SearchAndSelectUserScreen
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -61,16 +58,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-        val activitySearchAndSelectUserBinding =
-            DataBindingUtil.setContentView<ActivitySearchAndSelectUserBinding>(
-                this,
-                R.layout.activity_search_and_select_user
-            )
 
-        setSupportActionBar(activitySearchAndSelectUserBinding.searchAndSelectUsersToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        BottomSheetBehavior.from(activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersBottomSheet)
 
         val selectableMaximumSize = intent.getIntExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, Int.MAX_VALUE)
         val selectedUserIdList =
@@ -80,7 +68,6 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         mSelectedUserIds = selectedUserIdList
         Log.d(this.localClassName, "selected user ids :$selectedUserIdList")
 
-        val linearLayoutManager = LinearLayoutManager(this)
 
         val miCore = applicationContext as MiCore
 
@@ -95,31 +82,17 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
                     null
                 )
             )[SelectedUserViewModel::class.java]
-        val selectableUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
 
-
-        activitySearchAndSelectUserBinding.usersView.adapter = selectableUsersAdapter
-        activitySearchAndSelectUserBinding.searchUserViewModel = searchUserViewModel
-        activitySearchAndSelectUserBinding.selectedUserViewModel = selectedUserViewModel
-        activitySearchAndSelectUserBinding.usersView.layoutManager = linearLayoutManager
-        activitySearchAndSelectUserBinding.lifecycleOwner = this
-
-        val selectedUsersAdapter = SelectableUsersAdapter(selectedUserViewModel, this)
-        activitySearchAndSelectUserBinding.selectedUsersView.selectedUserViewModel =
-            selectedUserViewModel
-        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.adapter =
-            selectedUsersAdapter
-        activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager =
-            LinearLayoutManager(this)
-
-        searchUserViewModel.userViewDataList.observe(this) {
-            selectableUsersAdapter.submitList(it)
-        }
-
-        selectedUserViewModel.selectedUsers.observe(this) {
-            selectedUsersAdapter.submitList(it)
-        }
         mSelectedUserViewModel = selectedUserViewModel
+        setContent {
+            SearchAndSelectUserScreen(
+                searchUserViewModel = searchUserViewModel,
+                selectedUserViewModel = selectedUserViewModel,
+                onNavigateUp = {
+                    setResultFinish()
+                }
+            )
+        }
 
     }
 
