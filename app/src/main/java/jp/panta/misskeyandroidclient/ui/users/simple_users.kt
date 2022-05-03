@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,10 +21,18 @@ import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import net.pantasystem.milktea.model.user.User
 
 @Composable
-fun SimpleUserListView(users: List<User>, onSelected: (User.Id) -> Unit) {
-    LazyColumn {
+fun SimpleUserListView(
+    users: List<User>,
+    onSelected: (User.Id) -> Unit,
+    selectedUserIds: Set<User.Id> = emptySet()
+) {
+    LazyColumn(Modifier.fillMaxSize()) {
         items(count = users.size) { index ->
-            ItemSimpleUserCard(user = users[index], onSelected = onSelected)
+            ItemSimpleUserCard(
+                user = users[index],
+                onSelected = onSelected,
+                isSelected = selectedUserIds.contains(users[index].id)
+            )
         }
     }
 }
@@ -34,6 +43,7 @@ fun SimpleUserListView(users: List<User>, onSelected: (User.Id) -> Unit) {
 fun ItemSimpleUserCard(
     user: User,
     onSelected: (User.Id) -> Unit,
+    isSelected: Boolean = false,
 ) {
 
     Card(
@@ -41,7 +51,8 @@ fun ItemSimpleUserCard(
             onSelected.invoke(user.id)
         },
         shape = RoundedCornerShape(0.dp),
-        modifier = Modifier.padding(0.5.dp)
+        modifier = Modifier.padding(0.5.dp),
+        backgroundColor = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -66,9 +77,6 @@ fun ItemSimpleUserCard(
         }
     }
 }
-
-
-
 
 
 @Preview
