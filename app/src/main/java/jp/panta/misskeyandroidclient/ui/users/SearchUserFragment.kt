@@ -11,13 +11,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -57,7 +57,7 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
         mBinding.searchUsersView.adapter = adapter
         mBinding.searchUsersView.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.users.observe(viewLifecycleOwner) {
+        viewModel.userViewDataList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
         viewModel.isLoading.observe(viewLifecycleOwner) {

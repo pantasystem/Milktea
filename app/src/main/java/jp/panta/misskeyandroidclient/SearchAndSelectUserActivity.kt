@@ -14,13 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchAndSelectUserBinding
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.users.selectable.SelectableUsersAdapter
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 
 @FlowPreview
@@ -112,7 +112,7 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         activitySearchAndSelectUserBinding.selectedUsersView.selectedUsersView.layoutManager =
             LinearLayoutManager(this)
 
-        searchUserViewModel.users.observe(this) {
+        searchUserViewModel.userViewDataList.observe(this) {
             selectableUsersAdapter.submitList(it)
         }
 
