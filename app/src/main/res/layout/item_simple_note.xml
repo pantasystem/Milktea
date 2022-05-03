@@ -407,7 +407,8 @@
                 app:notesViewModelForClickRenote="@{notesViewModel}"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 app:layout_constraintEnd_toStartOf="@+id/textView4"
-                app:layout_constraintStart_toEndOf="@id/textView3" />
+                app:layout_constraintStart_toEndOf="@id/textView3"
+                android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"/>
 
         <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
