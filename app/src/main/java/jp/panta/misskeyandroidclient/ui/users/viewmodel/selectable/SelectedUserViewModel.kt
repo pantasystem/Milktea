@@ -4,15 +4,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
@@ -45,6 +44,7 @@ class SelectedUserViewModel(
         val selectedUsers: List<User>
     ) : Serializable
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
     val selectedUsers = MediatorLiveData<List<UserViewData>>()
