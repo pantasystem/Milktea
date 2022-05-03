@@ -32,6 +32,7 @@ fun SearchAndSelectUserScreen(
 
     val users by searchUserViewModel.users.collectAsState()
     val selectedUserIds by selectedUserViewModel.selectedUserIds.observeAsState()
+    val selectedUsers by selectedUserViewModel.selectedUserList.collectAsState()
 
     val userName by searchUserViewModel.userName.observeAsState()
     val host by searchUserViewModel.host.observeAsState()
@@ -42,7 +43,7 @@ fun SearchAndSelectUserScreen(
         sheetState = sheetState,
         sheetContent = {
             SimpleUserListView(
-                users = users,
+                users = selectedUsers.toList(),
                 onSelected = { selectedUserViewModel.toggleSelectUser(it) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,6 +69,38 @@ fun SearchAndSelectUserScreen(
                     },
                     backgroundColor = MaterialTheme.colors.surface
                 )
+            },
+            bottomBar = {
+                if (!sheetState.isVisible) {
+                    Surface {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .clickable {
+                                    scope.launch {
+                                        if (sheetState.isVisible) {
+                                            sheetState.hide()
+                                        } else {
+                                            sheetState.show()
+                                        }
+                                    }
+                                },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_person_add_black_24dp),
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${stringResource(R.string.select_user)}(${selectedUserIds?.size ?: 0})",
+                                fontSize = 24.sp
+                            )
+                        }
+                    }
+                }
+
             }
         ) {
             Column(
@@ -109,31 +142,7 @@ fun SearchAndSelectUserScreen(
                     modifier = Modifier.weight(1f)
                 )
 
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            scope.launch {
-                                if (sheetState.isVisible) {
-                                    sheetState.hide()
-                                } else {
-                                    sheetState.show()
-                                }
-                            }
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_person_add_black_24dp),
-                        contentDescription = null,
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${stringResource(R.string.select_user)}(${selectedUserIds?.size ?: 0})",
-                        fontSize = 24.sp
-                    )
-                }
+
             }
 
 

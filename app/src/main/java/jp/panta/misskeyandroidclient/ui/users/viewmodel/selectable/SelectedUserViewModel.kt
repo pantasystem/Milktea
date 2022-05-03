@@ -1,12 +1,13 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 
@@ -56,6 +57,13 @@ class SelectedUserViewModel(
         }
     }
 
+    val selectedUserList = selectedUserIds.asFlow().flatMapLatest { ids ->
+        miCore.getUserDataSource().state.map { state ->
+            ids.map {
+                state.get(it)
+            }.filterNotNull()
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init{
         val usersMap = HashMap<User.Id, UserViewData>()
