@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 
@@ -44,13 +43,13 @@ class SelectedUserViewModel(
         val selectedUsers: List<User>
     ) : Serializable
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
-    val selectedUsers = MediatorLiveData<List<UserViewData>>()
+    val selectedUsersViewData = MediatorLiveData<List<UserViewData>>()
 
     val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
-        addSource(selectedUsers){
+        addSource(selectedUsersViewData){
             value = it.mapNotNull{ uv ->
                 uv.userId
             }.toSet()
@@ -80,14 +79,14 @@ class SelectedUserViewModel(
         usersMap.putAll(srcUserId)
 
         mSelectedUserIdUserMap = LinkedHashMap(usersMap)
-        selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
+        selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
     private fun selectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap[user.id] = UserViewData(user, miCore, viewModelScope)
-            selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
+            selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
 
@@ -95,7 +94,7 @@ class SelectedUserViewModel(
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.remove(user.id)
-            selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
+            selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
 
@@ -128,11 +127,11 @@ class SelectedUserViewModel(
             addAll(selectedBeforeUsers)
         }
 
-        val selected = selectedUsers.value?.map{
+        val selected = selectedUsersViewData.value?.map{
             it.userId
         }?: emptyList()
 
-        val selectedUsers = selectedUsers.value?.mapNotNull {
+        val selectedUsers = selectedUsersViewData.value?.mapNotNull {
             it.user.value
         } ?: emptyList<User>()
 

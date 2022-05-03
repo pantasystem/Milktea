@@ -22,11 +22,12 @@ import net.pantasystem.milktea.model.user.User
 
 @Composable
 fun SimpleUserListView(
+    modifier: Modifier = Modifier,
     users: List<User>,
     onSelected: (User) -> Unit,
-    selectedUserIds: Set<User.Id> = emptySet()
+    selectedUserIds: Set<User.Id> = emptySet(),
 ) {
-    LazyColumn(Modifier.fillMaxSize()) {
+    LazyColumn(modifier) {
         items(count = users.size) { index ->
             ItemSimpleUserCard(
                 user = users[index],
