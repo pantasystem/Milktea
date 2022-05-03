@@ -7,14 +7,18 @@ import android.view.MenuItem
 import android.widget.SearchView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
-import jp.panta.misskeyandroidclient.ui.users.ClickableUserListAdapter
+import jp.panta.misskeyandroidclient.ui.users.SimpleUserListView
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -39,6 +43,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
+
         setContentView(R.layout.activity_search)
         setSupportActionBar(binding.searchToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -46,12 +51,20 @@ class SearchActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
 
-        val usersAdapter = ClickableUserListAdapter(this)
-        binding.searchedUsers.adapter = usersAdapter
-        binding.searchedUsers.layoutManager = LinearLayoutManager(this)
-        mSearchUserViewModel.users.observe(this) {
-            usersAdapter.submitList(it)
+        findViewById<ComposeView>(R.id.composeBase).setContent {
+            MdcTheme {
+                val users by mSearchUserViewModel.users.collectAsState()
+                SimpleUserListView(
+                    users = users,
+                    onSelected = ::showUserDetail,
+                )
+            }
         }
+
+    }
+
+    fun showUserDetail(userId: User.Id) {
+        startActivity(UserDetailActivity.newInstance(this, userId))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
