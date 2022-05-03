@@ -1,6 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -95,6 +98,12 @@ class SearchUserViewModel @Inject constructor(
     }.asLiveData()
 
     val users = searchState.map {
+        (it.content as? StateContent.Exist)?.rawContent
+            ?: emptyList()
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+
+    val userViewDataList = searchState.map {
         (it.content as? StateContent.Exist)?.rawContent
             ?: emptyList()
     }.map {
