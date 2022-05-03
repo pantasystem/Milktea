@@ -1,12 +1,12 @@
 package jp.panta.misskeyandroidclient
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,9 +49,9 @@ class SearchActivity : AppCompatActivity() {
         val usersAdapter = ClickableUserListAdapter(this)
         binding.searchedUsers.adapter = usersAdapter
         binding.searchedUsers.layoutManager = LinearLayoutManager(this)
-        mSearchUserViewModel.users.observe(this, {
+        mSearchUserViewModel.users.observe(this) {
             usersAdapter.submitList(it)
-        })
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
