@@ -7,8 +7,7 @@ import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 open class UserViewData(
     val userId: User.Id?,
     val userName: String? = null,

@@ -37,8 +37,6 @@ data class SearchUser(
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
  * SelectedUserViewModelに分離する予定
  */
-@FlowPreview
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
@@ -59,6 +57,7 @@ class SearchUserViewModel @Inject constructor(
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val searchState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.distinctUntilChanged()
@@ -103,6 +102,7 @@ class SearchUserViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val userViewDataList = searchState.map {
         (it.content as? StateContent.Exist)?.rawContent
             ?: emptyList()

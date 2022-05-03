@@ -1,18 +1,17 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable
 
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 class SelectedUserViewModel(
     val miCore: MiCore,
     val selectableSize: Int,
@@ -45,18 +44,26 @@ class SelectedUserViewModel(
         val selectedUsers: List<User>
     ) : Serializable
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
 
-    val selectedUsers = MediatorLiveData<List<UserViewData>>()
+    private val selectedUsersViewData = MediatorLiveData<List<UserViewData>>()
 
     val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
-        addSource(selectedUsers){
+        addSource(selectedUsersViewData){
             value = it.mapNotNull{ uv ->
                 uv.userId
             }.toSet()
         }
     }
 
+    val selectedUserList = selectedUserIds.asFlow().flatMapLatest { ids ->
+        miCore.getUserDataSource().state.map { state ->
+            ids.map {
+                state.get(it)
+            }.filterNotNull()
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init{
         val usersMap = HashMap<User.Id, UserViewData>()
@@ -80,14 +87,14 @@ class SelectedUserViewModel(
         usersMap.putAll(srcUserId)
 
         mSelectedUserIdUserMap = LinkedHashMap(usersMap)
-        selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
+        selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
     private fun selectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap[user.id] = UserViewData(user, miCore, viewModelScope)
-            selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
+            selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
 
@@ -95,7 +102,7 @@ class SelectedUserViewModel(
         user?: return
         synchronized(mSelectedUserIdUserMap){
             mSelectedUserIdUserMap.remove(user.id)
-            selectedUsers.postValue(mSelectedUserIdUserMap.values.toList())
+            selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
 
@@ -128,11 +135,11 @@ class SelectedUserViewModel(
             addAll(selectedBeforeUsers)
         }
 
-        val selected = selectedUsers.value?.map{
+        val selected = selectedUsersViewData.value?.map{
             it.userId
         }?: emptyList()
 
-        val selectedUsers = selectedUsers.value?.mapNotNull {
+        val selectedUsers = selectedUsersViewData.value?.mapNotNull {
             it.user.value
         } ?: emptyList<User>()
 

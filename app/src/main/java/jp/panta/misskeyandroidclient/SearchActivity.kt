@@ -7,8 +7,10 @@ import android.view.MenuItem
 import android.widget.SearchView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
@@ -57,14 +59,15 @@ class SearchActivity : AppCompatActivity() {
                 SimpleUserListView(
                     users = users,
                     onSelected = ::showUserDetail,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
 
     }
 
-    fun showUserDetail(userId: User.Id) {
-        startActivity(UserDetailActivity.newInstance(this, userId))
+    fun showUserDetail(user: User) {
+        startActivity(UserDetailActivity.newInstance(this, user.id))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
