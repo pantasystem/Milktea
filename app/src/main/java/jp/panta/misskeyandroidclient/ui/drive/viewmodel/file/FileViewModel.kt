@@ -6,14 +6,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.model.file.AppFile
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.*
+import net.pantasystem.milktea.model.file.AppFile
 
 /**
  * 選択状態とFileの読み込み＆表示を担当する
@@ -167,6 +170,18 @@ class FileViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             filePropertyRepository.delete(id).onFailure { e ->
                 logger.info("ファイルの削除に失敗しました", e = e)
+            }
+        }
+    }
+
+    fun updateCaption(id: FileProperty.Id, newCaption: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            filePropertyRepository.update(
+                filePropertyRepository.find(id)
+                    .update(comment = newCaption)
+            ).onFailure {
+                logger.info("キャプションの更新に失敗しました。", e = it)
             }
         }
     }

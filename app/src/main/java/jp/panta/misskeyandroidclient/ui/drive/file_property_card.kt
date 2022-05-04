@@ -3,7 +3,10 @@ package jp.panta.misskeyandroidclient.ui.drive
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,9 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
-import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.components.SensitiveIcon
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
+import net.pantasystem.milktea.model.drive.FileProperty
 
 
 @ExperimentalMaterialApi
@@ -22,9 +25,10 @@ import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 fun FilePropertySimpleCard(
     file: FileViewData,
     isSelectMode: Boolean = false,
-    onCheckedChanged: (Boolean)->Unit,
+    onCheckedChanged: (Boolean) -> Unit,
     onDeleteMenuItemClicked: () -> Unit,
     onToggleNsfwMenuItemClicked: () -> Unit,
+    onEditFileCaption: (id: FileProperty.Id, newCaption: String) -> Unit,
 ) {
     var actionMenuExpandedState by remember {
         mutableStateOf(false)
@@ -34,19 +38,23 @@ fun FilePropertySimpleCard(
         mutableStateOf<FileProperty.Id?>(null)
     }
 
+    var editCaptionTargetFile by remember {
+        mutableStateOf<FileProperty?>(null)
+    }
+
 
     Card(
         shape = RoundedCornerShape(0.dp),
         modifier = Modifier.padding(0.5.dp),
-        backgroundColor = if(file.isSelected) {
+        backgroundColor = if (file.isSelected) {
             MaterialTheme.colors.primary
         } else {
             MaterialTheme.colors.surface
         },
         onClick = {
-            if(isSelectMode) {
+            if (isSelectMode) {
                 onCheckedChanged.invoke(!file.isSelected)
-            }else{
+            } else {
                 actionMenuExpandedState = true
             }
 
@@ -66,7 +74,7 @@ fun FilePropertySimpleCard(
                         .height(64.dp)
                         .width(64.dp)
                         .padding(end = 4.dp)
-                ){
+                ) {
                     Image(
                         painter = rememberImagePainter(
                             file.fileProperty.thumbnailUrl
@@ -78,7 +86,7 @@ fun FilePropertySimpleCard(
                             .width(64.dp),
                         contentScale = ContentScale.Crop
                     )
-                    if(file.fileProperty.isSensitive) {
+                    if (file.fileProperty.isSensitive) {
                         SensitiveIcon()
                     }
                 }
@@ -107,7 +115,7 @@ fun FilePropertySimpleCard(
             }
             Box(
                 modifier = Modifier.align(Alignment.End)
-            ){
+            ) {
                 FileActionDropdownMenu(
 
                     expanded = actionMenuExpandedState,
@@ -122,6 +130,10 @@ fun FilePropertySimpleCard(
                         actionMenuExpandedState = false
                         confirmDeleteTargetId = file.fileProperty.id
                     },
+                    onEditFileCaption = {
+                        actionMenuExpandedState = false
+                        editCaptionTargetFile = file.fileProperty
+                    },
                     property = file.fileProperty
                 )
             }
@@ -130,7 +142,7 @@ fun FilePropertySimpleCard(
 
 
     }
-    if(confirmDeleteTargetId != null) {
+    if (confirmDeleteTargetId != null) {
         ConfirmDeleteFilePropertyDialog(
             filename = file.fileProperty.name,
             onDismissRequest = {
@@ -141,6 +153,21 @@ fun FilePropertySimpleCard(
                 onDeleteMenuItemClicked()
             }
         )
+    }
+
+    if (editCaptionTargetFile != null) {
+        EditCaptionDialog(
+            fileProperty = file.fileProperty,
+            onDismiss = {
+                editCaptionTargetFile = null
+            },
+            onSave = { id, newCaption ->
+                editCaptionTargetFile = null
+                onEditFileCaption.invoke(id, newCaption)
+            }
+        )
+
+
     }
 
 }
