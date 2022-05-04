@@ -384,6 +384,8 @@
     <string name="view_in_browser">在浏览器中查看</string>
     <string name="note_creation_failure">笔记创建失败</string>
     <string name="channel">Channel</string>
+
+    <string name="edit_caption">编辑标题</string>
 <!--    <string name="n_people">%d人</string>-->
 <!--    <string name="n_posts">%d个帖子</string>-->
 <!--    <string name="owned">拥有</string>-->
