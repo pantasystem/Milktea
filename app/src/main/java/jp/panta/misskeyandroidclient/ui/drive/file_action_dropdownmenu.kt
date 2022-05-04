@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -126,11 +127,18 @@ fun EditCaptionDialog(
             ) {
                 Text(
                     stringResource(R.string.edit_caption),
-                    style = MaterialTheme.typography.subtitle1
+                    fontSize = 24.sp,
                 )
-                TextField(value = captionText, onValueChange = { text ->
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = captionText,
+                    placeholder = {
+                        Text(stringResource(R.string.input_caption))
+                    },
+                    onValueChange = { text ->
                     captionText = text
-                })
+                    }
+                )
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
