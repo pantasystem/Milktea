@@ -97,6 +97,14 @@ class NoteTest {
     }
 
     @Test
+    fun canRenote_WhenVisibilityFollowersAndMyPost() {
+        val note = generateEmptyNote().copy(
+            visibility = Visibility.Followers(false),
+        )
+        assertTrue(note.canRenote(note.userId))
+    }
+
+    @Test
     fun canRenote_WhenVisibilitySpecifiedAndMyNote() {
         val userId = generateEmptyNote().userId
         val note = generateEmptyNote().copy(
