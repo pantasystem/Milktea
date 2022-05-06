@@ -81,7 +81,7 @@ class NoteTest {
     }
 
     @Test
-    fun canRenote_WhenVisibilityFollowers() {
+    fun canRenote_WhenVisibilityFollowersReturnFalse() {
         val note = generateEmptyNote().copy(
             visibility = Visibility.Followers(false),
         )
@@ -89,7 +89,7 @@ class NoteTest {
     }
 
     @Test
-    fun canRenote_WhenVisibilitySpecified() {
+    fun canRenote_WhenVisibilitySpecifiedReturnFalse() {
         val note = generateEmptyNote().copy(
             visibility = Visibility.Specified(emptyList()),
         )
@@ -97,7 +97,7 @@ class NoteTest {
     }
 
     @Test
-    fun canRenote_WhenVisibilityFollowersAndMyPost() {
+    fun canRenote_WhenVisibilityFollowersAndMyPostReturnTrue() {
         val note = generateEmptyNote().copy(
             visibility = Visibility.Followers(false),
         )
