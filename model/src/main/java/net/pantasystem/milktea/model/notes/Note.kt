@@ -90,8 +90,7 @@ data class Note(
         return id.accountId == userId.accountId
                 && (visibility is Visibility.Public
                 || visibility is Visibility.Home
-                || visibility is Visibility.Followers
-                || (visibility is Visibility.Specified && this.userId == userId)
+                || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
                 )
     }
 }

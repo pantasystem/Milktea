@@ -7,8 +7,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -18,6 +20,9 @@ import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -37,8 +42,14 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         .observeAsState(initial = false)
     val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
     val listViewState = rememberLazyListState()
-    if (listViewState.isScrolledToTheEnd() && listViewState.layoutInfo.totalItemsCount != listViewState.layoutInfo.visibleItemsInfo.size && listViewState.isScrollInProgress) {
-        fileViewModel.loadNext()
+    LaunchedEffect(null) {
+        snapshotFlow {
+            listViewState.isScrolledToTheEnd() && listViewState.layoutInfo.totalItemsCount != listViewState.layoutInfo.visibleItemsInfo.size && listViewState.isScrollInProgress
+        }.distinctUntilChanged().onEach {
+            if (it) {
+                fileViewModel.loadNext()
+            }
+        }.launchIn(this)
     }
     SwipeRefresh(
         state = swipeRefreshState,
