@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,6 +45,9 @@ class SearchUserViewModel @Inject constructor(
     private val miCore: MiCore,
 ) : ViewModel() {
 
+    private val userViewDataFactory by lazy {
+        miCore.userViewDataFactory()
+    }
     private val logger = loggerFactory.create("SearchUserViewModel")
 
 
@@ -108,7 +111,7 @@ class SearchUserViewModel @Inject constructor(
             ?: emptyList()
     }.map {
         it.map { u ->
-            UserViewData(u, miCore, viewModelScope)
+            userViewDataFactory.create(u, viewModelScope)
         }
     }.asLiveData()
 

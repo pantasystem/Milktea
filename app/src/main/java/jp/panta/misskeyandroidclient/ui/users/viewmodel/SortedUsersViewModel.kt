@@ -2,11 +2,11 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.di.module.getNoteDataSourceAdder
-import net.pantasystem.milktea.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.infrastructure.toUser
 import java.io.Serializable
 
@@ -21,6 +21,10 @@ class SortedUsersViewModel(
     private val orderBy: UserRequestConditions = type?.conditions ?: orderBy!!
 
     val logger = miCore.loggerFactory.create("SortedUsersViewModel")
+
+    private val userViewDataFactory by lazy {
+        miCore.userViewDataFactory()
+    }
 
     val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
 
@@ -137,7 +141,7 @@ class SortedUsersViewModel(
                             miCore.getUserDataSource().add(u)
                         }
                     }?.map { u ->
-                        UserViewData(u, miCore, viewModelScope, Dispatchers.IO)
+                        userViewDataFactory.create(u, viewModelScope, Dispatchers.IO)
                     } ?: emptyList()
                 }.onFailure { t ->
                     logger.error("ユーザーを取得しようとしたところエラーが発生しました", t)

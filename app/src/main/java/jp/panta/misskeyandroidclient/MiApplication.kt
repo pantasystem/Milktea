@@ -63,7 +63,6 @@ import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -140,7 +139,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mNotificationRepository: NotificationRepository
 
-    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -218,7 +216,6 @@ class MiApplication : Application(), MiCore {
         loggerFactory.create("MiApplication")
     }
 
-    private lateinit var _networkState: Flow<Boolean>
 
     @Inject
     lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
@@ -257,17 +254,9 @@ class MiApplication : Application(), MiCore {
             .setReplaceAll(true)
         EmojiCompat.init(config)
 
-        _networkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
-
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
-        mUserRepositoryEventToFlow =
-            UserRepositoryEventToFlow(
-                mUserDataSource,
-                applicationScope,
-                loggerFactory
-            )
 
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(
@@ -304,7 +293,7 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
 
-        _networkState.distinctUntilChanged().onEach {
+        activeNetworkFlow().distinctUntilChanged().onEach {
             logger.debug("接続状態が変化:${if (it) "接続" else "未接続"}")
             mSocketWithAccountProvider.all().forEach { socket ->
                 if (it) {
@@ -426,9 +415,6 @@ class MiApplication : Application(), MiCore {
         return mUserRepository
     }
 
-    override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {
-        return mUserRepositoryEventToFlow
-    }
 
     override suspend fun getChannelAPI(account: Account): ChannelAPI {
         return mChannelAPIWithAccountProvider.get(account)

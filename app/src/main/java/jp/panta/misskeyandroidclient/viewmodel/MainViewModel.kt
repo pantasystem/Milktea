@@ -60,7 +60,7 @@ class MainViewModel @Inject constructor(
         getters.notificationRelationGetter.get(it.first, it.second.body)
     }.flowOn(Dispatchers.IO).catch { e ->
         logger.error("通知取得エラー", e = e)
-    }.shareIn(viewModelScope, SharingStarted.Lazily)
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentAccountSocketStateEvent =
@@ -68,5 +68,5 @@ class MainViewModel @Inject constructor(
             socketProvider.get(it).stateEvent()
         }.filter { BuildConfig.DEBUG }.catch { e ->
             logger.error("WebSocket　状態取得エラー", e)
-        }.shareIn(viewModelScope, SharingStarted.Lazily)
+        }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 }

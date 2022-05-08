@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable
 
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -49,6 +50,10 @@ class SelectedUserViewModel(
 
     private val selectedUsersViewData = MediatorLiveData<List<UserViewData>>()
 
+    private val userViewDataFactory by lazy {
+        miCore.userViewDataFactory()
+    }
+
     val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
         addSource(selectedUsersViewData){
             value = it.mapNotNull{ uv ->
@@ -69,7 +74,7 @@ class SelectedUserViewModel(
         val usersMap = HashMap<User.Id, UserViewData>()
 
         val srcUser = exSelectedUsers.map{
-            it.id to UserViewData(it, miCore, viewModelScope)
+            it.id to userViewDataFactory.create(it, viewModelScope)
         }
 
         usersMap.putAll(srcUser)
@@ -79,7 +84,7 @@ class SelectedUserViewModel(
             if(usersMap.containsKey(it)){
                 null
             }else{
-                it to UserViewData(it, miCore, viewModelScope)
+                it to userViewDataFactory.create(it, viewModelScope)
             }
 
         }
@@ -93,7 +98,7 @@ class SelectedUserViewModel(
     private fun selectUser(user: User?){
         user?: return
         synchronized(mSelectedUserIdUserMap){
-            mSelectedUserIdUserMap[user.id] = UserViewData(user, miCore, viewModelScope)
+            mSelectedUserIdUserMap[user.id] = userViewDataFactory.create(user, viewModelScope)
             selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
         }
     }
