@@ -63,7 +63,6 @@ import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -140,7 +139,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mNotificationRepository: NotificationRepository
 
-    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -259,12 +257,6 @@ class MiApplication : Application(), MiCore {
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
-        mUserRepositoryEventToFlow =
-            UserRepositoryEventToFlow(
-                mUserDataSource,
-                applicationScope,
-                loggerFactory
-            )
 
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(
