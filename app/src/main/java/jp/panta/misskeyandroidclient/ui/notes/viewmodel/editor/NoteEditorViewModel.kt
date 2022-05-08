@@ -1,12 +1,14 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.model.instance.Version
-import net.pantasystem.milktea.model.file.toFile
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
@@ -21,7 +23,9 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.user.User
@@ -41,6 +45,10 @@ class NoteEditorViewModel @Inject constructor(
     private val accountStore: AccountStore,
     private val createNoteTaskExecutor: CreateNoteTaskExecutor
 ) : ViewModel() {
+
+    private val userViewDataFactory by lazy {
+        miCore.userViewDataFactory()
+    }
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -67,9 +75,8 @@ class NoteEditorViewModel @Inject constructor(
     val currentUser: StateFlow<UserViewData?> =
         accountStore.state.map { it.currentAccount }.filterNotNull().map {
             val userId = User.Id(it.accountId, it.remoteId)
-            UserViewData(
+            userViewDataFactory.create(
                 userId,
-                miCore,
                 viewModelScope,
                 dispatcher
             )
@@ -167,7 +174,7 @@ class NoteEditorViewModel @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     private fun setUpUserViewData(userId: User.Id): UserViewData {
-        return UserViewData(userId, miCore, viewModelScope, dispatcher)
+        return userViewDataFactory.create(userId, viewModelScope, dispatcher)
     }
 
     val isSpecified = _state.map {
