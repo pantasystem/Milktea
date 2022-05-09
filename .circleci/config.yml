@@ -33,10 +33,9 @@ jobs:
       - run:
           name: generate local.properties
           command:
-            run: |
-              echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./local.properties \
-              echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties \
-              echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties \
+              echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./local.properties
+              echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties
+              echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
 
       # The next step will run the unit tests
       - android/run-tests:
