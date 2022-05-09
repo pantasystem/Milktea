@@ -28,7 +28,7 @@ jobs:
       - run:
           name: decode google-services.json
           command:
-            echo "$GOOGLE_SERVICES_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
+            echo "$GOOGLE_SERVICE_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
 
       - run:
           name: generate local.properties
