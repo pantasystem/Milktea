@@ -35,4 +35,9 @@ jobs:
         run: chmod +x ./gradlew
       - name: build
 
-        run: ./gradlew build
+        run: ./gradlew assembleRelease
+      - uses: actions/upload-artifact@v3
+        with:
+          name: outputs
+          path: app/build/outputs/
+
