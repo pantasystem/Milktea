@@ -1,19 +1,19 @@
 package jp.panta.misskeyandroidclient.model.account.db
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.page.Page
-import jp.panta.misskeyandroidclient.model.account.page.Pageable
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
-import org.junit.Assert.*
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
+import net.pantasystem.milktea.data.infrastructure.account.db.RoomAccountRepository
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
-import java.lang.IllegalStateException
 
 class RoomAccountRepositoryTest{
 
