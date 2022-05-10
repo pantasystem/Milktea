@@ -65,7 +65,7 @@ Create your account on the instance you wish to use.<br>
 
 Launch the app after its installation is complete.
 When "Authentication" screen appears, type Misskey instance URL you're trying to use.
-For example, when you want to use misskey.io, type "misskey.io" .
+For example, when you want to use misskey.io, type `misskey.io` .
 
 You can freely change "App name".<br>
 "App name" maybe displaied with "via" on the instance depending on a Misskey version of it.<br>
@@ -82,7 +82,7 @@ If successful, you will be redirected to Milktea and press "CONTINUE" to complet
 
 ## Build
 
-"git clone" this repo and create a file "local.properties".<br>
+`git clone` this repo and create a file `local.properties`.<br>
 ```
 touch local.properties
 ```
