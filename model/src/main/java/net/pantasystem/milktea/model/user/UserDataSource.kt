@@ -11,8 +11,10 @@ data class UsersState (
         return usersMap[userId]
     }
 
-    fun get(userName: String, host: String? = null): User? {
-        return usersMap.values.firstOrNull {
+    fun get(userName: String, host: String? = null, accountId: Long? = null): User? {
+        return usersMap.values.filter {
+            accountId == null || accountId == it.id.accountId
+        }.firstOrNull {
             it.userName == userName && it.host == host
         }
     }

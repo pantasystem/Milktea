@@ -1,37 +1,59 @@
 package jp.panta.misskeyandroidclient.ui.drive.viewmodel
 
+
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.api.misskey.drive.CreateFolder
-import net.pantasystem.milktea.common.Encryption
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.api.misskey.drive.RequestFolder
-import net.pantasystem.milktea.api.misskey.throwIfHasError
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.drive.CreateDirectory
+import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore
+import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import net.pantasystem.milktea.model.drive.DriveStore
 
-class DirectoryViewModel(
-    private val accountWatcher: CurrentAccountWatcher,
-    private val driveStore: DriveStore,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
-    val loggerFactory: Logger.Factory
+
+class DirectoryViewModel @AssistedInject constructor(
+    loggerFactory: Logger.Factory,
+    private val accountRepository: AccountRepository,
+    private val driveDirectoryRepository: DriveDirectoryRepository,
+    private val driveDirectoryPagingStore: DriveDirectoryPagingStore,
+    accountStore: AccountStore,
+    @Assisted private val driveStore: DriveStore,
 ) : ViewModel() {
 
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(driveStore: DriveStore): DirectoryViewModel
+    }
 
-    val foldersLiveData = MutableLiveData<List<DirectoryViewData>>()
+    companion object;
+
+    private val accountWatcher by lazy {
+        CurrentAccountWatcher(driveStore.state.value.accountId, accountRepository)
+    }
+    val foldersLiveData = driveDirectoryPagingStore.state.map { state ->
+        state.convert { list ->
+            list.map {
+                DirectoryViewData(it)
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, PageableState.Loading.Init())
 
     val isRefreshing = MutableLiveData(false)
 
 
-    private var isLoading = false
 
     private val _error = MutableStateFlow<Throwable?>(null)
     val error: StateFlow<Throwable?> = _error
@@ -47,104 +69,62 @@ class DirectoryViewModel(
             logger.warning("アカウント変更伝達処理中にエラー", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
+        driveStore.state.map {
+            it.path.path.lastOrNull()
+        }.onEach {
+            driveDirectoryPagingStore.setCurrentDirectory(it)
+            driveDirectoryPagingStore.loadPrevious()
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        accountStore.state.map { it.currentAccount }.onEach {
+            driveDirectoryPagingStore.setAccount(it)
+            driveDirectoryPagingStore.loadPrevious()
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
     }
 
     fun loadInit() {
-        if (isLoading) {
-            return
-        }
-        isLoading = true
-
-        isRefreshing.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val account = accountWatcher.getAccount()
-                val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                val rawList = misskeyAPI.getFolders(
-                    RequestFolder(
-                        i = account.getI(encryption),
-                        folderId = driveStore.state.value.path.path.lastOrNull()?.id,
-                        limit = 20
-                    )
-                ).throwIfHasError().body()
-                requireNotNull(rawList)
-                require(rawList.isNotEmpty())
-                rawList.map {
-                    DirectoryViewData(it)
-                }
-            }.onSuccess {
-                foldersLiveData.postValue(it)
-            }.onFailure {
-                foldersLiveData.postValue(emptyList())
-                logger.debug("初期ロードに失敗しました")
-            }
-            isLoading = false
-            isRefreshing.postValue(false)
+            driveDirectoryPagingStore.clear()
+            driveDirectoryPagingStore.loadPrevious()
         }
     }
 
     fun loadNext() {
-        if (isLoading) {
-            return
-        }
-        isLoading = true
-        val beforeList = foldersLiveData.value
-        val untilId = beforeList?.lastOrNull()?.id
-        if (beforeList == null || untilId == null) {
-            isLoading = false
-            return
-        }
-
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val account = accountWatcher.getAccount()
-                val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                val request = RequestFolder(
-                    i = account.getI(encryption),
-                    folderId = driveStore.state.value.path.path.lastOrNull()?.id,
-                    limit = 20,
-                    untilId = untilId
-                )
-
-                misskeyAPI.getFolders(request).throwIfHasError().body()?.map {
-                    DirectoryViewData(it)
-                }
-
-            }.onSuccess { viewDataList ->
-                requireNotNull(viewDataList)
-                val newList = ArrayList<DirectoryViewData>(beforeList).apply {
-                    addAll(viewDataList)
-                }
-                foldersLiveData.postValue(newList)
-            }.onFailure {
-                logger.debug("loadNext中にエラー発生", e = it)
-            }
-            isLoading = false
+            driveDirectoryPagingStore.loadPrevious()
         }
-
     }
 
-    fun createFolder(folderName: String) {
+    fun createDirectory(folderName: String) {
         if (folderName.isNotBlank()) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
-                    val account = accountWatcher.getAccount()
-                    val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
-                    misskeyAPI.createFolder(
-                        CreateFolder(
-                            i = account.getI(encryption),
-                            name = folderName,
-                            parentId = driveStore.state.value.path.path.lastOrNull()?.id
-                        )
-                    ).throwIfHasError().body()
-
-                }.onFailure {
+                driveDirectoryRepository.create(
+                    CreateDirectory(
+                        accountId = accountWatcher.getAccount().accountId,
+                        directoryName = folderName,
+                        parentId = driveStore.state.value.path.path.lastOrNull()?.id
+                    )
+                ).onFailure {
                     Log.e("FolderViewModel", "error create folder", it)
                     _error.value = it
+                }.onSuccess {
+                    driveDirectoryPagingStore.onCreated(it)
                 }
             }
 
         }
 
     }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun DirectoryViewModel.Companion.provideViewModel(
+    assistedFactory: DirectoryViewModel.ViewModelAssistedFactory,
+    driveStore: DriveStore,
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return assistedFactory.create(driveStore) as T
+    }
+
 }

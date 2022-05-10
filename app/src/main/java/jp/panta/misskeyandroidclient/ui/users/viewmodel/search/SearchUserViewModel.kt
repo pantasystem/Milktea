@@ -1,8 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,8 +37,6 @@ data class SearchUser(
  * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
  * SelectedUserViewModelに分離する予定
  */
-@FlowPreview
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
@@ -44,6 +45,9 @@ class SearchUserViewModel @Inject constructor(
     private val miCore: MiCore,
 ) : ViewModel() {
 
+    private val userViewDataFactory by lazy {
+        miCore.userViewDataFactory()
+    }
     private val logger = loggerFactory.create("SearchUserViewModel")
 
 
@@ -56,6 +60,7 @@ class SearchUserViewModel @Inject constructor(
     val userName = MutableLiveData<String>()
     val host = MutableLiveData<String>()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val searchState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.distinctUntilChanged()
@@ -97,9 +102,16 @@ class SearchUserViewModel @Inject constructor(
     val users = searchState.map {
         (it.content as? StateContent.Exist)?.rawContent
             ?: emptyList()
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val userViewDataList = searchState.map {
+        (it.content as? StateContent.Exist)?.rawContent
+            ?: emptyList()
     }.map {
         it.map { u ->
-            UserViewData(u, miCore, viewModelScope)
+            userViewDataFactory.create(u, viewModelScope)
         }
     }.asLiveData()
 

@@ -14,9 +14,10 @@ import kotlinx.coroutines.flow.*
 @FlowPreview
 @ExperimentalCoroutinesApi
 class NotificationService : Service() {
-    companion object{
+    companion object {
         private const val TAG = "NotificationService"
-        private const val MESSAGE_CHANEL_ID = "jp.panta.misskeyandroidclient.NotificationService.MESSAGE_CHANEL_ID"
+        private const val MESSAGE_CHANNEL_ID =
+            "jp.panta.misskeyandroidclient.NotificationService.MESSAGE_CHANNEL_ID"
 
     }
 
@@ -47,28 +48,11 @@ class NotificationService : Service() {
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun startObserve(){
+    private fun startObserve() {
 
         val miApplication = applicationContext
-        if(miApplication is MiApplication){
+        if (miApplication is MiApplication) {
 
-            /*miApplication.getAccounts().flatMapLatest { acList ->
-                acList.map{ a ->
-                    miApplication.getChannelAPI(a).connect(ChannelAPI.Type.MAIN).map {
-                        a to it
-                    }
-                }.merge()
-            }.filterNot {
-                mStopNotificationAccountMap.contains(it.first.accountId)
-            }.map {
-                (it.second as? ChannelBody.Main.Notification)?.let{ body ->
-                    it.first to body
-                }
-            }.filterNotNull().onEach {
-                val notification = miApplication.getGetters().notificationRelationGetter.get(it.first, it.second.body)
-                showNotification(notification)
-            }.launchIn(coroutineScope + Dispatchers.IO)
-            */
 
             miApplication.messageObserver.observeAllAccountsMessages().onEach {
                 val msgRelation = miApplication.getGetters().messageRelationGetter.get(it)
@@ -81,27 +65,27 @@ class NotificationService : Service() {
     }
 
 
+    private fun showMessageNotification(message: MessageRelation) {
 
-    private fun showMessageNotification(message: MessageRelation){
-
-        val builder = NotificationCompat.Builder(this, MESSAGE_CHANEL_ID)
+        val builder = NotificationCompat.Builder(this, MESSAGE_CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setContentTitle(message.user.getDisplayUserName())
             .setContentText(SafeUnbox.unbox(message.message.text))
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
-        with(makeNotificationManager(MESSAGE_CHANEL_ID)){
+        with(makeNotificationManager(MESSAGE_CHANNEL_ID)) {
             notify(6, builder.build())
         }
     }
 
-    private fun makeNotificationManager(id: String): NotificationManager{
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun makeNotificationManager(id: String): NotificationManager {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val name = getString(R.string.app_name)
         val description = "THE NOTIFICATION"
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            if(notificationManager.getNotificationChannel(id) == null){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (notificationManager.getNotificationChannel(id) == null) {
                 val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
                 channel.description = description
                 notificationManager.createNotificationChannel(channel)
@@ -110,10 +94,6 @@ class NotificationService : Service() {
         return notificationManager
 
     }
-
-
-
-
 
 
     inner class NotificationBinder : Binder()

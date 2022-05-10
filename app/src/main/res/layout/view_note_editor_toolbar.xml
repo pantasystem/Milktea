@@ -30,7 +30,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:tint="?attr/colorNoteActionButtonTint" />
+                app:tint="?attr/normalIconTint" />
 
 
 
@@ -80,7 +80,7 @@
                 app:layout_constraintEnd_toStartOf="@id/reservationPostButton"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:tint="?attr/colorNoteActionButtonTint" />
+                app:tint="?attr/normalIconTint" />
 
         <ImageButton
                 android:id="@+id/reservationPostButton"
@@ -90,7 +90,7 @@
                 app:layout_constraintEnd_toStartOf="@id/textCounter"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:tint="?attr/colorNoteActionButtonTint"
+                app:tint="?attr/normalIconTint"
                 android:src="@drawable/ic_baseline_edit_calendar_24"
                 android:layout_marginEnd="8dp"
                 android:onClick="@{()-> viewModel.toggleReservationAt()}"

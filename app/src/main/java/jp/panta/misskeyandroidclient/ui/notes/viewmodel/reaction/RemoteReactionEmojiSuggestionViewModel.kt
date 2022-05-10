@@ -8,7 +8,6 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +17,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import javax.inject.Inject
 
 data class RemoteReaction(
@@ -32,6 +32,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     val noteRepository: NoteRepository,
     val loggerFactory: Logger.Factory,
+    val toggleReactionUseCase: ToggleReactionUseCase,
 ) : ViewModel() {
 
     private val _reaction = MutableStateFlow<RemoteReaction?>(null)
@@ -63,10 +64,6 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         it is State.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val isNotExists = filteredEmojis.map {
-        it.content is StateContent.NotExist && it is State.Fixed
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
-
 
     fun setReaction(accountId: Long, reaction: String, noteId: String) {
         _reaction.value = RemoteReaction(
@@ -81,14 +78,12 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         val name = value.reaction.getName()
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                noteRepository.toggleReaction(
-                    CreateReaction(
-                        Note.Id(
-                            value.currentAccountId,
-                            value.noteId
-                        ),
-                        ":$name:"
-                    )
+                toggleReactionUseCase(
+                    Note.Id(
+                        value.currentAccountId,
+                        value.noteId
+                    ),
+                    ":$name:"
                 )
             }.onFailure {
                 logger.warning("リアクションの作成失敗", e = it)

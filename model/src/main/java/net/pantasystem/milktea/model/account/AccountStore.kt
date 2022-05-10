@@ -21,7 +21,7 @@ class AccountStore @Inject constructor(
     val loggerFactory: Logger.Factory,
     val fetchMeta: FetchMeta,
     val makeDefaultPagesUseCase: MakeDefaultPagesUseCase,
-){
+) {
     val logger = loggerFactory.create("AccountStore")
     private val _state = MutableStateFlow<AccountState>(AccountState())
     val state: StateFlow<AccountState> = _state
@@ -55,7 +55,14 @@ class AccountStore @Inject constructor(
 
 
     suspend fun addAccount(account: Account) {
-        accountRepository.add(account, true)
+        try {
+            val newAccount = accountRepository.add(account, true)
+            saveDefaultPages(newAccount)
+            val updatedAccount = accountRepository.get(newAccount.accountId)
+            setCurrent(updatedAccount)
+        } catch (e: Exception) {
+            logger.error("アカウントの追加に失敗しました。", e)
+        }
     }
 
     suspend fun setCurrent(account: Account) {
@@ -100,27 +107,20 @@ class AccountStore @Inject constructor(
 
 
     suspend fun initialize() {
-        try{
+        try {
             var current: Account
             var accounts: List<Account>
-            try{
+            try {
                 current = accountRepository.getCurrentAccount()
                 accounts = accountRepository.findAll()
-            }catch(e: AccountNotFoundException){
+            } catch (e: AccountNotFoundException) {
                 _state.value = AccountState(isLoading = false)
                 return
             }
 
-            logger.debug("load account result : $current")
-
-            val meta = runCatching {
-                fetchMeta.fetch(current.instanceDomain)
-            }.getOrNull()
-
-
             logger.debug("accountId:${current.accountId}, account:$current")
-            if(current.pages.isEmpty()){
-                saveDefaultPages(current, meta)
+            if (current.pages.isEmpty()) {
+                saveDefaultPages(current)
                 accounts = accountRepository.findAll()
                 current = accountRepository.getCurrentAccount()
             }
@@ -131,21 +131,27 @@ class AccountStore @Inject constructor(
                 currentAccountId = current.accountId,
                 isLoading = false
             )
-        }catch(e: Exception){
+        } catch (e: Exception) {
             //isSuccessCurrentAccount.postValue(false)
-            logger.error( "初期読み込みに失敗しまちた", e)
+            logger.error("初期読み込みに失敗しまちた", e)
             _state.value = state.value.copy(error = e)
-        }finally {
+        } finally {
             _state.value = state.value.copy(isLoading = false)
         }
     }
 
 
-    private suspend fun saveDefaultPages(account: Account, meta: Meta?){
-        try{
+    private suspend fun saveDefaultPages(account: Account) {
+        if (account.pages.isNotEmpty()) {
+            return
+        }
+        try {
+            val meta = runCatching {
+                fetchMeta.fetch(account.instanceDomain)
+            }.getOrNull()
             val pages = makeDefaultPagesUseCase(account, meta)
             accountRepository.add(account.copy(pages = pages), true)
-        }catch(e: Exception){
+        } catch (e: Exception) {
             logger.error("default pages create error", e)
         }
     }

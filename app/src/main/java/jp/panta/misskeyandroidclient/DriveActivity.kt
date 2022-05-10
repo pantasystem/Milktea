@@ -7,28 +7,23 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveSelectableMode
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModelFactory
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModelFactory
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.*
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModelFactory
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.model.drive.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,19 +36,78 @@ class DriveActivity : AppCompatActivity() {
         const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
     }
 
-    enum class Type {
-        FILE
-    }
 
-    private lateinit var _driveViewModel: DriveViewModel
-
-    @ExperimentalCoroutinesApi
-    private lateinit var _fileViewModel: FileViewModel
-    private lateinit var _directoryViewModel: DirectoryViewModel
 
     @Inject
     lateinit var accountStore: AccountStore
 
+    private val accountId: Long? by lazy {
+        intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
+            if (it == -1L) null else it
+        }
+    }
+
+
+    private val selectedFileIds: List<FileProperty.Id>? by lazy {
+        (intent.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>)?.map {
+            it as FileProperty.Id
+        }
+    }
+
+    private val accountIds: List<Long> by lazy {
+        val accountIds = selectedFileIds?.map { it.accountId }?.distinct() ?: emptyList()
+        require(selectedFileIds == null || accountIds.size <= 1) {
+            "選択したFilePropertyの所有者は全て同一のアカウントである必要があります。ids:${accountIds}"
+        }
+        accountIds
+    }
+
+
+    private val driveSelectableMode: DriveSelectableMode? by lazy {
+
+        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
+        if (intent.action == Intent.ACTION_OPEN_DOCUMENT) {
+            val aId = accountId ?: accountIds.lastOrNull() ?: accountStore.currentAccountId
+            requireNotNull(aId)
+            DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
+        } else {
+            null
+        }
+    }
+
+    private val driveStore: DriveStore by lazy {
+        val selectable = driveSelectableMode
+        DriveStore(DriveState(
+            accountId = selectable?.accountId,
+            path = DirectoryPath(emptyList()),
+            selectedFilePropertyIds = selectable?.let {
+                SelectedFilePropertyIds(
+                    selectableMaxCount = it.selectableMaxSize,
+                    selectedIds = it.selectedFilePropertyIds.toSet()
+                )
+            }
+        ))
+    }
+
+    @Inject
+    lateinit var directoryViewModelFactory: DirectoryViewModel.ViewModelAssistedFactory
+    private val _directoryViewModel: DirectoryViewModel by viewModels {
+        DirectoryViewModel.provideViewModel(directoryViewModelFactory, driveStore)
+    }
+
+    @Inject
+    lateinit var fileViewModelFactory: FileViewModel.AssistedViewModelFactory
+
+    @ExperimentalCoroutinesApi
+    private val _fileViewModel: FileViewModel by viewModels {
+        FileViewModel.provideFactory(fileViewModelFactory, driveStore)
+    }
+
+    @Inject
+    lateinit var driveViewModelFactory: DriveViewModel.AssistedViewModelFactory
+    private val _driveViewModel: DriveViewModel by viewModels {
+        DriveViewModel.provideViewModel(driveViewModelFactory, driveStore, driveSelectableMode)
+    }
 
     @OptIn(
         ExperimentalPagerApi::class,
@@ -67,58 +121,8 @@ class DriveActivity : AppCompatActivity() {
         setTheme()
         ViewTreeLifecycleOwner.set(window.decorView, this)
 
-        val maxSize = intent.getIntExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, -1)
-        val selectedFileIds =
-            (intent.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>)?.map {
-                it as FileProperty.Id
-            }
-        val accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
-            if (it == -1L) null else it
-        }
-        val accountIds = selectedFileIds?.map { it.accountId }?.distinct() ?: emptyList()
-        require(selectedFileIds == null || accountIds.size <= 1) {
-            "選択したFilePropertyの所有者は全て同一のアカウントである必要があります。ids:${accountIds}"
-        }
-        val miCore = applicationContext as MiCore
-        val driveSelectableMode: DriveSelectableMode? =
-            if (intent.action == Intent.ACTION_OPEN_DOCUMENT) {
-                val aId = accountId ?: accountIds.lastOrNull() ?: accountStore.currentAccountId
-                requireNotNull(aId)
-                DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
-            } else {
-                null
-            }
 
-        _driveViewModel = ViewModelProvider(
-            this,
-            DriveViewModelFactory(driveSelectableMode)
-        )[DriveViewModel::class.java]
-        _fileViewModel = ViewModelProvider(
-            this, FileViewModelFactory(
-                accountId ?: accountIds.lastOrNull(),
-                miCore,
-                _driveViewModel.driveStore
-            )
-        )[FileViewModel::class.java]
-        _directoryViewModel = ViewModelProvider(
-            this, DirectoryViewModelFactory(
-                accountId ?: accountIds.lastOrNull(), miCore, _driveViewModel.driveStore
-            )
-        )[DirectoryViewModel::class.java]
 
-        _fileViewModel = ViewModelProvider(
-            this, FileViewModelFactory(
-                accountId ?: accountIds.lastOrNull(),
-                miCore,
-                _driveViewModel.driveStore
-            )
-        )[FileViewModel::class.java]
-
-        _directoryViewModel = ViewModelProvider(
-            this, DirectoryViewModelFactory(
-                accountId ?: accountIds.lastOrNull(), miCore, _driveViewModel.driveStore
-            )
-        )[DirectoryViewModel::class.java]
 
         setContent {
             MdcTheme {

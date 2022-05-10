@@ -15,7 +15,7 @@ import net.pantasystem.milktea.auth.viewmodel.Permissions
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.common.State

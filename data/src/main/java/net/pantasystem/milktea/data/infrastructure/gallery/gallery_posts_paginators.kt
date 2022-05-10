@@ -8,9 +8,8 @@ import net.pantasystem.milktea.model.instance.IllegalVersionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -87,12 +86,16 @@ class GalleryPostsLoader (
         }
     }
 
-    override suspend fun loadFuture(): Response<List<GalleryPostDTO>> {
-        return api(untilId = idGetter.getSinceId()).invoke()
+    override suspend fun loadFuture(): Result<List<GalleryPostDTO>> {
+        return runCatching {
+            api(untilId = idGetter.getSinceId()).invoke().throwIfHasError().body()!!
+        }
     }
 
-    override suspend fun loadPrevious(): Response<List<GalleryPostDTO>> {
-        return api(untilId = idGetter.getUntilId()).invoke()
+    override suspend fun loadPrevious(): Result<List<GalleryPostDTO>> {
+        return runCatching {
+            api(untilId = idGetter.getUntilId()).invoke().throwIfHasError().body()!!
+        }
     }
 
 

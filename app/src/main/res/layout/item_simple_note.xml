@@ -369,7 +369,7 @@
                 android:scaleType="centerCrop"
                 android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
                 android:contentDescription="@string/reply_title"
-                app:tint="?attr/colorNoteActionButtonTint"
+                app:tint="?attr/normalIconTint"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 android:layout_marginStart="8dp"
@@ -402,12 +402,13 @@
                 android:padding="@dimen/note_bottom_action_icon_padding_size"
                 android:scaleType="centerCrop"
                 android:contentDescription="@string/renote"
-                app:tint="?attr/colorNoteActionButtonTint"
+                app:tint="?attr/normalIconTint"
                 app:clickTargetNote="@{note}"
                 app:notesViewModelForClickRenote="@{notesViewModel}"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 app:layout_constraintEnd_toStartOf="@+id/textView4"
-                app:layout_constraintStart_toEndOf="@id/textView3" />
+                app:layout_constraintStart_toEndOf="@id/textView3"
+                android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"/>
 
         <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
@@ -440,7 +441,7 @@
                 android:scaleType="centerCrop"
                 android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
                 android:contentDescription="@string/reaction"
-                app:tint="?attr/colorNoteActionButtonTint"
+                app:tint="?attr/normalIconTint"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
 
                 app:layout_constraintEnd_toStartOf="@+id/textView5"
@@ -475,7 +476,7 @@
                 android:scaleType="centerCrop"
                 android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
                 android:contentDescription="@string/more"
-                app:tint="?attr/colorNoteActionButtonTint"
+                app:tint="?attr/normalIconTint"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 app:layout_constraintEnd_toEndOf="parent" />
 

@@ -2,15 +2,14 @@ package net.pantasystem.milktea.data.infrastructure.gallery
 
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.infrastructure.FuturePagingController
-import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
-import net.pantasystem.milktea.data.infrastructure.StateLocker
-
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.FuturePagingController
+import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.common.paginator.StateLocker
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource

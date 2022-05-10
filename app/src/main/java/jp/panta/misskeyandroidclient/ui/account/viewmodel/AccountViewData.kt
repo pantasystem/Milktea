@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.account.viewmodel
 
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.*
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import kotlinx.coroutines.*
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -15,7 +15,9 @@ class AccountViewData(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UserViewData(
     User.Id(account.accountId, account.remoteId),
-    miCore,
+    miCore.getUserDataSource(),
+    miCore.getUserRepository(),
+    miCore.loggerFactory.create("AccountViewData"),
     coroutineScope,
     coroutineDispatcher
 )

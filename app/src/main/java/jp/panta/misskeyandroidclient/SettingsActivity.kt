@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.activities.*
@@ -15,12 +16,12 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.MoveSettingActivityPa
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
 
     private val binding: ActivitySettingsBinding by dataBinding()
 
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -34,18 +35,18 @@ class SettingsActivity : AppCompatActivity() {
             activity = SettingMovementActivity::class.java,
             context = this
         )
-        movementSetting.startActivityEventBus.observe(this, {
+        movementSetting.startActivityEventBus.observe(this) {
             startActivity(Intent(this, it))
-        })
+        }
 
         val tabSetting = MoveSettingActivityPanel(
             titleStringRes = R.string.nav_setting_tab,
             activity = PageSettingActivity::class.java,
             context = this
         )
-        tabSetting.startActivityEventBus.observe(this, {
+        tabSetting.startActivityEventBus.observe(this) {
             startActivity(Intent(this, it))
-        })
+        }
 
         val appearanceSetting = MoveSettingActivityPanel(
             titleStringRes = R.string.appearance,
@@ -53,18 +54,18 @@ class SettingsActivity : AppCompatActivity() {
             context = this
         )
 
-        appearanceSetting.startActivityEventBus.observe(this, {
+        appearanceSetting.startActivityEventBus.observe(this) {
             startActivity(Intent(this, it))
-        })
+        }
 
         val reactionSetting = MoveSettingActivityPanel(
             titleStringRes = R.string.reaction,
             activity = ReactionSettingActivity::class.java,
             context = this
-        ).apply{
-            startActivityEventBus.observe(this@SettingsActivity, {
+        ).apply {
+            startActivityEventBus.observe(this@SettingsActivity) {
                 startActivity(Intent(this@SettingsActivity, it))
-            })
+            }
         }
 
 
@@ -73,9 +74,9 @@ class SettingsActivity : AppCompatActivity() {
             UrlPreviewSourceSettingActivity::class.java,
             this
         )
-        urlPreviewSource.startActivityEventBus.observe(this, {
+        urlPreviewSource.startActivityEventBus.observe(this) {
             startActivity(Intent(this, it))
-        })
+        }
 
 
         val licenseActivitySetting = MoveSettingActivityPanel(
@@ -83,16 +84,23 @@ class SettingsActivity : AppCompatActivity() {
             activity = OssLicensesMenuActivity::class.java,
             context = this
         )
-        licenseActivitySetting.startActivityEventBus.observe(this, {
+        licenseActivitySetting.startActivityEventBus.observe(this) {
             val intent = Intent(this, it)
             intent.putExtra("title", getString(R.string.license))
             startActivity(intent)
-        })
+        }
 
         val group = Group(
             titleStringRes = null,
             context = this,
-            items = listOf(movementSetting, tabSetting, appearanceSetting, urlPreviewSource, reactionSetting, licenseActivitySetting)
+            items = listOf(
+                movementSetting,
+                tabSetting,
+                appearanceSetting,
+                urlPreviewSource,
+                reactionSetting,
+                licenseActivitySetting
+            )
         )
 
         val adapter = SettingAdapter(this)
@@ -103,7 +111,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)

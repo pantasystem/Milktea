@@ -7,11 +7,22 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
+import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.data.infrastructure.*
-import net.pantasystem.milktea.data.infrastructure.drive.*
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.infrastructure.notes.*
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
@@ -21,23 +32,12 @@ import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEvent
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
-import net.pantasystem.milktea.data.infrastructure.url.*
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
-import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
-import net.pantasystem.milktea.common.getPreferenceName
-import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.data.streaming.Socket
-import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
@@ -45,7 +45,6 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryRepository
-import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
@@ -64,7 +63,6 @@ import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.UserRepositoryEventToFlow
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -127,9 +125,6 @@ class MiApplication : Application(), MiCore {
     lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
 
     @Inject
-    lateinit var mGroupDataSource: GroupDataSource
-
-    @Inject
     lateinit var mFilePropertyDataSource: FilePropertyDataSource
 
     @Inject
@@ -144,7 +139,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mNotificationRepository: NotificationRepository
 
-    private lateinit var mUserRepositoryEventToFlow: UserRepositoryEventToFlow
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -222,7 +216,6 @@ class MiApplication : Application(), MiCore {
         loggerFactory.create("MiApplication")
     }
 
-    private lateinit var _networkState: Flow<Boolean>
 
     @Inject
     lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
@@ -261,17 +254,9 @@ class MiApplication : Application(), MiCore {
             .setReplaceAll(true)
         EmojiCompat.init(config)
 
-        _networkState = activeNetworkFlow().shareIn(applicationScope, SharingStarted.Eagerly)
-
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
 
-        mUserRepositoryEventToFlow =
-            UserRepositoryEventToFlow(
-                mUserDataSource,
-                applicationScope,
-                loggerFactory
-            )
 
 
         mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(
@@ -308,7 +293,7 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
 
-        _networkState.distinctUntilChanged().onEach {
+        activeNetworkFlow().distinctUntilChanged().onEach {
             logger.debug("接続状態が変化:${if (it) "接続" else "未接続"}")
             mSocketWithAccountProvider.all().forEach { socket ->
                 if (it) {
@@ -369,33 +354,15 @@ class MiApplication : Application(), MiCore {
         return mAccountRepository
     }
 
-    override fun getNotificationDataSource(): NotificationDataSource {
-        return mNotificationDataSource
-    }
-
-    override fun getNotificationRepository(): NotificationRepository {
-        return mNotificationRepository
-    }
-
-    override fun getMessageDataSource(): MessageDataSource {
-        return mMessageDataSource
-    }
-
     override fun getMessageRepository(): MessageRepository {
         return mMessageRepository
     }
 
-    override fun getGroupDataSource(): GroupDataSource {
-        return mGroupDataSource
-    }
 
     override fun getGroupRepository(): GroupRepository {
         return mGroupRepository
     }
 
-    override fun getUnreadMessages(): UnReadMessages {
-        return mUnreadMessages
-    }
 
     override fun getGetters(): Getters {
         return mGetters
@@ -427,20 +394,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-    override suspend fun setCurrentAccount(account: Account) {
-        try {
-            mAccountRepository.setCurrentAccount(account)
-            mAccountStore.initialize()
-//            loadAndInitializeAccounts()
-        } catch (e: Exception) {
-            logger.error("switchAccount error", e)
-        }
-    }
-
-    override fun getDraftNoteDAO(): DraftNoteDao {
-        return draftNoteDao
-    }
-
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
@@ -462,29 +415,15 @@ class MiApplication : Application(), MiCore {
         return mUserRepository
     }
 
-    override fun getUserRepositoryEventToFlow(): UserRepositoryEventToFlow {
-        return mUserRepositoryEventToFlow
-    }
 
     override suspend fun getChannelAPI(account: Account): ChannelAPI {
         return mChannelAPIWithAccountProvider.get(account)
-    }
-
-    override fun getSocket(account: Account): Socket {
-        return mSocketWithAccountProvider.get(account)
-    }
-
-    override fun getMetaStore(): FetchMeta {
-        return mFetchMeta
     }
 
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
         return mFilePropertyDataSource
     }
 
-    override fun getFileUploaderProvider(): FileUploaderProvider {
-        return mFileUploaderProvider
-    }
 
     override fun getGalleryDataSource(): GalleryDataSource {
         return mGalleryDataSource
@@ -550,9 +489,6 @@ class MiApplication : Application(), MiCore {
         return mEncryption
     }
 
-    override fun getNoteCaptureAPI(account: Account): NoteCaptureAPI {
-        return mNoteCaptureAPIWithAccountProvider.get(account)
-    }
 
     override fun getReactionHistoryDataSource(): ReactionHistoryDataSource {
         return mReactionHistoryDataSource

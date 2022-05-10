@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import net.pantasystem.milktea.model.drive.Directory
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
 import androidx.compose.runtime.getValue
@@ -25,11 +26,14 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewData
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 
 @Composable
 fun DirectoryListScreen(viewModel: DirectoryViewModel, driveViewModel: DriveViewModel) {
-    val list:List<DirectoryViewData> by viewModel.foldersLiveData.observeAsState(emptyList())
-    val directories = list.map {
+    val state: PageableState<List<DirectoryViewData>> by viewModel.foldersLiveData.collectAsState()
+
+    val directories = ((state.content as? StateContent.Exist)?.rawContent?: emptyList()).map {
         it.directory
     }
     val isLoading: Boolean by viewModel.isRefreshing.observeAsState(

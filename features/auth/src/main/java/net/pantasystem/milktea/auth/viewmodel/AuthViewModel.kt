@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
@@ -168,8 +168,7 @@ class AuthViewModel @Inject constructor(
                     }
                 }
                 userDataSource.add(user)
-                accountRepository.add(account)
-                accountStore.setCurrent(account)
+                accountStore.addAccount(account)
 
                 account to user
             }.onSuccess {

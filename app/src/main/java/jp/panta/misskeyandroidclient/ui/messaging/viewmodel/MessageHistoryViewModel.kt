@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus

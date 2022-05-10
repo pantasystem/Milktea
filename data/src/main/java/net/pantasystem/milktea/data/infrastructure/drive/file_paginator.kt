@@ -9,62 +9,83 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.drive.RequestFile
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import retrofit2.Response
+import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
+import javax.inject.Inject
 
 
-class FilePropertyPagingStore(
-    private var currentDirectoryId: String?,
-    private val getAccount: suspend () -> Account,
+class FilePropertyPagingStoreImpl @Inject constructor(
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
     encryption: Encryption,
+) : FilePropertyPagingStore {
 
-    ) {
+    private var currentDirectoryId: String? = null
 
+    private var currentAccount: Account? = null
+
+    companion object;
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,
+        encryption,
+        filePropertyDataSource,
         {
-            getAccount.invoke()
+            currentAccount?: throw UnauthorizedException()
         },
         {
             currentDirectoryId
         },
-        encryption,
-        filePropertyDataSource
     )
 
-    private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> = PreviousPagingController(
-        filePropertyPagingImpl,
-        filePropertyPagingImpl,
-        filePropertyPagingImpl,
-        filePropertyPagingImpl
-    )
+    private val previousPagingController: PreviousPagingController<FilePropertyDTO, FileProperty.Id> =
+        PreviousPagingController(
+            filePropertyPagingImpl,
+            filePropertyPagingImpl,
+            filePropertyPagingImpl,
+            filePropertyPagingImpl
+        )
 
-    val state = this.filePropertyPagingImpl.state
+    override val state = this.filePropertyPagingImpl.state
 
-    val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
+    override val isLoading: Boolean get() = this.filePropertyPagingImpl.mutex.isLocked
 
-    suspend fun loadPrevious() {
+    override suspend fun loadPrevious() {
         previousPagingController.loadPrevious()
     }
 
-    suspend fun clear() {
+    override suspend fun clear() {
         this.filePropertyPagingImpl.mutex.withLock {
             this.filePropertyPagingImpl.setState(PageableState.Loading.Init())
         }
     }
 
-    suspend fun setCurrentDirectory(directory: Directory?) {
+    override suspend fun setCurrentDirectory(directory: Directory?) {
         this.clear()
         this.currentDirectoryId = directory?.id
+    }
+
+    override suspend fun setCurrentAccount(account: Account?) {
+        this.clear()
+        this.currentAccount = account
+    }
+
+    /**
+     * DriveFileが作成されたタイミングで呼び出される
+     */
+    override fun onCreated(id: FileProperty.Id) {
+        filePropertyPagingImpl.setState(
+            filePropertyPagingImpl.getState().convert {
+                it.toMutableList().also { list ->
+                    list.add(0, id)
+                }
+            }
+        )
     }
 
 }
@@ -72,18 +93,20 @@ class FilePropertyPagingStore(
 
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getAccount: suspend ()-> Account,
-    private val getCurrentFolderId: ()-> String?,
     private val encryption: Encryption,
-    private val filePropertyDataSource: FilePropertyDataSource
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val getAccount: suspend () -> Account,
+    private val getCurrentFolderId: () -> String?,
 ) : PaginationState<FileProperty.Id>,
     IdGetter<String>, PreviousLoader<FilePropertyDTO>,
     EntityConverter<FilePropertyDTO, FileProperty.Id>,
-    StateLocker
-{
+    StateLocker {
 
-    private val _state = MutableStateFlow<PageableState<List<FileProperty.Id>>>(PageableState.Fixed(
-        StateContent.NotExist()))
+    private val _state = MutableStateFlow<PageableState<List<FileProperty.Id>>>(
+        PageableState.Fixed(
+            StateContent.NotExist()
+        )
+    )
     override val state: Flow<PageableState<List<FileProperty.Id>>>
         get() = _state
 
@@ -105,15 +128,17 @@ class FilePropertyPagingImpl(
         return (getState().content as? StateContent.Exist<List<FileProperty.Id>>)?.rawContent?.lastOrNull()?.fileId
     }
 
-    override suspend fun loadPrevious(): Response<List<FilePropertyDTO>> {
-        return misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
-            RequestFile(
-                folderId = getCurrentFolderId.invoke(),
-                untilId = this.getUntilId(),
-                i = getAccount.invoke().getI(encryption),
-                limit = 20
-            )
-        ).throwIfHasError()
+    override suspend fun loadPrevious(): Result<List<FilePropertyDTO>> {
+        return runCatching {
+            misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
+                RequestFile(
+                    folderId = getCurrentFolderId.invoke(),
+                    untilId = this.getUntilId(),
+                    i = getAccount.invoke().getI(encryption),
+                    limit = 20
+                )
+            ).throwIfHasError().body()!!
+        }
     }
 
     override suspend fun convertAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {

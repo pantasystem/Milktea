@@ -3,12 +3,14 @@ package jp.panta.misskeyandroidclient.model.instance.db
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import jp.panta.misskeyandroidclient.model.DataBase
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.model.instance.Meta
-import jp.panta.misskeyandroidclient.model.instance.MetaRepository
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
+import net.pantasystem.milktea.api.Instance.db.RoomMetaRepository
+import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 

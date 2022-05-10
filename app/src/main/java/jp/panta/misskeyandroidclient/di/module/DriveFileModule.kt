@@ -15,6 +15,8 @@ import javax.inject.Singleton
 import net.pantasystem.milktea.model.drive.InMemoryFilePropertyDataSource
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
+
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DriveFileBindModule {
@@ -25,6 +27,10 @@ abstract class DriveFileBindModule {
     @Binds
     @Singleton
     abstract fun driveFileRepository(repo: DriveFileRepositoryImpl): DriveFileRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideFilePropertyPagingStore(impl: FilePropertyPagingStoreImpl): FilePropertyPagingStore
 }
 
 @Module

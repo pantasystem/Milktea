@@ -33,6 +33,6 @@
                 android:layout_gravity="center"
                 app:srcCompat="@drawable/ic_clear_black_24dp"
                 tools:ignore="ContentDescription,PrivateResource"
-                app:tint="?attr/colorNoteActionButtonTint" />
+                app:tint="?attr/normalIconTint" />
     </LinearLayout>
 </layout>

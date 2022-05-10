@@ -7,7 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.BookmarkRemove
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,9 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.user.User
-import kotlinx.datetime.Clock
 
 sealed interface ChannelCardAction {
     val channel: Channel
@@ -38,7 +41,6 @@ fun ChannelCard(
     isPaged: Boolean,
     onAction: (ChannelCardAction) -> Unit = {},
 ) {
-    val (r, g, b) = channel.rgpFromName
     Card(
         elevation = 4.dp,
         modifier = Modifier.padding(8.dp),
@@ -52,51 +54,7 @@ fun ChannelCard(
                 .fillMaxWidth()
         ) {
 
-            Box {
-                Image(
-                    painter = rememberImagePainter(channel.bannerUrl),
-                    contentDescription = "header",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .background(Color( r, g, b))
-                        .height(150.dp)
-                )
-
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color.Black.copy(alpha = 0.75f),
-                    contentColor = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(4.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = "users count"
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(stringResource(id = R.string.n_people, channel.usersCount))
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "posts count"
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(stringResource(id = R.string.n_posts, channel.notesCount))
-                        }
-                    }
-                }
-
-            }
+            ChannelCardHeader(channel = channel)
 
             Row(
                 modifier = Modifier
@@ -116,51 +74,141 @@ fun ChannelCard(
                         Text(channel.description ?: "", maxLines = 3)
                     }
                 }
-                Row {
-                    IconButton(onClick = {
-                        onAction.invoke(ChannelCardAction.OnToggleTabButtonClicked(channel))
-                    }) {
-                        if (isPaged) {
-                            Icon(
-                                imageVector = Icons.Default.BookmarkRemove,
-                                contentDescription = "add to tab",
-                                tint = MaterialTheme.colors.secondary
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.BookmarkAdd,
-                                contentDescription = "add to tab",
-                                tint = MaterialTheme.colors.secondary
-                            )
-                        }
-
-                    }
-                    if (channel.isFollowing != null) {
-                        if (channel.isFollowing!!) {
-                            Button(onClick = {
-                                onAction.invoke(
-                                    ChannelCardAction.OnUnFollowButtonClicked(
-                                        channel
-                                    )
-                                )
-                            }) {
-                                Text(stringResource(id = R.string.unfollow))
-                            }
-                        } else {
-                            OutlinedButton(onClick = {
-                                onAction.invoke(
-                                    ChannelCardAction.OnFollowButtonClicked(
-                                        channel
-                                    )
-                                )
-                            }) {
-                                Text(stringResource(id = R.string.follow))
-                            }
-                        }
-                    }
-
-                }
+                ChannelCardActionButtons(channel = channel, isPaged = isPaged, onAction = onAction)
             }
+        }
+    }
+}
+
+@Composable
+private fun AddToTabButton(isPaged: Boolean, onPressed: () -> Unit) {
+    IconButton(onClick = onPressed) {
+        if (isPaged) {
+            Icon(
+                imageVector = Icons.Default.BookmarkRemove,
+                contentDescription = "add to tab",
+                tint = MaterialTheme.colors.secondary
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.BookmarkAdd,
+                contentDescription = "add to tab",
+                tint = MaterialTheme.colors.secondary
+            )
+        }
+
+    }
+}
+
+@Composable
+private fun ChannelCardHeader(channel: Channel) {
+    val (r, g, b) = channel.rgpFromName
+    Box {
+        Image(
+            painter = rememberImagePainter(channel.bannerUrl),
+            contentDescription = "header",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .background(Color(r, g, b))
+                .fillMaxWidth()
+                .height(150.dp)
+        )
+
+        ChannelCardAggregateLabel(
+            channel = channel,
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.TopEnd)
+        )
+    }
+}
+
+@Composable
+private fun ChannelCardActionButtons(
+    channel: Channel,
+    isPaged: Boolean,
+    onAction: (ChannelCardAction) -> Unit
+) {
+    Row {
+        AddToTabButton(
+            isPaged = isPaged,
+            onPressed = {
+                onAction.invoke(
+                    ChannelCardAction.OnToggleTabButtonClicked(channel)
+                )
+            }
+        )
+        if (channel.isFollowing != null) {
+            ToggleFollowButton(
+                isFollowing = channel.isFollowing!!,
+                onChanged = { followed ->
+                    if (followed) {
+                        onAction.invoke(
+                            ChannelCardAction.OnFollowButtonClicked(
+                                channel
+                            )
+                        )
+                    } else {
+                        onAction.invoke(
+                            ChannelCardAction.OnUnFollowButtonClicked(
+                                channel
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChannelCardAggregateLabel(modifier: Modifier = Modifier, channel: Channel) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = Color.Black.copy(alpha = 0.75f),
+        contentColor = Color.White,
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "users count"
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(stringResource(id = R.string.n_people, channel.usersCount))
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "posts count"
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(stringResource(id = R.string.n_posts, channel.notesCount))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToggleFollowButton(isFollowing: Boolean, onChanged: (Boolean) -> Unit) {
+    if (isFollowing) {
+        Button(onClick = {
+            onChanged.invoke(!isFollowing)
+        }) {
+            Text(stringResource(id = R.string.unfollow))
+        }
+    } else {
+        OutlinedButton(onClick = {
+            onChanged.invoke(!isFollowing)
+        }) {
+            Text(stringResource(id = R.string.follow))
         }
     }
 }

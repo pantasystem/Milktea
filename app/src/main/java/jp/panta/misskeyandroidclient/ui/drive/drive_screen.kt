@@ -50,6 +50,7 @@ fun DriveScreen(
     require(tabTitles.size == 2)
 
     val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
+
     val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
     val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
     val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
@@ -58,7 +59,6 @@ fun DriveScreen(
     val scope = rememberCoroutineScope()
 
 
-    //val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {

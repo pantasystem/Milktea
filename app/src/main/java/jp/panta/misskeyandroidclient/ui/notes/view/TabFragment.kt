@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import android.content.Context
@@ -90,7 +91,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
     class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) :
         FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private var requestBaseList: List<Page> = list
-            private set
         private var oldRequestBaseSetting = requestBaseList
 
         var account: Account? = null

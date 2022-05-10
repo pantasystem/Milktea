@@ -4,21 +4,20 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
-import net.pantasystem.milktea.data.infrastructure.notes.*
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.user.User
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 open class PlaneNoteViewData (
     val note: NoteRelation,
@@ -138,6 +137,8 @@ open class PlaneNoteViewData (
     val reNoteCount: String?
         get() = if(toShowNote.note.renoteCount > 0) toShowNote.note.renoteCount.toString() else null
     val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
+
+    val canRenote = toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
 
     val reactionCounts = MutableLiveData(toShowNote.note.reactionCounts)
 

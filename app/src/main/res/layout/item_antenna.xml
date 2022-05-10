@@ -45,7 +45,7 @@
                     android:onClick="@{ ()-> antennaListViewModel.toggleTab(antenna) }"
                     app:pagedAntennaIds="@{antennaListViewModel.pagedAntennaIds}"
                     app:targetAntenna="@{antenna}"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <ImageButton
                     android:id="@+id/removeAntennaButton"
@@ -57,7 +57,7 @@
                     android:layout_below="@id/antennaNameInputLayout"
                     android:layout_toStartOf="@id/editAntennaButton"
                     android:onClick="@{ ()-> antennaListViewModel.confirmDeletionAntenna(antenna) }"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
 
             <ImageButton
                     android:id="@+id/editAntennaButton"
@@ -69,7 +69,7 @@
                     android:layout_below="@id/antennaNameInputLayout"
                     android:layout_alignParentEnd="true"
                     android:onClick="@{ ()-> antennaListViewModel.editAntenna(antenna) }"
-                    app:tint="?attr/colorNoteActionButtonTint" />
+                    app:tint="?attr/normalIconTint" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 

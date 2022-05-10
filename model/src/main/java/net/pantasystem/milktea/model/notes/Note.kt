@@ -1,13 +1,14 @@
 package net.pantasystem.milktea.model.notes
 
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
-import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import java.util.*
@@ -51,7 +52,7 @@ data class Note(
         val noteId: String
     ) : EntityId
 
-    fun updated(){
+    fun updated() {
         this.instanceUpdatedAt = Date()
     }
 
@@ -75,9 +76,26 @@ data class Note(
     fun hasContent(): Boolean {
         return !(text == null && fileIds.isNullOrEmpty() && poll == null)
     }
+
+    fun isOwnReaction(reaction: Reaction): Boolean {
+        return myReaction != null && myReaction == reaction.getName()
+    }
+
+    /**
+     * この投稿がRenote可能であるかをチェックしている。
+     * 既に取得できた投稿なので少なくともHome, Followers, Specifiedの公開範囲に
+     * 入っていることになるので厳密なチェックは行わない。
+     */
+    fun canRenote(userId: User.Id): Boolean {
+        return id.accountId == userId.accountId
+                && (visibility is Visibility.Public
+                || visibility is Visibility.Home
+                || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
+                )
+    }
 }
 
-sealed class NoteRelation : JSerializable{
+sealed class NoteRelation : JSerializable {
     abstract val note: Note
     abstract val user: User
     abstract val reply: NoteRelation?

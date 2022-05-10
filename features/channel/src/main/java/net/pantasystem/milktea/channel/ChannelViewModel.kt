@@ -3,7 +3,6 @@ package net.pantasystem.milktea.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.infrastructure.PreviousPagingController
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +13,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Pageable

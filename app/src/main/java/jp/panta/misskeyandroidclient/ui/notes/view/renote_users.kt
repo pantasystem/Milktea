@@ -12,15 +12,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
+import androidx.lifecycle.asLiveData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
-import androidx.compose.ui.Alignment
-import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelation
 
 
@@ -29,17 +32,22 @@ import net.pantasystem.milktea.model.notes.NoteRelation
 fun RenoteUsersScreen(
     renotesViewModel: RenotesViewModel,
     onSelected: (NoteRelation) -> Unit,
+    onScrollState: (Boolean) -> Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
 
-    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData().observeAsState(initial = PageableState.Fixed(
-        StateContent.NotExist()))
+    val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData()
+        .observeAsState(
+            initial = PageableState.Fixed(
+                StateContent.NotExist()
+            )
+        )
 
     LaunchedEffect(true) {
         renotesViewModel.refresh()
     }
 
-    if(renotes.content is StateContent.Exist && (renotes.content as StateContent.Exist).rawContent.isNotEmpty()) {
+    if (renotes.content is StateContent.Exist && (renotes.content as StateContent.Exist).rawContent.isNotEmpty()) {
         val content = (renotes.content as StateContent.Exist).rawContent
         RenoteUserList(
             notes = content,
@@ -48,9 +56,10 @@ fun RenoteUsersScreen(
                 renotesViewModel.next()
             },
             noteCaptureAPIAdapter = noteCaptureAPIAdapter,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            onScrollState = onScrollState,
         )
-    }else{
+    } else {
         Column(
             Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,8 +86,9 @@ fun RenoteUsersScreen(
 @Composable
 fun RenoteUserList(
     notes: List<NoteRelation>,
-    onSelected: (NoteRelation)->Unit,
-    onBottomReached: ()->Unit,
+    onSelected: (NoteRelation) -> Unit,
+    onBottomReached: () -> Unit,
+    onScrollState: (Boolean) -> Unit,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     modifier: Modifier = Modifier
 ) {
@@ -94,6 +104,15 @@ fun RenoteUserList(
         }.collect {
             onBottomReached.invoke()
         }
+    }
+
+    LaunchedEffect(scrollState) {
+        snapshotFlow { scrollState.layoutInfo.visibleItemsInfo.firstOrNull()?.offset }
+            .map { it == 0 }
+            .distinctUntilChanged()
+            .collect {
+                onScrollState.invoke(it)
+            }
     }
 
     LazyColumn(state = scrollState, modifier = modifier) {

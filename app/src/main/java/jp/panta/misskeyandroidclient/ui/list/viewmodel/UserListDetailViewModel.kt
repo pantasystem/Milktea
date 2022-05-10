@@ -7,10 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.list.UserListStore
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +15,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListStore
+import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -44,6 +44,7 @@ class UserListDetailViewModel @AssistedInject constructor(
         }
     }
 
+    private val userViewDataFactory = miCore.userViewDataFactory()
 
     val userList = userListStore.state.map {
         it.get(listId)
@@ -54,7 +55,7 @@ class UserListDetailViewModel @AssistedInject constructor(
         it.get(listId)
     }.filterNotNull().map {
         it.userIds.map { id ->
-            UserViewData(id, miCore, viewModelScope)
+            userViewDataFactory.create(id, viewModelScope)
         }
     }.asLiveData()
 
@@ -112,7 +113,7 @@ class UserListDetailViewModel @AssistedInject constructor(
             runCatching {
                 userListStore.removeUser(listId, userId)
             }.onFailure { t ->
-                logger.warning("ユーザーの除去に失敗")
+                logger.warning("ユーザーの除去に失敗", e = t)
             }.onSuccess {
                 logger.info("ユーザーの除去に成功")
             }

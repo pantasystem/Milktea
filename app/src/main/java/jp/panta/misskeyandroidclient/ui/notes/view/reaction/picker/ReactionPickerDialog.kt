@@ -15,17 +15,17 @@ import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,9 +64,9 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
                 it.weight
             }?.map{
                 it.reaction
-            }?: ReactionResourceMap.defaultReaction
+            }?: LegacyReaction.defaultReaction
             if(reactionSettings.isEmpty()){
-                reactionSettings = ReactionResourceMap.defaultReaction
+                reactionSettings = LegacyReaction.defaultReaction
             }
 
             Handler(Looper.getMainLooper()).post{

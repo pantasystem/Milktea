@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.Encryption
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.list.ListUserOperation
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountStore
 import javax.inject.Inject

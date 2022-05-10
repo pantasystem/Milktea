@@ -44,4 +44,19 @@ data class FileProperty (
             isSensitive
         )
     }
+
+    fun update(
+        name: String = this.name,
+        comment: String? = this.comment,
+        isSensitive: Boolean = this.isSensitive,
+        folderId: String? = this.folderId,
+    ): UpdateFileProperty {
+        return UpdateFileProperty(
+            name = name,
+            comment = comment,
+            fileId = this.id,
+            isSensitive = isSensitive,
+            folderId = folderId,
+        )
+    }
 }

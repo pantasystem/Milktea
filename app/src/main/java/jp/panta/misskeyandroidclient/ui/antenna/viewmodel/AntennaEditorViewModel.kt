@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.throwIfHasError
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
@@ -11,6 +11,7 @@ import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
@@ -36,6 +37,7 @@ class AntennaEditorViewModel (
     }
 
     private val logger = miCore.loggerFactory.create("AntennaEditorViewModel")
+    private val userViewDataFactory = miCore.userViewDataFactory()
 
 
 
@@ -97,7 +99,7 @@ class AntennaEditorViewModel (
     private val mUsers = userNames.map { list ->
         list.map { userName: String ->
             val userNameAndHost = userName.split("@").filterNot { it == "" }
-            UserViewData(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().accountId ,miCore, viewModelScope, Dispatchers.IO)
+            userViewDataFactory.create(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().accountId, viewModelScope, Dispatchers.IO)
 
         }
     }

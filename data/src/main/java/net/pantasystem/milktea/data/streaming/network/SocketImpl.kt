@@ -229,9 +229,7 @@ class SocketImpl(
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
         runCatching {
-            val r = json.decodeFromString<PongRes>(text)
-            r.id.isNotBlank()
-            pollingJob.onReceive(r)
+            pollingJob.onReceive(text)
         }.onSuccess {
             return
         }

@@ -5,35 +5,38 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.api.misskey.throwIfHasError
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.model.user.report.Report
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
+import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
+import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
 
@@ -41,13 +44,15 @@ data class SelectedReaction(val noteId: Note.Id, val reaction: String)
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val reactionHistoryDao: ReactionHistoryDao,
     private val encryption: Encryption,
     private val translationStore: NoteTranslationStore,
     private val draftNoteDAO: DraftNoteDao,
     private val noteRepository: NoteRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val toggleReactionUseCase: ToggleReactionUseCase,
+    private val favoriteRepository: FavoriteRepository,
+    private val renoteUseCase: CreateRenoteUseCase,
     val accountStore: AccountStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
@@ -140,17 +145,7 @@ class NotesViewModel @Inject constructor(
         val renoteId = reNoteTarget.event?.toShowNote?.note?.id
             ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val author = accountRepository.get(renoteId.accountId)
-                noteRepository.create(
-                    CreateNote(
-                        renoteId = renoteId,
-                        text = null,
-                        visibility = Visibility.Public(true),
-                        author = author
-                    )
-                )
-            }.onSuccess {
+            renoteUseCase(renoteId).onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "renoteしました"
                 }
@@ -159,7 +154,6 @@ class NotesViewModel @Inject constructor(
                     errorStatusMessage.event = "renote失敗しました"
                 }
             }
-
         }
 
     }
@@ -211,18 +205,11 @@ class NotesViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
 
-            runCatching {
-                val result = noteRepository.toggleReaction(
-                    CreateReaction(
-                        noteId = id,
-                        reaction = reaction
-                    )
-                )
-                if (result) {
-                    syncAddReactionHistory(reaction)
-                }
-            }
+            toggleReactionUseCase(id, reaction).onFailure {
 
+            }.onSuccess {
+
+            }
 
         }
     }
@@ -238,32 +225,10 @@ class NotesViewModel @Inject constructor(
         noteRepository.unreaction(planeNoteViewData.toShowNote.note.id)
     }
 
-    private fun syncAddReactionHistory(reaction: String) {
-        try {
-            val domain = getAccount()?.instanceDomain
-            reactionHistoryDao.insert(
-                ReactionHistory(
-                    instanceDomain = domain!!,
-                    reaction = reaction
-                )
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "reaction追加中にエラー発生", e)
-        }
-    }
-
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
         note ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                getMisskeyAPI()?.createFavorite(
-                    NoteRequest(
-                        i = getAccount()?.getI(encryption)!!,
-                        noteId = note.toShowNote.note.id.noteId
-                    )
-                )
-            }.onSuccess {
-                requireNotNull(it)
+            favoriteRepository.create(note.toShowNote.note.id).onSuccess {
                 Log.d(TAG, "お気に入りに追加しました")
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "お気に入りに追加しました"
@@ -280,16 +245,7 @@ class NotesViewModel @Inject constructor(
     fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event) {
         note ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            val result = runCatching {
-                val res = getMisskeyAPI()?.deleteFavorite(
-                    NoteRequest(
-                        i = getAccount()?.getI(encryption)!!,
-                        noteId = note.toShowNote.note.id.noteId
-                    )
-                )
-                requireNotNull(res)
-                res
-            }.getOrNull() != null
+            val result = favoriteRepository.delete(note.toShowNote.note.id).getOrNull() != null
             withContext(Dispatchers.Main) {
                 statusMessage.event = if (result) {
                     "お気に入りから削除しました"
@@ -298,8 +254,6 @@ class NotesViewModel @Inject constructor(
                 }
             }
         }
-
-
     }
 
 
@@ -382,7 +336,7 @@ class NotesViewModel @Inject constructor(
 
     fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
         if (noteId == null || poll == null || choice == null) {
-             return
+            return
         }
         if (SafeUnbox.unbox(poll.canVote)) {
             viewModelScope.launch(Dispatchers.IO) {

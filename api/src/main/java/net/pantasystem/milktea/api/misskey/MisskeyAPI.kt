@@ -22,6 +22,8 @@ import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
+import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
+import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.instance.Meta
@@ -102,10 +104,10 @@ interface MisskeyAPI {
     suspend fun favorites(@Body noteRequest: NoteRequest): Response<List<Favorite>?>
 
     @POST("api/notes/favorites/create")
-    suspend fun createFavorite(@Body noteRequest: NoteRequest): Response<Unit>
+    suspend fun createFavorite(@Body noteRequest: CreateFavorite): Response<Unit>
 
     @POST("api/notes/favorites/delete")
-    suspend fun deleteFavorite(@Body noteRequest: NoteRequest): Response<Unit>
+    suspend fun deleteFavorite(@Body noteRequest: DeleteFavorite): Response<Unit>
 
     @POST("api/i/notifications")
     suspend fun notification(@Body notificationRequest: NotificationRequest): Response<List<NotificationDTO>?>
@@ -193,7 +195,7 @@ interface MisskeyAPI {
     suspend fun getFolders(@Body folderRequest: RequestFolder): Response<List<Directory>>
 
     @POST("api/drive/folders/create")
-    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Unit>
+    suspend fun createFolder(@Body createFolder: CreateFolder): Response<Directory>
 
 
     //meta
