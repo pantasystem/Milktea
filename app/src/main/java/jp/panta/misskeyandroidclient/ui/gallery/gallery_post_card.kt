@@ -37,9 +37,17 @@ import net.pantasystem.milktea.model.user.User
 
 
 sealed interface GalleryPostCardAction {
-    object OnAvatarIconClicked : GalleryPostCardAction
-    data class OnThumbnailClicked(val fileProperty: FileProperty) : GalleryPostCardAction
-    data class OnFavoriteButtonClicked(val value: Boolean) : GalleryPostCardAction
+    val galleryPost: GalleryPost
+
+    data class OnAvatarIconClicked(override val galleryPost: GalleryPost) : GalleryPostCardAction
+    data class OnThumbnailClicked(
+        override val galleryPost: GalleryPost,
+        val fileProperty: FileProperty,
+        val files: List<FileProperty>,
+    ) : GalleryPostCardAction
+
+    data class OnFavoriteButtonClicked(override val galleryPost: GalleryPost, val value: Boolean) :
+        GalleryPostCardAction
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -58,11 +66,12 @@ fun GalleryPostCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
                 .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 8.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp)
             ) {
                 Image(
                     painter = rememberImagePainter(
@@ -72,7 +81,13 @@ fun GalleryPostCard(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .clickable(onClick = { onAction.invoke(GalleryPostCardAction.OnAvatarIconClicked) })
+                        .clickable(onClick = {
+                            onAction.invoke(
+                                GalleryPostCardAction.OnAvatarIconClicked(
+                                    galleryState.galleryPost
+                                )
+                            )
+                        })
                         .padding(end = 4.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -95,7 +110,13 @@ fun GalleryPostCard(
                     .height(250.dp)
             ) { page ->
                 ThumbnailPreview(file = galleryState.files[page]) {
-                    onAction.invoke(GalleryPostCardAction.OnThumbnailClicked(galleryState.files[page]))
+                    onAction.invoke(
+                        GalleryPostCardAction.OnThumbnailClicked(
+                            galleryState.galleryPost,
+                            galleryState.files[page],
+                            galleryState.files,
+                        )
+                    )
                 }
             }
             Box(
@@ -107,7 +128,7 @@ fun GalleryPostCard(
                     modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
                 )
             }
-            Row(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth().padding(start = 8 .dp, end = 8.dp)) {
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
@@ -125,7 +146,12 @@ fun GalleryPostCard(
                     GalleryFavoriteButton(
                         checked = galleryState.galleryPost.isLiked,
                         onChanged = {
-                            onAction.invoke(GalleryPostCardAction.OnFavoriteButtonClicked(it))
+                            onAction.invoke(
+                                GalleryPostCardAction.OnFavoriteButtonClicked(
+                                    galleryState.galleryPost,
+                                    it
+                                )
+                            )
                         }
                     )
                 }
