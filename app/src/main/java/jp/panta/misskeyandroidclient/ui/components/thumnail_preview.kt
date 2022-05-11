@@ -10,8 +10,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import coil.compose.rememberImagePainter
-import net.pantasystem.milktea.model.drive.FileProperty
 import jp.panta.misskeyandroidclient.R
+import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
 fun ThumbnailPreview(
@@ -32,7 +32,7 @@ fun ThumbnailPreview(
                 painter = painterResource(id = R.drawable.ic_play_circle_outline_black_24dp),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.matchParentSize()
+                modifier = modifier,
             )
         }
         
@@ -43,7 +43,7 @@ fun ThumbnailPreview(
                 ),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
+                modifier = modifier,
             )
         }
         
