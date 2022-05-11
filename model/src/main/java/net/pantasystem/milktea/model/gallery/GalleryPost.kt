@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.model.gallery
 
 
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.user.User
-import java.util.*
 
 sealed class GalleryPost {
     data class Id(
@@ -13,8 +13,8 @@ sealed class GalleryPost {
     ) : EntityId
 
     abstract val id: Id
-    abstract val createdAt: Date
-    abstract val updatedAt: Date
+    abstract val createdAt: Instant
+    abstract val updatedAt: Instant
     abstract val title: String
     abstract val description: String?
     abstract val userId: User.Id
@@ -24,8 +24,8 @@ sealed class GalleryPost {
 
     data class Normal(
         override val id: Id,
-        override val createdAt: Date,
-        override val updatedAt: Date,
+        override val createdAt: Instant,
+        override val updatedAt: Instant,
         override val title: String,
         override val description: String?,
         override val userId: User.Id,
@@ -36,8 +36,8 @@ sealed class GalleryPost {
 
     data class Authenticated(
         override val id: Id,
-        override val createdAt: Date,
-        override val updatedAt: Date,
+        override val createdAt: Instant,
+        override val updatedAt: Instant,
         override val title: String,
         override val description: String?,
         override val userId: User.Id,
