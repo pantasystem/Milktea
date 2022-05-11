@@ -47,10 +47,10 @@ class GalleryPostsViewModel(
     private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
 
     private val _galleryPosts =
-        MutableStateFlow<PageableState<List<GalleryPostState>>>(
+        MutableStateFlow<PageableState<List<GalleryPostUiState>>>(
             PageableState.Fixed(
                 StateContent.NotExist()))
-    val galleryPosts: StateFlow<PageableState<List<GalleryPostState>>> = _galleryPosts
+    val galleryPosts: StateFlow<PageableState<List<GalleryPostUiState>>> = _galleryPosts
     val lock = Mutex()
 
     private val galleryPostSendFavoriteStore =
@@ -122,7 +122,7 @@ class GalleryPostsViewModel(
         ) { posts, indexes, sends ->
             posts.convert {
                 it.map { relation ->
-                    GalleryPostState(
+                    GalleryPostUiState(
                         galleryPost = relation.galleryPost,
                         files = relation.files,
                         user = relation.user,

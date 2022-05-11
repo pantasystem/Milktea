@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 
-data class GalleryPostState(
+data class GalleryPostUiState(
     val galleryPost: GalleryPost,
     val files: List<FileProperty>,
     val user: User,
