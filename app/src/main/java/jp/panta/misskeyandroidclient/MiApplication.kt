@@ -41,10 +41,7 @@ import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvi
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.gallery.GalleryDataSource
-import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
@@ -127,8 +124,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mFilePropertyDataSource: FilePropertyDataSource
 
-    @Inject
-    lateinit var mGalleryDataSource: GalleryDataSource
 
     @Inject
     lateinit var mNoteRepository: NoteRepository
@@ -172,14 +167,10 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-    @Inject
-    lateinit var mGalleryRepository: GalleryRepository
 
     @Inject
     lateinit var mFileUploaderProvider: FileUploaderProvider
 
-    @Inject
-    lateinit var mDriveFileRepository: DriveFileRepository
 
     @Inject
     lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
@@ -368,9 +359,6 @@ class MiApplication : Application(), MiCore {
         return mGetters
     }
 
-    override fun getDriveFileRepository(): DriveFileRepository {
-        return mDriveFileRepository
-    }
 
     override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
@@ -424,14 +412,6 @@ class MiApplication : Application(), MiCore {
         return mFilePropertyDataSource
     }
 
-
-    override fun getGalleryDataSource(): GalleryDataSource {
-        return mGalleryDataSource
-    }
-
-    override fun getGalleryRepository(): GalleryRepository {
-        return mGalleryRepository
-    }
 
     override fun getSubscriptionRegistration(): SubscriptionRegistration {
         return _subscribeRegistration

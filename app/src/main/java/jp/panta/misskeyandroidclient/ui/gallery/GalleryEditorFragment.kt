@@ -20,15 +20,16 @@ import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.file.toFile
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
-import jp.panta.misskeyandroidclient.util.file.toAppFile
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
+import jp.panta.misskeyandroidclient.util.file.toAppFile
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.toFile
 import javax.inject.Inject
 
 @FlowPreview
@@ -37,7 +38,7 @@ import javax.inject.Inject
 class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
     companion object {
-        fun newInstance(editType: EditType) : GalleryEditorFragment {
+        fun newInstance(editType: EditType): GalleryEditorFragment {
             return GalleryEditorFragment().also {
                 it.arguments = Bundle().also { args ->
                     args.putSerializable("EDIT_TYPE", editType)
@@ -51,6 +52,11 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     @Inject
     lateinit var assistedFactory: GalleryEditorViewModel.ViewModelAssistedFactory
 
+    @Inject
+    lateinit var driveFileRepository: DriveFileRepository
+
+    @Inject
+    lateinit var dataSource: FilePropertyDataSource
 
 
     val viewModel: GalleryEditorViewModel by viewModels {
@@ -60,9 +66,6 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        val miCore = requireContext().applicationContext as MiCore
 
         binding.viewModel = viewModel
 
@@ -76,10 +79,10 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
                 MdcTheme {
                     PickedImagePreview(
                         viewModel = viewModel,
-                        repository = miCore.getDriveFileRepository(),
-                        dataSource = miCore.getFilePropertyDataSource(),
+                        repository = driveFileRepository,
+                        dataSource = dataSource,
                         onShow = {
-                            val file = when(it) {
+                            val file = when (it) {
                                 is FilePreviewTarget.Remote -> {
                                     it.fileProperty.toFile()
                                 }
@@ -102,9 +105,9 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
 
         binding.pickedImageFromLocalButton.setOnClickListener {
-            if(!checkPermission()) {
+            if (!checkPermission()) {
                 requestReadExternalStoragePermissionResultListener.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            }else{
+            } else {
                 showFilePicker()
             }
         }
@@ -114,7 +117,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         }
 
         binding.saveButton.setOnClickListener {
-            if(!viewModel.validate()) {
+            if (!viewModel.validate()) {
                 return@setOnClickListener
             }
             lifecycleScope.launch(Dispatchers.IO) {
@@ -136,28 +139,34 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         driveActivityResult.launch(intent)
     }
 
-    private val driveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if(it.resultCode == RESULT_OK && it.data != null) {
-            val result = it.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
-            val list = result?.mapNotNull { obj ->
-                obj as? FileProperty.Id
-            }?: emptyList()
-            viewModel.addFilePropertyIds(list)
+    private val driveActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK && it.data != null) {
+                val result =
+                    it.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
+                val list = result?.mapNotNull { obj ->
+                    obj as? FileProperty.Id
+                } ?: emptyList()
+                viewModel.addFilePropertyIds(list)
 
+            }
         }
-    }
 
     private fun checkPermission(): Boolean {
-        val permissionCheck = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
         return permissionCheck == PackageManager.PERMISSION_GRANTED
     }
 
-    private val pickFileResultListener = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val uri = it.data?.data
-        if(uri != null) {
-            viewModel.addFile(uri.toAppFile(requireContext()))
+    private val pickFileResultListener =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val uri = it.data?.data
+            if (uri != null) {
+                viewModel.addFile(uri.toAppFile(requireContext()))
+            }
         }
-    }
 
     private fun showFilePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -166,9 +175,10 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         pickFileResultListener.launch(intent)
     }
 
-    private val requestReadExternalStoragePermissionResultListener = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if(it) {
-            showFilePicker()
+    private val requestReadExternalStoragePermissionResultListener =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                showFilePicker()
+            }
         }
-    }
 }
