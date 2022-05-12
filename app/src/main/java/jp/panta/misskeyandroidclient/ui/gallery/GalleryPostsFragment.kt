@@ -2,42 +2,42 @@ package jp.panta.misskeyandroidclient.ui.gallery
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.wada811.databinding.dataBinding
+import com.google.android.material.composethemeadapter.MdcTheme
 import jp.panta.misskeyandroidclient.AuthorizationActivity
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostUiState
+import jp.panta.misskeyandroidclient.MediaActivity
+import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.page.Pageable
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view){
+class GalleryPostsFragment : Fragment() {
 
     companion object {
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.view.gallery.ACCOUNT_ID"
-        private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.view.gallery.EXTRA_PAGEABLE"
+        private const val EXTRA_PAGEABLE =
+            "jp.panta.misskeyandroidclient.view.gallery.EXTRA_PAGEABLE"
 
-        fun newInstance(pageable: Pageable.Gallery, accountId: Long?) : GalleryPostsFragment {
+        fun newInstance(pageable: Pageable.Gallery, accountId: Long?): GalleryPostsFragment {
             return GalleryPostsFragment().apply {
                 arguments = Bundle().also {
                     it.putSerializable(EXTRA_PAGEABLE, pageable)
-                    if(accountId != null) {
+                    if (accountId != null) {
                         it.putLong(EXTRA_ACCOUNT_ID, accountId)
                     }
                 }
@@ -45,67 +45,79 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
         }
     }
 
-    val binding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
     val pageable: Pageable.Gallery by lazy {
         arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
     }
 
-    val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
+    private val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
+
+    lateinit var viewModel: GalleryPostsViewModel
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
+        var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
+        if (accountId == -1L) {
+            accountId = null
+        }
+
+        val miCore = requireContext().applicationContext as MiCore
+        viewModel = ViewModelProvider(
+            this,
+            GalleryPostsViewModel.Factory(pageable, accountId, miCore)
+        )[GalleryPostsViewModel::class.java]
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MdcTheme {
+                    GalleryPostCardList(
+                        viewModel = viewModel,
+                        onAction = {
+                            when (it) {
+                                is GalleryPostCardAction.OnFavoriteButtonClicked -> {
+                                    viewModel.toggleFavorite(it.galleryPost.id)
+                                }
+                                is GalleryPostCardAction.OnThumbnailClicked -> {
+                                    startActivity(
+                                        MediaActivity.newInstance(
+                                            requireActivity(),
+                                            files = it.files.map { property ->
+                                                property.toFile()
+                                            },
+                                            index = it.index
+                                        )
+                                    )
+                                }
+                                is GalleryPostCardAction.OnAvatarIconClicked -> {
+                                    startActivity(
+                                        UserDetailActivity.newInstance(
+                                            requireActivity(),
+                                            it.galleryPost.userId
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
-        var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
-        if(accountId == -1L) {
-            accountId = null
-        }
-
-
-
-        val miCore = requireContext().applicationContext as MiCore
-        val viewModel = ViewModelProvider(this, GalleryPostsViewModel.Factory(pageable, accountId, miCore))[GalleryPostsViewModel::class.java]
-
-        val galleryPostsListAdapter = GalleryPostsListAdapter(viewLifecycleOwner, viewModel)
-
-        binding.listView.adapter = galleryPostsListAdapter
-        val layoutManager = LinearLayoutManager(this.context)
-        binding.listView.layoutManager = layoutManager
-        lifecycleScope.launchWhenStarted {
-            viewModel.galleryPosts.collect { state ->
-                if(state.content is StateContent.Exist) {
-                    // 要素を表示する
-                    binding.refresh.visibility = View.VISIBLE
-                    binding.timelineEmptyView.visibility = View.GONE
-                    binding.timelineProgressBar.visibility = View.GONE
-                    galleryPostsListAdapter.submitList((state.content as StateContent.Exist<List<GalleryPostUiState>>).rawContent)
-                    binding.refresh.isRefreshing = state is PageableState.Loading
-                }else{
-                    // エラーメッセージやプログレスバーなどを表示する
-                    binding.refresh.isRefreshing = false
-                    binding.refresh.visibility = View.GONE
-                    if(state is PageableState.Loading) {
-                        binding.timelineProgressBar.visibility = View.VISIBLE
-                        binding.timelineEmptyView.visibility = View.GONE
-                    }else{
-                        binding.timelineProgressBar.visibility = View.GONE
-                        binding.timelineEmptyView.visibility = View.VISIBLE
-                    }
-                }
-            }
-        }
-
-        binding.refresh.setOnRefreshListener {
-            viewModel.loadFuture()
-        }
-        binding.retryLoadButton.setOnClickListener {
-            viewModel.loadInit()
-        }
-
         lifecycleScope.launchWhenResumed {
             viewModel.error.collect {
-                if(it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
+                if (it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
                     Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
                     // 再認証をする
                     startActivity(Intent(requireContext(), AuthorizationActivity::class.java))
@@ -113,18 +125,8 @@ class GalleryPostsFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_v
             }
         }
 
-        binding.listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
 
-                if(layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 1){
-                    viewModel.loadPrevious()
-                }
-            }
-
-        })
     }
-
 
     override fun onResume() {
         super.onResume()
