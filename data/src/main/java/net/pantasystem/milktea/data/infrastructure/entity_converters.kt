@@ -8,9 +8,11 @@ import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.PollDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.messaging.Message
@@ -20,10 +22,6 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
-import java.lang.IllegalStateException
-import  net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.gallery.GalleryPost
 
 fun FilePropertyDTO.toFileProperty(account: Account): FileProperty {
     return FileProperty(
@@ -309,11 +307,15 @@ fun NotificationDTO.toNotification(account: Account): Notification {
         }
     }
 }
+
 fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
+    return toUser(account.accountId, isDetail)
+}
+fun UserDTO.toUser(accountId: Long, isDetail: Boolean = false): User {
     if (isDetail) {
 
         return User.Detail(
-            id = User.Id(account.accountId, this.id),
+            id = User.Id(accountId, this.id),
             avatarUrl = this.avatarUrl,
             emojis = this.emojis ?: emptyList(),
             isBot = this.isBot,
@@ -329,7 +331,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             hostLower = this.hostLower,
             notesCount = this.notesCount,
             pinnedNoteIds = this.pinnedNoteIds?.map {
-                Note.Id(account.accountId, it)
+                Note.Id(accountId, it)
             },
             isFollowing = this.isFollowing ?: false,
             isFollower = this.isFollowed ?: false,
@@ -342,7 +344,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
         )
     } else {
         return User.Simple(
-            id = User.Id(account.accountId, this.id),
+            id = User.Id(accountId, this.id),
             avatarUrl = this.avatarUrl,
             emojis = this.emojis ?: emptyList(),
             isBot = this.isBot,

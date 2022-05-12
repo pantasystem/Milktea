@@ -1,11 +1,9 @@
 package net.pantasystem.milktea.api.misskey.v12_75_0
 
-import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.common.serializations.DateSerializer
-import java.util.*
 
 
 @Serializable
@@ -27,10 +25,10 @@ data class GetPosts(
 )
 
 @Serializable
-data class GalleryPost @OptIn(ExperimentalSerializationApi::class) constructor(
+data class GalleryPost(
     val id: String,
-    @Serializable(with = DateSerializer::class) val createdAt: Date,
-    @Serializable(with = DateSerializer::class) val updatedAt: Date,
+    val createdAt: Instant,
+    val updatedAt: Instant,
     val title: String,
     val description: String,
     val userId: String,

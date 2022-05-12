@@ -6,7 +6,7 @@
 
         <variable
                 name="galleryPostState"
-                type="jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState" />
+                type="jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostUiState" />
         <import type="android.view.View" />
         <variable
                 name="galleryPostsViewModel"

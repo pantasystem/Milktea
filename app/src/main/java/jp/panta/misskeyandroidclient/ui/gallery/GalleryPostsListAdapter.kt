@@ -13,13 +13,13 @@ import jp.panta.misskeyandroidclient.databinding.ItemGalleryPhotoBinding
 import jp.panta.misskeyandroidclient.databinding.ItemGalleryPostBinding
 import jp.panta.misskeyandroidclient.ui.ViewDataBindingSimpleRecyclerViewAdapter
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostState
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostUiState
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 
 class GalleryPostsListAdapter(
     val lifecycleOwner: LifecycleOwner,
     private val galleryPostsViewModel: GalleryPostsViewModel
-) : ListAdapter<GalleryPostState, GalleryPostViewHolder>(GalleryPostDiffItemCallback) {
+) : ListAdapter<GalleryPostUiState, GalleryPostViewHolder>(GalleryPostDiffItemCallback) {
     override fun onBindViewHolder(holder: GalleryPostViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -34,7 +34,7 @@ class GalleryPostViewHolder(
     private val lifecycleOwner: LifecycleOwner,
     private val galleryPostsViewModel: GalleryPostsViewModel
 ) : RecyclerView.ViewHolder(itemGalleryPostBinding.root) {
-    fun bind(galleryPostState: GalleryPostState) {
+    fun bind(galleryPostState: GalleryPostUiState) {
         itemGalleryPostBinding.galleryPostState = galleryPostState
         itemGalleryPostBinding.lifecycleOwner = lifecycleOwner
 
@@ -68,12 +68,12 @@ class GalleryPostViewHolder(
     }
 }
 
-object GalleryPostDiffItemCallback : DiffUtil.ItemCallback<GalleryPostState>() {
-    override fun areContentsTheSame(oldItem: GalleryPostState, newItem: GalleryPostState): Boolean {
+object GalleryPostDiffItemCallback : DiffUtil.ItemCallback<GalleryPostUiState>() {
+    override fun areContentsTheSame(oldItem: GalleryPostUiState, newItem: GalleryPostUiState): Boolean {
         return oldItem.galleryPost == newItem.galleryPost
     }
 
-    override fun areItemsTheSame(oldItem: GalleryPostState, newItem: GalleryPostState): Boolean {
+    override fun areItemsTheSame(oldItem: GalleryPostUiState, newItem: GalleryPostUiState): Boolean {
         return oldItem.galleryPost.id == newItem.galleryPost.id
     }
 }
