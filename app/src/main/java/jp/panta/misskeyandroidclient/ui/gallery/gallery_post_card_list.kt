@@ -8,16 +8,20 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
+import jp.panta.misskeyandroidclient.util.compose.rememberViewInteropNestedScrollConnection
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 
 @Composable
-fun GalleryPostCardList(viewModel: GalleryPostsViewModel) {
+fun GalleryPostCardList(viewModel: GalleryPostsViewModel, onAction: (GalleryPostCardAction) -> Unit) {
     val listViewState = rememberLazyListState()
 
     LaunchedEffect(key1 = null) {
@@ -31,7 +35,7 @@ fun GalleryPostCardList(viewModel: GalleryPostsViewModel) {
             if (it) {
                 viewModel.loadPrevious()
             }
-        }
+        }.launchIn(this)
     }
 
     val state by viewModel.galleryPosts.collectAsState()
@@ -40,12 +44,12 @@ fun GalleryPostCardList(viewModel: GalleryPostsViewModel) {
     if (content is StateContent.Exist) {
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(rememberViewInteropNestedScrollConnection())
         ) {
             items(content.rawContent) { post ->
-                GalleryPostCard(galleryState = post, onAction = {
-
-                })
+                GalleryPostCard(galleryState = post, onAction = onAction)
             }
             if (state is PageableState.Loading.Previous) {
                 item {
@@ -58,7 +62,7 @@ fun GalleryPostCardList(viewModel: GalleryPostsViewModel) {
             when(state) {
 
                 is PageableState.Loading -> {
-                    Box(Modifier.fillMaxSize()) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                 }
