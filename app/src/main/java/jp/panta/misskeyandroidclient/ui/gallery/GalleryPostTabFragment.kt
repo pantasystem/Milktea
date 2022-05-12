@@ -7,13 +7,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryPostTabBinding
-import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.account.page.Pageable
 
+@AndroidEntryPoint
 class GalleryPostTabFragment : Fragment(R.layout.fragment_gallery_post_tab){
 
     val binding: FragmentGalleryPostTabBinding by dataBinding()
