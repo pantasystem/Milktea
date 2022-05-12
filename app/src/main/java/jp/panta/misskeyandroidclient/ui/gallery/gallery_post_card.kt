@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,7 @@ sealed interface GalleryPostCardAction {
         override val galleryPost: GalleryPost,
         val fileProperty: FileProperty,
         val files: List<FileProperty>,
+        val index: Int,
     ) : GalleryPostCardAction
 
     data class OnFavoriteButtonClicked(override val galleryPost: GalleryPost, val value: Boolean) :
@@ -62,7 +64,7 @@ fun GalleryPostCard(
     Card(
         elevation = 4.dp,
         modifier = Modifier.padding(8.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(16.dp),
     ) {
         Column(
             modifier = Modifier
@@ -78,6 +80,7 @@ fun GalleryPostCard(
                         galleryState.user.avatarUrl,
                     ),
                     contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
@@ -103,6 +106,7 @@ fun GalleryPostCard(
                 }
 
             }
+            Spacer(Modifier.height(4.dp))
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -115,6 +119,7 @@ fun GalleryPostCard(
                             galleryState.galleryPost,
                             galleryState.files[page],
                             galleryState.files,
+                            page,
                         )
                     )
                 }
@@ -128,16 +133,20 @@ fun GalleryPostCard(
                     modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
                 )
             }
-            Row(Modifier.fillMaxWidth().padding(start = 8 .dp, end = 8.dp)) {
+            Row(
+                Modifier.fillMaxWidth().padding(start = 8 .dp, end = 8.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
                 Column(
                     modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         galleryState.galleryPost.title,
                         modifier = Modifier.fillMaxWidth(),
-                        fontSize = 18.sp
+                        fontSize = 20.sp
                     )
-                    if (galleryState.galleryPost.description != null) {
+                    if (!galleryState.galleryPost.description.isNullOrBlank()) {
                         Text(galleryState.galleryPost.description ?: "")
                     }
                 }
@@ -145,6 +154,7 @@ fun GalleryPostCard(
                 if (galleryState.galleryPost is GalleryPost.Authenticated) {
                     GalleryFavoriteButton(
                         checked = galleryState.galleryPost.isLiked,
+                        enabled = !galleryState.isFavoriteSending,
                         onChanged = {
                             onAction.invoke(
                                 GalleryPostCardAction.OnFavoriteButtonClicked(
@@ -165,9 +175,14 @@ fun GalleryPostCard(
 private fun GalleryFavoriteButton(
     modifier: Modifier = Modifier,
     checked: Boolean,
+    enabled: Boolean,
     onChanged: (Boolean) -> Unit
 ) {
-    IconButton(onClick = { onChanged.invoke(!checked) }, modifier = modifier) {
+    IconButton(
+        onClick = { onChanged.invoke(!checked) },
+        modifier = modifier,
+        enabled = enabled
+    ) {
         if (checked) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_red_favorite_24),
@@ -249,8 +264,8 @@ fun PreviewGalleryPostCard() {
             isFavoriteSending = false,
             user = UserDTO(
                 id = "test",
-                name = "testname",
-                userName = "testtest"
+                name = "harunon",
+                userName = "harunonsysytem"
             ).toUser(0L)
         ),
         onAction = {})
