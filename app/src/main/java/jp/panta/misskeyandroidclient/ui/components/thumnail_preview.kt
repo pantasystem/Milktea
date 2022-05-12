@@ -3,8 +3,10 @@ package jp.panta.misskeyandroidclient.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -21,7 +23,8 @@ fun ThumbnailPreview(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier.clickable(onClick = onClick)
+        modifier = modifier.clickable(onClick = onClick).fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         if(isHidden) {
             Text(stringResource(R.string.nsfw_message))
@@ -32,7 +35,7 @@ fun ThumbnailPreview(
                 painter = painterResource(id = R.drawable.ic_play_circle_outline_black_24dp),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = modifier,
+                modifier = modifier.fillMaxSize(),
             )
         }
         
@@ -43,7 +46,7 @@ fun ThumbnailPreview(
                 ),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = modifier,
+                modifier = modifier.fillMaxSize(),
             )
         }
         
