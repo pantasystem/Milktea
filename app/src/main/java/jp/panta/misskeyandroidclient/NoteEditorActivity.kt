@@ -23,35 +23,38 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.toFile
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.editor.*
 import jp.panta.misskeyandroidclient.ui.emojis.CustomEmojiPickerDialog
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
+import jp.panta.misskeyandroidclient.ui.notes.view.editor.*
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.toFile
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 
@@ -113,10 +116,20 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     private lateinit var mConfirmViewModel: ConfirmViewModel
 
-    @Inject lateinit var accountStore: AccountStore
+    @Inject
+    lateinit var accountStore: AccountStore
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val accountViewModel: AccountViewModel by viewModels()
+
+    @Inject
+    lateinit var driveFileRepository: DriveFileRepository
+
+    @Inject
+    lateinit var filePropertyDataSource: FilePropertyDataSource
+
+    @Inject
+    lateinit var metaRepository: MetaRepository
 
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -141,8 +154,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             text = intent.getStringExtra(Intent.EXTRA_TEXT)
         }
 
-
-        val miApplication = applicationContext as MiApplication
 
         val toolbarBase = getToolbarBase()
         val noteEditorToolbar = DataBindingUtil.inflate<ViewNoteEditorToolbarBinding>(
@@ -202,7 +213,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getMetaRepository().observe(it.instanceDomain)
+            metaRepository.observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
         }.distinctUntilChanged().onEach { emojis ->
@@ -241,8 +252,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                 MdcTheme {
                     NoteFilePreview(
                         noteEditorViewModel = mViewModel,
-                        fileRepository = miApplication.getDriveFileRepository(),
-                        dataSource = miApplication.getFilePropertyDataSource(),
+                        fileRepository = driveFileRepository,
+                        dataSource = filePropertyDataSource,
                         onShow = {
                             val file = when (it) {
                                 is FilePreviewTarget.Remote -> {
@@ -349,7 +360,12 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             accountStore.state.collect() {
                 if (it.isUnauthorized) {
                     finish()
-                    startActivity(Intent(this@NoteEditorActivity, AuthorizationActivity::class.java))
+                    startActivity(
+                        Intent(
+                            this@NoteEditorActivity,
+                            AuthorizationActivity::class.java
+                        )
+                    )
                 }
             }
         }

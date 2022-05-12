@@ -21,27 +21,32 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.toFile
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.emojis.CustomEmojiPickerDialog
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.toFile
+import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.user.User
+import javax.inject.Inject
 
-interface SimpleEditor{
+interface SimpleEditor {
 
     val isShowEditorMenu: MutableLiveData<Boolean>
     fun goToNormalEditor()
@@ -63,6 +68,18 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     override val isShowEditorMenu: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    @Inject
+    lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var metaRepository: MetaRepository
+
+
+    @Inject
+    lateinit var filePropertyDataSource: FilePropertyDataSource
+
+    @Inject
+    lateinit var fileRepository: DriveFileRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -70,7 +87,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         mBinding.simpleEditor = this
 
-        val miApplication = requireContext().applicationContext as MiApplication
         mBinding.lifecycleOwner = this
         mBinding.noteEditorViewModel = mViewModel
 
@@ -84,14 +100,17 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         }
         accountViewModel.showProfile.observe(this) {
-            val intent = UserDetailActivity.newInstance(requireContext(), userId = User.Id(it.accountId, it.remoteId))
+            val intent = UserDetailActivity.newInstance(
+                requireContext(),
+                userId = User.Id(it.accountId, it.remoteId)
+            )
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
             startActivity(intent)
         }
 
-        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getMetaRepository().observe(it.instanceDomain)
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            metaRepository.observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
         }.distinctUntilChanged().onEach { emojis ->
@@ -120,10 +139,10 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                 MdcTheme {
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
-                        fileRepository = miApplication.getDriveFileRepository(),
-                        dataSource = miApplication.getFilePropertyDataSource(),
+                        fileRepository = fileRepository,
+                        dataSource = filePropertyDataSource,
                         onShow = {
-                            val file = when(it) {
+                            val file = when (it) {
                                 is FilePreviewTarget.Remote -> {
                                     it.fileProperty.toFile()
                                 }
@@ -147,9 +166,9 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         lifecycleScope.launchWhenResumed {
             viewModel.poll.collect { poll ->
-                if(poll == null) {
+                if (poll == null) {
                     removePollFragment()
-                }else{
+                } else {
                     setPollFragment()
                 }
             }
@@ -181,11 +200,11 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
 
         mBinding.inputCw.addTextChangedListener { e ->
-            viewModel.setCw((e?.toString()?: ""))
+            viewModel.setCw((e?.toString() ?: ""))
         }
 
         mBinding.inputMainText.addTextChangedListener { e ->
-            viewModel.setText((e?.toString()?: ""))
+            viewModel.setText((e?.toString() ?: ""))
         }
 
 
@@ -216,7 +235,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             viewModel.post()
         }
 
-        val emojiSelectionViewModel = ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
+        val emojiSelectionViewModel =
+            ViewModelProvider(requireActivity())[EmojiSelectionViewModel::class.java]
         emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, (::onSelect))
         emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, (::onSelect))
 
@@ -225,8 +245,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     private fun onSelect(emoji: Emoji) {
         val pos = mBinding.inputMainText.selectionEnd
-        mViewModel.addEmoji(emoji, pos).let{ newPos ->
-            mBinding.inputMainText.setText(mViewModel.text.value?: "")
+        mViewModel.addEmoji(emoji, pos).let { newPos ->
+            mBinding.inputMainText.setText(mViewModel.text.value ?: "")
             mBinding.inputMainText.setSelection(newPos)
             Log.d("NoteEditorActivity", "入力されたデータ:${mBinding.inputMainText.text}")
         }
@@ -234,41 +254,41 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     private fun onSelect(emoji: String) {
         val pos = mBinding.inputMainText.selectionEnd
-        mViewModel.addEmoji(emoji, pos).let{ newPos ->
-            mBinding.inputMainText.setText(mViewModel.text.value?: "")
+        mViewModel.addEmoji(emoji, pos).let { newPos ->
+            mBinding.inputMainText.setText(mViewModel.text.value ?: "")
             mBinding.inputMainText.setSelection(newPos)
         }
     }
 
-    private fun setPollFragment(){
+    private fun setPollFragment() {
         val ft = childFragmentManager.beginTransaction()
         ft.replace(R.id.edit_poll, PollEditorFragment(), "pollFragment")
         ft.commit()
     }
 
-    private fun removePollFragment(){
+    private fun removePollFragment() {
         val fragment = childFragmentManager.findFragmentByTag("pollFragment")
-        if(fragment != null){
+        if (fragment != null) {
             val ft = childFragmentManager.beginTransaction()
             ft.remove(fragment)
             ft.commit()
         }
     }
 
-    private fun showFileManager(){
-        if(checkPermission()){
+    private fun showFileManager() {
+        if (checkPermission()) {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             openLocalStorageResult.launch(intent)
-        }else{
+        } else {
             requestPermission()
         }
 
     }
 
-    private fun showDriveFileSelector(){
-        val selectedSize = mViewModel.totalImageCount.value?: 0
+    private fun showDriveFileSelector() {
+        val selectedSize = mViewModel.totalImageCount.value ?: 0
 
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = 4 - selectedSize
@@ -280,31 +300,38 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         registerForOpenDriveActivityResult.launch(intent)
     }
 
-    private fun checkPermission(): Boolean{
-        val permissionCheck = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun checkPermission(): Boolean {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
         return permissionCheck == PackageManager.PERMISSION_GRANTED
     }
-    private fun requestPermission(){
+
+    private fun requestPermission() {
         //val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        if(! checkPermission()){
+        if (!checkPermission()) {
             requestReadStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun startSearchAndSelectUser(){
+    private fun startSearchAndSelectUser() {
         val selectedUserIds = mViewModel.address.value.mapNotNull {
-            it.userId?: it.user.value?.id
+            it.userId ?: it.user.value?.id
         }
 
-        val intent = SearchAndSelectUserActivity.newIntent(requireContext(), selectedUserIds = selectedUserIds)
+        val intent = SearchAndSelectUserActivity.newIntent(
+            requireContext(),
+            selectedUserIds = selectedUserIds
+        )
         selectUserResult.launch(intent)
     }
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private fun startMentionToSearchAndSelectUser(){
+    private fun startMentionToSearchAndSelectUser() {
         val intent = Intent(requireContext(), SearchAndSelectUserActivity::class.java)
         selectMentionToUserResult.launch(intent)
     }
@@ -327,13 +354,14 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     override fun closeMenu() {
         isShowEditorMenu.value = false
     }
+
     override fun openMenu() {
         isShowEditorMenu.value = true
     }
 
 
     override fun goToNormalEditor() {
-        mViewModel.toDraftNote().let{
+        mViewModel.toDraftNote().let {
             val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = it)
             startActivity(intent)
             mViewModel.clear()
@@ -341,61 +369,73 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     }
 
-    private val registerForOpenDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if(result.resultCode == RESULT_OK) {
-            val selectedFilePropertyIds = (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
-                it as FileProperty.Id
+    private val registerForOpenDriveActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val selectedFilePropertyIds =
+                    (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
+                        it as FileProperty.Id
+                    }
+                mViewModel.addFilePropertyFromIds(selectedFilePropertyIds)
             }
-            mViewModel.addFilePropertyFromIds(selectedFilePropertyIds)
-        }
-
-    }
-
-    private val openLocalStorageResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-        val uri = result?.data?.data
-        if(uri != null){
-            mViewModel.add(uri.toAppFile(requireContext()))
-            Log.d("NoteEditorActivity", "成功しました")
 
         }
-    }
 
-    private val requestReadStoragePermissionResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if(it){
-            showFileManager()
-        }else{
-            Toast.makeText(requireContext(), "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+    private val openLocalStorageResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+            val uri = result?.data?.data
+            if (uri != null) {
+                mViewModel.add(uri.toAppFile(requireContext()))
+                Log.d("NoteEditorActivity", "成功しました")
+
+            }
         }
-    }
+
+    private val requestReadStoragePermissionResult =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                showFileManager()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    private val selectUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if(result.resultCode == RESULT_OK && result.data != null){
-            val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-            if(changed != null) {
-                mViewModel.setAddress(changed.added, changed.removed)
-            }
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    private val selectMentionToUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if(result.resultCode == RESULT_OK && result.data != null){
-            val changed = result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
-
-            if(changed != null){
-                val pos = mBinding.inputMainText.selectionEnd
-                mViewModel.addMentionUsers(changed.selectedUsers, pos).let { newPos ->
-                    mBinding.inputMainText.setText(mViewModel.text.value?: "")
-                    mBinding.inputMainText.setSelection(newPos)
+    private val selectUserResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val changed =
+                    result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                if (changed != null) {
+                    mViewModel.setAddress(changed.added, changed.removed)
                 }
             }
-
         }
-    }
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    private val selectMentionToUserResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val changed =
+                    result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+
+                if (changed != null) {
+                    val pos = mBinding.inputMainText.selectionEnd
+                    mViewModel.addMentionUsers(changed.selectedUsers, pos).let { newPos ->
+                        mBinding.inputMainText.setText(mViewModel.text.value ?: "")
+                        mBinding.inputMainText.setSelection(newPos)
+                    }
+                }
+
+            }
+        }
 
 
 }

@@ -18,10 +18,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.gallery.GalleryDataSource
-import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -61,17 +58,14 @@ interface MiCore {
     fun getUserRepository(): UserRepository
 
 
-
     fun getGroupRepository(): GroupRepository
 
     fun getFilePropertyDataSource(): FilePropertyDataSource
 
-    fun getDriveFileRepository(): DriveFileRepository
 
     fun getSubscriptionRegistration(): SubscriptionRegistration
 
     fun getSubscriptionUnRegstration(): SubscriptionUnRegistration
-
 
 
     fun getEncryption(): Encryption
@@ -80,7 +74,6 @@ interface MiCore {
     suspend fun getChannelAPI(account: Account): ChannelAPI
 
     fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter
-
 
 
     fun getCurrentInstanceMeta(): Meta?
@@ -103,10 +96,6 @@ interface MiCore {
     fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory
 
     fun getReactionHistoryDataSource(): ReactionHistoryDataSource
-
-    fun getGalleryDataSource(): GalleryDataSource
-
-    fun getGalleryRepository(): GalleryRepository
 
 
     fun getTranslationStore(): NoteTranslationStore

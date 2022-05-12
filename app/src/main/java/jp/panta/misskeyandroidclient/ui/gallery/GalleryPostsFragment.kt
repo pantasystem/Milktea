@@ -10,22 +10,25 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.AuthorizationActivity
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.model.account.page.Pageable
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class GalleryPostsFragment : Fragment() {
 
     companion object {
@@ -52,22 +55,20 @@ class GalleryPostsFragment : Fragment() {
 
     private val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
-    lateinit var viewModel: GalleryPostsViewModel
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    @Inject
+    lateinit var viewModelFactory: GalleryPostsViewModel.ViewModelAssistedFactory
 
+
+    val viewModel: GalleryPostsViewModel by viewModels {
         val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
         var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
         if (accountId == -1L) {
             accountId = null
         }
 
-        val miCore = requireContext().applicationContext as MiCore
-        viewModel = ViewModelProvider(
-            this,
-            GalleryPostsViewModel.Factory(pageable, accountId, miCore)
-        )[GalleryPostsViewModel::class.java]
+        GalleryPostsViewModel.provideFactory(viewModelFactory, pageable, accountId)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

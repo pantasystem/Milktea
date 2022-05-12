@@ -1,10 +1,13 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.di.module.createGalleryPostsStore
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -12,40 +15,39 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStore
+import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStoreFactory
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.*
+import net.pantasystem.milktea.model.user.UserRepository
 
-class GalleryPostsViewModel(
-    val pageable: Pageable.Gallery,
-    private var accountId: Long?,
-    galleryDataSource: GalleryDataSource,
+class GalleryPostsViewModel @AssistedInject constructor(
+
+    private val galleryDataSource: GalleryDataSource,
     galleryRepository: GalleryRepository,
+    private val filePropertyDataSource: FilePropertyDataSource,
+    private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
-    miCore: MiCore
+    private val galleryPostsStoreFactory: GalleryPostsStoreFactory,
+    @Assisted val pageable: Pageable.Gallery,
+    @Assisted private var accountId: Long?,
 ) : ViewModel(), GalleryToggleLikeOrUnlike {
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(
-        val pageable: Pageable.Gallery,
-        val accountId: Long?,
-        val miCore: MiCore
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return GalleryPostsViewModel(
-                pageable,
-                accountId,
-                miCore.getGalleryDataSource(),
-                miCore.getGalleryRepository(),
-                miCore.getAccountRepository(),
-                miCore
-            ) as T
-        }
-    }
 
-    private val galleryPostsStore = miCore.createGalleryPostsStore(pageable, this::getAccount)
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+
+        fun create(pageable: Pageable.Gallery, accountId: Long?): GalleryPostsViewModel
+    }
+    companion object;
+
+    private val galleryPostsStore: GalleryPostsStore by lazy {
+        galleryPostsStoreFactory.create(pageable, this::getAccount)
+    }
 
     private val _galleryPosts =
         MutableStateFlow<PageableState<List<GalleryPostUiState>>>(
@@ -92,6 +94,7 @@ class GalleryPostsViewModel(
 
     init {
 
+
         val relations = combine(galleryPostsStore.state, galleryDataSource.state) { it, _ ->
 
             it.convert {
@@ -99,19 +102,19 @@ class GalleryPostsViewModel(
                     it.map { id ->
                         async {
                             runCatching {
-                                miCore.getGalleryDataSource().find(id)
+                                galleryDataSource.find(id)
                             }.getOrNull()
                         }
 
                     }.awaitAll().filterNotNull().map { post ->
-                        post to miCore.getFilePropertyDataSource().findIn(post.fileIds)
+                        post to filePropertyDataSource.findIn(post.fileIds)
                     }.filter { postWithFiles ->
                         postWithFiles.second.isNotEmpty()
                     }.map { postWithFiles ->
                         GalleryPostRelation(
                             postWithFiles.first,
-                            miCore.getFilePropertyDataSource().findIn(postWithFiles.first.fileIds),
-                            miCore.getUserRepository().find(postWithFiles.first.userId, false)
+                            filePropertyDataSource.findIn(postWithFiles.first.fileIds),
+                            userRepository.find(postWithFiles.first.userId, false)
                         )
                     }
                 }
@@ -209,3 +212,12 @@ class GalleryPostsViewModel(
 
 }
 
+fun GalleryPostsViewModel.Companion.provideFactory(
+    factory: GalleryPostsViewModel.ViewModelAssistedFactory,
+    pageable: Pageable.Gallery,
+    accountId: Long?
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return factory.create(pageable, accountId) as T
+    }
+}
