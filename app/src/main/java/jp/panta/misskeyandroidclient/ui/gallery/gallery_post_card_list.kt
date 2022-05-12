@@ -21,8 +21,12 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 
 @Composable
-fun GalleryPostCardList(viewModel: GalleryPostsViewModel, onAction: (GalleryPostCardAction) -> Unit) {
+fun GalleryPostCardList(
+    viewModel: GalleryPostsViewModel,
+    onAction: (GalleryPostCardAction) -> Unit
+) {
     val listViewState = rememberLazyListState()
+    val visibleFileIds by viewModel.visibleFileIds.collectAsState()
 
     LaunchedEffect(key1 = null) {
         viewModel.loadInit()
@@ -49,7 +53,20 @@ fun GalleryPostCardList(viewModel: GalleryPostsViewModel, onAction: (GalleryPost
                 .nestedScroll(rememberViewInteropNestedScrollConnection())
         ) {
             items(content.rawContent) { post ->
-                GalleryPostCard(galleryState = post, onAction = onAction)
+                GalleryPostCard(
+                    galleryState = post,
+                    onAction = {
+                        if (
+                            it is GalleryPostCardAction.OnThumbnailClicked
+                            && (!visibleFileIds.contains(it.fileProperty.id) && it.fileProperty.isSensitive)
+                        ) {
+                            viewModel.toggleFileVisibleState(it.fileProperty.id)
+                        } else {
+                            onAction.invoke(it)
+                        }
+                    },
+                    visibleFileIds = visibleFileIds
+                )
             }
             if (state is PageableState.Loading.Previous) {
                 item {
@@ -59,7 +76,7 @@ fun GalleryPostCardList(viewModel: GalleryPostsViewModel, onAction: (GalleryPost
         }
     } else {
         Box(Modifier.fillMaxSize()) {
-            when(state) {
+            when (state) {
 
                 is PageableState.Loading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

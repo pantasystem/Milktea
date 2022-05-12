@@ -56,6 +56,7 @@ sealed interface GalleryPostCardAction {
 @Composable
 fun GalleryPostCard(
     galleryState: GalleryPostUiState,
+    visibleFileIds: Set<FileProperty.Id>,
     onAction: (GalleryPostCardAction) -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = galleryState.files.size)
@@ -113,7 +114,7 @@ fun GalleryPostCard(
                     .fillMaxWidth()
                     .height(250.dp)
             ) { page ->
-                ThumbnailPreview(file = galleryState.files[page]) {
+                ThumbnailPreview(file = galleryState.files[page], visibleFileIds = visibleFileIds) {
                     onAction.invoke(
                         GalleryPostCardAction.OnThumbnailClicked(
                             galleryState.galleryPost,
@@ -134,7 +135,9 @@ fun GalleryPostCard(
                 )
             }
             Row(
-                Modifier.fillMaxWidth().padding(start = 8 .dp, end = 8.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp),
                 verticalAlignment = Alignment.Bottom
             ) {
                 Column(
@@ -268,5 +271,6 @@ fun PreviewGalleryPostCard() {
                 userName = "harunonsysytem"
             ).toUser(0L)
         ),
-        onAction = {})
+        onAction = {}, visibleFileIds = emptySet()
+    )
 }

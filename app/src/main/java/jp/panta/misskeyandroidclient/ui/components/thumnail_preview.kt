@@ -19,27 +19,21 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun ThumbnailPreview(
     file: FileProperty,
     modifier: Modifier = Modifier,
-    isHidden: Boolean = false,
+    visibleFileIds: Set<FileProperty.Id>,
     onClick: () -> Unit,
 ) {
+
+    val isVisible = visibleFileIds.contains(file.id) || !file.isSensitive
     Box(
         modifier = modifier.clickable(onClick = onClick).fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        if(isHidden) {
+        if(!isVisible) {
             Text(stringResource(R.string.nsfw_message))
         }
         
-        if(file.type.startsWith("video")) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_play_circle_outline_black_24dp),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = modifier.fillMaxSize(),
-            )
-        }
-        
-        if(isHidden.not()) {
+
+        if(isVisible) {
             Image(
                 painter = rememberImagePainter(
                     file.thumbnailUrl ?: "",
@@ -49,7 +43,17 @@ fun ThumbnailPreview(
                 modifier = modifier.fillMaxSize(),
             )
         }
-        
+
+        if(file.type.startsWith("video")) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_play_circle_outline_black_24dp),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
+
+
     }
 
 }

@@ -10,10 +10,9 @@ data class GalleryPostUiState(
     val files: List<FileProperty>,
     val user: User,
     val currentIndex: Int,
-    val isFavoriteSending: Boolean,
-
-    ) {
-    val isLiked: Boolean get() = (galleryPost as? GalleryPost.Authenticated)?.isLiked?: false
+    val isFavoriteSending: Boolean
+) {
+    val isLiked: Boolean get() = (galleryPost as? GalleryPost.Authenticated)?.isLiked ?: false
 
     val fileViewDataList: List<FileViewData> by lazy {
         files.map {

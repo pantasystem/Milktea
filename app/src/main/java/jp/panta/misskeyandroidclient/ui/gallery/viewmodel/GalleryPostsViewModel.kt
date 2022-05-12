@@ -4,18 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.di.module.createGalleryPostsStore
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.gallery.*
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.gallery.*
 
 class GalleryPostsViewModel(
     val pageable: Pageable.Gallery,
@@ -51,7 +52,7 @@ class GalleryPostsViewModel(
             PageableState.Fixed(
                 StateContent.NotExist()))
     val galleryPosts: StateFlow<PageableState<List<GalleryPostUiState>>> = _galleryPosts
-    val lock = Mutex()
+    private val lock = Mutex()
 
     private val galleryPostSendFavoriteStore =
         GalleryPostSendFavoriteStore(galleryRepository)
@@ -64,6 +65,9 @@ class GalleryPostsViewModel(
 
     private val currentIndexes = MutableStateFlow<Map<GalleryPost.Id, Int>>(emptyMap())
 
+    private val _visibleFileIds = MutableStateFlow<Set<FileProperty.Id>>(emptySet())
+    val visibleFileIds: StateFlow<Set<FileProperty.Id>>
+        get() = _visibleFileIds
 
     init {
         galleryDataSource.events().mapNotNull {
@@ -88,8 +92,7 @@ class GalleryPostsViewModel(
 
     init {
 
-        // FIXME: 毎回Stateオブジェクトを生成してしまうのでユーザーの捜査情報が初期化されてしまうので何とかする
-        val relations = galleryPostsStore.state.combine(galleryDataSource.state) { it, _ ->
+        val relations = combine(galleryPostsStore.state, galleryDataSource.state) { it, _ ->
 
             it.convert {
                 runBlocking {
@@ -118,7 +121,7 @@ class GalleryPostsViewModel(
         combine(
             relations,
             currentIndexes,
-            galleryPostSendFavoriteStore.state
+            galleryPostSendFavoriteStore.state,
         ) { posts, indexes, sends ->
             posts.convert {
                 it.map { relation ->
@@ -127,12 +130,12 @@ class GalleryPostsViewModel(
                         files = relation.files,
                         user = relation.user,
                         currentIndex = indexes[relation.galleryPost.id] ?: 0,
-                        isFavoriteSending = sends.contains(relation.galleryPost.id)
+                        isFavoriteSending = sends.contains(relation.galleryPost.id),
                     )
                 }
             }
         }.onEach {
-            this._galleryPosts.value = it
+            _galleryPosts.value = it
             if (it is PageableState.Error) {
                 _error.emit(it.throwable)
             }
@@ -172,6 +175,18 @@ class GalleryPostsViewModel(
     fun toggleFavorite(galleryId: GalleryPost.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             toggle(galleryId)
+        }
+    }
+
+    fun toggleFileVisibleState(fileId: FileProperty.Id) {
+        _visibleFileIds.update {
+            it.toMutableSet().also { set ->
+                if (set.contains(fileId)) {
+                    set.remove(fileId)
+                } else {
+                    set.add(fileId)
+                }
+            }
         }
     }
 
