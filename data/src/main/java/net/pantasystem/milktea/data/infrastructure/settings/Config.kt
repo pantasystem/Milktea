@@ -42,17 +42,7 @@ fun Config.pref(key: Keys): PrefType? {
             }
         }
         Keys.UrlPreviewSourceType -> {
-            when (urlPreviewConfig.type) {
-                is UrlPreviewConfig.Type.Misskey -> {
-                    PrefType.IntPref(UrlPreviewSourceSetting.MISSKEY)
-                }
-                is UrlPreviewConfig.Type.SummalyServer -> {
-                    PrefType.IntPref(UrlPreviewSourceSetting.SUMMALY)
-                }
-                is UrlPreviewConfig.Type.InApp -> {
-                    PrefType.IntPref(UrlPreviewSourceSetting.APP)
-                }
-            }
+            PrefType.IntPref(urlPreviewConfig.type.toInt())
         }
         Keys.ThemeType -> {
             PrefType.IntPref(theme.toInt())
@@ -60,11 +50,11 @@ fun Config.pref(key: Keys): PrefType? {
     }
 }
 
-fun Config.prefs(): Map<String, PrefType> {
-    val map = mutableMapOf<String, PrefType>()
+fun Config.prefs(): Map<Keys, PrefType> {
+    val map = mutableMapOf<Keys, PrefType>()
     Keys.allKeys.forEach { key ->
         pref(key)?.let {
-            map[key.str()] = it
+            map[key] = it
         }
     }
     return map
