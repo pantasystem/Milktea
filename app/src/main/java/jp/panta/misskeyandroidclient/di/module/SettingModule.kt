@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import net.pantasystem.milktea.common.getPreferences
 import net.pantasystem.milktea.data.infrastructure.settings.LocalConfigRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
@@ -18,8 +19,8 @@ object SettingModule {
 
     @Singleton
     @Provides
-    fun settingStore(@ApplicationContext context: Context, repository: LocalConfigRepository): SettingStore {
-        return SettingStore(context.getPreferences(), repository)
+    fun settingStore(@ApplicationContext context: Context, repository: LocalConfigRepository, coroutineScope: CoroutineScope): SettingStore {
+        return SettingStore(context.getPreferences(), repository, coroutineScope)
     }
 
     @Singleton

@@ -1,8 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.model.setting.RememberVisibility
@@ -10,19 +14,22 @@ import net.pantasystem.milktea.model.setting.RememberVisibility
 
 class SettingStore(
     private val sharedPreferences: SharedPreferences,
-    private val localConfigRepository: LocalConfigRepository
+    private val localConfigRepository: LocalConfigRepository,
+    coroutineScope: CoroutineScope
 ) {
 
+    val configState = localConfigRepository.observe()
+        .stateIn(coroutineScope, SharingStarted.Eagerly, DefaultConfig.config)
 
     val isSimpleEditorEnabled: Boolean
         get() {
-            return localConfigRepository.get().getOrThrow().isSimpleEditorEnabled
+            return configState.value.isSimpleEditorEnabled
         }
 
 
     var reactionPickerType: ReactionPickerType
         get() {
-            return localConfigRepository.get().getOrThrow().reactionPickerType
+            return configState.value.reactionPickerType
         }
         set(value) {
             val editor = sharedPreferences.edit()
@@ -32,7 +39,7 @@ class SettingStore(
 
     var backgroundImagePath: String?
         get() {
-            return localConfigRepository.get().getOrThrow().backgroundImagePath
+            return configState.value.backgroundImagePath
         }
         set(value) {
             val edit = sharedPreferences.edit()
@@ -40,34 +47,21 @@ class SettingStore(
             edit.apply()
         }
 
-    var isClassicUI: Boolean
+    val isClassicUI: Boolean
         get() {
-            return localConfigRepository.get().getOrThrow().isClassicUI
-        }
-        set(value) {
-            val edit = sharedPreferences.edit()
-            edit.putBoolean(Keys.ClassicUI.str(), value)
-            edit.apply()
+            return configState.value.isClassicUI
         }
 
-    var isUserNameDefault: Boolean
+
+    val isUserNameDefault: Boolean
         get() {
-            return localConfigRepository.get().getOrThrow().isUserNameDefault
-        }
-        set(value) {
-            val edit = sharedPreferences.edit()
-            edit.putBoolean(Keys.IsUserNameDefault.str(), value)
-            edit.apply()
+            return configState.value.isUserNameDefault
         }
 
-    var isPostButtonAtTheBottom: Boolean
+
+    val isPostButtonAtTheBottom: Boolean
         get() {
-            return localConfigRepository.get().getOrThrow().isPostButtonAtTheBottom
-        }
-        set(value) {
-            val edit = sharedPreferences.edit()
-            edit.putBoolean(Keys.IsPostButtonToBottom.str(), value)
-            edit.apply()
+            return configState.value.isPostButtonAtTheBottom
         }
 
 
@@ -75,7 +69,7 @@ class SettingStore(
 
     val noteExpandedHeightSize: Int
         get() {
-            return localConfigRepository.get().getOrThrow().noteExpandedHeightSize
+            return configState.value.noteExpandedHeightSize
         }
 
 

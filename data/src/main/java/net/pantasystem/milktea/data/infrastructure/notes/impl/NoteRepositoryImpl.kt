@@ -1,21 +1,24 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.infrastructure.notes.*
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.onIReacted
+import net.pantasystem.milktea.data.infrastructure.notes.onIUnReacted
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
@@ -26,12 +29,12 @@ class NoteRepositoryImpl @Inject constructor(
     val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
     val encryption: Encryption,
-    val uploader: FileUploaderProvider,
+    private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val draftNoteDao: DraftNoteDao,
     val settingStore: SettingStore,
     val accountRepository: AccountRepository,
-    val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
+    private val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
 ) : NoteRepository {
 
     private val logger = loggerFactory.create("NoteRepositoryImpl")
@@ -123,7 +126,7 @@ class NoteRepositoryImpl @Inject constructor(
                 noteDataSource.add(note.onIReacted(createReaction.reaction))
             }
             true
-        }.getOrThrow()
+        }.getOrElse { false }
     }
 
     override suspend fun unreaction(noteId: Note.Id): Boolean {

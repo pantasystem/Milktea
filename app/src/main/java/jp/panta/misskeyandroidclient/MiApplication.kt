@@ -238,7 +238,7 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
 
