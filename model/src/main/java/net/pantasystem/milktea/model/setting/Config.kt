@@ -18,7 +18,14 @@ data class UrlPreviewConfig(
 sealed interface RememberVisibility {
     object None : RememberVisibility
     data class Remember(val visibility: Visibility, val accountId: Long) : RememberVisibility
+    sealed interface Keys {
+        object IsRememberNoteVisibility : Keys
+        data class NoteVisibility(val accountId: Long) : Keys
+        data class IsLocalOnly(val accountId: Long) : Keys
+    }
 }
+
+
 
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -46,6 +53,13 @@ object DefaultConfig {
         noteExpandedHeightSize = 300,
         theme = Theme.White
     )
+
+    fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
+        return RememberVisibility.Remember(
+            accountId = accountId,
+            visibility = Visibility.Public(false)
+        )
+    }
 }
 
 enum class ReactionPickerType {

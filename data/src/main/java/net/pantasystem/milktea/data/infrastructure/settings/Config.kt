@@ -2,8 +2,16 @@ package net.pantasystem.milktea.data.infrastructure.settings
 
 import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.ReactionPickerType
+import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.model.setting.UrlPreviewConfig
 
+fun RememberVisibility.Keys.str(): String {
+    return when(this) {
+        is RememberVisibility.Keys.IsLocalOnly -> "accountId:${accountId}:IS_LOCAL_ONLY"
+        is RememberVisibility.Keys.IsRememberNoteVisibility -> "IS_LEARN_NOTE_VISIBILITY"
+        is RememberVisibility.Keys.NoteVisibility -> "accountId:${accountId}:NOTE_VISIBILITY"
+    }
+}
 
 fun Config.pref(key: Keys): PrefType? {
     return when (key) {

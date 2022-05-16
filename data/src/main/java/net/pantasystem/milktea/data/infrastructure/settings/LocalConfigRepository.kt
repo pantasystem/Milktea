@@ -2,15 +2,17 @@ package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import net.pantasystem.milktea.model.notes.CanLocalOnly
+import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.model.setting.*
-import java.util.regex.Pattern
 
 
 class LocalConfigRepositoryImpl(
     private val sharedPreference: SharedPreferences
 ) : LocalConfigRepository {
-    private val urlPattern =
-        Pattern.compile("""(https)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+//    private val urlPattern =
+//        Pattern.compile("""(https)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
     override fun get(): Result<Config> {
         return runCatching {
@@ -51,7 +53,7 @@ class LocalConfigRepositoryImpl(
                 urlPreviewConfig = UrlPreviewConfig(
                     type = UrlPreviewConfig.Type.from(
                         sharedPreference.getInt(
-                            UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY,
+                            Keys.UrlPreviewSourceType.str(),
                             UrlPreviewSourceSetting.MISSKEY
                         ), url = sharedPreference.getString(Keys.SummalyServerUrl.str(), null)
                     ),
@@ -79,6 +81,70 @@ class LocalConfigRepositoryImpl(
                     }
                 }
             }
+        }
+    }
+
+    override fun getRememberVisibility(accountId: Long): Result<RememberVisibility> {
+        return runCatching {
+            val isRemember = sharedPreference.getBoolean(
+                RememberVisibility.Keys.IsRememberNoteVisibility.str(),
+                true
+            )
+            if (isRemember) {
+                val localOnly = sharedPreference.getBoolean(
+                    RememberVisibility.Keys.IsLocalOnly(accountId).str(),
+                    DefaultConfig.getRememberVisibilityConfig(accountId).visibility.isLocalOnly()
+                )
+                val visibility = when (sharedPreference.getString(
+                    RememberVisibility.Keys.NoteVisibility(accountId).str(),
+                    "public"
+                )) {
+                    "home" -> Visibility.Home(localOnly)
+                    "followers" -> Visibility.Followers(localOnly)
+                    "specified" -> Visibility.Specified(emptyList())
+                    else -> Visibility.Public(localOnly)
+                }
+                RememberVisibility.Remember(
+                    accountId = accountId,
+                    visibility = visibility,
+                )
+            } else {
+                RememberVisibility.None
+            }
+        }
+    }
+
+    override suspend fun save(remember: RememberVisibility): Result<Unit> {
+        return runCatching {
+            when (remember) {
+                is RememberVisibility.Remember -> {
+                    val localOnly = (remember.visibility as? CanLocalOnly)?.isLocalOnly ?: false
+                    val str = when (remember.visibility) {
+                        is Visibility.Public -> "public"
+                        is Visibility.Home -> "home"
+                        is Visibility.Followers -> "followers"
+                        is Visibility.Specified -> "specified"
+                    }
+                    sharedPreference.edit {
+                        putString(
+                            RememberVisibility.Keys.NoteVisibility(remember.accountId).str(),
+                            str
+                        )
+                        putBoolean(
+                            RememberVisibility.Keys.IsLocalOnly(remember.accountId).str(),
+                            localOnly
+                        )
+                        putBoolean(RememberVisibility.Keys.IsRememberNoteVisibility.str(), true)
+                    }
+                }
+                is RememberVisibility.None -> {
+                    sharedPreference.edit {
+                        putBoolean(RememberVisibility.Keys.IsRememberNoteVisibility.str(), false)
+                    }
+                }
+
+            }
+
         }
     }
 

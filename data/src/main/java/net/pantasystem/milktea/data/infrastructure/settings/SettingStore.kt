@@ -1,14 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
-import android.util.Log
-import androidx.core.content.edit
-import net.pantasystem.milktea.data.infrastructure.KeyStore
-import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
+import net.pantasystem.milktea.model.setting.RememberVisibility
 
 
 class SettingStore(
@@ -29,7 +26,7 @@ class SettingStore(
         }
         set(value) {
             val editor = sharedPreferences.edit()
-            editor.putInt("ReactionPickerType", value.ordinal)
+            editor.putInt(Keys.ReactionPickerType.str(), value.ordinal)
             editor.apply()
         }
 
@@ -39,7 +36,7 @@ class SettingStore(
         }
         set(value) {
             val edit = sharedPreferences.edit()
-            edit.putString("BackgroundImage", value)
+            edit.putString(Keys.BackgroundImage.str(), value)
             edit.apply()
         }
 
@@ -81,54 +78,28 @@ class SettingStore(
             return localConfigRepository.get().getOrThrow().noteExpandedHeightSize
         }
 
-    private var isLearnVisibility: Boolean
-        set(value) {
-            sharedPreferences.edit {
-                putBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, value)
-            }
-        }
-        get() {
-            return sharedPreferences.getBoolean(
-                KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name,
-                true
-            )
-        }
 
-
-    fun setNoteVisibility(createNote: CreateNote) {
-        if (!isLearnVisibility) {
-            return
-        }
+    suspend fun setNoteVisibility(createNote: CreateNote) {
         if (!(createNote.renoteId == null && createNote.replyId == null)) {
             return
         }
-        val localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly ?: false
-        val str = when (createNote.visibility) {
-            is Visibility.Public -> "public"
-            is Visibility.Home -> "home"
-            is Visibility.Followers -> "followers"
-            is Visibility.Specified -> "specified"
+        val nowConfig =
+            (localConfigRepository.getRememberVisibility(createNote.author.accountId).getOrThrow())
+
+        when (nowConfig) {
+            is RememberVisibility.None -> return
+            is RememberVisibility.Remember -> localConfigRepository.save(
+                nowConfig.copy(visibility = createNote.visibility)
+            )
         }
-        Log.d("SettingStore", "visibility: $str")
-        sharedPreferences.edit {
-            putString("accountId:${createNote.author.accountId}:NOTE_VISIBILITY", str)
-            putBoolean("accountId:${createNote.author.accountId}:IS_LOCAL_ONLY", localOnly)
-        }
+
     }
 
     fun getNoteVisibility(accountId: Long): Visibility {
-        if (!isLearnVisibility) {
-            return Visibility.Public(false)
-        }
-        val localOnly = sharedPreferences.getBoolean("accountId:${accountId}:IS_LOCAL_ONLY", false)
-        return when (sharedPreferences.getString(
-            "accountId:${accountId}:NOTE_VISIBILITY",
-            "public"
-        )) {
-            "home" -> Visibility.Home(localOnly)
-            "followers" -> Visibility.Followers(localOnly)
-            "specified" -> Visibility.Specified(emptyList())
-            else -> Visibility.Public(localOnly)
+        return when (val config =
+            localConfigRepository.getRememberVisibility(accountId).getOrThrow()) {
+            is RememberVisibility.None -> Visibility.Public(false)
+            is RememberVisibility.Remember -> config.visibility
         }
     }
 

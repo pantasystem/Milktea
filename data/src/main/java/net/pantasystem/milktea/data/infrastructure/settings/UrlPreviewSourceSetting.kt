@@ -8,11 +8,9 @@ class UrlPreviewSourceSetting(
 ) {
 
     companion object{
-        const val URL_PREVIEW_SOURCE_TYPE_KEY = "jp.panta.misskeyandroidclient.model.settings.URL_PREVIEW_SOURCE_TYPE"
         const val MISSKEY = 0
         const val SUMMALY = 1
         const val APP = 2
-        const val SUMMALY_SERVER_URL_KEY = "jp.panta.misskeyandroidclient.model.settings.SUMMALY_SERVER_URL_KEY"
 
     }
 
@@ -20,7 +18,7 @@ class UrlPreviewSourceSetting(
 
 
     fun getSummalyUrl(): String?{
-        return sharedPreferences.getString(SUMMALY_SERVER_URL_KEY, null)?.let{ url ->
+        return sharedPreferences.getString(Keys.SummalyServerUrl.str(), null)?.let{ url ->
             if(urlPattern.matcher(url).find()){
                 url
             }else{
@@ -33,8 +31,8 @@ class UrlPreviewSourceSetting(
         val matcher = urlPattern.matcher(url)
         return if(matcher.find()){
             val edit = sharedPreferences.edit()
-            edit.putString(SUMMALY_SERVER_URL_KEY, url)
-            edit.putInt(URL_PREVIEW_SOURCE_TYPE_KEY, SUMMALY)
+            edit.putString(Keys.SummalyServerUrl.str(), url)
+            edit.putInt(Keys.UrlPreviewSourceType.str(), SUMMALY)
             edit.apply()
             true
         }else{
@@ -49,12 +47,12 @@ class UrlPreviewSourceSetting(
         }else{
             MISSKEY
         }
-        edit.putInt(URL_PREVIEW_SOURCE_TYPE_KEY, srcType)
+        edit.putInt(Keys.UrlPreviewSourceType.str(), srcType)
         edit.apply()
     }
 
     fun getSourceType(): Int{
-        val type = sharedPreferences.getInt(URL_PREVIEW_SOURCE_TYPE_KEY, MISSKEY)
+        val type = sharedPreferences.getInt(Keys.UrlPreviewSourceType.str(), MISSKEY)
         if(type in MISSKEY..APP){
             if(type == SUMMALY && getSummalyUrl() == null){
                 return MISSKEY
