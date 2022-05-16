@@ -9,6 +9,8 @@ data class UrlPreviewConfig(
         object Misskey : Type
         object InApp : Type
         data class SummalyServer(val url: String) : Type
+
+        companion object
     }
 }
 
