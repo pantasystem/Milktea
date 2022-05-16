@@ -17,24 +17,41 @@ sealed interface Theme {
     object Black : Theme
     object Dark : Theme
     object Bread : Theme
+    companion object
 }
 
 sealed interface RememberVisibility {
     object None : RememberVisibility
-    data class Remember(val visibility: Visibility) : RememberVisibility
+    data class Remember(val visibility: Visibility, val accountId: Long) : RememberVisibility
 }
+
 data class Config(
-    val isSimpleEditorEnabled: Boolean = false,
-    val reactionPickerType: ReactionPickerType = ReactionPickerType.LIST,
-    val backgroundImagePath: String? = null,
-    val isClassicUI: Boolean = false,
-    val isUserNameDefault: Boolean = true,
-    val isPostButtonAtTheBottom: Boolean = true,
+    val isSimpleEditorEnabled: Boolean,
+    val reactionPickerType: ReactionPickerType,
+    val backgroundImagePath: String?,
+    val isClassicUI: Boolean,
+    val isUserNameDefault: Boolean,
+    val isPostButtonAtTheBottom: Boolean,
     val urlPreviewConfig: UrlPreviewConfig,
-    val noteExpandedHeightSize: Int = 300,
-    val rememberVisibility: RememberVisibility = RememberVisibility.Remember(Visibility.Public(false)),
-    val theme: Theme = Theme.White
-)
+    val noteExpandedHeightSize: Int,
+    val theme: Theme
+) {
+    companion object
+}
+
+object DefaultConfig {
+    val config = Config(
+        isSimpleEditorEnabled = false,
+        reactionPickerType = ReactionPickerType.LIST,
+        backgroundImagePath = null,
+        isClassicUI = false,
+        isUserNameDefault = true,
+        isPostButtonAtTheBottom = true,
+        urlPreviewConfig = UrlPreviewConfig(UrlPreviewConfig.Type.Misskey),
+        noteExpandedHeightSize = 300,
+        theme = Theme.White
+    )
+}
 
 enum class ReactionPickerType {
     LIST,
