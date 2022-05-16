@@ -7,6 +7,8 @@ import net.pantasystem.milktea.data.infrastructure.KeyStore
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.setting.ReactionPickerType
+
 
 class SettingStore(private val sharedPreferences: SharedPreferences) {
 
