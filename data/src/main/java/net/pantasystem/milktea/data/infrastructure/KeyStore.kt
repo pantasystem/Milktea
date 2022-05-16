@@ -10,14 +10,7 @@ object KeyStore {
         THEME(THEME_WHITE.default)
     }
 
-    enum class AutoTextFoldingCount(val default: Int){
-        RETURNS(10),
-        LENGTH(300)
-    }
 
-    enum class DisableAutoNoteExpandedContentSize(val default: Boolean) {
-        STATE(false)
-    }
 
     enum class AutoNoteExpandedContentSize(val default: Int) {
         HEIGHT(300)
@@ -43,6 +36,5 @@ object KeyStore {
         IS_POST_BUTTON_TO_BOTTOM(false),
         IS_SIMPLE_EDITOR_ENABLED(false),
         IS_LEARN_NOTE_VISIBILITY(true),
-        IS_DISABLE_AUTO_NOTE_EXPANDABLE(false)
     }
 }
