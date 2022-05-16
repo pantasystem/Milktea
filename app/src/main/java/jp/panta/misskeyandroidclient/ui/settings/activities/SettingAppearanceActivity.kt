@@ -21,7 +21,6 @@ import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
 import kotlinx.coroutines.*
-import net.pantasystem.milktea.data.infrastructure.KeyStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.str
@@ -90,29 +89,29 @@ class SettingAppearanceActivity : AppCompatActivity() {
             listOf(
                 themeSelection,
                 BooleanSharedItem(
-                    key = KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.name,
-                    default = KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.default,
+                    key = Keys.ClassicUI.str(),
+                    default = DefaultConfig.config.isClassicUI,
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
                     titleStringRes = R.string.hide_bottom_navigation
                 ),
                 BooleanSharedItem(
-                    key = KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED.name,
-                    default = KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED.default,
+                    key = Keys.IsSimpleEditorEnabled.str(),
+                    default = DefaultConfig.config.isSimpleEditorEnabled,
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
                     titleStringRes = R.string.use_simple_editor
                 ),
                 BooleanSharedItem(
-                    key = KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name,
-                    default = KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.default,
+                    key = Keys.IsUserNameDefault.str(),
+                    default = DefaultConfig.config.isUserNameDefault,
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
                     titleStringRes = R.string.user_name_as_default_display_name
                 ),
                 BooleanSharedItem(
-                    key = KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.name,
-                    default = KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.default,
+                    key = Keys.IsPostButtonToBottom.str(),
+                    default = DefaultConfig.config.isPostButtonAtTheBottom,
                     choiceType = BooleanSharedItem.ChoiceType.SWITCH,
                     context = this,
                     titleStringRes = R.string.post_button_at_the_bottom

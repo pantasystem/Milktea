@@ -7,21 +7,25 @@ import net.pantasystem.milktea.data.infrastructure.KeyStore
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 
 
-class SettingStore(private val sharedPreferences: SharedPreferences) {
+class SettingStore(
+    private val sharedPreferences: SharedPreferences,
+    private val localConfigRepository: LocalConfigRepository
+) {
 
 
     val isSimpleEditorEnabled: Boolean
-        get(){
-            return fromBooleanEnum(KeyStore.BooleanKey.IS_SIMPLE_EDITOR_ENABLED)
+        get() {
+            return localConfigRepository.get().getOrThrow().isSimpleEditorEnabled
         }
 
 
     var reactionPickerType: ReactionPickerType
-        get(){
-            return ReactionPickerType.values()[sharedPreferences.getInt("ReactionPickerType", 0)]
+        get() {
+            return localConfigRepository.get().getOrThrow().reactionPickerType
         }
         set(value) {
             val editor = sharedPreferences.edit()
@@ -30,8 +34,8 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         }
 
     var backgroundImagePath: String?
-        get(){
-            return sharedPreferences.getString("BackgroundImage", null)
+        get() {
+            return localConfigRepository.get().getOrThrow().backgroundImagePath
         }
         set(value) {
             val edit = sharedPreferences.edit()
@@ -40,43 +44,41 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
         }
 
     var isClassicUI: Boolean
-        get(){
-            return sharedPreferences.getBoolean(KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.name, false)
+        get() {
+            return localConfigRepository.get().getOrThrow().isClassicUI
         }
         set(value) {
             val edit = sharedPreferences.edit()
-            edit.putBoolean(KeyStore.BooleanKey.HIDE_BOTTOM_NAVIGATION.name, value)
+            edit.putBoolean(Keys.ClassicUI.str(), value)
             edit.apply()
         }
 
     var isUserNameDefault: Boolean
-        get(){
-            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name, true)
+        get() {
+            return localConfigRepository.get().getOrThrow().isUserNameDefault
         }
-        set(value){
+        set(value) {
             val edit = sharedPreferences.edit()
-            edit.putBoolean(KeyStore.BooleanKey.IS_USER_NAME_DEFAULT.name, value)
+            edit.putBoolean(Keys.IsUserNameDefault.str(), value)
             edit.apply()
         }
 
     var isPostButtonAtTheBottom: Boolean
-        get(){
-            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.name, KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.default)
+        get() {
+            return localConfigRepository.get().getOrThrow().isPostButtonAtTheBottom
         }
         set(value) {
             val edit = sharedPreferences.edit()
-            edit.putBoolean(KeyStore.BooleanKey.IS_POST_BUTTON_TO_BOTTOM.name, value)
+            edit.putBoolean(Keys.IsPostButtonToBottom.str(), value)
             edit.apply()
         }
-    private fun fromBooleanEnum(key: KeyStore.BooleanKey): Boolean{
-        return sharedPreferences.getBoolean(key.name, key.default)
-    }
+
 
     val urlPreviewSetting = UrlPreviewSourceSetting(sharedPreferences)
 
     val noteExpandedHeightSize: Int
         get() {
-            return sharedPreferences.getInt(KeyStore.AutoNoteExpandedContentSize.HEIGHT.name, KeyStore.AutoNoteExpandedContentSize.HEIGHT.default)
+            return localConfigRepository.get().getOrThrow().noteExpandedHeightSize
         }
 
     private var isLearnVisibility: Boolean
@@ -86,19 +88,22 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
             }
         }
         get() {
-            return sharedPreferences.getBoolean(KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name, true)
+            return sharedPreferences.getBoolean(
+                KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name,
+                true
+            )
         }
 
 
     fun setNoteVisibility(createNote: CreateNote) {
-        if(!isLearnVisibility) {
+        if (!isLearnVisibility) {
             return
         }
-        if(!(createNote.renoteId == null && createNote.replyId == null)) {
+        if (!(createNote.renoteId == null && createNote.replyId == null)) {
             return
         }
-        val localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly?: false
-        val str = when(createNote.visibility) {
+        val localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly ?: false
+        val str = when (createNote.visibility) {
             is Visibility.Public -> "public"
             is Visibility.Home -> "home"
             is Visibility.Followers -> "followers"
@@ -112,12 +117,15 @@ class SettingStore(private val sharedPreferences: SharedPreferences) {
     }
 
     fun getNoteVisibility(accountId: Long): Visibility {
-        if(!isLearnVisibility) {
+        if (!isLearnVisibility) {
             return Visibility.Public(false)
         }
         val localOnly = sharedPreferences.getBoolean("accountId:${accountId}:IS_LOCAL_ONLY", false)
-        return when(sharedPreferences.getString("accountId:${accountId}:NOTE_VISIBILITY", "public")) {
-            "home"-> Visibility.Home(localOnly)
+        return when (sharedPreferences.getString(
+            "accountId:${accountId}:NOTE_VISIBILITY",
+            "public"
+        )) {
+            "home" -> Visibility.Home(localOnly)
             "followers" -> Visibility.Followers(localOnly)
             "specified" -> Visibility.Specified(emptyList())
             else -> Visibility.Public(localOnly)

@@ -1,11 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.settings.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import net.pantasystem.milktea.data.infrastructure.KeyStore
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme
@@ -13,6 +12,10 @@ import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.Group
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.TextSharedItem
+import net.pantasystem.milktea.data.infrastructure.KeyStore
+import net.pantasystem.milktea.data.infrastructure.settings.Keys
+import net.pantasystem.milktea.data.infrastructure.settings.str
+import net.pantasystem.milktea.model.setting.DefaultConfig
 
 class SettingMovementActivity : AppCompatActivity() {
 
@@ -50,21 +53,8 @@ class SettingMovementActivity : AppCompatActivity() {
             context = this,
             titleStringRes = R.string.include_my_renotes
         )
-        val autoLoadTimeline = BooleanSharedItem(
-            key = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE.name,
-            default = KeyStore.BooleanKey.AUTO_LOAD_TIMELINE.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.auto_load_timeline
-        )
 
-        val hideRemovedNote = BooleanSharedItem(
-            key = KeyStore.BooleanKey.HIDE_REMOVED_NOTE.name,
-            default = KeyStore.BooleanKey.HIDE_REMOVED_NOTE.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.hide_removed_note
-        )
+
         val timelineGroup = Group(
             titleStringRes = R.string.timeline,
             context = this,
@@ -72,8 +62,6 @@ class SettingMovementActivity : AppCompatActivity() {
                 includeLocalRenotes,
                 includeRenotedMeyNotes,
                 includeMyRenotes,
-                autoLoadTimeline,
-                hideRemovedNote
             )
         )
 
@@ -82,32 +70,16 @@ class SettingMovementActivity : AppCompatActivity() {
             context = this,
             items = listOf(
                 TextSharedItem(
-                    KeyStore.AutoNoteExpandedContentSize.HEIGHT.name,
+                    Keys.NoteLimitHeight.str(),
                     R.string.height_limit,
                     type = TextSharedItem.InputType.NUMBER,
                     context = this,
-                    default = KeyStore.AutoNoteExpandedContentSize.HEIGHT.default.toString()
+                    default = DefaultConfig.config.noteExpandedHeightSize.toString()
                 ),
             )
         )
 
-        val updateTimelineInBackground = BooleanSharedItem(
-            key = KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND.name,
-            default = KeyStore.BooleanKey.UPDATE_TIMELINE_IN_BACKGROUND.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.update_timeline_in_background
-        )
 
-
-
-
-
-        val syncGroup = Group(
-            titleStringRes = R.string.sync,
-            items = listOf(updateTimelineInBackground),
-            context = this
-        )
 
 
         val learnNoteVisibility = BooleanSharedItem(
@@ -128,7 +100,7 @@ class SettingMovementActivity : AppCompatActivity() {
         mBinding.settingList.adapter = adapter
         mBinding.settingList.layoutManager = LinearLayoutManager(this)
 
-        adapter.submitList(listOf(timelineGroup, syncGroup, noteTextLimitGroup, postGroup))
+        adapter.submitList(listOf(timelineGroup, noteTextLimitGroup, postGroup))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
