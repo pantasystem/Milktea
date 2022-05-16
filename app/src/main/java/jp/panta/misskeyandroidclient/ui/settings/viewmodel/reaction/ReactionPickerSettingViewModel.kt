@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,14 +9,13 @@ import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.getPreferenceName
-import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.setting.ReactionPickerType
 
 class ReactionPickerSettingViewModel(
     private val account: Account,
@@ -28,9 +26,7 @@ class ReactionPickerSettingViewModel(
     @Suppress("UNCHECKED_CAST")
     class Factory(private val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val settingStore = SettingStore(
-                miApplication.getSharedPreferences(miApplication.getPreferenceName(), Context.MODE_PRIVATE)
-            )
+            val settingStore = miApplication.getSettingStore()
             return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, settingStore) as T
         }
     }

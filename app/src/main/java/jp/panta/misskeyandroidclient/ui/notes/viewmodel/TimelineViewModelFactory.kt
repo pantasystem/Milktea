@@ -3,16 +3,14 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import net.pantasystem.milktea.data.infrastructure.KeyStore
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.model.account.Account
-
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.common.getPreferenceName
-import java.lang.IllegalArgumentException
-import net.pantasystem.milktea.model.account.page.Pageable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.data.infrastructure.KeyStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 
 @Suppress("UNCHECKED_CAST")
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -35,7 +33,7 @@ class TimelineViewModelFactory(
                 includeRenotedMyNotes = includeRenotedMyNotes,
                 includeMyRenotes = includeMyRenotes
             )
-            return TimelineViewModel(account, accountId, pageable, miApplication, miApplication.getSettingStore(), include) as T
+            return TimelineViewModel(account, accountId, pageable, miApplication, include) as T
 
 
         }

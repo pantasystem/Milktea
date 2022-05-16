@@ -2,31 +2,33 @@ package jp.panta.misskeyandroidclient
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NoteDetailActivity : AppCompatActivity() {
-    companion object{
+    companion object {
         private const val EXTRA_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_NOTE_ID"
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
@@ -41,6 +43,7 @@ class NoteDetailActivity : AppCompatActivity() {
             }
         }
     }
+
     private var mNoteId: String? = null
     private var mAccountId: Long? = null
 
@@ -51,7 +54,12 @@ class NoteDetailActivity : AppCompatActivity() {
     private val binding: ActivityNoteDetailBinding by dataBinding()
     val notesViewModel: NotesViewModel by viewModels()
 
+    @Inject
+    lateinit var settingStore: SettingStore
+
+
     private val accountViewModel: AccountViewModel by viewModels()
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,15 +76,23 @@ class NoteDetailActivity : AppCompatActivity() {
             ?: intent.data?.path?.replace("/notes/", "")
         Log.d(TAG, "受け取ったnoteId: $noteId")
         mNoteId = noteId
-        mAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let{
-            if(it == -1L) null else it
+        mAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {
+            if (it == -1L) null else it
         }
 
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        ActionNoteHandler(
+            this,
+            notesViewModel,
+            ViewModelProvider(this)[ConfirmViewModel::class.java],
+            settingStore
+        ).initViewModelListener()
         val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_base, NoteDetailFragment.newInstance(noteId!!, accountId = mAccountId))
+        ft.replace(
+            R.id.fragment_base,
+            NoteDetailFragment.newInstance(noteId!!, accountId = mAccountId)
+        )
         ft.commit()
 
 
@@ -94,45 +110,45 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            android.R.id.home ->{
+        when (item.itemId) {
+            android.R.id.home -> {
                 finishAndGoToMainActivity()
             }
-            R.id.nav_add_to_tab ->{
+            R.id.nav_add_to_tab -> {
                 addToTab()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun finishAndGoToMainActivity(){
-        when(mParentActivity){
+    private fun finishAndGoToMainActivity() {
+        when (mParentActivity) {
             Activities.ACTIVITY_OUT_APP -> {
                 val upIntent = Intent(this, MainActivity::class.java)
                 upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                if(shouldUpRecreateTask(upIntent)){
+                if (shouldUpRecreateTask(upIntent)) {
                     TaskStackBuilder.create(this)
                         .addNextIntentWithParentStack(upIntent)
                         .startActivities()
                     finish()
-                }else{
+                } else {
                     navigateUpTo(upIntent)
                 }
             }
-            Activities.ACTIVITY_IN_APP ->{
+            Activities.ACTIVITY_IN_APP -> {
                 finish()
             }
 
             else -> {}
         }
-        if(!mIsMainActive){
+        if (!mIsMainActive) {
             startActivity(Intent(this, MainActivity::class.java))
         }
         finish()
     }
 
 
-    private fun addToTab(){
+    private fun addToTab() {
         val title = getString(R.string.detail)
 
         accountViewModel.addPage(

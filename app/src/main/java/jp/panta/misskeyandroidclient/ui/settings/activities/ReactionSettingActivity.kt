@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.settings.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -19,12 +19,11 @@ import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPickerSettingViewModel
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
-import java.lang.IllegalArgumentException
+import net.pantasystem.milktea.model.setting.ReactionPickerType
 
 class ReactionSettingActivity : AppCompatActivity() {
 
