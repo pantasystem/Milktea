@@ -12,13 +12,6 @@ data class UrlPreviewConfig(
     }
 }
 
-sealed interface Theme {
-    object White : Theme
-    object Black : Theme
-    object Dark : Theme
-    object Bread : Theme
-    companion object
-}
 
 sealed interface RememberVisibility {
     object None : RememberVisibility

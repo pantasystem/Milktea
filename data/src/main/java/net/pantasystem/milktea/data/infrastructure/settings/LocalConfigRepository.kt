@@ -9,24 +9,6 @@ import java.util.regex.Pattern
 
 
 
-fun Theme.toInt(): Int {
-    return when (this) {
-        is Theme.White -> 0
-        is Theme.Black -> 1
-        is Theme.Dark -> 2
-        is Theme.Bread -> 3
-    }
-}
-
-fun Theme.Companion.from(n: Int): Theme {
-    return when (n) {
-        0 -> Theme.White
-        1 -> Theme.Black
-        2 -> Theme.Dark
-        3 -> Theme.Bread
-        else -> DefaultConfig.config.theme
-    }
-}
 
 fun Config.pref(key: Keys): PrefType? {
     return when (key) {
