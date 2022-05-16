@@ -6,75 +6,8 @@ import net.pantasystem.milktea.model.setting.*
 import java.util.regex.Pattern
 
 
-sealed interface PrefType {
-    data class StrPref(
-        val value: String?
-    ) : PrefType
-
-    data class BoolPref(
-        val value: Boolean
-    ) : PrefType
-
-    data class IntPref(
-        val value: Int
-    ) : PrefType
-
-}
 
 
-val Keys.Companion.allKeys by lazy {
-    setOf(
-        Keys.IsSimpleEditorEnabled,
-        Keys.ReactionPickerType,
-        Keys.ReactionPickerType,
-        Keys.BackgroundImage,
-        Keys.ClassicUI,
-        Keys.IsUserNameDefault,
-        Keys.IsPostButtonToBottom,
-        Keys.NoteLimitHeight,
-        Keys.UrlPreviewSourceType,
-        Keys.SummalyServerUrl,
-    )
-}
-
-sealed interface Keys {
-
-    object SummalyServerUrl : Keys
-
-    object IsSimpleEditorEnabled : Keys
-
-    object ReactionPickerType : Keys
-
-    object BackgroundImage : Keys
-    object ClassicUI : Keys
-
-    object IsUserNameDefault : Keys
-
-    object IsPostButtonToBottom : Keys
-
-    object NoteLimitHeight : Keys
-
-    object UrlPreviewSourceType : Keys
-
-    object ThemeType : Keys
-
-    companion object
-}
-
-fun Keys.str(): String {
-    return when (this) {
-        is Keys.BackgroundImage -> "BackgroundImage"
-        is Keys.ClassicUI -> "HIDE_BOTTOM_NAVIGATION"
-        is Keys.IsPostButtonToBottom -> "IS_POST_BUTTON_TO_BOTTOM"
-        is Keys.IsSimpleEditorEnabled -> "IS_SIMPLE_EDITOR_ENABLED"
-        is Keys.IsUserNameDefault -> "IS_USER_NAME_DEFAULT"
-        is Keys.NoteLimitHeight -> "HEIGHT"
-        is Keys.ReactionPickerType -> "ReactionPickerType"
-        is Keys.SummalyServerUrl -> "jp.panta.misskeyandroidclient.model.settings.SUMMALY_SERVER_URL_KEY"
-        is Keys.UrlPreviewSourceType -> "jp.panta.misskeyandroidclient.model.settings.URL_PREVIEW_SOURCE_TYPE"
-        is Keys.ThemeType -> "THEME"
-    }
-}
 
 fun Theme.toInt(): Int {
     return when (this) {
