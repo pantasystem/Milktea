@@ -7,3 +7,8 @@ sealed interface Theme {
     object Bread : Theme
     companion object
 }
+
+
+fun Theme.isNightTheme(): Boolean {
+    return this is Theme.Black || this is Theme.Dark
+}

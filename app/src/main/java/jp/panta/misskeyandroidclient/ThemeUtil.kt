@@ -6,23 +6,28 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import net.pantasystem.milktea.common.getPreferenceName
-import net.pantasystem.milktea.data.infrastructure.KeyStore
+import net.pantasystem.milktea.data.infrastructure.settings.Keys
+import net.pantasystem.milktea.data.infrastructure.settings.from
+import net.pantasystem.milktea.data.infrastructure.settings.str
+import net.pantasystem.milktea.data.infrastructure.settings.toInt
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.Theme
+import net.pantasystem.milktea.model.setting.isNightTheme
 
 fun AppCompatActivity.setTheme(){
     val preference = this.getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
-    val theme = KeyStore.IntKey.values()[preference.getInt(KeyStore.IntKey.THEME.name, KeyStore.IntKey.THEME.default)]
-
-    if(KeyStore.isNightTheme(theme)){
+    val theme = Theme.from(preference.getInt(Keys.ThemeType.str(), DefaultConfig.config.theme.toInt()))
+    if(theme.isNightTheme()){
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
     }else{
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
     }
 
-    when(preference.getInt(KeyStore.IntKey.THEME.name, KeyStore.IntKey.THEME.default)){
-        KeyStore.IntKey.THEME_WHITE.default -> setTheme(R.style.AppTheme)
-        KeyStore.IntKey.THEME_DARK.default -> setTheme(R.style.AppThemeDark)
-        KeyStore.IntKey.THEME_BLACK.default -> setTheme(R.style.AppThemeBlack)
-        KeyStore.IntKey.THEME_BREAD.default -> setTheme(R.style.AppThemeBread)
+    when(theme) {
+        is Theme.Dark -> setTheme(R.style.AppThemeDark)
+        Theme.Black -> setTheme(R.style.AppThemeBlack)
+        Theme.Bread -> setTheme(R.style.AppThemeBread)
+        Theme.White -> setTheme(R.style.AppTheme)
     }
 
 }

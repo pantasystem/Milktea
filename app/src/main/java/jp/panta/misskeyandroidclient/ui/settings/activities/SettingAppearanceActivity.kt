@@ -12,17 +12,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.DriveActivity
+import jp.panta.misskeyandroidclient.MiApplication
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingAppearanceBinding
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.SelectionSharedItem
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.data.infrastructure.KeyStore
+import net.pantasystem.milktea.data.infrastructure.settings.Keys
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.str
+import net.pantasystem.milktea.data.infrastructure.settings.toInt
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.Theme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -48,29 +56,29 @@ class SettingAppearanceActivity : AppCompatActivity() {
         val themeChoices = listOf(
             SelectionSharedItem.Choice(
                 R.string.theme_white,
-                KeyStore.IntKey.THEME_WHITE.default,
+                Theme.White.toInt(),
                 this
             ),
             SelectionSharedItem.Choice(
                 R.string.theme_dark,
-                KeyStore.IntKey.THEME_DARK.default,
+                Theme.Dark.toInt(),
                 this
             ),
             SelectionSharedItem.Choice(
                 R.string.theme_black,
-                KeyStore.IntKey.THEME_BLACK.default,
+                Theme.Black.toInt(),
                 this
             ),
             SelectionSharedItem.Choice(
                 R.string.theme_bread,
-                KeyStore.IntKey.THEME_BREAD.default,
+                Theme.Bread.toInt(),
                 this
             )
         )
         val themeSelection = SelectionSharedItem(
-            KeyStore.IntKey.THEME.name,
+            Keys.ThemeType.str(),
             R.string.theme,
-            KeyStore.IntKey.THEME.default,
+            DefaultConfig.config.theme.toInt(),
             themeChoices,
             this
         )
