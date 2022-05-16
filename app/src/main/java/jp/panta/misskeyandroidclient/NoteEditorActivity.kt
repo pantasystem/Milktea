@@ -614,7 +614,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                     result.data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
 
                 if (changed != null) {
-                    addMentionUserNames(changed.selectedUsers.map { it.getDisplayUserName() })
+                    addMentionUserNames(changed.selectedUserNames)
                 }
 
             }
