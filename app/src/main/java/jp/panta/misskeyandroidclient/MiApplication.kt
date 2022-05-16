@@ -26,8 +26,9 @@ import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
+import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting
+import net.pantasystem.milktea.data.infrastructure.settings.str
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -481,7 +482,7 @@ class MiApplication : Application(), MiCore {
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
-                UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY -> {
+                Keys.UrlPreviewSourceType.str() -> {
                     mAccountStore.state.value.accounts.forEach {
                         getUrlPreviewStore(it, true)
                     }
