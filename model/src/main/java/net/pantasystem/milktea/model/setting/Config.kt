@@ -2,6 +2,8 @@ package net.pantasystem.milktea.model.setting
 
 import net.pantasystem.milktea.model.notes.Visibility
 
+val urlPattern = Regex("""(https)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+
 data class UrlPreviewConfig(
     val type: Type = Type.Misskey
 ) {
