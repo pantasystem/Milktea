@@ -6,8 +6,6 @@ import net.pantasystem.milktea.model.setting.*
 import java.util.regex.Pattern
 
 
-
-
 class LocalConfigRepositoryImpl(
     private val sharedPreference: SharedPreferences
 ) : LocalConfigRepository {
@@ -51,7 +49,12 @@ class LocalConfigRepositoryImpl(
                     DefaultConfig.config.isPostButtonAtTheBottom
                 ),
                 urlPreviewConfig = UrlPreviewConfig(
-                    type = getSourceType(),
+                    type = UrlPreviewConfig.Type.from(
+                        sharedPreference.getInt(
+                            UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY,
+                            UrlPreviewSourceSetting.MISSKEY
+                        ), url = sharedPreference.getString(Keys.SummalyServerUrl.str(), null)
+                    ),
                 ),
                 noteExpandedHeightSize = sharedPreference.getInt(
                     Keys.NoteLimitHeight.str(),
@@ -70,43 +73,13 @@ class LocalConfigRepositoryImpl(
                     old[it.key] == it.value
                 }.map {
                     when (val entry = it.value) {
-                        is PrefType.BoolPref -> putBoolean(it.key, entry.value)
-                        is PrefType.IntPref -> putInt(it.key, entry.value)
-                        is PrefType.StrPref -> putString(it.key, entry.value)
+                        is PrefType.BoolPref -> putBoolean(it.key.str(), entry.value)
+                        is PrefType.IntPref -> putInt(it.key.str(), entry.value)
+                        is PrefType.StrPref -> putString(it.key.str(), entry.value)
                     }
                 }
             }
         }
-    }
-
-    fun getSourceType(): UrlPreviewConfig.Type {
-        val type = sharedPreference.getInt(
-            UrlPreviewSourceSetting.URL_PREVIEW_SOURCE_TYPE_KEY,
-            UrlPreviewSourceSetting.MISSKEY
-        )
-        if (type in UrlPreviewSourceSetting.MISSKEY..UrlPreviewSourceSetting.APP) {
-            return if (type == UrlPreviewSourceSetting.SUMMALY && getSummalyUrl() == null) {
-                return UrlPreviewConfig.Type.SummalyServer(getSummalyUrl()!!)
-            } else if (type == UrlPreviewSourceSetting.APP) {
-                UrlPreviewConfig.Type.InApp
-            } else {
-                UrlPreviewConfig.Type.Misskey
-            }
-
-        } else {
-            return UrlPreviewConfig.Type.Misskey
-        }
-    }
-
-    fun getSummalyUrl(): String? {
-        return sharedPreference.getString(Keys.SummalyServerUrl.str(), null)
-            ?.let { url ->
-                if (urlPattern.matcher(url).find()) {
-                    url
-                } else {
-                    null
-                }
-            }
     }
 
 
