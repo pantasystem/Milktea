@@ -13,7 +13,6 @@ import jp.panta.misskeyandroidclient.ui.settings.SettingAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.Group
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.TextSharedItem
-import net.pantasystem.milktea.data.infrastructure.KeyStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.str
 import net.pantasystem.milktea.model.account.AccountStore
@@ -38,8 +37,8 @@ class SettingMovementActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val includeLocalRenotes = BooleanSharedItem(
-            key = KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name,
-            default = KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.default,
+            key = Keys.IsIncludeLocalRenotes.str(),
+            default = DefaultConfig.config.isIncludeLocalRenotes,
             choiceType = BooleanSharedItem.ChoiceType.SWITCH,
             context = this,
             titleStringRes = R.string.include_local_renotes
@@ -47,16 +46,16 @@ class SettingMovementActivity : AppCompatActivity() {
         )
 
         val includeRenotedMeyNotes = BooleanSharedItem(
-            key = KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name,
-            default = KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.default,
+            key = Keys.IsIncludeRenotedMyNotes.str(),
+            default = DefaultConfig.config.isIncludeRenotedMyNotes,
             choiceType = BooleanSharedItem.ChoiceType.SWITCH,
             context = this,
             titleStringRes = R.string.include_renoted_my_notes
         )
 
         val includeMyRenotes = BooleanSharedItem(
-            key = KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name,
-            default = KeyStore.BooleanKey.INCLUDE_MY_RENOTES.default,
+            key = Keys.IsIncludeMyRenotes.str(),
+            default = DefaultConfig.config.isIncludeMyRenotes,
             choiceType = BooleanSharedItem.ChoiceType.SWITCH,
             context = this,
             titleStringRes = R.string.include_my_renotes

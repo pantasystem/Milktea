@@ -48,7 +48,19 @@ class ConfigKtTest {
                 Keys.ThemeType -> Assert.assertEquals(
                     (config.theme.toInt()), (u as PrefType.IntPref).value
                 )
-                Keys.UrlPreviewSourceType -> Assert.assertEquals(config.urlPreviewConfig.type.toInt(), (u as PrefType.IntPref).value)
+                Keys.UrlPreviewSourceType -> Assert.assertEquals(
+                    config.urlPreviewConfig.type.toInt(),
+                    (u as PrefType.IntPref).value
+                )
+                Keys.IsIncludeLocalRenotes -> Assert.assertEquals(
+                    config.isIncludeLocalRenotes, (u as PrefType.BoolPref).value
+                )
+                Keys.IsIncludeMyRenotes -> Assert.assertEquals(
+                    config.isIncludeMyRenotes, (u as PrefType.BoolPref).value
+                )
+                Keys.IsIncludeRenotedMyNotes -> Assert.assertEquals(
+                    config.isIncludeRenotedMyNotes, (u as PrefType.BoolPref).value
+                )
             }
         }
     }

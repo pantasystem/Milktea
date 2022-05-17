@@ -38,7 +38,10 @@ data class Config(
     val isPostButtonAtTheBottom: Boolean,
     val urlPreviewConfig: UrlPreviewConfig,
     val noteExpandedHeightSize: Int,
-    val theme: Theme
+    val theme: Theme,
+    val isIncludeMyRenotes: Boolean,
+    val isIncludeRenotedMyNotes: Boolean,
+    val isIncludeLocalRenotes: Boolean,
 ) {
     companion object
 }
@@ -53,7 +56,10 @@ object DefaultConfig {
         isPostButtonAtTheBottom = true,
         urlPreviewConfig = UrlPreviewConfig(UrlPreviewConfig.Type.Misskey),
         noteExpandedHeightSize = 300,
-        theme = Theme.White
+        theme = Theme.White,
+        isIncludeLocalRenotes = true,
+        isIncludeMyRenotes = true,
+        isIncludeRenotedMyNotes = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

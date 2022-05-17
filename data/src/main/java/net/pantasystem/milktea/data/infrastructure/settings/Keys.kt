@@ -12,6 +12,9 @@ val Keys.Companion.allKeys by lazy {
         Keys.NoteLimitHeight,
         Keys.UrlPreviewSourceType,
         Keys.SummalyServerUrl,
+        Keys.IsIncludeLocalRenotes,
+        Keys.IsIncludeRenotedMyNotes,
+        Keys.IsIncludeMyRenotes,
     )
 }
 
@@ -36,6 +39,10 @@ sealed interface Keys {
 
     object ThemeType : Keys
 
+    object IsIncludeMyRenotes : Keys
+    object IsIncludeRenotedMyNotes : Keys
+    object IsIncludeLocalRenotes : Keys
+
     companion object
 }
 
@@ -51,5 +58,8 @@ fun Keys.str(): String {
         is Keys.SummalyServerUrl -> "jp.panta.misskeyandroidclient.model.settings.SUMMALY_SERVER_URL_KEY"
         is Keys.UrlPreviewSourceType -> "jp.panta.misskeyandroidclient.model.settings.URL_PREVIEW_SOURCE_TYPE"
         is Keys.ThemeType -> "THEME"
+        is Keys.IsIncludeMyRenotes -> "INCLUDE_MY_RENOTES"
+        is Keys.IsIncludeLocalRenotes -> "INCLUDE_LOCAL_RENOTES"
+        is Keys.IsIncludeRenotedMyNotes -> "INCLUDE_RENOTED_MY_NOTES"
     }
 }

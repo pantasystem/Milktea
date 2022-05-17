@@ -1,10 +1,8 @@
 @file:Suppress("DEPRECATION")
 package jp.panta.misskeyandroidclient.ui.notes.view
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
-
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -13,18 +11,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
-import net.pantasystem.milktea.data.infrastructure.KeyStore
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
 
+@AndroidEntryPoint
 class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
 
@@ -38,16 +39,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
         val miApp = context?.applicationContext as MiApplication
 
-        val sharedPreferences = requireContext().getSharedPreferences(
-            requireContext().getPreferenceName(),
-            Context.MODE_PRIVATE
-        )
-        val includeMyRenotes =
-            sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_MY_RENOTES.name, true)
-        val includeRenotedMyNotes =
-            sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_RENOTED_MY_NOTES.name, true)
-        val includeLocalRenotes =
-            sharedPreferences.getBoolean(KeyStore.BooleanKey.INCLUDE_LOCAL_RENOTES.name, true)
 
         mPagerAdapter = binding.viewPager.adapter as? TimelinePagerAdapter
         if (mPagerAdapter == null) {
@@ -55,9 +46,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
             binding.viewPager.adapter = mPagerAdapter
         }
 
-
-
-        Log.d("TabFragment", "設定:$includeLocalRenotes, $includeRenotedMyNotes, $includeMyRenotes")
         miApp.getAccountStore().observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
             .onEach { account ->
                 val pages = account.pages

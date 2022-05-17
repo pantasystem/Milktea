@@ -54,6 +54,15 @@ fun Config.pref(key: Keys): PrefType? {
         Keys.ThemeType -> {
             PrefType.IntPref(theme.toInt())
         }
+        Keys.IsIncludeLocalRenotes -> {
+            PrefType.BoolPref(isIncludeLocalRenotes)
+        }
+        Keys.IsIncludeMyRenotes -> {
+            PrefType.BoolPref(isIncludeMyRenotes)
+        }
+        Keys.IsIncludeRenotedMyNotes -> {
+            PrefType.BoolPref(isIncludeRenotedMyNotes)
+        }
     }
 }
 

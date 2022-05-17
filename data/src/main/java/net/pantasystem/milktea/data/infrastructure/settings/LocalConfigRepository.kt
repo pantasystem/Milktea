@@ -1,5 +1,3 @@
-
-
 package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
@@ -68,7 +66,19 @@ class LocalConfigRepositoryImpl(
                     Keys.NoteLimitHeight.str(),
                     DefaultConfig.config.noteExpandedHeightSize
                 ),
-                theme = Theme.from(sharedPreference.getInt(Keys.ThemeType.str(), 0))
+                theme = Theme.from(sharedPreference.getInt(Keys.ThemeType.str(), 0)),
+                isIncludeRenotedMyNotes = sharedPreference.getBoolean(
+                    Keys.IsIncludeRenotedMyNotes.str(),
+                    DefaultConfig.config.isIncludeRenotedMyNotes
+                ),
+                isIncludeMyRenotes = sharedPreference.getBoolean(
+                    Keys.IsIncludeMyRenotes.str(),
+                    DefaultConfig.config.isIncludeMyRenotes
+                ),
+                isIncludeLocalRenotes = sharedPreference.getBoolean(
+                    Keys.IsIncludeLocalRenotes.str(),
+                    DefaultConfig.config.isIncludeLocalRenotes
+                )
             )
         }
     }
@@ -165,6 +175,7 @@ class LocalConfigRepositoryImpl(
     }
 
 }
+
 @Suppress("ObjectLiteralToLambda")
 private fun SharedPreferences.asFlow(initialEvent: String? = null): Flow<String> {
     return channelFlow {
