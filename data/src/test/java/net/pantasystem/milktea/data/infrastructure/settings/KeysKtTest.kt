@@ -40,7 +40,25 @@ class KeysKtTest {
                     "jp.panta.misskeyandroidclient.model.settings.URL_PREVIEW_SOURCE_TYPE",
                     key.str()
                 )
+                Keys.IsIncludeLocalRenotes -> Assert.assertEquals(
+                    "INCLUDE_LOCAL_RENOTES",
+                    key.str()
+                )
+                Keys.IsIncludeMyRenotes -> Assert.assertEquals("INCLUDE_MY_RENOTES", key.str())
+                Keys.IsIncludeRenotedMyNotes -> Assert.assertEquals(
+                    "INCLUDE_RENOTED_MY_NOTES",
+                    key.str()
+                )
             }
         }
     }
+
+
+    @Test
+    fun checkAllKeysCount() {
+        Assert.assertEquals(12, Keys.allKeys.size)
+        Assert.assertEquals(12, Keys.allKeys.map { it.str() }.toSet().size)
+    }
+
+
 }

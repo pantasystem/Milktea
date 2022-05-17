@@ -4,7 +4,6 @@ val Keys.Companion.allKeys by lazy {
     setOf(
         Keys.IsSimpleEditorEnabled,
         Keys.ReactionPickerType,
-        Keys.ReactionPickerType,
         Keys.BackgroundImage,
         Keys.ClassicUI,
         Keys.IsUserNameDefault,
