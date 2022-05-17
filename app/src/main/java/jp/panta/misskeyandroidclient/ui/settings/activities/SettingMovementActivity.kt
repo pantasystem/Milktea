@@ -82,9 +82,10 @@ class SettingMovementActivity : AppCompatActivity() {
                 mutableStateOf(configState)
             }
 
-            val rv: RememberVisibility by accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-                localConfigRepository.observeRememberVisibility(it.accountId)
-            }.collectAsState(initial = RememberVisibility.None)
+            val rv: RememberVisibility by accountStore.observeCurrentAccount.filterNotNull()
+                .flatMapLatest {
+                    localConfigRepository.observeRememberVisibility(it.accountId)
+                }.collectAsState(initial = RememberVisibility.None)
 
             val scope = rememberCoroutineScope()
 
@@ -207,7 +208,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 SwitchTile(
                                     checked = rv is RememberVisibility.Remember,
                                     onChanged = {
-                                         val config = if (it) {
+                                        val config = if (it) {
                                             DefaultConfig.getRememberVisibilityConfig(currentAccount!!.accountId)
                                         } else {
                                             RememberVisibility.None
