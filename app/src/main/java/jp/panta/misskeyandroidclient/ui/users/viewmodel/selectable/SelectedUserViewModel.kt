@@ -42,7 +42,7 @@ class SelectedUserViewModel(
         val selected: List<User.Id>,
         val added: List<User.Id>,
         val removed: List<User.Id>,
-        val selectedUsers: List<User>
+        val selectedUserNames: List<String>,
     ) : Serializable
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -144,9 +144,7 @@ class SelectedUserViewModel(
             it.userId
         }?: emptyList()
 
-        val selectedUsers = selectedUsersViewData.value?.mapNotNull {
-            it.user.value
-        } ?: emptyList<User>()
+        val selectedUsers = selectedUserList.value
 
 
 
@@ -157,6 +155,8 @@ class SelectedUserViewModel(
         val removed = exSelected.filter{ ex ->
             !selected.contains(ex)
         }
-        return ChangedDiffResult(selected.filterNotNull().toList(), added.filterNotNull(), removed, selectedUsers)
+        return ChangedDiffResult(selected.filterNotNull().toList(), added.filterNotNull(), removed, selectedUsers.map {
+            it.getDisplayUserName()
+        })
     }
 }

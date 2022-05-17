@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.settings.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.ActivityPageSettingBinding
-import net.pantasystem.milktea.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.settings.page.EditTabNameDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PagesAdapter
@@ -22,6 +21,7 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewM
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.account.page.PageType
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -140,7 +140,7 @@ class PageSettingActivity : AppCompatActivity() {
         if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE || requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE){
             if(resultCode == RESULT_OK && data != null){
                 val changeDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as SelectedUserViewModel.ChangedDiffResult
-                val userId = changeDiff.selectedUsers.firstOrNull()?.id?.id
+                val userId = changeDiff.selected.firstOrNull()?.id
                 if(userId != null) {
                     if(resultCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
                         mPageSettingViewModel.addUsersGalleryById(userId)

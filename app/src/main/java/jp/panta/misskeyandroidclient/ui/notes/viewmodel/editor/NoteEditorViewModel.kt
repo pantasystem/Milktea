@@ -29,6 +29,7 @@ import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -39,6 +40,7 @@ class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val miCore: MiCore,
     private val noteRepository: NoteRepository,
+    private val userRepository: UserRepository,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
@@ -221,6 +223,18 @@ class NoteEditorViewModel @Inject constructor(
             _state.value = _state.value.setVisibility(v)
 
         }.launchIn(viewModelScope + Dispatchers.IO)
+        // NOTE: replyIdが入ったとき対象のユーザーを
+        _state.map {
+            it.replyId
+        }.distinctUntilChanged().filterNotNull().map {
+            noteRepository.find(it)
+        }.map {
+            userRepository.find(it.userId)
+        }.onEach { note ->
+            _state.update { state ->
+                state.addMentionUserNames(listOf(note.getDisplayUserName()), 0).state
+            }
+        }.launchIn(viewModelScope)
 
     }
 
@@ -397,13 +411,6 @@ class NoteEditorViewModel @Inject constructor(
     }
 
 
-    fun addMentionUsers(users: List<User>, pos: Int): Int {
-        val userNames = users.map {
-            it.getDisplayUserName()
-        }
-        return addMentionUserNames(userNames, pos)
-    }
-
     fun addMentionUserNames(userNames: List<String>, pos: Int): Int {
         val result = _state.value.addMentionUserNames(userNames, pos)
         _state.value = result.state
@@ -480,10 +487,10 @@ class NoteEditorViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     @FlowPreview
     fun canSaveDraft(): Boolean {
-        return !(_state.value.text.isNullOrBlank()
-                && files.value.isNullOrEmpty()
-                && poll.value?.choices.isNullOrEmpty()
-                && address.value.isNullOrEmpty())
+        return !_state.value.text.isNullOrBlank()
+                || !files.value.isNullOrEmpty()
+                || !poll.value?.choices.isNullOrEmpty()
+                || address.value.isNotEmpty()
     }
 
 

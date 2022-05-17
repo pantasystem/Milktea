@@ -428,7 +428,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
                 if (changed != null) {
                     val pos = mBinding.inputMainText.selectionEnd
-                    mViewModel.addMentionUsers(changed.selectedUsers, pos).let { newPos ->
+                    mViewModel.addMentionUserNames(changed.selectedUserNames, pos).let { newPos ->
                         mBinding.inputMainText.setText(mViewModel.text.value ?: "")
                         mBinding.inputMainText.setSelection(newPos)
                     }
