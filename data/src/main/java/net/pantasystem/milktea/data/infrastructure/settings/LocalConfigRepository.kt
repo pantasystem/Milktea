@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
-import net.pantasystem.milktea.model.setting.*
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.setting.RememberVisibility
 
 
 class LocalConfigRepositoryImpl(
@@ -20,66 +23,7 @@ class LocalConfigRepositoryImpl(
 
     override fun get(): Result<Config> {
         return runCatching {
-            Config(
-                isSimpleEditorEnabled = sharedPreference.getBoolean(
-                    Keys.IsSimpleEditorEnabled.str(), DefaultConfig.config.isSimpleEditorEnabled,
-                ),
-                reactionPickerType = sharedPreference.getInt(Keys.ReactionPickerType.str(), 0)
-                    .let {
-                        when (it) {
-                            0 -> {
-                                ReactionPickerType.LIST
-                            }
-                            1 -> {
-                                ReactionPickerType.SIMPLE
-                            }
-                            else -> {
-                                DefaultConfig.config.reactionPickerType
-                            }
-                        }
-                    },
-                backgroundImagePath = sharedPreference.getString(
-                    Keys.BackgroundImage.str(),
-                    DefaultConfig.config.backgroundImagePath
-                ),
-                isClassicUI = sharedPreference.getBoolean(
-                    Keys.ClassicUI.str(),
-                    DefaultConfig.config.isClassicUI
-                ),
-                isUserNameDefault = sharedPreference.getBoolean(
-                    Keys.IsUserNameDefault.str(),
-                    DefaultConfig.config.isUserNameDefault
-                ),
-                isPostButtonAtTheBottom = sharedPreference.getBoolean(
-                    Keys.IsPostButtonToBottom.str(),
-                    DefaultConfig.config.isPostButtonAtTheBottom
-                ),
-                urlPreviewConfig = UrlPreviewConfig(
-                    type = UrlPreviewConfig.Type.from(
-                        sharedPreference.getInt(
-                            Keys.UrlPreviewSourceType.str(),
-                            UrlPreviewSourceSetting.MISSKEY
-                        ), url = sharedPreference.getString(Keys.SummalyServerUrl.str(), null)
-                    ),
-                ),
-                noteExpandedHeightSize = sharedPreference.getInt(
-                    Keys.NoteLimitHeight.str(),
-                    DefaultConfig.config.noteExpandedHeightSize
-                ),
-                theme = Theme.from(sharedPreference.getInt(Keys.ThemeType.str(), 0)),
-                isIncludeRenotedMyNotes = sharedPreference.getBoolean(
-                    Keys.IsIncludeRenotedMyNotes.str(),
-                    DefaultConfig.config.isIncludeRenotedMyNotes
-                ),
-                isIncludeMyRenotes = sharedPreference.getBoolean(
-                    Keys.IsIncludeMyRenotes.str(),
-                    DefaultConfig.config.isIncludeMyRenotes
-                ),
-                isIncludeLocalRenotes = sharedPreference.getBoolean(
-                    Keys.IsIncludeLocalRenotes.str(),
-                    DefaultConfig.config.isIncludeLocalRenotes
-                )
-            )
+            Config.from(sharedPreference.getPrefTypes())
         }
     }
 

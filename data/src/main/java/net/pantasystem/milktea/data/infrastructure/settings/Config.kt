@@ -1,5 +1,8 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package net.pantasystem.milktea.data.infrastructure.settings
 
+import android.content.SharedPreferences
 import net.pantasystem.milktea.model.setting.*
 
 fun RememberVisibility.Keys.str(): String {
@@ -10,7 +13,78 @@ fun RememberVisibility.Keys.str(): String {
     }
 }
 
+fun SharedPreferences.getPrefTypes(keys: Set<Keys> = Keys.allKeys): Map<Keys, PrefType?> {
+    val strKeys = keys.associateBy { it.str() }
+    return all.filter {
+        strKeys.contains(it.key)
+    }.map {
+        strKeys[it.key]?.let { key ->
+            key to it.value?.let { value ->
+                when(value::class) {
+                    Boolean::class -> {
+                        PrefType.BoolPref(value as Boolean)
+                    }
+                    String::class -> {
+                        PrefType.StrPref(value as String)
+                    }
+                    Int::class -> {
+                        PrefType.IntPref(value as Int)
+                    }
+                    else -> null
+                }
+            }
+        }
+    }.filterNotNull().toMap()
+}
 
+fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
+    return Config(
+        isSimpleEditorEnabled = map.getValue<PrefType.BoolPref>(Keys.IsSimpleEditorEnabled)?.value
+            ?: DefaultConfig.config.isSimpleEditorEnabled,
+        reactionPickerType = (map.getValue<PrefType.IntPref>(Keys.ReactionPickerType)?.value)
+            .let {
+                when (it) {
+                    0 -> {
+                        ReactionPickerType.LIST
+                    }
+                    1 -> {
+                        ReactionPickerType.SIMPLE
+                    }
+                    else -> {
+                        DefaultConfig.config.reactionPickerType
+                    }
+                }
+            },
+        backgroundImagePath = map.getValue<PrefType.StrPref>(Keys.BackgroundImage)?.value
+            ?: DefaultConfig.config.backgroundImagePath,
+        isClassicUI = map.getValue<PrefType.BoolPref>(Keys.ClassicUI)?.value
+            ?: DefaultConfig.config.isClassicUI,
+        isUserNameDefault = map.getValue<PrefType.BoolPref>(Keys.IsUserNameDefault)?.value
+            ?: DefaultConfig.config.isUserNameDefault,
+        isPostButtonAtTheBottom = map.getValue<PrefType.BoolPref>(Keys.IsPostButtonToBottom)?.value
+            ?: DefaultConfig.config.isPostButtonAtTheBottom,
+        urlPreviewConfig = UrlPreviewConfig(
+            type = UrlPreviewConfig.Type.from(
+                map.getValue<PrefType.IntPref>(Keys.UrlPreviewSourceType)?.value
+                    ?: UrlPreviewSourceSetting.MISSKEY,
+                url = map.getValue<PrefType.StrPref>(Keys.SummalyServerUrl)?.value
+            ),
+        ),
+        noteExpandedHeightSize = map.getValue<PrefType.IntPref>(Keys.NoteLimitHeight)?.value
+            ?: DefaultConfig.config.noteExpandedHeightSize,
+        theme = Theme.from(map.getValue<PrefType.IntPref>(Keys.ThemeType)?.value ?: 0),
+        isIncludeRenotedMyNotes = map.getValue<PrefType.BoolPref>(Keys.IsIncludeRenotedMyNotes)?.value
+            ?: DefaultConfig.config.isIncludeMyRenotes,
+        isIncludeMyRenotes = map.getValue<PrefType.BoolPref>(Keys.IsIncludeMyRenotes)?.value
+            ?: DefaultConfig.config.isIncludeMyRenotes,
+        isIncludeLocalRenotes = map.getValue<PrefType.BoolPref>(Keys.IsIncludeLocalRenotes)?.value
+            ?: DefaultConfig.config.isIncludeLocalRenotes
+    )
+}
+
+private fun <T : PrefType?> Map<Keys, PrefType?>.getValue(key: Keys): T? {
+    return this[key] as? T
+}
 
 fun Config.pref(key: Keys): PrefType? {
     return when (key) {
