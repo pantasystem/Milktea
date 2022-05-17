@@ -5,6 +5,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme
@@ -15,11 +16,18 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.TextSharedItem
 import net.pantasystem.milktea.data.infrastructure.KeyStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.str
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.RememberVisibility
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingMovementActivity : AppCompatActivity() {
 
     lateinit var mBinding: ActivitySettingsBinding
+
+    @Inject
+    lateinit var accountStore: AccountStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,22 +88,24 @@ class SettingMovementActivity : AppCompatActivity() {
         )
 
 
+        val learnNoteVisibility = accountStore.currentAccountId?.let {
+            BooleanSharedItem(
+                key = RememberVisibility.Keys.IsRememberNoteVisibility.str(),
+                default = true,
+                choiceType = BooleanSharedItem.ChoiceType.SWITCH,
+                context = this,
+                titleStringRes = R.string.learn_note_visibility
+            )
+        }
 
 
-        val learnNoteVisibility = BooleanSharedItem(
-            key = KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.name,
-            default = KeyStore.BooleanKey.IS_LEARN_NOTE_VISIBILITY.default,
-            choiceType = BooleanSharedItem.ChoiceType.SWITCH,
-            context = this,
-            titleStringRes = R.string.learn_note_visibility
-        )
-
-        val postGroup = Group(
-            titleStringRes = R.string.post,
-            items = listOf(learnNoteVisibility),
-            context = this
-        )
-
+        val postGroup = learnNoteVisibility?.let {
+            Group(
+                titleStringRes = R.string.post,
+                items = listOf(learnNoteVisibility),
+                context = this
+            )
+        }
         val adapter = SettingAdapter(this)
         mBinding.settingList.adapter = adapter
         mBinding.settingList.layoutManager = LinearLayoutManager(this)
