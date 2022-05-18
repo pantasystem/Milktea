@@ -15,6 +15,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsIncludeRenotedMyNotes,
         Keys.IsIncludeMyRenotes,
         Keys.SurfaceColorOpacity,
+        Keys.ThemeType
     )
 }
 
