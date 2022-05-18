@@ -11,6 +11,14 @@ class ConfigKtTest {
 
 
     @Test
+    fun allKeys() {
+        Assert.assertEquals(
+            Keys::class.nestedClasses.map { it.simpleName }.filterNot { it == "Companion" }.toSet(),
+            Keys.allKeys.map { it::class }.map { it.simpleName }.toSet()
+        )
+    }
+
+    @Test
     fun prefs() {
         val config = DefaultConfig.config.copy(
             theme = Theme.Bread,
