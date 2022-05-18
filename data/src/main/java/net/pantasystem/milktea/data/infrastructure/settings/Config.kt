@@ -78,7 +78,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isIncludeMyRenotes = map.getValue<PrefType.BoolPref>(Keys.IsIncludeMyRenotes)?.value
             ?: DefaultConfig.config.isIncludeMyRenotes,
         isIncludeLocalRenotes = map.getValue<PrefType.BoolPref>(Keys.IsIncludeLocalRenotes)?.value
-            ?: DefaultConfig.config.isIncludeLocalRenotes
+            ?: DefaultConfig.config.isIncludeLocalRenotes,
+        surfaceColorOpacity = map.getValue<PrefType.IntPref>(Keys.SurfaceColorOpacity)?.value
+            ?: DefaultConfig.config.surfaceColorOpacity
     )
 }
 
@@ -136,6 +138,9 @@ fun Config.pref(key: Keys): PrefType? {
         }
         Keys.IsIncludeRenotedMyNotes -> {
             PrefType.BoolPref(isIncludeRenotedMyNotes)
+        }
+        Keys.SurfaceColorOpacity -> {
+            PrefType.IntPref(surfaceColorOpacity)
         }
     }
 }

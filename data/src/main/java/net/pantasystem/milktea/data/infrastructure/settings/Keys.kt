@@ -14,6 +14,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsIncludeLocalRenotes,
         Keys.IsIncludeRenotedMyNotes,
         Keys.IsIncludeMyRenotes,
+        Keys.SurfaceColorOpacity,
     )
 }
 
@@ -41,6 +42,7 @@ sealed interface Keys {
     object IsIncludeMyRenotes : Keys
     object IsIncludeRenotedMyNotes : Keys
     object IsIncludeLocalRenotes : Keys
+    object SurfaceColorOpacity : Keys
 
     companion object
 }
@@ -60,5 +62,6 @@ fun Keys.str(): String {
         is Keys.IsIncludeMyRenotes -> "INCLUDE_MY_RENOTES"
         is Keys.IsIncludeLocalRenotes -> "INCLUDE_LOCAL_RENOTES"
         is Keys.IsIncludeRenotedMyNotes -> "INCLUDE_RENOTED_MY_NOTES"
+        is Keys.SurfaceColorOpacity -> "jp.panta.misskeyandroidclient.model.settings.SURFACE_COLOR_OPAQUE_KEY"
     }
 }

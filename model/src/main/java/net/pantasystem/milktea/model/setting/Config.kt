@@ -42,6 +42,7 @@ data class Config(
     val isIncludeMyRenotes: Boolean,
     val isIncludeRenotedMyNotes: Boolean,
     val isIncludeLocalRenotes: Boolean,
+    val surfaceColorOpacity: Int,
 ) {
     companion object
 }
@@ -60,6 +61,7 @@ object DefaultConfig {
         isIncludeLocalRenotes = true,
         isIncludeMyRenotes = true,
         isIncludeRenotedMyNotes = true,
+        surfaceColorOpacity = 0xff,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

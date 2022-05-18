@@ -49,6 +49,10 @@ class KeysKtTest {
                     "INCLUDE_RENOTED_MY_NOTES",
                     key.str()
                 )
+                Keys.SurfaceColorOpacity -> Assert.assertEquals(
+                    "jp.panta.misskeyandroidclient.model.settings.SURFACE_COLOR_OPAQUE_KEY",
+                    key.str()
+                )
             }
         }
     }
@@ -56,8 +60,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(12, Keys.allKeys.size)
-        Assert.assertEquals(12, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(13, Keys.allKeys.size)
+        Assert.assertEquals(13, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
