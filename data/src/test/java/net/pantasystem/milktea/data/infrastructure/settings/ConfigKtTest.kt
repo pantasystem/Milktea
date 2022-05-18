@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
+import net.pantasystem.milktea.model.setting.Config
 import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.UrlPreviewConfig
 import org.junit.Assert
 import org.junit.Test
@@ -10,7 +12,18 @@ class ConfigKtTest {
 
     @Test
     fun prefs() {
-        val config = DefaultConfig.config
+        val config = DefaultConfig.config.copy(
+            theme = Theme.Bread,
+            surfaceColorOpacity = 250,
+            isClassicUI = true,
+            isPostButtonAtTheBottom = false,
+            isUserNameDefault = false,
+            isSimpleEditorEnabled = true,
+            isIncludeMyRenotes = false,
+            isIncludeRenotedMyNotes = false,
+            isIncludeLocalRenotes = false,
+        )
+        Assert.assertNotNull(config.prefs()[Keys.ThemeType])
         config.prefs().forEach { (k, u) ->
             when (k) {
                 Keys.BackgroundImage -> Assert.assertEquals(
@@ -61,7 +74,22 @@ class ConfigKtTest {
                 Keys.IsIncludeRenotedMyNotes -> Assert.assertEquals(
                     config.isIncludeRenotedMyNotes, (u as PrefType.BoolPref).value
                 )
+                Keys.SurfaceColorOpacity -> Assert.assertEquals(
+                    config.surfaceColorOpacity, (u as PrefType.IntPref).value
+                )
             }
         }
+    }
+
+    @Test
+    fun from() {
+        Assert.assertEquals(
+            Theme.Bread, Config.from(
+                mapOf(
+                    Keys.ThemeType to PrefType.IntPref(Theme.Bread.toInt())
+                )
+            ).theme
+        )
+
     }
 }
