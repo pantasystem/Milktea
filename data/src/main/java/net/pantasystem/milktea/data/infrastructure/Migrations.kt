@@ -72,6 +72,7 @@ val MIGRATION_4_5 = object : Migration(4, 5){
     }
 }
 
+@Suppress("DEPRECATION")
 class AccountMigration(private val accountDao: AccountDao, private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository, private val sharedPreferences: SharedPreferences){
 
     suspend fun executeMigrate(){

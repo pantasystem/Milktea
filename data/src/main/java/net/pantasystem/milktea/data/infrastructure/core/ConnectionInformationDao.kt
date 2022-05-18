@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import java.util.*
 
+@Suppress("DEPRECATION")
 @Dao
 @Deprecated("model.accountへ移行")
 abstract class ConnectionInformationDao{
