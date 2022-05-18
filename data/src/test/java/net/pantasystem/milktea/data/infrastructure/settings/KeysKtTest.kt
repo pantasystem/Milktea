@@ -60,8 +60,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(13, Keys.allKeys.size)
-        Assert.assertEquals(13, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(14, Keys.allKeys.size)
+        Assert.assertEquals(14, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
