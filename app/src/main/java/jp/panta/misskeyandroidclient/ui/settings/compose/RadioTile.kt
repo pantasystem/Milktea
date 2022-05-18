@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.settings.compose
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
@@ -14,7 +15,8 @@ fun RadioTile(selected: Boolean, onClick: () -> Unit, title: @Composable RowScop
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onClick.invoke() },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

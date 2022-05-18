@@ -73,6 +73,7 @@ class SettingMovementActivity : AppCompatActivity() {
 
 
             LaunchedEffect(key1 = currentConfigState) {
+                Log.d("SettingMovementActivity", "save:$currentConfigState")
                 localConfigRepository.save(
                     currentConfigState
                 ).onFailure {
@@ -101,9 +102,10 @@ class SettingMovementActivity : AppCompatActivity() {
                     ) {
 
                         item {
-                            SettingTitleTile(text = stringResource(id = R.string.timeline))
                         }
                         item {
+                            SettingTitleTile(text = stringResource(id = R.string.timeline))
+
                             SwitchTile(
                                 checked = currentConfigState.isIncludeLocalRenotes,
                                 onChanged = {
@@ -112,8 +114,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }) {
                                 Text(text = stringResource(id = R.string.include_local_renotes))
                             }
-                        }
-                        item {
+
                             SwitchTile(
                                 checked = currentConfigState.isIncludeRenotedMyNotes,
                                 onChanged = {
@@ -122,8 +123,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }) {
                                 Text(text = stringResource(id = R.string.include_renoted_my_notes))
                             }
-                        }
-                        item {
+
                             SwitchTile(
                                 checked = currentConfigState.isIncludeMyRenotes,
                                 onChanged = {
@@ -132,11 +132,11 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }) {
                                 Text(text = stringResource(id = R.string.include_my_renotes))
                             }
+                            SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
+
                         }
 
-                        item {
-                            SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
-                        }
+
                         item {
                             Column(
                                 modifier = Modifier
