@@ -101,7 +101,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
             LaunchedEffect(key1 = currentConfigState) {
                 localConfigRepository.save(currentConfigState).onFailure {
-                    Log.d("SettingAppearanceActivity", "save error", it)
+                    Log.d("SettingAppearance", "save error", it)
                 }
             }
             MdcTheme {
