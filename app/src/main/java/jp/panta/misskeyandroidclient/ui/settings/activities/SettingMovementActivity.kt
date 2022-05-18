@@ -102,8 +102,6 @@ class SettingMovementActivity : AppCompatActivity() {
                     ) {
 
                         item {
-                        }
-                        item {
                             SettingTitleTile(text = stringResource(id = R.string.timeline))
 
                             SwitchTile(
@@ -134,10 +132,6 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                             SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
 
-                        }
-
-
-                        item {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -160,12 +154,9 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
 
-
                         if (currentAccount != null) {
                             item {
                                 SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
-                            }
-                            item {
                                 SwitchTile(
                                     checked = rv is RememberVisibility.Remember,
                                     onChanged = {
@@ -184,7 +175,6 @@ class SettingMovementActivity : AppCompatActivity() {
                                     )
                                 }
                             }
-
                         }
                     }
                 }
