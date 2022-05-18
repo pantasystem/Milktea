@@ -24,38 +24,41 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
-import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
+import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TabFragment
+import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.ui.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
+import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
+import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import jp.panta.misskeyandroidclient.viewmodel.timeline.SuitableType
 import jp.panta.misskeyandroidclient.viewmodel.timeline.suitableType
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.plus
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.account.Account
@@ -132,7 +135,8 @@ class MainActivity : AppCompatActivity() {
         ActionNoteHandler(
             this,
             mNotesViewModel,
-            ViewModelProvider(this)[ConfirmViewModel::class.java]
+            ViewModelProvider(this)[ConfirmViewModel::class.java],
+            settingStore,
         ).initViewModelListener()
 
 

@@ -28,7 +28,6 @@ class TimelineViewModel(
     val accountId: Long? = account?.accountId,
     val pageable: Pageable,
     val miCore: MiCore,
-    val settingStore: SettingStore,
     val include: NoteRequest.Include
 ) : ViewModel() {
 

@@ -1,20 +1,20 @@
 package jp.panta.misskeyandroidclient
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
-import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.account.page.Pageable
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -23,6 +23,9 @@ class FavoriteActivity : AppCompatActivity() {
     lateinit var mBinding: ActivityFavoriteBinding
 
     val notesViewModel by viewModels<NotesViewModel>()
+
+    @Inject
+    lateinit var settingStore: SettingStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +36,12 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
 
-        ActionNoteHandler(this, notesViewModel, ViewModelProvider(this)[ConfirmViewModel::class.java]).initViewModelListener()
+        ActionNoteHandler(
+            this,
+            notesViewModel,
+            ViewModelProvider(this)[ConfirmViewModel::class.java],
+            settingStore
+        ).initViewModelListener()
         val fragment = TimelineFragment.newInstance(
             Pageable.Favorite
         )
@@ -46,7 +54,7 @@ class FavoriteActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)

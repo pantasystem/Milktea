@@ -8,6 +8,18 @@ class BooleanSharedPreferenceLiveData(
     private val key: String,
     private val default: Boolean
 ) : MutableLiveData<Boolean>(){
+
+
+
+    override fun onActive() {
+        super.onActive()
+
+
+    }
+
+    override fun onInactive() {
+        super.onInactive()
+    }
     override fun setValue(value: Boolean) {
         super.setValue(value)
 

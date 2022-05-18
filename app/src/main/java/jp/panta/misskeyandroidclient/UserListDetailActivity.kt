@@ -4,34 +4,35 @@ package jp.panta.misskeyandroidclient
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
-import net.pantasystem.milktea.model.list.UserList
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
-import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
+import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
+import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.list.UserList
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -62,6 +63,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
     private val accountViewModel: AccountViewModel by viewModels()
 
+    @Inject lateinit var settingStore: SettingStore
+
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -91,7 +94,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         ActionNoteHandler(
             this,
             notesViewModel,
-            ViewModelProvider(this)[ConfirmViewModel::class.java]
+            ViewModelProvider(this)[ConfirmViewModel::class.java],
+            settingStore
         ).initViewModelListener()
 
         binding.userListDetailViewPager.adapter = PagerAdapter(listId)

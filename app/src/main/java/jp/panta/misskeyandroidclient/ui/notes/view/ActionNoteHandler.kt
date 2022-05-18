@@ -1,23 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.notes.view
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.*
-import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmEvent
-import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
-import net.pantasystem.milktea.data.infrastructure.settings.ReactionPickerType
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.report.Report
-import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
@@ -25,29 +12,34 @@ import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInpu
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.renote.RenotesBottomSheetDialog
-import jp.panta.misskeyandroidclient.ui.users.ReportDialog
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.SelectedReaction
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import jp.panta.misskeyandroidclient.ui.users.ReportDialog
+import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmEvent
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.setting.ReactionPickerType
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.Report
+
 
 class ActionNoteHandler(
     val activity: AppCompatActivity,
     val mNotesViewModel: NotesViewModel,
-    val confirmViewModel: ConfirmViewModel
-) {
-    private val settingStore = SettingStore(
-        activity.getSharedPreferences(
-            activity.getPreferenceName(),
-            Context.MODE_PRIVATE
-        )
-    )
+    val confirmViewModel: ConfirmViewModel,
+    val settingStore: SettingStore,
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+) {
+
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
         activity.startActivity(
             NoteEditorActivity.newBundle(
