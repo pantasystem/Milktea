@@ -1,8 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Visibility
@@ -19,6 +21,9 @@ class SettingStore(
 ) {
 
     val configState = localConfigRepository.observe()
+        .catch { e ->
+            Log.e("SettingStore", "設定取得エラー", e)
+        }
         .stateIn(coroutineScope, SharingStarted.Eagerly, DefaultConfig.config)
 
     val isSimpleEditorEnabled: Boolean

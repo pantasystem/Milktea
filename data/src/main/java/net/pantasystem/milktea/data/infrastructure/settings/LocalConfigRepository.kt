@@ -31,7 +31,7 @@ class LocalConfigRepositoryImpl(
         return runCatching {
             val old = get().getOrThrow().prefs()
             sharedPreference.edit {
-                config.prefs().filter {
+                config.prefs().filterNot {
                     old[it.key] == it.value
                 }.map {
                     when (val entry = it.value) {
