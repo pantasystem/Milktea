@@ -5,26 +5,30 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme
+import jp.panta.misskeyandroidclient.ui.settings.compose.SettingTitleTile
+import jp.panta.misskeyandroidclient.ui.settings.compose.SwitchTile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -35,26 +39,7 @@ import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import javax.inject.Inject
 
-@Composable
-private fun SwitchTile(
-    checked: Boolean,
-    onChanged: (Boolean) -> Unit,
-    label: @Composable RowScope.() -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(modifier = Modifier.weight(1f)) {
-            label.invoke(this@Row)
-        }
 
-        Switch(checked = checked, onCheckedChange = onChanged)
-    }
-}
 
 @AndroidEntryPoint
 class SettingMovementActivity : AppCompatActivity() {
@@ -70,7 +55,6 @@ class SettingMovementActivity : AppCompatActivity() {
     @Inject
     lateinit var localConfigRepository: LocalConfigRepository
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -82,10 +66,8 @@ class SettingMovementActivity : AppCompatActivity() {
                 mutableStateOf(configState)
             }
 
-            val rv: RememberVisibility by accountStore.observeCurrentAccount.filterNotNull()
-                .flatMapLatest {
-                    localConfigRepository.observeRememberVisibility(it.accountId)
-                }.collectAsState(initial = RememberVisibility.None)
+            val rv: RememberVisibility by accountStore.observeCurrentRememberVisibility()
+                .collectAsState(initial = RememberVisibility.None)
 
             val scope = rememberCoroutineScope()
 
@@ -117,16 +99,9 @@ class SettingMovementActivity : AppCompatActivity() {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
 
                         item {
-                            Text(
-                                text = stringResource(id = R.string.timeline),
-                                fontSize = 24.sp,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                            SettingTitleTile(text = stringResource(id = R.string.timeline))
                         }
                         item {
                             SwitchTile(
@@ -160,14 +135,7 @@ class SettingMovementActivity : AppCompatActivity() {
                         }
 
                         item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                        item {
-                            Text(
-                                text = stringResource(id = R.string.auto_note_folding),
-                                fontSize = 24.sp,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                            SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
                         }
                         item {
                             Column(
@@ -192,17 +160,10 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
 
-                        item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
 
                         if (currentAccount != null) {
                             item {
-                                Text(
-                                    text = stringResource(id = R.string.auto_note_folding),
-                                    fontSize = 24.sp,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                )
+                                SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
                             }
                             item {
                                 SwitchTile(
@@ -237,5 +198,13 @@ class SettingMovementActivity : AppCompatActivity() {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun AccountStore.observeCurrentRememberVisibility(): Flow<RememberVisibility> {
+        return this.observeCurrentAccount.filterNotNull()
+            .flatMapLatest {
+                localConfigRepository.observeRememberVisibility(it.accountId)
+            }
     }
 }
