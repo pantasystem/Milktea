@@ -11,8 +11,8 @@ import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.data.infrastructure.instance.db.InMemoryMetaRepository
 import net.pantasystem.milktea.data.infrastructure.instance.db.MediatorMetaRepository
-import net.pantasystem.milktea.api.Instance.db.RoomMetaRepository
-import net.pantasystem.milktea.api.Instance.remote.RemoteFetchMeta
+import net.pantasystem.milktea.data.infrastructure.instance.db.RoomMetaRepository
+import net.pantasystem.milktea.data.infrastructure.instance.remote.RemoteFetchMeta
 import net.pantasystem.milktea.common.Logger
 import javax.inject.Singleton
 

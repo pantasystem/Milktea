@@ -12,6 +12,7 @@ import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.notes.renote.Renote
 
 interface RenotesPagingService {
     val state: Flow<PageableState<List<Renote>>>

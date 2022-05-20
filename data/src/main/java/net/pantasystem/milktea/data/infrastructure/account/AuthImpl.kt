@@ -37,9 +37,7 @@ class AuthImpl @Inject constructor(
     }
 
     override suspend fun getToken(id: Long): String {
-        return runCatching {
-            accountRepository.get(id).getI(encryption)
-        }.getOrThrow()
+        return accountRepository.get(id).getI(encryption)
     }
 
     override suspend fun get(id: Long): Account {

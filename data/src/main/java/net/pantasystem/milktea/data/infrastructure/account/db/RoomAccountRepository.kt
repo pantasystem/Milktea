@@ -4,12 +4,12 @@ import android.content.SharedPreferences
 import android.util.Log
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRegistrationFailedException
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import java.util.concurrent.Callable
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"
@@ -71,13 +71,13 @@ class RoomAccountRepository(
                     }
                 }
 
-                val pageMap = account.pages.map{
-                    it.pageId to it
-                }.toMap()
+                val pageMap = account.pages.associateBy {
+                    it.pageId
+                }
 
-                val exPageMap = exAccount.pages.map{
-                    it.pageId to it
-                }.toMap()
+                val exPageMap = exAccount.pages.associateBy {
+                    it.pageId
+                }
 
                 val addedPages = ArrayList<Page>()
                 val updatedPages = ArrayList<Page>()

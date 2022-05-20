@@ -1,7 +1,5 @@
 package net.pantasystem.milktea.model.app
 
-import java.net.URLEncoder
-
 
 sealed interface AppType {
     val callbackUrl: String?
@@ -35,6 +33,6 @@ sealed interface AppType {
         override val secret: String
             get() = clientSecret
 
-        companion object;
+        companion object
     }
 }

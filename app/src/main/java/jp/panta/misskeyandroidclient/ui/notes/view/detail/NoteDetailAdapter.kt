@@ -16,14 +16,13 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemConversationBinding
 import jp.panta.misskeyandroidclient.databinding.ItemDetailNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteConversationViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
-import java.lang.IllegalArgumentException
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 class NoteDetailAdapter(
     private val notesViewModel: NotesViewModel,
@@ -110,9 +109,9 @@ class NoteDetailAdapter(
                 val adapter = NoteChildConversationAdapter(notesViewModel, viewLifecycleOwner)
                 holder.binding.conversationView.adapter = adapter
                 holder.binding.conversationView.layoutManager = LinearLayoutManager(holder.itemView.context)
-                note.conversation.observe(viewLifecycleOwner, {
+                note.conversation.observe(viewLifecycleOwner) {
                     adapter.submitList(it)
-                })
+                }
                 // FIXME なぜ今まで動いていたのか何故エラーが出るようになったのかわからない
                 /*if(note.poll != null){
                      holder.binding.conversationView.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)

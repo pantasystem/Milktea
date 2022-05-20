@@ -3,21 +3,20 @@ package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notification.Notification
-import net.pantasystem.milktea.model.notification.NotificationRelation
-import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
-import kotlin.collections.ArrayList
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notification.Notification
+import net.pantasystem.milktea.model.notification.NotificationRelation
+import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
 
 @ExperimentalCoroutinesApi
 class NotificationViewModel(
@@ -142,7 +141,7 @@ class NotificationViewModel(
 
         val exNotificationList = notifications
         val untilId = exNotificationList.lastOrNull()?.id
-        if (exNotificationList.isNullOrEmpty() || untilId == null) {
+        if (exNotificationList.isEmpty() || untilId == null) {
             isLoadingFlag = false
             return loadInit()
         }

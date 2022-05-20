@@ -10,16 +10,6 @@ class BooleanSharedPreferenceLiveData(
 ) : MutableLiveData<Boolean>(){
 
 
-
-    override fun onActive() {
-        super.onActive()
-
-
-    }
-
-    override fun onInactive() {
-        super.onInactive()
-    }
     override fun setValue(value: Boolean) {
         super.setValue(value)
 

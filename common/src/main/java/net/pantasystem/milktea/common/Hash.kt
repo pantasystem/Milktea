@@ -1,14 +1,13 @@
 package net.pantasystem.milktea.common
 
-import java.lang.StringBuilder
 import java.security.MessageDigest
 
 object Hash {
+    private const val HEX_CHARS = "0123456789ABCDEF"
 
     fun sha256(input: String) = hashString("SHA-256", input)
 
     private fun hashString(type: String, input: String): String {
-        val HEX_CHARS = "0123456789ABCDEF"
         val bytes = MessageDigest
             .getInstance(type)
             .digest(input.toByteArray())

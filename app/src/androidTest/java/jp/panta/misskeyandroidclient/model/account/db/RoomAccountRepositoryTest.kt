@@ -43,14 +43,14 @@ class RoomAccountRepositoryTest{
             assertEquals(account.userName, result.userName)
             assertEquals(account.instanceDomain, result.instanceDomain)
             assertNotEquals(result.accountId, 0)
-            assertEquals(1, result.accountId,)
+            assertEquals(1, result.accountId)
             println(result)
 
             val account2 = Account(remoteId, instanceDomain, "Test", Account.InstanceType.MISSKEY, "hogehogehoge")
 
             val result2 = roomAccountRepository.add(account2)
-            assertEquals("Test", result2.userName, )
-            assertEquals(account.instanceDomain, result2.instanceDomain, )
+            assertEquals("Test", result2.userName)
+            assertEquals(account.instanceDomain, result2.instanceDomain)
             assertEquals(1, result2.accountId)
             assert(result2.accountId > 0)
             println(result2)
@@ -92,7 +92,7 @@ class RoomAccountRepositoryTest{
             val result = accountDAO.get(resultId)!!
             assertEquals(account.userName, result.userName)
             assertEquals(account.instanceDomain, result.instanceDomain)
-            assertNotEquals(0, result.accountId,)
+            assertNotEquals(0, result.accountId)
             assertEquals(1, result.accountId)
             println(result)
 

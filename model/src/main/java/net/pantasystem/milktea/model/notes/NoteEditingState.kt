@@ -83,7 +83,7 @@ data class NoteEditingState(
 
         return !(
                 this.text.isNullOrBlank()
-                        && this.files.isNullOrEmpty()
+                        && this.files.isEmpty()
                 )
     }
 

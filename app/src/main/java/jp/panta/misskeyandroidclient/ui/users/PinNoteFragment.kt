@@ -11,7 +11,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -19,6 +18,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 @FlowPreview
@@ -89,9 +89,9 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
         }, viewLifecycleOwner, notesViewModel)
         mBinding.pinNotesView.adapter = adapter
         mBinding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
-        userViewModel.pinNotes.observe(viewLifecycleOwner, {
+        userViewModel.pinNotes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
     }
 
 }

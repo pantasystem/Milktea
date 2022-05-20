@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.components
+package jp.panta.misskeyandroidclient.ui.gallery
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

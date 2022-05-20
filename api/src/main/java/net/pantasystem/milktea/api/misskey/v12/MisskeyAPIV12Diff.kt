@@ -9,7 +9,6 @@ import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaDTO
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
 import net.pantasystem.milktea.api.misskey.v12.channel.*
-import net.pantasystem.milktea.api.misskey.v12.channel.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

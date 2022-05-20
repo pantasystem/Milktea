@@ -65,13 +65,13 @@ class SortedHashTagFragment : Fragment(R.layout.fragment_sorted_hash_tag){
         flexBoxLayoutManager.justifyContent = JustifyContent.FLEX_START
         flexBoxLayoutManager.alignItems = AlignItems.STRETCH
         mBinding.hashTagListView.layoutManager = flexBoxLayoutManager
-        viewModel.hashTags.observe(viewLifecycleOwner, {
+        viewModel.hashTags.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
 
-        viewModel.isLoading.observe(viewLifecycleOwner, {
+        viewModel.isLoading.observe(viewLifecycleOwner) {
             mBinding.hashTagListSwipeRefresh.isRefreshing = it
-        })
+        }
 
         mBinding.hashTagListSwipeRefresh.setOnRefreshListener {
             viewModel.load()

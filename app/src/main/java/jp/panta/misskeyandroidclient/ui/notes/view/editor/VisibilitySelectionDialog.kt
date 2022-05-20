@@ -13,7 +13,6 @@ import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBindin
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
-import java.util.*
 
 @AndroidEntryPoint
 class VisibilitySelectionDialog : AppCompatDialogFragment(){

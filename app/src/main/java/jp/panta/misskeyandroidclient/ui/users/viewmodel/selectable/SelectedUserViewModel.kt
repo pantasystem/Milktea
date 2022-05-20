@@ -64,9 +64,9 @@ class SelectedUserViewModel(
 
     val selectedUserList = selectedUserIds.asFlow().flatMapLatest { ids ->
         miCore.getUserDataSource().state.map { state ->
-            ids.map {
+            ids.mapNotNull {
                 state.get(it)
-            }.filterNotNull()
+            }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 

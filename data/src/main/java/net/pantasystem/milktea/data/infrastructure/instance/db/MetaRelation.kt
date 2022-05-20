@@ -1,11 +1,9 @@
-package net.pantasystem.milktea.api.Instance.db
+package net.pantasystem.milktea.data.infrastructure.instance.db
 
 import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiAlias
-import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiDTO
 import net.pantasystem.milktea.model.instance.Meta
 
 @DatabaseView

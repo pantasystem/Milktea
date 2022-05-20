@@ -59,11 +59,11 @@ class FollowFollowerViewModel(
     @Suppress("BlockingMethodInNonBlockingContext")
     class DefaultPaginator(
         val account: Account,
-        val misskeyAPI: MisskeyAPIV11,
+        private val misskeyAPI: MisskeyAPIV11,
         val userId: User.Id,
         val type: Type,
         val encryption: Encryption,
-        val noteDataSourceAdder: NoteDataSourceAdder,
+        private val noteDataSourceAdder: NoteDataSourceAdder,
         val userDataSource: UserDataSource,
         private val logger: Logger?
 

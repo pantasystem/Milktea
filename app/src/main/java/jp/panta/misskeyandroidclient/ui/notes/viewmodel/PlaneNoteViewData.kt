@@ -97,9 +97,9 @@ open class PlaneNoteViewData (
 
     var emojis = toShowNote.note.emojis?: emptyList()
 
-    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.map{
+    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.associate {
         it.name to it
-    }?.toMap()?: mapOf())
+    } ?: mapOf())
 
     val files = toShowNote.files?.map{ fileProperty ->
         fileProperty.toFile()

@@ -12,9 +12,9 @@ object MFMParser{
         //println("textSize:${text.length}")
         val root = Root(text)
         NodeParser(text, root,
-            emojis?.map{
+            emojis?.associate {
                 it.name to it
-            }?.toMap()?: emptyMap()
+            } ?: emptyMap()
         ).parse()
         return root
     }
@@ -245,7 +245,7 @@ object MFMParser{
                     return null
                 }
             }
-            val quotePattern = Pattern.compile("""^>(?:[ ]?)([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
+            val quotePattern = Pattern.compile("""^>[ ]?([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
             val matcher = quotePattern.matcher(sourceText.substring(position, parent.insideEnd))
 
 

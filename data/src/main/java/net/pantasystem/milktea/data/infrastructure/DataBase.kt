@@ -1,20 +1,18 @@
+@file:Suppress("DEPRECATION")
+
 package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import net.pantasystem.milktea.api.Instance.db.EmojiAliasDAO
-import net.pantasystem.milktea.api.Instance.db.MetaDAO
-import net.pantasystem.milktea.api.Instance.db.MetaDTO
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
-import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiAlias
-import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiDTO
+import net.pantasystem.milktea.data.infrastructure.instance.db.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO

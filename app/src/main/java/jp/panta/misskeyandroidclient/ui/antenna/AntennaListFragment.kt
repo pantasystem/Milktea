@@ -31,17 +31,17 @@ class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
         binding.antennaListView.adapter = adapter
         binding.antennaListView.layoutManager = layoutManager
 
-        antennaViewModel.antennas.observe(viewLifecycleOwner, {
+        antennaViewModel.antennas.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
 
         binding.antennaListSwipeRefresh.setOnRefreshListener {
             antennaViewModel.loadInit()
         }
 
-        antennaViewModel.isLoading.observe(viewLifecycleOwner, {
+        antennaViewModel.isLoading.observe(viewLifecycleOwner) {
             binding.antennaListSwipeRefresh.isRefreshing = it
-        })
+        }
 
 
     }

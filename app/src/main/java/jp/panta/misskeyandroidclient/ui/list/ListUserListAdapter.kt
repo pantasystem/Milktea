@@ -24,7 +24,6 @@ class ListUserListAdapter(
     @FlowPreview
     class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
 
-        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun areContentsTheSame(
             oldItem: UserViewData,
             newItem: UserViewData
@@ -33,7 +32,6 @@ class ListUserListAdapter(
                     && oldItem.user.value == newItem.user.value
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun areItemsTheSame(
             oldItem: UserViewData,
             newItem: UserViewData

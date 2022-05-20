@@ -1,9 +1,9 @@
-package net.pantasystem.milktea.api.Instance.remote
+package net.pantasystem.milktea.data.infrastructure.instance.remote
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
 
 class RemoteFetchMeta(

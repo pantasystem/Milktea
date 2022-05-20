@@ -13,7 +13,6 @@ import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
-import net.pantasystem.milktea.model.account.page.Pageable
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
@@ -22,6 +21,7 @@ import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewM
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.account.page.Pageable
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -47,7 +47,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
         val factory = NotificationViewModelFactory(miApplication)
-        mViewModel = ViewModelProvider(this, factory).get(NotificationViewModel::class.java)
+        mViewModel = ViewModelProvider(this, factory)[NotificationViewModel::class.java]
 
 
 

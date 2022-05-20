@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.instance.db
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import net.pantasystem.milktea.api.Instance.db.MetaDTO
 import net.pantasystem.milktea.model.emoji.Emoji
 
 @Entity(

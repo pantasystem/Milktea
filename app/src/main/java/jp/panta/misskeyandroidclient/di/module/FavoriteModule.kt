@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.di.module
 
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.notes.favorite.FavoriteRepositoryImpl

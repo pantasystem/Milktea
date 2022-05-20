@@ -2,9 +2,9 @@ package jp.panta.misskeyandroidclient
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -12,9 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
@@ -24,6 +21,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,7 +45,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     @ExperimentalCoroutinesApi
     val mListListViewModel: ListListViewModel by viewModels()
 
-    val pullPushUserViewModel: UserListPullPushUserViewModel by viewModels()
+    private val pullPushUserViewModel: UserListPullPushUserViewModel by viewModels()
 
     @Inject
     lateinit var accountStore: AccountStore
