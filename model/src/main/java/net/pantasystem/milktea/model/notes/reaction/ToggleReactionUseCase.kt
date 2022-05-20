@@ -11,7 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface CheckEmoji {
-    fun checkEmoji(char: CharSequence): Boolean
+    suspend fun checkEmoji(char: CharSequence): Boolean
 }
 
 
