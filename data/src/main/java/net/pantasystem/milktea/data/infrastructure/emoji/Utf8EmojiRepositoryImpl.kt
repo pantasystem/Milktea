@@ -68,9 +68,6 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
     }
 
     override suspend fun exists(emoji: CharSequence): Boolean {
-        if (!isFetched) {
-            findAll()
-        }
         return emojis.any {
             emoji.startsWith(it.char)
         }
