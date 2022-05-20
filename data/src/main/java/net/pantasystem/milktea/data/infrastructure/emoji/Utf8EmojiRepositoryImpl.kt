@@ -14,10 +14,10 @@ const val RAW_EMOJI_SOURCE_URL: String =
     "https://raw.githubusercontent.com/amio/emoji.json/master/emoji.json"
 
 class Utf8EmojiRepositoryImpl @Inject constructor(
-    val coroutineScope: CoroutineScope,
-    val loggerFactory: Logger.Factory?,
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ) : UtfEmojiRepository {
+    coroutineScope: CoroutineScope,
+    private val loggerFactory: Logger.Factory?,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : UtfEmojiRepository {
 
     private val logger by lazy {
         loggerFactory?.create("Utf8EmojiRepository")
@@ -31,7 +31,7 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
             .build()
     }
 
-    private val json = Json{ignoreUnknownKeys = true}
+    private val json = Json { ignoreUnknownKeys = true }
 
 
     init {

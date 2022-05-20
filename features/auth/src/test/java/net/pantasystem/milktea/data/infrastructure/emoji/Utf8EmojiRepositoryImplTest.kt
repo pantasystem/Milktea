@@ -33,10 +33,6 @@ class Utf8EmojiRepositoryImplTest {
             Assert.assertFalse(utf8EmojiRepositoryImpl.exists("c"))
 
 
-
-
-//            Assert.assertTrue(utf8EmojiRepositoryImpl.exists("‼︎"))
-
         }
 
         job.cancel()
