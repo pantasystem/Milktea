@@ -33,8 +33,9 @@ jobs:
           echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+      - name: unit-test
+        run: ./gradlew lint testDebug --continue
       - name: build
-
         run: ./gradlew assembleRelease
       - uses: actions/upload-artifact@v3
         with:
