@@ -62,6 +62,8 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
             val list = fetchedEmojis.map { it.toDTO() }
             utf8EmojisDAO.insertAll(list)
             isFetched = true
+            emojis = fetchedEmojis
+            return fetchedEmojis
         }
         return emojis
 

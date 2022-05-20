@@ -36,10 +36,6 @@ class Utf8EmojiRepositoryImplTest {
             Assert.assertNotEquals(0, utf8EmojiRepositoryImpl.findAll().size)
             Assert.assertTrue(setOf("㊙️", "㊙︎").contains("㊙︎"))
 
-            val sets =
-                utf8EmojiRepositoryImpl.findAll().filter { it.name == "Japanese “secret” button" }
-            println(sets)
-            println(sets[1].char.toByteArray().toList())
 
             Assert.assertTrue(utf8EmojiRepositoryImpl.exists("㊙️"))
             Assert.assertTrue(utf8EmojiRepositoryImpl.exists("㊙︎"))
