@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         minSdk 21
-        targetSdk 31
+        targetSdk 32
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -43,7 +43,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'com.google.android.material:material:1.6.0'
     implementation project(path: ':model')
     implementation project(path: ':common')
     implementation project(path: ':data')
@@ -60,12 +60,12 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "com.google.android.material:compose-theme-adapter:1.1.6"
+    implementation "com.google.android.material:compose-theme-adapter:1.1.9"
     implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
     implementation 'androidx.activity:activity-compose:1.4.0'
     implementation "com.google.accompanist:accompanist-pager:0.14.0"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
-    implementation "io.coil-kt:coil-compose:1.4.0"
+    implementation "io.coil-kt:coil-compose:2.0.0"
 
     // hilt
     implementation 'com.google.dagger:hilt-android:2.40.5'
@@ -77,6 +77,6 @@ dependencies {
     kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
 
     // datetime
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
 
 }
