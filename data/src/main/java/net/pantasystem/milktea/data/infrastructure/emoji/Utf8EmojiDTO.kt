@@ -8,13 +8,11 @@ import net.pantasystem.milktea.model.emoji.Utf8Emoji
 data class Utf8EmojiDTO(
     @ColumnInfo(name = "codes") var codes: String,
     @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "char") var char: String,
-) {
-    constructor() : this("", "", "")
-}
+    @ColumnInfo(name = "char") var charCode: String,
+)
 
 fun Utf8EmojiDTO.toModel(): Utf8Emoji {
-    return Utf8Emoji(codes, name, char)
+    return Utf8Emoji(codes, name, charCode)
 }
 
 fun Utf8Emoji.toDTO(): Utf8EmojiDTO {

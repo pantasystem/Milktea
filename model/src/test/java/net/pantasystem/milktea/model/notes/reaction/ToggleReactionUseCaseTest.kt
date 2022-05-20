@@ -260,7 +260,7 @@ class ToggleReactionUseCaseTest {
             fetchMeta = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = mock {
-                on {
+                onBlocking {
                     checkEmoji(any())
                 } doReturn false
             }
@@ -321,7 +321,7 @@ class ToggleReactionUseCaseTest {
             fetchMeta = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = mock {
-                on {
+                onBlocking {
                     checkEmoji(any())
                 } doReturn true
             }
@@ -383,7 +383,7 @@ class ToggleReactionUseCaseTest {
             fetchMeta = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = mock {
-                on {
+                onBlocking {
                     checkEmoji(any())
                 } doReturn true
             }

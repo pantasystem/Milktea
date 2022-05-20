@@ -45,6 +45,16 @@ class Utf8EmojiRepositoryImplTest {
             Assert.assertFalse(utf8EmojiRepositoryImpl.exists("あ"))
             Assert.assertFalse(utf8EmojiRepositoryImpl.exists("a"))
             Assert.assertFalse(utf8EmojiRepositoryImpl.exists("c"))
+            Assert.assertFalse(utf8EmojiRepositoryImpl.exists("1"))
+            Assert.assertFalse(utf8EmojiRepositoryImpl.exists("2"))
+            Assert.assertFalse(utf8EmojiRepositoryImpl.exists(" "))
+
+            Assert.assertFalse(utf8EmojiRepositoryImpl.exists("3"))
+            Assert.assertTrue(utf8EmojiRepositoryImpl.exists("\uD83E\uDD7A"))
+            Assert.assertFalse(utf8EmojiRepositoryImpl.exists(" harunon "))
+            Assert.assertFalse(utf8EmojiRepositoryImpl.exists("鶏"))
+            Assert.assertTrue(utf8EmojiRepositoryImpl.exists("☕️"))
+            Assert.assertTrue(utf8EmojiRepositoryImpl.exists("\uD83D\uDCA2"))
 
 
         }

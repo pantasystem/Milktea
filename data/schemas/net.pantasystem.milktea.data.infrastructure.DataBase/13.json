@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "097ae5ab443e5819fa4dc2712fcd0693",
+    "identityHash": "9ee584917bd43848e691b5008beefce1",
     "entities": [
       {
         "tableName": "connection_information",
@@ -1565,7 +1565,7 @@
       },
       {
         "tableName": "utf8_emojis_by_amio",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codes` TEXT NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY(`codes`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`codes` TEXT NOT NULL, `name` TEXT NOT NULL, `char` TEXT NOT NULL, PRIMARY KEY(`codes`))",
         "fields": [
           {
             "fieldPath": "codes",
@@ -1576,6 +1576,12 @@
           {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "charCode",
+            "columnName": "char",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -1593,7 +1599,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '097ae5ab443e5819fa4dc2712fcd0693')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9ee584917bd43848e691b5008beefce1')"
     ]
   }
 }

@@ -70,8 +70,12 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
     }
 
     override suspend fun exists(emoji: CharSequence): Boolean {
+        logger?.debug("call exists emoji:$emoji, ${emoji.javaClass.simpleName}")
         return emojis.any {
             emoji.startsWith(it.char)
+        }.also {
+            logger?.debug("call exists emoji:$emoji, ${emoji.javaClass.simpleName} return :$it")
+            logger?.debug("target emojis:${emojis.filter { c ->emoji.startsWith(c.char) }}")
         }
     }
 
