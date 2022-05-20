@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.emoji
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.common.Logger
@@ -17,6 +20,7 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
     coroutineScope: CoroutineScope,
     private val loggerFactory: Logger.Factory?,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val utf8EmojisDAO: Utf8EmojisDAO,
 ) : UtfEmojiRepository {
 
     private val logger by lazy {
@@ -35,18 +39,28 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
 
 
     init {
-        coroutineScope.launch(Dispatchers.IO) {
+        coroutineScope.launch(dispatcher) {
             runCatching {
                 findAll()
             }.onFailure {
                 logger?.error("絵文字の取得に失敗しました", it)
             }
         }
+        coroutineScope.launch(dispatcher) {
+            utf8EmojisDAO.findAll().onEach { list ->
+                emojis = list.map { it.toModel() }
+            }.catch {
+                logger?.error("絵文字の取得に失敗しました", it)
+            }.launchIn(this)
+        }
     }
 
     override suspend fun findAll(): List<Utf8Emoji> {
         if (!isFetched) {
-            emojis = fetchEmojis()
+            utf8EmojisDAO.clear()
+            val fetchedEmojis = fetchEmojis()
+            val list = fetchedEmojis.map { it.toDTO() }
+            utf8EmojisDAO.insertAll(list)
             isFetched = true
         }
         return emojis

@@ -2,6 +2,7 @@ package net.pantasystem.milktea.api.Instance.db
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiDTO
 
 @Dao
 abstract class MetaDAO{

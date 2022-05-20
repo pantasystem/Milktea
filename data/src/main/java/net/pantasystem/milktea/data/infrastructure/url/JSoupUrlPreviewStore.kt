@@ -30,7 +30,7 @@ class JSoupUrlPreviewStore : UrlPreviewStore{
             var thumbnailImage: String? = null
 
 
-            ogpElements?.forEach{
+            ogpElements.forEach{
                 val property = it.attr("property")
                 val content = it.attr("content")
                 val ogMatcher = ogPattern.matcher(property)
@@ -46,7 +46,7 @@ class JSoupUrlPreviewStore : UrlPreviewStore{
             }
 
             description = description
-                ?: head.select("meta[name=description")?.first()?.attr("content")
+                ?: head.select("meta[name=description").first()?.attr("content")
             val iconUrl = when {
                 icon == null -> {
                     "$baseUrl/favicon.ico"
