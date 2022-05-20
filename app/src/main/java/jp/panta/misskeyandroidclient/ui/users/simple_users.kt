@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import net.pantasystem.milktea.model.user.User
 
@@ -62,7 +62,7 @@ fun ItemSimpleUserCard(
                 .padding(8.dp),
         ) {
             Image(
-                painter = rememberImagePainter(user.avatarUrl),
+                painter = rememberAsyncImagePainter(user.avatarUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(48.dp)

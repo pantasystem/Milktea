@@ -14,7 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.ui.components.SensitiveIcon
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -76,7 +76,7 @@ fun FilePropertySimpleCard(
                         .padding(end = 4.dp)
                 ) {
                     Image(
-                        painter = rememberImagePainter(
+                        painter = rememberAsyncImagePainter(
                             file.fileProperty.thumbnailUrl
                                 ?: file.fileProperty.url
                         ),
