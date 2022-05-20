@@ -12,17 +12,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
-import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
-import net.pantasystem.milktea.auth.viewmodel.app.AuthErrors
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.auth.databinding.FragmentAppAuthBinding
+import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.app.AuthErrors
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class AuthFragment : Fragment(){
+class AuthFragment : Fragment() {
 
     lateinit var binding: FragmentAppAuthBinding
 
@@ -64,9 +64,9 @@ class AuthFragment : Fragment(){
         }
         lifecycleScope.launchWhenResumed {
             appAuthViewModel.errors.collect {
-                binding.errorMsgView.visibility = if(it == null) View.GONE else View.VISIBLE
-                if(it != null) {
-                    binding.errorMsgView.text = when(it) {
+                binding.errorMsgView.visibility = if (it == null) View.GONE else View.VISIBLE
+                if (it != null) {
+                    binding.errorMsgView.text = when (it) {
                         is AuthErrors.GetMetaError -> {
                             getString(R.string.warning_s, it.throwable.toString())
                         }

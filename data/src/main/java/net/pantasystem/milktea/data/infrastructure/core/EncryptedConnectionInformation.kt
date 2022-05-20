@@ -14,6 +14,7 @@ import java.util.*
  * @param encryptedI encrypt済みのi
  * @param viaName appログイン出ない場合はnull
  */
+@Suppress("DEPRECATION")
 @Entity(
     tableName = "connection_information",
     foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = CASCADE, onUpdate = NO_ACTION)],

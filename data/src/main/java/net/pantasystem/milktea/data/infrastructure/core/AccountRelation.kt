@@ -7,6 +7,7 @@ import androidx.room.Ignore
 import androidx.room.Relation
 import net.pantasystem.milktea.data.infrastructure.Page
 
+@Suppress("DEPRECATION")
 @Deprecated("model.account.Accountへ移行")
 @Entity
 class AccountRelation{

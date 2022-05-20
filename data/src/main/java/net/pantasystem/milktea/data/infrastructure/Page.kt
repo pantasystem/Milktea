@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.*
@@ -30,6 +32,7 @@ data class Page(
 ){
     @PrimaryKey(autoGenerate = true) var id: Long? = null
 
+    @Suppress("DEPRECATION")
     @Ignore
     fun pageable(): PageableOld?{
         return when{
