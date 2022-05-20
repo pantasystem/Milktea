@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '1.6.21'
     repositories {
         google()
         maven { url "https://jitpack.io" }
@@ -20,7 +20,7 @@ buildscript {
     }
     ext {
         compose_version = '1.1.1'
-        coroutines_version = '1.6.0'
+        coroutines_version = '1.6.1'
         retrofit = '2.9.0'
         room_version = "2.4.2"
     }

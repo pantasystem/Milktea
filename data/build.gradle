@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         minSdk 21
-        targetSdk 31
+        targetSdk 32
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -44,7 +44,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'com.google.android.material:material:1.6.0'
     implementation project(path: ':common')
     implementation project(path: ':api')
     implementation project(path: ':model')
@@ -74,7 +74,7 @@ dependencies {
     // For local unit tests
     testImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
     kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
@@ -87,7 +87,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
 
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
