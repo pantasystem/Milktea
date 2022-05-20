@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -77,7 +77,7 @@ fun GalleryPostCard(
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp)
             ) {
                 Image(
-                    painter = rememberImagePainter(
+                    painter = rememberAsyncImagePainter(
                         galleryState.user.avatarUrl,
                     ),
                     contentDescription = null,

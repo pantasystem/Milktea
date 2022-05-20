@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.user.User
@@ -105,7 +105,7 @@ private fun ChannelCardHeader(channel: Channel) {
     val (r, g, b) = channel.rgpFromName
     Box {
         Image(
-            painter = rememberImagePainter(channel.bannerUrl),
+            painter = rememberAsyncImagePainter(channel.bannerUrl),
             contentDescription = "header",
             contentScale = ContentScale.Crop,
             modifier = Modifier

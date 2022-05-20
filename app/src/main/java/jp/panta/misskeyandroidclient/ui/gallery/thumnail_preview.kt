@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.drive.FileProperty
 
@@ -35,7 +35,7 @@ fun ThumbnailPreview(
 
         if(isVisible) {
             Image(
-                painter = rememberImagePainter(
+                painter = rememberAsyncImagePainter(
                     file.thumbnailUrl ?: "",
                 ),
                 contentDescription = null,

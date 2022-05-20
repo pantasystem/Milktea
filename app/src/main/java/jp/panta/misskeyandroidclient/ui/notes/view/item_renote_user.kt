@@ -15,7 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
@@ -78,7 +78,7 @@ fun ItemRenoteUser(
                 modifier = Modifier.weight(1f),
             ) {
                 Image(
-                    painter = rememberImagePainter(note.user.avatarUrl),
+                    painter = rememberAsyncImagePainter(note.user.avatarUrl),
                     contentDescription = null,
                     modifier = Modifier
                         .size(48.dp)

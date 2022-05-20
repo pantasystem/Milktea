@@ -4,27 +4,29 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import net.pantasystem.milktea.data.infrastructure.core.*
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftFileDTO
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDTO
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.PollChoiceDTO
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.UserIdDTO
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
-import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.api.Instance.db.EmojiAliasDAO
+import net.pantasystem.milktea.api.Instance.db.MetaDAO
+import net.pantasystem.milktea.api.Instance.db.MetaDTO
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
-import net.pantasystem.milktea.api.Instance.db.*
+import net.pantasystem.milktea.data.infrastructure.core.*
+import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
+import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
+import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiAlias
+import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiDTO
+import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
+import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDAO
+import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDTO
+import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
-import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDAO
-import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDTO
-import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
 
 @Database(
     entities = [
@@ -46,11 +48,13 @@ import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
         EmojiAlias::class,
         UnreadNotification::class,
         UserNicknameDTO::class,
+        Utf8EmojiDTO::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true,
     autoMigrations = [
-        AutoMigration(from = 11, to = 12)
+        AutoMigration(from = 11, to = 12),
+        AutoMigration(from = 12, to = 13),
     ]
 )
 @TypeConverters(
@@ -80,9 +84,10 @@ abstract class DataBase : RoomDatabase() {
 
     abstract fun metaDAO(): MetaDAO
     abstract fun emojiAliasDAO(): EmojiAliasDAO
-    //abstract fun connectionInstanceDao(): ConnectionInstanceDao
 
     abstract fun unreadNotificationDAO(): UnreadNotificationDAO
 
     abstract fun userNicknameDAO(): UserNicknameDAO
+
+    abstract fun utf8EmojiDAO(): Utf8EmojisDAO
 }

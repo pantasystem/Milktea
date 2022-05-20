@@ -10,7 +10,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.regex.Pattern
 
@@ -80,7 +80,7 @@ fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.s
                 placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
             )
         ) {
-            Image(painter = rememberImagePainter(data = emoji.url), contentDescription = null)
+            Image(painter = rememberAsyncImagePainter(model = emoji.url), contentDescription = null)
         }
     }.toMap()
     Text(annotatedText, inlineContent = inlineContents)

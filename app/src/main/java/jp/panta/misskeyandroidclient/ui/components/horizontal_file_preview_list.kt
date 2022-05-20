@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.HideImage
@@ -16,13 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import net.pantasystem.milktea.common.State
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.R
+import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -151,7 +151,7 @@ fun LocalFilePreview(
     ){
         Box (contentAlignment = Alignment.TopEnd) {
             Image(
-                painter = rememberImagePainter(uri),
+                painter = rememberAsyncImagePainter(model = uri),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -209,7 +209,7 @@ fun RemoteFilePreview(
                 val content = (filePropertyState.content as StateContent.Exist).rawContent
                 Box (contentAlignment = Alignment.TopEnd){
                     Image(
-                        painter = rememberImagePainter(
+                        painter = rememberAsyncImagePainter(
                             fileProperty.value?.thumbnailUrl
                                 ?: content.thumbnailUrl
                         ),

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiAlias
 
 @Dao
 abstract class EmojiAliasDAO {
