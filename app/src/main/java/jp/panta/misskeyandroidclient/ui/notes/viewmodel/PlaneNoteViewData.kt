@@ -105,7 +105,7 @@ open class PlaneNoteViewData (
         fileProperty.toFile()
     }
     private val previewableFiles = files?.filter{
-        it.type?.startsWith("image") == true || it.type?.startsWith("video") == true
+        it.aboutMediaType == File.AboutMediaType.IMAGE || it.aboutMediaType == File.AboutMediaType.VIDEO
     }?: emptyList()
     val media = MediaViewData(previewableFiles)
 
@@ -210,7 +210,7 @@ open class PlaneNoteViewData (
 
     private fun getNotMediaFiles() : List<File>{
         return  files?.filterNot{ fp ->
-            fp.type?.startsWith("image") == true || fp.type?.startsWith("video") == true
+            fp.aboutMediaType == File.AboutMediaType.IMAGE || fp.aboutMediaType == File.AboutMediaType.VIDEO
         }?: emptyList()
     }
 
