@@ -43,6 +43,7 @@ data class Config(
     val isIncludeRenotedMyNotes: Boolean,
     val isIncludeLocalRenotes: Boolean,
     val surfaceColorOpacity: Int,
+    val isEnableTimelineScrollAnimation: Boolean,
 ) {
     companion object
 }
@@ -62,6 +63,7 @@ object DefaultConfig {
         isIncludeMyRenotes = true,
         isIncludeRenotedMyNotes = true,
         surfaceColorOpacity = 0xff,
+        isEnableTimelineScrollAnimation = false,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

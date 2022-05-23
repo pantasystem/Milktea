@@ -80,7 +80,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isIncludeLocalRenotes = map.getValue<PrefType.BoolPref>(Keys.IsIncludeLocalRenotes)?.value
             ?: DefaultConfig.config.isIncludeLocalRenotes,
         surfaceColorOpacity = map.getValue<PrefType.IntPref>(Keys.SurfaceColorOpacity)?.value
-            ?: DefaultConfig.config.surfaceColorOpacity
+            ?: DefaultConfig.config.surfaceColorOpacity,
+        isEnableTimelineScrollAnimation = map.getValue<PrefType.BoolPref>(Keys.IsEnableTimelineScrollAnimation)?.value
+            ?: DefaultConfig.config.isEnableTimelineScrollAnimation
     )
 }
 
@@ -141,6 +143,9 @@ fun Config.pref(key: Keys): PrefType? {
         }
         Keys.SurfaceColorOpacity -> {
             PrefType.IntPref(surfaceColorOpacity)
+        }
+        Keys.IsEnableTimelineScrollAnimation -> {
+            PrefType.BoolPref(isEnableTimelineScrollAnimation)
         }
     }
 }
