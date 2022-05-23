@@ -4,23 +4,28 @@ package jp.panta.misskeyandroidclient.ui.notes.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.marginTop
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.*
-import com.google.android.flexbox.*
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexboxLayoutManager
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemHasReplyToNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.view.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.HasReplyToNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
-import java.lang.IllegalArgumentException
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 class TimelineListAdapter(
     diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
@@ -59,6 +64,7 @@ class TimelineListAdapter(
         }
 
         abstract fun onBind(note: PlaneNoteViewData)
+        abstract fun getAvatarIcon(): ImageView
 
         private var mCurrentNote: PlaneNoteViewData? = null
 
@@ -71,7 +77,10 @@ class TimelineListAdapter(
 
             onBind(mCurrentNote!!)
             binding.lifecycleOwner = lifecycleOwner
-
+            val parent = getAvatarIcon().parent
+            if (parent is ViewGroup) {
+                getAvatarIcon().y = getAvatarIcon().marginTop.toFloat() + parent.paddingTop
+            }
             binding.executePendingBindings()
         }
 
@@ -130,6 +139,10 @@ class TimelineListAdapter(
             binding.notesViewModel = notesViewModel
 
         }
+
+        override fun getAvatarIcon(): ImageView {
+            return binding.simpleNote.avatarIcon
+        }
     }
 
     inner class HasReplyToNoteViewHolder(override val binding: ItemHasReplyToNoteBinding): NoteViewHolderBase<ItemHasReplyToNoteBinding>(binding.root){
@@ -147,6 +160,9 @@ class TimelineListAdapter(
 
                 binding.notesViewModel = notesViewModel
             }
+        }
+        override fun getAvatarIcon(): ImageView {
+            return binding.simpleNote.avatarIcon
         }
     }
 
