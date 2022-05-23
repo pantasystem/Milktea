@@ -57,25 +57,25 @@ class AntennaEditorActivity : AppCompatActivity() {
         val miCore = applicationContext as MiCore
         val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(miCore, antennaId))[AntennaEditorViewModel::class.java]
         this.mViewModel = viewModel
-        viewModel.selectUserEvent.observe(this, {
+        viewModel.selectUserEvent.observe(this) {
             showSearchAndSelectUserActivity(it)
-        })
-        viewModel.name.observe(this, {
+        }
+        viewModel.name.observe(this) {
             supportActionBar?.title = it
-        })
-        viewModel.antennaRemovedEvent.observe(this, {
+        }
+        viewModel.antennaRemovedEvent.observe(this) {
             Toast.makeText(this, getString(R.string.remove), Toast.LENGTH_SHORT).show()
             setResult(RESULT_OK)
             finish()
-        })
+        }
 
-        viewModel.antennaAddedStateEvent.observe(this, {
-            if(it){
+        viewModel.antennaAddedStateEvent.observe(this) {
+            if (it) {
                 Toast.makeText(this, getString(R.string.success), Toast.LENGTH_LONG).show()
-            }else{
+            } else {
                 Toast.makeText(this, getString(R.string.failure), Toast.LENGTH_LONG).show()
             }
-        })
+        }
     }
 
     @FlowPreview

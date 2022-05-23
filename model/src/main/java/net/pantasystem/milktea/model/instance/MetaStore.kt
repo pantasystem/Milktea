@@ -1,6 +1,3 @@
 package net.pantasystem.milktea.model.instance
 
-class MetaStore {
-
-
-}
+class MetaStore

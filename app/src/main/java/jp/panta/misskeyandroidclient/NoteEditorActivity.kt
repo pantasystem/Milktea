@@ -357,7 +357,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
 
         lifecycleScope.launchWhenStarted {
-            accountStore.state.collect() {
+            accountStore.state.collect {
                 if (it.isUnauthorized) {
                     finish()
                     startActivity(

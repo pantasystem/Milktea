@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MessageActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessagingHistoryBinding
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,22 +51,22 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
             }
         }
 
-        historyViewModel.isRefreshing.observe(viewLifecycleOwner, {
+        historyViewModel.isRefreshing.observe(viewLifecycleOwner) {
             binding.refresh.isRefreshing = it
-        })
+        }
 
 
         binding.refresh.setOnRefreshListener {
             historyViewModel.loadGroupAndUser()
         }
 
-        historyViewModel.messageHistorySelected.observe(viewLifecycleOwner, { hvd ->
+        historyViewModel.messageHistorySelected.observe(viewLifecycleOwner) { hvd ->
             Handler(Looper.getMainLooper()).post {
                 val intent = Intent(activity, MessageActivity::class.java)
                 intent.putExtra(MessageActivity.EXTRA_MESSAGING_ID, hvd.messagingId)
                 startActivity(intent)
             }
-        })
+        }
 
 
     }

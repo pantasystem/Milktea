@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentFollowFollwerBinding
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -65,22 +65,22 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
         mBinding.followFollowerList.adapter = adapter
 
-        followFollowerViewModel.users.observe(viewLifecycleOwner,  {
+        followFollowerViewModel.users.observe(viewLifecycleOwner) {
             adapter.submitList(it)
-        })
+        }
 
         followFollowerViewModel.loadInit()
 
-        mViewModel?.isInitializing?.observe(viewLifecycleOwner,  {
+        mViewModel?.isInitializing?.observe(viewLifecycleOwner) {
             mBinding.swipeRefresh.isRefreshing = it
-        })
+        }
 
-        mViewModel?.showUserEventBus?.observe(viewLifecycleOwner,  {
+        mViewModel?.showUserEventBus?.observe(viewLifecycleOwner) {
             val intent = UserDetailActivity.newInstance(requireActivity(), userId = it)
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
             requireActivity().startActivity(intent)
-        })
+        }
 
         mBinding.swipeRefresh.setOnRefreshListener {
             mViewModel?.loadInit()

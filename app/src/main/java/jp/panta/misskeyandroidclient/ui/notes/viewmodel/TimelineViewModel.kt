@@ -7,7 +7,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.data.infrastructure.notes.*
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline

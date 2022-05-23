@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.api.Instance.db
+package net.pantasystem.milktea.data.infrastructure.instance.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

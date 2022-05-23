@@ -1,27 +1,26 @@
+@file:Suppress("unused")
+
 package jp.panta.misskeyandroidclient.ui.media
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Rect
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.clear
 import com.bumptech.glide.Glide
 import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.file.File
 import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
-import java.lang.IllegalArgumentException
+import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
+import net.pantasystem.milktea.model.file.File
 
 object MediaPreviewHelper {
 

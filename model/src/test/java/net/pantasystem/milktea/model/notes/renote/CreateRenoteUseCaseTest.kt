@@ -16,7 +16,7 @@ import org.mockito.kotlin.verifyBlocking
 
 class CreateRenoteUseCaseTest {
 
-    val account = Account(
+    private val account = Account(
         "testId",
         "misskey.io",
         instanceType = Account.InstanceType.MISSKEY,
@@ -31,7 +31,7 @@ class CreateRenoteUseCaseTest {
         val target = generateEmptyNote().copy(
             visibility = Visibility.Public(true),
         )
-        val noteRepository = mock<NoteRepository>() {
+        val noteRepository = mock<NoteRepository> {
             onBlocking {
                 create(any())
             } doReturn generateEmptyNote()
@@ -60,7 +60,7 @@ class CreateRenoteUseCaseTest {
             userId = User.Id(accountId = account.accountId, id = account.remoteId + "other")
         )
 
-        val noteRepository = mock<NoteRepository>() {
+        val noteRepository = mock<NoteRepository> {
             onBlocking {
                 create(any())
             } doReturn generateEmptyNote()

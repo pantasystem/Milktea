@@ -1,9 +1,9 @@
-package net.pantasystem.milktea.data.api.mastodon.instance
+package jp.panta.misskeyandroidclient.api.mastodon.instance
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.instance.Instance
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class InstanceTest {

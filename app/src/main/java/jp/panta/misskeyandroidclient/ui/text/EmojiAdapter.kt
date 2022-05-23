@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 class EmojiAdapter (view: View){
 
-    val weakReference = WeakReference(view)
+    private val weakReference = WeakReference(view)
 
     private val subject = PublishSubject.create<Boolean>()
 

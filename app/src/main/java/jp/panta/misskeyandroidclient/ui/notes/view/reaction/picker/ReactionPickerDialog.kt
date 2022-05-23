@@ -21,7 +21,6 @@ import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
@@ -34,7 +33,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
     @Inject
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(dialog.context, R.layout.dialog_reaction_picker, null)
@@ -53,7 +52,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         binding.reactionsView.adapter = adapter
 
 
-        
+
         binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
         //adapter.submitList(ReactionResourceMap.defaultReaction)
 
@@ -93,7 +92,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
                 dismiss()
             }
         }.launchIn(lifecycleScope)
-        
+
 
 
 

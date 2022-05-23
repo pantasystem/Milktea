@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
-import net.pantasystem.milktea.api.Instance.db.RoomMetaRepository
+import net.pantasystem.milktea.data.infrastructure.instance.db.RoomMetaRepository
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Meta

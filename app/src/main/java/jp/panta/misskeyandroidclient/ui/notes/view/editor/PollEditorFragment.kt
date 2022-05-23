@@ -32,7 +32,6 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
 
     val viewModel: NoteEditorViewModel by activityViewModels()
 
-    @OptIn(ExperimentalTime::class, FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

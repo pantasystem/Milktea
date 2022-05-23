@@ -286,7 +286,7 @@ class UserDetailActivity : AppCompatActivity() {
         block?.isVisible = !(state?.isBlocking ?: false)
         unblock?.isVisible = (state?.isBlocking ?: false)
         unmute?.isVisible = (state?.isMuting ?: false)
-        if (mViewModel.isMine.value == true) {
+        if (mViewModel.isMine.value) {
             block?.isVisible = false
             mute?.isVisible = false
             unblock?.isVisible = false

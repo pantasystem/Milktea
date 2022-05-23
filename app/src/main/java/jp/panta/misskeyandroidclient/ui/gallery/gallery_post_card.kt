@@ -27,7 +27,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.components.ThumbnailPreview
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostUiState
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.users.UserDTO

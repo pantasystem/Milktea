@@ -4,7 +4,10 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,15 +21,15 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.common.APIError
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import jp.panta.misskeyandroidclient.setMenuTint
-import net.pantasystem.milktea.common.getPreferenceName
 import jp.panta.misskeyandroidclient.ui.PageableView
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.*
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import java.io.IOException
@@ -71,7 +74,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private val mPageable: Pageable by lazy {
         val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
-        mPage?.pageable() ?: pageable?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
+        mPage?.pageable() ?: pageable ?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
     }
 
     /**
@@ -86,7 +89,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     lateinit var miApplication: MiApplication
 
     val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
-    
+
     val notesViewModel by activityViewModels<NotesViewModel>()
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
@@ -114,7 +117,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
-        
+
         //sharedPreference = view.context.getSharedPreferences()
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
@@ -144,7 +147,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 adapter.submitList(tm.notes)
                 timelineState = tm
 
-                if (tm.notes.isNullOrEmpty()) {
+                if (tm.notes.isEmpty()) {
                     mBinding.timelineEmptyView.visibility = View.VISIBLE
                     mBinding.refresh.visibility = View.GONE
                 } else {
@@ -238,13 +241,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
 
-
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
         mFirstVisibleItemPosition?.let { firstVisibleItemPosition ->
-            if (firstVisibleItemPosition > 0 && firstVisibleItemPosition <= mViewModel?.getTimelineState()?.value?.notes?.size ?: 0) {
+            if (firstVisibleItemPosition > 0 && firstVisibleItemPosition <= (mViewModel?.getTimelineState()?.value?.notes?.size
+                    ?: 0)
+            ) {
                 try {
                     mViewModel?.getTimelineState()?.value?.notes?.get(firstVisibleItemPosition)
                 } catch (t: Throwable) {

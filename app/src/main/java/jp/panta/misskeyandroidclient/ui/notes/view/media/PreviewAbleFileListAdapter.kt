@@ -6,10 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.databinding.ItemMediaPreviewBinding
-import jp.panta.misskeyandroidclient.ui.media.MediaPreviewHelper
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 
 class PreviewAbleFileListAdapter(
     val media: MediaViewData

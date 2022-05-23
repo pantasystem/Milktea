@@ -7,15 +7,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
-import net.pantasystem.milktea.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.antenna.Antenna
 
 @AndroidEntryPoint
 class AntennaListActivity : AppCompatActivity() {
@@ -34,13 +32,13 @@ class AntennaListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
-        mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this, {
+        mAntennaListViewModel.confirmDeletionAntennaEvent.observe(this) {
             confirmDeleteAntenna(it)
-        })
-        mAntennaListViewModel.editAntennaEvent.observe( this, {
+        }
+        mAntennaListViewModel.editAntennaEvent.observe( this) {
             val intent = AntennaEditorActivity.newIntent(this, it.id)
             requestEditAntennaResult.launch(intent)
-        })
+        }
 
         mBinding.addAntennaFab.setOnClickListener {
             requestEditAntennaResult.launch(Intent(this, AntennaEditorActivity::class.java))

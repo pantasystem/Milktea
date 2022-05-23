@@ -15,13 +15,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
-import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 
 @AndroidEntryPoint
 class ReactionSelectionDialog : BottomSheetDialogFragment(),
@@ -39,7 +39,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         return inflater.inflate(R.layout.dialog_select_reaction, container, false)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DialogSelectReactionBinding.bind(view)

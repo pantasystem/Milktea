@@ -1,12 +1,10 @@
-package net.pantasystem.milktea.api.Instance.db
+package net.pantasystem.milktea.data.infrastructure.instance.db
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiAlias
-import net.pantasystem.milktea.data.infrastructure.instance.db.EmojiDTO
 
 class RoomMetaRepository(
     private val metaDAO: MetaDAO,

@@ -2,30 +2,29 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
-import net.pantasystem.milktea.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.api.misskey.list.UserListDTO
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.user.User
-import java.lang.StringBuilder
 import java.util.regex.Pattern
 
 
 @FlowPreview
 @Suppress("BlockingMethodInNonBlockingContext")
 class AntennaEditorViewModel (
-    val antennaId: Antenna.Id?,
+    private val antennaId: Antenna.Id?,
     val miCore: MiCore,
 ) : ViewModel(){
 

@@ -72,7 +72,7 @@ fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.s
         }
     }
 
-    val inlineContents = emojis.map { emoji ->
+    val inlineContents = emojis.associate { emoji ->
         emoji.name to InlineTextContent(
             Placeholder(
                 width = fontSize,
@@ -82,6 +82,6 @@ fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.s
         ) {
             Image(painter = rememberAsyncImagePainter(model = emoji.url), contentDescription = null)
         }
-    }.toMap()
+    }
     Text(annotatedText, inlineContent = inlineContents)
 }
