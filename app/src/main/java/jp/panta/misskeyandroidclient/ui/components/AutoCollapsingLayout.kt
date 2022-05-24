@@ -1,18 +1,17 @@
 package jp.panta.misskeyandroidclient.ui.components
 
+import android.animation.Animator
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import androidx.databinding.InverseBindingAdapter
-import androidx.databinding.InverseBindingListener
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
-import java.util.ArrayList
 
 /**
  * ノートのコンテンツのサイズが言って以上超えた時に
@@ -24,9 +23,10 @@ class AutoCollapsingLayout : FrameLayout {
     private var limitedMaxHeight = 300
     private var expandedChangedListener: MutableList<(Boolean) -> Unit> = mutableListOf()
 
-    private var expanded = false
+    var isExpanded = false
 
     private var expandableButtonId: Int? = null
+    private var currentAnimator: Animator? = null
 
     init {
         limitedMaxHeight =
@@ -61,106 +61,95 @@ class AutoCollapsingLayout : FrameLayout {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 
         val limitedMaxPxHeight = limitedMaxHeight * resources.displayMetrics.density
+        val isExactlyHeight = MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY
 
+        var (maxWidth, maxHeight, expandedButton) = getWidthAndHeightAndButton(
+            widthMeasureSpec,
+            heightMeasureSpec
+        )
+
+        if (!isExpanded && maxHeight > limitedMaxPxHeight) {
+            maxHeight = limitedMaxPxHeight.toInt()
+            if (expandedButton != null) {
+                measureChildWithMargins(expandedButton, widthMeasureSpec, 0, heightMeasureSpec, 0)
+                expandedButton.isVisible = true
+            }
+        } else {
+            expandedButton?.isVisible = false
+        }
+
+        setMeasuredDimension(
+            resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
+            resolveSizeAndState(
+                if (isExactlyHeight) MeasureSpec.getSize(heightMeasureSpec) else maxHeight + paddingTop + paddingBottom,
+                heightMeasureSpec,
+                0
+            )
+        )
+    }
+
+    override fun addChildrenForAccessibility(outChildren: ArrayList<View>?) {
+        super.addChildrenForAccessibility(outChildren)
+    }
+
+    fun findExpandButton(): View? {
+        return children.firstOrNull { it.id == expandableButtonId }
+    }
+
+
+    fun setExpandedAndInvalidate(value: Boolean) {
+        this.isExpanded = value
+
+        invalidate()
+        requestLayout()
+        expandedChangedListener.forEach { it.invoke(isExpanded) }
+    }
+
+    internal fun getWidthAndHeightAndButton(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int
+    ): Triple<Int, Int, View?> {
         var maxHeight = 0
         var maxWidth = 0
 
-        var expandedButton: View? = null
+        var button: View? = null
 
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             if (child.id == expandableButtonId) {
-                expandedButton = child
+                button = child
             }
             if (child.visibility != View.GONE && child.id != expandableButtonId) {
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
                 maxHeight = maxHeight.coerceAtLeast(child.measuredHeight)
                 maxWidth = maxWidth.coerceAtLeast(child.measuredWidth)
             }
-
         }
-        if (!expanded && maxHeight > limitedMaxPxHeight) {
-            maxHeight = limitedMaxPxHeight.toInt()
-            if (expandedButton != null) {
-                measureChildWithMargins(expandedButton, widthMeasureSpec, 0, heightMeasureSpec, 0)
-                expandedButton.visibility = View.VISIBLE
-            }
-        } else {
+        return Triple(maxWidth, maxHeight, button)
 
-            expandedButton?.visibility = View.GONE
-            //setExpanded(true)
-        }
-
-        setMeasuredDimension(
-            resolveSizeAndState(maxWidth, widthMeasureSpec, 0),
-            resolveSizeAndState(maxHeight + paddingTop + paddingBottom, heightMeasureSpec, 0)
-        )
     }
 
 
-    override fun addChildrenForAccessibility(outChildren: ArrayList<View>?) {
-        super.addChildrenForAccessibility(outChildren)
+    fun setCurrentAnimator(animator: Animator) {
+        currentAnimator?.cancel()
+        currentAnimator = animator
     }
 
 
-    fun setExpanded(value: Boolean) {
-        this.expanded = value
-        expandedChangedListener.forEach { it.invoke(expanded) }
+    fun setHeightAndInvalidate(pixels: Int) {
+        layoutParams.height = pixels
         invalidate()
-        Log.d("AutoExpandableLayout", "setExpanded:$value")
-    }
-
-    fun getExpanded(): Boolean {
-        return this.expanded
-    }
-
-    fun addExpandedChangedListener(listener: (Boolean) -> Unit) {
-        expandedChangedListener.add(listener)
-    }
-
-    fun setLimitedMaxHeight(size: Int) {
-        limitedMaxHeight = size
-        invalidate()
+        requestLayout()
     }
 
 
     companion object {
 
-
-        @InverseBindingAdapter(attribute = "overflowExpanded")
-        @JvmStatic
-        fun overflowExpandedAttrChanged(viewGroup: AutoCollapsingLayout): Boolean {
-            return viewGroup.getExpanded()
-        }
-
         @JvmStatic
         @BindingAdapter("overflowExpanded")
         fun bindExpanded(viewGroup: AutoCollapsingLayout, expanded: Boolean?) {
-            viewGroup.setExpanded(expanded ?: false)
+            viewGroup.setExpandedAndInvalidate(expanded ?: false)
         }
-
-
-        @JvmStatic
-        @BindingAdapter("overflowExpandedAttrChanged")
-        fun overflowExpandedAttrChanged(
-            viewGroup: AutoCollapsingLayout,
-            listener: InverseBindingListener?
-        ) {
-            if (listener != null) {
-                viewGroup.addExpandedChangedListener {
-                    listener.onChange()
-                }
-            }
-        }
-
-        @JvmStatic
-        @BindingAdapter("limitedMaxHeight")
-        fun bindLimitedMaxHeight(viewGroup: AutoCollapsingLayout, size: Int?) {
-            size ?: return
-            viewGroup.setLimitedMaxHeight(size)
-        }
-
-
     }
 
 }

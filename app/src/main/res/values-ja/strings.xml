@@ -392,6 +392,9 @@
     <string name="channel">チャンネル</string>
     <string name="edit_caption">キャプションを編集</string>
     <string name="input_caption">キャプションを入力</string>
+    <string name="animation">アニメーション</string>
+    <string name="avatar_icon_animation">アバターアイコンアニメーション</string>
+
     <!--    <string name="n_people">%d人</string>-->
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->

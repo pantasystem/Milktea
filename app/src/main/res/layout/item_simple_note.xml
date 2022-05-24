@@ -110,14 +110,17 @@
                 app:expandableButton="@id/autoExpandableButton"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/subName">
+                app:layout_constraintTop_toBottomOf="@id/subName"
+                targetButton="@{autoExpandableButton}"
+                onExpandedChanged="@{note::expand}"
+                >
 
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/open"
                     android:layout_gravity="center_horizontal|bottom"
-                    android:onClick="@{()-> note.expand()}"
+
                     android:id="@+id/autoExpandableButton"
                     android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
 
@@ -149,8 +152,11 @@
                         android:layout_marginBottom="5dp"
                         tools:text="展開する"
                         android:textColor="?attr/colorAccent"
-                        android:onClick="@{()-> note.changeContentFolding() }"
                         android:text="@string/auto_note_folding"
+                        onToggleCw="@{ note::changeContentFolding }"
+                        noteId="@{note.id}"
+                        targetView="@{contentMain}"
+                        isVisible="@{note.contentFolding}"
                          />
 
                 <LinearLayout
@@ -306,6 +312,10 @@
                                 android:onClick="@{()-> note.changeSubContentFolding() }"
                                 app:layout_constraintTop_toBottomOf="@id/subCw"
                                 app:layout_constraintStart_toStartOf="parent"
+                                noteId="@{ note.subNote.note.id }"
+                                onToggleCw="@{ note::changeSubContentFolding }"
+                                targetView="@{ subNoteText }"
+                                isVisible="@{ note.subContentFolding }"
 
                                 />
 

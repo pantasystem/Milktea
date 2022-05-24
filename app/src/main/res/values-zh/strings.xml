@@ -387,7 +387,11 @@
 
     <string name="edit_caption">编辑标题</string>
     <string name="input_caption">输入标题</string>
-<!--    <string name="n_people">%d位用户</string>-->
+    <string name="animation">头像图标动画</string>
+    <string name="avatar_icon_animation">头像图标动画</string>
+
+
+    <!--    <string name="n_people">%d位用户</string>-->
 <!--    <string name="n_posts">%d篇帖文</string>-->
 <!--    <string name="owned">拥有</string>-->
 
