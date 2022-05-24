@@ -149,8 +149,11 @@
                         android:layout_marginBottom="5dp"
                         tools:text="展開する"
                         android:textColor="?attr/colorAccent"
-                        android:onClick="@{()-> note.changeContentFolding() }"
                         android:text="@string/auto_note_folding"
+                        onToggleCw="@{ note::changeContentFolding }"
+                        noteId="@{note.id}"
+                        targetView="@{contentMain}"
+                        isVisible="@{note.contentFolding}"
                          />
 
                 <LinearLayout
@@ -306,6 +309,10 @@
                                 android:onClick="@{()-> note.changeSubContentFolding() }"
                                 app:layout_constraintTop_toBottomOf="@id/subCw"
                                 app:layout_constraintStart_toStartOf="parent"
+                                noteId="@{ note.subNote.note.id }"
+                                onToggleCw="@{ note::changeSubContentFolding }"
+                                targetView="@{ subNoteText }"
+                                isVisible="@{ note.subContentFolding }"
 
                                 />
 
