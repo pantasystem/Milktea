@@ -145,16 +145,11 @@ class AutoCollapsingLayout : FrameLayout {
 
     companion object {
 
-
         @JvmStatic
         @BindingAdapter("overflowExpanded")
         fun bindExpanded(viewGroup: AutoCollapsingLayout, expanded: Boolean?) {
             viewGroup.setExpandedAndInvalidate(expanded ?: false)
         }
-
-
-
-
     }
 
 }
