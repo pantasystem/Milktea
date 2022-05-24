@@ -1,16 +1,12 @@
 package jp.panta.misskeyandroidclient.ui.components
 
 import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import androidx.core.animation.doOnCancel
-import androidx.core.animation.doOnEnd
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
@@ -109,7 +105,7 @@ class AutoCollapsingLayout : FrameLayout {
         expandedChangedListener.forEach { it.invoke(isExpanded) }
     }
 
-    private fun getWidthAndHeightAndButton(
+    internal fun getWidthAndHeightAndButton(
         widthMeasureSpec: Int,
         heightMeasureSpec: Int
     ): Triple<Int, Int, View?> {
@@ -157,55 +153,7 @@ class AutoCollapsingLayout : FrameLayout {
         }
 
 
-        @JvmStatic
-        @BindingAdapter("targetButton", "onExpandedChanged")
-        fun AutoCollapsingLayout.setExpandedWithAnimation(
-            targetButton: View,
-            onExpandedChanged: (() -> Unit)?
-        ) {
 
-            val button = findExpandButton()
-            button?.alpha = 1.0f
-
-            targetButton.setOnClickListener {
-
-                val beforeHeight = measuredHeight
-
-                val (_, maxHeight, _) = getWidthAndHeightAndButton(
-                    MeasureSpec.makeMeasureSpec(
-                        0,
-                        MeasureSpec.UNSPECIFIED
-                    ), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-                )
-
-                val animator =
-                    ValueAnimator.ofInt(beforeHeight, maxHeight)
-                        .setDuration(100).apply {
-                            addUpdateListener {
-                                onExpandedChanged?.invoke()
-                                val newHeight = it.animatedValue as Int
-                                setHeightAndInvalidate(newHeight)
-                                button?.alpha = 1f - newHeight.toFloat() / maxHeight.toFloat()
-                            }
-
-
-                            doOnEnd {
-                                isExpanded = true
-                                findExpandButton()?.isVisible = false
-                                onExpandedChanged?.invoke()
-                                setHeightAndInvalidate(ViewGroup.LayoutParams.WRAP_CONTENT)
-                            }
-                            doOnCancel {
-                                setHeightAndInvalidate(ViewGroup.LayoutParams.WRAP_CONTENT)
-                            }
-                        }
-
-
-                setCurrentAnimator(animator)
-                animator.start()
-            }
-
-        }
 
     }
 
