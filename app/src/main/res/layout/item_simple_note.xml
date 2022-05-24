@@ -110,14 +110,17 @@
                 app:expandableButton="@id/autoExpandableButton"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/subName">
+                app:layout_constraintTop_toBottomOf="@id/subName"
+                targetButton="@{autoExpandableButton}"
+                onExpandedChanged="@{note::expand}"
+                >
 
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/open"
                     android:layout_gravity="center_horizontal|bottom"
-                    android:onClick="@{()-> note.expand()}"
+
                     android:id="@+id/autoExpandableButton"
                     android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
 
