@@ -391,7 +391,11 @@
 
     <string name="edit_caption">Edit caption</string>
     <string name="input_caption">Input caption</string>
-<!--    <string name="n_people">%d people</string>-->
+    <string name="animation">Animation</string>
+    <string name="avatar_icon_animation">Avatar icon animation</string>
+
+
+    <!--    <string name="n_people">%d people</string>-->
 <!--    <string name="n_posts">%d posts</string>-->
 <!--    <string name="owned">Owned</string>-->
 </resources>

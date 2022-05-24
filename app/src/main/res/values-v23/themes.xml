@@ -32,7 +32,7 @@
 
 
 
-        <item name="android:navigationBarColor">@color/navigationColor</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
 
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
 

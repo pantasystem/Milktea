@@ -181,7 +181,8 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 Image(
                                     rememberAsyncImagePainter(configState.backgroundImagePath),
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                         .aspectRatio(16f / 9)
                                 )
                             }
@@ -216,6 +217,15 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 },
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
+                        }
+
+                        item {
+                            SettingTitleTile(text = stringResource(id = R.string.animation))
+                            SwitchTile(checked = currentConfigState.isEnableTimelineScrollAnimation, onChanged = {
+                                currentConfigState = currentConfigState.copy(isEnableTimelineScrollAnimation = it)
+                            }) {
+                                Text(stringResource(id = R.string.avatar_icon_animation))
+                            }
                         }
 
 
