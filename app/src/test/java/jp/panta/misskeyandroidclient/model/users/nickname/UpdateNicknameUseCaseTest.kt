@@ -51,7 +51,7 @@ class UpdateNicknameUseCaseTest {
         )
         val result = updateNicknameUseCase.invoke(user, "updated nickname")
         assertEquals("updated nickname", nicknameRepository.findOne(targetId).name)
-        assertEquals("updated nickname", result.getDisplayName())
-        assertEquals("updated nickname", userDataSource.get(user.id).getDisplayName())
+        assertEquals("updated nickname", result.displayName)
+        assertEquals("updated nickname", userDataSource.get(user.id).displayName)
     }
 }

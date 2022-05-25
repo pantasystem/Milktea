@@ -6,13 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.MiApplication
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.api.misskey.users.RequestUser
-import net.pantasystem.milktea.api.misskey.users.UserDTO
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
@@ -20,9 +15,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.*
-import java.lang.IllegalStateException
+import net.pantasystem.milktea.model.user.User
 
 class PageSettingViewModel(
     val miCore: MiCore,
@@ -137,10 +136,10 @@ class PageSettingViewModel(
     private fun addUserPage(user: UserDTO) {
         val page = if (settingStore.isUserNameDefault) {
             PageableTemplate(account!!)
-                .user(user.id, title = user.getShortDisplayName())
+                .user(user.id, title = user.shortDisplayName)
         } else {
             PageableTemplate(account!!)
-                .user(user.id, title = user.getDisplayName())
+                .user(user.id, title = user.displayName)
         }
         addPage(page)
     }
@@ -152,7 +151,7 @@ class PageSettingViewModel(
                 val user = miCore.getUserRepository()
                     .find(User.Id(accountId = account!!.accountId, id = userId))
                 val name =
-                    if (settingStore.isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
+                    if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName
                 val page = account!!.newPage(pageable, name = name)
                 addPage(page)
             }

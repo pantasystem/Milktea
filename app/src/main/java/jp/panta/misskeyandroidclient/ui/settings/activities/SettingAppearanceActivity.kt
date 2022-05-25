@@ -118,8 +118,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             }
                         )
                     }
-                ) {
-                    LazyColumn {
+                ) { padding ->
+                    LazyColumn(
+                        modifier = Modifier.padding(padding)
+                    ) {
                         item {
                             SettingTitleTile(text = stringResource(id = R.string.theme))
                         }

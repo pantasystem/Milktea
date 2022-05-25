@@ -174,7 +174,7 @@ class UserDetailActivity : AppCompatActivity() {
                     ) { tab, position ->
                         tab.text = adapter.titles[position]
                     }.attach()
-                    supportActionBar?.title = detail.getDisplayUserName()
+                    supportActionBar?.title = detail.displayUserName
                 }
 
             }
@@ -199,7 +199,7 @@ class UserDetailActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 mViewModel.userState.collect {
                     invalidateOptionsMenu()
-                    supportActionBar?.title = it?.getDisplayUserName()
+                    supportActionBar?.title = it?.displayUserName
                 }
             }
 
@@ -219,7 +219,7 @@ class UserDetailActivity : AppCompatActivity() {
             }
 
             binding.createMention.setOnClickListener {
-                mViewModel.user.value?.getDisplayUserName()?.let {
+                mViewModel.user.value?.displayUserName?.let {
                     val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
                     startActivity(intent)
                 }
@@ -411,7 +411,7 @@ class UserDetailActivity : AppCompatActivity() {
             accountViewModel.addPage(
                 Page(
                     accountStore.currentAccountId ?: -1,
-                    title = user.getDisplayUserName(),
+                    title = user.displayUserName,
                     weight = -1,
                     pageable = Pageable.UserTimeline(
                         userId = user.id.id

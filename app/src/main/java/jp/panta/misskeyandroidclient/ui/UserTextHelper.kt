@@ -24,10 +24,10 @@ object UserTextHelper{
             userName = subNameView
         }
         name?.let{
-            name.text = CustomEmojiDecorator().decorate(user.emojis, user.getDisplayName(), name)
+            name.text = CustomEmojiDecorator().decorate(user.emojis, user.displayName, name)
         }
         userName?.let{
-            userName.text = user.getDisplayUserName()
+            userName.text = user.displayUserName
         }
     }
 }

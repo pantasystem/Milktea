@@ -13,7 +13,7 @@ object NotificationHelper {
     fun TextView.setUnknownNotificationMessage(n: Notification) {
 
         if(n is UnknownNotification) {
-            this.text = context.getString(R.string.unknown_notification_msg, n.id.notificationId, n.rawType, n.userId.id)
+            this.text = String.format(context.getString(R.string.unknown_notification_msg), n.id.notificationId, n.rawType, n.userId.id)
         }
     }
 }

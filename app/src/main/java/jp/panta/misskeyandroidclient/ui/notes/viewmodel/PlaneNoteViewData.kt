@@ -50,13 +50,13 @@ open class PlaneNoteViewData (
         get(){
             if(note.reply != null){
                 //reply
-                return "${note.user.getDisplayUserName()}が返信しました"
+                return "${note.user.displayUserName}が返信しました"
             }else if(note.note.renoteId == null && (note.note.text != null || note.files != null)){
                 //Note
                 return null
             }else if(note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()){
                 //reNote
-                return "${note.user.getDisplayUserName()}がリノートしました"
+                return "${note.user.displayUserName}がリノートしました"
 
             }else if(note.note.renoteId != null && (note.note.text != null || note.files != null)){
                 //quote
@@ -71,9 +71,9 @@ open class PlaneNoteViewData (
         get() = toShowNote.user.id
 
     val name: String
-        get() = toShowNote.user.getDisplayName()
+        get() = toShowNote.user.displayName
 
-    val userName: String = toShowNote.user.getDisplayUserName()
+    val userName: String = toShowNote.user.displayUserName
 
     val avatarUrl = toShowNote.user.avatarUrl
 

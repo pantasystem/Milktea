@@ -96,11 +96,11 @@ fun GalleryPostCard(
                 Spacer(modifier = Modifier.width(4.dp))
                 Column {
                     Text(
-                        galleryState.user.getDisplayName(),
+                        galleryState.user.displayName,
                         maxLines = 1,
                     )
                     Text(
-                        galleryState.user.getDisplayUserName(),
+                        galleryState.user.displayUserName,
                         maxLines = 1,
                     )
                 }

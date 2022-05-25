@@ -18,9 +18,9 @@ object NotificationTitleHelper {
                 context.getString(R.string.poll_ended)
             }
             else -> if (miCore.getSettingStore().isUserNameDefault) {
-                notification.user?.getDisplayUserName()?: ""
+                notification.user?.displayUserName?: ""
             } else {
-                notification.user?.getDisplayName()?: ""
+                notification.user?.displayName?: ""
             }
         }
     }

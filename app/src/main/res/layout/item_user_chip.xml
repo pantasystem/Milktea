@@ -6,6 +6,7 @@
         <variable
                 name="userViewData"
                 type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData" />
+        <import type="net.pantasystem.milktea.model.user.User" />
     </data>
     <LinearLayout
             android:background="@drawable/shape_chip"
@@ -33,7 +34,7 @@
                 android:layout_height="wrap_content"
                 tools:text="UserName"
                 android:layout_gravity="center_vertical"
-                android:text="@{userViewData.user.shortDisplayName}"/>
+                android:text="@{((User.Detail)userViewData.user).shortDisplayName }"/>
     </LinearLayout>
 
 </layout>

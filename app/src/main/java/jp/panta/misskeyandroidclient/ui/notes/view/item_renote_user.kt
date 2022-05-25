@@ -88,14 +88,14 @@ fun ItemRenoteUser(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     if(isUserNameDefault){
-                        CustomEmojiText(text = note.user.getDisplayUserName(), emojis = note.user.emojis)
+                        CustomEmojiText(text = note.user.displayUserName, emojis = note.user.emojis)
                     }else{
-                        CustomEmojiText(text = note.user.getDisplayName(), emojis = note.user.emojis)
+                        CustomEmojiText(text = note.user.displayName, emojis = note.user.emojis)
                     }
                     if(isUserNameDefault){
-                        Text(text = note.user.getDisplayName())
+                        Text(text = note.user.displayName)
                     }else{
-                        Text(text = note.user.getDisplayUserName())
+                        Text(text = note.user.displayUserName)
                     }
                 }
 

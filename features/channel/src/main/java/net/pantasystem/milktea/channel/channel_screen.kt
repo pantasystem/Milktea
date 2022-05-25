@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.channel
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -8,13 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
 import net.pantasystem.milktea.model.account.AccountStore
 
 data class ChannelTypeWithTitle(
@@ -73,11 +75,13 @@ fun ChannelScreen(
 
             }
         }
-    ) {
+    ) { padding ->
         if (currentAccount == null) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.padding(padding)
+            )
         } else {
-            HorizontalPager(state = pagerState) {
+            HorizontalPager(state = pagerState, modifier = Modifier.padding(padding)) {
                 ChannelListStateScreen(
                     listType = channelTypeWithTitleList[pagerState.currentPage].type,
                     account = currentAccount!!,

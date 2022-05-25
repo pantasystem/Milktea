@@ -69,7 +69,7 @@ class NotificationService : Service() {
 
         val builder = NotificationCompat.Builder(this, MESSAGE_CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
-            .setContentTitle(message.user.getDisplayUserName())
+            .setContentTitle(message.user.displayUserName)
             .setContentText(SafeUnbox.unbox(message.message.text))
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 

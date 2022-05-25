@@ -61,7 +61,7 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
 
         userDetailViewModel.user.observe(this) {
-            title = it?.getDisplayName()
+            title = it?.displayName
         }
 
         mBinding.followFollowerPager.adapter = FollowFollowerPagerAdapter(userId)

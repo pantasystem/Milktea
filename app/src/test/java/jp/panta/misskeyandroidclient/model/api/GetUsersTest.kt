@@ -22,7 +22,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -41,7 +41,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -62,7 +62,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -82,7 +82,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -102,7 +102,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -121,7 +121,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //        })
 //        Assert.assertNotEquals(list, null)
 //    }

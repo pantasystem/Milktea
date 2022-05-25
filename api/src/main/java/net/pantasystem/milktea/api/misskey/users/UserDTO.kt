@@ -46,19 +46,16 @@ data class UserDTO(
     val hasPendingFollowRequestToYou: Boolean? = null,
     val isLocked: Boolean? = null
 ) : Serializable {
-    fun getDisplayUserName(): String {
-        return "@" + this.userName + if (this.host == null) {
+    val displayUserName: String
+        get() = "@" + this.userName + if(this.host == null){
             ""
-        } else {
+        }else{
             "@" + this.host
         }
-    }
 
-    fun getDisplayName(): String {
-        return name ?: userName
-    }
+    val displayName: String
+        get() = name?: userName
 
-    fun getShortDisplayName(): String {
-        return "@" + this.userName
-    }
+    val shortDisplayName: String
+        get() = "@" + this.userName
 }

@@ -102,9 +102,10 @@ fun SearchAndSelectUserScreen(
                 }
 
             }
-        ) {
+        ) { padding ->
             Column(
                 modifier = Modifier.fillMaxSize()
+                    .padding(padding)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

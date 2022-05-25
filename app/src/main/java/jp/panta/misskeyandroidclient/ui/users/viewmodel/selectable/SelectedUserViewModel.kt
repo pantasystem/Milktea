@@ -156,7 +156,7 @@ class SelectedUserViewModel(
             !selected.contains(ex)
         }
         return ChangedDiffResult(selected.filterNotNull().toList(), added.filterNotNull(), removed, selectedUsers.map {
-            it.getDisplayUserName()
+            it.displayUserName
         })
     }
 }

@@ -66,8 +66,8 @@ class DeleteNicknameUseCaseTest {
         val nickname = UserNickname(nicknameId, "changed name")
         nicknameRepository.save(nickname)
         userDataSource.add(user)
-        assertEquals("changed name", userDataSource.get(user.id).getDisplayName())
+        assertEquals("changed name", userDataSource.get(user.id).displayName)
         deleteNicknameUseCase.invoke(user)
-        assertEquals("name1", userDataSource.get(user.id).getDisplayName())
+        assertEquals("name1", userDataSource.get(user.id).displayName)
     }
 }

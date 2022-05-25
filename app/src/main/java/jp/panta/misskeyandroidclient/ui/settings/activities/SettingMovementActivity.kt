@@ -96,9 +96,10 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         )
                     },
-                ) {
+                ) { padding ->
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
+                            .padding(padding)
                     ) {
 
                         item {

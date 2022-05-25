@@ -18,10 +18,10 @@ object MessagingTitleHelper {
                 titleTargetMsgHistoryViewData.group?.name
             }
             isUserNameDefault -> {
-                titleTargetMsgHistoryViewData.partner?.getDisplayUserName()
+                titleTargetMsgHistoryViewData.partner?.displayUserName
             }
             else -> {
-                titleTargetMsgHistoryViewData.partner?.getDisplayName()
+                titleTargetMsgHistoryViewData.partner?.displayName
             }
         }
 

@@ -40,7 +40,7 @@ class MessageViewModel(
             runCatching {
                 when (messagingId) {
                     is MessagingId.Direct -> {
-                        miCore.getUserRepository().find(messagingId.userId).getDisplayUserName()
+                        miCore.getUserRepository().find(messagingId.userId).displayUserName
                     }
                     is MessagingId.Group -> {
                         miCore.getGroupRepository().find(messagingId.groupId).name

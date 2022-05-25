@@ -1,15 +1,18 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 
-@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 open class UserViewData(
     val userId: User.Id?,
     val userName: String? = null,
@@ -82,7 +85,7 @@ open class UserViewData(
 
 
 
-    val user = userDataSource.state.map { state ->
+    val user: LiveData<User.Detail?> = userDataSource.state.map { state ->
         if (userId != null) {
             state.get(userId)
         } else {

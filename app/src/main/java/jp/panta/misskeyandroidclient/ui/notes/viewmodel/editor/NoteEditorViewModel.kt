@@ -232,7 +232,7 @@ class NoteEditorViewModel @Inject constructor(
             userRepository.find(it.userId)
         }.onEach { note ->
             _state.update { state ->
-                state.addMentionUserNames(listOf(note.getDisplayUserName()), 0).state
+                state.addMentionUserNames(listOf(note.displayUserName), 0).state
             }
         }.launchIn(viewModelScope)
 
