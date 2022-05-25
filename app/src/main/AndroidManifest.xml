@@ -143,10 +143,6 @@
             </intent-filter>
         </activity>
 
-        <service
-                android:name=".PostNoteService"
-                android:exported="false" />
-
         <activity android:name=".MessageActivity" />
         <activity android:name=".DriveActivity" />
         <activity
@@ -164,7 +160,6 @@
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:label="@string/app_name"
                 android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

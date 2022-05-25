@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp">
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/shared_switch"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

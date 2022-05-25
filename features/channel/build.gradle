@@ -60,7 +60,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "com.google.android.material:compose-theme-adapter:1.1.9"
+    implementation "com.google.android.material:compose-theme-adapter:1.1.10"
     implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
     implementation 'androidx.activity:activity-compose:1.4.0'
     implementation "com.google.accompanist:accompanist-pager:0.14.0"

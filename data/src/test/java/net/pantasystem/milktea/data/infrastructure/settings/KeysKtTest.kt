@@ -53,6 +53,7 @@ class KeysKtTest {
                     "jp.panta.misskeyandroidclient.model.settings.SURFACE_COLOR_OPAQUE_KEY",
                     key.str()
                 )
+                Keys.IsEnableTimelineScrollAnimation -> Assert.assertEquals("IS_ENABLE_TIMELINE_SCROLL_ANIMATION", key.str())
             }
         }
     }
@@ -60,8 +61,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(14, Keys.allKeys.size)
-        Assert.assertEquals(14, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(15, Keys.allKeys.size)
+        Assert.assertEquals(15, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
