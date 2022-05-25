@@ -357,7 +357,7 @@
     <string name="request_follow_from_u">请求关注</string>
     <string name="unfollow">取消关注</string>
     <string name="unknown_notification">未知的提醒</string>
-    <string name="unknown_notification_msg">未知的提醒。请截图并报告给开发者。通知id：%s，类型：%s，发送者ID：%s,</string>
+    <string name="unknown_notification_msg" formatted="false">未知的提醒。请截图并报告给开发者。通知id：%s，类型：%s，发送者ID：%s,</string>
 
     <string name="translated_from_s">翻译自 %s： \n</string>
     <string name="error_s">发生错误: %s</string>

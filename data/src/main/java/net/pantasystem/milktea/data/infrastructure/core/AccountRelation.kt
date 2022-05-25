@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package net.pantasystem.milktea.data.infrastructure.core
 
 import android.util.Log

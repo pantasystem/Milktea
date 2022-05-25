@@ -11,8 +11,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -21,13 +23,13 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.drive.FileProperty
+import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.PathViewData
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
 import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.drive.FileProperty
 
 
 @ExperimentalPagerApi
@@ -38,10 +40,10 @@ fun DriveScreen(
     driveViewModel: DriveViewModel,
     fileViewModel: FileViewModel,
     directoryViewModel: DirectoryViewModel,
-    onNavigateUp: ()->Unit,
-    onFixSelected: ()->Unit,
-    onShowLocalFilePicker: ()->Unit,
-    onShowCreateDirectoryEditor: ()-> Unit,
+    onNavigateUp: () -> Unit,
+    onFixSelected: () -> Unit,
+    onShowLocalFilePicker: () -> Unit,
+    onShowCreateDirectoryEditor: () -> Unit,
     tabTitles: List<String> = listOf(
         stringResource(id = R.string.file),
         stringResource(id = R.string.folder)
@@ -49,11 +51,14 @@ fun DriveScreen(
 ) {
     require(tabTitles.size == 2)
 
-    val isSelectMode: Boolean by  driveViewModel.isSelectMode.asLiveData().observeAsState(initial = false)
+    val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
+        .observeAsState(initial = false)
 
     val selectableMaxCount = driveViewModel.selectable?.selectableMaxSize
-    val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData().observeAsState(initial = emptySet())
-    val path: List<PathViewData> by driveViewModel.path.asLiveData().observeAsState(initial = emptyList())
+    val selectedFileIds: Set<FileProperty.Id>? by fileViewModel.selectedFileIds.asLiveData()
+        .observeAsState(initial = emptySet())
+    val path: List<PathViewData> by driveViewModel.path.asLiveData()
+        .observeAsState(initial = emptyList())
 
     val pagerState = rememberPagerState(pageCount = tabTitles.size)
     val scope = rememberCoroutineScope()
@@ -65,11 +70,11 @@ fun DriveScreen(
 
             Column {
 
-                TopAppBar (
+                TopAppBar(
                     title = {
-                        if(isSelectMode) {
-                            Text("${stringResource(R.string.selected)} ${selectedFileIds?.size?: 0}/${selectableMaxCount}")
-                        }else{
+                        if (isSelectMode) {
+                            Text("${stringResource(R.string.selected)} ${selectedFileIds?.size ?: 0}/${selectableMaxCount}")
+                        } else {
                             Text(stringResource(id = R.string.drive))
                         }
                     },
@@ -83,7 +88,7 @@ fun DriveScreen(
                         }
                     },
                     actions = {
-                        if(isSelectMode) {
+                        if (isSelectMode) {
                             IconButton(onClick = onFixSelected) {
                                 Icon(imageVector = Icons.Filled.Check, contentDescription = "Fix")
                             }
@@ -99,7 +104,7 @@ fun DriveScreen(
                 TabRow(selectedTabIndex = pagerState.currentPage) {
                     tabTitles.forEachIndexed { index, s ->
                         Tab(
-                            text = {  Text(text = s) },
+                            text = { Text(text = s) },
                             selected = index == pagerState.currentPage,
                             onClick = {
 
@@ -116,11 +121,11 @@ fun DriveScreen(
             }
         },
         floatingActionButton = {
-            if(pagerState.currentPage == 0) {
+            if (pagerState.currentPage == 0) {
                 FloatingActionButton(onClick = onShowLocalFilePicker) {
                     Icon(imageVector = Icons.Filled.AddAPhoto, contentDescription = null)
                 }
-            }else{
+            } else {
                 FloatingActionButton(onClick = onShowCreateDirectoryEditor) {
                     Icon(imageVector = Icons.Filled.Add, contentDescription = null)
                 }
@@ -128,13 +133,16 @@ fun DriveScreen(
 
         }
 
-    ) {
+    ) { padding ->
 
 
-        HorizontalPager(state = pagerState) { page ->
-            if(page == 0) {
-                FilePropertyListScreen(fileViewModel = fileViewModel, driveViewModel = driveViewModel)
-            }else{
+        HorizontalPager(state = pagerState, modifier = Modifier.padding(padding)) { page ->
+            if (page == 0) {
+                FilePropertyListScreen(
+                    fileViewModel = fileViewModel,
+                    driveViewModel = driveViewModel
+                )
+            } else {
                 DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
             }
         }
@@ -142,15 +150,14 @@ fun DriveScreen(
 }
 
 
-
 @Composable
-fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData)->Unit) {
+fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData) -> Unit) {
     LazyRow(
         Modifier
             .background(MaterialTheme.colors.primarySurface)
             .fillMaxWidth(),
 
-    ){
+        ) {
         this.items(path, key = {
             it.id to it.name
         }) { dir ->
