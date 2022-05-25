@@ -85,6 +85,10 @@ class ConfigKtTest {
                 Keys.SurfaceColorOpacity -> Assert.assertEquals(
                     config.surfaceColorOpacity, (u as PrefType.IntPref).value
                 )
+                Keys.IsEnableTimelineScrollAnimation -> Assert.assertEquals(
+                    config.isEnableTimelineScrollAnimation,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
