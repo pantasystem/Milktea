@@ -21,39 +21,39 @@ class NotificationMessageScope(val context: Context) {
         return when (this.notification) {
             is FollowNotification -> context.getString(
                 R.string.followed_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is MentionNotification -> context.getString(
                 R.string.mention_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is ReplyNotification -> context.getString(
                 R.string.replied_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is RenoteNotification -> context.getString(
                 R.string.renoted_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is QuoteNotification -> context.getString(
                 R.string.quoted_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is ReactionNotification -> context.getString(
                 R.string.reacted_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is PollVoteNotification -> context.getString(
                 R.string.voted_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is ReceiveFollowRequestNotification -> context.getString(
                 R.string.follow_requested_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is FollowRequestAcceptedNotification -> context.getString(
                 R.string.follow_request_accepted_by,
-                this.user?.getDisplayUserName() ?: ""
+                this.user?.displayUserName ?: ""
             )
             is PollEndedNotification -> context.getString(R.string.poll_ended)
             is UnknownNotification -> context.getString(R.string.unknown_notification)

@@ -30,7 +30,7 @@ class HistoryViewData (account: Account, val message: MessageHistoryRelation, un
     val title = if(isGroup){
         "${group?.name}"
     }else{
-        partner?.getDisplayUserName()
+        partner?.displayUserName
     }
     private val mUnreadMessages = unReadMessages.findByMessagingId(messagingId)
     val unreadMessages = mUnreadMessages.stateIn(coroutineScope, SharingStarted.Lazily, emptyList())

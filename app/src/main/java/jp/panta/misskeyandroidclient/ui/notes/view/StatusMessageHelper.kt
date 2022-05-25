@@ -18,9 +18,9 @@ object StatusMessageHelper {
         val isUserNameDefault = settingStore.isUserNameDefault
         val note = statusMessageTargetViewNote.note
         val name = if(isUserNameDefault){
-            note.user.getDisplayUserName()
+            note.user.displayUserName
         }else{
-            note.user.getDisplayName()
+            note.user.displayName
         }
         val context = this.context
         val message = when{

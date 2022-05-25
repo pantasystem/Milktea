@@ -71,9 +71,9 @@ fun ItemSimpleUserCard(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Column {
-                CustomEmojiText(text = user.getDisplayName(), emojis = user.emojis)
+                CustomEmojiText(text = user.displayName, emojis = user.emojis)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = user.getDisplayUserName())
+                Text(text = user.displayUserName)
             }
         }
     }

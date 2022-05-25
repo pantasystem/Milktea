@@ -6,7 +6,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
-import java.lang.Exception
 import java.util.*
 
 /**
@@ -93,24 +92,23 @@ sealed interface User : Entity {
         instanceUpdatedAt = Date()
     }
 
-    fun getDisplayUserName(): String{
-        return "@" + this.userName + if(this.host == null){
+
+    val displayUserName: String
+        get() = "@" + this.userName + if(this.host == null){
             ""
         }else{
             "@" + this.host
-        }
-    }
+        } 
 
-    fun getDisplayName(): String{
-        return nickname?.name?: name?: userName
-    }
+    val displayName: String
+        get() = nickname?.name?: name?: userName
 
-    fun getShortDisplayName(): String{
-        return "@" + this.userName
-    }
+    
+    val shortDisplayName: String
+        get() = "@" + this.userName
 
     fun getProfileUrl(account: Account): String {
-        return "https://${account.getHost()}/${getDisplayUserName()}"
+        return "https://${account.getHost()}/${displayUserName}"
     }
 }
 

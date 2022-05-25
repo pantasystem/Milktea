@@ -122,7 +122,7 @@ class UserRepositoryImpl @Inject constructor(
         return userDataSource.all().asSequence().filter {
             it.id.accountId == accountId
         }.filter {
-            it.getDisplayName().startsWith(name)
+            it.displayName.startsWith(name)
         }.toList()
     }
 

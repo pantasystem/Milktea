@@ -41,7 +41,7 @@ class PageableTemplate(val account: Account?) {
         return Page(account?.accountId?: - 1, title, 0, Pageable.UserTimeline(userId))
     }
     fun user(user: User, isUserNameDefault: Boolean): Page {
-        val title = if(isUserNameDefault) user.getShortDisplayName() else user.getDisplayName()
+        val title = if(isUserNameDefault) user.shortDisplayName else user.displayName
         return Page(account?.accountId?: - 1, title, 0, Pageable.UserTimeline(userId = user.id.id))
     }
     fun favorite(title: String): Page {
