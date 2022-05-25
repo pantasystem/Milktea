@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.core
 
 import androidx.room.*
 
+@Suppress("DEPRECATION")
 @Dao
 @Deprecated("model.accountへ移行")
 abstract class AccountDao{

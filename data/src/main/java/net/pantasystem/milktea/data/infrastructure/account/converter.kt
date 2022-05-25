@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package net.pantasystem.milktea.data.infrastructure.account
 
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -61,6 +63,7 @@ fun UserDTO.newAccount(instanceDomain: String, encryptedToken: String): Account 
         instanceType = Account.InstanceType.MISSKEY
     )
 }
+@Suppress("DEPRECATION")
 fun AccountRelation.newAccount(user: UserDTO?): Account?{
     val ci = getCurrentConnectionInformation()
         ?: return null
