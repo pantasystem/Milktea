@@ -29,7 +29,7 @@ fun ThumbnailPreview(
         contentAlignment = Alignment.Center
     ) {
         if(!isVisible) {
-            Text(stringResource(R.string.nsfw_message))
+            Text(stringResource(R.string.sensitive_content))
         }
         
 

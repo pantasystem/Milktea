@@ -51,7 +51,7 @@
                 tools:text="クリックで表示"
                 android:layout_gravity="center"
                 android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.VISIBLE : View.GONE }"
-                android:text="@string/nsfw_message"
+                android:text="@string/sensitive_content"
                 />
         <ImageButton
                 android:id="@+id/toggleVisibilityButton"

@@ -70,7 +70,7 @@
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
-                        android:text="@string/nsfw_message"
+                        android:text="@string/sensitive_content"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -123,7 +123,7 @@
                         android:id="@+id/nsfwMessageBottomLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/nsfw_message"
+                        android:text="@string/sensitive_content"
                         android:layout_gravity="center"
                         android:visibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
                         />
@@ -193,7 +193,7 @@
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
                         android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
-                        android:text="@string/nsfw_message"
+                        android:text="@string/sensitive_content"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -249,7 +249,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="@string/nsfw_message"
+                        android:text="@string/sensitive_content"
                         android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}" />
                 <ImageButton
                         android:layout_width="40dp"

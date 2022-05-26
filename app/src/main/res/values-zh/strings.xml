@@ -100,7 +100,7 @@
     <string name="dummy_button">虚拟按钮</string>
     <string name="dummy_content">虚拟\n内容</string>
 
-    <string name="nsfw_message">NSFW信息</string>
+    <string name="sensitive_content">NSFW信息</string>
 
     <string name="thumbnail">缩略图</string>
     <string name="play_media">播放</string>

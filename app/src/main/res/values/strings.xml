@@ -101,7 +101,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
-    <string name="nsfw_message">Browsing attention</string>
+    <string name="sensitive_content">Sensitive content</string>
 
     <string name="thumbnail">Thumbnail</string>
     <string name="play_media">Play</string>
