@@ -52,30 +52,27 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // compose
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling:$compose_version"
-    implementation "androidx.compose.foundation:foundation:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.material:material-icons-core:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation "com.google.android.material:compose-theme-adapter:1.1.10"
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
-    implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation "com.google.accompanist:accompanist-pager:0.14.0"
-    implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
-    implementation "io.coil-kt:coil-compose:2.0.0"
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
 
     // hilt
-    implementation 'com.google.dagger:hilt-android:2.42'
-    kapt 'com.google.dagger:hilt-compiler:2.42'
-    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.42'
-    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.42'
-    testImplementation 'com.google.dagger:hilt-android-testing:2.42'
-    kaptTest 'com.google.dagger:hilt-compiler:2.42'
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    androidTestImplementation  libs.hilt.android.testing
+    kaptAndroidTest libs.hilt.compiler
+    testImplementation libs.hilt.android.testing
+    kaptTest libs.hilt.compiler
 
     // datetime
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
+    implementation libs.kotlin.datetime
 
 }
