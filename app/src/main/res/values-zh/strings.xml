@@ -52,10 +52,7 @@
     <string name="tab_selected">已选择的</string>
     <string name="tab_selectable">从下方区域选择</string>
     <string name="title_featured">热门</string>
-    <string name="drive">云盘</string>
 
-    <string name="file">文件</string>
-    <string name="folder">文件夹</string>
     <string name="create_folder">创建文件夹</string>
     <string name="add_account">添加账号</string>
     <string name="post">发帖</string>
@@ -368,9 +365,9 @@
     <string name="report_failed">举报失败</string>
     <string name="mark_as_nsfw">将内容标记为NSFW</string>
     <string name="undo_nsfw">取消NSFW标签</string>
-    <string name="file_deletion_confirmation">确认删除</string>
+<!--    <string name="file_deletion_confirmation">确认删除</string>-->
     <string name="cancel">取消</string>
-    <string name="do_u_want_2_delete_s">你确定要删除 %s 吗？</string>
+<!--    <string name="do_u_want_2_delete_s">你确定要删除 %s 吗？</string>-->
     <string name="remove_attachment">删除附件</string>
     <string name="warning_s">警告:%s</string>
     <string name="reservation_at">自动发布的日期和时间</string>
@@ -385,8 +382,8 @@
     <string name="note_creation_failure">帖文创建失败</string>
     <string name="channel">频道</string>
 
-    <string name="edit_caption">编辑标题</string>
-    <string name="input_caption">输入标题</string>
+<!--    <string name="edit_caption">编辑标题</string>-->
+<!--    <string name="input_caption">输入标题</string>-->
     <string name="animation">头像图标动画</string>
     <string name="avatar_icon_animation">头像图标动画</string>
 

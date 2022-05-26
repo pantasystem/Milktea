@@ -15,14 +15,11 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.model.account.AccountStore
-import jp.panta.misskeyandroidclient.ui.drive.DriveScreen
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.*
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.provideFactory
+import jp.panta.misskeyandroidclient.util.file.toAppFile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.drive.viewmodel.*
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.*
 import javax.inject.Inject
 
@@ -69,7 +66,11 @@ class DriveActivity : AppCompatActivity() {
         if (intent.action == Intent.ACTION_OPEN_DOCUMENT) {
             val aId = accountId ?: accountIds.lastOrNull() ?: accountStore.currentAccountId
             requireNotNull(aId)
-            DriveSelectableMode(maxSize, selectedFileIds ?: emptyList(), aId)
+            DriveSelectableMode(
+                maxSize,
+                selectedFileIds ?: emptyList(),
+                aId
+            )
         } else {
             null
         }
@@ -126,7 +127,7 @@ class DriveActivity : AppCompatActivity() {
 
         setContent {
             MdcTheme {
-                DriveScreen(
+                net.pantasystem.milktea.drive.DriveScreen(
                     driveViewModel = _driveViewModel,
                     fileViewModel = _fileViewModel,
                     directoryViewModel = _directoryViewModel,
@@ -157,7 +158,6 @@ class DriveActivity : AppCompatActivity() {
 
 
     private fun createDirectoryDialog() {
-
         CreateFolderDialog().show(supportFragmentManager, "CreateFolder")
     }
 

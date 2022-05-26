@@ -31,6 +31,11 @@ android {
     }
     buildFeatures {
         dataBinding true
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = compose_version
     }
 }
 
@@ -47,8 +52,14 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     implementation 'com.google.code.gson:gson:2.8.9'
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
+    implementation libs.kotlin.datetime
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
+    // compose
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+
 
 
     //glide

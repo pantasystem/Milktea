@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.drive.viewmodel
+package net.pantasystem.milktea.drive.viewmodel
 
 
 import android.util.Log

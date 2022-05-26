@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.drive
+package net.pantasystem.milktea.drive
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,16 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
-import jp.panta.misskeyandroidclient.util.compose.isScrolledToTheEnd
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
+import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
+import net.pantasystem.milktea.drive.viewmodel.FileViewData
+import net.pantasystem.milktea.drive.viewmodel.FileViewModel
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @ExperimentalCoroutinesApi

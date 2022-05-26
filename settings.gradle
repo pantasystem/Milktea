@@ -1,7 +1,53 @@
-include ':app'
-include ':data'
-include ':common'
-include ':api'
-include ':model'
-include ':features:auth'
-include ':features:channel'
+include ":app"
+include ":data"
+include ":common"
+include ":api"
+include ":model"
+include ":features:auth"
+include ":features:channel"
+
+enableFeaturePreview("VERSION_CATALOGS")
+
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            alias("kotlin-datetime").to("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+
+            // compose libs
+            alias("compose-ui-ui").to("androidx.compose.ui:ui:1.2.0-beta01")
+            alias("compose-ui-ui-tooling").to("androidx.compose.ui:ui-tooling:1.2.0-beta01")
+            bundle("compose-ui", ["compose-ui-ui-tooling", "compose-ui-ui"])
+
+            alias("compose-foundation-foundation").to("androidx.compose.foundation:foundation:1.2.0-beta01")
+            bundle("compose-foundation", ["compose-foundation-foundation"])
+
+            alias("compose-material-material").to("androidx.compose.material:material:1.2.0-beta01")
+            alias("compose-material-material-icons-core").to("androidx.compose.material:material-icons-core:1.2.0-beta01")
+            alias("compose-material-material-icons-extended").to("androidx.compose.material:material-icons-extended:1.2.0-beta01")
+            bundle("compose-material", ["compose-material-material", "compose-material-material-icons-core", "compose-material-material-icons-extended"])
+
+            alias("compose-ui-ui-test-junit4").to("androidx.compose.ui:ui-test-junit4:1.2.0-beta01")
+            alias("compose-runtime-runtime-livedata").to("androidx.compose.runtime:runtime-livedata:1.2.0-beta01")
+            alias("android-material-compose-theme-adapter").to("com.google.android.material:compose-theme-adapter:1.1.6")
+            alias("accompanist-swiperefresh").to("com.google.accompanist:accompanist-swiperefresh:0.14.0")
+            alias("activity-compose").to("androidx.activity:activity-compose:1.4.0")
+
+            alias("accompanist-pager").to("com.google.accompanist:accompanist-pager:0.14.0")
+            alias("accompanist-pager-indicators").to("com.google.accompanist:accompanist-pager-indicators:0.14.0")
+            alias("coil-compose").to("io.coil-kt:coil-compose:2.0.0")
+
+
+            alias("hilt-android").to("com.google.dagger:hilt-android:2.42")
+            alias("hilt-compiler").to("com.google.dagger:hilt-compiler:2.42")
+            alias("hilt-android-testing").to("com.google.dagger:hilt-android-testing:2.42")
+
+            alias("lifecycle-extenstions").to("androidx.lifecycle:lifecycle-extensions:2.2.0")
+            alias("lifecycle-viewmodel").to("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
+            alias("lifecycle-livedata").to("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
+
+            bundle('lifecycle', ['lifecycle-extenstions', 'lifecycle-viewmodel'])
+        }
+    }
+}
+include ':features:drive'

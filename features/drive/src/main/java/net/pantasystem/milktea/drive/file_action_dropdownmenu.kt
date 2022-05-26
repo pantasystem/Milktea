@@ -1,15 +1,18 @@
-package jp.panta.misskeyandroidclient.ui.drive
+package net.pantasystem.milktea.drive
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.HideImage
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
@@ -33,9 +36,7 @@ fun FileActionDropdownMenu(
         ) {
             if (property.isSensitive) {
                 Icon(
-                    painter = painterResource(
-                        id = R.drawable.ic_baseline_image_24
-                    ),
+                    Icons.Default.Image,
                     contentDescription = stringResource(R.string.undo_nsfw),
                     modifier = Modifier.size(24.dp)
 
@@ -43,9 +44,7 @@ fun FileActionDropdownMenu(
                 Text(stringResource(R.string.undo_nsfw))
             } else {
                 Icon(
-                    painter = painterResource(
-                        id = R.drawable.ic_baseline_hide_image_24
-                    ),
+                    Icons.Default.HideImage,
                     contentDescription = stringResource(R.string.mark_as_nsfw),
                     modifier = Modifier.size(24.dp)
                 )
@@ -58,7 +57,7 @@ fun FileActionDropdownMenu(
             onClick = onDeleteMenuItemClicked,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_delete_black_24dp),
+                Icons.Default.Delete,
                 modifier = Modifier.size(24.dp),
                 contentDescription = stringResource(R.string.delete)
             )
@@ -67,7 +66,7 @@ fun FileActionDropdownMenu(
         Divider()
         DropdownMenuItem(onClick = onEditFileCaption) {
             Icon(
-                painter = painterResource(R.drawable.ic_edit_black_24dp),
+                Icons.Default.Edit,
                 modifier = Modifier.size(24.dp),
                 contentDescription = stringResource(R.string.edit_caption)
             )
