@@ -53,10 +53,7 @@
     <string name="tab_selected">追加済み</string>
     <string name="tab_selectable">以下から追加</string>
     <string name="title_featured">ハイライト</string>
-    <string name="drive">ドライブ</string>
 
-    <string name="file">File</string>
-    <string name="folder">Folder</string>
     <string name="create_folder">フォルダーを作成</string>
     <string name="add_account">アカウントを追加</string>
     <string name="post">投稿</string>
@@ -373,9 +370,9 @@
     <string name="report_failed">報告失敗</string>
     <string name="mark_as_nsfw">閲覧注意にする</string>
     <string name="undo_nsfw">閲覧注意解除</string>
-    <string name="file_deletion_confirmation">ファイル削除の確認</string>
+<!--    <string name="file_deletion_confirmation">ファイル削除の確認</string>-->
     <string name="cancel">やめる</string>
-    <string name="do_u_want_2_delete_s">%sを削除しますか？</string>
+<!--    <string name="do_u_want_2_delete_s">%sを削除しますか？</string>-->
 
     <string name="remove_attachment">添付取りやめ</string>
     <string name="warning_s">警告:%s</string>
@@ -390,8 +387,8 @@
     <string name="view_in_browser">ブラウザで表示</string>
     <string name="note_creation_failure">ノートの作成失敗</string>
     <string name="channel">チャンネル</string>
-    <string name="edit_caption">キャプションを編集</string>
-    <string name="input_caption">キャプションを入力</string>
+<!--    <string name="edit_caption">キャプションを編集</string>-->
+<!--    <string name="input_caption">キャプションを入力</string>-->
     <string name="animation">アニメーション</string>
     <string name="avatar_icon_animation">アバターアイコンアニメーション</string>
 

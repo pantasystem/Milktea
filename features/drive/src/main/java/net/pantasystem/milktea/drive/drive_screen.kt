@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.drive
+package net.pantasystem.milktea.drive
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,13 +22,12 @@ import androidx.lifecycle.asLiveData
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DirectoryViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.DriveViewModel
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.PathViewData
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.drive.viewmodel.DirectoryViewModel
+import net.pantasystem.milktea.drive.viewmodel.DriveViewModel
+import net.pantasystem.milktea.drive.viewmodel.FileViewModel
+import net.pantasystem.milktea.drive.viewmodel.PathViewData
 import net.pantasystem.milktea.model.drive.FileProperty
 
 

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.compose
+package net.pantasystem.milktea.common.ui
 
 import androidx.compose.foundation.lazy.LazyListState
 

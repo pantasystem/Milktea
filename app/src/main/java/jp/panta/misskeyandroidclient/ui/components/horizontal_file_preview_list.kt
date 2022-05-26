@@ -20,10 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.ui.components.SensitiveIcon
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource

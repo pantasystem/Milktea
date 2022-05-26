@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.drive
+package net.pantasystem.milktea.drive
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -15,8 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import jp.panta.misskeyandroidclient.ui.components.SensitiveIcon
-import jp.panta.misskeyandroidclient.ui.drive.viewmodel.file.FileViewData
+import net.pantasystem.milktea.common.ui.components.SensitiveIcon
+import net.pantasystem.milktea.drive.viewmodel.FileViewData
 import net.pantasystem.milktea.model.drive.FileProperty
 
 

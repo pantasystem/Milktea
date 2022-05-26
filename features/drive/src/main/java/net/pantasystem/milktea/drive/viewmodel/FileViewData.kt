@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.drive.viewmodel.file
+package net.pantasystem.milktea.drive.viewmodel
 
 import net.pantasystem.milktea.model.drive.FileProperty
 

@@ -53,10 +53,7 @@
     <string name="tab_selected">Added</string>
     <string name="tab_selectable">Add from below</string>
     <string name="title_featured">Highlights</string>
-    <string name="drive">Drive</string>
 
-    <string name="file">File</string>
-    <string name="folder">Folder</string>
     <string name="create_folder">Create folder</string>
     <string name="add_account">Add account</string>
     <string name="post">Post</string>
@@ -373,9 +370,9 @@
     <string name="report_failed">Report Failed</string>
     <string name="mark_as_nsfw">Mark as NSFW</string>
     <string name="undo_nsfw">Undo NSFW</string>
-    <string name="file_deletion_confirmation">File deletion confirmation</string>
+<!--    <string name="file_deletion_confirmation">File deletion confirmation</string>-->
     <string name="cancel">Cancel</string>
-    <string name="do_u_want_2_delete_s">Do you want to delete %s?</string>
+<!--    <string name="do_u_want_2_delete_s">Do you want to delete %s?</string>-->
     <string name="remove_attachment">Remove attachment</string>
     <string name="warning_s">Warning:%s</string>
     <string name="reservation_at">Post date and time</string>
@@ -389,8 +386,8 @@
     <string name="view_in_browser">View in browser</string>
     <string name="channel">Channel</string>
 
-    <string name="edit_caption">Edit caption</string>
-    <string name="input_caption">Input caption</string>
+<!--    <string name="edit_caption">Edit caption</string>-->
+<!--    <string name="input_caption">Input caption</string>-->
     <string name="animation">Animation</string>
     <string name="avatar_icon_animation">Avatar icon animation</string>
 
