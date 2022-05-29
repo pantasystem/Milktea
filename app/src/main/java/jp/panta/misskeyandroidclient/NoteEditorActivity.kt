@@ -110,7 +110,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
-    val mViewModel: NoteEditorViewModel by viewModels<NoteEditorViewModel>()
+    val mViewModel: NoteEditorViewModel by viewModels()
 
     private lateinit var mBinding: ActivityNoteEditorBinding
 
@@ -119,7 +119,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     @Inject
     lateinit var accountStore: AccountStore
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val accountViewModel: AccountViewModel by viewModels()
 
     @Inject
@@ -297,6 +296,12 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             mViewModel.setText((e?.toString() ?: ""))
         }
 
+        mViewModel.state.onEach {
+            if (it.textCursorPos != null && it.text != null) {
+                mBinding.inputMain.setText(it.text ?: "")
+                mBinding.inputMain.setSelection(it.textCursorPos ?: 0)
+            }
+        }.launchIn(lifecycleScope)
 
         mViewModel.isPost.observe(this) {
             if (it) {
@@ -466,7 +471,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun showDriveFileSelector() {
         val selectedSize = mViewModel.state.value.totalFilesCount
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
@@ -527,7 +531,6 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         }
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun upTo() {
         if (intent.getStringExtra(Intent.EXTRA_TEXT).isNullOrEmpty()) {
             finish()

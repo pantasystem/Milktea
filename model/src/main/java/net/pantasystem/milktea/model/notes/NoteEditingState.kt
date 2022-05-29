@@ -16,10 +16,14 @@ data class AddMentionResult(
     val state: NoteEditingState
 )
 
+/**
+ * @param textCursorPos 次のカーソルの位置を明示的に示したい時に使用します。平常時はNullを指定します。
+ */
 data class NoteEditingState(
     val author: Account? = null,
     val visibility: Visibility = Visibility.Public(false),
     val text: String? = null,
+    val textCursorPos: Int? = null,
     val cw: String? = null,
     val replyId: Note.Id? = null,
     val renoteId: Note.Id? = null,
@@ -89,7 +93,8 @@ data class NoteEditingState(
 
     fun changeText(text: String): NoteEditingState {
         return this.copy(
-            text = text
+            text = text,
+            textCursorPos = null,
         )
     }
 
@@ -106,7 +111,8 @@ data class NoteEditingState(
         }
         val builder = StringBuilder(text ?: "")
         builder.insert(pos, mentionBuilder.toString())
-        return AddMentionResult(pos + mentionBuilder.length, copy(text = builder.toString()))
+        val nextPos = pos + mentionBuilder.length
+        return AddMentionResult(nextPos, copy(text = builder.toString(), textCursorPos = nextPos))
     }
 
     fun changeCw(text: String?): NoteEditingState {
