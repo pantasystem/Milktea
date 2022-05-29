@@ -16,6 +16,9 @@ data class AddMentionResult(
     val state: NoteEditingState
 )
 
+/**
+ * @param textCursorPos 次のカーソルの位置を明示的に示したい時に使用します。平常時はNullを指定します。
+ */
 data class NoteEditingState(
     val author: Account? = null,
     val visibility: Visibility = Visibility.Public(false),
