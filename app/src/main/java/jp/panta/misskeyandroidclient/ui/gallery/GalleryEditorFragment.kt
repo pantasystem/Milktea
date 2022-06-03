@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.DriveActivity
+import net.pantasystem.milktea.drive.DriveActivity
 import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
@@ -23,7 +23,7 @@ import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
-import jp.panta.misskeyandroidclient.util.file.toAppFile
+import net.pantasystem.milktea.drive.toAppFile
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.drive.DriveFileRepository

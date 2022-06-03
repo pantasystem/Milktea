@@ -35,7 +35,7 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import jp.panta.misskeyandroidclient.util.file.toAppFile
+import net.pantasystem.milktea.drive.toAppFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -44,6 +44,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
