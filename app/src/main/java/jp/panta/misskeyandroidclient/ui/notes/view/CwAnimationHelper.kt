@@ -64,6 +64,7 @@ object CwAnimationHelper {
                         val newHeight = it.animatedValue as Int
 
                         if (newHeight == 0) {
+                            targetView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                             targetView.isVisible = true
                         }
                         targetView.layoutParams.height = newHeight
@@ -80,6 +81,7 @@ object CwAnimationHelper {
 
             }
             animator.doOnEnd {
+                targetView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 animatingNoteIds.remove(noteId)
                 onToggleCw?.invoke()
 

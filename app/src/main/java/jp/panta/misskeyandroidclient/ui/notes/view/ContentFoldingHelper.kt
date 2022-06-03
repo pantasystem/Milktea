@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -15,12 +16,8 @@ object ContentFoldingHelper {
     @JvmStatic
     fun ViewGroup.setFoldingState(foldingNote: PlaneNoteViewData?, cw: TextView?, foldingButton: TextView?, foldingContent: ViewGroup?, isFolding: Boolean?){
 
-        cw?.visibility = if (foldingNote?.cw == null || foldingNote.cw.isBlank()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-
+        val isVisible = foldingNote?.cw != null && foldingNote.cw.isNotBlank()
+        cw?.isVisible = isVisible
 
 
         val folding = isFolding ?: false
