@@ -55,6 +55,10 @@ dependencyResolutionManagement {
             alias('animation-apng').to('com.github.penfeizhou.android.animation:apng:2.17.2')
 
             alias('wada811-databinding').to('com.github.wada811:DataBinding-ktx:5.0.2')
+
+            alias('appcompat-appcompat').to('androidx.appcompat:appcompat:1.4.1')
+            alias('android-material-material').to('com.google.android.material:material:1.6.0')
+            alias('androidx-core-ktx').to('androidx.core:core-ktx:1.7.0')
         }
     }
 }

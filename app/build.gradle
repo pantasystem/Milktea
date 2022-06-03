@@ -86,11 +86,11 @@ dependencies {
 
     //noinspection GradleCompatible
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation "androidx.appcompat:appcompat:1.4.1"
+    implementation libs.appcompat.appcompat
 
 
     // NOTE: リアクションピッカーなどでリフレクションを行っているのでバージョンを変更しないこと
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation libs.android.material.material
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation 'androidx.preference:preference-ktx:1.2.0'
@@ -178,7 +178,7 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.google.firebase:firebase-messaging'
-    implementation "androidx.core:core-ktx:1.7.0"
+    implementation libs.androidx.core.ktx
 
     def work_version = "2.7.1"
     implementation "androidx.work:work-runtime-ktx:$work_version"
