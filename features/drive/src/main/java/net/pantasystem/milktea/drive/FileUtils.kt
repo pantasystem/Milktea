@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.file
+package net.pantasystem.milktea.drive
 
 import android.content.Context
 import android.net.Uri
@@ -6,7 +6,6 @@ import android.provider.MediaStore
 import android.util.Log
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.File
-import java.lang.IllegalArgumentException
 
 fun Uri.toAppFile(context: Context): AppFile.Local {
     val fileName = try{

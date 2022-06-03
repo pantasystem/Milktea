@@ -31,11 +31,12 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import jp.panta.misskeyandroidclient.util.file.toAppFile
+import net.pantasystem.milktea.drive.toAppFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -150,7 +151,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                                     it.file.toFile()
                                 }
                             }
-                            val intent = MediaActivity.newInstance(
+                            val intent = net.pantasystem.milktea.media.MediaActivity.newInstance(
                                 requireActivity(),
                                 listOf(file),
                                 0

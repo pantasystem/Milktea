@@ -19,7 +19,7 @@
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
-                android:name=".ChannelActivity"
+                android:name="net.pantasystem.milktea.channel.ChannelActivity"
                 android:exported="false" />
 
         <receiver
@@ -97,7 +97,7 @@
                 android:enabled="true"
                 android:exported="false" />
 
-        <activity android:name=".MediaActivity" />
+        <activity android:name="net.pantasystem.milktea.media.MediaActivity" />
         <activity android:name=".ui.settings.activities.SettingAppearanceActivity" />
         <activity android:name=".ui.settings.activities.SettingMovementActivity" />
         <activity
@@ -144,7 +144,7 @@
         </activity>
 
         <activity android:name=".MessageActivity" />
-        <activity android:name=".DriveActivity" />
+        <activity android:name="net.pantasystem.milktea.drive.DriveActivity" />
         <activity
                 android:name=".NoteEditorActivity"
                 android:exported="true"

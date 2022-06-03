@@ -6,12 +6,12 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".MediaActivity"
+            tools:context="net.pantasystem.milktea.media.MediaActivity"
             >
 
 
 
-        <jp.panta.misskeyandroidclient.ui.PhotoViewViewPager
+        <net.pantasystem.milktea.media.PhotoViewViewPager
                 android:id="@+id/mediaViewPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.DriveActivity
+import net.pantasystem.milktea.drive.DriveActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.settings.compose.RadioTile

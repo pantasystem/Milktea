@@ -12,4 +12,7 @@
     <string name="drive">ドライブ</string>
     <string name="file">ファイル</string>
     <string name="folder">フォルダー</string>
+    <string name="create_folder">フォルダーを作成</string>
+    <string name="folder_name">フォルダ名</string>
+
 </resources>

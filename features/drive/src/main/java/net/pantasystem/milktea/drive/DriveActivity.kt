@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.drive
 
 import android.Manifest
 import android.content.Intent
@@ -15,9 +15,8 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
-import jp.panta.misskeyandroidclient.util.file.toAppFile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.common.ui.SetTheme
 import net.pantasystem.milktea.drive.viewmodel.*
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.*
@@ -32,7 +31,6 @@ class DriveActivity : AppCompatActivity() {
             "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
         const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
     }
-
 
 
     @Inject
@@ -110,6 +108,9 @@ class DriveActivity : AppCompatActivity() {
         DriveViewModel.provideViewModel(driveViewModelFactory, driveStore, driveSelectableMode)
     }
 
+    @Inject
+    lateinit var setTheme: SetTheme
+
     @OptIn(
         ExperimentalPagerApi::class,
         ExperimentalMaterialApi::class,
@@ -117,9 +118,8 @@ class DriveActivity : AppCompatActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme.setTheme()
 
-
-        setTheme()
         ViewTreeLifecycleOwner.set(window.decorView, this)
 
 
@@ -127,7 +127,7 @@ class DriveActivity : AppCompatActivity() {
 
         setContent {
             MdcTheme {
-                net.pantasystem.milktea.drive.DriveScreen(
+                DriveScreen(
                     driveViewModel = _driveViewModel,
                     fileViewModel = _fileViewModel,
                     directoryViewModel = _directoryViewModel,

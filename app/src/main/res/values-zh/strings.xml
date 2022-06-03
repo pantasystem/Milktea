@@ -53,7 +53,7 @@
     <string name="tab_selectable">从下方区域选择</string>
     <string name="title_featured">热门</string>
 
-    <string name="create_folder">创建文件夹</string>
+<!--    <string name="create_folder">创建文件夹</string>-->
     <string name="add_account">添加账号</string>
     <string name="post">发帖</string>
     <string name="please_speak">有什么想说的?</string>
@@ -198,7 +198,7 @@
 
     <string name="network_error">网络错误</string>
 
-    <string name="folder_name">文件夹名称</string>
+<!--    <string name="folder_name">文件夹名称</string>-->
     <string name="selected">已选中</string>
     <string name="more">更多</string>
 
@@ -313,8 +313,6 @@
     <string name="height_limit">Height limit</string>
     <string name="disable_height_limit">Disable height limit</string>
     <string name="auto_note_folding">自动折叠帖文</string>
-    <string name="download">下载</string>
-    <string name="start_downloading_placeholder">开始下载 %s</string>
     <string name="add_to_list">添加至列表</string>
     <string name="promotion">晋升</string>
     <string name="waiting_4_approval">正在等待批准</string>

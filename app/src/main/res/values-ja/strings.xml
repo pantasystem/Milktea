@@ -54,7 +54,7 @@
     <string name="tab_selectable">以下から追加</string>
     <string name="title_featured">ハイライト</string>
 
-    <string name="create_folder">フォルダーを作成</string>
+<!--    <string name="create_folder">フォルダーを作成</string>-->
     <string name="add_account">アカウントを追加</string>
     <string name="post">投稿</string>
     <string name="please_speak">お気持ちを表明してください</string>
@@ -201,7 +201,7 @@
 
     <string name="network_error">接続できません</string>
 
-    <string name="folder_name">フォルダ名</string>
+<!--    <string name="folder_name">フォルダ名</string>-->
     <string name="selected">選択済み</string>
     <string name="more">さらに</string>
 
@@ -319,8 +319,6 @@
     <string name="returns_limit">改行数制限（自動的に投稿が折りたたまれます）</string>
     <string name="height_limit">高さ制限</string>
     <string name="disable_height_limit">高さ制限無効</string>
-    <string name="download">ダウンロード</string>
-    <string name="start_downloading_placeholder">%sのダウンロードを開始します。</string>
     <string name="add_to_list">リストに追加する</string>
     <string name="promotion">プロモーション</string>
     <string name="waiting_4_approval">認可されるのを待っています。</string>

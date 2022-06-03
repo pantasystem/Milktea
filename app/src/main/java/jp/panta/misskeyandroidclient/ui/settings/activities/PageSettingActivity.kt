@@ -21,6 +21,7 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewM
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.model.account.page.PageType
 
 @FlowPreview
