@@ -15,9 +15,9 @@ import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.ui.drive.CreateFolderDialog
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.drive.CreateFolderDialog
 import net.pantasystem.milktea.drive.viewmodel.*
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.*

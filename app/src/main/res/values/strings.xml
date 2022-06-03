@@ -54,7 +54,7 @@
     <string name="tab_selectable">Add from below</string>
     <string name="title_featured">Highlights</string>
 
-    <string name="create_folder">Create folder</string>
+<!--    <string name="create_folder">Create folder</string>-->
     <string name="add_account">Add account</string>
     <string name="post">Post</string>
     <string name="please_speak">What\'s on your mind?</string>
@@ -198,7 +198,7 @@
 
     <string name="network_error">Network error</string>
 
-    <string name="folder_name">Folder name</string>
+<!--    <string name="folder_name">Folder name</string>-->
     <string name="selected">Selected</string>
     <string name="more">More</string>
 

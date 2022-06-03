@@ -13,5 +13,7 @@
 
     <string name="file">File</string>
     <string name="folder">Folder</string>
+    <string name="create_folder">Create folder</string>
+    <string name="folder_name">Folder name</string>
 
 </resources>

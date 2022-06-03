@@ -12,4 +12,6 @@
     <string name="drive">云盘</string>
     <string name="file">文件</string>
     <string name="folder">文件夹</string>
+    <string name="create_folder">创建文件夹</string>
+    <string name="folder_name">文件夹名称</string>
 </resources>

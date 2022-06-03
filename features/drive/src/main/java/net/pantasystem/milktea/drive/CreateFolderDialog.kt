@@ -1,12 +1,11 @@
-package jp.panta.misskeyandroidclient.ui.drive
+package net.pantasystem.milktea.drive
 
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.DialogCreateFolderBinding
+import net.pantasystem.milktea.drive.databinding.DialogCreateFolderBinding
 import net.pantasystem.milktea.drive.viewmodel.DirectoryViewModel
 
 class CreateFolderDialog : AppCompatDialogFragment(){

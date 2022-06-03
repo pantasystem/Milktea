@@ -54,7 +54,7 @@
     <string name="tab_selectable">以下から追加</string>
     <string name="title_featured">ハイライト</string>
 
-    <string name="create_folder">フォルダーを作成</string>
+<!--    <string name="create_folder">フォルダーを作成</string>-->
     <string name="add_account">アカウントを追加</string>
     <string name="post">投稿</string>
     <string name="please_speak">お気持ちを表明してください</string>
@@ -201,7 +201,7 @@
 
     <string name="network_error">接続できません</string>
 
-    <string name="folder_name">フォルダ名</string>
+<!--    <string name="folder_name">フォルダ名</string>-->
     <string name="selected">選択済み</string>
     <string name="more">さらに</string>
 
