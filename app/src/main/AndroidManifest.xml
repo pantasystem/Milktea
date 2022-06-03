@@ -19,7 +19,7 @@
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
-                android:name=".ChannelActivity"
+                android:name="net.pantasystem.milktea.channel.ChannelActivity"
                 android:exported="false" />
 
         <receiver

@@ -57,6 +57,7 @@ import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
