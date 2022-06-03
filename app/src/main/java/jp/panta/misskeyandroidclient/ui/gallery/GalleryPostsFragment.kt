@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.AuthorizationActivity
-import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
@@ -23,6 +22,7 @@ import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineV
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 

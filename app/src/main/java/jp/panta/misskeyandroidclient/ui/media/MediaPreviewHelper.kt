@@ -14,12 +14,12 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
+import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.file.File
 
 object MediaPreviewHelper {

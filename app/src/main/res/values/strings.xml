@@ -315,11 +315,9 @@
     <string name="disable_height_limit">Disable height limit</string>
     <string name="returns_limit">Returns limit</string>
     <string name="auto_note_folding">Automatic note folding</string>
-    <string name="download">Download</string>
-    <string name="start_downloading_placeholder">Start downloading %s</string>
     <string name="add_to_list">Add to list</string>
     <string name="promotion">Promotion</string>
-    <string name="waiting_4_approval">Waiting for approval</string>
+    <string name="waiting_4_approval">Waaaiting for approval</string>
 <!--    <string name="i_have_approved">Approved</string>-->
 <!--    <string name="waiting_4_u_to_approve">Waiting for you to approve</string>-->
     <string name="learn_note_visibility">Learn note visibility</string>

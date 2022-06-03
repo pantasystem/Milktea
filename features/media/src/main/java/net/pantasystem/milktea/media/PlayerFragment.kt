@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.media
+package net.pantasystem.milktea.media
 
 import android.net.Uri
 import android.os.Bundle
@@ -8,17 +8,15 @@ import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
-import jp.panta.misskeyandroidclient.MediaActivity
-import jp.panta.misskeyandroidclient.R
 
 class PlayerFragment : Fragment(R.layout.fragment_player){
 
     companion object{
         const val TAG = "PlayerFragment"
-        private const val EXTRA_MEDIA_SOURCE_URI = "jp.panta.misskeyandroidclient.ui.media.PlayerFragment.EXTRA_MEDIA_SOURCE_URI"
-        private const val EXTRA_INDEX = "jp.panta.misskeyandroidclient.ui.media.PlayerFragment.extra.INDEX"
+        private const val EXTRA_MEDIA_SOURCE_URI = "net.pantasystem.milktea.media.PlayerFragment.EXTRA_MEDIA_SOURCE_URI"
+        private const val EXTRA_INDEX = "net.pantasystem.milktea.media.PlayerFragment.extra.INDEX"
 
-        fun newInstance(index: Int, uri: String): PlayerFragment{
+        fun newInstance(index: Int, uri: String): PlayerFragment {
             return PlayerFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_MEDIA_SOURCE_URI, uri)
@@ -27,7 +25,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
             }
         }
 
-        fun newInstance(index: Int, uri: Uri): PlayerFragment{
+        fun newInstance(index: Int, uri: Uri): PlayerFragment {
             return PlayerFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_MEDIA_SOURCE_URI, uri.toString())

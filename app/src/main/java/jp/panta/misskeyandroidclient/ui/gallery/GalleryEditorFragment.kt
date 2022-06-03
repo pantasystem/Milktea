@@ -17,7 +17,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.DriveActivity
 import jp.panta.misskeyandroidclient.GalleryPostsActivity
-import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
@@ -26,6 +25,7 @@ import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
 import jp.panta.misskeyandroidclient.util.file.toAppFile
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource

@@ -9,11 +9,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFilePreviewBinding
 import jp.panta.misskeyandroidclient.databinding.ItemUrlPreviewBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.Preview
+import net.pantasystem.milktea.media.MediaActivity
 
 class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCallback()){
     class ItemCallback : DiffUtil.ItemCallback<Preview>(){

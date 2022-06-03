@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.media
 
 import android.app.DownloadManager
 import android.content.Intent
@@ -13,12 +13,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
-import jp.panta.misskeyandroidclient.databinding.ActivityMediaBinding
+import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.media.databinding.ActivityMediaBinding
 import net.pantasystem.milktea.model.file.File
-import jp.panta.misskeyandroidclient.ui.media.ImageFragment
-import jp.panta.misskeyandroidclient.ui.media.PlayerFragment
 import java.io.Serializable
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MediaActivity : AppCompatActivity() {
 
     private sealed class Media : Serializable{
@@ -28,9 +30,9 @@ class MediaActivity : AppCompatActivity() {
 
     companion object{
         const val TAG = "MediaActivity"
-        const val EXTRA_FILE = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILE"
-        const val EXTRA_FILES = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILES"
-        const val EXTRA_FILE_CURRENT_INDEX = "jp.panta.misskeyandroidclient.MediaActivity.EXTRA_FILES_CURRENT_INDEX"
+        const val EXTRA_FILE = "net.pantasystem.milktea.media.MediaActivity.EXTRA_FILE"
+        const val EXTRA_FILES = "net.pantasystem.milktea.media.MediaActivity.EXTRA_FILES"
+        const val EXTRA_FILE_CURRENT_INDEX = "net.pantasystem.milktea.media.MediaActivity.EXTRA_FILES_CURRENT_INDEX"
 
 
 
@@ -47,9 +49,12 @@ class MediaActivity : AppCompatActivity() {
     private var mMedias: List<Media>? = null
     private lateinit var mBinding: ActivityMediaBinding
 
+    @Inject
+    lateinit var setTheme: SetTheme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        setTheme.setTheme()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_media)
         setSupportActionBar(mBinding.mediaToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -179,9 +184,8 @@ class MediaActivity : AppCompatActivity() {
         val status = cursor.getInt(columnIndex)
         val columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON)
         val reason = cursor.getInt(columnReason)
-        val statusText: String
 
-        statusText = when (status) {
+        val statusText: String = when (status) {
             DownloadManager.STATUS_SUCCESSFUL -> "Successful"
             DownloadManager.STATUS_FAILED -> {
                 "Failed: $reason"

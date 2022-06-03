@@ -150,7 +150,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                                     it.file.toFile()
                                 }
                             }
-                            val intent = MediaActivity.newInstance(
+                            val intent = net.pantasystem.milktea.media.MediaActivity.newInstance(
                                 requireActivity(),
                                 listOf(file),
                                 0

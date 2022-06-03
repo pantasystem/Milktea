@@ -7,19 +7,19 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MediaActivity
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentDraftNotesBinding
-import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
-import net.pantasystem.milktea.model.file.File
-import net.pantasystem.milktea.model.notes.draft.DraftNote
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNotesViewModel
+import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
+import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.media.MediaActivity
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 /**
  * NOTE: 直接的なコードによる参照はないが、activity_draft_notesから参照されているので削除しないこと。

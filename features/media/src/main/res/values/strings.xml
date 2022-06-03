@@ -1,0 +1,5 @@
+<resources>
+    <string name="download">Download</string>
+    <string name="start_downloading_placeholder">Start downloading %s</string>
+
+</resources>

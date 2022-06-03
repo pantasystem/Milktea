@@ -313,8 +313,6 @@
     <string name="height_limit">Height limit</string>
     <string name="disable_height_limit">Disable height limit</string>
     <string name="auto_note_folding">自动折叠帖文</string>
-    <string name="download">下载</string>
-    <string name="start_downloading_placeholder">开始下载 %s</string>
     <string name="add_to_list">添加至列表</string>
     <string name="promotion">晋升</string>
     <string name="waiting_4_approval">正在等待批准</string>

@@ -262,7 +262,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                                     it.file.toFile()
                                 }
                             }
-                            val intent = MediaActivity.newInstance(
+                            val intent = net.pantasystem.milktea.media.MediaActivity.newInstance(
                                 this@NoteEditorActivity,
                                 listOf(file),
                                 0

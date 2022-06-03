@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.media
+package net.pantasystem.milktea.media
 
 import android.net.Uri
 import android.os.Bundle
@@ -7,9 +7,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MediaActivity
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentImageBinding
+import net.pantasystem.milktea.media.databinding.FragmentImageBinding
 import net.pantasystem.milktea.model.file.File
 
 class ImageFragment : Fragment(R.layout.fragment_image){
@@ -19,7 +17,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
         private const val EXTRA_IMAGE_URL = "jp.panta.misskeyandroidclient.ui.media.EXTRA_IMAGE_URL"
         private const val EXTRA_IMAGE_URI = "jp.panta.misskeyandroidclient.ui.media.EXTRA_IMAGE_URI"
         private const val EXTRA_INDEX = "jp.panta.misskeyandroidclient.ui.media.EXTRA_INDEX"
-        fun newInstance(index: Int, url: String): ImageFragment{
+        fun newInstance(index: Int, url: String): ImageFragment {
             val bundle = Bundle().apply{
                 putString(EXTRA_IMAGE_URL, url)
                 putInt(EXTRA_INDEX, index)
@@ -29,7 +27,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
             }
         }
 
-        fun newInstance(index: Int, uri: Uri): ImageFragment{
+        fun newInstance(index: Int, uri: Uri): ImageFragment {
             return ImageFragment().apply{
                 arguments = Bundle().apply{
                     putString(EXTRA_IMAGE_URI, uri.toString())
@@ -38,7 +36,7 @@ class ImageFragment : Fragment(R.layout.fragment_image){
             }
         }
 
-        fun newInstance(index: Int, file: File): ImageFragment{
+        fun newInstance(index: Int, file: File): ImageFragment {
             return newInstance(index, file.path!!)
         }
     }

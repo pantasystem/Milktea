@@ -1,15 +1,16 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Context
 import android.util.TypedValue
 import android.view.Menu
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import net.pantasystem.milktea.common.ui.SetTheme
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.isNightTheme
 
-fun AppCompatActivity.setTheme(){
+fun Activity.setTheme(){
     val miCore = this.applicationContext as MiCore
     val theme = miCore.getSettingStore().configState.value.theme
     if(theme.isNightTheme()){
@@ -33,6 +34,14 @@ fun Context.setMenuTint(menu: Menu){
     0.until(menu.size()).forEach{
         val item = menu.getItem(it)
         item.icon?.setTint(typedValue.data)
+    }
+}
+
+class SetThemeImpl(
+    val activity: Activity,
+) : SetTheme {
+    override fun setTheme() {
+        activity.setTheme()
     }
 }
 

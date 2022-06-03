@@ -102,7 +102,7 @@ class ActionNoteHandler(
         val index = it.second.files.value!!.indexOfFirst { fv ->
             fv.file == it.first.file
         }
-        val intent = MediaActivity.newInstance(activity, list, index)
+        val intent = net.pantasystem.milktea.media.MediaActivity.newInstance(activity, list, index)
         activity.startActivity(intent)
         //val intent =
     }
