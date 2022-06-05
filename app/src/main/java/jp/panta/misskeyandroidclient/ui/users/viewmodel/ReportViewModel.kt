@@ -1,15 +1,16 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.report.Report
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.report.Report
+import javax.inject.Inject
 
 
 sealed interface ReportState {
@@ -41,19 +42,14 @@ sealed interface ReportState {
             override val comment: String
         ) : Sending
     }
-
-
-
-
 }
-class ReportViewModel(private val miCore: MiCore) : ViewModel(){
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ReportViewModel(miCore) as T
-        }
-    }
+
+@HiltViewModel
+class ReportViewModel @Inject constructor(
+    val userRepository: UserRepository,
+): ViewModel(){
+
 
     private val _state = MutableStateFlow<ReportState>(ReportState.None)
     val state: StateFlow<ReportState> = _state
@@ -107,7 +103,7 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
                             report.userId,
                             report.comment
                         )
-                        miCore.getUserRepository().report(
+                        userRepository.report(
                             r
                         )
                         r

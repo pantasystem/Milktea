@@ -101,6 +101,8 @@ class MainActivity : AppCompatActivity() {
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by viewModels()
 
+    private val reportViewModel: ReportViewModel by viewModels()
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -196,20 +198,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        ViewModelProvider(
-            this,
-            ReportViewModel.Factory(miApplication)
-        )[ReportViewModel::class.java].also { viewModel ->
-            lifecycleScope.launchWhenResumed {
-                viewModel.state.distinctUntilChangedBy {
-                    it is ReportState.Sending.Success
-                            || it is ReportState.Sending.Failed
-                }.collect { state ->
-                    showSendReportStateFrom(state)
-                }
+        lifecycleScope.launchWhenResumed {
+            reportViewModel.state.distinctUntilChangedBy {
+                it is ReportState.Sending.Success
+                        || it is ReportState.Sending.Failed
+            }.collect { state ->
+                showSendReportStateFrom(state)
             }
         }
-
 
         startService(Intent(this, NotificationService::class.java))
         mBottomNavigationAdapter =
