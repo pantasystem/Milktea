@@ -6,48 +6,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.report.Report
+import net.pantasystem.milktea.model.user.report.ReportState
+import net.pantasystem.milktea.model.user.report.SendReportUseCase
 import javax.inject.Inject
 
 
-sealed interface ReportState {
-    data class Specify(
-        val userId: User.Id,
-        val comment: String
-    ) : ReportState {
-        val canSend: Boolean
-            get() = this.comment.isNotBlank()
-    }
-    object None : ReportState
-
-
-    sealed interface Sending : ReportState {
-        val userId: User.Id
-        val comment: String
-        data class Doing(
-            override val userId: User.Id,
-            override val comment: String
-        ) : Sending
-
-        data class Failed(
-            override val userId: User.Id,
-            override val comment: String
-        ) : Sending
-
-        data class Success(
-            override val userId: User.Id,
-            override val comment: String
-        ) : Sending
-    }
-}
 
 
 @HiltViewModel
 class ReportViewModel @Inject constructor(
-    val userRepository: UserRepository,
+    val sendReportUseCase: SendReportUseCase,
 ): ViewModel(){
 
 
@@ -87,40 +56,9 @@ class ReportViewModel @Inject constructor(
 
     fun submit() {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                when (val report = state.value) {
-                    is ReportState.None -> {
-                        return@launch
-                    }
-                    is ReportState.Sending -> {
-                        return@launch
-                    }
-                    is ReportState.Specify -> {
-                        withContext(Dispatchers.Main) {
-                            _state.value = ReportState.Sending.Doing(report.userId, report.comment)
-                        }
-                        val r = Report(
-                            report.userId,
-                            report.comment
-                        )
-                        userRepository.report(
-                            r
-                        )
-                        r
-                    }
-                }
-
-            }.onSuccess {
-                withContext(Dispatchers.Main) {
-                    _state.value = ReportState.Sending.Success(it.userId, it.comment)
-                }
-            }.onFailure {
-                withContext(Dispatchers.Main) {
-                    val sending = _state.value as ReportState.Sending
-                    _state.value = ReportState.Sending.Failed(sending.userId, sending.comment)
-                }
+            sendReportUseCase.invoke(state.value).collect {
+                _state.value = it
             }
-
         }
 
     }
