@@ -1,59 +1,24 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.report.Report
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-
-sealed interface ReportState {
-    data class Specify(
-        val userId: User.Id,
-        val comment: String
-    ) : ReportState {
-        val canSend: Boolean
-            get() = this.comment.isNotBlank()
-    }
-    object None : ReportState
-
-
-    sealed interface Sending : ReportState {
-        val userId: User.Id
-        val comment: String
-        data class Doing(
-            override val userId: User.Id,
-            override val comment: String
-        ) : Sending
-
-        data class Failed(
-            override val userId: User.Id,
-            override val comment: String
-        ) : Sending
-
-        data class Success(
-            override val userId: User.Id,
-            override val comment: String
-        ) : Sending
-    }
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.ReportState
+import net.pantasystem.milktea.model.user.report.SendReportUseCase
+import javax.inject.Inject
 
 
 
 
-}
-class ReportViewModel(private val miCore: MiCore) : ViewModel(){
+@HiltViewModel
+class ReportViewModel @Inject constructor(
+    val sendReportUseCase: SendReportUseCase,
+): ViewModel(){
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ReportViewModel(miCore) as T
-        }
-    }
 
     private val _state = MutableStateFlow<ReportState>(ReportState.None)
     val state: StateFlow<ReportState> = _state
@@ -91,40 +56,9 @@ class ReportViewModel(private val miCore: MiCore) : ViewModel(){
 
     fun submit() {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                when (val report = state.value) {
-                    is ReportState.None -> {
-                        return@launch
-                    }
-                    is ReportState.Sending -> {
-                        return@launch
-                    }
-                    is ReportState.Specify -> {
-                        withContext(Dispatchers.Main) {
-                            _state.value = ReportState.Sending.Doing(report.userId, report.comment)
-                        }
-                        val r = Report(
-                            report.userId,
-                            report.comment
-                        )
-                        miCore.getUserRepository().report(
-                            r
-                        )
-                        r
-                    }
-                }
-
-            }.onSuccess {
-                withContext(Dispatchers.Main) {
-                    _state.value = ReportState.Sending.Success(it.userId, it.comment)
-                }
-            }.onFailure {
-                withContext(Dispatchers.Main) {
-                    val sending = _state.value as ReportState.Sending
-                    _state.value = ReportState.Sending.Failed(sending.userId, sending.comment)
-                }
+            sendReportUseCase.invoke(state.value).collect {
+                _state.value = it
             }
-
         }
 
     }

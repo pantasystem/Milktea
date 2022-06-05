@@ -20,7 +20,6 @@
             android:checked="@{ noteEditorViewModel.isLocalOnly == true }"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:textColor="@android:color/white"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 </layout>
