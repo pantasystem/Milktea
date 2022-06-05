@@ -39,7 +39,7 @@ import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.ui.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportState
+import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
@@ -68,6 +68,7 @@ import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.report.ReportState
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -549,19 +550,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSendReportStateFrom(state: ReportState) {
-        if (state is ReportState.Sending.Success) {
-            Snackbar.make(
-                binding.appBarMain.simpleNotification,
-                R.string.successful_report,
-                Snackbar.LENGTH_SHORT
-            ).show()
-        } else if (state is ReportState.Sending.Failed) {
-            Snackbar.make(
-                binding.appBarMain.simpleNotification,
-                R.string.report_failed,
-                Snackbar.LENGTH_SHORT
-            ).show()
-        }
+        ReportStateHandler().invoke(binding.appBarMain.simpleNotification, state)
     }
 
     @ExperimentalCoroutinesApi
