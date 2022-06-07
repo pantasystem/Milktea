@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.State
@@ -19,7 +18,7 @@ import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.user.User
 
-open class PlaneNoteViewData (
+open class PlaneNoteViewData(
     val note: NoteRelation,
     val account: Account,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
@@ -35,9 +34,9 @@ open class PlaneNoteViewData (
 
     val toShowNote: NoteRelation
         get() {
-            return if(note.note.isRenote() && !note.note.hasContent()){
-                note.renote?: note
-            }else{
+            return if (note.note.isRenote() && !note.note.hasContent()) {
+                note.renote ?: note
+            } else {
                 note
             }
         }
@@ -47,22 +46,22 @@ open class PlaneNoteViewData (
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
     val statusMessage: String?
-        get(){
-            if(note.reply != null){
+        get() {
+            if (note.reply != null) {
                 //reply
                 return "${note.user.displayUserName}が返信しました"
-            }else if(note.note.renoteId == null && (note.note.text != null || note.files != null)){
+            } else if (note.note.renoteId == null && (note.note.text != null || note.files != null)) {
                 //Note
                 return null
-            }else if(note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()){
+            } else if (note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()) {
                 //reNote
                 return "${note.user.displayUserName}がリノートしました"
 
-            }else if(note.note.renoteId != null && (note.note.text != null || note.files != null)){
+            } else if (note.note.renoteId != null && (note.note.text != null || note.files != null)) {
                 //quote
                 //"${note.user.name}が引用リノートしました"
                 return null
-            }else{
+            } else {
                 return null
             }
         }
@@ -84,8 +83,8 @@ open class PlaneNoteViewData (
     val text = toShowNote.note.text
 
     val contentFolding = MutableLiveData(cw != null)
-    val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding){
-        if(it) "もっと見る: ${text?.length}文字" else "隠す"
+    val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding) {
+        if (it) "もっと見る: ${text?.length}文字" else "隠す"
     }
 
 
@@ -93,38 +92,39 @@ open class PlaneNoteViewData (
     val urls = textNode?.getUrls()
 
 
-    val translateState: LiveData<State<Translation?>?> = this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
+    val translateState: LiveData<State<Translation?>?> =
+        this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
 
-    var emojis = toShowNote.note.emojis?: emptyList()
+    var emojis = toShowNote.note.emojis ?: emptyList()
 
     val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.associate {
         it.name to it
     } ?: mapOf())
 
-    val files = toShowNote.files?.map{ fileProperty ->
+    val files = toShowNote.files?.map { fileProperty ->
         fileProperty.toFile()
     }
-    private val previewableFiles = files?.filter{
+    private val previewableFiles = files?.filter {
         it.aboutMediaType == File.AboutMediaType.IMAGE || it.aboutMediaType == File.AboutMediaType.VIDEO
-    }?: emptyList()
+    } ?: emptyList()
     val media = MediaViewData(previewableFiles)
 
 
     val urlPreviewList = MutableLiveData<List<UrlPreview>>()
 
-    val previews = MediatorLiveData<List<Preview>>().apply{
-        val otherFiles = getNotMediaFiles().map{ file ->
+    val previews = MediatorLiveData<List<Preview>>().apply {
+        val otherFiles = getNotMediaFiles().map { file ->
             Preview.FileWrapper(file)
         }
 
         postValue(otherFiles)
 
-        this.addSource(urlPreviewList){
+        this.addSource(urlPreviewList) {
 
             val list: ArrayList<Preview> = ArrayList(otherFiles)
-            val urlPreviews = it?.map{ url ->
+            val urlPreviews = it?.map { url ->
                 Preview.UrlWrapper(url)
-            }?: emptyList()
+            } ?: emptyList()
             list.addAll(urlPreviews)
             postValue(list)
 
@@ -135,16 +135,17 @@ open class PlaneNoteViewData (
     val replyCount = MutableLiveData(toShowNote.note.repliesCount)
 
     val reNoteCount: String?
-        get() = if(toShowNote.note.renoteCount > 0) toShowNote.note.renoteCount.toString() else null
+        get() = if (toShowNote.note.renoteCount > 0) toShowNote.note.renoteCount.toString() else null
     val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
 
-    val canRenote = toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
+    val canRenote =
+        toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
 
     val reactionCounts = MutableLiveData(toShowNote.note.reactionCounts)
 
-    val reactionCount = Transformations.map(reactionCounts){
+    val reactionCount = Transformations.map(reactionCounts) {
         var sum = 0
-        it?.forEach{ count ->
+        it?.forEach { count ->
             sum += count.count
         }
         return@map sum
@@ -163,41 +164,42 @@ open class PlaneNoteViewData (
 
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(subNote?.note?.cw, subNote?.note?.emojis)
+
     //true　折り畳み
-    val subContentFolding = MutableLiveData( subCw != null )
-    val subContentFoldingStatusMessage = Transformations.map(subContentFolding){
-        if(it) "もっと見る: ${subNoteText?.length}" else "閉じる"
+    val subContentFolding = MutableLiveData(subCw != null)
+    val subContentFoldingStatusMessage = Transformations.map(subContentFolding) {
+        if (it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }
-    val subNoteFiles = subNote?.files?.map{
+    val subNoteFiles = subNote?.files?.map {
         it.toFile()
-    }?: emptyList()
+    } ?: emptyList()
     val subNoteMedia = MediaViewData(subNoteFiles)
 
 
-    fun changeContentFolding(){
-        val isFolding = contentFolding.value?: return
+    fun changeContentFolding() {
+        val isFolding = contentFolding.value ?: return
         contentFolding.value = !isFolding
     }
 
-    fun changeSubContentFolding(){
-        val isFolding = subContentFolding.value?: return
+    fun changeSubContentFolding() {
+        val isFolding = subContentFolding.value ?: return
         subContentFolding.value = !isFolding
     }
 
 
-    val urlPreviewLoadTaskCallback = object : UrlPreviewLoadTask.Callback{
+    val urlPreviewLoadTaskCallback = object : UrlPreviewLoadTask.Callback {
         override fun accept(list: List<UrlPreview>) {
             urlPreviewList.postValue(list)
         }
     }
 
-    fun update(note: Note){
+    fun update(note: Note) {
         require(toShowNote.note.id == note.id) {
             "更新として渡されたNote.Idと現在のIdが一致しません。"
         }
-        emojiMap.putAll(note.emojis?.map{
+        emojiMap.putAll(note.emojis?.map {
             it.name to it
-        }?: emptyList())
+        } ?: emptyList())
         emojis = emojiMap.values.toList()
         renoteCount.postValue(note.renoteCount)
 
@@ -208,15 +210,14 @@ open class PlaneNoteViewData (
         }
     }
 
-    private fun getNotMediaFiles() : List<File>{
-        return  files?.filterNot{ fp ->
+    private fun getNotMediaFiles(): List<File> {
+        return files?.filterNot { fp ->
             fp.aboutMediaType == File.AboutMediaType.IMAGE || fp.aboutMediaType == File.AboutMediaType.VIDEO
-        }?: emptyList()
+        } ?: emptyList()
     }
 
-    @ExperimentalCoroutinesApi
     val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-        if(it is NoteDataSource.Event.Updated){
+        if (it is NoteDataSource.Event.Updated) {
             update(it.note)
         }
     }

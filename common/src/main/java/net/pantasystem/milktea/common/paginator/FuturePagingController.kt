@@ -12,6 +12,9 @@ class FuturePagingController<DTO, E>(
     private val futureLoader: FutureLoader<DTO>
 ) : FuturePaginator {
     override suspend fun loadFuture() {
+        if (locker.mutex.isLocked) {
+            return
+        }
         locker.mutex.withLock {
 
             val loading = PageableState.Loading.Future(
