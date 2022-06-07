@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.users
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
@@ -62,6 +63,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
     }
 
     val mBinding: FragmentExploreUsersBinding by dataBinding()
+    private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,10 +82,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
             this,
             SortedUsersViewModel.Factory(miCore, type, condition)
         )[SortedUsersViewModel::class.java]
-        val toggleFollowViewModel = ViewModelProvider(
-            this,
-            ToggleFollowViewModel.Factory(miCore)
-        )[ToggleFollowViewModel::class.java]
+
 
 
         exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner) {

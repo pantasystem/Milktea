@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.Activities
+import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentFollowFollwerBinding
+import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
@@ -56,6 +59,8 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         FollowFollowerViewModel.provideFactory(viewModelFactory, type)
     }
 
+    val viewModel: ToggleFollowViewModel by activityViewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -65,12 +70,6 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         _binding.followFollowerList.layoutManager = mLinearLayoutManager
         _binding.followFollowerList.addOnScrollListener(_scrollListener)
 
-
-        val miApplication = context?.applicationContext as MiApplication
-
-
-
-        val viewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miApplication))[ToggleFollowViewModel::class.java]
 
         val adapter = FollowableUserListAdapter(
             viewLifecycleOwner, followFollowerViewModel,

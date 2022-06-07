@@ -1,48 +1,37 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.user.ToggleFollowUseCase
+import net.pantasystem.milktea.model.user.User
+import javax.inject.Inject
 
-@Suppress("BlockingMethodInNonBlockingContext")
-class ToggleFollowViewModel(val miCore: MiCore) : ViewModel(){
 
+data class ToggleFollowErrorUiState(
+    val userId: User.Id,
+    val throwable: Throwable,
+)
+@HiltViewModel
+class ToggleFollowViewModel @Inject constructor(
+    val toggleFollowUseCase: ToggleFollowUseCase,
+) : ViewModel(){
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ToggleFollowViewModel(miCore) as T
-        }
-    }
+    private val _errors = MutableStateFlow<ToggleFollowErrorUiState?>(null)
+    val errors: StateFlow<ToggleFollowErrorUiState?> = _errors
 
     fun toggleFollow(userId: User.Id){
         viewModelScope.launch(Dispatchers.IO) {
 
-            val user = runCatching {
-                getUser(userId)
-            }.getOrNull() ?: return@launch
-            runCatching {
-                if(user.isFollowing) {
-                    miCore.getUserRepository().unfollow(userId)
-                }else{
-                    miCore.getUserRepository().follow(userId)
-                }
+            toggleFollowUseCase(userId).onFailure {
+                _errors.value = ToggleFollowErrorUiState(userId, it)
             }
 
-
         }
-
     }
 
-    private suspend fun getUser(userId: User.Id): User.Detail? {
-        return runCatching {
-            miCore.getUserRepository().find(userId, true) as User.Detail
-        }.getOrNull()
-
-
-    }
 }
