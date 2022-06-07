@@ -54,7 +54,9 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
             ToggleFollowViewModel.Factory(miCore)
         )[ToggleFollowViewModel::class.java]
 
-        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
+        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this) {
+            toggleFollowViewModel.toggleFollow(it)
+        }
         mBinding.searchUsersView.adapter = adapter
         mBinding.searchUsersView.layoutManager = LinearLayoutManager(requireContext())
         viewModel.userViewDataList.observe(viewLifecycleOwner) {

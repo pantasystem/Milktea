@@ -70,10 +70,13 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
 
 
+        val viewModel = ViewModelProvider(this, ToggleFollowViewModel.Factory(miApplication))[ToggleFollowViewModel::class.java]
 
         val adapter = FollowableUserListAdapter(
-            viewLifecycleOwner, followFollowerViewModel, ViewModelProvider(this, ToggleFollowViewModel.Factory(miApplication))[ToggleFollowViewModel::class.java]
-        )
+            viewLifecycleOwner, followFollowerViewModel,
+        ) {
+            viewModel.toggleFollow(it)
+        }
 
         _binding.followFollowerList.adapter = adapter
 

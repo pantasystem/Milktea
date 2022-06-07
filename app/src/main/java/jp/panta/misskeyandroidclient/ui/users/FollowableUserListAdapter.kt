@@ -10,17 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.user.User
+
+fun interface OnToggleFollowListener {
+    fun toggle(userId: User.Id)
+}
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class FollowableUserListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val showUserDetails: ShowUserDetails,
-    private val toggleFollowViewModel: ToggleFollowViewModel
+    private val onToggleFollowListener: OnToggleFollowListener,
 ) : ListAdapter<User.Detail, FollowableUserListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){
@@ -43,7 +46,7 @@ class FollowableUserListAdapter(
         holder.binding.user = getItem(position)
         holder.binding.lifecycleOwner = viewLifecycleOwner
         holder.binding.showUserDetails = showUserDetails
-        holder.binding.toggleFollowViewModel = toggleFollowViewModel
+        holder.binding.toggleFollowListener = onToggleFollowListener
         holder.binding.executePendingBindings()
     }
 
