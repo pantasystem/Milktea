@@ -1,11 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -34,7 +36,16 @@ class TimelineStoreImpl(
     val getAccount: suspend () -> Account,
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val coroutineScope: CoroutineScope,
 ) : TimelineStore {
+
+    private val willAddNoteQueue = MutableSharedFlow<Note.Id>(
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 1000
+    )
+
+    override val receiveNoteQueue: SharedFlow<Note.Id>
+        get() = willAddNoteQueue
 
 
     val pageableStore: TimelinePagingBase by lazy {
@@ -51,6 +62,51 @@ class TimelineStoreImpl(
     }
     override val timelineState: Flow<PageableState<List<Note.Id>>>
         get() = pageableStore.state
+
+    var latestReceiveId: Note.Id? = null
+
+    init {
+        coroutineScope.launch(Dispatchers.IO) {
+            willAddNoteQueue.collect { noteId ->
+                val store = pageableStore
+                if (store is TimelinePagingStoreImpl) {
+                    store.mutex.withLock {
+                        val content = store.getState().content
+
+                        var added = false
+                        store.setState(
+                            PageableState.Fixed(
+                                when (content) {
+                                    is StateContent.NotExist -> {
+                                        added = true
+                                        StateContent.Exist(
+                                            listOf(noteId)
+                                        )
+                                    }
+                                    is StateContent.Exist -> {
+                                        if (content.rawContent.contains(noteId)) {
+                                            content
+                                        } else {
+                                            added = true
+                                            content.copy(
+                                                content.rawContent.toMutableList().also { list ->
+                                                    list.add(0, noteId)
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            )
+                        )
+                        if (added) {
+                            latestReceiveId = noteId
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val relatedNotes: Flow<PageableState<List<NoteRelation>>> =
@@ -85,6 +141,7 @@ class TimelineStoreImpl(
                     ).loadFuture()
                 }
             }
+            latestReceiveId = null
         }
     }
 
@@ -108,10 +165,24 @@ class TimelineStoreImpl(
                     ).loadPrevious()
                 }
             }
+            latestReceiveId = null
         }
 
     }
 
+    override suspend fun clear() {
+        pageableStore.mutex.withLock {
+            pageableStore.setState(PageableState.Loading.Init())
+        }
+    }
+
+    override fun onReceiveNote(noteId: Note.Id) {
+        willAddNoteQueue.tryEmit(noteId)
+    }
+
+    override fun latestReceiveNoteId(): Note.Id? {
+        return latestReceiveId
+    }
 
 }
 
@@ -126,7 +197,7 @@ class TimelinePagingStoreImpl(
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
-    IdGetter<Note.Id>, StateLocker, TimelinePagingBase {
+    IdGetter<Note.Id>, TimelinePagingBase {
 
     private val _state =
         MutableStateFlow<PageableState<List<Note.Id>>>(PageableState.Loading.Init())
