@@ -67,16 +67,16 @@ class FollowFollowerPagingStoreImpl(
     override val state: StateFlow<PageableState<List<User.Id>>>
         get() = _state
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val users: Flow<List<User>>
+    override val users: Flow<List<User.Detail>>
         get() = userDataSource.state.flatMapLatest { s ->
             state.map {
                 it.content
             }.filter {
                 it is StateContent.Exist
             }.map {
-                (it as StateContent.Exist).rawContent.map { userId ->
-                    s.get(userId)
-                }.filterNotNull()
+                (it as StateContent.Exist).rawContent.mapNotNull { userId ->
+                    s.get(userId) as? User.Detail
+                }
             }
         }
 
@@ -108,9 +108,14 @@ class FollowFollowerPagingStoreImpl(
                     _state.value.content,
                     it
                 )
-            }.onSuccess {
+            }.onSuccess { responseUserIds ->
+                val list = ((_state.value.content as? StateContent.Exist)?.rawContent
+                    ?: emptyList())
+                val newList = list.toMutableList().also { mutableList ->
+                    mutableList.addAll(responseUserIds)
+                }
                 _state.value = PageableState.Fixed(
-                    StateContent.Exist(it)
+                    StateContent.Exist(newList)
                 )
             }
         }
