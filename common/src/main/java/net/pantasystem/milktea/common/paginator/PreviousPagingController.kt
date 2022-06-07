@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.common.paginator
 
+import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import kotlinx.coroutines.sync.withLock
 
 class PreviousPagingController<DTO, E>(
     private val entityConverter: EntityConverter<DTO, E>,
@@ -11,6 +11,9 @@ class PreviousPagingController<DTO, E>(
     private val previousLoader: PreviousLoader<DTO>
 ) : PreviousPaginator {
     override suspend fun loadPrevious() {
+        if (locker.mutex.isLocked) {
+            return
+        }
         locker.mutex.withLock {
 
             val loading = PageableState.Loading.Previous(
