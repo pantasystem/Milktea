@@ -1,15 +1,18 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
@@ -20,14 +23,24 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.TimelineStore
 
-@ExperimentalCoroutinesApi
-class TimelineViewModel(
-    val account: Account?,
-    val accountId: Long? = account?.accountId,
-    val pageable: Pageable,
+@OptIn(ExperimentalCoroutinesApi::class)
+class TimelineViewModel @AssistedInject constructor(
     val miCore: MiCore,
-    val include: NoteRequest.Include
+    @Assisted val account: Account?,
+    @Assisted val accountId: Long? = account?.accountId,
+    @Assisted val pageable: Pageable,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(
+            account: Account?,
+            accountId: Long?,
+            pageable: Pageable,
+        ): TimelineViewModel
+    }
+
+    companion object
 
     val tag = "TimelineViewModel"
     private val mErrorEvent = MutableSharedFlow<Exception>()
@@ -175,4 +188,17 @@ class TimelineViewModel(
         return mAccountCache ?: throw IllegalStateException("Accountが取得できませんでした。")
     }
 
+}
+
+@Suppress("UNCHECKED_CAST")
+fun TimelineViewModel.Companion.provideViewModel(
+    assistedFactory: TimelineViewModel.ViewModelAssistedFactory,
+    account: Account?,
+    accountId: Long? = account?.accountId,
+    pageable: Pageable,
+
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return assistedFactory.create(account, accountId, pageable) as T
+    }
 }
