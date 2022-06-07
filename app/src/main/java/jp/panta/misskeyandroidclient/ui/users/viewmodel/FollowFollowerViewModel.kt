@@ -36,6 +36,9 @@ class FollowFollowerViewModel @AssistedInject constructor(
 
     val users = followFollowerPagingStore.users.asLiveData()
 
+    val showUserEventBus = EventBus<User.Id>()
+
+
     fun loadInit() = viewModelScope.launch(Dispatchers.IO) {
         followFollowerPagingStore.clear()
         followFollowerPagingStore.loadPrevious()
@@ -47,7 +50,6 @@ class FollowFollowerViewModel @AssistedInject constructor(
     }
 
 
-    val showUserEventBus = EventBus<User.Id>()
 
     override fun show(userId: User.Id?) {
         showUserEventBus.event = userId
