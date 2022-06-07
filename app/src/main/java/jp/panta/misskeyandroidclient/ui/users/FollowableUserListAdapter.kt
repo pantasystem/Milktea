@@ -11,9 +11,9 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFollowingFollowerBinding
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -21,27 +21,26 @@ class FollowableUserListAdapter(
     private val viewLifecycleOwner: LifecycleOwner,
     private val showUserDetails: ShowUserDetails,
     private val toggleFollowViewModel: ToggleFollowViewModel
-) : ListAdapter<UserViewData, FollowableUserListAdapter.ViewHolder>(
+) : ListAdapter<User.Detail, FollowableUserListAdapter.ViewHolder>(
     DiffUtilItemCallback()
 ){
     @FlowPreview
     @ExperimentalCoroutinesApi
-    class DiffUtilItemCallback : DiffUtil.ItemCallback<UserViewData>(){
-        override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
-            return oldItem.user.value == newItem.user.value
+    class DiffUtilItemCallback : DiffUtil.ItemCallback<User.Detail>(){
+        override fun areContentsTheSame(oldItem: User.Detail, newItem: User.Detail): Boolean {
+            return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
-            return oldItem.userId == newItem.userId
+        override fun areItemsTheSame(oldItem: User.Detail, newItem: User.Detail): Boolean {
+            return oldItem.id == newItem.id
         }
     }
     class ViewHolder(val binding: ItemFollowingFollowerBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        getItem(position).user.observe(viewLifecycleOwner) {
-            holder.binding.user = it
-        }
+
+        holder.binding.user = getItem(position)
         holder.binding.lifecycleOwner = viewLifecycleOwner
         holder.binding.showUserDetails = showUserDetails
         holder.binding.toggleFollowViewModel = toggleFollowViewModel

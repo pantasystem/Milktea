@@ -3,11 +3,17 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel
 import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.di.module.getNoteDataSourceAdder
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 
 @Suppress("UNCHECKED_CAST")
@@ -22,11 +28,8 @@ class SortedUsersViewModel(
 
     val logger = miCore.loggerFactory.create("SortedUsersViewModel")
 
-    private val userViewDataFactory by lazy {
-        miCore.userViewDataFactory()
-    }
 
-    val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
+    private val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
 
     class Factory(
         val miCore: MiCore,
@@ -104,14 +107,17 @@ class SortedUsersViewModel(
 
     }
 
+    private val userIds = MutableStateFlow<List<User.Id>>(emptyList())
 
-    val users = object : MediatorLiveData<List<UserViewData>>() {
 
-    }.apply {
-        miCore.getAccountStore().observeCurrentAccount.onEach {
-            loadUsers()
-        }.launchIn(viewModelScope + Dispatchers.Main)
-    }
+    val users = miCore.getUserDataSource().state.flatMapLatest { state ->
+        userIds.map { list ->
+            list.mapNotNull {
+                state.get(it) as? User.Detail
+            }
+        }
+    }.flowOn(Dispatchers.IO).asLiveData()
+
 
     val isRefreshing = MutableLiveData<Boolean>()
 
@@ -141,12 +147,12 @@ class SortedUsersViewModel(
                             miCore.getUserDataSource().add(u)
                         }
                     }?.map { u ->
-                        userViewDataFactory.create(u, viewModelScope, Dispatchers.IO)
+                        u.id
                     } ?: emptyList()
                 }.onFailure { t ->
                     logger.error("ユーザーを取得しようとしたところエラーが発生しました", t)
                 }.onSuccess {
-                    users.postValue(it)
+                    userIds.value = it
                 }
             isRefreshing.postValue(false)
         }
