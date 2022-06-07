@@ -31,7 +31,7 @@ fun SearchAndSelectUserScreen(
 
 
     val users by searchUserViewModel.users.collectAsState()
-    val selectedUserIds by selectedUserViewModel.selectedUserIds.observeAsState()
+    val selectedUserIds by selectedUserViewModel.selectedUserIds.collectAsState()
     val selectedUsers by selectedUserViewModel.selectedUserList.collectAsState()
 
     val userName by searchUserViewModel.userName.observeAsState()
@@ -94,7 +94,7 @@ fun SearchAndSelectUserScreen(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "${stringResource(R.string.select_user)}(${selectedUserIds?.size ?: 0})",
+                                text = "${stringResource(R.string.select_user)}(${selectedUserIds.size})",
                                 fontSize = 24.sp
                             )
                         }
@@ -104,7 +104,8 @@ fun SearchAndSelectUserScreen(
             }
         ) { padding ->
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(padding)
             ) {
                 Row(
@@ -136,7 +137,7 @@ fun SearchAndSelectUserScreen(
                 }
                 SimpleUserListView(
                     users = users,
-                    selectedUserIds = selectedUserIds ?: emptySet(),
+                    selectedUserIds = selectedUserIds,
                     onSelected = {
                         selectedUserViewModel.toggleSelectUser(it)
                     },

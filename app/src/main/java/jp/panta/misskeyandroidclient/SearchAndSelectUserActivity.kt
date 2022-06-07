@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -50,9 +49,9 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private var mSelectedUserViewModel: SelectedUserViewModel? = null
+    private lateinit var selectedUserViewModel: SelectedUserViewModel
 
-    val searchUserViewModel: SearchUserViewModel by viewModels()
+    private val searchUserViewModel: SearchUserViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +59,6 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         setTheme()
 
 
-        val selectableMaximumSize = intent.getIntExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, Int.MAX_VALUE)
         val selectedUserIdList =
             (intent.getSerializableExtra(EXTRA_SELECTED_USER_IDS) as? ArrayList<*>)?.mapNotNull {
                 it as? User.Id
@@ -72,18 +70,16 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         val miCore = applicationContext as MiCore
 
 
-        val selectedUserViewModel =
+        this.selectedUserViewModel =
             ViewModelProvider(
                 this,
                 SelectedUserViewModel.Factory(
                     miCore,
-                    selectableMaximumSize,
                     selectedUserIdList,
                     null
                 )
             )[SelectedUserViewModel::class.java]
 
-        mSelectedUserViewModel = selectedUserViewModel
         setContent {
             SearchAndSelectUserScreen(
                 searchUserViewModel = searchUserViewModel,
@@ -109,13 +105,9 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
 
     private fun setResultFinish() {
-        val selectedDiff = mSelectedUserViewModel?.getSelectedUserIdsChangedDiff()
+        val selectedDiff = selectedUserViewModel.getSelectedUserIdsChangedDiff()
 
-        if (selectedDiff == null) {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
-            return
-        }
+
         val intent = Intent()
 
         Log.d("SearchAndSelectAC", "新たに追加:${selectedDiff.added}, 削除:${selectedDiff.removed}")

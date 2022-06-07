@@ -1,38 +1,49 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable
 
-import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
+
+data class SelectedUserUiState(
+    val selectedUserIds: Set<User.Id>
+) {
+    fun toggle(userId: User.Id): SelectedUserUiState {
+
+        return copy(
+            selectedUserIds = selectedUserIds.toMutableSet().also {
+                if (it.contains(userId)) {
+                    it.remove(userId)
+                } else {
+                    it.add(userId)
+                }
+            }
+        )
+    }
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SelectedUserViewModel(
     val miCore: MiCore,
-    val selectableSize: Int,
     private val exSelectedUserIds: List<User.Id> = emptyList(),
     private val exSelectedUsers: List<User> = emptyList()
-) : ViewModel(){
+) : ViewModel() {
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
         val miCore: MiCore,
-        private val selectableSize: Int,
         private val selectedUserIds: List<User.Id>?,
         val selectedUsers: List<User>?
-    ) : ViewModelProvider.Factory{
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SelectedUserViewModel(
                 miCore,
-                selectableSize,
-                selectedUserIds?: emptyList(),
-                selectedUsers?: emptyList()
+                selectedUserIds ?: emptyList(),
+                selectedUsers ?: emptyList()
             ) as T
         }
     }
@@ -45,24 +56,17 @@ class SelectedUserViewModel(
         val selectedUserNames: List<String>,
     ) : Serializable
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val mSelectedUserIdUserMap: HashMap<User.Id, UserViewData>
+    private val _state = MutableStateFlow(
+        SelectedUserUiState(
+            exSelectedUserIds.toSet()
+        )
+    )
 
-    private val selectedUsersViewData = MediatorLiveData<List<UserViewData>>()
+    val selectedUserIds = _state.map {
+        it.selectedUserIds
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
-    private val userViewDataFactory by lazy {
-        miCore.userViewDataFactory()
-    }
-
-    val selectedUserIds = MediatorLiveData<Set<User.Id>>().apply{
-        addSource(selectedUsersViewData){
-            value = it.mapNotNull{ uv ->
-                uv.userId
-            }.toSet()
-        }
-    }
-
-    val selectedUserList = selectedUserIds.asFlow().flatMapLatest { ids ->
+    val selectedUserList = selectedUserIds.flatMapLatest { ids ->
         miCore.getUserDataSource().state.map { state ->
             ids.mapNotNull {
                 state.get(it)
@@ -70,93 +74,45 @@ class SelectedUserViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    init{
-        val usersMap = HashMap<User.Id, UserViewData>()
 
-        val srcUser = exSelectedUsers.map{
-            it.id to userViewDataFactory.create(it, viewModelScope)
+    fun toggleSelectUser(user: User?) {
+        user ?: return
+
+        _state.update { state ->
+            state.toggle(user.id)
         }
 
-        usersMap.putAll(srcUser)
-
-        val srcUserId = exSelectedUserIds.mapNotNull{
-
-            if(usersMap.containsKey(it)){
-                null
-            }else{
-                it to userViewDataFactory.create(it, viewModelScope)
-            }
-
-        }
-
-        usersMap.putAll(srcUserId)
-
-        mSelectedUserIdUserMap = LinkedHashMap(usersMap)
-        selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
     }
 
-    private fun selectUser(user: User?){
-        user?: return
-        synchronized(mSelectedUserIdUserMap){
-            mSelectedUserIdUserMap[user.id] = userViewDataFactory.create(user, viewModelScope)
-            selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
-        }
-    }
-
-    private fun unSelectUser(user: User?){
-        user?: return
-        synchronized(mSelectedUserIdUserMap){
-            mSelectedUserIdUserMap.remove(user.id)
-            selectedUsersViewData.postValue(mSelectedUserIdUserMap.values.toList())
-        }
-    }
-
-    fun toggleSelectUser(user: User?){
-        user?: return
-
-        synchronized(mSelectedUserIdUserMap){
-            if(mSelectedUserIdUserMap.containsKey(user.id)){
-                unSelectUser(user)
-            }else{
-                selectUser(user)
-            }
-        }
-    }
-
-    fun isSelectedUser(user: User?): Boolean{
-        user?: return false
-        return synchronized(mSelectedUserIdUserMap){
-            mSelectedUserIdUserMap.containsKey(user.id)
-        }
-    }
 
     fun getSelectedUserIdsChangedDiff(): ChangedDiffResult {
         val selectedBeforeIds = exSelectedUserIds.toSet()
-        val selectedBeforeUsers = exSelectedUsers.map{
+        val selectedBeforeUsers = exSelectedUsers.map {
             it.id
         }.toSet()
-        val exSelected = HashSet<User.Id>().apply{
+        val exSelected = HashSet<User.Id>().apply {
             addAll(selectedBeforeIds)
             addAll(selectedBeforeUsers)
         }
 
-        val selected = selectedUsersViewData.value?.map{
-            it.userId
-        }?: emptyList()
+        val selected = _state.value.selectedUserIds
 
         val selectedUsers = selectedUserList.value
 
 
-
-        val added = selected.filter{ s ->
+        val added = selected.filter { s ->
             !exSelected.contains(s)
         }
 
-        val removed = exSelected.filter{ ex ->
+        val removed = exSelected.filter { ex ->
             !selected.contains(ex)
         }
-        return ChangedDiffResult(selected.filterNotNull().toList(), added.filterNotNull(), removed, selectedUsers.map {
-            it.displayUserName
-        })
+        return ChangedDiffResult(
+            selected.toList().toList(),
+            added,
+            removed,
+            selectedUsers.map {
+                it.displayUserName
+            })
     }
 }
