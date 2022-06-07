@@ -1,13 +1,17 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
-import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.NoteDataSource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSourceState
+import net.pantasystem.milktea.model.notes.NoteNotFoundException
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -23,6 +27,19 @@ class InMemoryNoteDataSource @Inject constructor(
     private val listenersLock = Mutex()
 
     private var listeners = setOf<NoteDataSource.Listener>()
+
+    private val _state = MutableStateFlow(NoteDataSourceState(emptyMap()))
+
+    override val state: StateFlow<NoteDataSourceState>
+        get() = _state
+
+    init {
+        addEventListener {
+            _state.update {
+                it.copy(notes.toMutableMap())
+            }
+        }
+    }
 
     override fun addEventListener(listener: NoteDataSource.Listener): Unit = runBlocking {
         listeners = listeners.toMutableSet().apply {

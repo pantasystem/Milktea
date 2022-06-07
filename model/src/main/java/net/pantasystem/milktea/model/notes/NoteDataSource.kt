@@ -1,9 +1,23 @@
 package net.pantasystem.milktea.model.notes
 
+import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
-import kotlin.jvm.Throws
+
+data class NoteDataSourceState(
+    val map: Map<Note.Id, Note>
+) {
+    fun findIn(ids: List<Note.Id>) : List<Note>{
+        return ids.mapNotNull {
+            map[it]
+        }
+    }
+
+    fun getOrNull(id: Note.Id) : Note? {
+        return map[id]
+    }
+}
 
 /**
  * キャッシュやデータベースの実装の差をなくすためのRepository
@@ -21,6 +35,7 @@ interface NoteDataSource {
     }
 
 
+
     sealed class Event{
         abstract val noteId: Note.Id
         data class Deleted(override val noteId: Note.Id) : Event()
@@ -30,6 +45,7 @@ interface NoteDataSource {
 
     fun addEventListener(listener: Listener)
 
+    val state: StateFlow<NoteDataSourceState>
 
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id) : Note
