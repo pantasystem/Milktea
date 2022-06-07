@@ -3,23 +3,26 @@ package jp.panta.misskeyandroidclient
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
+import jp.panta.misskeyandroidclient.ui.users.ToggleFollowErrorHandler
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.user.RequestType
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,7 +52,9 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         UserDetailViewModel.provideFactory(assistedFactory, userId)
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private val toggleFollowFollowerViewModel: ToggleFollowViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -68,6 +73,12 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         mBinding.followFollowerTab.setupWithViewPager(mBinding.followFollowerPager)
         mBinding.followFollowerPager.currentItem = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
 
+        val errorHandler = ToggleFollowErrorHandler(mBinding.layoutBase) {
+            toggleFollowFollowerViewModel.toggleFollow(it)
+        }
+        lifecycleScope.launchWhenResumed {
+            toggleFollowFollowerViewModel.errors.collect(errorHandler::invoke)
+        }
 
     }
 
@@ -97,9 +108,9 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun getItem(position: Int): Fragment {
             return if(position == 0){
-                FollowFollowerFragment.newInstance(FollowFollowerViewModel.Type.FOLLOWING, userId)
+                FollowFollowerFragment.newInstance(RequestType.Following(userId))
             }else{
-                FollowFollowerFragment.newInstance(FollowFollowerViewModel.Type.FOLLOWER, userId)
+                FollowFollowerFragment.newInstance(RequestType.Follower(userId))
             }
         }
     }

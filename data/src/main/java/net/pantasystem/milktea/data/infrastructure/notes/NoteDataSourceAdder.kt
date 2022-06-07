@@ -7,9 +7,12 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class NoteDataSourceAdder(
+@Singleton
+class NoteDataSourceAdder @Inject constructor(
     private val userDataSource: UserDataSource,
     private val noteDataSource: NoteDataSource,
     private val filePropertyDataSource: FilePropertyDataSource

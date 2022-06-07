@@ -5,11 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
@@ -17,6 +15,7 @@ import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -45,9 +44,6 @@ class SearchUserViewModel @Inject constructor(
     private val miCore: MiCore,
 ) : ViewModel() {
 
-    private val userViewDataFactory by lazy {
-        miCore.userViewDataFactory()
-    }
     private val logger = loggerFactory.create("SearchUserViewModel")
 
 
@@ -105,14 +101,11 @@ class SearchUserViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val userViewDataList = searchState.map {
-        (it.content as? StateContent.Exist)?.rawContent
-            ?: emptyList()
-    }.map {
-        it.map { u ->
-            userViewDataFactory.create(u, viewModelScope)
+        (it.content as? StateContent.Exist)?.rawContent?.map { user ->
+            user as? User.Detail
         }
+            ?: emptyList()
     }.asLiveData()
 
     init {

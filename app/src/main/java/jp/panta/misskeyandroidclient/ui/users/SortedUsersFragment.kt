@@ -3,23 +3,23 @@ package jp.panta.misskeyandroidclient.ui.users
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import jp.panta.misskeyandroidclient.Activities
-
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import net.pantasystem.milktea.api.misskey.users.RequestUser
 import jp.panta.misskeyandroidclient.databinding.FragmentExploreUsersBinding
-import net.pantasystem.milktea.model.user.User
 import jp.panta.misskeyandroidclient.putActivity
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -63,6 +63,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
     }
 
     val mBinding: FragmentExploreUsersBinding by dataBinding()
+    private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,10 +82,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
             this,
             SortedUsersViewModel.Factory(miCore, type, condition)
         )[SortedUsersViewModel::class.java]
-        val toggleFollowViewModel = ViewModelProvider(
-            this,
-            ToggleFollowViewModel.Factory(miCore)
-        )[ToggleFollowViewModel::class.java]
+
 
 
         exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner) {
@@ -95,7 +93,9 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
             exploreUsersViewModel.loadUsers()
         }
 
-        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
+        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this) {
+            toggleFollowViewModel.toggleFollow(it)
+        }
         mBinding.exploreUsersView.adapter = adapter
         mBinding.exploreUsersView.layoutManager = LinearLayoutManager(view.context)
         exploreUsersViewModel.users.observe(viewLifecycleOwner) {

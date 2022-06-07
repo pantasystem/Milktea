@@ -13,8 +13,8 @@
                 name="showUserDetails"
                 type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails" />
         <variable
-                name="toggleFollowViewModel"
-                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel" />
+                name="toggleFollowListener"
+                type="jp.panta.misskeyandroidclient.ui.users.OnToggleFollowListener" />
 
     </data>
     <androidx.cardview.widget.CardView
@@ -82,7 +82,7 @@
                     android:layout_marginStart='8dp'
                     android:layout_alignTop="@id/mainName"
                     app:isFollowing="@{SafeUnbox.unbox(user.isFollowing)}"
-                    android:onClick="@{()-> toggleFollowViewModel.toggleFollow(user.id)}"
+                    android:onClick="@{()-> toggleFollowListener.toggle(user.id)}"
                     followState="@{user.followState}"
                     />
             <androidx.emoji.widget.EmojiTextView

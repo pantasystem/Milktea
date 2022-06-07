@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -14,7 +13,6 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSearchUserBinding
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.user.User
@@ -41,20 +39,14 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
 
     val viewModel: SearchUserViewModel by viewModels()
 
+    private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userName = arguments?.getString(EXTRA_USER_NAME) ?: ""
-
-        val miCore = requireContext().applicationContext as MiCore
-        viewModel.userName.value = userName
-
-        val toggleFollowViewModel = ViewModelProvider(
-            this,
-            ToggleFollowViewModel.Factory(miCore)
-        )[ToggleFollowViewModel::class.java]
-
-        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this, toggleFollowViewModel)
+        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this) {
+            toggleFollowViewModel.toggleFollow(it)
+        }
         mBinding.searchUsersView.adapter = adapter
         mBinding.searchUsersView.layoutManager = LinearLayoutManager(requireContext())
         viewModel.userViewDataList.observe(viewLifecycleOwner) {
@@ -66,6 +58,8 @@ class SearchUserFragment : Fragment(R.layout.fragment_search_user), ShowUserDeta
         mBinding.searchUserSwipeRefresh.setOnRefreshListener {
             viewModel.search()
         }
+
+
     }
 
 
