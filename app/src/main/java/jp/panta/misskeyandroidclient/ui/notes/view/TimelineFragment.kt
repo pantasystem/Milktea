@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -23,10 +24,15 @@ import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerVie
 import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.ui.PageableView
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.*
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TimelineViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TimelineViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.page.Page
@@ -141,39 +147,32 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }
 
-        //mLinearLayoutManager.scrollToPosition(mViewModel?.position?.value?: 0)
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
         mBinding.listView.adapter = adapter
 
-        var timelineState: TimelineState? = null
         lifecycleScope.launchWhenResumed {
-            mViewModel?.getTimelineState()?.collect { tm ->
-                adapter.submitList(tm.notes)
-                timelineState = tm
+            mViewModel?.timelineState?.collect { state ->
+                val notes = (state.content as? StateContent.Exist)?.rawContent ?: emptyList()
+                adapter.submitList(notes)
 
-                if (tm.notes.isEmpty()) {
-                    mBinding.timelineEmptyView.visibility = View.VISIBLE
-                    mBinding.refresh.visibility = View.GONE
-                } else {
-                    mBinding.timelineEmptyView.visibility = View.GONE
-                    mBinding.refresh.visibility = View.VISIBLE
+                mBinding.timelineProgressBar.isVisible =
+                    state is PageableState.Loading && state.content is StateContent.NotExist
+
+                mBinding.refresh.isVisible = state.content is StateContent.Exist
+                when (state.content) {
+                    is StateContent.Exist -> {
+                        mBinding.timelineEmptyView.visibility = View.GONE
+                    }
+                    is StateContent.NotExist -> {
+                        mBinding.timelineEmptyView.isVisible = state is PageableState.Error
+                    }
                 }
-                mBinding.timelineProgressBar.visibility = View.GONE
             }
+
         }
 
 
-        mViewModel?.isInitLoading?.observe(viewLifecycleOwner) {
-            if (it) {
 
-                mBinding.timelineProgressBar.visibility = View.VISIBLE
-                mBinding.refresh.visibility = View.GONE
-                mBinding.timelineEmptyView.visibility = View.GONE
-            } else {
-                mBinding.timelineProgressBar.visibility = View.GONE
-
-            }
-        }
 
 
         lifecycleScope.launchWhenResumed {
@@ -221,7 +220,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
 
-                if (timelineState is TimelineState.ReceivedNew && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
+
+                if (mViewModel?.timelineStore?.latestReceiveNoteId() != null && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
                     mLinearLayoutManager.scrollToPosition(0)
                 }
 
@@ -245,27 +245,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        mFirstVisibleItemPosition?.let { firstVisibleItemPosition ->
-            if (firstVisibleItemPosition > 0 && firstVisibleItemPosition <= (mViewModel?.getTimelineState()?.value?.notes?.size
-                    ?: 0)
-            ) {
-                try {
-                    mViewModel?.getTimelineState()?.value?.notes?.get(firstVisibleItemPosition)
-                } catch (t: Throwable) {
-                    Log.e("TimelineFragment", "先端に表示されているノートを取得しようとしたら失敗した", t)
-                    null
-                }
-            } else {
-                null
-            }
-        }
-
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -281,13 +260,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         Log.d("TimelineFragment", "onPause")
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        //mViewModel?.streamingStop()
-        //mViewModel?.stop()
-        Log.d("TimelineFragment", "onDestroyView")
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
