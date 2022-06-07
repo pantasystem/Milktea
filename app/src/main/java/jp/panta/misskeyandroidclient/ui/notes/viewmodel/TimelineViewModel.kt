@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline
@@ -26,6 +25,8 @@ import net.pantasystem.milktea.model.notes.TimelineStore
 @OptIn(ExperimentalCoroutinesApi::class)
 class TimelineViewModel @AssistedInject constructor(
     val miCore: MiCore,
+    private val noteDataSourceAdder: NoteDataSourceAdder,
+    timelineStoreFactory: TimelineStore.Factory,
     @Assisted val account: Account?,
     @Assisted val accountId: Long? = account?.accountId,
     @Assisted val pageable: Pageable,
@@ -50,24 +51,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     var position: Int = 0
 
-
-    private val noteDataSourceAdder = NoteDataSourceAdder(
-        miCore.getUserDataSource(),
-        miCore.getNoteDataSource(),
-        miCore.getFilePropertyDataSource()
-    )
-
-
-    val timelineStore: TimelineStore = TimelineStoreImpl(
-        pageable,
-        noteDataSourceAdder,
-        miCore.getNoteDataSource(),
-        miCore.getGetters(),
-        this::getAccount,
-        miCore.getEncryption(),
-        miCore.getMisskeyAPIProvider(),
-        viewModelScope,
-    )
+    val timelineStore: TimelineStore = timelineStoreFactory.create(pageable, viewModelScope, this::getAccount)
 
     val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->

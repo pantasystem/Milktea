@@ -7,13 +7,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
-import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
 import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
 import net.pantasystem.milktea.data.infrastructure.notes.NoteTranslationStoreImpl
+import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notes.TimelineStore
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import javax.inject.Singleton
 
@@ -28,6 +30,10 @@ abstract class NoteBindModule{
     @Binds
     @Singleton
     abstract fun noteRepository(impl: NoteRepositoryImpl): NoteRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideTimelineStoreFactory(impl: TimelineStoreImpl.Factory): TimelineStore.Factory
 }
 
 

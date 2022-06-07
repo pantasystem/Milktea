@@ -26,6 +26,7 @@ import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.TimelineStore
 import retrofit2.Response
+import javax.inject.Inject
 
 
 class TimelineStoreImpl(
@@ -38,6 +39,31 @@ class TimelineStoreImpl(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val coroutineScope: CoroutineScope,
 ) : TimelineStore {
+
+    class Factory @Inject constructor(
+        private val noteAdder: NoteDataSourceAdder,
+        private val noteDataSource: NoteDataSource,
+        private val getters: Getters,
+        private val encryption: Encryption,
+        private val misskeyAPIProvider: MisskeyAPIProvider,
+    ) : TimelineStore.Factory {
+        override fun create(
+            pageable: Pageable,
+            coroutineScope: CoroutineScope,
+            getAccount: suspend () -> Account
+        ): TimelineStore {
+            return TimelineStoreImpl(
+                pageable,
+                noteAdder,
+                noteDataSource,
+                getters,
+                getAccount,
+                encryption,
+                misskeyAPIProvider,
+                coroutineScope,
+            )
+        }
+    }
 
     private val willAddNoteQueue = MutableSharedFlow<Note.Id>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,

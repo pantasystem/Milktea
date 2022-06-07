@@ -1,10 +1,17 @@
 package net.pantasystem.milktea.model.notes
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 
 interface TimelineStore {
+    interface Factory {
+        fun create(pageable: Pageable, coroutineScope: CoroutineScope, getAccount: suspend () -> Account): TimelineStore
+    }
+
     val timelineState: Flow<PageableState<List<Note.Id>>>
     val relatedNotes: Flow<PageableState<List<NoteRelation>>>
     val receiveNoteQueue: SharedFlow<Note.Id>
