@@ -1,25 +1,25 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.favorite.FavoriteNotePagingStore
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.data.infrastructure.notes.*
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
-import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 @ExperimentalCoroutinesApi
 class TimelineViewModel(
@@ -73,6 +73,7 @@ class TimelineViewModel(
 
 
     private val logger = miCore.loggerFactory.create("TimelineViewModel")
+    private val cache = PlaneNoteViewDataCache(this::getAccount, miCore.getNoteCaptureAdapter(), miCore.getTranslationStore())
 
     init {
         flow {
@@ -129,21 +130,7 @@ class TimelineViewModel(
         }.filter {
             !mNoteIds.contains(it.note.id) && !this.mIsLoading
         }.map {
-            if (it.reply == null) {
-                PlaneNoteViewData(
-                    it,
-                    getAccount(),
-                    miCore.getNoteCaptureAdapter(),
-                    miCore.getTranslationStore()
-                )
-            } else {
-                HasReplyToNoteViewData(
-                    it,
-                    getAccount(),
-                    miCore.getNoteCaptureAdapter(),
-                    miCore.getTranslationStore()
-                )
-            }
+            cache.get(it)
         }.onEach { note ->
             this.mNoteIds.add(note.id)
             listOf(note).captureNotes()
@@ -397,13 +384,7 @@ class TimelineViewModel(
             notes.forEach { note ->
                 note.job = note.eventFlow.onEach {
                     if (it is NoteDataSource.Event.Deleted) {
-                        timelineState.value =
-                            TimelineState.Deleted(
-                                timelineState.value.notes.filterNot { pnvd ->
-                                    pnvd.id == it.noteId
-                                }
-                            )
-
+                        cache.onDeleted(it.noteId)
                     }
                 }.launchIn(scope)
             }
@@ -473,14 +454,14 @@ class TimelineViewModel(
                 pageable,
                 miCore,
                 miCore.getNoteCaptureAdapter(),
+                planeNoteViewDataCache = cache
             )
             else -> NoteTimelineStore(
                 this,
                 pageable,
                 include,
                 miCore,
-                miCore.getNoteCaptureAdapter(),
-                miCore.getTranslationStore()
+                planeNoteViewDataCache = cache
             )
         }
     }

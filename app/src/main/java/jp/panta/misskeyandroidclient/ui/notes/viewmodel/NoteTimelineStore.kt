@@ -1,34 +1,26 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
 import android.util.Log
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import jp.panta.misskeyandroidclient.util.BodyLessResponse
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-
-import retrofit2.Response
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.NullPointerException
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.account.page.Pageable
+import retrofit2.Response
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteTimelineStore(
     val account: Account,
-    //override val timelineRequestBase: NoteRequest.Setting,
     override val pageableTimeline: Pageable,
     val include: NoteRequest.Include,
     private val miCore: MiCore,
-    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteTranslationStore: NoteTranslationStore
-) : NotePagedStore {
+    private val planeNoteViewDataCache: PlaneNoteViewDataCache,
+    ) : NotePagedStore {
 
     private val requestBuilder = NoteRequest.Builder(pageableTimeline, account.getI(miCore.getEncryption()), include)
     private val adder = NoteDataSourceAdder(
@@ -117,11 +109,7 @@ class NoteTimelineStore(
                     val related = adder.addNoteDtoToDataSource(account, it).let { note ->
                         miCore.getGetters().noteRelationGetter.get(note)
                     }
-                    if (it.reply == null) {
-                        PlaneNoteViewData(related, account, noteCaptureAPIAdapter, noteTranslationStore)
-                    } else {
-                        HasReplyToNoteViewData(related, account, noteCaptureAPIAdapter, noteTranslationStore)
-                    }
+                    planeNoteViewDataCache.get(related)
                 } catch (e: Exception) {
                     Log.d("NoteTimelineStore", "パース中にエラー発生: $it", e)
                     null

@@ -8,7 +8,6 @@ sealed class TimelineState{
     data class LoadNew(override val notes: List<PlaneNoteViewData>) : TimelineState()
     data class LoadOld(override val notes: List<PlaneNoteViewData>) : TimelineState()
     data class ReceivedNew(override val notes: List<PlaneNoteViewData>) : TimelineState()
-    data class Deleted(override val notes: List<PlaneNoteViewData>) : TimelineState()
 
 
     /**
