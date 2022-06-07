@@ -63,7 +63,7 @@ class TimelineViewModel(
             }
             cache.getIn(relations)
         }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, PageableState.Loading.Init())
+    }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, PageableState.Loading.Init())
 
     val isLoading = timelineStore.timelineState.map {
         it is PageableState.Loading
@@ -131,7 +131,7 @@ class TimelineViewModel(
             noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it.body)
         }.map {
             timelineStore.onReceiveNote(it.id)
-        }.catch { e ->
+        }.flowOn(Dispatchers.IO).catch { e ->
             logger.warning("ストリーミング受信中にエラー発生", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
 

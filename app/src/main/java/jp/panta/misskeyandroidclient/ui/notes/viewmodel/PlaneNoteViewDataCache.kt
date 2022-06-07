@@ -104,7 +104,7 @@ class PlaneNoteViewDataCache(
             UrlPreviewLoadTask(
                 GetUrlPreviewStore.invoke(getAccount.invoke()),
                 urls,
-                coroutineScope,
+                coroutineScope + Dispatchers.IO,
             ).load(note.urlPreviewLoadTaskCallback)
         }
     }
