@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
@@ -30,15 +29,12 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TimelineViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TimelineViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
-import java.io.IOException
-import java.net.SocketTimeoutException
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -118,7 +114,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val factory = TimelineViewModelFactory(null, mPage?.accountId, mPageable, miApplication)
         mViewModel = ViewModelProvider(this, factory)[TimelineViewModel::class.java]
 
-
     }
 
 
@@ -127,8 +122,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
-
-        //sharedPreference = view.context.getSharedPreferences()
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         mBinding.listView.layoutManager = mLinearLayoutManager
@@ -168,50 +161,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     }
                 }
             }
-
         }
-
-
-
-
 
         lifecycleScope.launchWhenResumed {
             mViewModel?.errorEvent?.collect { error ->
-                when (error) {
-                    is IOException -> {
-                        Toast.makeText(requireContext(), R.string.network_error, Toast.LENGTH_LONG)
-                            .show()
-
-                    }
-                    is SocketTimeoutException -> {
-                        Toast.makeText(requireContext(), R.string.timeout_error, Toast.LENGTH_LONG)
-                            .show()
-
-                    }
-                    is APIError.AuthenticationException -> {
-                        Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_LONG)
-                            .show()
-                    }
-                    is APIError.IAmAIException -> {
-                        Toast.makeText(requireContext(), R.string.bot_error, Toast.LENGTH_LONG)
-                            .show()
-                    }
-                    is APIError.InternalServerException -> {
-                        Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_LONG)
-                            .show()
-                    }
-                    is APIError.ClientException -> {
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.parameter_error,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    else -> {
-                        Toast.makeText(requireContext(), "error:$error", Toast.LENGTH_SHORT).show()
-                    }
-
-                }
+                TimelineErrorHandler(requireContext())(error)
             }
         }
 
@@ -219,12 +173,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-
-
                 if (mViewModel?.timelineStore?.latestReceiveNoteId() != null && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
                     mLinearLayoutManager.scrollToPosition(0)
                 }
-
             }
         })
 
@@ -240,8 +191,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             Log.d("TimelineFragment", "リトライボタンを押しました")
             mViewModel?.loadInit()
         }
-
-        //mViewModel?.loadInit()
     }
 
 
@@ -312,26 +261,21 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 }
             }
 
+            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+            mFirstVisibleItemPosition = firstVisibleItemPosition
+            mViewModel?.position = firstVisibleItemPosition
+
         }
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
             val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
             val itemCount = mLinearLayoutManager.itemCount
-
-            mFirstVisibleItemPosition = firstVisibleItemPosition
-            mViewModel?.position = firstVisibleItemPosition
-
-            if (firstVisibleItemPosition == 0) {
-                Log.d("", "先頭")
-            }
 
             if (endVisibleItemPosition == (itemCount - 1)) {
                 Log.d("", "後ろ")
                 mViewModel?.loadOld()
-
             }
 
         }
