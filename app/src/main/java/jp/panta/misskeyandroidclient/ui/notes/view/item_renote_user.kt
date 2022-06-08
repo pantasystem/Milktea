@@ -17,13 +17,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
+import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelation
 
 @ExperimentalCoroutinesApi

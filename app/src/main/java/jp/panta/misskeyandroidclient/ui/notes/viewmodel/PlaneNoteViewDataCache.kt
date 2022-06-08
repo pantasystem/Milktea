@@ -8,13 +8,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notes.*
 
 
 class PlaneNoteViewDataCache(

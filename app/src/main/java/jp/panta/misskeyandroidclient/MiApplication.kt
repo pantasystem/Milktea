@@ -20,7 +20,6 @@ import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
@@ -50,6 +49,7 @@ import net.pantasystem.milktea.model.instance.MetaCache
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.MessageRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteTranslationStore

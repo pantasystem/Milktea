@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User

@@ -9,7 +9,6 @@ import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.State
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji

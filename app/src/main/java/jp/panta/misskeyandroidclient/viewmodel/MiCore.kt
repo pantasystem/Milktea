@@ -7,7 +7,6 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -23,6 +22,7 @@ import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.MessageRepository
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteTranslationStore

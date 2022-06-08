@@ -1,10 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel
 
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
-import java.lang.IllegalArgumentException
 
 class HasReplyToNoteViewData(
     noteRelation: NoteRelation,
