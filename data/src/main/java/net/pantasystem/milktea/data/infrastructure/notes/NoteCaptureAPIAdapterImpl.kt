@@ -8,19 +8,20 @@ import net.pantasystem.milktea.data.streaming.NoteUpdated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 
 /**
  * model層とNoteCaptureAPIをいい感じに接続する
  */
-class NoteCaptureAPIAdapter(
+class NoteCaptureAPIAdapterImpl(
     private val accountRepository: AccountRepository,
     private val noteDataSource: NoteDataSource,
     private val noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : NoteDataSource.Listener {
+) : NoteDataSource.Listener, NoteCaptureAPIAdapter {
 
     private val logger = loggerFactory.create("NoteCaptureAPIAdapter")
 
@@ -59,7 +60,7 @@ class NoteCaptureAPIAdapter(
 
     }
 
-    fun capture(id: Note.Id): Flow<NoteDataSource.Event> = channelFlow {
+    override fun capture(id: Note.Id): Flow<NoteDataSource.Event> = channelFlow {
         val account = accountRepository.get(id.accountId)
 
         val repositoryEventListener: (NoteDataSource.Event) -> Unit = { ev ->
