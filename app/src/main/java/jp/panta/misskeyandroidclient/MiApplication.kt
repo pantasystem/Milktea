@@ -34,7 +34,7 @@ import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDi
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
@@ -62,7 +62,6 @@ import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -163,7 +162,9 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
-    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
+//    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
+    @Inject
+    lateinit var urlPreviewProvider: UrlPreviewStoreProvider
 
     lateinit var colorSettingStore: ColorSettingStore
         private set
@@ -330,7 +331,7 @@ class MiApplication : Application(), MiCore {
     }
 
     override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
-        return getUrlPreviewStore(account, false)
+        return urlPreviewProvider.getUrlPreviewStore(account, false)
     }
 
     override fun getAccountStore(): AccountStore {
@@ -363,25 +364,7 @@ class MiApplication : Application(), MiCore {
 
     override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
-    private fun getUrlPreviewStore(
-        account: Account,
-        isReplace: Boolean
-    ): UrlPreviewStore {
-        return account.instanceDomain.let { accountUrl ->
-            val url = mSettingStore.urlPreviewSetting.getSummalyUrl() ?: accountUrl
 
-            var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
-            if (store == null || isReplace) {
-                store = UrlPreviewStoreFactory(
-                    urlPreviewDAO, mSettingStore.urlPreviewSetting.getSourceType(),
-                    mSettingStore.urlPreviewSetting.getSummalyUrl(),
-                    mAccountStore.state.value.currentAccount
-                ).create()
-            }
-            mUrlPreviewStoreInstanceBaseUrlMap[url] = store
-            store
-        }
-    }
 
 
     override fun getSettingStore(): SettingStore {
@@ -484,7 +467,7 @@ class MiApplication : Application(), MiCore {
             when (key) {
                 Keys.UrlPreviewSourceType.str() -> {
                     mAccountStore.state.value.accounts.forEach {
-                        getUrlPreviewStore(it, true)
+                        urlPreviewProvider.getUrlPreviewStore(it, true)
                     }
                 }
             }
