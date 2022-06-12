@@ -42,6 +42,16 @@ jobs:
     steps:
       - checkout
       - run:
+          name: decode google-services.json
+          command:
+            echo "$GOOGLE_SERVICE_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
+      - run:
+          name: generate local.properties
+          command:
+            echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./local.properties
+            echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties
+            echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
+      - run:
           name: decode jks file
           command:
             echo "$KEYSTORE_BASE_64" | base64 --decode --ignore-garbage > ~/release.jks
@@ -70,8 +80,6 @@ workflows:
     jobs:
       - build-and-test
       - release-and-publish:
-          requires:
-            - build-and-test
           filters:
             tags:
               only: /v.*/
