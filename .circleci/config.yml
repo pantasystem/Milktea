@@ -15,14 +15,7 @@ jobs:
           name: decode google-services.json
           command:
             echo "$GOOGLE_SERVICE_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
-      - run:
-          name: decode jks file
-          command:
-            echo "$KEYSTORE_BASE_64" | base64 --decode --ignore-garbage > ~/release.jks
 
-      - run:
-          name: Export version code
-          command: echo 'export ORG_GRADLE_PROJECT_VERSION_CODE="$CIRCLE_BUILD_NUM"' >> $BASH_ENV
       - run:
           name: generate local.properties
           command:
@@ -51,7 +44,7 @@ jobs:
       - run:
           name: decode jks file
           command:
-            echo "$KEYSTORE_BASE_64 | base 64 --decode --ignore-grabage > ~/release.jks
+            echo "$KEYSTORE_BASE_64" | base 64 --decode --ignore-grabage > ~/release.jks
 
       - run:
           name: Export version code
