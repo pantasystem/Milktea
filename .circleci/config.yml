@@ -52,9 +52,13 @@ jobs:
             echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties
             echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
       - run:
+          name: export KEYSTORE path
+          command:
+            echo 'export KEYSTORE=$(pwd)/release.jks' >> $BASH_ENV
+      - run:
           name: decode jks file
           command:
-            echo "$KEYSTORE_BASE_64" | base64 --decode --ignore-garbage > ~/release.jks
+            echo "$KEYSTORE_BASE_64" | base64 --decode --ignore-garbage > $KEYSTORE
 
       - run:
           name: Export version code
@@ -66,7 +70,7 @@ jobs:
           name: Assemble release build and publish
           command: |
             ./gradlew publishBundle \
-              -Pandroid.injected.signing.store.file=~/release.jks \
+              -Pandroid.injected.signing.store.file=$KEYSTORE \
               -Pandroid.injected.signing.store.password=$STORE_PASSWORD \
               -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
               -Pandroid.injected.signing.key.password=$KEY_PASSWORD
