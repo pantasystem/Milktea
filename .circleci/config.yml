@@ -66,7 +66,9 @@ workflows:
   ci-and-deploy:
     jobs:
       - build-and-test
-      - release-and-publish
+      - release-and-publish:
+          requires:
+            - build-and-test
 
 
 
