@@ -18,7 +18,7 @@ jobs:
       - run:
           name: decode jks file
           command:
-            echo "$KEYSTORE_BASE_64 | base 64 --decode --ignore-grabage > ~/release.jks
+            echo "$KEYSTORE_BASE_64" | base 64 --decode --ignore-grabage > ~/release.jks
 
       - run:
           name: Export version code
@@ -74,8 +74,6 @@ workflows:
     jobs:
       - build-and-test
       - release-and-publish
-        requires:
-          - build-and-test
 
 
 
