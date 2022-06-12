@@ -36,7 +36,8 @@ data class File(
     val localFileId: Long?,
     val thumbnailUrl: String?,
     val isSensitive: Boolean?,
-    val folderId: String? = null
+    val folderId: String? = null,
+    val comment: String? = null,
 ) : JSerializable {
     enum class AboutMediaType {
         VIDEO, IMAGE, SOUND, OTHER
