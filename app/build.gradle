@@ -1,18 +1,19 @@
-apply plugin: 'com.android.application'
+plugins {
+    id('com.android.application')
+    id('kotlin-android')
+    id('kotlin-kapt')
+    id('org.jetbrains.kotlin.plugin.serialization')
+    id('com.google.gms.google-services')
+    id('com.google.android.gms.oss-licenses-plugin')
+    id('dagger.hilt.android.plugin')
+    id('com.github.triplet.play')
+}
 
-apply plugin: 'kotlin-android'
 
-
-apply plugin: 'kotlin-kapt'
-
-
-apply plugin: "org.jetbrains.kotlin.plugin.serialization"
-
-apply plugin: 'com.google.gms.google-services'
-
-apply plugin: "com.google.android.gms.oss-licenses-plugin"
-
-apply plugin: 'dagger.hilt.android.plugin'
+play {
+    track = "internal"
+    enabled = (System.getenv("ANDROID_PUBLISHER_CREDENTIALS") != null)
+}
 
 android {
     compileSdkVersion 32
@@ -21,7 +22,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 32
         multiDexEnabled true
-        versionCode 93
+        versionCode VERSION_CODE as int
         versionName "v2.16.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
