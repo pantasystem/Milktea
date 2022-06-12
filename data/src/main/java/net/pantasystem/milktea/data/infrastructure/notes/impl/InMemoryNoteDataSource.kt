@@ -8,10 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteDataSourceState
-import net.pantasystem.milktea.model.notes.NoteNotFoundException
+import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -29,6 +26,8 @@ class InMemoryNoteDataSource @Inject constructor(
     private var listeners = setOf<NoteDataSource.Listener>()
 
     private val _state = MutableStateFlow(NoteDataSourceState(emptyMap()))
+
+    private var deleteNoteIds = mutableSetOf<Note.Id>()
 
     override val state: StateFlow<NoteDataSourceState>
         get() = _state
@@ -50,6 +49,9 @@ class InMemoryNoteDataSource @Inject constructor(
 
     override suspend fun get(noteId: Note.Id): Note {
         mutex.withLock{
+            if (deleteNoteIds.contains(noteId)) {
+                throw NoteDeletedException(noteId)
+            }
             return notes[noteId]
                 ?: throw NoteNotFoundException(noteId)
         }
@@ -84,6 +86,7 @@ class InMemoryNoteDataSource @Inject constructor(
             mutex.withLock{
                 val n = this.notes[noteId]
                 this.notes.remove(noteId)
+                deleteNoteIds.add(noteId)
                 return n != null
             }
         }
@@ -120,6 +123,7 @@ class InMemoryNoteDataSource @Inject constructor(
             this.notes[note.id] = note
             note.updated()
 
+            deleteNoteIds.remove(note.id)
             return if(n == null){
                 AddResult.CREATED
             } else {

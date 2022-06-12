@@ -93,9 +93,14 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun find(noteId: Note.Id): Note {
         val account = accountRepository.get(noteId.accountId)
 
-        var note = runCatching {
+        var note = try {
             noteDataSource.get(noteId)
-        }.getOrNull()
+        } catch (e: NoteDeletedException) {
+            throw e
+        } catch (e: Throwable) {
+            null
+        }
+
         if (note != null) {
             return note
         }
