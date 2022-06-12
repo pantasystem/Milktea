@@ -82,15 +82,7 @@ workflows:
       - build-and-test
   ci-and-deploy:
     jobs:
-      - build-and-test:
-          filters:
-            tags:
-              only: /v.*/
-            branches:
-              ignore: /.*/
       - release-and-publish:
-          requires:
-            - build-and-test
           filters:
             tags:
               only: /v.*/
