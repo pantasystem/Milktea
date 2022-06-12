@@ -60,8 +60,6 @@ jobs:
             ./gradlew assembleRelease
 
   release-and-publish:
-    requires:
-      - build-and-test
     executor:
       name: android/android-machine
 
