@@ -29,7 +29,14 @@ jobs:
           name: decode google-services.json
           command:
             echo "$GOOGLE_SERVICE_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
+      - run:
+          name: decode jks file
+          command:
+            echo "$KEYSTORE_BASE_64 | base 64 --decode --ignore-grabage > ~/release.jks
 
+      - run:
+          name: Export version code
+          command: echo 'export ORG_GRADLE_PROJECT_VERSION_CODE="$CIRCLE_BUILD_NUM"' >> $BASH_ENV
       - run:
           name: generate local.properties
           command:
@@ -52,6 +59,35 @@ jobs:
           command: |
             ./gradlew assembleRelease
 
+  release-and-publish:
+    requires:
+      - build-and-test
+    executor:
+      name: android/android-machine
+
+      # Add steps to the job
+      # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+        # Checkout the code as the first step.
+      - checkout
+      - run:
+          name: decode jks file
+          command:
+            echo "$KEYSTORE_BASE_64 | base 64 --decode --ignore-grabage > ~/release.jks
+
+      - run:
+          name: Export version code
+          command: echo 'export ORG_GRADLE_PROJECT_VERSION_CODE="$CIRCLE_BUILD_NUM"' >> $BASH_ENV
+      - run:
+          name: Assemble release build and publish
+          command: |
+            ./gradlew publishBundle \
+              -Pandroid.injected.signing.store.file=~/release.jks \
+              -Pandroid.injected.signing.store.password=$STORE_PASSWORD \
+              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+              -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -59,3 +95,7 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
+  ci-and-deploy:
+    jobs:
+      - build-and-test
+      - release-and-publish
