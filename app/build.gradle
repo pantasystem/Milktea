@@ -23,7 +23,7 @@ android {
         targetSdkVersion 32
         multiDexEnabled true
         versionCode VERSION_CODE as int
-        versionName "v2.16.8"
+        versionName VERSION_NAME
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {

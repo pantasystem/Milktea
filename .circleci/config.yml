@@ -50,6 +50,9 @@ jobs:
           name: Export version code
           command: echo 'export ORG_GRADLE_PROJECT_VERSION_CODE="$CIRCLE_BUILD_NUM"' >> $BASH_ENV
       - run:
+          name: Export version name
+          command: echo 'export ORG_GRADLE_PROJECT_VERSION_NAME="$CIRCLE_TAG"' >> $BASH_ENV
+      - run:
           name: Assemble release build and publish
           command: |
             ./gradlew publishBundle \
@@ -69,6 +72,11 @@ workflows:
       - release-and-publish:
           requires:
             - build-and-test
+          filters:
+            tags:
+              only: /v.*/
+            branches:
+              only: develop
 
 
 
