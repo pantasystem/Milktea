@@ -212,9 +212,7 @@ class TimelineStoreImpl(
 
 }
 
-sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker {
-
-}
+sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
 
 class TimelinePagingStoreImpl(
     val pageableTimeline: Pageable,

@@ -15,7 +15,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.onIReacted
 import net.pantasystem.milktea.data.infrastructure.notes.onIUnReacted
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
@@ -33,7 +33,7 @@ class NoteRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val draftNoteDao: DraftNoteDao,
     val settingStore: SettingStore,
-    val accountRepository: AccountRepository,
+    val getAccount: GetAccount,
     private val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
 ) : NoteRepository {
 
@@ -84,18 +84,23 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(noteId: Note.Id): Boolean {
-        val account = accountRepository.get(noteId.accountId)
+        val account = getAccount.get(noteId.accountId)
         return misskeyAPIProvider.get(account).delete(
             DeleteNote(i = account.getI(encryption), noteId = noteId.noteId)
         ).isSuccessful
     }
 
     override suspend fun find(noteId: Note.Id): Note {
-        val account = accountRepository.get(noteId.accountId)
+        val account = getAccount.get(noteId.accountId)
 
-        var note = runCatching {
+        var note = try {
             noteDataSource.get(noteId)
-        }.getOrNull()
+        } catch (e: NoteDeletedException) {
+            throw e
+        } catch (e: Throwable) {
+            null
+        }
+
         if (note != null) {
             return note
         }
@@ -117,7 +122,7 @@ class NoteRepositoryImpl @Inject constructor(
 
 
     override suspend fun reaction(createReaction: CreateReaction): Boolean {
-        val account = accountRepository.get(createReaction.noteId.accountId)
+        val account = getAccount.get(createReaction.noteId.accountId)
         val note = find(createReaction.noteId)
 
         return runCatching {
@@ -131,7 +136,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun unreaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
-        val account = accountRepository.get(noteId.accountId)
+        val account = getAccount.get(noteId.accountId)
         return postUnReaction(noteId)
                 && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
@@ -139,7 +144,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
-        val account = accountRepository.get(createReaction.noteId.accountId)
+        val account = getAccount.get(createReaction.noteId.accountId)
         val res = misskeyAPIProvider.get(account).createReaction(
             CreateReactionDTO(
                 i = account.getI(encryption),
@@ -153,7 +158,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
         val note = find(noteId)
-        val account = accountRepository.get(noteId.accountId)
+        val account = getAccount.get(noteId.accountId)
         val res = misskeyAPIProvider.get(account).deleteReaction(
             DeleteNote(
                 noteId = note.id.noteId,
