@@ -14,6 +14,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
@@ -103,6 +104,21 @@ object MediaPreviewHelper {
         }
         thumbnailView.setOnClickListener(listener)
         playButton.setOnClickListener(listener)
+
+        val holdListener = View.OnLongClickListener {
+            val context = it.context
+            val title = previewAbleFile?.file?.name
+            val altText = previewAbleFile?.file?.comment
+            val alertDialog = MaterialAlertDialogBuilder(context)
+            alertDialog.setTitle(title)
+            alertDialog.setMessage(altText)
+            alertDialog.setNeutralButton("Exit") { intf, _ ->
+                intf.cancel()
+            }
+            alertDialog.show()
+            true
+        }
+        thumbnailView.setOnLongClickListener(holdListener)
     }
 
 

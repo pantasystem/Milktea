@@ -41,7 +41,9 @@ data class FileProperty (
             id,
             null,
             thumbnailUrl,
-            isSensitive
+            isSensitive,
+            null,
+            comment
         )
     }
 
