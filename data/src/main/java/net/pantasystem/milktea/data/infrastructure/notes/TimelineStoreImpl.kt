@@ -87,7 +87,7 @@ class TimelineStoreImpl(
         }
     }
     override val timelineState: Flow<PageableState<List<Note.Id>>>
-        get() = pageableStore.state
+        get() = pageableStore.state.distinctUntilChanged()
 
     var latestReceiveId: Note.Id? = null
 
@@ -139,7 +139,7 @@ class TimelineStoreImpl(
         noteDataSource.state.flatMapLatest {
             timelineState.map { pageableState ->
                 pageableState.suspendConvert { list ->
-                    list.mapNotNull {
+                    list.distinct().mapNotNull {
                         getters.noteRelationGetter.get(it)
                     }
                 }
@@ -231,11 +231,15 @@ class TimelinePagingStoreImpl(
     override val mutex: Mutex = Mutex()
 
     override suspend fun getSinceId(): Note.Id? {
-        return (getState().content as? StateContent.Exist)?.rawContent?.firstOrNull()
+        return (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
+            it.noteId
+        }
     }
 
     override suspend fun getUntilId(): Note.Id? {
-        return (getState().content as? StateContent.Exist)?.rawContent?.lastOrNull()
+        return (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
+            it.noteId
+        }
     }
 
     override suspend fun loadPrevious(): Result<List<NoteDTO>> {
