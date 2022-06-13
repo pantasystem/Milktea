@@ -12,11 +12,6 @@ jobs:
       - checkout
 
       - run:
-          name: decode google-services.json
-          command:
-            echo "$GOOGLE_SERVICE_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
-
-      - run:
           name: generate local.properties
           command:
               echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./local.properties
@@ -41,10 +36,7 @@ jobs:
 
     steps:
       - checkout
-      - run:
-          name: decode google-services.json
-          command:
-            echo "$GOOGLE_SERVICE_JSON" | base64 --decode --ignore-garbage > ./app/google-services.json
+
       - run:
           name: generate local.properties
           command:

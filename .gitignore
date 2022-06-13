@@ -98,6 +98,5 @@ SecretConstant.java
 SecretConstantTest.java
 MisskeyAndroidClient.zip
 
-google-services.json
 .DS_Store
 *.jks

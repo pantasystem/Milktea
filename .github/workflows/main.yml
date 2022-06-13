@@ -18,10 +18,6 @@ jobs:
           distribution: 'zulu'
           java-version: '11'
 
-      - name: Generate google-services.json
-        env:
-          GOOGLE_SERVICE: ${{ secrets.GOOGLE_SERVICE_JSON }}
-        run: echo $GOOGLE_SERVICE | base64 --decode --ignore-garbage > $GITHUB_WORKSPACE/app/google-services.json
       - name: Generate local.properties
         env:
           PUSH_TO_FCM_AUTH: ${{ secrets.PUSH_TO_FCM_AUTH }}
