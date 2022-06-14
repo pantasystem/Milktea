@@ -1,9 +1,15 @@
 package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
 
-import androidx.lifecycle.*
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.DriveFileRepository
@@ -14,16 +20,11 @@ import net.pantasystem.milktea.model.gallery.CreateGalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.model.gallery.toTask
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
 import java.io.Serializable
+import javax.inject.Inject
 
 
-sealed class EditType : Serializable{
+sealed class EditType : Serializable {
     data class Update(
         val postId: GalleryPost.Id
     ) : EditType()
@@ -33,77 +34,129 @@ sealed class EditType : Serializable{
     ) : EditType()
 }
 
-class GalleryEditorViewModel @AssistedInject constructor(
+data class GalleryEditorUiState(
+    val type: EditType,
+    val title: String = "",
+    val description: String? = null,
+    val pickedImages: List<AppFile> = emptyList(),
+    val isSensitive: Boolean = false,
+) {
+
+    fun validate(): Boolean {
+        return this.pickedImages.isNotEmpty() && this.title.isNotBlank()
+    }
+
+    fun detach(file: AppFile): GalleryEditorUiState {
+        return copy(
+            pickedImages = pickedImages.filterNot { f ->
+                f == file
+            }
+        )
+    }
+
+}
+
+@HiltViewModel
+class GalleryEditorViewModel @Inject constructor(
     private val galleryRepository: GalleryRepository,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
     private val driveFileRepository: DriveFileRepository,
     loggerFactory: Logger.Factory,
-    @Assisted private val editType: EditType,
-    ) : ViewModel(){
+) : ViewModel() {
 
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(type: EditType): GalleryEditorViewModel
-    }
-    companion object
+
+    companion object;
+
+    private val _state = MutableStateFlow(
+        GalleryEditorUiState(
+            type = EditType.Create(accountId = null),
+        )
+    )
+
+    val state: StateFlow<GalleryEditorUiState> = _state
 
     val logger = loggerFactory.create("GalleryEditorVM")
 
-    private val _title = MutableLiveData<String>()
-    val title = _title
+    val title = state.map {
+        it.title
+    }.stateIn(viewModelScope, SharingStarted.Lazily, "")
 
-    private val _description = MutableLiveData<String>()
-    val description = _description
+    val description = state.map {
+        it.description
+    }.stateIn(viewModelScope, SharingStarted.Lazily, "")
 
-    private val _pickedImages = MutableLiveData<List<AppFile>>()
-    val pickedImages: LiveData<List<AppFile>> = _pickedImages
+    val pickedImages = state.map {
+        it.pickedImages
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    val isSensitive = MutableLiveData(false)
+    val isSensitive = state.map {
+        it.isSensitive
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            if(editType is EditType.Update) {
-                runCatching {
-                    fetchWithApply(editType.postId)
-                }.onFailure {
-                    logger.debug("Update用のGalleryPostの取得に失敗した", e = it)
-                }
 
+        viewModelScope.launch {
+            state.map {
+                it.type
+            }.distinctUntilChanged().map {
+                when (it) {
+                    is EditType.Update -> {
+                        val gallery = galleryRepository.find(it.postId)
+                        val files = filePropertyDataSource.findIn(gallery.fileIds)
+                        state.value.copy(
+                            title = gallery.title,
+                            description = gallery.description,
+                            isSensitive = gallery.isSensitive,
+                            pickedImages = files.map { file -> file.id }.map { fileId ->
+                                AppFile.Remote(fileId)
+                            },
+                        )
+                    }
+                    is EditType.Create -> {
+                        GalleryEditorUiState(type = it)
+                    }
+                }
+            }.catch { error ->
+                logger.error("致命的なエラーが発生", error)
+            }.collect { newState ->
+                _state.update {
+                    newState
+                }
             }
         }
     }
 
-    private suspend fun fetchWithApply(postId: GalleryPost.Id) {
-        val galleryPost = galleryRepository.find(postId)
-        _title.postValue(galleryPost.title)
-        _description.postValue(galleryPost.description ?: "")
-        val files = filePropertyDataSource.findIn(galleryPost.fileIds)
-
-        _pickedImages.postValue(
-            files.map {
-                AppFile.Remote(it.id)
-            }
-        )
+    fun setType(type: EditType) {
+        _state.update {
+            it.copy(
+                type = type
+            )
+        }
     }
 
     fun detach(file: AppFile) {
-        _pickedImages.value = (_pickedImages.value?: emptyList()).filterNot {
-            it == file
+        _state.update {
+            it.detach(file)
         }
     }
 
     fun toggleSensitive(file: AppFile) {
-        when(file) {
+        when (file) {
             is AppFile.Local -> {
-                _pickedImages.value = _pickedImages.value?.map {
-                    if(it === file) {
-                        it.copy(isSensitive = !file.isSensitive)
-                    }else{
-                        it
-                    }
+
+                _state.update { state ->
+                    state.copy(
+                        pickedImages = state.pickedImages.map {
+                            if (it === file) {
+                                it.copy(isSensitive = !file.isSensitive)
+                            } else {
+                                it
+                            }
+                        }
+                    )
                 }
             }
             is AppFile.Remote -> {
@@ -123,33 +176,60 @@ class GalleryEditorViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val files = filePropertyDataSource.findIn(ids)
 
-            val list = (_pickedImages.value?: emptyList()).toMutableList().also { list ->
-                list.addAll(
-                    files.map {
-                        AppFile.Remote(it.id)
-                    }
+            _state.update { state ->
+                val list = state.pickedImages.toMutableList().also { list ->
+                    list.addAll(
+                        files.map {
+                            AppFile.Remote(it.id)
+                        }
+                    )
+                }
+                state.copy(
+                    pickedImages = list
                 )
             }
-            _pickedImages.postValue(list)
         }
     }
 
     fun addFile(file: AppFile) {
-        _pickedImages.value = (_pickedImages.value?: emptyList()).toMutableList().also { mutable ->
-            mutable.add(file)
+        _state.update { state ->
+            state.copy(
+                pickedImages = state.pickedImages.toMutableList().also { mutable ->
+                    mutable.add(file)
+                }
+            )
         }
     }
 
-    fun validate() : Boolean {
+    fun validate(): Boolean {
         logger.debug("title:${this.title.value}, images:${pickedImages.value}")
-        return this.pickedImages.value?.isNotEmpty() == true && this.title.value?.isNotBlank() == true
+        return this.state.value.validate()
     }
-    suspend fun save(){
-        val files = this.pickedImages.value?: emptyList()
-        val title = this.title.value?: ""
-        val description = this.description.value?: ""
-        val isSensitive = this.isSensitive.value?: false
-        if(validate()) {
+
+    fun setTitle(text: String?) {
+        _state.update {
+            it.copy(title = text ?: "")
+        }
+    }
+
+    fun setDescription(text: String?) {
+        _state.update {
+            it.copy(description = text)
+        }
+    }
+
+    fun toggleSensitive() {
+        _state.update {
+            it.copy(isSensitive = !it.isSensitive)
+        }
+    }
+
+    suspend fun save() {
+        val files = this.pickedImages.value
+        val title = this.title.value
+        val description = this.description.value ?: ""
+        val isSensitive = this.isSensitive.value
+        if (validate()) {
             val create = CreateGalleryPost(
                 title,
                 getAccount(),
@@ -164,24 +244,16 @@ class GalleryEditorViewModel @AssistedInject constructor(
 
     private var _accountId: Long? = null
     private val _accountLock = Mutex()
-    private suspend fun getAccount() : Account {
+
+
+    private suspend fun getAccount(): Account {
         _accountLock.withLock {
-            if(_accountId == null) {
+            if (_accountId == null) {
                 return accountRepository.getCurrentAccount().also {
                     _accountId = it.accountId
                 }
             }
             return accountRepository.get(_accountId!!)
         }
-    }
-}
-
-@Suppress("UNCHECKED_CAST")
-fun GalleryEditorViewModel.Companion.provideFactory(
-    assistedFactory: GalleryEditorViewModel.ViewModelAssistedFactory,
-    type: EditType,
-) : ViewModelProvider.Factory = object  : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return assistedFactory.create(type) as T
     }
 }
