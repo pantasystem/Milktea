@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
@@ -77,6 +78,7 @@ fun GalleryEditorPage(
                     Button(onClick = { onAction.invoke(GalleryEditorPageAction.PickDriveFile) }) {
                         Icon(Icons.Default.Cloud, contentDescription = null)
                         Text(
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = R.string.pick_image_from_device)
                         )
@@ -84,6 +86,7 @@ fun GalleryEditorPage(
                     Button(onClick = { onAction.invoke(GalleryEditorPageAction.PickLocalFile) }) {
                         Icon(Icons.Default.PhotoAlbum, contentDescription = null)
                         Text(
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                             text = stringResource(id = R.string.pick_image_from_drive)
                         )
@@ -115,6 +118,8 @@ fun GalleryEditorPage(
                             galleryEditorViewModel.setDescription(text)
                         }
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     SwitchTile(
                         checked = state.isSensitive,
