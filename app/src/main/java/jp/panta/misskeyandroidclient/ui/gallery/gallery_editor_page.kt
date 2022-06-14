@@ -43,7 +43,7 @@ fun GalleryEditorPage(
                 },
                 navigationIcon = {
                     IconButton(onClick = { onAction.invoke(GalleryEditorPageAction.NavigateUp) }) {
-                        Icons.Default.ArrowBack
+                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
