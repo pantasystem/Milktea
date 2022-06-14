@@ -48,7 +48,8 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
                         thumbnailView="@{ media.fileOne }"
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.GONE : View.VISIBLE }"
                         />
@@ -103,7 +104,8 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
                         android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
                         thumbnailView="@{ media.fileThree }"
                         />
@@ -172,7 +174,8 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
                         android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.GONE : View.VISIBLE }"
                         thumbnailView="@{media.fileTwo}"
                         />
@@ -228,7 +231,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/ic_reaction_laugh"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
                         android:visibility="@{ media.fileFour.isHiding == true ? View.GONE : View.VISIBLE}"
                         thumbnailView="@{ media.fileFour }"
                         />

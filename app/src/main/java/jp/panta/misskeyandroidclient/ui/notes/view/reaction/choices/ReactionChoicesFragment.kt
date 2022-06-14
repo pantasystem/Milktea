@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionResourceMap
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -108,9 +107,7 @@ class ReactionChoicesFragment : Fragment() {
 
     private fun showDefault(adapter: ReactionChoicesAdapter) {
         val miApplication = context?.applicationContext as MiApplication
-        val defaultReaction = ReactionResourceMap.reactionDrawableMap.map {
-            it.key
-        }
+        val defaultReaction = LegacyReaction.defaultReaction
         val emojiFlow = miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
             miApplication.getMetaRepository().observe(it.instanceDomain)
         }.mapNotNull {
