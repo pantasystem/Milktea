@@ -139,9 +139,7 @@ class TimelineStoreImpl(
         noteDataSource.state.flatMapLatest {
             timelineState.map { pageableState ->
                 pageableState.suspendConvert { list ->
-                    list.distinct().mapNotNull {
-                        getters.noteRelationGetter.get(it)
-                    }
+                    getters.noteRelationGetter.getIn(list.distinct())
                 }
             }
         }
