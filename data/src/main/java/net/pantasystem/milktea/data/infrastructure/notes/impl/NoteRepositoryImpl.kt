@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
@@ -106,18 +107,21 @@ class NoteRepositoryImpl @Inject constructor(
         }
 
         logger.debug("request notes/show=$noteId")
-        note = runCatching {
+        note = try {
             misskeyAPIProvider.get(account).showNote(
                 NoteRequest(
                     i = account.getI(encryption),
                     noteId = noteId.noteId
                 )
-            )
-        }.getOrNull()?.body()?.let {
-            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+            ).throwIfHasError().body()?.let { resDTO ->
+                noteDataSourceAdder.addNoteDtoToDataSource(account, resDTO)
+            }
+        } catch (e: APIError.NotFoundException) {
+            // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
+            noteDataSource.remove(noteId)
+            null
         }
-        note ?: throw NoteNotFoundException(noteId)
-        return note
+        return note ?: throw NoteNotFoundException(noteId)
     }
 
 
