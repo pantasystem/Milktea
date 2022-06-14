@@ -62,7 +62,7 @@ class GalleryEditorViewModel @Inject constructor(
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     private val taskExecutor: CreateGalleryTaskExecutor,
-    private val driveFileRepository: DriveFileRepository,
+    val driveFileRepository: DriveFileRepository,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 

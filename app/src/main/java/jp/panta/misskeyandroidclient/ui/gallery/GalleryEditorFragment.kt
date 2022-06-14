@@ -5,24 +5,21 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
-import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.GalleryPostsActivity
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.media.MediaActivity
@@ -35,7 +32,7 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
+class GalleryEditorFragment : Fragment() {
 
     companion object {
         fun newInstance(editType: EditType): GalleryEditorFragment {
@@ -47,7 +44,7 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         }
     }
 
-    val binding: FragmentGalleryEditorBinding by dataBinding()
+//    val binding: FragmentGalleryEditorBinding by dataBinding()
 
 
     @Inject
@@ -67,81 +64,132 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
         viewModel.setType(args)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.viewModel = viewModel
-
-        (requireActivity() as AppCompatActivity).also { appCompatActivity ->
-            appCompatActivity.setSupportActionBar(binding.toolbar)
-            appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
-
-        binding.pickedImages.apply {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return ComposeView(requireContext()).apply {
             setContent {
                 MdcTheme {
-                    PickedImagePreview(
-                        viewModel = viewModel,
-                        repository = driveFileRepository,
-                        dataSource = dataSource,
-                        onShow = {
-                            val file = when (it) {
-                                is FilePreviewTarget.Remote -> {
-                                    it.fileProperty.toFile()
-                                }
-                                is FilePreviewTarget.Local -> {
-                                    it.file.toFile()
-                                }
-                            }
-                            val intent = MediaActivity.newInstance(
-                                requireActivity(),
-                                listOf(file),
-                                0
-                            )
-                            requireActivity().startActivity(intent)
-                        }
+                    GalleryEditorPage(
+                        galleryEditorViewModel = viewModel,
+                        onAction = this@GalleryEditorFragment::onAction
                     )
                 }
             }
-        }
+        }.rootView
+    }
 
-        binding.inputTitle.addTextChangedListener {
-            viewModel.setTitle(it?.toString())
-        }
+    private fun onAction(action: GalleryEditorPageAction) {
+        when (action) {
+            is GalleryEditorPageAction.OnSave -> {
 
-        binding.inputDescription.addTextChangedListener {
-            viewModel.setDescription(it?.toString())
-        }
-
-        binding.toggleSensitive.setOnClickListener {
-            viewModel.toggleSensitive()
-        }
-
-
-
-        binding.pickedImageFromLocalButton.setOnClickListener {
-            if (!checkPermission()) {
-                requestReadExternalStoragePermissionResultListener.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            } else {
-                showFilePicker()
             }
-        }
 
-        binding.pickedImageFromDriveButton.setOnClickListener {
-            showDrivePicker()
-        }
-
-        binding.saveButton.setOnClickListener {
-            if (!viewModel.validate()) {
-                return@setOnClickListener
+            is GalleryEditorPageAction.NavigateToMediaPreview -> {
+                val intent = MediaActivity.newInstance(
+                    requireActivity(),
+                    listOf(action.appFile.toFile()),
+                    0
+                )
+                requireActivity().startActivity(intent)
             }
-            lifecycleScope.launch(Dispatchers.IO) {
-                viewModel.save()
-                withContext(Dispatchers.Main) {
-                    (requireActivity() as? GalleryPostsActivity)?.pop()
+            GalleryEditorPageAction.NavigateUp -> {
+                (requireActivity() as? GalleryPostsActivity)?.pop()
+            }
+            GalleryEditorPageAction.PickDriveFile -> {
+                showDrivePicker()
+            }
+            GalleryEditorPageAction.PickLocalFile -> {
+                if (!checkPermission()) {
+                    requestReadExternalStoragePermissionResultListener.launch(
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
+                } else {
+                    showFilePicker()
                 }
             }
         }
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
+//        binding.viewModel = viewModel
+//
+//        (requireActivity() as AppCompatActivity).also { appCompatActivity ->
+//            appCompatActivity.setSupportActionBar(binding.toolbar)
+//            appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        }
+//
+//
+//
+//        binding.pickedImages.apply {
+//            setContent {
+//                MdcTheme {
+//                    PickedImagePreview(
+//                        viewModel = viewModel,
+//                        repository = driveFileRepository,
+//                        dataSource = dataSource,
+//                        onShow = {
+//                            val file = when (it) {
+//                                is FilePreviewTarget.Remote -> {
+//                                    it.fileProperty.toFile()
+//                                }
+//                                is FilePreviewTarget.Local -> {
+//                                    it.file.toFile()
+//                                }
+//                            }
+//                            val intent = MediaActivity.newInstance(
+//                                requireActivity(),
+//                                listOf(file),
+//                                0
+//                            )
+//                            requireActivity().startActivity(intent)
+//                        }
+//                    )
+//                }
+//            }
+//        }
+//
+//        binding.inputTitle.addTextChangedListener {
+//            viewModel.setTitle(it?.toString())
+//        }
+//
+//        binding.inputDescription.addTextChangedListener {
+//            viewModel.setDescription(it?.toString())
+//        }
+//
+//        binding.toggleSensitive.setOnClickListener {
+//            viewModel.toggleSensitive()
+//        }
+//
+//
+//
+//        binding.pickedImageFromLocalButton.setOnClickListener {
+//            if (!checkPermission()) {
+//                requestReadExternalStoragePermissionResultListener.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+//            } else {
+//                showFilePicker()
+//            }
+//        }
+//
+//        binding.pickedImageFromDriveButton.setOnClickListener {
+//            showDrivePicker()
+//        }
+//
+//        binding.saveButton.setOnClickListener {
+//            if (!viewModel.validate()) {
+//                return@setOnClickListener
+//            }
+//            lifecycleScope.launch(Dispatchers.IO) {
+//                viewModel.save()
+//                withContext(Dispatchers.Main) {
+//                    (requireActivity() as? GalleryPostsActivity)?.pop()
+//                }
+//            }
+//        }
 
     }
 
