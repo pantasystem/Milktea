@@ -27,15 +27,15 @@ import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.drive.DriveActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.setTheme
-import jp.panta.misskeyandroidclient.ui.settings.compose.RadioTile
 import jp.panta.misskeyandroidclient.ui.settings.compose.SettingTitleTile
-import jp.panta.misskeyandroidclient.ui.settings.compose.SwitchTile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common_compose.RadioTile
+import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -137,7 +137,9 @@ class SettingAppearanceActivity : AppCompatActivity() {
                         }
 
                         item {
-                            SwitchTile(checked = currentConfigState.isClassicUI, onChanged = {
+                            SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                checked = currentConfigState.isClassicUI, onChanged = {
                                 currentConfigState = currentConfigState.copy(isClassicUI = it)
                             }) {
                                 Text(stringResource(R.string.hide_bottom_navigation))
@@ -145,6 +147,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                         }
                         item {
                             SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                                 checked = currentConfigState.isSimpleEditorEnabled,
                                 onChanged = {
                                     currentConfigState =
@@ -156,7 +159,9 @@ class SettingAppearanceActivity : AppCompatActivity() {
                         }
 
                         item {
-                            SwitchTile(checked = currentConfigState.isUserNameDefault, onChanged = {
+                            SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                checked = currentConfigState.isUserNameDefault, onChanged = {
                                 currentConfigState = currentConfigState.copy(isUserNameDefault = it)
                             }) {
                                 Text(stringResource(id = R.string.user_name_as_default_display_name))
@@ -164,6 +169,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                         }
                         item {
                             SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                                 checked = currentConfigState.isPostButtonAtTheBottom,
                                 onChanged = {
                                     currentConfigState =
@@ -223,9 +229,12 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
                         item {
                             SettingTitleTile(text = stringResource(id = R.string.animation))
-                            SwitchTile(checked = currentConfigState.isEnableTimelineScrollAnimation, onChanged = {
-                                currentConfigState = currentConfigState.copy(isEnableTimelineScrollAnimation = it)
-                            }) {
+                            SwitchTile(
+                                checked = currentConfigState.isEnableTimelineScrollAnimation,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(isEnableTimelineScrollAnimation = it)
+                                }) {
                                 Text(stringResource(id = R.string.avatar_icon_animation))
                             }
                         }
@@ -250,30 +259,30 @@ class SettingAppearanceActivity : AppCompatActivity() {
         openDriveActivityResult.launch(intent)
     }
 
-    private val openDriveActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val ids =
-            (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
-                it as? FileProperty.Id
-            }
-        val fileId = ids?.firstOrNull() ?: return@registerForActivityResult
-        lifecycleScope.launch(Dispatchers.IO) {
-            val file = runCatching {
-                driveFileRepository.find(fileId)
-            }.onFailure {
-                Log.e("SettingAppearanceACT", "画像の取得に失敗", it)
-            }.getOrNull()
-                ?: return@launch
-            runCatching {
-                localConfigRepository.save(
-                    localConfigRepository.get().getOrThrow().copy(
-                        backgroundImagePath = file.url
+    private val openDriveActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val ids =
+                (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
+                    it as? FileProperty.Id
+                }
+            val fileId = ids?.firstOrNull() ?: return@registerForActivityResult
+            lifecycleScope.launch(Dispatchers.IO) {
+                val file = runCatching {
+                    driveFileRepository.find(fileId)
+                }.onFailure {
+                    Log.e("SettingAppearanceACT", "画像の取得に失敗", it)
+                }.getOrNull()
+                    ?: return@launch
+                runCatching {
+                    localConfigRepository.save(
+                        localConfigRepository.get().getOrThrow().copy(
+                            backgroundImagePath = file.url
+                        )
                     )
-                )
+                }
+
             }
-
         }
-    }
-
 
 
 }

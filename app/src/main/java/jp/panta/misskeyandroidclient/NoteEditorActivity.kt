@@ -25,7 +25,6 @@ import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.databinding.ViewNoteEditorToolbarBinding
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
@@ -42,6 +41,7 @@ import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.drive.DriveActivity

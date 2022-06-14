@@ -7,13 +7,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewActionType
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
-import jp.panta.misskeyandroidclient.ui.components.HorizontalFilePreviewList
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.common_compose.FilePreviewActionType
+import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 
 @ExperimentalCoroutinesApi
 @Composable

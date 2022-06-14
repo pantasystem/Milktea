@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.components
+package net.pantasystem.milktea.common_compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.text.InlineTextContent

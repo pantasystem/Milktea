@@ -17,7 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import jp.panta.misskeyandroidclient.ui.components.CustomEmojiText
+import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.user.User
 
 @Composable

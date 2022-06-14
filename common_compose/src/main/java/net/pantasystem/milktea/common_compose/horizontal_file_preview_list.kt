@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.components
+package net.pantasystem.milktea.common_compose
 
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -12,18 +12,14 @@ import androidx.compose.material.icons.filled.HideImage
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.asLiveData
 import coil.compose.rememberAsyncImagePainter
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.ui.components.SensitiveIcon
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -54,7 +50,8 @@ fun HorizontalFilePreviewList(
 sealed interface FilePreviewTarget {
     val file: AppFile
     data class Local(override val file: AppFile.Local) : FilePreviewTarget
-    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) : FilePreviewTarget
+    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
+        FilePreviewTarget
 }
 
 sealed interface FilePreviewActionType {
@@ -174,8 +171,7 @@ fun RemoteFilePreview(
         mutableStateOf(State.Loading(content = StateContent.NotExist()))
     }
     val fileProperty = dataSource.observe(file.id)
-        .asLiveData()
-        .observeAsState()
+        .collectAsState(null)
 
 
     LaunchedEffect(key1 = file.id) {

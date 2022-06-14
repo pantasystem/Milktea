@@ -59,7 +59,8 @@
                         android:layout_height="37dp"
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
-                        tools:srcCompat="@drawable/ic_reaction_like"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
 
                         tools:ignore="ContentDescription" />
                 <androidx.emoji.widget.EmojiTextView

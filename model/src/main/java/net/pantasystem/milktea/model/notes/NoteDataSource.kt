@@ -50,6 +50,12 @@ interface NoteDataSource {
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id) : Note
 
+    /**
+     * @param noteId 削除対象のNoteのId
+     * キャッシュ上のノートを削除する。
+     * これを実行すると削除フラグが立ち、
+     * 次からgetなどの関数にアクセスすると、NoteDeletedExceptionの例外が投げられる
+     */
     suspend fun remove(noteId: Note.Id) : Boolean
 
     suspend fun add(note: Note) : AddResult
