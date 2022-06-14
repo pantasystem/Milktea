@@ -23,7 +23,6 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.databinding.FragmentSimpleEditorBinding
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
@@ -31,12 +30,13 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import net.pantasystem.milktea.drive.toAppFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.drive.DriveActivity
+import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty

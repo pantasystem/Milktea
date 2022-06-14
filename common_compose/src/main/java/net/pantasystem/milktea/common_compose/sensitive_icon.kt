@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.common.ui.components
+package net.pantasystem.milktea.common_compose
 
 import androidx.compose.foundation.background
 import androidx.compose.material.Icon

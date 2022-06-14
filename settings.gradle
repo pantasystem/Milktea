@@ -64,3 +64,4 @@ dependencyResolutionManagement {
 }
 include ':features:drive'
 include ':features:media'
+include ':common_compose'

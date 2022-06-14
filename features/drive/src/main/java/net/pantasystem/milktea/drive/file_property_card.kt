@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import net.pantasystem.milktea.common.ui.components.SensitiveIcon
+import net.pantasystem.milktea.common_compose.SensitiveIcon
 import net.pantasystem.milktea.drive.viewmodel.FileViewData
 import net.pantasystem.milktea.model.drive.FileProperty
 
