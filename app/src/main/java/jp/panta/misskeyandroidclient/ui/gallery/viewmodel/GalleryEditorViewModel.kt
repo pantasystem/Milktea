@@ -79,21 +79,9 @@ class GalleryEditorViewModel @Inject constructor(
 
     val logger = loggerFactory.create("GalleryEditorVM")
 
-    val title = state.map {
-        it.title
-    }.stateIn(viewModelScope, SharingStarted.Lazily, "")
-
-    val description = state.map {
-        it.description
-    }.stateIn(viewModelScope, SharingStarted.Lazily, "")
-
     val pickedImages = state.map {
         it.pickedImages
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-    val isSensitive = state.map {
-        it.isSensitive
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
     init {
@@ -202,7 +190,6 @@ class GalleryEditorViewModel @Inject constructor(
     }
 
     fun validate(): Boolean {
-        logger.debug("title:${this.title.value}, images:${pickedImages.value}")
         return this.state.value.validate()
     }
 
@@ -225,10 +212,10 @@ class GalleryEditorViewModel @Inject constructor(
     }
 
     suspend fun save() {
-        val files = this.pickedImages.value
-        val title = this.title.value
-        val description = this.description.value ?: ""
-        val isSensitive = this.isSensitive.value
+        val files = state.value.pickedImages
+        val title = state.value.title
+        val description = state.value.description ?: ""
+        val isSensitive = state.value.isSensitive
         if (validate()) {
             val create = CreateGalleryPost(
                 title,

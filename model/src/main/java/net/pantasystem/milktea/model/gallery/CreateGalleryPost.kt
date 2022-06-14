@@ -4,7 +4,7 @@ import net.pantasystem.milktea.model.ITask
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.file.AppFile
 
-class CreateGalleryPost (
+data class CreateGalleryPost (
     val title: String,
     val author: Account,
     val files: List<AppFile>,
