@@ -8,16 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,10 +22,10 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostUiState
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.common_compose.FavoriteButton
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.gallery.GalleryPost
@@ -154,51 +150,18 @@ fun GalleryPostCard(
                 }
 
                 if (galleryState.galleryPost is GalleryPost.Authenticated) {
-                    GalleryFavoriteButton(
-                        checked = galleryState.galleryPost.isLiked,
-                        enabled = !galleryState.isFavoriteSending,
-                        onChanged = {
-                            onAction.invoke(
-                                GalleryPostCardAction.OnFavoriteButtonClicked(
-                                    galleryState.galleryPost,
-                                    it
-                                )
+                    FavoriteButton(isFavorite = galleryState.galleryPost.isLiked, onClick = {
+                        onAction.invoke(
+                            GalleryPostCardAction.OnFavoriteButtonClicked(
+                                galleryState.galleryPost,
+                                !galleryState.galleryPost.isLiked,
                             )
-                        }
-                    )
+                        )
+                    })
                 }
             }
 
         }
-    }
-}
-
-@Composable
-private fun GalleryFavoriteButton(
-    modifier: Modifier = Modifier,
-    checked: Boolean,
-    enabled: Boolean,
-    onChanged: (Boolean) -> Unit
-) {
-    IconButton(
-        onClick = { onChanged.invoke(!checked) },
-        modifier = modifier,
-        enabled = enabled
-    ) {
-        if (checked) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_red_favorite_24),
-                contentDescription = null,
-                tint = Color(red = 0xFF, green = 0x65, blue = 0x5B)
-            )
-        } else {
-            Icon(
-                painterResource(id = R.drawable.ic_baseline_favorite_border_24),
-                contentDescription = null,
-                tint = Color(red = 0xFF, green = 0x65, blue = 0x5B)
-            )
-        }
-
     }
 }
 
