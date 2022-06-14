@@ -57,6 +57,14 @@ class InMemoryNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun getIn(noteIds: List<Note.Id>): List<Note> {
+        mutex.withLock {
+            return noteIds.mapNotNull { noteId ->
+                notes[noteId]
+            }
+        }
+    }
+
     /**
      * @param note 追加するノート
      * @return ノートが新たに追加されるとtrue、上書きされた場合はfalseが返されます。

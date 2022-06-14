@@ -10,6 +10,8 @@ interface NoteRepository {
 
     suspend fun find(noteId: Note.Id): Note
 
+    suspend fun findIn(noteIds: List<Note.Id>): List<Note>
+
     suspend fun reaction(createReaction: CreateReaction): Boolean
 
     suspend fun unreaction(noteId: Note.Id): Boolean

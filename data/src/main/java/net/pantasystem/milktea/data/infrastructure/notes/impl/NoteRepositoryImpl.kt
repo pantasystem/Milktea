@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -124,6 +127,18 @@ class NoteRepositoryImpl @Inject constructor(
         return note ?: throw NoteNotFoundException(noteId)
     }
 
+    override suspend fun findIn(noteIds: List<Note.Id>): List<Note> {
+        val notes = noteDataSource.getIn(noteIds)
+        val notExistsIds = noteIds.filterNot {
+            notes.any { note -> note.id == it }
+        }
+        if (notExistsIds.isEmpty()) {
+            return notes
+        }
+
+        fetchIn(notExistsIds)
+        return noteDataSource.getIn(noteIds)
+    }
 
     override suspend fun reaction(createReaction: CreateReaction): Boolean {
         val account = getAccount.get(createReaction.noteId.accountId)
@@ -172,5 +187,39 @@ class NoteRepositoryImpl @Inject constructor(
         res.throwIfHasError()
         return res.isSuccessful
 
+    }
+
+    private suspend fun fetchIn(noteIds: List<Note.Id>) {
+        val accountMap = noteIds.map {
+            it.accountId
+        }.distinct().mapNotNull {
+            runCatching {
+                getAccount.get(it)
+            }.getOrNull()
+        }.associateBy {
+            it.accountId
+        }
+
+        coroutineScope {
+            noteIds.map { noteId ->
+                async {
+                    try {
+                        val account = accountMap.getValue(noteId.accountId)
+                        misskeyAPIProvider.get(account).showNote(
+                            NoteRequest(
+                                i = account.getI(encryption)
+                            )
+                        ).throwIfHasError().body()?.let {
+                            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+                        }
+                    } catch (e: Throwable) {
+                        if (e is APIError.NotFoundException) {
+                            noteDataSource.remove(noteId)
+                        }
+                        null
+                    }
+                }
+            }.awaitAll().filterNotNull()
+        }
     }
 }
