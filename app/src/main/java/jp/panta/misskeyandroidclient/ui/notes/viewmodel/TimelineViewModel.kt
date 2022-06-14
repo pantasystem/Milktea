@@ -111,6 +111,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     fun loadInit() {
         viewModelScope.launch(Dispatchers.IO) {
+            cache.clear()
             timelineStore.clear()
             timelineStore.loadPrevious()
         }

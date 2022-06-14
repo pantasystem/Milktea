@@ -45,6 +45,19 @@ class PlaneNoteViewDataCache(
         }
     }
 
+    suspend fun clear() {
+        return lock.withLock {
+            releaseAll(cache.values.toList())
+            cache.clear()
+        }
+    }
+
+    private fun releaseAll(list: List<PlaneNoteViewData>) {
+        list.map { note ->
+            note.job?.cancel()
+        }
+    }
+
     private suspend fun getUnThreadSafe(relation: NoteRelation): PlaneNoteViewData {
         val note = cache[relation.note.id]
 

@@ -47,6 +47,8 @@ interface NoteDataSource {
 
     val state: StateFlow<NoteDataSourceState>
 
+    suspend fun getIn(noteIds: List<Note.Id>) : List<Note>
+
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id) : Note
 
