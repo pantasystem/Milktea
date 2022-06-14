@@ -1,22 +1,23 @@
-package jp.panta.misskeyandroidclient.ui.settings.compose
+package net.pantasystem.milktea.common_compose
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun SwitchTile(
+    modifier: Modifier = Modifier,
     checked: Boolean,
     onChanged: (Boolean) -> Unit,
     label: @Composable RowScope.() -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

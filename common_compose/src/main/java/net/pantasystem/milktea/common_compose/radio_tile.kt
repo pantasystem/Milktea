@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.settings.compose
+package net.pantasystem.milktea.common_compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

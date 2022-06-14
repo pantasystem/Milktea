@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
+import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.model.file.AppFile
 
 sealed interface GalleryEditorPageAction {
@@ -26,7 +27,10 @@ sealed interface GalleryEditorPageAction {
 }
 
 @Composable
-fun GalleryEditorPage(galleryEditorViewModel: GalleryEditorViewModel, onAction: (GalleryEditorPageAction) -> Unit) {
+fun GalleryEditorPage(
+    galleryEditorViewModel: GalleryEditorViewModel,
+    onAction: (GalleryEditorPageAction) -> Unit
+) {
 
     val state by galleryEditorViewModel.state.collectAsState()
 
@@ -45,13 +49,20 @@ fun GalleryEditorPage(galleryEditorViewModel: GalleryEditorViewModel, onAction: 
         }
     ) {
 
-        Column(Modifier.padding(it).fillMaxSize()) {
+        Column(
+            Modifier
+                .padding(it)
+                .fillMaxSize()
+        ) {
             LazyColumn(
-                Modifier.padding(16.dp)
+                Modifier
+                    .padding(16.dp)
                     .fillMaxHeight()
                     .weight(1f)
             ) {
                 item {
+                    Text(stringResource(id = R.string.pick_image))
+
                     if (state.pickedImages.isNotEmpty()) {
                         PickedImagePreview(
                             viewModel = galleryEditorViewModel,
@@ -62,15 +73,20 @@ fun GalleryEditorPage(galleryEditorViewModel: GalleryEditorViewModel, onAction: 
                             }
                         )
                     }
-                    Text(stringResource(id = R.string.pick_image))
 
                     Button(onClick = { onAction.invoke(GalleryEditorPageAction.PickDriveFile) }) {
                         Icon(Icons.Default.Cloud, contentDescription = null)
-                        Text(modifier = Modifier.fillMaxWidth(), text = stringResource(id = R.string.pick_image_from_device))
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(id = R.string.pick_image_from_device)
+                        )
                     }
                     Button(onClick = { onAction.invoke(GalleryEditorPageAction.PickLocalFile) }) {
                         Icon(Icons.Default.PhotoAlbum, contentDescription = null)
-                        Text(modifier = Modifier.fillMaxWidth(), text = stringResource(id = R.string.pick_image_from_drive))
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(id = R.string.pick_image_from_drive)
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -99,23 +115,31 @@ fun GalleryEditorPage(galleryEditorViewModel: GalleryEditorViewModel, onAction: 
                             galleryEditorViewModel.setDescription(text)
                         }
                     )
+
+                    SwitchTile(
+                        checked = state.isSensitive,
+                        onChanged = {
+                            galleryEditorViewModel.toggleSensitive()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(id = R.string.sensitive))
+                    }
                 }
 
             }
 
             Row(
-                Modifier.fillMaxWidth().padding(start = 16.dp ,end = 16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(onClick = { onAction.invoke(GalleryEditorPageAction.OnSave) }) {
                     Text(stringResource(id = R.string.save))
                 }
             }
-
-
         }
-
-
     }
 }
 

@@ -25,13 +25,13 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivitySettingsBinding
 import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.settings.compose.SettingTitleTile
-import jp.panta.misskeyandroidclient.ui.settings.compose.SwitchTile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.setting.DefaultConfig
@@ -106,6 +106,7 @@ class SettingMovementActivity : AppCompatActivity() {
                             SettingTitleTile(text = stringResource(id = R.string.timeline))
 
                             SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                                 checked = currentConfigState.isIncludeLocalRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -115,6 +116,7 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
 
                             SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                                 checked = currentConfigState.isIncludeRenotedMyNotes,
                                 onChanged = {
                                     currentConfigState =
@@ -124,6 +126,7 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
 
                             SwitchTile(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                                 checked = currentConfigState.isIncludeMyRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -159,6 +162,7 @@ class SettingMovementActivity : AppCompatActivity() {
                             item {
                                 SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
                                 SwitchTile(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                                     checked = rv is RememberVisibility.Remember,
                                     onChanged = {
                                         val config = if (it) {
