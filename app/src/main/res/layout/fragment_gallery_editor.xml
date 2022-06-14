@@ -85,10 +85,11 @@
                         android:id="@+id/titleInputLayout"
                         >
                     <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/title"
-                            android:text="@={viewModel.title}"
+                            android:text="@{viewModel.title}"
                             />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -99,21 +100,23 @@
                         android:layout_marginTop="16dp"
                         app:layout_constraintTop_toBottomOf="@id/titleInputLayout">
                     <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputDescription"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/description"
                             android:inputType="textMultiLine"
                             android:lines="3"
-                            android:text="@={viewModel.description}"
+                            android:text="@{viewModel.description}"
                             />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/toggleSensitive"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/descriptionInputLayout"
                         android:text="@string/sensitive"
-                        android:checked="@={viewModel.isSensitive}"
+                        android:checked="@{viewModel.isSensitive}"
                         />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>

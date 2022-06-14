@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.gallery
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -16,9 +17,9 @@ fun PickedImagePreview(
     dataSource: FilePropertyDataSource,
     onShow: (FilePreviewTarget) -> Unit,
 ) {
-    val files = viewModel.pickedImages.observeAsState()
+    val files = viewModel.pickedImages.collectAsState()
     HorizontalFilePreviewList(
-        files = files.value ?: emptyList(),
+        files = files.value,
         repository = repository,
         dataSource = dataSource,
         onAction = {

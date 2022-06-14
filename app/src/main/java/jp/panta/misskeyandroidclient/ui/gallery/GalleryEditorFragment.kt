@@ -9,22 +9,22 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.drive.DriveActivity
 import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentGalleryEditorBinding
 import jp.panta.misskeyandroidclient.ui.components.FilePreviewTarget
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
-import net.pantasystem.milktea.drive.toAppFile
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.drive.DriveActivity
+import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -49,8 +49,6 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
 
     val binding: FragmentGalleryEditorBinding by dataBinding()
 
-    @Inject
-    lateinit var assistedFactory: GalleryEditorViewModel.ViewModelAssistedFactory
 
     @Inject
     lateinit var driveFileRepository: DriveFileRepository
@@ -59,9 +57,14 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
     lateinit var dataSource: FilePropertyDataSource
 
 
-    val viewModel: GalleryEditorViewModel by viewModels {
+    val viewModel: GalleryEditorViewModel by viewModels()
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         val args = arguments?.getSerializable("EDIT_TYPE") as? EditType ?: EditType.Create(null)
-        GalleryEditorViewModel.provideFactory(assistedFactory, args)
+        viewModel.setType(args)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,6 +103,18 @@ class GalleryEditorFragment : Fragment(R.layout.fragment_gallery_editor) {
                     )
                 }
             }
+        }
+
+        binding.inputTitle.addTextChangedListener {
+            viewModel.setTitle(it?.toString())
+        }
+
+        binding.inputDescription.addTextChangedListener {
+            viewModel.setDescription(it?.toString())
+        }
+
+        binding.toggleSensitive.setOnClickListener {
+            viewModel.toggleSensitive()
         }
 
 
