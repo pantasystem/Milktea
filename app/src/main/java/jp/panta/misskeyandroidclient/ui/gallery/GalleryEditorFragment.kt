@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.media.MediaActivity
@@ -43,9 +43,6 @@ class GalleryEditorFragment : Fragment() {
             }
         }
     }
-
-//    val binding: FragmentGalleryEditorBinding by dataBinding()
-
 
     @Inject
     lateinit var driveFileRepository: DriveFileRepository
@@ -84,9 +81,8 @@ class GalleryEditorFragment : Fragment() {
     private fun onAction(action: GalleryEditorPageAction) {
         when (action) {
             is GalleryEditorPageAction.OnSave -> {
-
+                onSave()
             }
-
             is GalleryEditorPageAction.NavigateToMediaPreview -> {
                 val intent = MediaActivity.newInstance(
                     requireActivity(),
@@ -112,85 +108,17 @@ class GalleryEditorFragment : Fragment() {
             }
         }
     }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-
-//        binding.viewModel = viewModel
-//
-//        (requireActivity() as AppCompatActivity).also { appCompatActivity ->
-//            appCompatActivity.setSupportActionBar(binding.toolbar)
-//            appCompatActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//        }
-//
-//
-//
-//        binding.pickedImages.apply {
-//            setContent {
-//                MdcTheme {
-//                    PickedImagePreview(
-//                        viewModel = viewModel,
-//                        repository = driveFileRepository,
-//                        dataSource = dataSource,
-//                        onShow = {
-//                            val file = when (it) {
-//                                is FilePreviewTarget.Remote -> {
-//                                    it.fileProperty.toFile()
-//                                }
-//                                is FilePreviewTarget.Local -> {
-//                                    it.file.toFile()
-//                                }
-//                            }
-//                            val intent = MediaActivity.newInstance(
-//                                requireActivity(),
-//                                listOf(file),
-//                                0
-//                            )
-//                            requireActivity().startActivity(intent)
-//                        }
-//                    )
-//                }
-//            }
-//        }
-//
-//        binding.inputTitle.addTextChangedListener {
-//            viewModel.setTitle(it?.toString())
-//        }
-//
-//        binding.inputDescription.addTextChangedListener {
-//            viewModel.setDescription(it?.toString())
-//        }
-//
-//        binding.toggleSensitive.setOnClickListener {
-//            viewModel.toggleSensitive()
-//        }
-//
-//
-//
-//        binding.pickedImageFromLocalButton.setOnClickListener {
-//            if (!checkPermission()) {
-//                requestReadExternalStoragePermissionResultListener.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-//            } else {
-//                showFilePicker()
-//            }
-//        }
-//
-//        binding.pickedImageFromDriveButton.setOnClickListener {
-//            showDrivePicker()
-//        }
-//
-//        binding.saveButton.setOnClickListener {
-//            if (!viewModel.validate()) {
-//                return@setOnClickListener
-//            }
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                viewModel.save()
-//                withContext(Dispatchers.Main) {
-//                    (requireActivity() as? GalleryPostsActivity)?.pop()
-//                }
-//            }
-//        }
-
+    private fun onSave() {
+        if (!viewModel.validate()) {
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.save()
+            withContext(Dispatchers.Main) {
+                (requireActivity() as? GalleryPostsActivity)?.pop()
+            }
+        }
     }
 
 
