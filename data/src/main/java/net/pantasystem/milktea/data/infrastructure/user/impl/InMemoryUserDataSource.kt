@@ -1,13 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.user.impl
 
 
-import net.pantasystem.milktea.model.AddResult
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -48,7 +47,6 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun add(user: User): AddResult {
         return createOrUpdate(user).also {
             if(it == AddResult.CREATED) {
@@ -56,12 +54,10 @@ class InMemoryUserDataSource @Inject constructor(
             }else if(it == AddResult.UPDATED) {
                 publish(UserDataSource.Event.Updated(user.id, user))
             }
-            logger?.debug("add result:$it")
         }
 
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun addAll(users: List<User>): List<AddResult> {
         return users.map {
             add(it)
@@ -72,6 +68,14 @@ class InMemoryUserDataSource @Inject constructor(
         return usersLock.withLock {
             userMap[userId]
         }?: throw UserNotFoundException(userId)
+    }
+
+    override suspend fun getIn(userIds: List<User.Id>): List<User> {
+        return usersLock.withLock {
+            userIds.mapNotNull {
+                userMap[it]
+            }
+        }
     }
 
     override suspend fun get(accountId: Long, userName: String, host: String?): User {
@@ -86,7 +90,6 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun remove(user: User): Boolean {
         return usersLock.withLock {
             val map = userMap.toMutableMap()
@@ -156,7 +159,6 @@ class InMemoryUserDataSource @Inject constructor(
         return userMap.values.toList()
     }
 
-    @ExperimentalCoroutinesApi
     private fun publish(e: UserDataSource.Event) {
         _state.value = _state.value.copy(
             usersMap = userMap
