@@ -40,7 +40,7 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".GalleryPostsActivity" />
+        <activity android:name=".GalleryPostsActivity" android:windowSoftInputMode="adjustResize"/>
         <activity
                 android:name=".AuthorizationActivity"
                 android:exported="true"
@@ -72,7 +72,7 @@
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
                 android:theme="@style/LicensePageTheme" />
-        <activity android:name=".SearchAndSelectUserActivity" />
+        <activity android:name=".SearchAndSelectUserActivity" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".UserListDetailActivity" />
         <activity android:name=".ListListActivity" />
         <activity android:name=".FavoriteActivity" />
