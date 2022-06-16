@@ -29,4 +29,19 @@ abstract class DriveFileRecordDao {
 
     @Query("select * from drive_file_v1 where relatedAccountId=:accountId and serverId in (:serverIds)")
     abstract suspend fun findIn(accountId: Long, serverIds: List<String>): List<DriveFileRecord>
+
+    @Query(
+        """
+        delete from drive_file_v1
+            where not exists(
+                select * from draft_file_v2_table as draft 
+                    where draft.filePropertyId = drive_file_v1.id
+            )
+        """
+    )
+    abstract suspend fun deleteUnUsedFiles()
+
+    @Query("select count(*) from drive_file_v1")
+    abstract suspend fun count(): Int
+
 }
