@@ -359,7 +359,7 @@ fun DraftNote.toNoteEditingState(): NoteEditingState {
         renoteId = this.renoteId?.let {
             Note.Id(accountId = accountId, noteId = it)
         },
-        files = this.files?.map {
+        files = draftFiles?.map {
             AppFile.from(it)
         } ?: emptyList(),
         reservationPostingAt = reservationPostingAt?.let {
