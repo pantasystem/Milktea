@@ -34,7 +34,7 @@ data class DraftNoteDTO(
     @Embedded val poll: DraftPollDTO?,
     @ColumnInfo(name = "draft_note_id")
     @PrimaryKey(autoGenerate = true)
-    var draftNoteId: Long? = 0L,
+    var draftNoteId: Long? = null,
 
 ) {
 
@@ -55,10 +55,9 @@ data class DraftNoteDTO(
                 draftNote.replyId,
                 draftNote.renoteId,
                 draftNote.channelId?.channelId,
-                DraftPollDTO.make(draftNote.draftPoll)
-            ).apply {
-                draftNoteId = draftNote.draftNoteId
-            }
+                DraftPollDTO.make(draftNote.draftPoll),
+                draftNoteId = if(draftNote.draftNoteId == 0L) null else draftNote.draftNoteId
+            )
         }
     }
 
