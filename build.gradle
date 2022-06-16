@@ -21,7 +21,7 @@ buildscript {
         classpath 'com.github.triplet.gradle:play-publisher:4.0.0-SNAPSHOT'
     }
     ext {
-        compose_version = '1.2.0-beta01'
+        compose_version = '1.2.0-beta02'
         coroutines_version = '1.6.1'
         retrofit = '2.9.0'
         room_version = "2.4.2"
