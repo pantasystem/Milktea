@@ -49,8 +49,8 @@ class DraftNoteRelation {
         entityColumn = "id",
         associateBy = Junction(
             DraftFileJunctionRef::class,
-            parentColumn = "filePropertyId",
-            entityColumn = "id"
+            parentColumn = "draftNoteId",
+            entityColumn = "filePropertyId"
         )
     )
     var driveFileRecords: List<DriveFileRecord>? = null
@@ -64,7 +64,7 @@ class DraftNoteRelation {
                 localFiles?.firstOrNull {
                     it.localFileId == ref.localFileId
                 }?.apply {
-                    DraftNoteFile.Local(
+                    return@mapNotNull DraftNoteFile.Local(
                         name = name,
                         folderId = folderId,
                         filePath = filePath,
@@ -80,7 +80,7 @@ class DraftNoteRelation {
                 driveFileRecords?.firstOrNull {
                     it.id == ref.filePropertyId
                 }?.apply {
-                    DraftNoteFile.Remote(toFileProperty())
+                    return@mapNotNull DraftNoteFile.Remote(toFileProperty())
                 }
             }
             null
@@ -90,6 +90,7 @@ class DraftNoteRelation {
 
     @Ignore
     fun toDraftNote(accountId: Long): DraftNote {
+
         return draftNoteDTO.toDraftNote(accountId, visibilityUserIds, pollChoices, getDraftNoteFiles())
     }
 }
