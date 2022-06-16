@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.notes.CreateNoteUseCase
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.toCreateNote
 import net.pantasystem.milktea.model.notes.toNoteEditingState
@@ -25,6 +26,10 @@ class AlarmNotePostReceiver : BroadcastReceiver() {
     lateinit var coroutineScope: CoroutineScope
     @Inject
     lateinit var noteRepository: NoteRepository
+
+    @Inject
+    lateinit var createNoteUseCase: CreateNoteUseCase
+
     override fun onReceive(context: Context, intent: Intent) {
         val draftNoteId = intent.getLongExtra("DRAFT_NOTE_ID", -1)
         val accountId = intent.getLongExtra("ACCOUNT_ID", -1)
@@ -37,7 +42,7 @@ class AlarmNotePostReceiver : BroadcastReceiver() {
             draftNote ?: return@launch
             val account = accountRepository.get(accountId)
             val createNote = draftNote.toNoteEditingState().toCreateNote(account)
-            noteRepository.create(createNote)
+            createNoteUseCase.invoke(createNote)
         }
 
     }
