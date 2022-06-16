@@ -19,7 +19,11 @@ data class DraftFileJunctionRef(
     val filePropertyId: Long?,
     val localFileId: Long?,
     @PrimaryKey(autoGenerate = true) val id: Long = 0L
-)
+) {
+    companion object
+}
+
+
 
 data class DraftFileRelation(
     @Embedded val draftFileDTO: DraftFileDTO,
@@ -49,6 +53,7 @@ data class DraftLocalFile(
     @PrimaryKey(autoGenerate = true) val localFileId: Long = 0L,
 )
 
+@Suppress("DEPRECATION")
 @Entity(
     tableName = "draft_file_table",
     foreignKeys = [
@@ -62,6 +67,7 @@ data class DraftLocalFile(
     ],
     indices = [Index("draft_note_id")]
 )
+@Deprecated("DraftFileDTOV2へ移行")
 data class DraftFileDTO(
     @ColumnInfo(defaultValue = "name none") val name: String,
     @ColumnInfo(name = "remote_file_id") val remoteFileId: String?,
