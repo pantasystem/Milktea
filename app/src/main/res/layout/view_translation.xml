@@ -23,7 +23,7 @@
         <ProgressBar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{ translationState instanceof State.Loading ? View.VISIBLE : View.GONE}"/>
+                android:visibility="@{ translationState instanceof ResultState.Loading ? View.VISIBLE : View.GONE}"/>
         <androidx.emoji.widget.EmojiTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
