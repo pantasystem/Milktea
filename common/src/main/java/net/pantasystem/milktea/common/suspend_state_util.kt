@@ -4,17 +4,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 
-suspend fun<T> (suspend () -> T).asLoadingStateFlow(): Flow<State<T>> {
+suspend fun<T> (suspend () -> T).asLoadingStateFlow(): Flow<ResultState<T>> {
 
     return flow {
-        emit(State.Fixed(StateContent.NotExist()))
-        emit(State.Loading(StateContent.NotExist()))
+        emit(ResultState.Fixed(StateContent.NotExist()))
+        emit(ResultState.Loading(StateContent.NotExist()))
         runCatching {
             this@asLoadingStateFlow.invoke()
         }.onSuccess {
-            emit(State.Fixed(StateContent.Exist(it)))
+            emit(ResultState.Fixed(StateContent.Exist(it)))
         }.onFailure {
-            emit(State.Error(StateContent.NotExist(), it))
+            emit(ResultState.Error(StateContent.NotExist(), it))
         }
     }
 }

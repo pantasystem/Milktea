@@ -7,7 +7,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.translation.Translate
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -28,7 +28,7 @@ class NoteTranslationStoreImpl @Inject constructor(
 
     private val _mutex = Mutex()
 
-    override fun state(id: Note.Id): Flow<State<Translation>> {
+    override fun state(id: Note.Id): Flow<ResultState<Translation>> {
         return _state.map { states ->
             states.state(id)
         }

@@ -5,6 +5,7 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftPoll
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
@@ -359,20 +360,7 @@ fun DraftNote.toNoteEditingState(): NoteEditingState {
             Note.Id(accountId = accountId, noteId = it)
         },
         files = this.files?.map {
-            if (it.isRemoteFile) {
-                AppFile.Remote(
-                    it.remoteFileId!!
-                )
-            } else {
-                AppFile.Local(
-                    name = it.name,
-                    isSensitive = it.isSensitive ?: false,
-                    path = it.path ?: "",
-                    thumbnailUrl = it.thumbnailUrl,
-                    type = it.type ?: "",
-                    folderId = null
-                )
-            }
+            AppFile.from(it)
         } ?: emptyList(),
         reservationPostingAt = reservationPostingAt?.let {
             Instant.fromEpochMilliseconds(it.time)

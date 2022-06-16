@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.api.misskey.auth.createObtainToken
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -66,12 +66,12 @@ class AuthViewModel @Inject constructor(
                             a.instanceBaseURL,
                             accessToken = token.toModel(a.appSecret)
                         )
-                        State.Fixed(StateContent.Exist(authenticated))
+                        ResultState.Fixed(StateContent.Exist(authenticated))
                     } catch (e: Throwable) {
-                        State.Error(StateContent.NotExist(), e)
+                        ResultState.Error(StateContent.NotExist(), e)
                     }
                 } else {
-                    State.Fixed(StateContent.NotExist())
+                    ResultState.Fixed(StateContent.NotExist())
                 }
             }
         }.mapNotNull {

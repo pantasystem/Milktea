@@ -60,6 +60,7 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
     DateConverter::class,
     TimelinePageTypeConverter::class,
     AccountInstanceTypeConverter::class,
+    InstantConverter::class,
 )
 abstract class DataBase : RoomDatabase() {
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
