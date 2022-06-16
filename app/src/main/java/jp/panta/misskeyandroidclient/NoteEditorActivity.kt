@@ -34,7 +34,6 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import net.pantasystem.milktea.drive.toAppFile
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -45,6 +44,7 @@ import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.drive.DriveActivity
+import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
@@ -54,7 +54,6 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -67,7 +66,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             "jp.panta.misskeyandroidclient.EXTRA_REPLY_TO_NOTE_ID"
         private const val EXTRA_QUOTE_TO_NOTE_ID =
             "jp.panta.misskeyandroidclient.EXTRA_QUOTE_TO_NOTE_ID"
-        private const val EXTRA_DRAFT_NOTE = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
+        private const val EXTRA_DRAFT_NOTE_ID = "jp.panta.misskeyandroidclient.EXTRA_DRAFT_NOTE"
         private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
         private const val CONFIRM_SAVE_AS_DRAFT_OR_DELETE = "confirm_save_as_draft_or_delete"
@@ -78,7 +77,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             context: Context,
             replyTo: Note.Id? = null,
             quoteTo: Note.Id? = null,
-            draftNote: DraftNote? = null,
+            draftNoteId: Long? = null,
             mentions: List<String>? = null,
             channelId: Channel.Id? = null,
         ): Intent {
@@ -94,8 +93,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                 }
 
 
-                draftNote?.let {
-                    putExtra(EXTRA_DRAFT_NOTE, it)
+                draftNoteId?.let {
+                    putExtra(EXTRA_DRAFT_NOTE_ID, it)
                 }
 
                 mentions?.let {
@@ -183,7 +182,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
             Channel.Id(accountId, it)
         }
 
-        val draftNote: DraftNote? = intent.getSerializableExtra(EXTRA_DRAFT_NOTE) as? DraftNote?
+        val draftNoteId = intent.getLongExtra(EXTRA_DRAFT_NOTE_ID, - 1).let {
+            if (it == -1L) null else it
+        }
 
 
         noteEditorToolbar.actionUpButton.setOnClickListener {
@@ -240,8 +241,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         mViewModel.setReplyTo(replyToNoteId)
         mViewModel.setRenoteTo(quoteToNoteId)
         mViewModel.setChannelId(channelId)
-        if (draftNote != null) {
-            mViewModel.setDraftNote(draftNote)
+        if (draftNoteId != null) {
+            mViewModel.setDraftNoteId(draftNoteId)
         }
         binding.viewModel = mViewModel
         noteEditorToolbar.viewModel = mViewModel

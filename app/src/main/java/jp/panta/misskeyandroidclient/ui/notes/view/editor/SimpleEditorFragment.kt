@@ -31,8 +31,7 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.drive.DriveActivity
@@ -44,6 +43,8 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.notes.toCreateNote
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -81,6 +82,9 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     @Inject
     lateinit var fileRepository: DriveFileRepository
+
+    @Inject
+    lateinit var draftNoteService: DraftNoteService
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -362,10 +366,18 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
 
     override fun goToNormalEditor() {
-        mViewModel.toDraftNote().let {
-            val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = it)
-            startActivity(intent)
-            mViewModel.clear()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            accountStore.currentAccount?.let {
+                draftNoteService.save(mViewModel.state.value.toCreateNote(it)).onSuccess {
+                    withContext(Dispatchers.Main) {
+                        val intent = NoteEditorActivity.newBundle(requireContext(), draftNoteId = it.draftNoteId)
+                        startActivity(intent)
+                        mViewModel.clear()
+                    }
+                }
+            }
         }
 
     }
