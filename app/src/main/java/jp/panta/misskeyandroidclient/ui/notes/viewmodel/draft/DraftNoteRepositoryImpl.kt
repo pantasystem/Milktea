@@ -31,7 +31,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
 
             draftNoteDao.deleteDraftJunctionFilesByDraftNoteId(inserted.draftNoteId)
 
-            val refs = draftNote.files?.map {
+            val refs = draftNote.draftFiles?.map {
                 when (it) {
                     is DraftNoteFile.Local -> {
                         DraftFileJunctionRef(
@@ -84,5 +84,6 @@ class DraftNoteRepositoryImpl @Inject constructor(
             )
         }
     }
+
 
 }
