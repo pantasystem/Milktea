@@ -47,9 +47,22 @@ sealed interface DraftNoteFile {
         val thumbnailUrl: String?,
         val folderId: String?,
         val localFileId: Long,
-    ) : DraftNoteFile
+    ) : DraftNoteFile {
+        companion object
+    }
 }
 
+fun DraftNoteFile.Local.Companion.from(appFile: AppFile.Local, id: Long = 0L): DraftNoteFile.Local {
+    return DraftNoteFile.Local(
+        filePath = appFile.path,
+        folderId = appFile.folderId,
+        isSensitive = appFile.isSensitive,
+        type = appFile.type,
+        name = appFile.name,
+        thumbnailUrl = appFile.thumbnailUrl,
+        localFileId = id
+    )
+}
 fun NoteRelation.toDraftNote() : DraftNote {
     return DraftNote(
         accountId = this.note.id.accountId,
