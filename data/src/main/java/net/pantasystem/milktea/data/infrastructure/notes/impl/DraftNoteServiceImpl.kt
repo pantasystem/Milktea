@@ -7,6 +7,7 @@ import net.pantasystem.milktea.model.notes.draft.*
 import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.model.notes.type
 import net.pantasystem.milktea.model.notes.visibleUserIds
+import java.util.*
 import javax.inject.Inject
 
 class DraftNoteServiceImpl @Inject constructor(
@@ -48,7 +49,9 @@ class DraftNoteServiceImpl @Inject constructor(
                     replyId = createNote.replyId?.noteId,
                     renoteId = createNote.renoteId?.noteId,
                     draftPoll = draftPoll,
-                    reservationPostingAt = null,
+                    reservationPostingAt = createNote.scheduleWillPostAt?.toEpochMilliseconds()?.let {
+                        Date(it)
+                    },
                     channelId = createNote.channelId,
                     draftNoteId = createNote.draftNoteId ?: 0L
                 )
