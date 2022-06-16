@@ -7,16 +7,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".DraftNotesActivity">
-        <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/draftNotesAppBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/draftNotesToolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/draft_notes"/>
-        </com.google.android.material.appbar.AppBarLayout>
+
 
         <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/draftNotesFragment"
