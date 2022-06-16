@@ -50,13 +50,17 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         UserNicknameDTO::class,
         Utf8EmojiDTO::class,
         DriveFileRecord::class,
+        DraftFileJunctionRef::class,
+        DraftLocalFile::class,
+
     ],
-    version = 14,
+    version = 15,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
         AutoMigration(from = 13, to = 14),
+        AutoMigration(from = 14, to = 15)
     ],
 )
 @TypeConverters(

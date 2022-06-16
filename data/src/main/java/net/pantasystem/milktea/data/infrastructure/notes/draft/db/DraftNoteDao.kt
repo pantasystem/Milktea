@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 @Dao
@@ -86,5 +87,9 @@ abstract class DraftNoteDao {
 
     @Query("delete from 'draft_file_table' where draft_note_id = :draftNoteId and file_id = :fileId")
     abstract fun deleteFile(draftNoteId: Long, fileId: Long)
+
+    @Transaction
+    @Query("select * from draft_note_table where accountId = :accountId")
+    abstract fun observeDraftNotesRelation(accountId: Long): Flow<List<DraftNoteRelation>>
 
 }

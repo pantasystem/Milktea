@@ -1,8 +1,53 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
+import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.File
+
+@Entity(
+    tableName = "draft_file_v2_table",
+    indices = [Index(
+        "draftNoteId",
+        "filePropertyId",
+        "localFileId",
+        unique = true
+    ), Index("draftNoteId"), Index("localFileId"), Index("filePropertyId")],
+)
+data class DraftFileJunctionRef(
+    val draftNoteId: Long,
+    val filePropertyId: Long?,
+    val localFileId: Long?,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L
+)
+
+data class DraftFileRelation(
+    @Embedded val draftFileDTO: DraftFileDTO,
+
+    @Relation(
+        parentColumn = "localFileId",
+        entityColumn = "localFileId"
+    )
+    val localFile: DraftLocalFile?,
+
+    @Relation(
+        parentColumn = "filePropertyId",
+        entityColumn = "id"
+    )
+    val fileProperty: DriveFileRecord?,
+)
+
+
+@Entity(tableName = "draft_local_file_v2_table")
+data class DraftLocalFile(
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "file_path") val filePath: String,
+    @ColumnInfo(name = "is_sensitive") val isSensitive: Boolean?,
+    @ColumnInfo(name = "type") val type: String,
+    @ColumnInfo(name = "thumbnailUrl") val thumbnailUrl: String?,
+    @ColumnInfo(name = "folder_id") val folderId: String?,
+    @PrimaryKey(autoGenerate = true) val localFileId: Long = 0L,
+)
 
 @Entity(
     tableName = "draft_file_table",
