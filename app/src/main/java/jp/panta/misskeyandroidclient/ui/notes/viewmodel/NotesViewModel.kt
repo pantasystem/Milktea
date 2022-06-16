@@ -18,7 +18,6 @@ import net.pantasystem.milktea.api.misskey.notes.NoteState
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
@@ -27,6 +26,7 @@ import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -46,7 +46,6 @@ data class SelectedReaction(val noteId: Note.Id, val reaction: String)
 class NotesViewModel @Inject constructor(
     private val encryption: Encryption,
     private val translationStore: NoteTranslationStore,
-    private val draftNoteDAO: DraftNoteDao,
     private val noteRepository: NoteRepository,
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
@@ -54,6 +53,7 @@ class NotesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     private val renoteUseCase: CreateRenoteUseCase,
     val accountStore: AccountStore,
+    val draftNoteRepository: DraftNoteRepository,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
 
@@ -274,8 +274,8 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
 
-                val id = draftNoteDAO.fullInsert(note.toDraftNote())
-                val dn = draftNoteDAO.getDraftNote(note.note.id.accountId, id)!!
+                val dn = draftNoteRepository.save(note.toDraftNote())
+                    .getOrThrow()
                 noteRepository.delete(note.note.id)
                 dn
             }.onSuccess {
@@ -284,7 +284,6 @@ class NotesViewModel @Inject constructor(
                 }
             }.onFailure { t ->
                 Log.e(TAG, "削除に失敗しました", t)
-
             }
         }
 
