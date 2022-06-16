@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class DriveFileRecordDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     abstract suspend fun insert(record: DriveFileRecord)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(records: List<DriveFileRecord>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract suspend fun insertAll(records: List<DriveFileRecord>): List<Long>
 
     @Update
     abstract suspend fun update(record: DriveFileRecord)

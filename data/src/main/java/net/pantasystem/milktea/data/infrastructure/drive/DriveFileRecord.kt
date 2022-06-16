@@ -61,6 +61,48 @@ data class DriveFileRecord(
         )
     }
 
+    @Ignore
+    fun toFilePropertyId(): FileProperty.Id {
+        return FileProperty.Id(relatedAccountId, serverId)
+    }
+
+    @Ignore
+    fun update(file: FileProperty): DriveFileRecord {
+        require(toFilePropertyId() == file.id) {
+            "同一Id外の更新を行うことはできません id:${toFilePropertyId()}, args id:${file.id}"
+        }
+        return copy(
+            serverId = file.id.fileId,
+            relatedAccountId = file.id.accountId,
+            createdAt = file.createdAt,
+            name = file.name,
+            type = file.type,
+            md5 = file.md5,
+            size = file.size,
+            url = file.url,
+            isSensitive = file.isSensitive,
+            thumbnailUrl = file.thumbnailUrl,
+            folderId = file.folderId,
+            userId = file.userId?.id,
+            comment = file.comment
+        )
+    }
+
+    @Ignore
+    fun equalFileProperty(property: FileProperty): Boolean {
+        return property.id != toFilePropertyId()
+                || property.isSensitive != isSensitive
+                || property.comment != comment
+                || property.size != size
+                || property.md5 != md5
+                || property.name != name
+                || property.thumbnailUrl != thumbnailUrl
+                || property.url != url
+                || property.userId?.id != userId
+                || property.folderId != folderId
+                || property.type != type
+    }
+
     companion object
 }
 
