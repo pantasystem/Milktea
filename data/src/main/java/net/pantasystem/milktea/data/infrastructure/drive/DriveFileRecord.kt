@@ -1,10 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.user.User
 
@@ -13,10 +11,19 @@ import net.pantasystem.milktea.model.user.User
     indices = [
         Index("serverId", "relatedAccountId", unique = true),
         Index("serverId"),
-        Index("entityHost"),
+        Index("relatedAccountId"),
+    ],
+    foreignKeys = [
+        ForeignKey(
+            entity = Account::class,
+            parentColumns = ["accountId"],
+            childColumns = ["relatedAccountId"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        )
     ]
 )
-data class DriveFileRecord (
+data class DriveFileRecord(
     val serverId: String,
     val relatedAccountId: Long,
     val createdAt: Instant,

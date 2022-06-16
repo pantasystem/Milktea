@@ -7,22 +7,21 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.common.GsonFactory
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.GsonFactory
 import net.pantasystem.milktea.data.infrastructure.drive.*
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
-import net.pantasystem.milktea.model.drive.InMemoryFilePropertyDataSource
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DriveFileBindModule {
     @Binds
     @Singleton
-    abstract fun filePropertyDataSource(inMem: InMemoryFilePropertyDataSource): FilePropertyDataSource
+    abstract fun filePropertyDataSource(inMem: MediatorFilePropertyDataSource): FilePropertyDataSource
 
     @Binds
     @Singleton

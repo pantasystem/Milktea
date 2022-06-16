@@ -10,6 +10,8 @@ import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.infrastructure.core.*
+import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
+import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
 import net.pantasystem.milktea.data.infrastructure.instance.db.*
@@ -47,13 +49,15 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         UnreadNotification::class,
         UserNicknameDTO::class,
         Utf8EmojiDTO::class,
+        DriveFileRecord::class,
     ],
-    version = 13,
+    version = 14,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
-    ]
+        AutoMigration(from = 13, to = 14),
+    ],
 )
 @TypeConverters(
     PageTypeConverter::class,
@@ -89,4 +93,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun userNicknameDAO(): UserNicknameDAO
 
     abstract fun utf8EmojiDAO(): Utf8EmojisDAO
+
+    abstract fun driveFileRecordDAO(): DriveFileRecordDao
 }
