@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
 
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.from
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
@@ -10,11 +11,17 @@ import javax.inject.Inject
 
 class DraftNoteRepositoryImpl @Inject constructor(
     val draftNoteDao: DraftNoteDao,
+    val loggerFactory: Logger.Factory
 ) : DraftNoteRepository {
+    val logger by lazy {
+        loggerFactory.create("DraftNoteRepositoryImpl")
+    }
 
     override suspend fun save(draftNote: DraftNote): Result<DraftNote> {
         return runCatching {
             val id = draftNoteDao.insert(DraftNoteDTO.make(draftNote))
+
+            logger.debug("draftNoteId:$id")
             val inserted = draftNote.copy(draftNoteId = id)
             val pollChoices = draftNote.draftPoll?.choices?.let {
                 it.mapIndexed { index, s ->
@@ -29,13 +36,13 @@ class DraftNoteRepositoryImpl @Inject constructor(
                 UserIdDTO(draftNoteId = id, userId = it)
             }
 
-            draftNoteDao.deleteDraftJunctionFilesByDraftNoteId(inserted.draftNoteId)
+            draftNoteDao.deleteDraftJunctionFilesByDraftNoteId(id)
 
             val refs = draftNote.draftFiles?.map {
                 when (it) {
                     is DraftNoteFile.Local -> {
                         DraftFileJunctionRef(
-                            draftNoteId = inserted.draftNoteId,
+                            draftNoteId = id,
                             localFileId = draftNoteDao.insertDraftLocalFile(
                                 DraftLocalFile(
                                     localFileId = it.localFileId,
@@ -52,7 +59,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
                     }
                     is DraftNoteFile.Remote -> {
                         DraftFileJunctionRef(
-                            draftNoteId = inserted.draftNoteId,
+                            draftNoteId = id,
                             filePropertyId = draftNoteDao.insertDriveFile(DriveFileRecord.from(it.fileProperty)),
                             localFileId = null,
                         )
@@ -82,6 +89,13 @@ class DraftNoteRepositoryImpl @Inject constructor(
                 relation.draftNoteDTO.accountId,
                 relation.draftNoteDTO.draftNoteId!!
             )
+        }
+    }
+
+    override suspend fun findOne(draftNoteId: Long): Result<DraftNote> {
+        return runCatching {
+            val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
+            relation.toDraftNote(relation.draftNoteDTO.accountId)
         }
     }
 
