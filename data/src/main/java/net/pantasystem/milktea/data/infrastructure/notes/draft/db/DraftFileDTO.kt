@@ -1,8 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
+import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 
 @Entity(
     tableName = "draft_file_v2_table",
@@ -12,6 +14,23 @@ import net.pantasystem.milktea.model.file.File
         "localFileId",
         unique = true
     ), Index("draftNoteId"), Index("localFileId"), Index("filePropertyId")],
+    foreignKeys = [
+        ForeignKey(
+            entity = DriveFileRecord::class,
+            parentColumns = ["id"],
+            childColumns = ["filePropertyId"],
+            onDelete = OnConflictStrategy.ABORT,
+            onUpdate = OnConflictStrategy.REPLACE,
+        ),
+        ForeignKey(
+            entity = DraftLocalFile::class,
+            parentColumns = ["localFileId"],
+            childColumns = ["localFileId"],
+            onDelete = OnConflictStrategy.ABORT,
+            onUpdate = OnConflictStrategy.REPLACE,
+        )
+
+    ]
 )
 data class DraftFileJunctionRef(
     val draftNoteId: Long,
@@ -34,7 +53,21 @@ data class DraftLocalFile(
     @ColumnInfo(name = "thumbnailUrl") val thumbnailUrl: String?,
     @ColumnInfo(name = "folder_id") val folderId: String?,
     @PrimaryKey(autoGenerate = true) val localFileId: Long = 0L,
-)
+) {
+    companion object
+}
+
+fun DraftLocalFile.Companion.from(draftNote: DraftNoteFile.Local): DraftLocalFile {
+    return DraftLocalFile(
+        localFileId = draftNote.localFileId,
+        filePath = draftNote.filePath,
+        folderId = draftNote.folderId,
+        name = draftNote.name,
+        type = draftNote.type,
+        thumbnailUrl = draftNote.thumbnailUrl,
+        isSensitive = draftNote.isSensitive,
+    )
+}
 
 @Suppress("DEPRECATION")
 @Entity(
