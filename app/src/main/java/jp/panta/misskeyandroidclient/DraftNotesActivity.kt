@@ -1,11 +1,13 @@
 package jp.panta.misskeyandroidclient
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityDraftNotesBinding
 
+@AndroidEntryPoint
 class DraftNotesActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityDraftNotesBinding
