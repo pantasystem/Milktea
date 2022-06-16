@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
-import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.File
 
@@ -24,22 +23,6 @@ data class DraftFileJunctionRef(
 }
 
 
-
-data class DraftFileRelation(
-    @Embedded val draftFileDTO: DraftFileDTO,
-
-    @Relation(
-        parentColumn = "localFileId",
-        entityColumn = "localFileId"
-    )
-    val localFile: DraftLocalFile?,
-
-    @Relation(
-        parentColumn = "filePropertyId",
-        entityColumn = "id"
-    )
-    val fileProperty: DriveFileRecord?,
-)
 
 
 @Entity(tableName = "draft_local_file_v2_table")

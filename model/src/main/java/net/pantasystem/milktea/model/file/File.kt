@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.file
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import java.io.Serializable as JSerializable
 
 sealed interface AppFile : JSerializable {
@@ -118,5 +119,19 @@ fun AppFile.Companion.from(file: File): AppFile {
             thumbnailUrl = file.thumbnailUrl,
             type = file.type!!
         )
+    }
+}
+
+fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
+    return when(file) {
+        is DraftNoteFile.Local -> AppFile.Local(
+            name = file.name,
+            path = file.filePath,
+            thumbnailUrl = file.thumbnailUrl,
+            type = file.type,
+            isSensitive = file.isSensitive ?: false,
+            folderId = file.folderId,
+        )
+        is DraftNoteFile.Remote -> AppFile.Remote(file.fileProperty.id)
     }
 }

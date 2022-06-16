@@ -2,6 +2,8 @@ package net.pantasystem.milktea.model.notes.draft
 
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.getName
 import net.pantasystem.milktea.model.notes.isLocalOnly
@@ -15,7 +17,7 @@ data class DraftNote(
     var visibleUserIds: List<String>? = null,
     val text: String?,
     val cw: String? = null,
-    var files: List<DraftNoteFile>? = null,
+    var draftFiles: List<DraftNoteFile>? = null,
     val viaMobile: Boolean? = null,
     val localOnly: Boolean? = null,
     val noExtractMentions: Boolean? = null,
@@ -27,9 +29,11 @@ data class DraftNote(
     val reservationPostingAt: Date? = null,
     val channelId: Channel.Id? = null,
     var draftNoteId: Long = 0L
-): Serializable{
-
-
+): Serializable {
+    val appFiles: List<AppFile>
+        get() = draftFiles?.map { draftNoteFile ->
+            AppFile.from(draftNoteFile)
+        } ?: emptyList()
 }
 
 sealed interface DraftNoteFile {
@@ -55,7 +59,7 @@ fun NoteRelation.toDraftNote() : DraftNote {
         },
         text = this.note.text,
         cw = this.note.cw,
-        files = this.files?.map {
+        draftFiles = this.files?.map {
             DraftNoteFile.Remote(it)
         },
         viaMobile = this.note.viaMobile,
