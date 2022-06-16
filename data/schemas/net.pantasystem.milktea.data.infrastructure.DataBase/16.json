@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "a05481b4307e3365d6e16249e1aadee3",
+    "identityHash": "339e5af4007d54dddc9c03e43bd72233",
     "entities": [
       {
         "tableName": "connection_information",
@@ -1757,7 +1757,7 @@
       },
       {
         "tableName": "draft_file_v2_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draftNoteId` INTEGER NOT NULL, `filePropertyId` INTEGER, `localFileId` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`draftNoteId` INTEGER NOT NULL, `filePropertyId` INTEGER, `localFileId` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`filePropertyId`) REFERENCES `drive_file_v1`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`localFileId`) REFERENCES `draft_local_file_v2_table`(`localFileId`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "draftNoteId",
@@ -1830,7 +1830,30 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_draft_file_v2_table_filePropertyId` ON `${TABLE_NAME}` (`filePropertyId`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "drive_file_v1",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "filePropertyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "draft_local_file_v2_table",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "localFileId"
+            ],
+            "referencedColumns": [
+              "localFileId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "draft_local_file_v2_table",
@@ -1892,7 +1915,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a05481b4307e3365d6e16249e1aadee3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '339e5af4007d54dddc9c03e43bd72233')"
     ]
   }
 }
