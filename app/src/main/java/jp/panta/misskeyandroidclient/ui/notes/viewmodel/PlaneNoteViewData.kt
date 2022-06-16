@@ -8,7 +8,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -91,7 +91,7 @@ open class PlaneNoteViewData(
     val urls = textNode?.getUrls()
 
 
-    val translateState: LiveData<State<Translation?>?> =
+    val translateState: LiveData<ResultState<Translation?>?> =
         this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
 
     var emojis = toShowNote.note.emojis ?: emptyList()

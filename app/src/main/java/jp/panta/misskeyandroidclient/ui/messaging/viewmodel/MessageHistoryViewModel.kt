@@ -121,7 +121,7 @@ class MessageHistoryViewModel @Inject constructor(
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Eagerly, emptyList())
 
     val isRefreshing = combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
-        users is State.Loading || groups is State.Loading
+        users is ResultState.Loading || groups is ResultState.Loading
     }.asLiveData()
 
     val messageHistorySelected = EventBus<HistoryViewData>()

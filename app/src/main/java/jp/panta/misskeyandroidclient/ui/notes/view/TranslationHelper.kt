@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.mfm.MFMDecorator
 import jp.panta.misskeyandroidclient.mfm.MFMParser
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Translation
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 
 object TranslationHelper {
@@ -17,13 +17,13 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState", "emojis")
-    fun TextView.setTranslatedText(state: State<Translation>?, emojis: List<Emoji>?) {
+    fun TextView.setTranslatedText(state: ResultState<Translation>?, emojis: List<Emoji>?) {
         if(state == null) {
             this.visibility = View.GONE
             return
         }
 
-        if(state is State.Loading) {
+        if(state is ResultState.Loading) {
             this.visibility = View.GONE
             return
         }
@@ -33,7 +33,7 @@ object TranslationHelper {
         }.getOrNull()
         this.visibility = View.VISIBLE
 
-        if(state is State.Error) {
+        if(state is ResultState.Error) {
             this.text = context.getString(R.string.error_s, state.throwable.toString())
         }
         if(translation == null) {
@@ -48,12 +48,12 @@ object TranslationHelper {
 
     @JvmStatic
     @BindingAdapter("translationState")
-    fun ViewGroup.translationVisibility(state: State<Translation>?) {
+    fun ViewGroup.translationVisibility(state: ResultState<Translation>?) {
         if(state == null) {
             this.visibility = View.GONE
             return
         }
-        this.visibility = if(state.content is StateContent.NotExist && state is State.Fixed) {
+        this.visibility = if(state.content is StateContent.NotExist && state is ResultState.Fixed) {
             View.GONE
         }else{
             View.VISIBLE

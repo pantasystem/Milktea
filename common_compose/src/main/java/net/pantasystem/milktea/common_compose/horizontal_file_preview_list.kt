@@ -18,7 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -167,8 +167,8 @@ fun RemoteFilePreview(
     dataSource: FilePropertyDataSource,
     onClick: (FileProperty) -> Unit
 ) {
-    var filePropertyState: State<FileProperty> by remember {
-        mutableStateOf(State.Loading(content = StateContent.NotExist()))
+    var filePropertyState: ResultState<FileProperty> by remember {
+        mutableStateOf(ResultState.Loading(content = StateContent.NotExist()))
     }
     val fileProperty = dataSource.observe(file.id)
         .collectAsState(null)
@@ -178,11 +178,11 @@ fun RemoteFilePreview(
         runCatching {
             repository.find(file.id)
         }.onSuccess {
-            filePropertyState = State.Fixed(
+            filePropertyState = ResultState.Fixed(
                 StateContent.Exist(it)
             )
         }.onFailure {
-            filePropertyState = State.Error(
+            filePropertyState = ResultState.Error(
                 filePropertyState.content,
                 throwable = it
             )

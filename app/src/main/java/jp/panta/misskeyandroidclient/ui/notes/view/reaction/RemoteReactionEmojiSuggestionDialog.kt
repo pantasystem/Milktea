@@ -13,7 +13,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogRemoteReactionEmojiSuggestionBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.RemoteReactionEmojiSuggestionViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 
 private const val EXTRA_REACTION = "EXTRA_REACTION"
@@ -62,12 +62,12 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
         lifecycleScope.launchWhenResumed {
             viewModel.filteredEmojis.collect { state ->
                 when (state) {
-                    is State.Loading -> {
+                    is ResultState.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.suggestedEmojis.visibility = View.GONE
                         binding.errorMessage.visibility = View.GONE
                     }
-                    is State.Fixed -> {
+                    is ResultState.Fixed -> {
                         binding.progressBar.visibility = View.GONE
                         binding.suggestedEmojis.visibility = View.VISIBLE
                         val emojis = (state.content as? StateContent.Exist)?.rawContent?: emptyList()
@@ -81,7 +81,7 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
                             ":${it.name}:"
                         })
                     }
-                    is State.Error -> {
+                    is ResultState.Error -> {
                         binding.progressBar.visibility = View.GONE
                         binding.suggestedEmojis.visibility = View.GONE
                         binding.errorMessage.visibility = View.VISIBLE
