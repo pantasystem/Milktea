@@ -4,10 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentDraftNotesBinding
@@ -15,6 +17,8 @@ import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.media.MediaActivity
@@ -24,6 +28,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNote
 /**
  * NOTE: 直接的なコードによる参照はないが、activity_draft_notesから参照されているので削除しないこと。
  */
+@AndroidEntryPoint
 class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteActionCallback, FileListener{
 
     companion object{
@@ -35,27 +40,32 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
 
     private val binding: FragmentDraftNotesBinding by dataBinding()
 
+    val viewModel: DraftNotesViewModel by viewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // TODO: 実装する
 
-        val miApplication = view.context.applicationContext as MiApplication
-        val viewModel = ViewModelProvider(this, DraftNotesViewModel.Factory(miApplication))[DraftNotesViewModel::class.java]
         mDraftNotesViewModel = viewModel
 
         val adapter = DraftNoteListAdapter(this, this, viewLifecycleOwner)
         binding.draftNotesView.adapter = adapter
         binding.draftNotesView.layoutManager = LinearLayoutManager(view.context)
 
-        viewModel.draftNotes.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+        lifecycleScope.launchWhenResumed {
+            viewModel.uiState.collect {
+                binding.draftNotesSwipeRefresh.isRefreshing = it.draftNotes is ResultState.Loading
+                when(val content = it.draftNoteUiStateList.content) {
+                    is StateContent.NotExist -> {
+                        adapter.submitList(emptyList())
+                    }
+                    is StateContent.Exist -> {
+                        adapter.submitList(content.rawContent)
+                    }
+                }
+            }
         }
 
-        binding.draftNotesSwipeRefresh.setOnRefreshListener {
-            viewModel.loadDraftNotes()
-        }
-        viewModel.isLoading.observe( viewLifecycleOwner) {
-            binding.draftNotesSwipeRefresh.isRefreshing = it
-        }
 
         val confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
         mConfirmViewModel = confirmViewModel
@@ -74,18 +84,14 @@ class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteAct
     }
 
     override fun onSelect(draftNote: DraftNote?) {
-        val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = draftNote)
+        val intent = NoteEditorActivity.newBundle(requireContext(), draftNoteId = draftNote?.draftNoteId)
         requireActivity().startActivityFromFragment(this, intent, 300)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        mDraftNotesViewModel?.loadDraftNotes()
-
-    }
 
     override fun onDetach(file: File?) {
-        mDraftNotesViewModel?.detachFile(file)
+        // TODO: 実装する
+//        mDraftNotesViewModel?.detachFile(file)
     }
 
     override fun onSelect(file: File?) {

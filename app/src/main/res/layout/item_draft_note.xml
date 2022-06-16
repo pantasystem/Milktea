@@ -86,15 +86,7 @@
                         app:draftPollChoices="@{note.draftNote.draftPoll.choices}"
                     />
 
-                <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/imagesView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/pollChoicesView"
-                        tools:listitem="@layout/item_note_editor_file_preview"
-                        tools:itemCount="1"
-                        app:previewFiles="@{note.draftNote.files}"
-                        app:imagePreviewsFileListener="@{fileListener}"/>
+
 
 
             </RelativeLayout>

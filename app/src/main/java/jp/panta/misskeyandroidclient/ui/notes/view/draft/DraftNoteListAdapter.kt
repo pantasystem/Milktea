@@ -10,23 +10,23 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemDraftNoteBinding
 import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNoteViewData
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNoteUiState
 
 class DraftNoteListAdapter(
     private val draftNoteActionCallback: DraftNoteActionCallback,
     val fileListener: FileListener,
     val lifecycleOwner: LifecycleOwner
-) : ListAdapter<DraftNoteViewData, DraftNoteListAdapter.VH>(DFUtilItemCallback()){
+) : ListAdapter<DraftNoteUiState, DraftNoteListAdapter.VH>(DFUtilItemCallback()){
 
     class VH(val binding: ItemDraftNoteBinding) : RecyclerView.ViewHolder(binding.root)
 
-    class DFUtilItemCallback : DiffUtil.ItemCallback<DraftNoteViewData>(){
-        override fun areContentsTheSame(oldItem: DraftNoteViewData, newItem: DraftNoteViewData): Boolean {
-            return oldItem.note.value == newItem.note.value
+    class DFUtilItemCallback : DiffUtil.ItemCallback<DraftNoteUiState>(){
+        override fun areContentsTheSame(oldItem: DraftNoteUiState, newItem: DraftNoteUiState): Boolean {
+            return oldItem == newItem
         }
 
-        override fun areItemsTheSame(oldItem: DraftNoteViewData, newItem: DraftNoteViewData): Boolean {
-            return oldItem.note.value?.draftNoteId == newItem.note.value?.draftNoteId
+        override fun areItemsTheSame(oldItem: DraftNoteUiState, newItem: DraftNoteUiState): Boolean {
+            return oldItem.draftNote.draftNoteId == newItem.draftNote.draftNoteId
         }
     }
 

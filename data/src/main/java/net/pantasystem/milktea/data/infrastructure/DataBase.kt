@@ -54,13 +54,14 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         DraftLocalFile::class,
 
     ],
-    version = 15,
+    version = 16,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
         AutoMigration(from = 13, to = 14),
-        AutoMigration(from = 14, to = 15)
+        AutoMigration(from = 14, to = 15),
+        AutoMigration(from = 15, to = 16)
     ],
 )
 @TypeConverters(
