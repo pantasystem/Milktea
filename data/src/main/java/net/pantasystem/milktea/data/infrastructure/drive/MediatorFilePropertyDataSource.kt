@@ -39,9 +39,10 @@ class MediatorFilePropertyDataSource @Inject constructor(
     }
 
     override suspend fun addAll(list: List<FileProperty>): List<AddResult> {
-        return list.map {
-            add(it)
-        }
+        driveFileRecordDao.insertAll(list.map {
+            DriveFileRecord.from(it)
+        })
+        return inMemoryFilePropertyDataSource.addAll(list)
     }
 
     override suspend fun find(filePropertyId: FileProperty.Id): FileProperty {

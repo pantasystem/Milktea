@@ -1,9 +1,14 @@
 package net.pantasystem.milktea.model.file
 
+import kotlinx.coroutines.flow.Flow
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.model.drive.FileProperty
 import java.io.Serializable as JSerializable
 
 sealed interface AppFile : JSerializable {
+
+    companion object;
+
 
     data class Local(
         val name: String,
@@ -25,6 +30,18 @@ sealed interface AppFile : JSerializable {
         val id: FileProperty.Id,
     ) : AppFile
 
+}
+
+
+sealed interface FileState {
+    val appFile: AppFile
+
+    data class Local(override val appFile: AppFile.Local) : FileState
+    data class Remote(
+        override val appFile: AppFile,
+        val state: Flow<ResultState<FileProperty>>,
+        val source: FileProperty?
+    ) : FileState
 }
 
 
@@ -83,5 +100,23 @@ fun AppFile.toFile(): File {
                 localFileId = id
             )
         }
+    }
+}
+
+fun AppFile.Companion.from(file: File): AppFile {
+    return if (file.isRemoteFile) {
+        AppFile.Remote(
+            file.remoteFileId!!
+        )
+    } else {
+        AppFile.Local(
+            folderId = file.folderId,
+            isSensitive = file.isSensitive ?: false,
+            id = file.localFileId!!,
+            name = file.name,
+            path = file.path!!,
+            thumbnailUrl = file.thumbnailUrl,
+            type = file.type!!
+        )
     }
 }

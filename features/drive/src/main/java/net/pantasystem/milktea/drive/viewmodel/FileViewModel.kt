@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
@@ -61,10 +62,14 @@ class FileViewModel @AssistedInject constructor(
         currentAccountWatcher.account.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val state = filePropertyDataSource.state.flatMapLatest { state ->
-        filePropertyPagingStore.state.map { pageable ->
-            pageable.convert {
-                state.findIn(it)
+    val state = filePropertyPagingStore.state.flatMapLatest { pageableState->
+        val ids = when(val content = pageableState.content) {
+            is StateContent.Exist -> content.rawContent
+            is StateContent.NotExist -> emptyList()
+        }
+        filePropertyDataSource.observeIn(ids).map { list ->
+            pageableState.convert {
+                list
             }
         }
     }.combine(driveStore.state) { p, driveState ->
@@ -77,7 +82,7 @@ class FileViewModel @AssistedInject constructor(
                 )
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
 
     init {

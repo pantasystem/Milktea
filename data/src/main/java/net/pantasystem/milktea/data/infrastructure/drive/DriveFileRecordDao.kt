@@ -1,16 +1,16 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class DriveFileRecordDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(record: DriveFileRecord)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAll(records: List<DriveFileRecord>)
 
     @Update
     abstract suspend fun update(record: DriveFileRecord)
