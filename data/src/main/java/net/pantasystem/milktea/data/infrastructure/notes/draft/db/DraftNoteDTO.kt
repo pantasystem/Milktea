@@ -34,7 +34,7 @@ data class DraftNoteDTO(
     @Embedded val poll: DraftPollDTO?,
     @ColumnInfo(name = "draft_note_id")
     @PrimaryKey(autoGenerate = true)
-    var draftNoteId: Long = 0L,
+    var draftNoteId: Long? = 0L,
 
 ) {
 
@@ -89,7 +89,7 @@ data class DraftNoteDTO(
             channelId = channelId?.let {
                 Channel.Id(accountId, it)
             },
-            draftNoteId = draftNoteId
+            draftNoteId = draftNoteId ?: 0L
         )
     }
 

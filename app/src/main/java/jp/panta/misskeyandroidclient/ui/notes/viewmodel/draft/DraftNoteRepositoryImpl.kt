@@ -80,7 +80,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
 
             draftNoteDao.deleteDraftNote(
                 relation.draftNoteDTO.accountId,
-                relation.draftNoteDTO.draftNoteId
+                relation.draftNoteDTO.draftNoteId!!
             )
         }
     }
