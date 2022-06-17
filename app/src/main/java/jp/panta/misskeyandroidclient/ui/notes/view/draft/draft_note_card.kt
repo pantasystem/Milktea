@@ -33,29 +33,21 @@ fun DraftNoteCard(
         mutableStateOf(null)
     }
 
-//    fun onConfirmDelete() {
-//        confirmDeleteDraftNoteId = null
-////        onAction(DraftNoteCardAction.DeleteDraftNote(draftNote))
-//    }
+    fun onConfirmDelete() {
+        confirmDeleteDraftNoteId = null
+        onAction(DraftNoteCardAction.DeleteDraftNote(draftNote))
+    }
 
-//    if (confirmDeleteDraftNoteId != null) {
-//        AlertDialog(
-//            onDismissRequest = { confirmDeleteDraftNoteId = null },
-//            title = {
-//                Text(stringResource(id = R.string.confirm_deletion))
-//            },
-//            confirmButton = {
-//                TextButton(onClick = ::onConfirmDelete) {
-//                    Text(stringResource(R.string.delete))
-//                }
-//            },
-//            dismissButton = {
-//                TextButton(onClick = { confirmDeleteDraftNoteId = null }) {
-//                    Text(stringResource(R.string.cancel))
-//                }
-//            }
-//        )
-//    }
+    if (confirmDeleteDraftNoteId != null) {
+        ConfirmDeleteDraftNoteDialog(
+            onDismiss = {
+                confirmDeleteDraftNoteId = null
+            },
+            onConfirmed = {
+                onConfirmDelete()
+            }
+        )
+    }
     Card(
         elevation = 4.dp,
         modifier = Modifier
@@ -89,7 +81,7 @@ fun DraftNoteCard(
                     repository = driveFileRepository,
                     dataSource = filePropertyDataSource,
                     onAction = {
-//                        onAction(DraftNoteCardAction.FileAction(draftNote, it))
+                        onAction(DraftNoteCardAction.FileAction(draftNote, it))
                     },
                 )
             }
@@ -153,6 +145,26 @@ fun DraftNotePollChoice(text: String) {
 
     }
 
+}
+
+@Composable
+fun ConfirmDeleteDraftNoteDialog(onDismiss: () -> Unit, onConfirmed: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss.invoke() },
+        title = {
+            Text(stringResource(id = R.string.confirm_deletion))
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirmed.invoke() }) {
+                Text(stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss.invoke() }) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 sealed interface DraftNoteCardAction {
