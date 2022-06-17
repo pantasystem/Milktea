@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.model.notes
 
 
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.ITask
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
@@ -28,19 +29,20 @@ data class CreateNote(
     val poll: CreatePoll? = null,
     val draftNoteId: Long? = null,
     val channelId: Channel.Id? = null,
+    val scheduleWillPostAt: Instant? = null,
 )
 
 class CreateNoteTask(
-    private val noteRepository: NoteRepository,
+    private val createNoteUseCase: CreateNoteUseCase,
     val createNote: CreateNote
 ) : ITask<Note> {
     override suspend fun execute(): Note {
-        return noteRepository.create(createNote)
+        return createNoteUseCase(createNote).getOrThrow()
     }
 }
 
-fun CreateNote.task(noteRepository: NoteRepository) : CreateNoteTask {
-    return CreateNoteTask(noteRepository, this)
+fun CreateNote.task(createNoteUseCase: CreateNoteUseCase) : CreateNoteTask {
+    return CreateNoteTask(createNoteUseCase, this)
 }
 
 fun NoteEditingState.toCreateNote(account: Account): CreateNote {
@@ -55,6 +57,7 @@ fun NoteEditingState.toCreateNote(account: Account): CreateNote {
         renoteId = renoteId,
         poll = poll?.toCreatePoll(),
         draftNoteId = draftNoteId,
-        channelId = channelId
+        channelId = channelId,
+        scheduleWillPostAt = reservationPostingAt
     )
 }

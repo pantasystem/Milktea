@@ -113,7 +113,7 @@ class ActionNoteHandler(
     }
 
     private val openNoteEditor = Observer<DraftNote?> { note ->
-        activity.startActivity(NoteEditorActivity.newBundle(activity, draftNote = note))
+        activity.startActivity(NoteEditorActivity.newBundle(activity, draftNoteId = note.draftNoteId))
     }
 
     private val confirmDeletionEventObserver = Observer<PlaneNoteViewData> {

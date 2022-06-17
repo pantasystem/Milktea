@@ -4,17 +4,20 @@ import androidx.room.*
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 
-@Entity(tableName = "draft_note_table", foreignKeys = [
-    ForeignKey(
-        parentColumns = ["accountId"],
-        childColumns = ["accountId"],
-        entity = Account::class,
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.CASCADE
-    )
-],
-indices = [Index("accountId", "text")])
+@Entity(
+    tableName = "draft_note_table", foreignKeys = [
+        ForeignKey(
+            parentColumns = ["accountId"],
+            childColumns = ["accountId"],
+            entity = Account::class,
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("accountId", "text")]
+)
 data class DraftNoteDTO(
     val accountId: Long,
     val visibility: String = "public",
@@ -28,16 +31,17 @@ data class DraftNoteDTO(
     val replyId: String? = null,
     val renoteId: String? = null,
     val channelId: String? = null,
-    @Embedded val poll: DraftPollDTO?
-
-){
-
-    @ColumnInfo(name="draft_note_id")
+    @Embedded val poll: DraftPollDTO?,
+    @ColumnInfo(name = "draft_note_id")
     @PrimaryKey(autoGenerate = true)
-    var draftNoteId: Long? = null
+    var draftNoteId: Long? = null,
 
-    companion object{
-        fun make(draftNote: DraftNote): DraftNoteDTO{
+) {
+
+
+
+    companion object {
+        fun make(draftNote: DraftNote): DraftNoteDTO {
             return DraftNoteDTO(
                 draftNote.accountId,
                 draftNote.visibility,
@@ -51,10 +55,9 @@ data class DraftNoteDTO(
                 draftNote.replyId,
                 draftNote.renoteId,
                 draftNote.channelId?.channelId,
-                DraftPollDTO.make(draftNote.draftPoll)
-            ).apply {
-                draftNoteId = draftNote.draftNoteId
-            }
+                DraftPollDTO.make(draftNote.draftPoll),
+                draftNoteId = if(draftNote.draftNoteId == 0L) null else draftNote.draftNoteId
+            )
         }
     }
 
@@ -62,20 +65,18 @@ data class DraftNoteDTO(
     fun toDraftNote(
         accountId: Long,
         visibilityUserIds: List<UserIdDTO>?,
-        draftFiles: List<DraftFileDTO>?,
-        pollChoicesDTO: List<PollChoiceDTO>?
+        pollChoicesDTO: List<PollChoiceDTO>?,
+        draftFiles: List<DraftNoteFile>?,
     ): DraftNote {
         return DraftNote(
             accountId,
             visibility,
-            visibilityUserIds?.map{
+            visibilityUserIds?.map {
                 it.userId
             },
             text,
             cw,
-            draftFiles?.map{
-                it.toFile(accountId)
-            },
+            draftFiles,
             viaMobile,
             localOnly,
             noExtractMentions,
@@ -86,12 +87,9 @@ data class DraftNoteDTO(
             poll?.toDraftPoll(pollChoicesDTO),
             channelId = channelId?.let {
                 Channel.Id(accountId, it)
-            }
-
-
-        ).apply{
-            draftNoteId = this@DraftNoteDTO.draftNoteId
-        }
+            },
+            draftNoteId = draftNoteId ?: 0L
+        )
     }
 
 }

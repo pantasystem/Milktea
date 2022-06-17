@@ -16,7 +16,7 @@ class AndroidNoteReservationPostExecutor(
     override fun register(draftNote: DraftNote) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmNotePostReceiver::class.java)
-        intent.putExtra("DRAFT_NOTE_ID", draftNote.draftNoteId!!)
+        intent.putExtra("DRAFT_NOTE_ID", draftNote.draftNoteId)
         intent.putExtra("ACCOUNT_ID", draftNote.accountId)
 
         val flag = when {
@@ -32,7 +32,7 @@ class AndroidNoteReservationPostExecutor(
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            (draftNote.draftNoteId!! % 1000).toInt(),
+            (draftNote.draftNoteId % 1000).toInt(),
             intent,
             flag
         )

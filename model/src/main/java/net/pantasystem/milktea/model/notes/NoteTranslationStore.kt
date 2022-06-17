@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.model.notes
 
 import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 
 data class NoteTranslationsState(
@@ -46,7 +46,7 @@ data class NoteTranslationsState(
     }
 
 
-    fun state(noteId: Note.Id): State<Translation> {
+    fun state(noteId: Note.Id): ResultState<Translation> {
         val translation = translation(noteId)
         val isLoading = isLoading(noteId)
         val error = loadFails[noteId]
@@ -57,13 +57,13 @@ data class NoteTranslationsState(
         }
         return when {
             isLoading -> {
-                State.Loading(content)
+                ResultState.Loading(content)
             }
             error != null -> {
-                State.Error(content, error)
+                ResultState.Error(content, error)
             }
             else -> {
-                State.Fixed(content)
+                ResultState.Fixed(content)
             }
         }
 
@@ -71,6 +71,6 @@ data class NoteTranslationsState(
 }
 
 interface NoteTranslationStore {
-    fun state(id: Note.Id): Flow<State<Translation>>
+    fun state(id: Note.Id): Flow<ResultState<Translation>>
     suspend fun translate(noteId: Note.Id)
 }

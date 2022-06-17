@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
-import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -78,21 +77,7 @@ class SettingStore(
         }
 
 
-    suspend fun setNoteVisibility(createNote: CreateNote) {
-        if (!(createNote.renoteId == null && createNote.replyId == null)) {
-            return
-        }
-        val nowConfig =
-            (localConfigRepository.getRememberVisibility(createNote.author.accountId).getOrThrow())
 
-        when (nowConfig) {
-            is RememberVisibility.None -> return
-            is RememberVisibility.Remember -> localConfigRepository.save(
-                nowConfig.copy(visibility = createNote.visibility)
-            )
-        }
-
-    }
 
     fun getNoteVisibility(accountId: Long): Visibility {
         return when (val config =

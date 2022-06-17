@@ -2,112 +2,78 @@ package jp.panta.misskeyandroidclient.ui.notes.view.draft
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MiApplication
+import androidx.fragment.app.viewModels
+import com.google.android.material.composethemeadapter.MdcTheme
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.NoteEditorActivity
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentDraftNotesBinding
-import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.file.FileListener
-import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
-import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.media.MediaActivity
-import net.pantasystem.milktea.model.file.File
-import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.toFile
+import javax.inject.Inject
 
 /**
  * NOTE: 直接的なコードによる参照はないが、activity_draft_notesから参照されているので削除しないこと。
  */
-class DraftNotesFragment : Fragment(R.layout.fragment_draft_notes), DraftNoteActionCallback, FileListener{
+@AndroidEntryPoint
+class DraftNotesFragment : Fragment() {
 
-    companion object{
-        private const val EV_DELETE_DRAFT_NOTE = "delete_draft_note"
-    }
+    val viewModel: DraftNotesViewModel by viewModels()
 
-    private var mDraftNotesViewModel: DraftNotesViewModel? = null
-    private var mConfirmViewModel: ConfirmViewModel? = null
+    @Inject
+    lateinit var filePropertyDataSource: FilePropertyDataSource
 
-    private val binding: FragmentDraftNotesBinding by dataBinding()
+    @Inject
+    lateinit var driveFileRepository: DriveFileRepository
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val miApplication = view.context.applicationContext as MiApplication
-        val viewModel = ViewModelProvider(this, DraftNotesViewModel.Factory(miApplication))[DraftNotesViewModel::class.java]
-        mDraftNotesViewModel = viewModel
-
-        val adapter = DraftNoteListAdapter(this, this, viewLifecycleOwner)
-        binding.draftNotesView.adapter = adapter
-        binding.draftNotesView.layoutManager = LinearLayoutManager(view.context)
-
-        viewModel.draftNotes.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
-
-        binding.draftNotesSwipeRefresh.setOnRefreshListener {
-            viewModel.loadDraftNotes()
-        }
-        viewModel.isLoading.observe( viewLifecycleOwner) {
-            binding.draftNotesSwipeRefresh.isRefreshing = it
-        }
-
-        val confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
-        mConfirmViewModel = confirmViewModel
-
-        confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
-            if (it.eventType == EV_DELETE_DRAFT_NOTE && it.resultType == ResultType.POSITIVE) {
-                (it.args as? DraftNote)?.let { dn ->
-                    mDraftNotesViewModel?.deleteDraftNote(dn)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MdcTheme {
+                    DraftNotesPage(
+                        viewModel = viewModel,
+                        filePropertyDataSource = filePropertyDataSource,
+                        driveFileRepository = driveFileRepository,
+                        onAction = {
+                            onAction(it)
+                        }
+                    )
                 }
             }
+        }.rootView
+    }
+
+    private fun onAction(action: DraftNotePageAction) {
+        when (action) {
+            is DraftNotePageAction.Edit -> {
+                val intent = NoteEditorActivity.newBundle(
+                    requireContext(),
+                    draftNoteId = action.draftNote.draftNoteId
+                )
+                requireActivity().startActivityFromFragment(this, intent, 300)
+            }
+            DraftNotePageAction.NavigateUp -> {
+                requireActivity().finish()
+            }
+            is DraftNotePageAction.ShowFile -> {
+                val intent = Intent(requireContext(), MediaActivity::class.java)
+                intent.putExtra(MediaActivity.EXTRA_FILE, action.previewActionType.file.toFile())
+                startActivity(intent)
+            }
         }
-
-        confirmViewModel.confirmEvent.observe(viewLifecycleOwner) {
-            ConfirmDialog().show(parentFragmentManager, "confirm")
-        }
     }
 
-    override fun onSelect(draftNote: DraftNote?) {
-        val intent = NoteEditorActivity.newBundle(requireContext(), draftNote = draftNote)
-        requireActivity().startActivityFromFragment(this, intent, 300)
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        mDraftNotesViewModel?.loadDraftNotes()
 
-    }
-
-    override fun onDetach(file: File?) {
-        mDraftNotesViewModel?.detachFile(file)
-    }
-
-    override fun onSelect(file: File?) {
-        file?.let{
-            val intent = Intent(requireContext(), MediaActivity::class.java)
-            intent.putExtra(MediaActivity.EXTRA_FILE, file)
-            startActivity(intent)
-        }
-
-    }
-
-    override fun onDelete(draftNote: DraftNote?) {
-        draftNote?.let{
-            mConfirmViewModel?.confirmEvent?.event = ConfirmCommand(
-                title = null,
-                message = getString(R.string.delete_draft_note),
-                args = draftNote,
-                eventType = EV_DELETE_DRAFT_NOTE
-
-            )
-        }
-
-    }
 
 }

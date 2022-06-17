@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.model.drive
 
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.model.AddResult
-import javax.inject.Inject
 
 class FilePropertyNotFoundException(filePropertyId: FileProperty.Id) : NoSuchElementException("id:$filePropertyId　は存在しません")
 
@@ -48,54 +48,13 @@ interface FilePropertyDataSource {
         }.distinctUntilChanged()
     }
 
-}
-
-class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSource {
-    private var map = mapOf<FileProperty.Id, FileProperty>()
-    private var _state = MutableStateFlow(FilePropertyDataSourceState(map))
-    override val state: StateFlow<FilePropertyDataSourceState> = _state
-
-    private val lock = Mutex()
-
-    override suspend fun add(fileProperty: FileProperty): AddResult {
-        val result: AddResult
-        lock.withLock {
-            map = map.toMutableMap().also {
-                result = if(it.put(fileProperty.id, fileProperty) == null) AddResult.CREATED else AddResult.UPDATED
+    fun observeIn(ids: List<FileProperty.Id>): Flow<List<FileProperty>> {
+        return state.map { state ->
+            ids.mapNotNull { id ->
+                state.map[id]
             }
         }
-        _state.value = _state.value.copy(
-            map = map
-        )
-        return result
     }
-
-    override suspend fun addAll(list: List<FileProperty>): List<AddResult> {
-        return list.map {
-            add(it)
-        }
-    }
-
-    override suspend fun find(filePropertyId: FileProperty.Id): FileProperty {
-        return map[filePropertyId]?: throw FilePropertyNotFoundException(filePropertyId)
-    }
-
-    override suspend fun remove(fileProperty: FileProperty): Boolean {
-        val result: Boolean
-        lock.withLock {
-            map = map.toMutableMap().also {
-                result = it.remove(fileProperty.id) != null
-            }
-        }
-        _state.value = _state.value.copy(
-            map = map
-        )
-        return result
-
-    }
-
-
-
 
 
 }

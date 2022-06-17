@@ -17,6 +17,7 @@ import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
@@ -209,6 +210,9 @@ class MiApplication : Application(), MiCore {
         loggerFactory.create("MiApplication")
     }
 
+    @Inject
+    lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
+
 
     @Inject
     lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
@@ -273,6 +277,12 @@ class MiApplication : Application(), MiCore {
                 } catch (e: Exception) {
                     logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
                 }
+            }
+        }
+
+        applicationScope.launch(Dispatchers.IO) {
+            clearDriveCacheJob.checkAndClear().onFailure {
+                logger.error("ドライブのキャッシュのクリーンアップに失敗しました", it)
             }
         }
 

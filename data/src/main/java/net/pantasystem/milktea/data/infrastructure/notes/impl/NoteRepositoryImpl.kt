@@ -14,10 +14,8 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.onIReacted
 import net.pantasystem.milktea.data.infrastructure.notes.onIUnReacted
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -35,8 +33,6 @@ class NoteRepositoryImpl @Inject constructor(
     val encryption: Encryption,
     private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val draftNoteDao: DraftNoteDao,
-    val settingStore: SettingStore,
     val getAccount: GetAccount,
     private val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
 ) : NoteRepository {
@@ -64,25 +60,8 @@ class NoteRepositoryImpl @Inject constructor(
             }
         }
 
-        if (result.isFailure) {
-            val exDraft = createNote.draftNoteId?.let {
-                draftNoteDao.getDraftNote(
-                    createNote.author.accountId,
-                    createNote.draftNoteId!!
-                )
-            }
-            draftNoteDao.fullInsert(task.toDraftNote(exDraft))
-        }
         val noteDTO = result.getOrThrow()
         require(noteDTO != null)
-        createNote.draftNoteId?.let {
-            draftNoteDao.deleteDraftNote(createNote.author.accountId, draftNoteId = it)
-        }
-
-        if (createNote.channelId == null) {
-            settingStore.setNoteVisibility(createNote)
-        }
-
         return noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
 
     }

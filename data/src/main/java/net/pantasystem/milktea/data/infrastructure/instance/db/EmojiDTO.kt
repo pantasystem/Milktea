@@ -52,6 +52,9 @@ data class EmojiDTO(
     primaryKeys = ["alias", "name", "instanceDomain"],
     foreignKeys = [
         ForeignKey(parentColumns = ["name", "instanceDomain"], childColumns = ["name", "instanceDomain"], entity = EmojiDTO::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE),
+    ],
+    indices = [
+        Index("name", "instanceDomain")
     ]
 )
 data class EmojiAlias(

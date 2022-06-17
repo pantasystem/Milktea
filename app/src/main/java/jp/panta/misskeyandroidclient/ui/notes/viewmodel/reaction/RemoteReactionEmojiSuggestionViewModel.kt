@@ -14,7 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
@@ -44,7 +44,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         val name = remoteReaction?.reaction?.getName()
         if (name == null) {
             flow {
-                emit(State.Fixed<List<Emoji>>(StateContent.NotExist()))
+                emit(ResultState.Fixed<List<Emoji>>(StateContent.NotExist()))
             }
         } else {
             suspend {
@@ -55,13 +55,13 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
             }.asLoadingStateFlow()
         }
     }.stateIn(
-        viewModelScope, SharingStarted.Lazily, State.Loading(
+        viewModelScope, SharingStarted.Lazily, ResultState.Loading(
             StateContent.NotExist()
         )
     )
 
     val isLoading = filteredEmojis.map {
-        it is State.Loading
+        it is ResultState.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 

@@ -3,12 +3,12 @@
     <data>
         <variable
                 name="translationState"
-                type="net.pantasystem.milktea.common.State&lt;net.pantasystem.milktea.model.notes.Translation>" />
+                type="net.pantasystem.milktea.common.ResultState&lt;net.pantasystem.milktea.model.notes.Translation>" />
         <variable
                 name="emojis"
                 type="List&lt;net.pantasystem.milktea.model.emoji.Emoji>" />
         <import type="android.view.View" />
-        <import type="net.pantasystem.milktea.common.State" />
+        <import type="net.pantasystem.milktea.common.ResultState" />
         <import type="net.pantasystem.milktea.model.notes.Translation" />
         <import type="net.pantasystem.milktea.common.StateContent"/>
         <import type="java.util.List" />
@@ -23,7 +23,7 @@
         <ProgressBar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{ translationState instanceof State.Loading ? View.VISIBLE : View.GONE}"/>
+                android:visibility="@{ translationState instanceof ResultState.Loading ? View.VISIBLE : View.GONE}"/>
         <androidx.emoji.widget.EmojiTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

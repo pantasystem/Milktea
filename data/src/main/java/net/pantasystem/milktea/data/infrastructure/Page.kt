@@ -4,12 +4,23 @@ package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.*
 import androidx.room.ForeignKey.NO_ACTION
-import androidx.room.Entity
 import net.pantasystem.milktea.data.infrastructure.core.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 
 @Deprecated("model.account.pages.Pageへ移行")
-@Entity(tableName = "page", foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = NO_ACTION, onUpdate = NO_ACTION)])
+@Entity(
+    tableName = "page",
+    foreignKeys = [ForeignKey(
+        childColumns = ["accountId"],
+        parentColumns = ["id"],
+        entity = Account::class,
+        onDelete = NO_ACTION,
+        onUpdate = NO_ACTION
+    )],
+    indices = [
+        Index("accountId")
+    ]
+)
 data class Page(
     var accountId: String?,
     var title: String,
@@ -29,13 +40,14 @@ data class Page(
     @Embedded(prefix = "favorite_") val favorite: Favorite? = null,
     @Embedded(prefix = "antenna_") val antenna: Antenna? = null
 
-){
-    @PrimaryKey(autoGenerate = true) var id: Long? = null
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Long? = null
 
     @Suppress("DEPRECATION")
     @Ignore
-    fun pageable(): PageableOld?{
-        return when{
+    fun pageable(): PageableOld? {
+        return when {
             globalTimeline != null -> globalTimeline
             localTimeline != null -> localTimeline
             hybridTimeline != null -> hybridTimeline
@@ -55,8 +67,8 @@ data class Page(
     }
 
     @Ignore
-    fun toPage(): net.pantasystem.milktea.model.account.page.Page?{
-        this.pageable()?.toPageable()?.let{
+    fun toPage(): net.pantasystem.milktea.model.account.page.Page? {
+        this.pageable()?.toPageable()?.let {
             return net.pantasystem.milktea.model.account.page.Page(0L, this.title, 0, it)
         }
         return null
@@ -67,7 +79,7 @@ data class Page(
     data class GlobalTimeline(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         override val type: PageType = PageType.GLOBAL
-    ): PageableOld, Timeline(){
+    ) : PageableOld, Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.GlobalTimeline(
                 withFiles = withFiles
@@ -75,11 +87,12 @@ data class Page(
         }
 
     }
+
     data class LocalTimeline(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         @ColumnInfo(name = "exclude_nsfw") var excludeNsfw: Boolean? = null,
         override val type: PageType = PageType.LOCAL
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.LocalTimeline(
                 withFiles = withFiles,
@@ -99,7 +112,7 @@ data class Page(
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.SOCIAL
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.HybridTimeline(
                 withFiles = withFiles,
@@ -116,7 +129,7 @@ data class Page(
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.HOME
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.HomeTimeline(
                 withFiles = withFiles,
@@ -135,7 +148,7 @@ data class Page(
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null,
         override val type: PageType = PageType.USER_LIST
-    ) : Timeline(){
+    ) : Timeline() {
 
         override fun toPageable(): Pageable {
             return Pageable.UserListTimeline(
@@ -152,7 +165,7 @@ data class Page(
         val following: Boolean?, val
         visibility: String? = null,
         override val type: PageType = PageType.MENTION
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.Mention(
                 following = following,
@@ -160,20 +173,26 @@ data class Page(
             )
         }
     }
+
     data class Show(
         val noteId: String,
         override val type: PageType = PageType.DETAIL
-    ) : PageableOld{
+    ) : PageableOld {
         override fun toPageable(): Pageable {
             return Pageable.Show(
                 noteId = noteId
             )
         }
     }
+
     data class SearchByTag(
-        val tag: String, var reply: Boolean? = null, var renote: Boolean? = null, var withFiles: Boolean? = null, var poll: Boolean? = null,
+        val tag: String,
+        var reply: Boolean? = null,
+        var renote: Boolean? = null,
+        var withFiles: Boolean? = null,
+        var poll: Boolean? = null,
         override val type: PageType = PageType.SEARCH_HASH
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.SearchByTag(
                 tag = tag,
@@ -184,17 +203,23 @@ data class Page(
             )
         }
     }
+
     data class Featured(
         val offset: Int?,
         override val type: PageType = PageType.FEATURED
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.Featured(
                 offset = offset
             )
         }
     }
-    data class Notification(var following: Boolean? = null, var markAsRead: Boolean? = null, override val type: PageType = PageType.NOTIFICATION) : PageableOld{
+
+    data class Notification(
+        var following: Boolean? = null,
+        var markAsRead: Boolean? = null,
+        override val type: PageType = PageType.NOTIFICATION
+    ) : PageableOld {
         override fun toPageable(): Pageable {
             return Pageable.Notification(
                 following = following,
@@ -202,10 +227,14 @@ data class Page(
             )
         }
     }
+
     data class UserTimeline(
-        val userId: String, var includeReplies: Boolean = true, var includeMyRenotes: Boolean? = true, var withFiles: Boolean? = null,
+        val userId: String,
+        var includeReplies: Boolean = true,
+        var includeMyRenotes: Boolean? = true,
+        var withFiles: Boolean? = null,
         override val type: PageType = PageType.USER
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.UserTimeline(
                 userId = userId,
@@ -215,20 +244,22 @@ data class Page(
             )
         }
     }
+
     data class Search(
         var query: String, var host: String? = null, var userId: String? = null,
         override val type: PageType = PageType.SEARCH
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.Search(
                 query = query, host = host, userId = userId
             )
         }
     }
+
     data class Antenna(
         val antennaId: String,
         override val type: PageType = PageType.ANTENNA
-    ) : Timeline(){
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.Antenna(
                 antennaId = antennaId
@@ -236,7 +267,7 @@ data class Page(
         }
     }
 
-    class Favorite(override val type: PageType = PageType.FAVORITE) : Timeline(){
+    class Favorite(override val type: PageType = PageType.FAVORITE) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.Favorite
         }

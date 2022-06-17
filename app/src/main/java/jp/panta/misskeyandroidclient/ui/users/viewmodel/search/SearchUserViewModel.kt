@@ -11,7 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.AccountStore
@@ -86,13 +86,13 @@ class SearchUserViewModel @Inject constructor(
             logger.info("ユーザー検索処理に失敗しました", e = error)
         }
         .stateIn(
-            viewModelScope, SharingStarted.Lazily, State.Fixed(
+            viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
                 StateContent.NotExist()
             )
         )
 
     val isLoading = searchState.map {
-        it is State.Loading
+        it is ResultState.Loading
     }.asLiveData()
 
     val users = searchState.map {

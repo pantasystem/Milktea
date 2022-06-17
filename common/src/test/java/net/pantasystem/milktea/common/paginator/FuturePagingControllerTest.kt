@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.State
 import net.pantasystem.milktea.common.StateContent
 import org.junit.Assert.*
 

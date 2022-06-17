@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.api.misskey.notes.CreateNote as CreateNoteDTO
-import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftPoll
-import kotlinx.coroutines.*
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploader
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.*
 import java.io.Serializable
+import net.pantasystem.milktea.api.misskey.notes.CreateNote as CreateNoteDTO
 
 class PostNoteTask(
     val encryption: Encryption,
@@ -83,28 +84,28 @@ class PostNoteTask(
         return tmpFiles != null && tmpFiles.size == filesIds?.size
     }
 
-    fun toDraftNote(draftNote: DraftNote? = null): DraftNote {
-        logger.debug("下書きノートが作成された")
-        val draftPoll = createNote.poll?.let{
-            DraftPoll(it.choices, it.multiple, it.expiresAt)
-        }
-
-        return DraftNote(
-            accountId = account.accountId,
-            text = createNote.text,
-            cw = createNote.cw,
-            visibleUserIds = createNote.visibleUserIds(),
-            draftPoll = draftPoll,
-            visibility = createNote.visibility.type(),
-            localOnly = createNote.visibility.isLocalOnly(),
-            renoteId = createNote.renoteId?.noteId,
-            replyId = createNote.replyId?.noteId,
-            channelId = createNote.channelId
-        ).apply{
-            this.draftNoteId = draftNote?.draftNoteId
-        }
-    }
-
+//    fun toDraftNote(draftNote: DraftNote? = null): DraftNote {
+//        logger.debug("下書きノートが作成された")
+//        val draftPoll = createNote.poll?.let{
+//            DraftPoll(it.choices, it.multiple, it.expiresAt)
+//        }
+//
+//        return DraftNote(
+//            accountId = account.accountId,
+//            text = createNote.text,
+//            cw = createNote.cw,
+//            visibleUserIds = createNote.visibleUserIds(),
+//            draftPoll = draftPoll,
+//            visibility = createNote.visibility.type(),
+//            localOnly = createNote.visibility.isLocalOnly(),
+//            renoteId = createNote.renoteId?.noteId,
+//            replyId = createNote.replyId?.noteId,
+//            channelId = createNote.channelId,
+//            draftNoteId = draftNote?.draftNoteId ?: 0L,
+//            draftFiles =
+//        )
+//    }
+//
 
 
 }

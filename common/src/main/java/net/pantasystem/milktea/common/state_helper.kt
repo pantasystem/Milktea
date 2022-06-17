@@ -1,11 +1,45 @@
 package net.pantasystem.milktea.common
 
 
-sealed class State<out T>(val content: StateContent<T>) {
-    class Fixed<out T>(content: StateContent<T>) : State<T>(content)
-    class Loading<out T>(content: StateContent<T>) : State<T>(content)
-    class Error<out T>(content: StateContent<T>, val throwable: Throwable) : State<T>(content)
+sealed class ResultState<out T>(val content: StateContent<T>) {
+    class Fixed<out T>(content: StateContent<T>) : ResultState<T>(content)
+    class Loading<out T>(content: StateContent<T>) : ResultState<T>(content)
+    class Error<out T>(content: StateContent<T>, val throwable: Throwable) : ResultState<T>(content)
+
+    fun<O> convert(converter: (T)->O) : ResultState<O> {
+        val content = when(this.content) {
+            is StateContent.Exist -> {
+                StateContent.Exist(converter.invoke(this.content.rawContent))
+            }
+            is StateContent.NotExist -> {
+                StateContent.NotExist()
+            }
+        }
+
+        return when(this) {
+            is Fixed -> Fixed(content)
+            is Loading -> Loading(content)
+            is Error -> Error(content, this.throwable)
+        }
+    }
+    suspend fun<O> suspendConvert(converter: suspend (T)->O) : ResultState<O> {
+        val content = when(this.content) {
+            is StateContent.Exist -> {
+                StateContent.Exist(converter.invoke(this.content.rawContent))
+            }
+            is StateContent.NotExist -> {
+                StateContent.NotExist()
+            }
+        }
+
+        return when(this) {
+            is Fixed -> Fixed(content)
+            is Loading -> Loading(content)
+            is Error -> Error(content, this.throwable)
+        }
+    }
 }
+
 sealed class StateContent<out T> {
     data class Exist<out T>(val rawContent: T) : StateContent<T>()
     class NotExist<out T> : StateContent<T>()

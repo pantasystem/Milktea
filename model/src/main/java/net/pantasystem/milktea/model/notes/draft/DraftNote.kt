@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.model.notes.draft
 
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.getName
 import net.pantasystem.milktea.model.notes.isLocalOnly
@@ -15,7 +17,7 @@ data class DraftNote(
     var visibleUserIds: List<String>? = null,
     val text: String?,
     val cw: String? = null,
-    var files: List<File>? = null,
+    var draftFiles: List<DraftNoteFile>? = null,
     val viaMobile: Boolean? = null,
     val localOnly: Boolean? = null,
     val noExtractMentions: Boolean? = null,
@@ -26,13 +28,41 @@ data class DraftNote(
     val draftPoll: DraftPoll? = null,
     val reservationPostingAt: Date? = null,
     val channelId: Channel.Id? = null,
-
-    ): Serializable{
-
-    var draftNoteId: Long? = null
-
+    var draftNoteId: Long = 0L
+): Serializable {
+    val appFiles: List<AppFile>
+        get() = draftFiles?.map { draftNoteFile ->
+            AppFile.from(draftNoteFile)
+        } ?: emptyList()
 }
 
+sealed interface DraftNoteFile {
+
+    data class Remote(val fileProperty: FileProperty) : DraftNoteFile
+    data class Local(
+        val name: String,
+        val filePath: String,
+        val isSensitive: Boolean?,
+        val type: String,
+        val thumbnailUrl: String?,
+        val folderId: String?,
+        val localFileId: Long,
+    ) : DraftNoteFile {
+        companion object
+    }
+}
+
+fun DraftNoteFile.Local.Companion.from(appFile: AppFile.Local, id: Long = 0L): DraftNoteFile.Local {
+    return DraftNoteFile.Local(
+        filePath = appFile.path,
+        folderId = appFile.folderId,
+        isSensitive = appFile.isSensitive,
+        type = appFile.type,
+        name = appFile.name,
+        thumbnailUrl = appFile.thumbnailUrl,
+        localFileId = id
+    )
+}
 fun NoteRelation.toDraftNote() : DraftNote {
     return DraftNote(
         accountId = this.note.id.accountId,
@@ -42,8 +72,8 @@ fun NoteRelation.toDraftNote() : DraftNote {
         },
         text = this.note.text,
         cw = this.note.cw,
-        files = this.files?.map {
-            it.toFile()
+        draftFiles = this.files?.map {
+            DraftNoteFile.Remote(it)
         },
         viaMobile = this.note.viaMobile,
         localOnly = this.note.visibility.isLocalOnly(),

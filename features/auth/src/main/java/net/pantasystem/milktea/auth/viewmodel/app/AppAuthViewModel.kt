@@ -18,7 +18,7 @@ import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.model.app.AppType
-import net.pantasystem.milktea.common.State
+import net.pantasystem.milktea.common.ResultState
 import java.util.regex.Pattern
 import javax.inject.Inject
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
@@ -63,28 +63,28 @@ class AppAuthViewModel @Inject constructor(
     val instanceDomain = MutableStateFlow("")
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, State.Fixed(
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
         StateContent.NotExist()))
 
-    private val _generatingTokenState = MutableStateFlow<State<Session>>(
-        State.Fixed(StateContent.NotExist()))
-    private val generatingTokenState: StateFlow<State<Session>> = _generatingTokenState
+    private val _generatingTokenState = MutableStateFlow<ResultState<Session>>(
+        ResultState.Fixed(StateContent.NotExist()))
+    private val generatingTokenState: StateFlow<ResultState<Session>> = _generatingTokenState
     private val generateTokenError = generatingTokenState.map {
-        it as? State.Error
+        it as? ResultState.Error
     }.map {
         it?.throwable
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val isFetchingMeta = metaState.map {
-        it is State.Loading
+        it is ResultState.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     private val fetchingMetaError = metaState.map {
-        (it as? State.Error)?.throwable
+        (it as? ResultState.Error)?.throwable
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val isGeneratingToken = generatingTokenState.map {
-        it is State.Loading
+        it is ResultState.Loading
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val isProgress = combine(isFetchingMeta, isGeneratingToken) { a, b ->
@@ -92,7 +92,7 @@ class AppAuthViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val validatedInstanceDomain = metaState.map {
-        it is State.Fixed && it.content is StateContent.Exist
+        it is ResultState.Fixed && it.content is StateContent.Exist
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val appName = MutableLiveData<String>()
@@ -117,12 +117,12 @@ class AppAuthViewModel @Inject constructor(
         }
     }
 
-    private fun getMeta(instanceDomain: String): Flow<State<InstanceType>> {
+    private fun getMeta(instanceDomain: String): Flow<ResultState<InstanceType>> {
         return flow {
             val url = toEnableUrl(instanceDomain)
-            emit(State.Fixed(StateContent.NotExist()))
+            emit(ResultState.Fixed(StateContent.NotExist()))
             if(urlPattern.matcher(url).find()){
-                emit(State.Loading(StateContent.NotExist()))
+                emit(ResultState.Loading(StateContent.NotExist()))
                 runCatching {
                     coroutineScope {
                         val misskey = withContext(Dispatchers.IO) {
@@ -150,11 +150,11 @@ class AppAuthViewModel @Inject constructor(
                     }
 
                 }.onFailure {
-                    emit(State.Error(StateContent.NotExist(), it))
+                    emit(ResultState.Error(StateContent.NotExist(), it))
                 }.onSuccess {
                     Log.d("AppAuthVM", "meta:$it")
                     emit(
-                        State.Fixed(
+                        ResultState.Fixed(
                         StateContent.Exist(it)
                     ))
                 }
@@ -171,7 +171,7 @@ class AppAuthViewModel @Inject constructor(
         val meta = (this.metaState.value.content as? StateContent.Exist)?.rawContent
             ?: return
         viewModelScope.launch(Dispatchers.IO){
-            _generatingTokenState.value = State.Loading(generatingTokenState.value.content)
+            _generatingTokenState.value = ResultState.Loading(generatingTokenState.value.content)
             runCatching {
                 val app = createApp(instanceBase, meta, appName)
                 this@AppAuthViewModel.app.postValue(app)
@@ -210,11 +210,11 @@ class AppAuthViewModel @Inject constructor(
             }.onSuccess { w4a ->
                 this@AppAuthViewModel.waiting4UserAuthorization.postValue(w4a)
                 if (w4a is Authorization.Waiting4UserAuthorization.Misskey) {
-                    _generatingTokenState.value = State.Fixed(StateContent.Exist(w4a.session))
+                    _generatingTokenState.value = ResultState.Fixed(StateContent.Exist(w4a.session))
                 }
             }.onFailure {
                 Log.e("AppAuthViewModel", "認証開始処理失敗", it)
-                _generatingTokenState.value = State.Error(StateContent.NotExist(), it)
+                _generatingTokenState.value = ResultState.Error(StateContent.NotExist(), it)
             }
 
         }

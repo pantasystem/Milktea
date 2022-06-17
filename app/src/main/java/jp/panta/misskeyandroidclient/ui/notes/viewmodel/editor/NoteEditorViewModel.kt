@@ -13,21 +13,21 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import java.io.IOException
@@ -36,7 +36,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
-    private val draftNoteDao: DraftNoteDao,
     loggerFactory: Logger.Factory,
     private val miCore: MiCore,
     private val noteRepository: NoteRepository,
@@ -45,7 +44,10 @@ class NoteEditorViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
     private val accountStore: AccountStore,
-    private val createNoteTaskExecutor: CreateNoteTaskExecutor
+    private val createNoteTaskExecutor: CreateNoteTaskExecutor,
+    private val createNoteUseCase: CreateNoteUseCase,
+    private val draftNoteService: DraftNoteService,
+    private val draftNoteRepository: DraftNoteRepository,
 ) : ViewModel() {
 
     private val userViewDataFactory by lazy {
@@ -205,8 +207,13 @@ class NoteEditorViewModel @Inject constructor(
         _state.value = _state.value.changeReplyTo(noteId)
     }
 
-    fun setDraftNote(note: DraftNote?) {
-        _state.value = _state.value.setDraftNote(note)
+    fun setDraftNoteId(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            draftNoteRepository.findOne(id).onSuccess { note ->
+                _state.value = _state.value.setDraftNote(note)
+            }
+        }
+
     }
 
     init {
@@ -272,13 +279,14 @@ class NoteEditorViewModel @Inject constructor(
                 val reservationPostingAt = _state.value.reservationPostingAt
                 if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                     val createNote = _state.value.toCreateNote(account)
-                    createNoteTaskExecutor.dispatch(createNote.task(noteRepository))
+                    createNoteTaskExecutor.dispatch(createNote.task(createNoteUseCase))
                 } else {
                     runCatching {
-                        val dfNote = toDraftNote()
 
-                        val result = draftNoteDao.fullInsert(dfNote)
-                        dfNote.draftNoteId = result
+
+                        val dfNote = draftNoteService.save(_state.value.toCreateNote(account))
+                            .getOrThrow()
+
                         miCore.getNoteReservationPostExecutor().register(dfNote)
                     }.onFailure {
                         logger.error("登録失敗", it)
@@ -429,32 +437,6 @@ class NoteEditorViewModel @Inject constructor(
         return pos + emoji.length
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    fun toDraftNote(): DraftNote {
-        return DraftNote(
-            accountId = currentAccount.value?.accountId!!,
-            text = _state.value.text,
-            cw = _state.value.cw,
-            visibleUserIds = address.value.mapNotNull {
-                it.userId?.id ?: it.user.value?.id?.id
-            },
-            draftPoll = poll.value?.toDraftPoll(),
-            visibility = visibility.value.type(),
-            localOnly = visibility.value.isLocalOnly(),
-            renoteId = _state.value.renoteId?.noteId,
-            replyId = _state.value.replyId?.noteId,
-            files = files.value?.map {
-                it.toFile()
-            },
-            reservationPostingAt = _state.value.reservationPostingAt?.toEpochMilliseconds()?.let {
-                Date(it)
-            },
-            channelId = _state.value.channelId,
-        ).apply {
-            setDraftNote(this)
-        }
-    }
 
     @ExperimentalCoroutinesApi
     @FlowPreview
@@ -464,10 +446,10 @@ class NoteEditorViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val dfNote = toDraftNote()
-
                 try {
-                    isSaveNoteAsDraft.event = draftNoteDao.fullInsert(dfNote)
+                    val account = accountStore.currentAccount?: throw UnauthorizedException()
+                    val result = draftNoteService.save(_state.value.toCreateNote(account)).getOrThrow()
+                    isSaveNoteAsDraft.event = result.draftNoteId
                 } catch (e: Exception) {
                     logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
                 }
