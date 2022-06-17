@@ -22,6 +22,8 @@ import net.pantasystem.milktea.common_compose.FilePreviewActionType
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 
 @Composable
@@ -33,16 +35,20 @@ fun DraftNotesPage(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    fun onFileAction(action: FilePreviewActionType) {
+    fun onFileAction(draftNote: DraftNote, action: FilePreviewActionType) {
+        val targetFile = draftNote.draftFiles?.firstOrNull { file ->
+            AppFile.from(file) == action.target.file
+        }?: return
         when (action) {
             is FilePreviewActionType.Detach -> {
-                viewModel.detachFile(action.target.file)
+
+                viewModel.detachFile(draftNote, targetFile)
             }
             is FilePreviewActionType.Show -> {
                 onAction(DraftNotePageAction.ShowFile(action.target))
             }
             is FilePreviewActionType.ToggleSensitive -> {
-                viewModel.toggleSensitive(action.target.file)
+                viewModel.toggleSensitive(targetFile)
             }
         }
     }
@@ -92,7 +98,7 @@ fun DraftNotesPage(
                                                 onAction(DraftNotePageAction.Edit(action.draftNote))
                                             }
                                             is DraftNoteCardAction.FileAction -> {
-                                                onFileAction(action.fileAction)
+                                                onFileAction(item.draftNote, action.fileAction)
                                             }
                                         }
                                     }

@@ -13,7 +13,11 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
+import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +25,10 @@ class DraftNotesViewModel @Inject constructor(
     val draftNoteDao: DraftNoteDao,
     val accountStore: AccountStore,
     val loggerFactory: Logger.Factory,
-) : ViewModel(){
+    val draftNoteRepository: DraftNoteRepository,
+    val driveFileRepository: DriveFileRepository,
+    val draftNoteService: DraftNoteService,
+) : ViewModel() {
 
 
     val logger = loggerFactory.create("DraftNotesVM")
@@ -42,18 +49,59 @@ class DraftNotesViewModel @Inject constructor(
         }
     }.catch { e ->
         this.emit(ResultState.Error(StateContent.NotExist(), e))
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ResultState.Loading(StateContent.NotExist()))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        ResultState.Loading(StateContent.NotExist())
+    )
 
     val uiState = combine(visibleContentDraftNoteIds, draftNotesState) { ids, state ->
         DraftNotesPageUiState(
             visibleContentDraftNoteIds = ids,
             draftNotes = state
         )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        DraftNotesPageUiState(emptySet(), ResultState.Loading(StateContent.NotExist()))
+    )
+
+
+    fun detachFile(draftNote: DraftNote, file: DraftNoteFile) {
+        viewModelScope.launch(Dispatchers.IO) {
+            draftNoteRepository.save(
+                draftNote.copy(
+                    draftFiles = draftNote.draftFiles?.filterNot {
+                        it == file
+                    }
+                )
+            ).onFailure {
+                logger.error("detach file error", it)
+            }
+        }
     }
 
+    fun toggleSensitive(file: DraftNoteFile) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (file) {
+                is DraftNoteFile.Remote -> {
+                    driveFileRepository.update(
+                        file.fileProperty.update(
+                            isSensitive = !file.fileProperty.isSensitive
+                        )
+                    )
+                }
+                is DraftNoteFile.Local -> {
+                    draftNoteService.save(
+                        file.copy(isSensitive = file.isSensitive?.not())
+                    )
+                }
+            }.onFailure {
+                logger.error("toggle sensitiveに失敗", it)
+            }
 
-
-
+        }
+    }
 //    fun detachFile(file: File?) {
 //
 //        // TODO: 実装する
@@ -80,18 +128,17 @@ class DraftNotesViewModel @Inject constructor(
 //        }
 //    }
 
-    fun deleteDraftNote(draftNote: DraftNote){
-        viewModelScope.launch(Dispatchers.IO){
-            try{
+    fun deleteDraftNote(draftNote: DraftNote) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 draftNoteDao.deleteDraftNote(draftNote)
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 Log.e("DraftNotesViewModel", "下書きノート削除に失敗しました", e)
             }
         }
     }
 
 }
-
 
 
 data class DraftNotesPageUiState(
@@ -101,7 +148,10 @@ data class DraftNotesPageUiState(
     val draftNoteUiStateList
         get() = draftNotes.convert { list ->
             list.map { note ->
-                DraftNoteUiState(note, note.cw == null || visibleContentDraftNoteIds.contains(note.draftNoteId))
+                DraftNoteUiState(
+                    note,
+                    note.cw == null || visibleContentDraftNoteIds.contains(note.draftNoteId)
+                )
             }
         }
 }

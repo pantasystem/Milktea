@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.common.APIError
@@ -12,6 +13,7 @@ class TimelineErrorHandler(
 ) {
 
     operator fun invoke(error: Throwable) {
+        Log.e("TimelineErrorHandler", "error", error)
         when (error) {
             is IOException -> {
                 Toast.makeText(context, R.string.network_error, Toast.LENGTH_LONG)
