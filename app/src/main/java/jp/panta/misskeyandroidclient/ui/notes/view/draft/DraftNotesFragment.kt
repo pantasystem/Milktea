@@ -15,6 +15,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNotesViewMode
 import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.toFile
 import javax.inject.Inject
 
 /**
@@ -66,7 +67,7 @@ class DraftNotesFragment : Fragment() {
             }
             is DraftNotePageAction.ShowFile -> {
                 val intent = Intent(requireContext(), MediaActivity::class.java)
-                intent.putExtra(MediaActivity.EXTRA_FILE, action.previewActionType.file)
+                intent.putExtra(MediaActivity.EXTRA_FILE, action.previewActionType.file.toFile())
                 startActivity(intent)
             }
         }
