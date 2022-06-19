@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.gettters
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteDeletedException
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.User
@@ -29,7 +30,9 @@ class NoteRelationGetter(
                 noteRepository.find(noteId)
             }
         }.onFailure {
-            logger.error("ノートの取得に失敗しました", e = it)
+            if (it !is NoteDeletedException) {
+                logger.error("ノートの取得に失敗しました", e = it)
+            }
         }.getOrNull()?.let {
             get(
                 it,
