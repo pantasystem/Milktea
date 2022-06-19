@@ -1,13 +1,11 @@
 package net.pantasystem.milktea.model.account
 
-import java.lang.IllegalStateException
-
 interface AccountException
 
 /**
  * アカウントが存在しなかった場合に呼び出されます
  */
-class AccountNotFoundException(msg: String = "") : NoSuchElementException(msg), AccountException {
+class AccountNotFoundException(accountId: Long? = null) : NoSuchElementException("Account not found: $accountId"), AccountException {
 
     companion object{
         @JvmStatic

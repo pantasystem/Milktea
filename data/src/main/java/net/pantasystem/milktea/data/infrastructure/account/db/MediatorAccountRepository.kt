@@ -37,7 +37,7 @@ class MediatorAccountRepository(
     override suspend fun get(accountId: Long): Account {
         return findAll().firstOrNull {
             it.accountId == accountId
-        }?: throw AccountNotFoundException()
+        }?: throw AccountNotFoundException(accountId)
     }
 
     override suspend fun getCurrentAccount(): Account {

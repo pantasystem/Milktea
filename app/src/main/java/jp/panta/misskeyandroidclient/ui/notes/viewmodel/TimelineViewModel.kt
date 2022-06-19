@@ -53,7 +53,10 @@ class TimelineViewModel @AssistedInject constructor(
 
 
     var position: Int = 0
-    private val currentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
+    private val currentAccountWatcher = CurrentAccountWatcher(
+        if (accountId != null && accountId <= 0) null else accountId,
+        accountRepository
+    )
 
     val timelineStore: TimelineStore =
         timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount)
