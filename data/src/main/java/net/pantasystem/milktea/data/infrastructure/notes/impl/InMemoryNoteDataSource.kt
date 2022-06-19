@@ -18,7 +18,7 @@ class InMemoryNoteDataSource @Inject constructor(
 
     val logger = loggerFactory.create("InMemoryNoteRepository")
 
-    private val notes = HashMap<Note.Id, Note>()
+    private var notes = mapOf<Note.Id, Note>()
 
     private val mutex = Mutex()
     private val listenersLock = Mutex()
@@ -35,7 +35,7 @@ class InMemoryNoteDataSource @Inject constructor(
     init {
         addEventListener {
             _state.update {
-                it.copy(notes.toMutableMap())
+                it.copy(notes)
             }
         }
     }
@@ -93,7 +93,7 @@ class InMemoryNoteDataSource @Inject constructor(
         suspend fun delete(noteId: Note.Id): Boolean {
             mutex.withLock{
                 val n = this.notes[noteId]
-                this.notes.remove(noteId)
+                notes = notes - noteId
                 deleteNoteIds.add(noteId)
                 return n != null
             }
@@ -128,7 +128,7 @@ class InMemoryNoteDataSource @Inject constructor(
             if(n != null && n.instanceUpdatedAt > note.instanceUpdatedAt){
                 return AddResult.CANCEL
             }
-            this.notes[note.id] = note
+            notes = notes + (note.id to note)
             note.updated()
 
             deleteNoteIds.remove(note.id)

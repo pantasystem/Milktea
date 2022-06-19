@@ -94,42 +94,7 @@ class TimelineStoreImpl(
     init {
         coroutineScope.launch(Dispatchers.IO) {
             willAddNoteQueue.collect { noteId ->
-                val store = pageableStore
-                if (store is TimelinePagingStoreImpl) {
-                    store.mutex.withLock {
-                        val content = store.getState().content
-
-                        var added = false
-                        store.setState(
-                            PageableState.Fixed(
-                                when (content) {
-                                    is StateContent.NotExist -> {
-                                        added = true
-                                        StateContent.Exist(
-                                            listOf(noteId)
-                                        )
-                                    }
-                                    is StateContent.Exist -> {
-                                        if (content.rawContent.contains(noteId)) {
-                                            content
-                                        } else {
-                                            added = true
-                                            content.copy(
-                                                content.rawContent.toMutableList().also { list ->
-                                                    list.add(0, noteId)
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            )
-                        )
-                        if (added) {
-                            latestReceiveId = noteId
-                        }
-
-                    }
-                }
+                appendStreamEventNote(noteId)
             }
         }
     }
@@ -142,7 +107,7 @@ class TimelineStoreImpl(
                     getters.noteRelationGetter.getIn(list.distinct())
                 }
             }
-        }
+        }.distinctUntilChanged()
 
 
     override suspend fun loadFuture(): Result<Unit> {
@@ -206,6 +171,43 @@ class TimelineStoreImpl(
 
     override fun latestReceiveNoteId(): Note.Id? {
         return latestReceiveId
+    }
+
+    private suspend fun appendStreamEventNote(noteId: Note.Id) {
+        val store = pageableStore
+        if (store is TimelinePagingStoreImpl) {
+            store.mutex.withLock {
+                val content = store.getState().content
+
+                var added = false
+                store.setState(
+                    PageableState.Fixed(
+                        when (content) {
+                            is StateContent.NotExist -> {
+                                added = true
+                                StateContent.Exist(
+                                    listOf(noteId)
+                                )
+                            }
+                            is StateContent.Exist -> {
+                                if (content.rawContent.contains(noteId)) {
+                                    content
+                                } else {
+                                    added = true
+                                    content.copy(
+                                        listOf(noteId) + content.rawContent
+                                    )
+                                }
+                            }
+                        }
+                    )
+                )
+                if (added) {
+                    latestReceiveId = noteId
+                }
+
+            }
+        }
     }
 
 }
