@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
-import androidx.lifecycle.*
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
-import net.pantasystem.milktea.model.messaging.MessagingId
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
@@ -11,8 +11,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
+import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.throwIfHasError
-import kotlin.collections.ArrayList
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.messaging.MessageRelation
+import net.pantasystem.milktea.model.messaging.MessagingId
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -163,3 +167,8 @@ class MessageViewModel(
         return miCore.getAccountRepository().get(accountId)
     }
 }
+
+data class MessageScreenUiState (
+    val messages: PageableState<List<MessageRelation>>,
+)
+
