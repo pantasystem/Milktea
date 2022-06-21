@@ -12,7 +12,6 @@ interface MessagePagingStore {
     val state: Flow<MessagingPagingState>
 
     suspend fun loadPrevious()
-    suspend fun loadFuture()
     suspend fun clear()
     suspend fun setMessagingId(messagingId: MessagingId)
     suspend fun collectReceivedMessageQueue(): Nothing
