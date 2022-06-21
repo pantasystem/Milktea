@@ -156,6 +156,10 @@ sealed class MessageRelation {
         return message.userId == User.Id(account.accountId, account.remoteId)
     }
 
+    fun isMine(): Boolean {
+        return message.userId == User.Id(account.accountId, account.remoteId)
+    }
+
     fun getFile(): File? {
         return message.file?.toFile()
     }
