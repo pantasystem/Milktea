@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes.renote
 
+import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
@@ -12,7 +13,7 @@ import javax.inject.Singleton
 class CreateRenoteUseCase @Inject constructor(
     val noteRepository: NoteRepository,
     val getAccount: GetAccount,
-){
+) : UseCase {
 
     suspend operator fun invoke(noteId: Note.Id): Result<Note> {
         return runCatching {
