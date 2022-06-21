@@ -38,7 +38,6 @@ class MessagePagingStoreImpl @Inject constructor(
     )
 
 
-
     private val receivedMessageQueue = MutableSharedFlow<Message.Id>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
         extraBufferCapacity = 1000
@@ -56,19 +55,13 @@ class MessagePagingStoreImpl @Inject constructor(
 
     private var latestReceivedMessageId: Message.Id? = null
 
-    private val previousPagingController = PreviousPagingController(
+    private val previousPagingController = MessagingPreviousPaging(
         messagePagingModel,
         messagePagingModel,
         messagePagingModel,
         messagePagingModel,
     )
 
-    private val futurePagingController = FuturePagingController(
-        messagePagingModel,
-        messagePagingModel,
-        messagePagingModel,
-        messagePagingModel
-    )
 
     override suspend fun clear() {
         messagePagingModel.mutex.withLock {
@@ -76,10 +69,6 @@ class MessagePagingStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun loadFuture() {
-        latestReceivedMessageId = null
-        futurePagingController.loadFuture()
-    }
 
     override suspend fun loadPrevious() {
         latestReceivedMessageId = null
@@ -98,7 +87,7 @@ class MessagePagingStoreImpl @Inject constructor(
         receivedMessageQueue.collect { msgId ->
             messagePagingModel.mutex.withLock {
                 val state = messagePagingModel.getState()
-                val existsItem = when(val content = state.content) {
+                val existsItem = when (val content = state.content) {
                     is StateContent.Exist -> {
                         content.rawContent.contains(msgId)
                     }
@@ -116,6 +105,52 @@ class MessagePagingStoreImpl @Inject constructor(
             }
         }
     }
+}
+
+class MessagingPreviousPaging<DTO, E>(
+    private val entityConverter: EntityConverter<DTO, E>,
+    private val locker: StateLocker,
+    private val state: PaginationState<E>,
+    private val previousLoader: PreviousLoader<DTO>
+) {
+
+
+    suspend fun loadPrevious() {
+        locker.mutex.withLock {
+            runCatching {
+                val body = previousLoader.loadPrevious().getOrThrow().asReversed()
+                entityConverter.convertAll(body)
+            }.onFailure {
+                val errorState = PageableState.Error(
+                    state.getState().content,
+                    it
+                )
+                state.setState(errorState)
+            }.onSuccess {
+                when(val content = this.state.getState().content) {
+                    is StateContent.Exist -> {
+                        val newList = content.rawContent.toMutableList()
+                        newList.addAll(0, it)
+                        state.setState(
+                            PageableState.Fixed(
+                                StateContent.Exist(
+                                    newList
+                                )
+                            )
+                        )
+                    }
+                    is StateContent.NotExist -> {
+                        state.setState(
+                            PageableState.Fixed(
+                                StateContent.Exist(it)
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 
@@ -137,7 +172,7 @@ class MessagePagingModel(
     override val state: Flow<PageableState<List<Message.Id>>> = _state
 
     override suspend fun getSinceId(): Message.Id? {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()
+        return null
     }
 
     override fun getState(): PageableState<List<Message.Id>> {
@@ -145,7 +180,7 @@ class MessagePagingModel(
     }
 
     override suspend fun getUntilId(): Message.Id? {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()
+        return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()
     }
 
     override suspend fun loadFuture(): Result<List<MessageDTO>> = runCatching {
