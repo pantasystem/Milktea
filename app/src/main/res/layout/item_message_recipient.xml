@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
                 name="message"
-                type="jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewData" />
+                type="net.pantasystem.milktea.model.messaging.MessageRelation" />
     </data>
     <RelativeLayout
             android:layout_width="match_parent"
@@ -18,15 +18,15 @@
             android:layout_marginEnd="20dp"
             app:mainNameView="@{mainName}"
             app:subNameView="@{null}"
-            app:user="@{message.message.user}">
+            app:user="@{message.user}">
         <ImageView
                 android:id="@+id/user_icon"
                 android:layout_width="65dp" android:layout_height="65dp"
                 android:layout_marginEnd="4dp"
-                app:circleIcon="@{message.avatarIcon}"
+                app:circleIcon="@{message.user.avatarUrl}"
                 tools:srcCompat="@drawable/ic_follow"
                 tools:ignore="ContentDescription"
-                app:transitionDestinationUser="@{message.message.user}"/>
+                app:transitionDestinationUser="@{message.user}"/>
 
         <androidx.emoji.widget.EmojiTextView
                 android:id="@+id/mainName"
@@ -34,7 +34,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:layout_marginStart="8dp"
-                android:text="@{message.name}"
+                android:text="@{message.user.displayName}"
                 tools:text="しろう"
                 android:layout_toEndOf="@+id/user_icon"/>
         <View
@@ -63,16 +63,15 @@
                     android:id="@+id/message_text"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"
                     tools:text="aaaaaaa"
-                    android:text="@{message.text}"
-                    app:textNode="@{message.textNode}"
+                    android:text="@{message.message.text}"
 
                     />
-            <include layout="@layout/single_media_preview"
-                    android:layout_width="240sp"
-                    android:layout_height="200dp"
-                    android:visibility="@{message.file == null ? View.GONE : View.VISIBLE}"
+<!--            <include layout="@layout/single_media_preview"-->
+<!--                    android:layout_width="240sp"-->
+<!--                    android:layout_height="200dp"-->
+<!--                    android:visibility="@{message.message.file == null ? View.GONE : View.VISIBLE}"-->
 
-                    app:fileViewData="@{message.file}"/>
+<!--                    app:fileViewData="@{message.getFile()}"/>-->
         </LinearLayout>
 
         <androidx.emoji.widget.EmojiTextView
@@ -83,7 +82,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="8dp"
                 tools:text="10秒前"
-                elapsedTime="@{message.message.message.createdAt}"
+                elapsedTime="@{message.message.createdAt}"
 
                 />
 

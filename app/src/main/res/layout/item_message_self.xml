@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
                 name="message"
-                type="jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewData" />
+                type="net.pantasystem.milktea.model.messaging.MessageRelation" />
     </data>
     <RelativeLayout
             android:layout_width="match_parent"
@@ -19,7 +19,7 @@
                 android:layout_width="65dp" android:layout_height="65dp"
                 android:layout_marginStart="4dp"
                 android:layout_alignParentEnd="true" tools:srcCompat="@drawable/ic_follow"
-                app:circleIcon="@{message.avatarIcon}"
+                app:circleIcon="@{message.user.avatarUrl}"
                 tools:ignore="ContentDescription" />
         <View
                 android:layout_width="8dp"
@@ -46,13 +46,14 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
 
                     tools:text="セイバーかわaaaaaa"
-                    app:textNode="@{message.textNode}"
+                    android:text="@{message.message.text}"
+
                     />
-            <include layout="@layout/single_media_preview"
-                    android:layout_width="240sp"
-                    android:layout_height="200dp"
-                    android:visibility="@{message.file == null ? View.GONE : View.VISIBLE}"
-                    app:fileViewData="@{message.file}"/>
+<!--            <include layout="@layout/single_media_preview"-->
+<!--                    android:layout_width="240sp"-->
+<!--                    android:layout_height="200dp"-->
+<!--                    android:visibility="@{message.message.file == null ? View.GONE : View.VISIBLE}"-->
+<!--                    app:fileViewData="@{message.file}"/>-->
 
         </LinearLayout>
         <androidx.emoji.widget.EmojiTextView
@@ -63,7 +64,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
                 tools:text="10秒前"
-                elapsedTime="@{message.message.message.createdAt}"
+                elapsedTime="@{message.message.createdAt}"
                 />
 
     </RelativeLayout>
