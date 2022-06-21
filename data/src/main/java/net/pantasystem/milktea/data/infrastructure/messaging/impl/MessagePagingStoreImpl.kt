@@ -93,12 +93,15 @@ class MessagePagingStoreImpl @Inject constructor(
                     }
                     is StateContent.NotExist -> false
                 }
+                if(!existsItem) {
+                    latestReceivedMessageId = msgId
+                }
                 messagePagingModel.setState(
                     state.convert {
                         if (existsItem) {
                             it
                         } else {
-                            listOf(msgId) + it
+                            it + msgId
                         }
                     }
                 )
