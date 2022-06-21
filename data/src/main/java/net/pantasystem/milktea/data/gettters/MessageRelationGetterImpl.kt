@@ -10,15 +10,11 @@ import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessageNotFoundException
 import net.pantasystem.milktea.model.messaging.MessageRelation
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
-interface MessageRelationGetter {
-    suspend fun get(messageId: Message.Id): MessageRelation
-
-    suspend fun get(message: Message): MessageRelation
-}
 
 interface MessageAdder {
     suspend fun add(account: Account, messageDTO: MessageDTO): MessageRelation

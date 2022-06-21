@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO

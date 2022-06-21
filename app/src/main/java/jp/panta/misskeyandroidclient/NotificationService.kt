@@ -15,7 +15,7 @@ import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import net.pantasystem.milktea.model.messaging.MessageRelation
 import javax.inject.Inject

@@ -15,9 +15,7 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.gettters.MessageAdder
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -26,6 +24,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.messaging.toHistory

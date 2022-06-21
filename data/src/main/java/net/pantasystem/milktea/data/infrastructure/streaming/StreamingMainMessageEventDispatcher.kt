@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
 import net.pantasystem.milktea.data.gettters.MessageAdder
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.model.account.Account
