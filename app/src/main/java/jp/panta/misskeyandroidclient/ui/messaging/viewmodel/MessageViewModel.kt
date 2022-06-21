@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.messaging.MessageRelationGetter
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
+import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessagePagingStore

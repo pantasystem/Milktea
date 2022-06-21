@@ -10,20 +10,22 @@ import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvi
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
-class MessageObserver @Inject constructor(
+class MessageObserverImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val messageAdder: MessageAdder,
-){
+) : MessageObserver {
 
 
     @OptIn(FlowPreview::class)
-    fun observeAllAccountsMessages(): Flow<Message>{
+    override fun observeAllAccountsMessages(): Flow<Message>{
         return suspend {
             accountRepository.findAll()
         }.asFlow().flatMapMerge {
@@ -34,7 +36,7 @@ class MessageObserver @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeByMessagingId(messagingId: MessagingId): Flow<Message>{
+    override fun observeByMessagingId(messagingId: MessagingId): Flow<Message>{
         return flow {
             val accountId = when(messagingId) {
                 is MessagingId.Direct -> messagingId.userId.accountId
@@ -55,7 +57,7 @@ class MessageObserver @Inject constructor(
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun observeAccountMessages(ac: Account): Flow<Message>{
+    override fun observeAccountMessages(ac: Account): Flow<Message>{
         return suspend {
             channelAPIProvider.get(ac)
         }.asFlow().flatMapLatest {

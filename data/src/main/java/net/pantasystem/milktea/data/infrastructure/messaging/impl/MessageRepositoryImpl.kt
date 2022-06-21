@@ -5,7 +5,6 @@ import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
-import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.CreateMessage
 import net.pantasystem.milktea.model.messaging.Message
@@ -19,7 +18,6 @@ class MessageRepositoryImpl @Inject constructor(
     val messageDataSource: MessageDataSource,
     val accountRepository: AccountRepository,
     val encryption: Encryption,
-    val messageRelationGetter: MessageRelationGetter,
     val messageAdder: MessageAdder,
 ) : MessageRepository {
 
