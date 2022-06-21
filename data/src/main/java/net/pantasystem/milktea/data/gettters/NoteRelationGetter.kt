@@ -8,14 +8,20 @@ import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class NoteRelationGetter(
+@Singleton
+class NoteRelationGetter @Inject constructor(
     private val noteRepository: NoteRepository,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val logger: Logger
+    private val loggerFactory: Logger.Factory
 ) {
+    private val logger: Logger by lazy {
+        loggerFactory.create("NoteRelationGetter")
+    }
 
     suspend fun get(
         noteId: Note.Id,

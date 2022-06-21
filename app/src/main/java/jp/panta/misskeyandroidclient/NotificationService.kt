@@ -1,18 +1,28 @@
 package jp.panta.misskeyandroidclient
 
-import android.app.*
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import net.pantasystem.milktea.model.messaging.MessageRelation
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
+import net.pantasystem.milktea.model.messaging.MessageRelation
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class NotificationService : Service() {
     companion object {
         private const val TAG = "NotificationService"
@@ -24,6 +34,12 @@ class NotificationService : Service() {
     private lateinit var mBinder: NotificationBinder
 
     private val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+
+    @Inject
+    lateinit var messageObserver: MessageObserver
+
+    @Inject
+    lateinit var messageRelationGetter: MessageRelationGetter
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -54,8 +70,8 @@ class NotificationService : Service() {
         if (miApplication is MiApplication) {
 
 
-            miApplication.messageObserver.observeAllAccountsMessages().onEach {
-                val msgRelation = miApplication.getGetters().messageRelationGetter.get(it)
+            messageObserver.observeAllAccountsMessages().onEach {
+                val msgRelation = messageRelationGetter.get(it)
                 showMessageNotification(msgRelation)
             }.launchIn(coroutineScope + Dispatchers.IO)
 

@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.messaging.impl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
@@ -18,7 +18,7 @@ import javax.inject.Singleton
 class MessageObserver @Inject constructor(
     private val accountRepository: AccountRepository,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
-    private val getters: Getters
+    private val messageRelationGetter: MessageRelationGetter,
 ){
 
 
@@ -45,7 +45,7 @@ class MessageObserver @Inject constructor(
             channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
-                getters.messageRelationGetter.get(ac, it)
+                messageRelationGetter.get(ac, it)
             }.map {
                 it.message
             }.filter {
@@ -63,7 +63,7 @@ class MessageObserver @Inject constructor(
         }.map{
             (it as? ChannelBody.Main.MessagingMessage)?.body
         }.filterNotNull().map {
-            getters.messageRelationGetter.get(ac, it)
+            messageRelationGetter.get(ac, it)
         }.map {
             it.message
         }

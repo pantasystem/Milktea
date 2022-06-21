@@ -15,7 +15,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessagePagingStore
@@ -27,14 +27,14 @@ class MessagePagingStoreImpl @Inject constructor(
     val getAccount: GetAccount,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
-    getters: Getters,
+    messageRelationGetter: MessageRelationGetter,
 ) : MessagePagingStore {
 
     private val messagePagingModel: MessagePagingModel = MessagePagingModel(
         getAccount = getAccount,
         misskeyAPIProvider = misskeyAPIProvider,
         encryption = encryption,
-        getters = getters,
+        messageRelationGetter = messageRelationGetter
     )
 
 
@@ -123,7 +123,7 @@ class MessagePagingModel(
     val getAccount: GetAccount,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
-    private val getters: Getters,
+    private val messageRelationGetter: MessageRelationGetter,
     var messagingId: MessagingId? = null,
 ) : StateLocker, PreviousLoader<MessageDTO>, FutureLoader<MessageDTO>,
     IdGetter<Message.Id>, PaginationState<Message.Id>, EntityConverter<MessageDTO, Message.Id> {
@@ -185,7 +185,7 @@ class MessagePagingModel(
     override suspend fun convertAll(list: List<MessageDTO>): List<Message.Id> {
         val account = getAccount.get(messagingId!!.accountId)
         return list.map {
-            getters.messageRelationGetter.get(account, it)
+            messageRelationGetter.get(account, it)
         }.map {
             it.message.id
         }
