@@ -14,15 +14,25 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface MessageRelationGetter {
+    suspend fun get(messageId: Message.Id): MessageRelation
+
+    suspend fun get(message: Message): MessageRelation
+}
+
+interface MessageAdder {
+    suspend fun add(account: Account, messageDTO: MessageDTO): MessageRelation
+}
+
 @Singleton
-class MessageRelationGetter @Inject constructor(
+class MessageRelationGetterImpl @Inject constructor(
     private val messageDataSource: MessageDataSource,
     private val userDataSource: UserDataSource,
     private val groupDataSource: GroupDataSource,
     private val accountRepository: AccountRepository,
-) {
+) : MessageRelationGetter, MessageAdder {
 
-    suspend fun get(account: Account, messageDTO: MessageDTO): MessageRelation {
+    override suspend fun add(account: Account, messageDTO: MessageDTO): MessageRelation {
         val (message, users) = messageDTO.entities(account)
         messageDataSource.add(message)
         userDataSource.addAll(users)
@@ -33,13 +43,13 @@ class MessageRelationGetter @Inject constructor(
     }
 
     @Throws(MessageNotFoundException::class)
-    suspend fun get(messageId: Message.Id): MessageRelation {
+    override suspend fun get(messageId: Message.Id): MessageRelation {
         val message = messageDataSource.find(messageId)
             ?: throw MessageNotFoundException(messageId)
         return get(message)
     }
 
-    suspend fun get(message: Message): MessageRelation {
+    override suspend fun get(message: Message): MessageRelation {
 
         return when(message) {
             is Message.Direct -> {

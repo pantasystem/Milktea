@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.messaging.impl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
@@ -18,11 +18,11 @@ import javax.inject.Singleton
 class MessageObserver @Inject constructor(
     private val accountRepository: AccountRepository,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
-    private val messageRelationGetter: MessageRelationGetter,
+    private val messageAdder: MessageAdder,
 ){
 
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(FlowPreview::class)
     fun observeAllAccountsMessages(): Flow<Message>{
         return suspend {
             accountRepository.findAll()
@@ -45,7 +45,7 @@ class MessageObserver @Inject constructor(
             channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
-                messageRelationGetter.get(ac, it)
+                messageAdder.add(ac, it)
             }.map {
                 it.message
             }.filter {
@@ -63,7 +63,7 @@ class MessageObserver @Inject constructor(
         }.map{
             (it as? ChannelBody.Main.MessagingMessage)?.body
         }.filterNotNull().map {
-            messageRelationGetter.get(ac, it)
+            messageAdder.add(ac, it)
         }.map {
             it.message
         }

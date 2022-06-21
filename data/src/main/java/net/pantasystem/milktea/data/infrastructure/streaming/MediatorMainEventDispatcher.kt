@@ -29,15 +29,13 @@ class MediatorMainEventDispatcher(val logger: Logger) {
         val unreadNotificationDAO: UnreadNotificationDAO,
         val userDataSource: UserDataSource,
         val notificationRelationGetter: NotificationRelationGetter,
+        val streamingMainMessageEventDispatcher: StreamingMainMessageEventDispatcher
     ) {
 
         fun create(): MediatorMainEventDispatcher {
             return MediatorMainEventDispatcher(loggerFactory.create("MediatorMainEventDispatcher"))
                 .attach(
-                    StreamingMainMessageEventDispatcher(
-                        messageDataSource,
-                        messageRelationGetter
-                    )
+                    streamingMainMessageEventDispatcher
                 )
                 .attach(
                     StreamingMainNotificationEventDispatcher(

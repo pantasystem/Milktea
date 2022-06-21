@@ -16,6 +16,7 @@ import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.infrastructure.toGroup
@@ -44,11 +45,11 @@ class MessageHistoryViewModel @Inject constructor(
     private val groupDataSource: GroupDataSource,
     private val userDataSource: UserDataSource,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getters: Getters,
     private val groupRepository: GroupRepository,
     private val messageObserver: MessageObserver,
     private val unreadMessages: UnReadMessages,
-    private val messageRelationGetter: MessageRelationGetter
+    private val messageRelationGetter: MessageRelationGetter,
+    private val messageAdder: MessageAdder,
 ) : ViewModel() {
 
 
@@ -156,7 +157,7 @@ class MessageHistoryViewModel @Inject constructor(
                 it.recipient?.let { userDTO ->
                     userDataSource.add(userDTO.toUser(account))
                 }
-                messageRelationGetter.get(account, it)
+                messageAdder.add(account, it)
             }
         }.onFailure {
             logger.error("fetchMessagingHistory error", e = it)
