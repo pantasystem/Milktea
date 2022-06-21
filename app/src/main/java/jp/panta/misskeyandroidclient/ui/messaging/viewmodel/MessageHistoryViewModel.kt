@@ -1,18 +1,23 @@
 package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.plus
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.MessageRelationGetter
+import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
@@ -43,6 +48,7 @@ class MessageHistoryViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val messageObserver: MessageObserver,
     private val unreadMessages: UnReadMessages,
+    private val messageRelationGetter: MessageRelationGetter
 ) : ViewModel() {
 
 
@@ -56,7 +62,7 @@ class MessageHistoryViewModel @Inject constructor(
     private val updateEvent =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
             messageObserver.observeAccountMessages(account).map {
-                account to getters.messageRelationGetter.get(it)
+                account to messageRelationGetter.get(it)
             }
         }.map { (a, msg) ->
             a to msg.toHistory(groupRepository, userRepository)
@@ -150,7 +156,7 @@ class MessageHistoryViewModel @Inject constructor(
                 it.recipient?.let { userDTO ->
                     userDataSource.add(userDTO.toUser(account))
                 }
-                getters.messageRelationGetter.get(account, it)
+                messageRelationGetter.get(account, it)
             }
         }.onFailure {
             logger.error("fetchMessagingHistory error", e = it)
