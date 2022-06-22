@@ -1,165 +1,90 @@
 package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
 
-import androidx.lifecycle.*
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
+import net.pantasystem.milktea.model.messaging.MessageObserver
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessagePagingStore
 import net.pantasystem.milktea.model.messaging.MessagingId
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.common.throwIfHasError
-import kotlin.collections.ArrayList
+import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@FlowPreview
-class MessageViewModel(
-    private val miCore: MiCore,
-    private val messagingId: MessagingId,
+@HiltViewModel
+class MessageViewModel @Inject constructor(
+    private val messagePagingStore: MessagePagingStore,
+    private val messageRelationGetter: MessageRelationGetter,
+    private val messageObserver: MessageObserver,
+    private val accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
-    class State(
-        val messages: List<MessageViewData>,
-        val type: Type
-    ) {
-        enum class Type {
-            LOAD_INIT, LOAD_OLD, RECEIVED
-        }
+
+    private val logger by lazy {
+        loggerFactory.create("MessageViewModel")
     }
 
-    val messagesLiveData = MutableLiveData<State>()
+    val latestReceivedMessageId: Message.Id?
+        get() = messagePagingStore.latestReceivedMessageId()
 
-    private var isLoading = false
-
-
-    private val mTitle = MutableLiveData<String>().apply {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                when (messagingId) {
-                    is MessagingId.Direct -> {
-                        miCore.getUserRepository().find(messagingId.userId).displayUserName
-                    }
-                    is MessagingId.Group -> {
-                        miCore.getGroupRepository().find(messagingId.groupId).name
-                    }
-                }
-            }.onSuccess {
-                postValue(it)
-            }.onFailure {
-                logger.debug("タイトル取得の失敗", e = it)
+    val messages = messagePagingStore.state.map { state ->
+        state.pageState.suspendConvert { list ->
+            list.mapNotNull { id ->
+                runCatching {
+                    messageRelationGetter.get(id)
+                }.getOrNull()
             }
         }
-    }
-    val title: LiveData<String> = mTitle
+    }.flowOn(Dispatchers.IO).catch {
+        logger.debug("message error", e = it)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, PageableState.Loading.Init())
 
-    private val logger = miCore.loggerFactory.create("MessageViewModel")
+
+    val title: LiveData<String> = MutableLiveData("")
 
     init {
-        miCore.messageObserver.observeByMessagingId(messagingId).map {
-            miCore.getGetters().messageRelationGetter.get(it)
-        }.catch { e ->
-            logger.warning("ストリーミング受信中にエラー発生", e = e)
-        }.onEach { msg ->
-            val messages = messagesLiveData.value?.messages.toArrayList()
-            val a = messagingId.getAccount()
-            val viewData = if (msg.isMime(a)) {
-                SelfMessageViewData(msg, a)
-            } else {
-                OtherUserMessageViewData(msg, a)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModelScope.launch(Dispatchers.IO) {
+            accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+                messageObserver.observeAccountMessages(it)
+            }.collect {
+                messagePagingStore.onReceiveMessage(it.id)
             }
-            logger.debug("onMessage: $msg")
-            messages.add(viewData)
+        }
 
-            messagesLiveData.postValue(State(messages, State.Type.RECEIVED))
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
+        viewModelScope.launch(Dispatchers.IO) {
+            messagePagingStore.collectReceivedMessageQueue()
+        }
     }
 
     fun loadInit() {
-        if (isLoading) {
-            logger.debug("load cancel")
-            return
-        }
-        isLoading = true
         viewModelScope.launch(Dispatchers.IO) {
-            val account = messagingId.getAccount()
-            val viewDataList = runCatching {
-                miCore.getMisskeyAPIProvider().get(account).getMessages(
-                    RequestMessage(
-                        i = account.getI(miCore.getEncryption()),
-                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
-                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
-                    ),
-                ).throwIfHasError().body()?.asReversed()
-            }.onFailure {
-                logger.debug("メッセージの読み込みに失敗しました。", e = it)
-            }.getOrNull()?.toMessageViewData(account) ?: emptyList()
-            messagesLiveData.postValue(State(viewDataList, State.Type.LOAD_INIT))
-            isLoading = false
+            messagePagingStore.clear()
+            messagePagingStore.loadPrevious()
         }
-
     }
 
     fun loadOld() {
-        if (isLoading) {
-            return
-        }
-        isLoading = true
-        val exMessages = messagesLiveData.value?.messages
-        val untilId = exMessages?.firstOrNull()?.id
-        if (exMessages.isNullOrEmpty() || untilId == null) {
-            isLoading = false
-            return
-        }
         viewModelScope.launch(Dispatchers.IO) {
-            val account = messagingId.getAccount()
-            val viewData = runCatching {
-                miCore.getMisskeyAPIProvider().get(messagingId.getAccount()).getMessages(
-                    RequestMessage(
-                        i = account.getI(miCore.getEncryption()),
-                        untilId = untilId.messageId,
-                        groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
-                        userId = (messagingId as? MessagingId.Direct)?.userId?.id
-                    )
-                ).body()?.asReversed()
-            }.getOrNull()?.toMessageViewData(account) ?: emptyList()
-
-            val messages = ArrayList<MessageViewData>(exMessages).apply {
-                addAll(0, viewData)
-            }
-            messagesLiveData.postValue(State(messages, State.Type.LOAD_OLD))
-            isLoading = false
+            messagePagingStore.loadPrevious()
         }
     }
 
-    private suspend fun List<MessageDTO>.toMessageViewData(account: Account): List<MessageViewData> {
-        return this.map {
-            miCore.getGetters().messageRelationGetter.get(account, it)
-        }.map { msg ->
-            if (msg.isMime(account)) {
-                SelfMessageViewData(msg, account)
-            } else {
-                OtherUserMessageViewData(msg, account)
-            }
+    fun setMessagingId(messagingId: MessagingId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            messagePagingStore.setMessagingId(messagingId)
+            messagePagingStore.clear()
+            messagePagingStore.loadPrevious()
         }
     }
 
-    private fun List<MessageViewData>?.toArrayList(): ArrayList<MessageViewData> {
-        return if (this == null) {
-            ArrayList()
-        } else {
-            ArrayList(this)
-        }
-    }
-
-    private suspend fun MessagingId.getAccount(): Account {
-        val accountId = when (this) {
-            is MessagingId.Direct -> this.userId.accountId
-            is MessagingId.Group -> this.groupId.accountId
-        }
-        return miCore.getAccountRepository().get(accountId)
-    }
 }

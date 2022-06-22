@@ -18,12 +18,9 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessagingHistoryBinding
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.StateContent
 
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
 
@@ -45,9 +42,17 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
         binding.historyListView.adapter = adapter
         lifecycleScope.launchWhenResumed {
             historyViewModel.loadGroupAndUser()
-            historyViewModel.histories.collect {
-                Log.d("MsgHistoryFragment", "msg:$it")
-                adapter.submitList(it)
+            historyViewModel.histories.collect { resultState ->
+                Log.d("MsgHistoryFragment", "msg:$resultState")
+                when(val content = resultState.content) {
+                    is StateContent.Exist -> {
+                        adapter.submitList(content.rawContent)
+                    }
+                    is StateContent.NotExist -> {
+                        adapter.submitList(emptyList())
+                    }
+                }
+
             }
         }
 

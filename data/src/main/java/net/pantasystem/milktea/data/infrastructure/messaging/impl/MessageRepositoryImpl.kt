@@ -2,17 +2,15 @@ package net.pantasystem.milktea.data.infrastructure.messaging.impl
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.CreateMessage
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessageRepository
 import java.io.IOException
-import java.lang.IllegalStateException
 import javax.inject.Inject
-import kotlin.jvm.Throws
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class MessageRepositoryImpl @Inject constructor(
@@ -20,7 +18,7 @@ class MessageRepositoryImpl @Inject constructor(
     val messageDataSource: MessageDataSource,
     val accountRepository: AccountRepository,
     val encryption: Encryption,
-    val messageRelationGetter: MessageRelationGetter
+    val messageAdder: MessageAdder,
 ) : MessageRepository {
 
     @Throws(IOException::class)
@@ -76,7 +74,7 @@ class MessageRepositoryImpl @Inject constructor(
         val body: MessageDTO = misskeyAPIProvider.get(account).createMessage(action).body()
             ?: throw IllegalStateException("メッセージの作成に失敗しました")
 
-        return messageRelationGetter.get(account, body).message
+        return messageAdder.add(account, body).message
 
     }
 

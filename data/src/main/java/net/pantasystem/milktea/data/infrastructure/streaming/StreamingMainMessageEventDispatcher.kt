@@ -1,14 +1,19 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
-import net.pantasystem.milktea.data.gettters.MessageRelationGetter
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.data.gettters.MessageAdder
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.model.account.Account
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class StreamingMainMessageEventDispatcher(
+@Singleton
+class StreamingMainMessageEventDispatcher @Inject constructor(
     private val messageDataSource: MessageDataSource,
-    private val messagingGetter: MessageRelationGetter
+    private val messagingGetter: MessageRelationGetter,
+    private val messageAdder: MessageAdder,
 ) : StreamingMainEventDispatcher{
 
     override suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main): Boolean {
@@ -16,7 +21,7 @@ class StreamingMainMessageEventDispatcher(
             messageDataSource.readAllMessages(account.accountId)
         }
         return (mainEvent as? ChannelBody.Main.HavingMessagingBody)?.let{
-            messagingGetter.get(account, it.body)
+            messageAdder.add(account, it.body)
         } != null
     }
 }

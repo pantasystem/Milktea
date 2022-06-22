@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -17,11 +18,12 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
-class NotificationViewModel(
+@HiltViewModel
+class NotificationViewModel @Inject constructor(
     private val miCore: MiCore,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val encryption: Encryption = miCore.getEncryption()
@@ -33,11 +35,8 @@ class NotificationViewModel(
             isLoading.postValue(value)
             field = value
         }
-    //loadNewはない
 
-    private var noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + ioDispatcher)
-
-    // private val streamingAdapter = StreamingAdapter(accountRelation.getCurrentConnectionInformation(), encryption)
+    private var noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.IO)
 
 
     val notificationsLiveData = MutableLiveData<List<NotificationViewData>>()
@@ -101,7 +100,7 @@ class NotificationViewModel(
 
         isLoadingFlag = true
         //noteCaptureScope.cancel()
-        noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + ioDispatcher)
+        noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.IO)
 
         logger.debug("before launch:${viewModelScope.isActive}")
         viewModelScope.launch(Dispatchers.IO) {
@@ -146,7 +145,7 @@ class NotificationViewModel(
             return loadInit()
         }
 
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(Dispatchers.IO) {
             val account = miCore.getAccountRepository().getCurrentAccount()
             val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
 

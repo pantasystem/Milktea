@@ -5,11 +5,11 @@ import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 import net.pantasystem.milktea.model.group.Group as GroupEntity
 
-sealed class MessagingId : Serializable{
+sealed class MessagingId : Serializable {
 
     val accountId: Long
         get() {
-            return when(this) {
+            return when (this) {
                 is Group -> {
                     groupId.accountId
                 }
@@ -26,7 +26,10 @@ sealed class MessagingId : Serializable{
     data class Direct(
         val userId: User.Id
     ) : MessagingId() {
-        constructor(message: Message.Direct, account: Account) : this(message.partnerUserId(account))
+        constructor(
+            message: Message.Direct,
+            account: Account
+        ) : this(message.partnerUserId(account))
     }
 
 

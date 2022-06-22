@@ -9,25 +9,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.messaging.MessagingId
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
+import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.drive.DriveActivity
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.messaging.MessagingId
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class MessageActivity : AppCompatActivity(), TitleSettable {
 
     companion object{

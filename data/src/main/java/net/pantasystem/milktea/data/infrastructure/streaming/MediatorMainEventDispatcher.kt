@@ -6,15 +6,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
+import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,22 +25,21 @@ class MediatorMainEventDispatcher(val logger: Logger) {
     class Factory @Inject constructor(
         val loggerFactory: Logger.Factory,
         val messageDataSource: MessageDataSource,
-        val getters: Getters,
+        val messageRelationGetter: MessageRelationGetter,
         val unreadNotificationDAO: UnreadNotificationDAO,
         val userDataSource: UserDataSource,
+        val notificationRelationGetter: NotificationRelationGetter,
+        val streamingMainMessageEventDispatcher: StreamingMainMessageEventDispatcher
     ) {
 
         fun create(): MediatorMainEventDispatcher {
             return MediatorMainEventDispatcher(loggerFactory.create("MediatorMainEventDispatcher"))
                 .attach(
-                    StreamingMainMessageEventDispatcher(
-                        messageDataSource,
-                        getters.messageRelationGetter
-                    )
+                    streamingMainMessageEventDispatcher
                 )
                 .attach(
                     StreamingMainNotificationEventDispatcher(
-                        getters.notificationRelationGetter,
+                        notificationRelationGetter,
                         unreadNotificationDAO
                     )
                 )

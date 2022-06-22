@@ -5,19 +5,18 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
-import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModelFactory
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -25,11 +24,12 @@ import net.pantasystem.milktea.model.account.page.Pageable
 
 @ExperimentalCoroutinesApi
 @FlowPreview
+@AndroidEntryPoint
 class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
-    lateinit var mViewModel: NotificationViewModel
+    private val mViewModel: NotificationViewModel by viewModels()
 
     private val mBinding: FragmentNotificationBinding by dataBinding()
     val notesViewModel by activityViewModels<NotesViewModel>()
@@ -42,22 +42,15 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
         mLinearLayoutManager = LinearLayoutManager(requireContext())
 
-        val miApplication = context?.applicationContext as MiApplication
-
-
-        //val nowConnectionInstance = miApplication.currentConnectionInstanceLiveData.value
-        val factory = NotificationViewModelFactory(miApplication)
-        mViewModel = ViewModelProvider(this, factory)[NotificationViewModel::class.java]
-
-
-
-        val adapter = NotificationListAdapter(diffUtilItemCallBack, notesViewModel, mViewModel, viewLifecycleOwner)
+        val adapter = NotificationListAdapter(
+            diffUtilItemCallBack,
+            notesViewModel,
+            mViewModel,
+            viewLifecycleOwner
+        )
 
         mBinding.notificationListView.adapter = adapter
         mBinding.notificationListView.layoutManager = mLinearLayoutManager
-
-
-        //mViewModel.loadInit()
 
         mViewModel.notificationsLiveData.observe(viewLifecycleOwner) {
             adapter.submitList(it)
@@ -85,7 +78,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     }
 
     @ExperimentalCoroutinesApi
-    private val mScrollListener = object : RecyclerView.OnScrollListener(){
+    private val mScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
@@ -94,11 +87,11 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
             val itemCount = mLinearLayoutManager.itemCount
 
 
-            if(firstVisibleItemPosition == 0){
+            if (firstVisibleItemPosition == 0) {
                 Log.d("", "先頭")
             }
 
-            if(endVisibleItemPosition == (itemCount - 1)){
+            if (endVisibleItemPosition == (itemCount - 1)) {
                 Log.d("", "後ろ")
                 //mTimelineViewModel?.getOldTimeline()
                 mViewModel.loadOld()
@@ -108,7 +101,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         }
     }
 
-    private val diffUtilItemCallBack = object : DiffUtil.ItemCallback<NotificationViewData>(){
+    private val diffUtilItemCallBack = object : DiffUtil.ItemCallback<NotificationViewData>() {
         override fun areContentsTheSame(
             oldItem: NotificationViewData,
             newItem: NotificationViewData

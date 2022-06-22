@@ -20,7 +20,6 @@ import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
@@ -188,15 +187,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    override val messageObserver: MessageObserver by lazy {
-        MessageObserver(
-            accountRepository = getAccountRepository(),
-            channelAPIProvider = mChannelAPIWithAccountProvider,
-            getters = getGetters()
-        )
-    }
 
 
     @Inject

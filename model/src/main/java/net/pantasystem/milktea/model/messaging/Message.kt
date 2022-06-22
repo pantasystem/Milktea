@@ -1,14 +1,15 @@
 package net.pantasystem.milktea.model.messaging
 
-import net.pantasystem.milktea.model.EntityId
-import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.model.group.Group as GroupEntity
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.group.Group as GroupEntity
 
 
 sealed class Message{
@@ -137,19 +138,30 @@ sealed class MessageRelation {
 
     abstract val message: Message
     abstract val user: User
+    abstract val account: Account
 
     data class Group(
         override val message: Message.Group,
-        override val user: User
+        override val user: User,
+        override val account: Account
     ) : MessageRelation()
 
     data class Direct(
         override val message: Message.Direct,
         override val user: User,
+        override val account: Account
     ) : MessageRelation()
 
     fun isMime(account: Account): Boolean {
         return message.userId == User.Id(account.accountId, account.remoteId)
+    }
+
+    fun isMine(): Boolean {
+        return message.userId == User.Id(account.accountId, account.remoteId)
+    }
+
+    fun getFile(): File? {
+        return message.file?.toFile()
     }
 }
 
@@ -157,13 +169,15 @@ sealed class MessageHistoryRelation : MessageRelation(){
     data class Group(
         override val message: Message,
         override val user: User,
-        val group: GroupEntity
+        val group: GroupEntity,
+        override val account: Account
     ) : MessageHistoryRelation()
 
     data class Direct(
         override val message: Message,
         override val user: User,
-        val recipient: User
+        val recipient: User,
+        override val account: Account
     ) : MessageHistoryRelation()
 }
 
@@ -171,11 +185,11 @@ suspend fun MessageRelation.toHistory(groupRepository: GroupRepository, userRepo
     return when(val msg = message) {
         is Message.Direct -> {
             val recipient = userRepository.find(msg.recipientId, false)
-            MessageHistoryRelation.Direct(this.message, this.user, recipient)
+            MessageHistoryRelation.Direct(this.message, this.user, recipient, account)
         }
         is Message.Group -> {
             val group = groupRepository.find(msg.groupId)
-            MessageHistoryRelation.Group(this.message, this.user, group)
+            MessageHistoryRelation.Group(this.message, this.user, group, account)
         }
     }
 

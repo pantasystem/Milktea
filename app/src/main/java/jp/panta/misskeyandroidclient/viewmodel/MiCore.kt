@@ -1,12 +1,9 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageObserver
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -35,9 +32,6 @@ import net.pantasystem.milktea.model.user.UserRepository
 interface MiCore {
 
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    val messageObserver: MessageObserver
 
     val loggerFactory: Logger.Factory
 

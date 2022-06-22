@@ -1,29 +1,31 @@
 package net.pantasystem.milktea.data.infrastructure.messaging.impl
 
-import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.data.gettters.MessageAdder
+import net.pantasystem.milktea.data.streaming.ChannelBody
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
-class MessageObserver @Inject constructor(
+class MessageObserverImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
-    private val getters: Getters
-){
+    private val messageAdder: MessageAdder,
+) : MessageObserver {
 
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun observeAllAccountsMessages(): Flow<Message>{
+    @OptIn(FlowPreview::class)
+    override fun observeAllAccountsMessages(): Flow<Message>{
         return suspend {
             accountRepository.findAll()
         }.asFlow().flatMapMerge {
@@ -33,8 +35,8 @@ class MessageObserver @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun observeByMessagingId(messagingId: MessagingId): Flow<Message>{
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun observeByMessagingId(messagingId: MessagingId): Flow<Message>{
         return flow {
             val accountId = when(messagingId) {
                 is MessagingId.Direct -> messagingId.userId.accountId
@@ -45,7 +47,7 @@ class MessageObserver @Inject constructor(
             channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
-                getters.messageRelationGetter.get(ac, it)
+                messageAdder.add(ac, it)
             }.map {
                 it.message
             }.filter {
@@ -55,7 +57,7 @@ class MessageObserver @Inject constructor(
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    fun observeAccountMessages(ac: Account): Flow<Message>{
+    override fun observeAccountMessages(ac: Account): Flow<Message>{
         return suspend {
             channelAPIProvider.get(ac)
         }.asFlow().flatMapLatest {
@@ -63,7 +65,7 @@ class MessageObserver @Inject constructor(
         }.map{
             (it as? ChannelBody.Main.MessagingMessage)?.body
         }.filterNotNull().map {
-            getters.messageRelationGetter.get(ac, it)
+            messageAdder.add(ac, it)
         }.map {
             it.message
         }
