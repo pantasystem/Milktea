@@ -17,8 +17,6 @@ import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewMod
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
@@ -27,8 +25,6 @@ import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.messaging.MessagingId
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MessageActivity : AppCompatActivity(), TitleSettable {
 

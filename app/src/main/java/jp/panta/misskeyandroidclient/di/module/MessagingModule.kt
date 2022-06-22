@@ -8,10 +8,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.*
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.messaging.MessageObserver
-import net.pantasystem.milktea.model.messaging.MessagePagingStore
-import net.pantasystem.milktea.model.messaging.MessageRepository
-import net.pantasystem.milktea.model.messaging.UnReadMessages
+import net.pantasystem.milktea.model.messaging.*
 import javax.inject.Singleton
 
 @Module
@@ -52,6 +49,12 @@ abstract class MessagingBindsModule {
     abstract fun provideMessageObserve(
         messageObserverImpl: MessageObserverImpl
     ): MessageObserver
+
+    @Binds
+    @Singleton
+    abstract fun messagingRepository(
+        impl: MessagingRepositoryImpl
+    ) : MessagingRepository
 }
 
 @Module

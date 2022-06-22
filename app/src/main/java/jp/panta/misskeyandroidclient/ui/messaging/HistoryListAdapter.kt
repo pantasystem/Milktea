@@ -11,12 +11,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemMessagingHistoryBinding
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.HistoryViewData
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
-@ExperimentalCoroutinesApi
-class HistoryListAdapter @ExperimentalCoroutinesApi constructor(
+class HistoryListAdapter constructor(
     itemCallback: DiffUtil.ItemCallback<HistoryViewData>,
     private val historyViewModel: MessageHistoryViewModel,
     private val lifecycleOwner: LifecycleOwner

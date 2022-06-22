@@ -15,14 +15,11 @@ import jp.panta.misskeyandroidclient.databinding.FragmentMessageBinding
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.model.messaging.MessagingId
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MessageFragment : Fragment(R.layout.fragment_message) {
 
@@ -115,8 +112,6 @@ class MessageFragment : Fragment(R.layout.fragment_message) {
         }
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     private val scrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             val first = mLayoutManager?.findFirstVisibleItemPosition()
