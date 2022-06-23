@@ -5,9 +5,13 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -20,12 +24,12 @@ data class EmojiPos(
     val end: Int
 )
 
-fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
+fun String.findCustomEmojiInText(emojis: List<Emoji>): List<EmojiPos> {
 
     val pattern = StringBuilder(":(").also { patternBuilder ->
         emojis.forEachIndexed { index, emoji ->
             patternBuilder.append(Pattern.quote(emoji.name))
-            if(emojis.size - 1 != index) {
+            if (emojis.size - 1 != index) {
                 patternBuilder.append("|")
             }
         }
@@ -36,7 +40,7 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
 
     val matches = mutableListOf<EmojiPos>()
 
-    while(matcher.find()) {
+    while (matcher.find()) {
         val emoji = emojis.first {
             it.name == this.substring(matcher.start() + 1, matcher.end() - 1)
         }
@@ -53,21 +57,30 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>) : List<EmojiPos> {
 
 
 @Composable
-fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.sp) {
+@Stable
+fun CustomEmojiText(
+    text: String,
+    emojis: List<Emoji>,
+    fontSize: TextUnit = 14.sp,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    maxLines: Int = Int.MAX_VALUE,
+) {
 
     val matches = text.findCustomEmojiInText(emojis)
 
     val annotatedText = buildAnnotatedString {
         var pos = 0
 
-        for(m in matches) {
-            if(pos != m.start) {
+        for (m in matches) {
+            if (pos != m.start) {
                 append(text.substring(pos, m.start))
             }
             appendInlineContent(m.emoji.name, text.substring(m.start, m.end))
             pos = m.end
         }
-        if(pos != text.length && text.isNotBlank()) {
+        if (pos != text.length && text.isNotBlank()) {
             append(text.substring(pos, text.length))
         }
     }
@@ -83,5 +96,13 @@ fun CustomEmojiText(text: String, emojis: List<Emoji>, fontSize: TextUnit = 14.s
             Image(painter = rememberAsyncImagePainter(model = emoji.url), contentDescription = null)
         }
     }
-    Text(annotatedText, inlineContent = inlineContents)
+    Text(
+        annotatedText,
+        inlineContent = inlineContents,
+        fontSize = fontSize,
+        fontStyle = fontStyle,
+        fontWeight = fontWeight,
+        fontFamily = fontFamily,
+        maxLines = maxLines
+    )
 }
