@@ -9,6 +9,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +29,7 @@ import net.pantasystem.milktea.model.notes.NoteRelation
 
 @ExperimentalCoroutinesApi
 @Composable
+@Stable
 fun ItemRenoteUser(
     note: NoteRelation,
     onClick: ()->Unit,
