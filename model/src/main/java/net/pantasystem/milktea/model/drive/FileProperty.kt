@@ -6,7 +6,6 @@ import net.pantasystem.milktea.model.user.User
 
 import java.io.Serializable as JSerializable
 
-
 data class FileProperty (
     val id: Id,
     val name: String,

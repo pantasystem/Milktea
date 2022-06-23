@@ -181,6 +181,47 @@ sealed class MessageHistoryRelation : MessageRelation(){
     ) : MessageHistoryRelation()
 }
 
+val MessageHistoryRelation.Direct.partner: User
+    get() {
+        return if(this.recipient.id.id == account.remoteId){
+            this.user
+        }else{
+            this.recipient
+        }
+    }
+
+val MessageHistoryRelation.thumbnailUrl: String?
+    get() {
+        return when(this) {
+            is MessageHistoryRelation.Direct -> partner.avatarUrl
+            is MessageHistoryRelation.Group -> user.avatarUrl
+        }
+    }
+
+val MessageHistoryRelation.messagingId: MessagingId
+    get() {
+        return message.messagingId(account)
+    }
+
+val MessageHistoryRelation.isGroup: Boolean
+    get() = this is MessageHistoryRelation.Group
+
+fun MessageHistoryRelation.getTitle(isUserNameDefault: Boolean): String {
+
+    return when(this) {
+        is MessageHistoryRelation.Direct -> {
+            if (isUserNameDefault) {
+                partner.displayUserName
+            } else {
+                partner.displayName
+            }
+        }
+        is MessageHistoryRelation.Group -> {
+            group.name
+        }
+    }
+}
+
 suspend fun MessageRelation.toHistory(groupRepository: GroupRepository, userRepository: UserRepository): MessageHistoryRelation {
     return when(val msg = message) {
         is Message.Direct -> {

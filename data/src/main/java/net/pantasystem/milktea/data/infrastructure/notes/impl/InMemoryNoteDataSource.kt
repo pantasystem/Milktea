@@ -125,11 +125,7 @@ class InMemoryNoteDataSource @Inject constructor(
     private suspend fun createOrUpdate(note: Note): AddResult {
         mutex.withLock{
             val n = this.notes[note.id]
-            if(n != null && n.instanceUpdatedAt > note.instanceUpdatedAt){
-                return AddResult.CANCEL
-            }
             notes = notes + (note.id to note)
-            note.updated()
 
             deleteNoteIds.remove(note.id)
             return if(n == null){
