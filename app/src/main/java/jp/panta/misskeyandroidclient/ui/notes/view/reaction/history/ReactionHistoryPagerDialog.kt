@@ -1,25 +1,32 @@
 package jp.panta.misskeyandroidclient.ui.notes.view.reaction.history
 
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogReactionHistoryPagerBinding
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerUiState
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerViewModel
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 
-class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
+@AndroidEntryPoint
+class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
     companion object {
         private const val EXTRA_NOTE_ID = "EXTRA_NOTE_ID"
@@ -40,38 +47,59 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
     }
 
     lateinit var binding: DialogReactionHistoryPagerBinding
-    lateinit var noteId: Note.Id
 
+    val pagerViewModel by viewModels<ReactionHistoryPagerViewModel>()
+
+    private val aId: Long by lazy(LazyThreadSafetyMode.NONE) {
+        requireArguments().getLong(EXTRA_ACCOUNT_ID, -1).apply {
+            require(this != -1L)
+        }
+    }
+
+    private val nId: String by lazy(LazyThreadSafetyMode.NONE) {
+        requireArguments().getString(EXTRA_NOTE_ID)!!
+    }
+
+    private val noteId by lazy {
+        Note.Id(aId, nId)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.dialog_reaction_history_pager, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.dialog_reaction_history_pager,
+            container,
+            false
+        )
         return binding.root
     }
-    @OptIn(ExperimentalCoroutinesApi::class)
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        pagerViewModel.setNoteId(noteId)
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val aId = requireArguments().getLong(EXTRA_ACCOUNT_ID, - 1)
-        val nId = requireArguments().getString(EXTRA_NOTE_ID)
-        require(aId != -1L)
-        requireNotNull(nId)
         val showCurrentReaction = requireArguments().getString(EXTRA_SHOW_REACTION_TYPE)
 
-        val noteId = Note.Id(aId, nId)
-        this.noteId = noteId
 
-        val miCore = requireContext().applicationContext as MiCore
         binding.reactionHistoryTab.setupWithViewPager(binding.reactionHistoryPager)
-        val pagerViewModel = ViewModelProvider(this, ReactionHistoryPagerViewModel.Factory(noteId, miCore))[ReactionHistoryPagerViewModel::class.java]
 
         lifecycleScope.launchWhenCreated {
-            pagerViewModel.types.collect { list ->
+            pagerViewModel.uiState.collect { uiState ->
+                val list = uiState.types
                 val types = list.toMutableList().also {
-                    it.add(0,
+                    it.add(
+                        0,
                         ReactionHistoryRequest(
                             noteId,
                             null
@@ -87,11 +115,42 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
                 withContext(Dispatchers.Main) {
                     showPager(noteId, types)
                     binding.reactionHistoryPager.currentItem = index
+                    setCustomEmojiSpanIntoTabs(uiState)
                 }
             }
         }
 
 
+    }
+
+    private fun setCustomEmojiSpanIntoTabs(uiState: ReactionHistoryPagerUiState) {
+        if (uiState.note != null) {
+            val types = uiState.types
+            for (i in 0 until binding.reactionHistoryTab.tabCount) {
+                if (types[i].type == null) {
+                    continue
+                }
+                val tab = binding.reactionHistoryTab.getTabAt(i)!!
+                val textView = tab.view.children.firstOrNull {
+                    it is TextView && it.id == -1
+                }
+
+                if (textView != null) {
+                    val spanned = CustomEmojiDecorator().decorate(
+                        uiState.note.emojis,
+                        types[i].type ?: "",
+                        textView,
+                    )
+
+                    tab.text = SpannableStringBuilder(spanned).apply {
+                        if (Reaction(types[i].type ?: "").isCustomEmojiFormat()) {
+                            append(types[i].type ?: "")
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     private fun showPager(noteId: Note.Id, types: List<ReactionHistoryRequest>) {
@@ -103,6 +162,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment(){
         super.onPause()
         dismissAllowingStateLoss()
     }
+
     override fun onDestroy() {
         super.onDestroy()
         val miCore = requireContext().applicationContext as MiCore
