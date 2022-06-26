@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.messaging
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
@@ -12,7 +13,7 @@ import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.group.Group as GroupEntity
 
 
-sealed class Message{
+sealed class Message {
     data class Id(
         val accountId: Long,
         val messageId: String
@@ -33,12 +34,11 @@ sealed class Message{
     abstract fun read(): Message
 
     fun messagingId(account: Account): MessagingId {
-        return when(this) {
+        return when (this) {
             is Direct -> MessagingId.Direct(this, account)
             is Group -> MessagingId.Group(groupId)
         }
     }
-
 
 
     data class Group(
@@ -71,6 +71,9 @@ sealed class Message{
         override val emojis: List<Emoji>,
         val recipientId: User.Id
     ) : Message() {
+
+        companion object;
+
         override fun read(): Message {
             return this.copy(isRead = true)
         }
@@ -84,9 +87,31 @@ sealed class Message{
         }
     }
 
+}
 
+fun Message.Direct.Companion.make(
+    id: Message.Id,
+    userId: User.Id,
+    recipientId: User.Id,
+    createdAt: Instant = Clock.System.now(),
+    text: String? = null,
+    fileId: String? = null,
+    file: FileProperty? = null,
+    isRead: Boolean = false,
+    emojis: List<Emoji> = emptyList()
+): Message.Direct {
 
-
+    return Message.Direct(
+        id = id,
+        userId = userId,
+        recipientId = recipientId,
+        createdAt = createdAt,
+        text = text,
+        file = file,
+        fileId = fileId,
+        isRead = isRead,
+        emojis = emojis,
+    )
 }
 
 
@@ -112,7 +137,7 @@ sealed class CreateMessage {
     object Factory {
 
         fun create(messagingId: MessagingId, text: String?, fileId: String?): CreateMessage {
-            return when(messagingId) {
+            return when (messagingId) {
                 is MessagingId.Direct -> {
                     Direct(
                         messagingId.accountId,
@@ -165,7 +190,7 @@ sealed class MessageRelation {
     }
 }
 
-sealed class MessageHistoryRelation : MessageRelation(){
+sealed class MessageHistoryRelation : MessageRelation() {
     data class Group(
         override val message: Message,
         override val user: User,
@@ -183,16 +208,16 @@ sealed class MessageHistoryRelation : MessageRelation(){
 
 val MessageHistoryRelation.Direct.partner: User
     get() {
-        return if(this.recipient.id.id == account.remoteId){
+        return if (this.recipient.id.id == account.remoteId) {
             this.user
-        }else{
+        } else {
             this.recipient
         }
     }
 
 val MessageHistoryRelation.thumbnailUrl: String?
     get() {
-        return when(this) {
+        return when (this) {
             is MessageHistoryRelation.Direct -> partner.avatarUrl
             is MessageHistoryRelation.Group -> user.avatarUrl
         }
@@ -208,7 +233,7 @@ val MessageHistoryRelation.isGroup: Boolean
 
 fun MessageHistoryRelation.getTitle(isUserNameDefault: Boolean): String {
 
-    return when(this) {
+    return when (this) {
         is MessageHistoryRelation.Direct -> {
             if (isUserNameDefault) {
                 partner.displayUserName
@@ -222,8 +247,11 @@ fun MessageHistoryRelation.getTitle(isUserNameDefault: Boolean): String {
     }
 }
 
-suspend fun MessageRelation.toHistory(groupRepository: GroupRepository, userRepository: UserRepository): MessageHistoryRelation {
-    return when(val msg = message) {
+suspend fun MessageRelation.toHistory(
+    groupRepository: GroupRepository,
+    userRepository: UserRepository
+): MessageHistoryRelation {
+    return when (val msg = message) {
         is Message.Direct -> {
             val recipient = userRepository.find(msg.recipientId, false)
             MessageHistoryRelation.Direct(this.message, this.user, recipient, account)
