@@ -6,7 +6,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
-import java.util.*
+import javax.annotation.concurrent.Immutable
 
 /**
  * Userはfollowやunfollowなどは担当しない
@@ -23,7 +23,7 @@ sealed interface User : Entity {
     val isBot: Boolean?
     val host: String?
     val nickname: UserNickname?
-    var instanceUpdatedAt: Date
+
 
     data class Id(
         val accountId: Long,
@@ -40,8 +40,9 @@ sealed interface User : Entity {
         override val isBot: Boolean?,
         override val host: String?,
         override val nickname: UserNickname?,
-        override var instanceUpdatedAt: Date = Date()
-    ) : User
+    ) : User {
+        companion object
+    }
 
     data class Detail(
         override val id: Id,
@@ -68,7 +69,6 @@ sealed interface User : Entity {
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
-        override var instanceUpdatedAt: Date = Date()
     ) : User {
         val followState: FollowState
             get() {
@@ -86,10 +86,6 @@ sealed interface User : Entity {
 
                 return FollowState.UNFOLLOWING
             }
-    }
-
-    fun updated(){
-        instanceUpdatedAt = Date()
     }
 
 
@@ -116,8 +112,26 @@ enum class FollowState {
     PENDING_FOLLOW_REQUEST, FOLLOWING, UNFOLLOWING, UNFOLLOWING_LOCKED
 }
 
-sealed class UserState {
-    data class Removed(val id: User.Id) : UserState()
-    data class Error(val exception: Exception) : UserState()
-    object Loading : UserState()
+fun User.Simple.Companion.make(
+    id: User.Id,
+    userName: String,
+    name: String? = null,
+    avatarUrl: String? = null,
+    emojis: List<Emoji> = emptyList(),
+    isCat: Boolean? = null,
+    isBot: Boolean? = null,
+    host: String? = null,
+    nickname: UserNickname? = null,
+): User.Simple {
+    return User.Simple(
+        id,
+        userName = userName,
+        name = name,
+        avatarUrl = avatarUrl,
+        emojis = emojis,
+        isCat = isCat,
+        isBot = isBot,
+        host = host,
+        nickname = nickname
+    )
 }

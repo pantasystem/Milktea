@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -19,10 +18,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.model.messaging.MessageObserver
-import net.pantasystem.milktea.model.messaging.MessagingRepository
-import net.pantasystem.milktea.model.messaging.UnReadMessages
-import net.pantasystem.milktea.model.messaging.toHistory
+import net.pantasystem.milktea.model.messaging.*
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -35,7 +31,6 @@ class MessageHistoryViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val groupRepository: GroupRepository,
     private val messageObserver: MessageObserver,
-    private val unreadMessages: UnReadMessages,
     private val messagingRepository: MessagingRepository,
 ) : ViewModel() {
 
@@ -58,7 +53,7 @@ class MessageHistoryViewModel @Inject constructor(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
         ResultState.Loading(StateContent.NotExist())
-    )
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val fetchGroupMsgHistories = _actionFetchMessageHistories.map {
@@ -70,10 +65,11 @@ class MessageHistoryViewModel @Inject constructor(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
         ResultState.Loading(StateContent.NotExist())
-    )
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
 
     private val usersAndGroups =
         combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
+            logger.debug("users($users), groups($groups)")
             val content =
                 if (users.content is StateContent.Exist || groups.content is StateContent.Exist) {
                     val userList = (users.content as? StateContent.Exist)?.rawContent ?: emptyList()
@@ -94,15 +90,24 @@ class MessageHistoryViewModel @Inject constructor(
 
     val histories = usersAndGroups.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(),
+        SharingStarted.Lazily,
         ResultState.Loading(StateContent.NotExist())
+    )
+
+    private val isUserNameDefault = MutableStateFlow(false)
+
+    val uiState = combine(histories, isUserNameDefault) { histories, configState ->
+        MessageHistoryScreenUiState(configState, histories)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        MessageHistoryScreenUiState()
     )
 
     val isRefreshing = combine(fetchUserMsgHistories, fetchGroupMsgHistories) { users, groups ->
         users is ResultState.Loading || groups is ResultState.Loading
     }.asLiveData()
 
-    val messageHistorySelected = EventBus<HistoryViewData>()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -123,14 +128,12 @@ class MessageHistoryViewModel @Inject constructor(
     private suspend fun fetchHistory(
         isGroup: Boolean,
         account: Account
-    ): Flow<ResultState<List<HistoryViewData>>> {
+    ): Flow<ResultState<List<MessageHistoryRelation>>> {
         logger.debug("fetchHistory")
         return suspend {
             messagingRepository.findMessageSummaries(account.accountId, isGroup).map { list ->
                 list.map {
                     it.toHistory(groupRepository, userRepository)
-                }.map {
-                    HistoryViewData(account, it, unreadMessages, viewModelScope)
                 }
             }.onFailure {
                 logger.error("fetchMessagingHistory error", e = it)
@@ -139,9 +142,11 @@ class MessageHistoryViewModel @Inject constructor(
 
     }
 
-    fun openMessage(messageHistory: HistoryViewData) {
-        messageHistorySelected.event = messageHistory
-    }
 
 
 }
+
+data class MessageHistoryScreenUiState(
+    val isUserNameDefault: Boolean = true,
+    val histories: ResultState<List<MessageHistoryRelation>> = ResultState.Loading(StateContent.NotExist())
+)

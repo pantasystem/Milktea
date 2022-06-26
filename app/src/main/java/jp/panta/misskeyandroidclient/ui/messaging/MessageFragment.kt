@@ -1,20 +1,24 @@
 package jp.panta.misskeyandroidclient.ui.messaging
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.BuildConfig
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentMessageBinding
 import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.messaging.MessageRelation
@@ -42,6 +46,23 @@ class MessageFragment : Fragment(R.layout.fragment_message) {
 
     val messageViewModel by viewModels<MessageViewModel>()
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        if (!BuildConfig.DEBUG) {
+            return super.onCreateView(inflater, container, savedInstanceState)
+        }
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MdcTheme {
+
+                }
+            }
+        }.rootView
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,6 +71,10 @@ class MessageFragment : Fragment(R.layout.fragment_message) {
 
         require(messagingId != null) {
             "messageHistory must not null"
+        }
+
+        if (BuildConfig.DEBUG) {
+            return
         }
 
         val lm = LinearLayoutManager(context).apply {

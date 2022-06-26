@@ -1,41 +1,46 @@
 package jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-class ReactionHistoryPagerViewModel(
-    val noteId: Note.Id,
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class ReactionHistoryPagerViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val adapter: NoteCaptureAPIAdapter,
-    val logger: Logger?
+    val noteDataSource: NoteDataSource,
+    val loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val noteId: Note.Id, val miCore: MiCore) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ReactionHistoryPagerViewModel(noteId = noteId,
-                noteRepository = miCore.getNoteRepository(),
-                adapter = miCore.getNoteCaptureAdapter(),
-                logger = miCore.loggerFactory.create("ReactionHistoryPagerVM")) as T
-        }
+    val logger by lazy {
+        loggerFactory.create("ReactionHistoryVM")
     }
 
-    private val mNote = MutableStateFlow<Note?>(null)
-    val note: StateFlow<Note?> = mNote
-    val types: Flow<List<ReactionHistoryRequest>> = note.mapNotNull { note ->
+
+    private val noteId = MutableStateFlow<Note.Id?>(null)
+    val note: StateFlow<Note?> = noteId.filterNotNull().flatMapLatest {
+        noteDataSource.state.map { state ->
+            state.getOrNull(it)
+        }
+    }.catch { e ->
+        logger.warning("ノートの取得に失敗", e = e)
+    }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, null)
+
+    private val types: Flow<List<ReactionHistoryRequest>> = note.mapNotNull { note ->
         note?.id?.let {  note.id to note.reactionCounts }
     }.map { idAndList ->
         idAndList.second.map { count ->
@@ -45,22 +50,33 @@ class ReactionHistoryPagerViewModel(
         }
     }.shareIn(viewModelScope, SharingStarted.Eagerly)
 
+    val uiState = combine(note, types) { note, types ->
+        ReactionHistoryPagerUiState(note, types)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, ReactionHistoryPagerUiState())
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                noteRepository.find(noteId)
-            }.onSuccess {
-                mNote.value = it
-            }.onFailure {
-                logger?.debug("ノート取得エラー noteId: $noteId", e = it)
-            }
+            noteId.filterNotNull().flatMapLatest { noteId ->
+                adapter.capture(noteId)
+            }.collect()
         }
-
-        adapter.capture(noteId).mapNotNull {
-            (it as? NoteDataSource.Event.Updated)?.note?: (it as? NoteDataSource.Event.Created)?.note
-        }.onEach {
-            mNote.value = it
+        viewModelScope.launch(Dispatchers.IO) {
+            noteId.filterNotNull().flatMapLatest {
+                suspend {
+                    noteRepository.find(it)
+                }.asLoadingStateFlow()
+            }.collect()
         }
     }
 
+    fun setNoteId(noteId: Note.Id) {
+        this.noteId.update {
+            noteId
+        }
+    }
 }
+
+data class ReactionHistoryPagerUiState(
+    val note: Note? = null,
+    val types: List<ReactionHistoryRequest> = emptyList()
+)

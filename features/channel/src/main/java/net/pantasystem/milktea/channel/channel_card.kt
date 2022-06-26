@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.BookmarkRemove
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ sealed interface ChannelCardAction {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
+@Stable
 fun ChannelCard(
     channel: Channel,
     isPaged: Boolean,
@@ -81,6 +83,7 @@ fun ChannelCard(
 }
 
 @Composable
+@Stable
 private fun AddToTabButton(isPaged: Boolean, onPressed: () -> Unit) {
     IconButton(onClick = onPressed) {
         if (isPaged) {
@@ -101,6 +104,7 @@ private fun AddToTabButton(isPaged: Boolean, onPressed: () -> Unit) {
 }
 
 @Composable
+@Stable
 private fun ChannelCardHeader(channel: Channel) {
     val (r, g, b) = channel.rgpFromName
     Box {
@@ -124,6 +128,7 @@ private fun ChannelCardHeader(channel: Channel) {
 }
 
 @Composable
+@Stable
 private fun ChannelCardActionButtons(
     channel: Channel,
     isPaged: Boolean,

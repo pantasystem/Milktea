@@ -150,7 +150,6 @@ class InMemoryUserDataSource @Inject constructor(
                 }
             }
 
-            user.updated()
             return AddResult.UPDATED
         }
     }

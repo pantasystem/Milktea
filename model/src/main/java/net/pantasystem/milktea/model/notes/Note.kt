@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
-import java.util.*
+import javax.annotation.concurrent.Immutable
 import java.io.Serializable as JSerializable
 
 data class Note(
@@ -44,17 +44,13 @@ data class Note(
 
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
-    var instanceUpdatedAt: Date = Date()
 ) : Entity {
-
     data class Id(
         val accountId: Long,
         val noteId: String
     ) : EntityId
 
-    fun updated() {
-        this.instanceUpdatedAt = Date()
-    }
+
 
     /**
      * 引用リノートであるか

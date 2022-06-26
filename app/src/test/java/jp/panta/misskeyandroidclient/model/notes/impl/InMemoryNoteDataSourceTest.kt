@@ -1,17 +1,18 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.users.UserDTO
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.toNote
-import org.junit.Assert.*
+import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.account.Account
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -52,16 +53,12 @@ class InMemoryNoteDataSourceTest {
             delay(10)
 
             assertEquals(AddResult.CREATED, result)
-            val old = note.copy()
             delay(10)
 
             assertEquals(AddResult.UPDATED, noteDataSource.add(note))
             delay(10)
 
-            assertEquals(AddResult.CANCEL, noteDataSource.add(old))
-            delay(10)
 
-            assertEquals(AddResult.CANCEL, noteDataSource.add(old.copy()))
         }
 
     }
