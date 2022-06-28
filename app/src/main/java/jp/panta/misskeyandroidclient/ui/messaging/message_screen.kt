@@ -54,7 +54,11 @@ fun MessageScreen(
                     Text(title ?: "")
                 }
             )
-        }
+        },
+        modifier = Modifier.windowInsetsPadding(
+            WindowInsets
+                .navigationBars
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top))
     ) {
         Column(
             Modifier
