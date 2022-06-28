@@ -11,12 +11,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.model.messaging.MessageRelationGetter
-import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.messaging.Message
-import net.pantasystem.milktea.model.messaging.MessagePagingStore
-import net.pantasystem.milktea.model.messaging.MessagingId
+import net.pantasystem.milktea.model.messaging.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +38,7 @@ class MessageViewModel @Inject constructor(
                 runCatching {
                     messageRelationGetter.get(id)
                 }.getOrNull()
-            }
+            }.asReversed()
         }
     }.flowOn(Dispatchers.IO).catch {
         logger.debug("message error", e = it)
