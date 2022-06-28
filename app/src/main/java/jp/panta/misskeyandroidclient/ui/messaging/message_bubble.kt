@@ -9,12 +9,14 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_compose.CustomEmojiText
+import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.make
 import net.pantasystem.milktea.model.user.User
@@ -23,7 +25,6 @@ import net.pantasystem.milktea.model.user.make
 @Composable
 @Stable
 fun SelfMessageBubble(
-    user: User,
     message: Message,
 ) {
 
@@ -31,20 +32,32 @@ fun SelfMessageBubble(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
     ) {
-        Surface(
-            shape = RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp),
-            contentColor = MaterialTheme.colors.primary,
+        Spacer(Modifier.width(48.dp))
+
+        Column(
+            horizontalAlignment = Alignment.End
         ) {
-            Column(
-                Modifier.padding(8.dp)
+            Surface(
+                shape = RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp),
+                color = MaterialTheme.colors.primary,
+                elevation = 4.dp
             ) {
-                if (message.text != null) {
-                    Text(text = message.text ?: "")
+                Column(
+                    Modifier.padding(8.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    if (message.text != null) {
+                        Text(text = message.text ?: "")
+                    }
+                    if (message.file != null) {
+                        Image(painter = rememberAsyncImagePainter(message.file?.thumbnailUrl), contentDescription = null)
+                    }
                 }
             }
+
+            Text(getSimpleElapsedTime(time = message.createdAt))
         }
-        Spacer(Modifier.width(4.dp))
-        MessageAvatarIcon(avatarUrl = user.avatarUrl)
+
     }
 }
 
@@ -59,11 +72,12 @@ fun RecipientMessageBubble(
     ) {
         MessageAvatarIcon(avatarUrl = user.avatarUrl)
         Spacer(Modifier.width(8.dp))
-        Column() {
+        Column{
             CustomEmojiText(text = user.displayName, emojis = user.emojis)
             Surface(
                 shape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp),
-                contentColor = MaterialTheme.colors.surface,
+                color = MaterialTheme.colors.surface,
+                elevation = 4.dp
             ) {
                 Column(
                     Modifier.padding(8.dp)
@@ -74,10 +88,14 @@ fun RecipientMessageBubble(
                     if (message.file != null) {
                         Image(painter = rememberAsyncImagePainter(message.file?.thumbnailUrl), contentDescription = null)
                     }
+
                 }
 
             }
+            Text(getSimpleElapsedTime(time = message.createdAt))
         }
+        Spacer(Modifier.width(48.dp))
+
 
     }
 }
@@ -101,7 +119,6 @@ private fun MessageAvatarIcon(avatarUrl: String?) {
 fun PreviewMessageBubble() {
     Column {
         SelfMessageBubble(
-            User.Simple.make(User.Id(0L, ""), "harunon"),
             Message.Direct.make(
                 id = Message.Id(0L, ""),
                 recipientId = User.Id(0L, ""),
