@@ -76,9 +76,14 @@ fun MessageScreen(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val selectedFile by messageActionViewModel.file.observeAsState()
                     IconButton(onClick = onOpenDriveToSelect) {
                         Icon(Icons.Default.Cloud, contentDescription = "Pick a File")
+                    }
+                    if (selectedFile != null) {
+                        Text(selectedFile?.name ?: "")
                     }
                     IconButton(onClick = {
                         messageActionViewModel.send()
