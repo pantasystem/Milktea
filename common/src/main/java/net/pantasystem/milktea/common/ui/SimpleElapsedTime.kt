@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui
+package net.pantasystem.milktea.common.ui
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -11,7 +11,7 @@ class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
     }
 
     // 送られてくる時間はUS
-    fun format(date: Instant): String{
+    operator fun invoke(date: Instant): String{
 
         val epoch = date.toEpochMilliseconds()
         val nowEpoch = Clock.System.now().toEpochMilliseconds()

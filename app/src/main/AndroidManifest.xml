@@ -143,7 +143,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MessageActivity" />
+        <activity android:name=".MessageActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name="net.pantasystem.milktea.drive.DriveActivity" />
         <activity
                 android:name=".NoteEditorActivity"

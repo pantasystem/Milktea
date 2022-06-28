@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.ui.text
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.common.ui.SimpleElapsedTime
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,7 +43,7 @@ object DateFormatHelper {
                 SimpleElapsedTime.TimeUnit.FUTURE -> context.getString(R.string.future)
             }
         }
-        this.text = simpleElapsedTime.format(elapsedTime ?: Clock.System.now())
+        this.text = simpleElapsedTime.invoke(elapsedTime ?: Clock.System.now())
     }
 
     @BindingAdapter("createdAt")

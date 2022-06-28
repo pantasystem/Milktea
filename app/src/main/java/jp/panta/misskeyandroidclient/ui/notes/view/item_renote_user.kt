@@ -14,16 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.SimpleElapsedTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_compose.CustomEmojiText
+import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelation
 
@@ -37,20 +35,7 @@ fun ItemRenoteUser(
     isUserNameDefault: Boolean = false
 ) {
 
-    val stringResourceMap = mapOf(
-        SimpleElapsedTime.TimeUnit.YEAR to stringResource(R.string.year_ago),
-        SimpleElapsedTime.TimeUnit.MONTH to stringResource(R.string.month_ago),
-        SimpleElapsedTime.TimeUnit.DATE to stringResource(R.string.date_ago),
-        SimpleElapsedTime.TimeUnit.HOUR to stringResource(R.string.hour_ago),
-        SimpleElapsedTime.TimeUnit.MINUTE to stringResource(R.string.minute_ago),
-        SimpleElapsedTime.TimeUnit.SECOND to stringResource(R.string.second_ago),
-        SimpleElapsedTime.TimeUnit.NOW to stringResource(R.string.now),
-        SimpleElapsedTime.TimeUnit.FUTURE to stringResource(R.string.future)
-    )
-
-    val createdAt = SimpleElapsedTime{
-        stringResourceMap[it] ?: throw IllegalStateException("対応する文字列リソースを発見することができませんでした")
-    }.format(note.note.createdAt)
+    val createdAt = getSimpleElapsedTime(time = note.note.createdAt)
 
     LaunchedEffect(key1 = true){
         withContext(Dispatchers.IO) {
