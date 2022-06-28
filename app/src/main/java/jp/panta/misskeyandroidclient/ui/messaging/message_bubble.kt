@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
@@ -47,10 +48,17 @@ fun SelfMessageBubble(
                     horizontalAlignment = Alignment.End
                 ) {
                     if (message.text != null) {
-                        Text(text = message.text ?: "")
+                        CustomEmojiText(
+                            text = message.text ?: "",
+                            emojis = message.emojis,
+                            fontSize = 16.sp
+                        )
                     }
                     if (message.file != null) {
-                        Image(painter = rememberAsyncImagePainter(message.file?.thumbnailUrl), contentDescription = null)
+                        Image(
+                            painter = rememberAsyncImagePainter(message.file?.thumbnailUrl),
+                            contentDescription = null
+                        )
                     }
                 }
             }
@@ -72,8 +80,12 @@ fun RecipientMessageBubble(
     ) {
         MessageAvatarIcon(avatarUrl = user.avatarUrl)
         Spacer(Modifier.width(8.dp))
-        Column{
-            CustomEmojiText(text = user.displayName, emojis = user.emojis)
+        Column {
+            CustomEmojiText(
+                text = user.displayName,
+                emojis = user.emojis,
+                fontSize = 16.sp
+            )
             Surface(
                 shape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp),
                 color = MaterialTheme.colors.surface,
@@ -83,10 +95,13 @@ fun RecipientMessageBubble(
                     Modifier.padding(8.dp)
                 ) {
                     if (message.text != null) {
-                        Text(text = message.text ?: "")
+                        CustomEmojiText(text = message.text ?: "", emojis = message.emojis)
                     }
                     if (message.file != null) {
-                        Image(painter = rememberAsyncImagePainter(message.file?.thumbnailUrl), contentDescription = null)
+                        Image(
+                            painter = rememberAsyncImagePainter(message.file?.thumbnailUrl),
+                            contentDescription = null
+                        )
                     }
 
                 }
@@ -99,7 +114,6 @@ fun RecipientMessageBubble(
 
     }
 }
-
 
 
 @Composable
