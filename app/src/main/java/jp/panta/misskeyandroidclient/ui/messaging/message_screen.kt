@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.messaging.MessageRelation
 fun MessageScreen(
     messageViewModel: MessageViewModel,
     messageActionViewModel: MessageActionViewModel,
+    onOpenDriveToSelect: () -> Unit,
 ) {
 
     val messages by messageViewModel.messages.collectAsState()
@@ -76,9 +77,7 @@ fun MessageScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    IconButton(onClick = {
-
-                    }) {
+                    IconButton(onClick = onOpenDriveToSelect) {
                         Icon(Icons.Default.Cloud, contentDescription = "Pick a File")
                     }
                     IconButton(onClick = {
