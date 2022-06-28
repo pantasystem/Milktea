@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
@@ -14,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
 import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -28,11 +28,13 @@ fun MessageScreen(
     messageViewModel: MessageViewModel,
     messageActionViewModel: MessageActionViewModel,
     onOpenDriveToSelect: () -> Unit,
+    onNavigateUp: () -> Unit
 ) {
 
     val messages by messageViewModel.messages.collectAsState()
     val scrollState = rememberLazyListState()
 
+    val title by messageViewModel.title.observeAsState()
 
     LaunchedEffect(key1 = messages) {
         if (messageViewModel.latestReceivedMessageId != null && scrollState.layoutInfo.visibleItemsInfo.firstOrNull()?.index == 1) {
@@ -40,7 +42,20 @@ fun MessageScreen(
         }
     }
 
-    Scaffold {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                title = {
+                    Text(title ?: "")
+                }
+            )
+        }
+    ) {
         Column(
             Modifier
                 .padding(it)
@@ -57,42 +72,7 @@ fun MessageScreen(
                     messageViewModel.loadOld()
                 },
             )
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-            ) {
-                val viewModelText by messageActionViewModel.text.observeAsState()
-                OutlinedTextField(
-                    value = viewModelText ?: "",
-                    onValueChange = { text ->
-                        messageActionViewModel.text.value = text
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = {
-                        Text(stringResource(id = R.string.input_message))
-                    }
-                )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val selectedFile by messageActionViewModel.file.observeAsState()
-                    IconButton(onClick = onOpenDriveToSelect) {
-                        Icon(Icons.Default.Cloud, contentDescription = "Pick a File")
-                    }
-                    if (selectedFile != null) {
-                        Text(selectedFile?.name ?: "")
-                    }
-                    IconButton(onClick = {
-                        messageActionViewModel.send()
-                    }) {
-                        Icon(Icons.Default.Send, contentDescription = "Send")
-                    }
-                }
-
-            }
+            MessageForm(messageActionViewModel = messageActionViewModel, onOpenDriveToSelect)
         }
     }
 }
@@ -150,4 +130,47 @@ fun Messages(
         }
     }
 
+}
+
+@Composable
+fun MessageForm(
+    messageActionViewModel: MessageActionViewModel,
+    onOpenDriveToSelect: () -> Unit,
+) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        val viewModelText by messageActionViewModel.text.observeAsState()
+        OutlinedTextField(
+            value = viewModelText ?: "",
+            onValueChange = { text ->
+                messageActionViewModel.text.value = text
+            },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = {
+                Text(stringResource(id = jp.panta.misskeyandroidclient.R.string.input_message))
+            }
+        )
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val selectedFile by messageActionViewModel.file.observeAsState()
+            IconButton(onClick = onOpenDriveToSelect) {
+                Icon(Icons.Default.Cloud, contentDescription = "Pick a File")
+            }
+            if (selectedFile != null) {
+                Text(selectedFile?.name ?: "")
+            }
+            IconButton(onClick = {
+                messageActionViewModel.send()
+            }) {
+                Icon(Icons.Default.Send, contentDescription = "Send")
+            }
+        }
+
+    }
 }

@@ -2,17 +2,15 @@ package jp.panta.misskeyandroidclient
 
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMessageBinding
-import jp.panta.misskeyandroidclient.ui.TitleSettable
 import jp.panta.misskeyandroidclient.ui.messaging.MessageFragment
 import net.pantasystem.milktea.model.messaging.MessagingId
 
 @AndroidEntryPoint
-class MessageActivity : AppCompatActivity(), TitleSettable {
+class MessageActivity : AppCompatActivity() {
 
     companion object{
         const val EXTRA_MESSAGING_ID = "jp.panta.misskeyandroidclient.MessageActivity.EXTRA_MESSAGING_ID"
@@ -25,9 +23,7 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
         setTheme()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_message)
         mBinding.lifecycleOwner = this
-        setSupportActionBar(mBinding.messageToolbar)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val messagingId = intent?.getSerializableExtra(EXTRA_MESSAGING_ID) as MessagingId?
 
@@ -51,16 +47,6 @@ class MessageActivity : AppCompatActivity(), TitleSettable {
 
     }
 
-    override fun setTitle(text: String) {
-        supportActionBar?.title = text
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
 
 

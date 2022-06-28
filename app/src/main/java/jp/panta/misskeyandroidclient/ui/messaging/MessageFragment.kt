@@ -81,6 +81,9 @@ class MessageFragment : Fragment() {
                         messageActionViewModel = messageActionViewModel,
                         onOpenDriveToSelect = {
                             openDriveActivity()
+                        },
+                        onNavigateUp = {
+                            requireActivity().finish()
                         }
                     )
                 }

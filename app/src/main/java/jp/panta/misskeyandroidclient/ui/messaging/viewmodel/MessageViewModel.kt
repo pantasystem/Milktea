@@ -12,7 +12,9 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.messaging.*
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +23,8 @@ class MessageViewModel @Inject constructor(
     private val messageRelationGetter: MessageRelationGetter,
     private val messageObserver: MessageObserver,
     private val accountStore: AccountStore,
+    private val groupRepository: GroupRepository,
+    private  val userRepository: UserRepository,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -80,6 +84,20 @@ class MessageViewModel @Inject constructor(
             messagePagingStore.setMessagingId(messagingId)
             messagePagingStore.clear()
             messagePagingStore.loadPrevious()
+            (title as MutableLiveData).postValue(loadMessageTitle(messagingId).getOrNull() ?: "")
+        }
+    }
+
+    private suspend fun loadMessageTitle(messagingId: MessagingId): Result<String> {
+        return runCatching {
+            when(messagingId) {
+                is MessagingId.Direct -> {
+                    userRepository.find(messagingId.userId).displayUserName
+                }
+                is MessagingId.Group -> {
+                    groupRepository.find(messagingId.groupId).name
+                }
+            }
         }
     }
 
