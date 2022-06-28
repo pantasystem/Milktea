@@ -56,6 +56,7 @@ fun SelfMessageBubble(
                     }
                     if (message.file != null) {
                         Image(
+                            modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3),
                             painter = rememberAsyncImagePainter(message.file?.thumbnailUrl),
                             contentDescription = null
                         )
@@ -99,6 +100,7 @@ fun RecipientMessageBubble(
                     }
                     if (message.file != null) {
                         Image(
+                            modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3),
                             painter = rememberAsyncImagePainter(message.file?.thumbnailUrl),
                             contentDescription = null
                         )
