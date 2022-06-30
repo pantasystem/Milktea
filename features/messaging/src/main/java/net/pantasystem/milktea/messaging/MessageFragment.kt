@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_navigation.DriveNavigation
 import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
-import net.pantasystem.milktea.messaging.viewmodel.MessageActionViewModel
+import net.pantasystem.milktea.messaging.viewmodel.MessageEditorViewModel
 import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -42,7 +42,7 @@ class MessageFragment : Fragment() {
 
     private val messageViewModel by viewModels<MessageViewModel>()
 
-    private val messageActionViewModel by viewModels<MessageActionViewModel>()
+    private val messageActionViewModel by viewModels<MessageEditorViewModel>()
 
     private val messagingId: MessagingId by lazy {
         arguments?.getSerializable(EXTRA_MESSAGING_ID) as MessagingId

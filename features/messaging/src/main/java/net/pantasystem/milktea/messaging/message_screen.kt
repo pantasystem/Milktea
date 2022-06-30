@@ -19,14 +19,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
-import net.pantasystem.milktea.messaging.viewmodel.MessageActionViewModel
+import net.pantasystem.milktea.messaging.viewmodel.MessageEditorViewModel
 import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
 import net.pantasystem.milktea.model.messaging.MessageRelation
 
 @Composable
 fun MessageScreen(
     messageViewModel: MessageViewModel,
-    messageActionViewModel: MessageActionViewModel,
+    messageActionViewModel: MessageEditorViewModel,
     onOpenDriveToSelect: () -> Unit,
     onNavigateUp: () -> Unit
 ) {
@@ -138,7 +138,7 @@ fun Messages(
 
 @Composable
 fun MessageForm(
-    messageActionViewModel: MessageActionViewModel,
+    messageActionViewModel: MessageEditorViewModel,
     onOpenDriveToSelect: () -> Unit,
 ) {
     Column(

@@ -17,7 +17,7 @@ import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
 
 @HiltViewModel
-class MessageActionViewModel @Inject constructor(
+class MessageEditorViewModel @Inject constructor(
 
     private val filePropertyDataSource: FilePropertyDataSource,
     private val messageRepository: MessageRepository,
