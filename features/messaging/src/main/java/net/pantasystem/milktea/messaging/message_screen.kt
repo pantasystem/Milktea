@@ -146,11 +146,11 @@ fun MessageForm(
             .fillMaxWidth()
             .padding(4.dp)
     ) {
-        val viewModelText by messageActionViewModel.text.observeAsState()
+        val uiState by messageActionViewModel.uiState.collectAsState()
         OutlinedTextField(
-            value = viewModelText ?: "",
+            value = uiState.text,
             onValueChange = { text ->
-                messageActionViewModel.text.value = text
+                messageActionViewModel.setText(text)
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
@@ -162,12 +162,11 @@ fun MessageForm(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val selectedFile by messageActionViewModel.file.observeAsState()
             IconButton(onClick = onOpenDriveToSelect) {
                 Icon(Icons.Default.Cloud, contentDescription = "Pick a File")
             }
-            if (selectedFile != null) {
-                Text(selectedFile?.name ?: "")
+            if (uiState.file != null) {
+                Text(uiState.file?.name ?: "")
             }
             IconButton(onClick = {
                 messageActionViewModel.send()

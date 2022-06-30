@@ -1,11 +1,11 @@
 package net.pantasystem.milktea.messaging.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
@@ -28,8 +28,8 @@ class MessageEditorViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("MessageActionViewModel")
 
-    val text = MutableLiveData<String>()
-    val file = MutableLiveData<FileProperty?>()
+    private val _uiState = MutableStateFlow(MessageEditorUiState("", null))
+    val uiState: StateFlow<MessageEditorUiState> = _uiState
 
     private val mErrors = MutableStateFlow<Throwable?>(null)
 
@@ -37,14 +37,16 @@ class MessageEditorViewModel @Inject constructor(
 
     fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            file.postValue(filePropertyDataSource.find(filePropertyId))
+            _uiState.update { uiState ->
+                uiState.copy(file = filePropertyDataSource.find(filePropertyId))
+            }
         }
     }
 
     fun send() {
 
-        val tmpText = text.value
-        val tmpFile = file.value
+        val tmpText = uiState.value.text
+        val tmpFile = uiState.value.file
         val msgId = messagingId.value
 
         require(msgId != null)
@@ -54,8 +56,9 @@ class MessageEditorViewModel @Inject constructor(
                 logger.error("メッセージ作成中にエラー発生", e = it)
                 mErrors.value = it
             }.onSuccess {
-                file.postValue(null)
-                text.postValue("")
+                _uiState.update { state ->
+                    state.copy(file = null, text = "")
+                }
             }
         }
     }
@@ -66,4 +69,15 @@ class MessageEditorViewModel @Inject constructor(
         }
     }
 
+    fun setText(text: String) {
+        _uiState.update { state ->
+            state.copy(text = text)
+        }
+    }
+
 }
+
+data class MessageEditorUiState(
+    val text: String,
+    val file: FileProperty?,
+)
