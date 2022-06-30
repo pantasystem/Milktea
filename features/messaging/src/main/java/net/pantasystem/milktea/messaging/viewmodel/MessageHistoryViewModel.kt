@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
+package net.pantasystem.milktea.messaging.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -18,7 +18,10 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.model.messaging.*
+import net.pantasystem.milktea.model.messaging.MessageHistoryRelation
+import net.pantasystem.milktea.model.messaging.MessageObserver
+import net.pantasystem.milktea.model.messaging.MessagingRepository
+import net.pantasystem.milktea.model.messaging.toHistory
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -141,7 +144,6 @@ class MessageHistoryViewModel @Inject constructor(
         }.asLoadingStateFlow()
 
     }
-
 
 
 }

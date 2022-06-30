@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.messaging
+package net.pantasystem.milktea.messaging
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,13 +9,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
-import net.pantasystem.milktea.drive.DriveActivity
+import net.pantasystem.milktea.common_navigation.DriveNavigation
+import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
+import net.pantasystem.milktea.messaging.viewmodel.MessageActionViewModel
+import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -42,11 +42,12 @@ class MessageFragment : Fragment() {
 
     private val messageViewModel by viewModels<MessageViewModel>()
 
+    private val messageActionViewModel by viewModels<MessageActionViewModel>()
+
     private val messagingId: MessagingId by lazy {
         arguments?.getSerializable(EXTRA_MESSAGING_ID) as MessagingId
     }
 
-    lateinit var messageActionViewModel: MessageActionViewModel
 
     @Inject
     lateinit var accountStore: AccountStore
@@ -54,15 +55,13 @@ class MessageFragment : Fragment() {
     @Inject
     lateinit var metaRepository: MetaRepository
 
+    @Inject
+    lateinit var driveNavigation: DriveNavigation
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val factory = MessageActionViewModel.Factory(
-            messagingId,
-            requireContext().applicationContext as MiApplication
-        )
-        messageActionViewModel =
-            ViewModelProvider(this, factory)[MessageActionViewModel::class.java]
 
+        messageActionViewModel.setMessagingId(messagingId)
         messageViewModel.setMessagingId(messagingId)
 
     }
@@ -93,8 +92,7 @@ class MessageFragment : Fragment() {
 
 
     private fun openDriveActivity() {
-        val intent = Intent(requireActivity(), DriveActivity::class.java)
-        intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 1)
+        val intent = driveNavigation.newIntent(DriveNavigationArgs(selectableFileMaxSize = 1))
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         openDriveActivityForPickFileResult.launch(intent)
@@ -104,7 +102,7 @@ class MessageFragment : Fragment() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val ids =
-            (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? List<*>)?.map {
+            (result.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? List<*>)?.map {
                 it as FileProperty.Id
             }
         ids?.firstOrNull()?.let {

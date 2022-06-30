@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.messaging
+package net.pantasystem.milktea.messaging
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,12 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageActionViewModel
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
+import net.pantasystem.milktea.messaging.viewmodel.MessageActionViewModel
+import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
 import net.pantasystem.milktea.model.messaging.MessageRelation
 
 @Composable
@@ -154,7 +154,7 @@ fun MessageForm(
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
-                Text(stringResource(id = jp.panta.misskeyandroidclient.R.string.input_message))
+                Text(stringResource(id = R.string.input_message))
             }
         )
         Row(

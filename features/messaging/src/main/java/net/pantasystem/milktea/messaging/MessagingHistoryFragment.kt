@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.messaging
+package net.pantasystem.milktea.messaging
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,16 +10,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MessageActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.ui.messaging.viewmodel.MessageHistoryViewModel
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.messaging.viewmodel.MessageHistoryViewModel
 import net.pantasystem.milktea.model.messaging.messagingId
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MessagingHistoryFragment : Fragment() {
 
     private val historyViewModel: MessageHistoryViewModel by viewModels()
+
+    @Inject
+    lateinit var userDetailNavigation: UserDetailNavigation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +43,8 @@ class MessagingHistoryFragment : Fragment() {
                         onAction = { action ->
                             when (action) {
                                 is Action.OnAvatarIconClick -> {
-                                    val intent = UserDetailActivity.newInstance(
-                                        requireActivity(),
-                                        action.user.id
+                                    val intent = userDetailNavigation.newIntent(
+                                        UserDetailNavigationArgs.UserId(action.user.id)
                                     )
                                     startActivity(intent)
                                 }

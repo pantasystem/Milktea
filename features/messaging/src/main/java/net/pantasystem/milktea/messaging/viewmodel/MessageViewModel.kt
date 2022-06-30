@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.messaging.viewmodel
+package net.pantasystem.milktea.messaging.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,7 +24,7 @@ class MessageViewModel @Inject constructor(
     private val messageObserver: MessageObserver,
     private val accountStore: AccountStore,
     private val groupRepository: GroupRepository,
-    private  val userRepository: UserRepository,
+    private val userRepository: UserRepository,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -90,7 +90,7 @@ class MessageViewModel @Inject constructor(
 
     private suspend fun loadMessageTitle(messagingId: MessagingId): Result<String> {
         return runCatching {
-            when(messagingId) {
+            when (messagingId) {
                 is MessagingId.Direct -> {
                     userRepository.find(messagingId.userId).displayUserName
                 }

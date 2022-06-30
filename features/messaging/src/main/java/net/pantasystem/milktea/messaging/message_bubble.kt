@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.messaging
+package net.pantasystem.milktea.messaging
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
