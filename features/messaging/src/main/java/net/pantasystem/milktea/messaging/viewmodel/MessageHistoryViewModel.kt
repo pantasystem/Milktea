@@ -120,6 +120,11 @@ class MessageHistoryViewModel @Inject constructor(
                 _actionFetchMessageHistories.tryEmit(Clock.System.now().toEpochMilliseconds())
             }
         }
+        viewModelScope.launch {
+            accountStore.observeCurrentAccount.distinctUntilChanged().collect {
+                loadGroupAndUser()
+            }
+        }
     }
 
     fun loadGroupAndUser() {
