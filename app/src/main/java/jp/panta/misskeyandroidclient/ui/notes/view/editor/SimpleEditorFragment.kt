@@ -34,6 +34,8 @@ import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.model.account.AccountStore
@@ -299,7 +301,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         val selectableMaxSize = 4 - selectedSize
         Log.d("", "選択済みのサイズ:$selectedSize")
         val intent = Intent(requireContext(), DriveActivity::class.java)
-            .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
+            .putExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
 
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         registerForOpenDriveActivityResult.launch(intent)
@@ -386,7 +388,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val selectedFilePropertyIds =
-                    (result.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
+                    (result.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>).map {
                         it as FileProperty.Id
                     }
                 mViewModel.addFilePropertyFromIds(selectedFilePropertyIds)

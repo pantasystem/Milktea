@@ -41,6 +41,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.drive.DriveActivity
@@ -478,8 +480,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = mViewModel.maxFileCount.value - selectedSize
         val intent = Intent(this, DriveActivity::class.java)
-            .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
-            .putExtra(DriveActivity.EXTRA_ACCOUNT_ID, accountStore.currentAccount?.accountId)
+            .putExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, selectableMaxSize)
+            .putExtra(EXTRA_ACCOUNT_ID, accountStore.currentAccount?.accountId)
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         openDriveActivityResult.launch(intent)
     }
@@ -556,11 +558,10 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
         finishOrConfirmSaveAsDraftOrDelete()
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val openDriveActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
-                (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
+                (result?.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
                     it as? FileProperty.Id
                 }
             Log.d("NoteEditorActivity", "result:${ids}")

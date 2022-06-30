@@ -85,6 +85,8 @@ dependencies {
     implementation project(path: ':features:media')
     implementation project(path: ':common_compose')
     implementation project(path: ':common_compose')
+    implementation project(path: ':features:messaging')
+    implementation project(path: ':common_navigation')
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
@@ -179,7 +181,7 @@ dependencies {
 
     implementation libs.wada811.databinding
 
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation libs.fragment.ktx
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.google.firebase:firebase-messaging'
     implementation libs.androidx.core.ktx

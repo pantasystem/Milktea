@@ -20,6 +20,8 @@ import jp.panta.misskeyandroidclient.GalleryPostsActivity
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.media.MediaActivity
@@ -124,7 +126,7 @@ class GalleryEditorFragment : Fragment() {
 
     private fun showDrivePicker() {
         val intent = Intent(requireContext(), DriveActivity::class.java)
-        intent.putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, Int.MAX_VALUE)
+        intent.putExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, Int.MAX_VALUE)
         intent.action = Intent.ACTION_OPEN_DOCUMENT
 
         driveActivityResult.launch(intent)
@@ -134,7 +136,7 @@ class GalleryEditorFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK && it.data != null) {
                 val result =
-                    it.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
+                    it.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as? ArrayList<*>
                 val list = result?.mapNotNull { obj ->
                     obj as? FileProperty.Id
                 } ?: emptyList()

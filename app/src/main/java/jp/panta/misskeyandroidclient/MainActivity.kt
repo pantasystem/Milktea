@@ -29,7 +29,7 @@ import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.messaging.MessagingHistoryFragment
+import net.pantasystem.milktea.messaging.MessagingHistoryFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TabFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
@@ -61,6 +61,7 @@ import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
+import net.pantasystem.milktea.messaging.MessagingListActivity
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.account.Account
