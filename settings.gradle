@@ -1,10 +1,4 @@
-include ":app"
-include ":data"
-include ":common"
-include ":api"
-include ":model"
-include ":features:auth"
-include ":features:channel"
+
 
 enableFeaturePreview("VERSION_CATALOGS")
 
@@ -59,9 +53,20 @@ dependencyResolutionManagement {
             alias('appcompat-appcompat').to('androidx.appcompat:appcompat:1.4.1')
             alias('android-material-material').to('com.google.android.material:material:1.6.0')
             alias('androidx-core-ktx').to('androidx.core:core-ktx:1.7.0')
+            alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.4.1')
         }
     }
 }
+
+include ":app"
+include ":data"
+include ":common"
+include ":api"
+include ":model"
+include ":features:auth"
+include ":features:channel"
 include ':features:drive'
 include ':features:media'
+include ':features:messaging'
 include ':common_compose'
+include ':common_navigation'

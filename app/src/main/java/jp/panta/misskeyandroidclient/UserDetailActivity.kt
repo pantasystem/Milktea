@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -36,6 +37,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
@@ -44,6 +47,17 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
+class UserDetailNavigationImpl @Inject constructor(
+    val activity: Activity,
+) : UserDetailNavigation {
+
+    override fun newIntent(args: UserDetailNavigationArgs): Intent {
+        return when(args) {
+            is UserDetailNavigationArgs.UserId -> UserDetailActivity.newInstance(activity, args.userId)
+            is UserDetailNavigationArgs.UserName -> UserDetailActivity.newInstance(activity, args.userName)
+        }
+    }
+}
 
 @AndroidEntryPoint
 class UserDetailActivity : AppCompatActivity() {

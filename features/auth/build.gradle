@@ -28,6 +28,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
     buildFeatures {
         dataBinding true
@@ -81,7 +82,7 @@ dependencies {
     testImplementation libs.hilt.android.testing
     kaptTest libs.hilt.compiler
 
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation libs.fragment.ktx
     // EmojiCompat
     implementation "androidx.emoji:emoji-bundled:1.2.0-alpha03"
 

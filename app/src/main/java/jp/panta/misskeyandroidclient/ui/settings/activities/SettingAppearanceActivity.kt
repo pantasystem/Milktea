@@ -34,6 +34,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common_compose.RadioTile
 import net.pantasystem.milktea.common_compose.SwitchTile
+import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
+import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.model.account.AccountStore
@@ -250,9 +253,9 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
     fun showFileManager() {
         val intent = Intent(this, DriveActivity::class.java)
-            .putExtra(DriveActivity.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 1)
+            .putExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, 1)
             .putExtra(
-                DriveActivity.EXTRA_ACCOUNT_ID,
+                EXTRA_ACCOUNT_ID,
                 accountStore.currentAccount?.accountId
             )
         intent.action = Intent.ACTION_OPEN_DOCUMENT
@@ -262,7 +265,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
     private val openDriveActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
-                (result?.data?.getSerializableExtra(DriveActivity.EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
+                (result?.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
                     it as? FileProperty.Id
                 }
             val fileId = ids?.firstOrNull() ?: return@registerForActivityResult

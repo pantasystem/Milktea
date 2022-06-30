@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.drive
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -17,20 +18,29 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.drive.viewmodel.*
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.*
 import javax.inject.Inject
 
+class DriveNavigationImpl @Inject constructor(
+    val activity: Activity
+) : DriveNavigation {
+
+    override fun newIntent(args: DriveNavigationArgs): Intent {
+        return Intent(activity, DriveActivity::class.java)
+            .putExtra(EXTRA_INT_SELECTABLE_FILE_MAX_SIZE, args.selectableFileMaxSize)
+            .putExtra(EXTRA_ACCOUNT_ID, args.accountId)
+            .putExtra(
+                EXTRA_SELECTED_FILE_PROPERTY_IDS,
+                args.selectedFilePropertyIds?.let { ArrayList(it) })
+    }
+}
+
 @AndroidEntryPoint
 class DriveActivity : AppCompatActivity() {
-    companion object {
-        const val EXTRA_INT_SELECTABLE_FILE_MAX_SIZE =
-            "jp.panta.misskeyandroidclient.EXTRA_INT_SELECTABLE_FILE_SIZE"
-        const val EXTRA_SELECTED_FILE_PROPERTY_IDS =
-            "jp.panta.misskeyandroiclient.EXTRA_STRING_ARRAY_LIST_SELECTED_FILES_ID"
-        const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
-    }
+
 
 
     @Inject

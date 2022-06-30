@@ -15,13 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.AuthorizationActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
 import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
 import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
@@ -57,6 +58,9 @@ class GalleryPostsFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: GalleryPostsViewModel.ViewModelAssistedFactory
+
+    @Inject
+    lateinit var userDetailNavigation: UserDetailNavigation
 
 
     val viewModel: GalleryPostsViewModel by viewModels {
@@ -99,9 +103,10 @@ class GalleryPostsFragment : Fragment() {
                                 }
                                 is GalleryPostCardAction.OnAvatarIconClicked -> {
                                     startActivity(
-                                        UserDetailActivity.newInstance(
-                                            requireActivity(),
-                                            it.galleryPost.userId
+                                        userDetailNavigation.newIntent(
+                                            UserDetailNavigationArgs.UserId(
+                                                it.galleryPost.userId
+                                            )
                                         )
                                     )
                                 }
