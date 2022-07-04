@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.di.module
 
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.BuildConfig
@@ -11,11 +12,14 @@ import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegis
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.model.account.AccountRepository
 import java.util.*
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object PushSubscriptionModule {
 
+    @Singleton
+    @Provides
     fun provideSubscriptionRegistration(
         accountRepository: AccountRepository,
         encryption: Encryption,
@@ -34,11 +38,12 @@ object PushSubscriptionModule {
         )
     }
 
+    @Singleton
+    @Provides
     fun provideUnSubscriptionRegistration(
         accountRepository: AccountRepository,
         encryption: Encryption,
         misskeyAPIProvider: MisskeyAPIProvider,
-        loggerFactory: Logger.Factory
     ): SubscriptionUnRegistration {
         return SubscriptionUnRegistration(
             accountRepository,

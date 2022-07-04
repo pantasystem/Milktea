@@ -12,7 +12,6 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
@@ -39,7 +38,6 @@ interface MiCore {
     @Throws(AccountNotFoundException::class)
     suspend fun getAccount(accountId: Long): Account
 
-    fun getAccountRepository(): AccountRepository
 
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
 

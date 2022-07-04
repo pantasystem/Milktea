@@ -61,7 +61,6 @@ import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
-import java.util.*
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -162,7 +161,7 @@ class MiApplication : Application(), MiCore {
 
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
-//    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
+    //    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
     @Inject
     lateinit var urlPreviewProvider: UrlPreviewStoreProvider
 
@@ -188,7 +187,6 @@ class MiApplication : Application(), MiCore {
     lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
 
 
-
     @Inject
     lateinit var applicationScope: CoroutineScope
 
@@ -207,31 +205,12 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
 
-    private val _subscribeRegistration: SubscriptionRegistration by lazy {
-        SubscriptionRegistration(
-            getAccountRepository(),
-            getEncryption(),
-            getMisskeyAPIProvider(),
-            lang = Locale.getDefault().language,
-            loggerFactory,
-            auth = BuildConfig.PUSH_TO_FCM_AUTH,
-            publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
-            endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
-        )
-    }
+    @Inject
+    lateinit var mSubscriptionRegistration: SubscriptionRegistration
 
-    private val _subscriptionUnRegistration: SubscriptionUnRegistration by lazy {
-        SubscriptionUnRegistration(
-            getAccountRepository(),
-            getEncryption(),
-            lang = Locale.getDefault().language,
-            misskeyAPIProvider = getMisskeyAPIProvider(),
-            endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,
-            auth = BuildConfig.PUSH_TO_FCM_AUTH,
-            publicKey = BuildConfig.PUSH_TO_FCM_PUBLIC_KEY,
-        )
-    }
 
+    @Inject
+    lateinit var mSubscriptionUnRegistration: SubscriptionUnRegistration
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -308,7 +287,7 @@ class MiApplication : Application(), MiCore {
             it.result?.also { token ->
                 applicationScope.launch(Dispatchers.IO) {
                     runCatching {
-                        getSubscriptionRegistration().registerAll(token)
+                        mSubscriptionRegistration.registerAll(token)
                     }.onFailure { e ->
                         logger.error("register error", e)
                     }
@@ -343,8 +322,13 @@ class MiApplication : Application(), MiCore {
         return mNoteCaptureAPIAdapter
     }
 
-    override fun getAccountRepository(): AccountRepository {
-        return mAccountRepository
+
+    override fun getSubscriptionRegistration(): SubscriptionRegistration {
+        return mSubscriptionRegistration
+    }
+
+    override fun getSubscriptionUnRegstration(): SubscriptionUnRegistration {
+        return mSubscriptionUnRegistration
     }
 
     override fun getMessageRepository(): MessageRepository {
@@ -363,8 +347,6 @@ class MiApplication : Application(), MiCore {
 
 
     override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
-
-
 
 
     override fun getSettingStore(): SettingStore {
@@ -396,14 +378,6 @@ class MiApplication : Application(), MiCore {
         return mFilePropertyDataSource
     }
 
-
-    override fun getSubscriptionRegistration(): SubscriptionRegistration {
-        return _subscribeRegistration
-    }
-
-    override fun getSubscriptionUnRegstration(): SubscriptionUnRegistration {
-        return _subscriptionUnRegistration
-    }
 
     override fun getTranslationStore(): NoteTranslationStore {
         return noteTranslationStore

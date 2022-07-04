@@ -3,37 +3,45 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
-import kotlin.collections.ArrayList
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
 
 @Suppress("BlockingMethodInNonBlockingContext")
-class NoteDetailViewModel(
-    val show: Pageable.Show,
-    val miCore: MiCore,
-    val accountId: Long? = null,
-    val encryption: Encryption = miCore.getEncryption(),
-    private val noteDataSourceAdder: NoteDataSourceAdder = NoteDataSourceAdder(
-        miCore.getUserDataSource(),
-        miCore.getNoteDataSource(),
-        miCore.getFilePropertyDataSource()
-    )
+class NoteDetailViewModel @AssistedInject constructor(
+    private val miCore: MiCore,
+    private val encryption: Encryption = miCore.getEncryption(),
+    private val noteDataSourceAdder: NoteDataSourceAdder,
+    private val accountRepository: AccountRepository,
+    @Assisted val show: Pageable.Show,
+    @Assisted val accountId: Long? = null,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(show: Pageable.Show, accountId: Long?): NoteDetailViewModel
+    }
+
+    companion object
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
@@ -145,15 +153,15 @@ class NoteDetailViewModel(
                     )
                 )
             }?.map {
-            PlaneNoteViewData(
-                it,
-                getAccount(),
-                miCore.getNoteCaptureAdapter(),
-                miCore.getTranslationStore()
-            ).apply {
-                loadUrlPreview(this)
+                PlaneNoteViewData(
+                    it,
+                    getAccount(),
+                    miCore.getNoteCaptureAdapter(),
+                    miCore.getTranslationStore()
+                ).apply {
+                    loadUrlPreview(this)
+                }
             }
-        }
     }
 
     private suspend fun loadChildren(): List<NoteConversationViewData>? {
@@ -239,15 +247,26 @@ class NoteDetailViewModel(
         }
 
         if (accountId != null) {
-            mAc = miCore.getAccountRepository().get(accountId)
+            mAc = accountRepository.get(accountId)
             return mAc!!
         }
 
-        mAc = miCore.getAccountRepository().getCurrentAccount()
+        mAc = accountRepository.getCurrentAccount()
         return mAc!!
     }
 
     private suspend fun makeRequest(): NoteRequest {
         return show.toParams().toNoteRequest(i = getAccount().getI(miCore.getEncryption()))
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun NoteDetailViewModel.Companion.provideFactory(
+    factory: NoteDetailViewModel.ViewModelAssistedFactory,
+    show: Pageable.Show,
+    accountId: Long? = null,
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return factory.create(show, accountId) as T
     }
 }

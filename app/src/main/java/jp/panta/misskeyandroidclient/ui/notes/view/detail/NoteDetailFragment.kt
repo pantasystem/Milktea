@@ -7,22 +7,22 @@ import android.view.View
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModelFactory
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.provideFactory
+import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
+import kotlinx.coroutines.*
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
-import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
-import kotlinx.coroutines.*
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -69,26 +69,29 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
+    @Inject
+    lateinit var noteDetailViewModelAssistedFactory: NoteDetailViewModel.ViewModelAssistedFactory
+
     val page: Pageable.Show by lazy {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
             ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
     }
+    private val noteDetailViewModel: NoteDetailViewModel by viewModels {
+        val accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.let {
+            if (it == -1L) null else it
+        }
+        NoteDetailViewModel.provideFactory(
+            noteDetailViewModelAssistedFactory,
+            page,
+            accountId
+        )
+    }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        val accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.let {
-            if (it == -1L) null else it
-        }
-
-        val miApplication = context?.applicationContext as MiApplication
-
-
-        val noteDetailViewModel = ViewModelProvider(
-            this,
-            NoteDetailViewModelFactory(page, accountId = accountId, miApplication = miApplication)
-        )[NoteDetailViewModel::class.java]
 
         noteDetailViewModel.loadDetail()
         val adapter = NoteDetailAdapter(
