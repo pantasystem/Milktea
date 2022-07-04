@@ -4,26 +4,36 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
-import java.lang.IllegalArgumentException
 
 class UserDetailViewModel @AssistedInject constructor(
-    val miCore: MiCore,
     private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
-    val accountStore: AccountStore,
+    accountStore: AccountStore,
+    private val accountRepository: AccountRepository,
+    private val noteDataSource: NoteDataSource,
+    userDataSource: UserDataSource,
+    loggerFactory: Logger.Factory,
+    private val noteRelationGetter: NoteRelationGetter,
+    private val userRepository: UserRepository,
+    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -35,11 +45,11 @@ class UserDetailViewModel @AssistedInject constructor(
 
     companion object;
 
-    private val logger = miCore.loggerFactory.create("UserDetailViewModel")
+    private val logger = loggerFactory.create("UserDetailViewModel")
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
 
-    val userState = miCore.getUserDataSource().state.map { state ->
+    val userState = userDataSource.state.map { state ->
         when {
             userId != null -> {
                 state.get(userId)
@@ -60,24 +70,23 @@ class UserDetailViewModel @AssistedInject constructor(
 
     private val pinNotesState = userState.filterNotNull().map {
         it.pinnedNoteIds?.map { id ->
-            miCore.getNoteDataSource().get(id)
+            noteDataSource.get(id)
         } ?: emptyList()
     }
 
     val profileUrl = userState.filterNotNull().map {
-        val ac = miCore.getAccountRepository().get(it.id.accountId)
+        val ac = accountRepository.get(it.id.accountId)
         it.getProfileUrl(ac)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
-
         pinNotesState.map { notes ->
             notes.map { note ->
                 PlaneNoteViewData(
-                    miCore.getGetters().noteRelationGetter.get(note),
+                    noteRelationGetter.get(note),
                     getAccount(),
-                    miCore.getNoteCaptureAdapter(),
+                    noteCaptureAPIAdapter,
                     translationStore
                 )
             }
@@ -123,13 +132,13 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    val user = miCore.getUserRepository().find(it.id) as User.Detail
+                    val user = userRepository.find(it.id) as User.Detail
                     if (user.isFollowing || user.hasPendingFollowRequestFromYou) {
-                        miCore.getUserRepository().unfollow(user.id)
+                        userRepository.unfollow(user.id)
                     } else {
-                        miCore.getUserRepository().follow(user.id)
+                        userRepository.follow(user.id)
                     }
-                    miCore.getUserRepository().find(user.id) as User.Detail
+                    userRepository.find(user.id) as User.Detail
                 }.onSuccess {
 
                 }.onFailure {
@@ -152,7 +161,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    miCore.getUserRepository().mute(it.id)
+                    userRepository.mute(it.id)
                 }.onSuccess {
 
                 }.onFailure {
@@ -166,7 +175,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    miCore.getUserRepository().unmute(it.id)
+                    userRepository.unmute(it.id)
                 }.onSuccess {
 
                 }.onFailure {
@@ -180,7 +189,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    miCore.getUserRepository().block(it.id)
+                    userRepository.block(it.id)
                 }.onSuccess {
 
                 }
@@ -192,8 +201,8 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    miCore.getUserRepository().unblock(it.id)
-                    (miCore.getUserRepository().find(it.id, true) as User.Detail)
+                    userRepository.unblock(it.id)
+                    (userRepository.find(it.id, true) as User.Detail)
                 }.onSuccess {
 
                 }
@@ -230,7 +239,7 @@ class UserDetailViewModel @AssistedInject constructor(
     private suspend fun findUser(): User {
         val u = userId?.let {
             runCatching {
-                miCore.getUserRepository().find(userId!!, true)
+                userRepository.find(userId!!, true)
             }.onSuccess {
                 logger.debug("ユーザー取得成功:$it")
             }.onFailure {
@@ -242,7 +251,7 @@ class UserDetailViewModel @AssistedInject constructor(
             val userName = userNameAndHost[0]
             val host = userNameAndHost.getOrNull(1)
             runCatching {
-                miCore.getUserRepository().findByUserName(account.accountId, userName, host, true)
+                userRepository.findByUserName(account.accountId, userName, host, true)
             }.onFailure {
                 logger.error("ユーザー取得失敗", e = it)
             }.onSuccess {
@@ -258,11 +267,11 @@ class UserDetailViewModel @AssistedInject constructor(
             return mAc!!
         }
         if (userId != null) {
-            mAc = miCore.getAccountRepository().get(userId.accountId)
+            mAc = accountRepository.get(userId.accountId)
             return mAc!!
         }
 
-        mAc = miCore.getAccountRepository().getCurrentAccount()
+        mAc = accountRepository.getCurrentAccount()
         return mAc!!
     }
 
