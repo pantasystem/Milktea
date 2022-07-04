@@ -1,7 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -15,29 +19,28 @@ import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.user.User
 import java.util.regex.Pattern
+import javax.inject.Inject
 
 
-@FlowPreview
+
 @Suppress("BlockingMethodInNonBlockingContext")
-class AntennaEditorViewModel (
-    private val antennaId: Antenna.Id?,
+@HiltViewModel
+class AntennaEditorViewModel @Inject constructor(
     val miCore: MiCore,
+    val accountRepository: AccountRepository,
 ) : ViewModel(){
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(val miCore: MiCore, val antennaId: Antenna.Id?) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AntennaEditorViewModel(antennaId, miCore) as T
-        }
-    }
 
     private val logger = miCore.loggerFactory.create("AntennaEditorViewModel")
     private val userViewDataFactory = miCore.userViewDataFactory()
 
+
+    private val _antennaId = MutableStateFlow<Antenna.Id?>(null)
 
 
     private val mAntenna = MutableStateFlow<Antenna?>(null).apply {
@@ -109,23 +112,6 @@ class AntennaEditorViewModel (
             value = list
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
-    /*val users = MediatorLiveData<List<UserViewData>>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.users?.filter{ str ->
-                str.isNotBlank()
-            }?.map{ userId ->
-                UserViewData(userId)
-            }?: emptyList()
-        }
-
-        addSource(this){
-            val i = account.getI(miCore.getEncryption())?: return@addSource
-            it.forEach { uvd ->
-                uvd.setApi(i, miCore.getMisskeyAPI(account))
-            }
-        }
-    }*/
-
 
 
     val userListList = MediatorLiveData<List<UserListDTO>>().apply{
@@ -220,7 +206,7 @@ class AntennaEditorViewModel (
                 val antenna = mAntenna.value
                 val request = AntennaToAdd(
                     account.getI(miCore.getEncryption()),
-                    antennaId?.antennaId,
+                    _antennaId.value?.antennaId,
                     name.value ?: antenna?.name ?: "",
                     source.value?.remote!!,
                     userList.value?.id,
@@ -234,7 +220,7 @@ class AntennaEditorViewModel (
                     notify.value ?: false,
 
                     )
-                val res = if(antennaId == null) {
+                val res = if(_antennaId.value == null) {
                     api.createAntenna(request)
                 }else{
                     api.updateAntenna(request)
@@ -261,7 +247,7 @@ class AntennaEditorViewModel (
     val antennaRemovedEvent = EventBus<Unit>()
 
     fun removeRemote(){
-        val antennaId = antennaId ?: return
+        val antennaId = _antennaId.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
@@ -317,9 +303,13 @@ class AntennaEditorViewModel (
         this.userNames.value = userNames
     }
 
+    fun setAntennaId(antennaId: Antenna.Id) {
+        _antennaId.value = antennaId
+    }
+
     private suspend fun fetch(): Antenna? {
-        return antennaId?.let{ antennaId ->
-            val account = miCore.getAccount(antennaId.accountId)
+        return _antennaId.value?.let{ antennaId ->
+            val account = accountRepository.get(antennaId.accountId)
             val api = miCore.getMisskeyAPIProvider().get(account) as? MisskeyAPIV12
                 ?: return null
             val res = api.showAntenna(
@@ -338,9 +328,9 @@ class AntennaEditorViewModel (
     private var mAccount: Account? = null
     private suspend fun getAccount(): Account {
         if(mAccount == null) {
-            mAccount = antennaId?.let{
-                miCore.getAccountRepository().get(it.accountId)
-            }?: miCore.getAccountRepository().getCurrentAccount()
+            mAccount = _antennaId.value?.let{
+                accountRepository.get(it.accountId)
+            }?: accountRepository.getCurrentAccount()
         }
         require(mAccount != null)
         return mAccount!!
