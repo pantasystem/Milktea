@@ -1,20 +1,29 @@
 package net.pantasystem.milktea.data.infrastructure.notes.renote
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.FindRenotes
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.renote.Renote
+import javax.inject.Inject
 
 interface RenotesPagingService {
+
+    interface Factory {
+        fun create(noteId: Note.Id): RenotesPagingService
+    }
+
     val state: Flow<PageableState<List<Renote>>>
     suspend fun next()
     suspend fun refresh()
@@ -30,6 +39,22 @@ class RenotesPagingServiceImpl(
 
     ) : RenotesPagingService {
 
+    class Factory @Inject constructor(
+        val misskeyAPIProvider: MisskeyAPIProvider,
+        val accountRepository: AccountRepository,
+        val noteDataSourceAdder: NoteDataSourceAdder,
+        val encryption: Encryption,
+    ) : RenotesPagingService.Factory {
+        override fun create(noteId: Note.Id): RenotesPagingService {
+            return RenotesPagingServiceImpl(
+                noteId,
+                misskeyAPIProvider,
+                accountRepository,
+                noteDataSourceAdder,
+                encryption,
+            )
+        }
+    }
     private val pagingImpl = RenotesPagingImpl(
         targetNoteId,
         misskeyAPIProvider,

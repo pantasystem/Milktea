@@ -7,14 +7,14 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaEditorBinding
 import jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.antenna.Antenna
@@ -22,6 +22,7 @@ import net.pantasystem.milktea.model.user.User
 
 @ExperimentalCoroutinesApi
 @FlowPreview
+@AndroidEntryPoint
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
         const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
@@ -37,6 +38,8 @@ class AntennaEditorActivity : AppCompatActivity() {
     private var mViewModel: AntennaEditorViewModel? = null
 
     private lateinit var mBinding: ActivityAntennaEditorBinding
+
+    val viewModel: AntennaEditorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +57,6 @@ class AntennaEditorActivity : AppCompatActivity() {
             ft.commit()
         }
 
-        val miCore = applicationContext as MiCore
-        val viewModel = ViewModelProvider(this, AntennaEditorViewModel.Factory(miCore, antennaId))[AntennaEditorViewModel::class.java]
         this.mViewModel = viewModel
         viewModel.selectUserEvent.observe(this) {
             showSearchAndSelectUserActivity(it)

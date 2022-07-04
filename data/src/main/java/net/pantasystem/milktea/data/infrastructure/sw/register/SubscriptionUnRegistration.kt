@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.sw.register
 
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.AccountRepository
+import javax.inject.Singleton
 
 class SubscriptionUnRegistration(
     val accountRepository: AccountRepository,
@@ -15,6 +16,7 @@ class SubscriptionUnRegistration(
     private val auth: String,
     private val endpointBase: String,
 ) {
+
 
     suspend fun unregister(deviceToken: String, accountId: Long) {
         val account = accountRepository.get(accountId)

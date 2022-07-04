@@ -15,6 +15,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
@@ -48,6 +50,10 @@ abstract class NoteBindModule{
     @Binds
     @Singleton
     abstract fun provideDraftNoteService(impl: DraftNoteServiceImpl): DraftNoteService
+
+    @Binds
+    @Singleton
+    abstract fun bindRenotePagingService(impl: RenotesPagingServiceImpl.Factory): RenotesPagingService.Factory
 }
 
 

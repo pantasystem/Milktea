@@ -7,19 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.ui.notes.view.RenoteUsersScreen
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.renote.RenotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
     companion object {
@@ -36,21 +37,24 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
         }
     }
 
-    private lateinit var viewModel: RenotesViewModel
+    @Inject
+    lateinit var renotesViewModelAssistedFactory: RenotesViewModel.ViewModelAssistedFactory
 
-    private val bottomSheetDialogBehavior: BottomSheetBehavior<FrameLayout>?
-        get() = (dialog as? BottomSheetDialog)?.behavior
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    private val viewModel by lazy {
         val noteId = arguments?.let {
             val aId = it.getLong(EXTRA_ACCOUNT_ID)
             val nId = it.getString(EXTRA_NOTE_ID)!!
             Note.Id(aId, nId)
         }!!
-        val miCore = requireContext().applicationContext as MiCore
-        viewModel = ViewModelProvider(this, RenotesViewModel.Factory(noteId, miCore))[RenotesViewModel::class.java]
+        renotesViewModelAssistedFactory.create(noteId)
     }
+
+
+    private val bottomSheetDialogBehavior: BottomSheetBehavior<FrameLayout>?
+        get() = (dialog as? BottomSheetDialog)?.behavior
+
+    @Inject
+    lateinit var noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
@@ -58,7 +62,6 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val miCore = requireContext().applicationContext as MiCore
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -71,7 +74,7 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
                             val intent = UserDetailActivity.newInstance(requireContext(), nr.user.id)
                             startActivity(intent)
                         },
-                        noteCaptureAPIAdapter = miCore.getNoteCaptureAdapter(),
+                        noteCaptureAPIAdapter = noteCaptureAPIAdapter,
                         onScrollState = { state ->
                             bottomSheetDialogBehavior?.isDraggable = state
                         }

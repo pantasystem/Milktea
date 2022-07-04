@@ -4,29 +4,47 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
-    private val miCore: MiCore,
+    private val accountRepository: AccountRepository,
+    private val userRepository: UserRepository,
+    private val encryption: Encryption,
+    loggerFactory: Logger.Factory,
+    accountStore: AccountStore,
+    private val noteTranslationStore: NoteTranslationStore,
+    private val channelAPIAdapterProvider: ChannelAPIWithAccountProvider,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val notificationRelationGetter: NotificationRelationGetter,
+    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val unreadNotificationDAO: UnreadNotificationDAO
 ) : ViewModel() {
 
-    private val encryption: Encryption = miCore.getEncryption()
 
 
     val isLoading = MutableLiveData<Boolean>()
@@ -50,21 +68,21 @@ class NotificationViewModel @Inject constructor(
             notificationsLiveData.postValue(value)
             field = value
         }
-    private val logger = miCore.loggerFactory.create("NotificationViewModel")
+    private val logger = loggerFactory.create("NotificationViewModel")
 
     init {
-        miCore.getAccountStore().observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
+        accountStore.observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
             .onEach {
                 loadInit()
             }.launchIn(viewModelScope)
 
-        miCore.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            miCore.getChannelAPI(ac).connect(ChannelAPI.Type.Main).map {
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+            channelAPIAdapterProvider.get(ac).connect(ChannelAPI.Type.Main).map {
                 it as? ChannelBody.Main.Notification
             }.filterNotNull().map {
                 ac to it
             }.map {
-                it.first to miCore.getGetters().notificationRelationGetter.get(
+                it.first to notificationRelationGetter.get(
                     it.first,
                     it.second.body
                 )
@@ -75,8 +93,8 @@ class NotificationViewModel @Inject constructor(
             NotificationViewData(
                 notificationRelation,
                 account,
-                miCore.getNoteCaptureAdapter(),
-                miCore.getTranslationStore()
+                noteCaptureAPIAdapter,
+                noteTranslationStore,
             )
         }.catch { e ->
             logger.warning("ストーリミング受信中にエラー発生", e = e)
@@ -105,9 +123,9 @@ class NotificationViewModel @Inject constructor(
         logger.debug("before launch:${viewModelScope.isActive}")
         viewModelScope.launch(Dispatchers.IO) {
             logger.debug("in launch")
-            val account = miCore.getAccountRepository().getCurrentAccount()
+            val account = accountRepository.getCurrentAccount()
             val request = NotificationRequest(i = account.getI(encryption), limit = 20)
-            val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+            val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
 
             runCatching {
                 val notificationDTOList = misskeyAPI.notification(request).throwIfHasError().body()
@@ -117,7 +135,7 @@ class NotificationViewModel @Inject constructor(
                 viewDataList.forEach {
                     it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
                 }
-                miCore.getUnreadNotificationDAO().deleteWhereAccountId(account.accountId)
+                unreadNotificationDAO.deleteWhereAccountId(account.accountId)
 
                 viewDataList
             }.onSuccess {
@@ -146,8 +164,8 @@ class NotificationViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val account = miCore.getAccountRepository().getCurrentAccount()
-            val misskeyAPI = miCore.getMisskeyAPIProvider().get(account.instanceDomain)
+            val account = accountRepository.getCurrentAccount()
+            val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
 
             val request = NotificationRequest(
                 i = account.getI(encryption),
@@ -183,7 +201,7 @@ class NotificationViewModel @Inject constructor(
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
-                    miCore.getUserRepository().acceptFollowRequest(notification.userId)
+                    userRepository.acceptFollowRequest(notification.userId)
                 }.onSuccess {
                     if (it) {
                         notifications = notifications.filterNot { n ->
@@ -203,7 +221,7 @@ class NotificationViewModel @Inject constructor(
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
-                    miCore.getUserRepository().rejectFollowRequest(notification.userId)
+                    userRepository.rejectFollowRequest(notification.userId)
                 }.onSuccess {
                     if (it) {
                         notifications = notifications.filterNot { n ->
@@ -219,7 +237,7 @@ class NotificationViewModel @Inject constructor(
     }
 
     private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
-        return miCore.getGetters().notificationRelationGetter.get(account, this)
+        return notificationRelationGetter.get(account, this)
     }
 
     private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
@@ -237,8 +255,8 @@ class NotificationViewModel @Inject constructor(
             NotificationViewData(
                 it,
                 account,
-                miCore.getNoteCaptureAdapter(),
-                miCore.getTranslationStore()
+                noteCaptureAPIAdapter,
+                noteTranslationStore
             )
         }
     }

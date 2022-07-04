@@ -15,14 +15,14 @@ import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notification.PushNotification
 import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import javax.inject.Inject
 
 const val NOTIFICATION_CHANNEL_ID =
@@ -38,11 +38,13 @@ class FCMService : FirebaseMessagingService() {
 
     @Inject lateinit var accountStore: AccountStore
 
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
         val subscriptionRegistrationWorker =
             OneTimeWorkRequestBuilder<SubscriptionRegistrationWorker>()
+
                 .setInputData(
                     workDataOf(
                         SubscriptionRegistrationWorker.TOKEN to token

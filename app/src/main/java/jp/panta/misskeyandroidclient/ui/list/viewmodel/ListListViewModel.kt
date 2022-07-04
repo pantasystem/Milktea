@@ -4,28 +4,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.list.UserListStore
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListStore
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class ListListViewModel @Inject constructor(
-    val miCore: MiCore,
     val encryption: Encryption,
     private val userListStore: UserListStore,
-    val accountStore: AccountStore
+    val accountStore: AccountStore,
+    val accountRepository: AccountRepository,
+    val loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
 
@@ -51,7 +53,7 @@ class ListListViewModel @Inject constructor(
 
     val showUserDetailEvent = EventBus<UserList>()
 
-    private val logger = miCore.loggerFactory.create("ListListViewModel")
+    private val logger = loggerFactory.create("ListListViewModel")
 
     init {
         accountStore.observeCurrentAccount.onEach {
@@ -63,7 +65,7 @@ class ListListViewModel @Inject constructor(
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = miCore.getAccountRepository().getCurrentAccount()
+                val account = accountRepository.getCurrentAccount()
                 loadListList(account.accountId)
             }.onSuccess {
                 logger.debug("success fetch")
@@ -90,7 +92,7 @@ class ListListViewModel @Inject constructor(
         userList?.let { ul ->
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
-                    val account = miCore.getAccountRepository().get(userList.id.accountId)
+                    val account = accountRepository.get(userList.id.accountId)
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
                         if (pageable is Pageable.UserListTimeline) {
@@ -108,9 +110,9 @@ class ListListViewModel @Inject constructor(
                             ),
                             weight = 0
                         )
-                        miCore.getAccountStore().addPage(page)
+                        accountStore.addPage(page)
                     } else {
-                        miCore.getAccountStore().removePage(exPage)
+                        accountStore.removePage(exPage)
                     }
                 }.onFailure {
                     logger.error("タブtoggle処理失敗", e = it)
@@ -134,7 +136,7 @@ class ListListViewModel @Inject constructor(
     fun createUserList(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = miCore.getAccountRepository().getCurrentAccount()
+                val account = accountRepository.getCurrentAccount()
                 userListStore.create(account.accountId, name)
             }.onSuccess {
                 logger.debug("作成成功")
