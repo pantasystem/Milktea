@@ -7,20 +7,20 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.model.antenna.Antenna
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     companion object {
@@ -36,6 +36,16 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         }
     }
 
+    val viewModel: AntennaEditorViewModel by activityViewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val antennaId = arguments?.getSerializable(EXTRA_ANTENNA_ID) as? Antenna.Id
+        if (antennaId != null) {
+            viewModel.setAntennaId(antennaId)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,10 +57,6 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
 
 
-        val antennaId = arguments?.getSerializable(EXTRA_ANTENNA_ID) as? Antenna.Id
-
-        val miCore: MiCore = view.context.applicationContext as MiApplication
-        val viewModel = ViewModelProvider(requireActivity(), AntennaEditorViewModel.Factory(miCore, antennaId))[AntennaEditorViewModel::class.java]
         binding.antennaEditorViewModel = viewModel
 
 
