@@ -19,19 +19,29 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteTranslationStore
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteDetailViewModel @AssistedInject constructor(
-    private val miCore: MiCore,
-    private val encryption: Encryption = miCore.getEncryption(),
+    private val encryption: Encryption,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val accountRepository: AccountRepository,
+    private val noteCaptureAdapter: NoteCaptureAPIAdapter,
+    private val noteRelationGetter: NoteRelationGetter,
+    private val noteRepository: NoteRepository,
+    private val noteTranslationStore: NoteTranslationStore,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val miCore: MiCore,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -52,15 +62,15 @@ class NoteDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = getAccount()
-                val note = miCore.getNoteRepository().find(Note.Id(account.accountId, show.noteId))
+                val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
 
-                val noteDetail = miCore.getGetters().noteRelationGetter.get(note)
+                val noteDetail = noteRelationGetter.get(note)
 
                 val detail = NoteDetailViewData(
                     noteDetail,
                     getAccount(),
-                    miCore.getNoteCaptureAdapter(),
-                    miCore.getTranslationStore()
+                    noteCaptureAdapter,
+                    noteTranslationStore,
                 )
                 loadUrlPreview(detail)
                 var list: List<PlaneNoteViewData> = listOf(detail)
@@ -120,7 +130,7 @@ class NoteDetailViewModel @AssistedInject constructor(
             noteConversationViewData
         } else {
             conversation.add(next)
-            val children = miCore.getMisskeyAPIProvider().get(getAccount()).children(
+            val children = misskeyAPIProvider.get(getAccount()).children(
                 NoteRequest(
                     getAccount().getI(encryption),
                     limit = 100,
@@ -129,10 +139,10 @@ class NoteDetailViewModel @AssistedInject constructor(
             ).body()?.map {
                 val n = noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it)
                 PlaneNoteViewData(
-                    miCore.getGetters().noteRelationGetter.get(n),
+                    noteRelationGetter.get(n),
                     getAccount(),
-                    miCore.getNoteCaptureAdapter(),
-                    miCore.getTranslationStore()
+                    noteCaptureAdapter,
+                    noteTranslationStore
                 ).apply {
                     loadUrlPreview(this)
                 }
@@ -144,9 +154,9 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun loadConversation(): List<PlaneNoteViewData>? {
-        return miCore.getMisskeyAPIProvider().get(getAccount()).conversation(makeRequest()).body()
+        return misskeyAPIProvider.get(getAccount()).conversation(makeRequest()).body()
             ?.map {
-                miCore.getGetters().noteRelationGetter.get(
+                noteRelationGetter.get(
                     noteDataSourceAdder.addNoteDtoToDataSource(
                         getAccount(),
                         it
@@ -156,8 +166,8 @@ class NoteDetailViewModel @AssistedInject constructor(
                 PlaneNoteViewData(
                     it,
                     getAccount(),
-                    miCore.getNoteCaptureAdapter(),
-                    miCore.getTranslationStore()
+                    noteCaptureAdapter,
+                    noteTranslationStore,
                 ).apply {
                     loadUrlPreview(this)
                 }
@@ -168,7 +178,7 @@ class NoteDetailViewModel @AssistedInject constructor(
         return loadChildren(id = show.noteId)?.filter {
             it.reNote?.id != show.noteId
         }?.map {
-            miCore.getGetters().noteRelationGetter.get(
+            noteRelationGetter.get(
                 noteDataSourceAdder.addNoteDtoToDataSource(
                     getAccount(),
                     it
@@ -178,21 +188,21 @@ class NoteDetailViewModel @AssistedInject constructor(
             val planeNoteViewData = PlaneNoteViewData(
                 it,
                 getAccount(),
-                miCore.getNoteCaptureAdapter(),
-                miCore.getTranslationStore(),
+                noteCaptureAdapter,
+                noteTranslationStore,
             )
             val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map { n ->
 
                 PlaneNoteViewData(
-                    miCore.getGetters().noteRelationGetter.get(
+                    noteRelationGetter.get(
                         noteDataSourceAdder.addNoteDtoToDataSource(
                             getAccount(),
                             n
                         )
                     ),
                     getAccount(),
-                    miCore.getNoteCaptureAdapter(),
-                    miCore.getTranslationStore()
+                    noteCaptureAdapter,
+                    noteTranslationStore,
                 ).apply {
                     loadUrlPreview(this)
                 }
@@ -201,8 +211,8 @@ class NoteDetailViewModel @AssistedInject constructor(
                 it,
                 childInChild,
                 getAccount(),
-                miCore.getNoteCaptureAdapter(),
-                miCore.getTranslationStore()
+                noteCaptureAdapter,
+                noteTranslationStore,
             ).apply {
                 this.hasConversation.postValue(this.getNextNoteForConversation() != null)
             }
@@ -211,7 +221,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     private suspend fun loadChildren(id: String): List<NoteDTO>? {
-        return miCore.getMisskeyAPIProvider().get(getAccount())
+        return misskeyAPIProvider.get(getAccount())
             .children(NoteRequest(i = getAccount().getI(encryption), limit = 100, noteId = id))
             .body()
     }
@@ -256,7 +266,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     private suspend fun makeRequest(): NoteRequest {
-        return show.toParams().toNoteRequest(i = getAccount().getI(miCore.getEncryption()))
+        return show.toParams().toNoteRequest(i = getAccount().getI(encryption))
     }
 }
 

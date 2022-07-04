@@ -20,7 +20,6 @@ import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
@@ -36,8 +35,6 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
@@ -47,18 +44,14 @@ import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaCache
 import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.messaging.MessageRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.notification.NotificationDataSource
-import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
@@ -130,28 +123,14 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mUserRepository: UserRepository
 
-    @Inject
-    lateinit var mNotificationRepository: NotificationRepository
-
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-
-    @Inject
-    lateinit var mNoteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider
-
-    @Inject
-    lateinit var mChannelAPIWithAccountProvider: ChannelAPIWithAccountProvider
-
-    @Inject
-    lateinit var mNoteCaptureAPIAdapter: NoteCaptureAPIAdapter
 
 
     @Inject
     lateinit var mUnreadMessages: UnReadMessages
 
-    @Inject
-    lateinit var mMessageRepository: MessageRepository
 
     @Inject
     lateinit var mGroupRepository: GroupRepository
@@ -176,9 +155,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
 
-
-    @Inject
-    lateinit var noteTranslationStore: NoteTranslationStore
 
     @Inject
     lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
@@ -318,21 +294,12 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getNoteCaptureAdapter(): NoteCaptureAPIAdapter {
-        return mNoteCaptureAPIAdapter
-    }
-
-
     override fun getSubscriptionRegistration(): SubscriptionRegistration {
         return mSubscriptionRegistration
     }
 
     override fun getSubscriptionUnRegstration(): SubscriptionUnRegistration {
         return mSubscriptionUnRegistration
-    }
-
-    override fun getMessageRepository(): MessageRepository {
-        return mMessageRepository
     }
 
 
@@ -344,9 +311,6 @@ class MiApplication : Application(), MiCore {
     override fun getGetters(): Getters {
         return mGetters
     }
-
-
-    override fun getUnreadNotificationDAO() = mUnreadNotificationDAO
 
 
     override fun getSettingStore(): SettingStore {
@@ -369,19 +333,10 @@ class MiApplication : Application(), MiCore {
         return mUserRepository
     }
 
-
-    override suspend fun getChannelAPI(account: Account): ChannelAPI {
-        return mChannelAPIWithAccountProvider.get(account)
-    }
-
     override fun getFilePropertyDataSource(): FilePropertyDataSource {
         return mFilePropertyDataSource
     }
 
-
-    override fun getTranslationStore(): NoteTranslationStore {
-        return noteTranslationStore
-    }
 
     override fun getMetaRepository(): MetaRepository {
         return mMetaRepository
