@@ -16,7 +16,6 @@ import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
@@ -37,7 +36,6 @@ interface MiCore {
 
     fun getNoteDataSource(): NoteDataSource
 
-    fun getNoteRepository(): NoteRepository
 
     fun getUserDataSource(): UserDataSource
 

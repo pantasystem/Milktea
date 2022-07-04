@@ -321,9 +321,6 @@ class MiApplication : Application(), MiCore {
         return mNoteDataSource
     }
 
-    override fun getNoteRepository(): NoteRepository {
-        return mNoteRepository
-    }
 
     override fun getUserDataSource(): UserDataSource {
         return mUserDataSource
