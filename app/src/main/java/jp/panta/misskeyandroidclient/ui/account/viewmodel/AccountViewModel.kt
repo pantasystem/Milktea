@@ -1,43 +1,45 @@
 package jp.panta.misskeyandroidclient.ui.account.viewmodel
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import jp.panta.misskeyandroidclient.util.task.asSuspend
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.util.task.asSuspend
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("UNCHECKED_CAST")
 @HiltViewModel
 class AccountViewModel @Inject constructor(
-    val miCore: MiCore,
-    val accountStore: AccountStore,
-    val userDataSource: UserDataSource,
+    private val accountStore: AccountStore,
+    private val userDataSource: UserDataSource,
+    loggerFactory: Logger.Factory,
+    private val userRepository: UserRepository,
+    private val accountRepository: AccountRepository,
+    private val accountViewDataFactory: AccountViewData.Factory,
+    private val subscriptionUnRegistration: SubscriptionUnRegistration
 ) : ViewModel() {
 
-    companion object {
-        const val TAG = "AccountViewModel"
-    }
 
-    private val logger = miCore.loggerFactory.create("AccountViewModel")
+    private val logger = loggerFactory.create("AccountViewModel")
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @FlowPreview
     val accounts = accountStore.observeAccounts.map { accounts ->
         accounts.map { ac ->
-            AccountViewData(ac, miCore, viewModelScope, Dispatchers.IO)
+            accountViewDataFactory.create(ac, viewModelScope)
         }
     }.catch { e ->
         logger.debug("アカウントロードエラー", e = e)
@@ -68,7 +70,7 @@ class AccountViewModel @Inject constructor(
 
     init {
         accountStore.observeCurrentAccount.filterNotNull().onEach { ac ->
-            miCore.getUserRepository()
+            userRepository
                 .find(User.Id(ac.accountId, ac.remoteId), true)
         }.catch { e ->
             logger.error("現在のアカウントの取得に失敗した", e = e)
@@ -112,13 +114,13 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val token = FirebaseMessaging.getInstance().token.asSuspend()
-                miCore.getSubscriptionUnRegstration()
+                subscriptionUnRegistration
                     .unregister(token, accountViewData.account.accountId)
             } catch (e: Throwable) {
                 logger.warning("token解除処理失敗", e = e)
             }
             try {
-                miCore.getAccountRepository().delete(accountViewData.account)
+                accountRepository.delete(accountViewData.account)
             } catch (e: Throwable) {
                 logger.error("ログアウト処理失敗", e)
             }
