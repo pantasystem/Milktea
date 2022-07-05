@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.users.SearchAndSelectUserScreen
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
@@ -81,13 +82,16 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
             )[SelectedUserViewModel::class.java]
 
         setContent {
-            SearchAndSelectUserScreen(
-                searchUserViewModel = searchUserViewModel,
-                selectedUserViewModel = selectedUserViewModel,
-                onNavigateUp = {
-                    setResultFinish()
-                }
-            )
+            MdcTheme {
+                SearchAndSelectUserScreen(
+                    searchUserViewModel = searchUserViewModel,
+                    selectedUserViewModel = selectedUserViewModel,
+                    onNavigateUp = {
+                        setResultFinish()
+                    }
+                )
+            }
+
         }
 
     }

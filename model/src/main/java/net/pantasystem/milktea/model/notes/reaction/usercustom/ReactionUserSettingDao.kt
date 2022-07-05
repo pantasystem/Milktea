@@ -8,6 +8,10 @@ interface ReactionUserSettingDao{
     @Query("select * from reaction_user_setting where instance_domain = :instanceDomain order by weight asc")
     fun findByInstanceDomain(instanceDomain: String): List<ReactionUserSetting>?
 
+    @Query("select * from reaction_user_setting where instance_domain = :instanceDomain order by weight asc")
+    fun observeByInstanceDomain(instanceDomain: String): List<ReactionUserSetting>?
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(setting: ReactionUserSetting): Long?
 

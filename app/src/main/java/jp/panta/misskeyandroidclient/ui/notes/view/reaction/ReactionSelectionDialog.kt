@@ -21,7 +21,10 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReactionSelectionDialog : BottomSheetDialogFragment(),
@@ -29,6 +32,12 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
     private var mNoteViewModel: NotesViewModel? = null
     val notesViewModel by activityViewModels<NotesViewModel>()
+
+    @Inject
+    lateinit var metaRepository: MetaRepository
+
+    @Inject
+    lateinit var accountStore: AccountStore
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,8 +63,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         mNoteViewModel = notesViewModel
 
 
-        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getMetaRepository().observe(it.instanceDomain)
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            metaRepository.observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
         }.map { emojis ->

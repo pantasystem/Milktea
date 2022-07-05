@@ -8,7 +8,6 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -40,7 +39,6 @@ interface MiCore {
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
 
 
-    fun getMetaRepository(): MetaRepository
 
     fun getReactionHistoryDataSource(): ReactionHistoryDataSource
 

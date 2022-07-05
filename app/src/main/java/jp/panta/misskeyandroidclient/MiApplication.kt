@@ -38,7 +38,6 @@ import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaCache
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -71,8 +70,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mAccountRepository: AccountRepository
 
-    @Inject
-    lateinit var mMetaRepository: MetaRepository
 
     @Inject
     lateinit var mFetchMeta: FetchMeta
@@ -107,7 +104,6 @@ class MiApplication : Application(), MiCore {
     lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
 
 
-
     @Inject
     lateinit var mNoteRepository: NoteRepository
 
@@ -126,9 +122,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mGroupRepository: GroupRepository
 
-
-
-    //    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
     @Inject
     lateinit var urlPreviewProvider: UrlPreviewStoreProvider
 
@@ -138,8 +131,6 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mFileUploaderProvider: FileUploaderProvider
-
-
 
 
     @Inject
@@ -163,10 +154,8 @@ class MiApplication : Application(), MiCore {
     lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
 
 
-
     @Inject
     lateinit var mSubscriptionRegistration: SubscriptionRegistration
-
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -252,7 +241,6 @@ class MiApplication : Application(), MiCore {
     }
 
 
-
     override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return urlPreviewProvider.getUrlPreviewStore(account, false)
     }
@@ -271,7 +259,6 @@ class MiApplication : Application(), MiCore {
     }
 
 
-
     override fun getUserDataSource(): UserDataSource {
         return mUserDataSource
     }
@@ -279,14 +266,6 @@ class MiApplication : Application(), MiCore {
     override fun getUserRepository(): UserRepository {
         return mUserRepository
     }
-
-
-
-    override fun getMetaRepository(): MetaRepository {
-        return mMetaRepository
-    }
-
-
 
 
     override fun getCurrentInstanceMeta(): Meta? {
