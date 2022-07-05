@@ -303,9 +303,6 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getGroupRepository(): GroupRepository {
-        return mGroupRepository
-    }
 
 
     override fun getGetters(): Getters {

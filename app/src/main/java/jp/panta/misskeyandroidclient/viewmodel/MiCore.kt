@@ -12,7 +12,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
@@ -42,7 +41,6 @@ interface MiCore {
     fun getUserRepository(): UserRepository
 
 
-    fun getGroupRepository(): GroupRepository
 
     fun getFilePropertyDataSource(): FilePropertyDataSource
 
