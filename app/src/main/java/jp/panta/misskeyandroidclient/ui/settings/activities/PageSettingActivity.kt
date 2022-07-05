@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +34,7 @@ class PageSettingActivity : AppCompatActivity() {
         const val SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE = 31
     }
 
-    private lateinit var mPageSettingViewModel: PageSettingViewModel
+    private val mPageSettingViewModel: PageSettingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,8 +44,7 @@ class PageSettingActivity : AppCompatActivity() {
         setSupportActionBar(binding.pageSettingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val miApplication = applicationContext as MiApplication
-        mPageSettingViewModel = ViewModelProvider(this, PageSettingViewModel.Factory(miApplication))[PageSettingViewModel::class.java]
+
 
         val touchHelper = ItemTouchHelper(ItemTouchCallback())
         touchHelper.attachToRecyclerView(binding.pagesView)

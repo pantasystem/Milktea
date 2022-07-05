@@ -3,9 +3,8 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel.page
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
@@ -22,24 +21,14 @@ import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.*
 import net.pantasystem.milktea.model.user.User
+import javax.inject.Inject
 
-class PageSettingViewModel(
+@HiltViewModel
+class PageSettingViewModel @Inject constructor(
     val miCore: MiCore,
     val settingStore: SettingStore,
     private val pageTypeNameMap: PageTypeNameMap
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
-
-    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return PageSettingViewModel(
-                miApplication,
-                miApplication.getSettingStore(),
-                PageTypeNameMap(miApplication)
-            ) as T
-        }
-    }
 
     val encryption = miCore.getEncryption()
 
