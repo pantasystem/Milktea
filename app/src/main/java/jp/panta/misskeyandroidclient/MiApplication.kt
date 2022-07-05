@@ -45,7 +45,6 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -106,9 +105,6 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mNoteRepository: NoteRepository
-
-    @Inject
-    lateinit var mUserRepository: UserRepository
 
 
     @Inject
@@ -261,10 +257,6 @@ class MiApplication : Application(), MiCore {
 
     override fun getUserDataSource(): UserDataSource {
         return mUserDataSource
-    }
-
-    override fun getUserRepository(): UserRepository {
-        return mUserRepository
     }
 
 

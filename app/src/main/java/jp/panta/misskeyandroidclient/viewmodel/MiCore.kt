@@ -10,38 +10,15 @@ import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.UserRepository
 
 interface MiCore {
-
-
-
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?
-
-
     fun getUserDataSource(): UserDataSource
-
-    fun getUserRepository(): UserRepository
-
-
     fun getSubscriptionRegistration(): SubscriptionRegistration
-
-
     fun getEncryption(): Encryption
-
-
     fun getCurrentInstanceMeta(): Meta?
-
-
     fun getSettingStore(): SettingStore
-
-
     fun getMisskeyAPIProvider(): MisskeyAPIProvider
-
-
-
     fun getReactionHistoryDataSource(): ReactionHistoryDataSource
-
-
     fun getAccountStore(): AccountStore
 }
