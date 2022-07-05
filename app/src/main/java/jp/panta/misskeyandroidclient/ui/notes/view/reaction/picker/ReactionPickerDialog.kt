@@ -18,11 +18,12 @@ import jp.panta.misskeyandroidclient.databinding.DialogReactionPickerBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import javax.inject.Inject
@@ -33,6 +34,12 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
     @Inject
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
+    @Inject
+    lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var metaRepository: MetaRepository
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -40,8 +47,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         dialog.setContentView(view)
         val binding = DialogReactionPickerBinding.bind(view)
 
-        val miApplication = view.context.applicationContext as MiCore
-        val ac = miApplication.getAccountStore().currentAccount
+        val ac = accountStore.currentAccount
 
 
         val adapter =
@@ -75,8 +81,8 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         }
 
-        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getMetaRepository().observe(it.instanceDomain)
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            metaRepository.observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
         }.onEach { emojis ->
