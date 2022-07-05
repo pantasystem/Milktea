@@ -12,7 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
@@ -54,8 +53,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         val binding = DialogSelectReactionBinding.bind(view)
 
         val activity = activity
-        val miApplication = context?.applicationContext as MiApplication
-        val ar  = miApplication.getAccountStore().currentAccount
+        val ar  = accountStore.currentAccount
 
         activity?: return
         ar?: return

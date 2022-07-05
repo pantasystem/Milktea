@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
@@ -52,9 +53,15 @@ class UserDetailNavigationImpl @Inject constructor(
 ) : UserDetailNavigation {
 
     override fun newIntent(args: UserDetailNavigationArgs): Intent {
-        return when(args) {
-            is UserDetailNavigationArgs.UserId -> UserDetailActivity.newInstance(activity, args.userId)
-            is UserDetailNavigationArgs.UserName -> UserDetailActivity.newInstance(activity, args.userName)
+        return when (args) {
+            is UserDetailNavigationArgs.UserId -> UserDetailActivity.newInstance(
+                activity,
+                args.userId
+            )
+            is UserDetailNavigationArgs.UserName -> UserDetailActivity.newInstance(
+                activity,
+                args.userName
+            )
         }
     }
 }
@@ -122,7 +129,11 @@ class UserDetailActivity : AppCompatActivity() {
     private var mParentActivity: Activities? = null
     val notesViewModel by viewModels<NotesViewModel>()
 
-    @Inject lateinit var settingStore: SettingStore
+    @Inject
+    lateinit var settingStore: SettingStore
+
+    @Inject
+    lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -160,8 +171,6 @@ class UserDetailActivity : AppCompatActivity() {
         Log.d("UserDetailActivity", "userName:$userName")
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        val miApplication = applicationContext as MiApplication
-
         ActionNoteHandler(
             this,
             notesViewModel,
@@ -170,12 +179,12 @@ class UserDetailActivity : AppCompatActivity() {
         )
             .initViewModelListener()
 
-        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().onEach { ar ->
+        accountStore.observeCurrentAccount.filterNotNull().onEach { ar ->
 
             binding.userViewModel = mViewModel
 
             val isEnableGallery =
-                miApplication.getMisskeyAPIProvider().get(ar.instanceDomain) is MisskeyAPIV1275
+                misskeyAPIProvider.get(ar.instanceDomain) is MisskeyAPIV1275
             mViewModel.load()
             mViewModel.user.observe(this) { detail ->
                 if (detail != null) {
@@ -284,7 +293,7 @@ class UserDetailActivity : AppCompatActivity() {
     }
 
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
@@ -328,7 +337,7 @@ class UserDetailActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         Log.d("UserDetail", "mParentActivity: $mParentActivity")
 
@@ -383,7 +392,6 @@ class UserDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun finishAndGoToMainActivity() {
         if (mParentActivity == null || mParentActivity == Activities.ACTIVITY_OUT_APP) {
             val upIntent = Intent(this, MainActivity::class.java)

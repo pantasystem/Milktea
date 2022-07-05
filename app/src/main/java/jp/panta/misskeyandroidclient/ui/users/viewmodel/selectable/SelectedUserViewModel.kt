@@ -3,10 +3,13 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import java.io.Serializable
 
 data class SelectedUserUiState(
@@ -27,25 +30,19 @@ data class SelectedUserUiState(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SelectedUserViewModel(
-    val miCore: MiCore,
-    private val exSelectedUserIds: List<User.Id> = emptyList(),
-    private val exSelectedUsers: List<User> = emptyList()
+class SelectedUserViewModel @AssistedInject constructor(
+    val userDataSource: UserDataSource,
+    @Assisted val exSelectedUserIds: List<User.Id>,
+    @Assisted val exSelectedUsers: List<User>,
 ) : ViewModel() {
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(
-        val miCore: MiCore,
-        private val selectedUserIds: List<User.Id>?,
-        val selectedUsers: List<User>?
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SelectedUserViewModel(
-                miCore,
-                selectedUserIds ?: emptyList(),
-                selectedUsers ?: emptyList()
-            ) as T
-        }
+
+    @AssistedFactory
+    interface AssistedViewModelFactory {
+        fun create(
+            exSelectedUserIds: List<User.Id>,
+            exSelectedUsers: List<User>
+        ): SelectedUserViewModel
     }
 
 
@@ -55,6 +52,8 @@ class SelectedUserViewModel(
         val removed: List<User.Id>,
         val selectedUserNames: List<String>,
     ) : Serializable
+
+    companion object;
 
     private val _state = MutableStateFlow(
         SelectedUserUiState(
@@ -67,7 +66,7 @@ class SelectedUserViewModel(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
     val selectedUserList = selectedUserIds.flatMapLatest { ids ->
-        miCore.getUserDataSource().state.map { state ->
+        userDataSource.state.map { state ->
             ids.mapNotNull {
                 state.get(it)
             }
@@ -114,5 +113,16 @@ class SelectedUserViewModel(
             selectedUsers.map {
                 it.displayUserName
             })
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun SelectedUserViewModel.Companion.provideViewModel(
+    factory: SelectedUserViewModel.AssistedViewModelFactory,
+    selectedUserIds: List<User.Id>,
+    selectedUsers: List<User>
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return factory.create(selectedUserIds, selectedUsers) as T
     }
 }

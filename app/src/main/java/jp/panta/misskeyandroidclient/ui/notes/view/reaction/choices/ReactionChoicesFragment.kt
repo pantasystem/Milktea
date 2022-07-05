@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
@@ -166,8 +165,8 @@ class ReactionChoicesFragment : Fragment() {
 
     @ExperimentalCoroutinesApi
     private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiApplication
-        val emojiFlow = miApplication.getAccountStore().observeCurrentAccount.filterNotNull()
+
+        val emojiFlow = accountStore.observeCurrentAccount.filterNotNull()
             .flatMapLatest {
                 metaRepository.observe(it.instanceDomain)
             }.mapNotNull {
@@ -191,10 +190,9 @@ class ReactionChoicesFragment : Fragment() {
     }
 
     private fun showUserSettings(adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiApplication
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val instance = miApplication.getAccountStore().currentAccount?.instanceDomain
+                val instance = accountStore.currentAccount?.instanceDomain
                 var reactions =
                     reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
                         it.reaction

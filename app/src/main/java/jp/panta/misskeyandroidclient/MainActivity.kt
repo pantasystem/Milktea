@@ -58,6 +58,7 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.messaging.MessagingHistoryFragment
@@ -141,8 +142,6 @@ class MainActivity : AppCompatActivity() {
             onFabClicked()
         }
 
-        val miApplication = application as MiApplication
-
         initAccountViewModelListener()
         binding.setupHeaderProfile()
 
@@ -155,7 +154,7 @@ class MainActivity : AppCompatActivity() {
 
 
         // NOTE: 各ばーしょんに合わせMenuを制御している
-        miApplication.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
+        getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
             changeMenuVisibilityFrom(api)
         }.launchIn(lifecycleScope)
 
@@ -274,12 +273,11 @@ class MainActivity : AppCompatActivity() {
      */
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun ActivityMainBinding.setSimpleEditor() {
-        val miCore = applicationContext as MiCore
         val ft = supportFragmentManager.beginTransaction()
 
         val editor = supportFragmentManager.findFragmentByTag("simpleEditor")
 
-        if (miCore.getSettingStore().isSimpleEditorEnabled) {
+        if (settingStore.isSimpleEditorEnabled) {
             this.appBarMain.fab.visibility = View.GONE
             if (editor == null) {
                 ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
@@ -562,13 +560,14 @@ class MainActivity : AppCompatActivity() {
         ReportStateHandler().invoke(binding.appBarMain.simpleNotification, state)
     }
 
+    @Inject lateinit var misskeyAPIProvider: MisskeyAPIProvider
     @ExperimentalCoroutinesApi
-    private fun MiCore.getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
+    private fun getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
         return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             metaRepository.observe(it.instanceDomain)
         }.map {
             it?.let {
-                this.getMisskeyAPIProvider().get(it.uri, it.getVersion())
+                misskeyAPIProvider.get(it.uri, it.getVersion())
             }
         }
     }

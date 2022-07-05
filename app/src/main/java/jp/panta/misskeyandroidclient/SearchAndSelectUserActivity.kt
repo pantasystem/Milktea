@@ -8,17 +8,17 @@ import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.users.SearchAndSelectUserScreen
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.provideViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -46,11 +46,18 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         }
     }
 
-    private var mSelectedUserIds: List<User.Id>? = null
+    @Inject
+    lateinit var factory: SelectedUserViewModel.AssistedViewModelFactory
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    private lateinit var selectedUserViewModel: SelectedUserViewModel
+    private val selectedUserViewModel: SelectedUserViewModel by viewModels {
+        val selectedUserIdList =
+            (intent.getSerializableExtra(EXTRA_SELECTED_USER_IDS) as? ArrayList<*>)?.mapNotNull {
+                it as? User.Id
+            } ?: emptyList()
+        SelectedUserViewModel.provideViewModel(factory, selectedUserIdList, emptyList())
+    }
 
     private val searchUserViewModel: SearchUserViewModel by viewModels()
 
@@ -58,28 +65,6 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
-
-
-        val selectedUserIdList =
-            (intent.getSerializableExtra(EXTRA_SELECTED_USER_IDS) as? ArrayList<*>)?.mapNotNull {
-                it as? User.Id
-            }
-        mSelectedUserIds = selectedUserIdList
-        Log.d(this.localClassName, "selected user ids :$selectedUserIdList")
-
-
-        val miCore = applicationContext as MiCore
-
-
-        this.selectedUserViewModel =
-            ViewModelProvider(
-                this,
-                SelectedUserViewModel.Factory(
-                    miCore,
-                    selectedUserIdList,
-                    null
-                )
-            )[SelectedUserViewModel::class.java]
 
         setContent {
             MdcTheme {
@@ -110,7 +95,6 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
     private fun setResultFinish() {
         val selectedDiff = selectedUserViewModel.getSelectedUserIdsChangedDiff()
-
 
         val intent = Intent()
 

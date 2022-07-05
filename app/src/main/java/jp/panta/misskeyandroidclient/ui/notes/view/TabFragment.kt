@@ -12,7 +12,6 @@ import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
@@ -23,7 +22,9 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
@@ -33,11 +34,12 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
     private val binding: FragmentTabBinding by dataBinding()
 
+    @Inject
+    lateinit var accountStore: AccountStore
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val miApp = context?.applicationContext as MiApplication
 
 
         mPagerAdapter = binding.viewPager.adapter as? TimelinePagerAdapter
@@ -46,7 +48,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
             binding.viewPager.adapter = mPagerAdapter
         }
 
-        miApp.getAccountStore().observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
+        accountStore.observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
             .onEach { account ->
                 val pages = account.pages
                 Log.d("TabFragment", "pages:$pages")

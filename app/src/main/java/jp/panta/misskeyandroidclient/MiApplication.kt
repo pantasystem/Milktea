@@ -11,7 +11,6 @@ import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -78,8 +77,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mAccountStore: AccountStore
 
-    @Inject
-    lateinit var mEncryption: Encryption
 
     @Inject
     lateinit var mMetaCache: MetaCache
@@ -241,10 +238,6 @@ class MiApplication : Application(), MiCore {
         return urlPreviewProvider.getUrlPreviewStore(account, false)
     }
 
-    override fun getAccountStore(): AccountStore {
-        return mAccountStore
-    }
-
 
     override fun getSubscriptionRegistration(): SubscriptionRegistration {
         return mSubscriptionRegistration
@@ -255,9 +248,6 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override fun getUserDataSource(): UserDataSource {
-        return mUserDataSource
-    }
 
 
     override fun getCurrentInstanceMeta(): Meta? {
@@ -284,15 +274,6 @@ class MiApplication : Application(), MiCore {
         } catch (e: Exception) {
             logger.error("metaの読み込み一連処理に失敗したでち", e)
         }
-    }
-
-
-    override fun getMisskeyAPIProvider(): MisskeyAPIProvider {
-        return mMisskeyAPIProvider
-    }
-
-    override fun getEncryption(): Encryption {
-        return mEncryption
     }
 
 

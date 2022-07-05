@@ -22,7 +22,6 @@ import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.SearchUserFragment
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
@@ -55,6 +55,9 @@ class SearchResultActivity : AppCompatActivity() {
 
     @Inject
     lateinit var settingStore: SettingStore
+
+    @Inject
+    lateinit var accountStore: AccountStore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +93,7 @@ class SearchResultActivity : AppCompatActivity() {
         ).initViewModelListener()
         invalidateOptionsMenu()
 
-        (application as MiCore).getAccountStore().observeCurrentAccount.onEach { ar ->
+        accountStore.observeCurrentAccount.onEach { ar ->
             mAccountRelation = ar
         }.launchIn(lifecycleScope)
 
