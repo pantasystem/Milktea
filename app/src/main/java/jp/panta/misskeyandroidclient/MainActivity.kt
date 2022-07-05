@@ -84,9 +84,13 @@ class MainActivity : AppCompatActivity() {
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
+    @Inject
+    lateinit var loggerFactory: Logger.Factory
     private val logger: Logger by lazy {
-        (applicationContext as MiCore).loggerFactory.create("MainActivity")
+        loggerFactory.create("MainActivity")
     }
+
+
 
     private val binding: ActivityMainBinding by dataBinding()
 

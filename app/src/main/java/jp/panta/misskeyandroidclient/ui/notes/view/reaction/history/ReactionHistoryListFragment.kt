@@ -7,16 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionHistoryListBinding
-import net.pantasystem.milktea.model.notes.Note
-import jp.panta.misskeyandroidclient.ui.users.SimpleUserListAdapter
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.provideViewModel
+import jp.panta.misskeyandroidclient.ui.users.SimpleUserListAdapter
+import net.pantasystem.milktea.model.notes.Note
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ReactionHistoryListFragment : Fragment() {
 
     companion object {
@@ -39,7 +42,18 @@ class ReactionHistoryListFragment : Fragment() {
 
     lateinit var binding: FragmentReactionHistoryListBinding
     lateinit var mLinearLayoutManager: LinearLayoutManager
-    lateinit var mViewModel: ReactionHistoryViewModel
+
+    @Inject
+    lateinit var assistedFactory: ReactionHistoryViewModel.ViewModelAssistedFactory
+    private val viewModel: ReactionHistoryViewModel by viewModels {
+        val aId = requireArguments().getLong(EXTRA_ACCOUNT_ID, -1)
+        val nId = requireArguments().getString(EXTRA_NOTE_ID)
+        val type = requireArguments().getString(EXTRA_TYPE)
+        requireNotNull(nId)
+        require(aId != -1L)
+        val noteId = Note.Id(aId, nId)
+        ReactionHistoryViewModel.provideViewModel(assistedFactory, noteId, type)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,13 +69,8 @@ class ReactionHistoryListFragment : Fragment() {
 
         val aId = requireArguments().getLong(EXTRA_ACCOUNT_ID, -1)
         val nId = requireArguments().getString(EXTRA_NOTE_ID)
-        val type = requireArguments().getString(EXTRA_TYPE)
         requireNotNull(nId)
         require(aId != -1L)
-        val noteId = Note.Id(aId, nId)
-        val miCore = context?.applicationContext as MiCore
-        val viewModel = ViewModelProvider(this, ReactionHistoryViewModel.Factory(noteId, type, miCore))[ReactionHistoryViewModel::class.java]
-        mViewModel = viewModel
         viewModel.isLoading.observe(viewLifecycleOwner) {
             if(it == true && viewModel.histories.value.isNullOrEmpty()) {
                 // 初期読み込み
@@ -99,7 +108,7 @@ class ReactionHistoryListFragment : Fragment() {
 
             if(endVisibleItemPosition == (itemCount - 1)){
                 Log.d("", "後ろ")
-                mViewModel.next()
+                viewModel.next()
 
             }
 

@@ -11,7 +11,6 @@ import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 
@@ -45,8 +44,6 @@ interface MiCore {
 
 
     fun getMetaRepository(): MetaRepository
-
-    fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory
 
     fun getReactionHistoryDataSource(): ReactionHistoryDataSource
 

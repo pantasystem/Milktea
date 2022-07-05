@@ -20,7 +20,6 @@ import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCac
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
@@ -129,7 +128,6 @@ class MiApplication : Application(), MiCore {
     lateinit var mGroupRepository: GroupRepository
 
 
-    private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
     //    private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
     @Inject
@@ -186,13 +184,7 @@ class MiApplication : Application(), MiCore {
 
 
 
-        mReactionHistoryPaginatorFactory = ReactionHistoryPaginatorImpl.Factory(
-            mReactionHistoryDataSource,
-            mMisskeyAPIProvider,
-            mAccountRepository,
-            getEncryption(),
-            mUserDataSource
-        )
+
 
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
@@ -348,9 +340,6 @@ class MiApplication : Application(), MiCore {
         return mReactionHistoryDataSource
     }
 
-    override fun getReactionHistoryPaginatorFactory(): ReactionHistoryPaginator.Factory {
-        return mReactionHistoryPaginatorFactory
-    }
 
     private val sharedPreferencesChangedListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->

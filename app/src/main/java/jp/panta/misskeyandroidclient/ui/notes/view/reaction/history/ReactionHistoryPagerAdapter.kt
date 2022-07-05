@@ -5,6 +5,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view.reaction.history
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 
