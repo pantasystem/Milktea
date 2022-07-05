@@ -8,31 +8,37 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogCustomEmojiPickerBinding
-import net.pantasystem.milktea.model.emoji.Emoji
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.instance.MetaRepository
+import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
 
     private var mEmojisAdapter: EmojiListAdapter? = null
     private var mSelectionViewModel: EmojiSelectionViewModel? = null
 
+    @Inject
+    lateinit var accountStore: AccountStore
 
+    @Inject
+    lateinit var metaRepository: MetaRepository
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog =  super.onCreateDialog(savedInstanceState)
 
 
 
-        val miCore = requireContext().applicationContext as MiCore
         val binding = View.inflate(dialog.context, R.layout.dialog_custom_emoji_picker, null).let {
             dialog.setContentView(it)
             DialogCustomEmojiPickerBinding.bind(it)
@@ -54,8 +60,8 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
             mEmojisAdapter = adapter
             Log.d("PickerDialog", "アダプターをセットアップしました")
 
-            miCore.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-                miCore.getMetaRepository().observe(it.instanceDomain)
+            accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+                metaRepository.observe(it.instanceDomain)
             }.map {
                 it?.emojis?: emptyList()
             }.onEach {

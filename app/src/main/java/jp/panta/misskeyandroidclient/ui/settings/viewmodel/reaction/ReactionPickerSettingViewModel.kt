@@ -3,33 +3,31 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.setting.ReactionPickerType
+import javax.inject.Inject
 
-class ReactionPickerSettingViewModel(
-    private val account: Account,
+@HiltViewModel
+class ReactionPickerSettingViewModel @Inject constructor(
     private val reactionUserSettingDao: ReactionUserSettingDao,
     private val settingStore: SettingStore,
+    val accountStore: AccountStore,
 ) : ViewModel(), ReactionSelection {
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(private val ar: Account, val miApplication: MiApplication) : ViewModelProvider.Factory{
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val settingStore = miApplication.getSettingStore()
-            return ReactionPickerSettingViewModel(ar, miApplication.reactionUserSettingDao, settingStore) as T
-        }
-    }
+
+    companion object
 
     var reactionPickerType = settingStore.reactionPickerType
         private set
@@ -39,52 +37,62 @@ class ReactionPickerSettingViewModel(
     private var mExistingSettingList: List<ReactionUserSetting>? = null
     private val mReactionSettingReactionNameMap = LinkedHashMap<String, ReactionUserSetting>()
 
-    init{
-        loadSetReactions()
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            accountStore.observeCurrentAccount.filterNotNull().collect {
+                loadSetReactions(it)
+            }
+        }
+
     }
 
-    private fun loadSetReactions(){
-        viewModelScope.launch(Dispatchers.IO){
-            try{
+    private fun loadSetReactions(account: Account) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 val rawSettings = reactionUserSettingDao
                     .findByInstanceDomain(account.instanceDomain)
-                mExistingSettingList = rawSettings?: emptyList()
+                mExistingSettingList = rawSettings ?: emptyList()
                 var settingReactions = rawSettings
-                    ?: LegacyReaction.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
-                if(settingReactions.isEmpty()){
-                    settingReactions = LegacyReaction.defaultReaction.mapIndexed(::toReactionUserSettingFromTextTypeReaction)
+                    ?: LegacyReaction.defaultReaction.mapIndexed { index, str ->
+                        toReactionUserSettingFromTextTypeReaction(account, index, str)
+                    }
+                if (settingReactions.isEmpty()) {
+                    settingReactions =
+                        LegacyReaction.defaultReaction.mapIndexed { index, str ->
+                            toReactionUserSettingFromTextTypeReaction(account, index, str)
+                        }
                 }
                 mReactionSettingReactionNameMap.clear()
-                mReactionSettingReactionNameMap.putAll(settingReactions.map{
+                mReactionSettingReactionNameMap.putAll(settingReactions.map {
                     it.reaction to it
                 })
                 reactionSettingsList.postValue(settingReactions)
 
 
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 Log.e("ReactionPickerSettingVM", "load set reaction error", e)
             }
         }
     }
 
-    fun save(){
+    fun save() {
         val userSettings = this.reactionSettingsList.value
         userSettings?.forEachIndexed { index, reactionUserSetting ->
             reactionUserSetting.weight = index
         }
-        val ex = mExistingSettingList?: emptyList()
-        val removed = ex.filter{ out ->
-            userSettings?.any{ inner ->
+        val ex = mExistingSettingList ?: emptyList()
+        val removed = ex.filter { out ->
+            userSettings?.any { inner ->
                 out.instanceDomain == inner.instanceDomain && out.reaction == inner.reaction
             } == false
         }
-        viewModelScope.launch(Dispatchers.IO){
-            try{
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 reactionUserSettingDao.deleteAll(removed)
-                userSettings?.let{
+                userSettings?.let {
                     reactionUserSettingDao.insertAll(userSettings)
                 }
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 Log.e("ReactionPickerSettingVM", "save error", e)
             }
         }
@@ -92,7 +100,7 @@ class ReactionPickerSettingViewModel(
 
     // delete reaction
     override fun selectReaction(reaction: String) {
-        mReactionSettingReactionNameMap[reaction]?.let{
+        mReactionSettingReactionNameMap[reaction]?.let {
             reactionSelectEvent.event = it
         }
     }
@@ -104,7 +112,8 @@ class ReactionPickerSettingViewModel(
         )
     }
 
-    fun addReaction(reaction: String){
+    fun addReaction(reaction: String) {
+        val account = accountStore.currentAccount ?: return
         mReactionSettingReactionNameMap[reaction] =
             ReactionUserSetting(
                 reaction,
@@ -114,20 +123,24 @@ class ReactionPickerSettingViewModel(
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
     }
 
-    fun putSortedList(list: List<ReactionUserSetting>){
+    fun putSortedList(list: List<ReactionUserSetting>) {
         mReactionSettingReactionNameMap.clear()
-        mReactionSettingReactionNameMap.putAll(list.map{
+        mReactionSettingReactionNameMap.putAll(list.map {
             it.reaction to it
         })
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
     }
 
-    fun setReactionPickerType(type: ReactionPickerType){
+    fun setReactionPickerType(type: ReactionPickerType) {
         settingStore.reactionPickerType = type
         reactionPickerType = type
     }
 
-    private fun toReactionUserSettingFromTextTypeReaction(index: Int, reaction: String): ReactionUserSetting {
+    private fun toReactionUserSettingFromTextTypeReaction(
+        account: Account,
+        index: Int,
+        reaction: String
+    ): ReactionUserSetting {
         return ReactionUserSetting(
             reaction,
             account.instanceDomain,

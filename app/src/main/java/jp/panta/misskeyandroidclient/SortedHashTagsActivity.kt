@@ -1,13 +1,15 @@
 package jp.panta.misskeyandroidclient
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySortedHashTagsBinding
 import jp.panta.misskeyandroidclient.ui.tags.SortedHashTagFragment
 import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
 
+@AndroidEntryPoint
 class SortedHashTagsActivity : AppCompatActivity() {
 
     companion object{

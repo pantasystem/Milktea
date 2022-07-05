@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.UserDetailActivity
@@ -15,14 +15,12 @@ import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.providerViewModel
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.model.user.User
+import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails {
 
     companion object {
@@ -34,8 +32,6 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         const val EXTRA_STATE = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_STATE"
 
         @JvmStatic
-        @FlowPreview
-        @ExperimentalCoroutinesApi
         fun newInstance(type: SortedUsersViewModel.Type): SortedUsersFragment {
             return SortedUsersFragment()
                 .apply {
@@ -66,9 +62,10 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
     private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    @Inject
+    lateinit var sortedUserViewModelFactory: SortedUsersViewModel.AssistedViewModelFactory
 
+    private val exploreUsersViewModel: SortedUsersViewModel by viewModels {
         val type =
             arguments?.getSerializable(EXTRA_EXPLORE_USERS_TYPE) as? SortedUsersViewModel.Type
         val condition = SortedUsersViewModel.UserRequestConditions(
@@ -76,14 +73,11 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
             state = arguments?.getSerializable(EXTRA_STATE) as? RequestUser.State?,
             origin = arguments?.getSerializable(EXTRA_ORIGIN) as? RequestUser.Origin?
         )
+        SortedUsersViewModel.providerViewModel(sortedUserViewModelFactory, type, condition)
+    }
 
-        val miCore = view.context.applicationContext as MiCore
-        val exploreUsersViewModel = ViewModelProvider(
-            this,
-            SortedUsersViewModel.Factory(miCore, type, condition)
-        )[SortedUsersViewModel::class.java]
-
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner) {
             mBinding.exploreUsersSwipeRefresh.isRefreshing = it ?: false

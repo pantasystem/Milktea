@@ -8,11 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.PageType
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,13 +18,20 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.PageableTemplate
+import javax.inject.Inject
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class NotificationMentionFragment : Fragment(R.layout.fragment_notification_mention) {
 
     private val mBinding: FragmentNotificationMentionBinding by dataBinding()
+    @Inject
+    lateinit var accountStore: AccountStore
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,8 +49,8 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
         mBinding.notificationPager.adapter = notificationPagerAdapter
         mBinding.notificationTab.setupWithViewPager(mBinding.notificationPager)
 
-        val miCore = requireContext().applicationContext as MiApplication
-        miCore.getAccountStore().observeCurrentAccount.filterNotNull().onEach {
+
+        accountStore.observeCurrentAccount.filterNotNull().onEach {
             notificationPagerAdapter.notifyDataSetChanged()
         }.launchIn(lifecycleScope)
 

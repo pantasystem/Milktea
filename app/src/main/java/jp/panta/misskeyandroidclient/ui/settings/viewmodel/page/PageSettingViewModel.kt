@@ -3,12 +3,10 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel.page
 import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -17,36 +15,32 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.*
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
+import javax.inject.Inject
 
-class PageSettingViewModel(
-    val miCore: MiCore,
+@HiltViewModel
+class PageSettingViewModel @Inject constructor(
     val settingStore: SettingStore,
-    private val pageTypeNameMap: PageTypeNameMap
+    private val pageTypeNameMap: PageTypeNameMap,
+    private val userRepository: UserRepository,
+    private val accountStore: AccountStore,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val encryption: Encryption
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
-    class Factory(val miApplication: MiApplication) : ViewModelProvider.Factory {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return PageSettingViewModel(
-                miApplication,
-                miApplication.getSettingStore(),
-                PageTypeNameMap(miApplication)
-            ) as T
-        }
-    }
-
-    val encryption = miCore.getEncryption()
 
     val selectedPages = MediatorLiveData<List<Page>>()
 
     var account: Account? = null
-        get() = miCore.getAccountStore().currentAccount
+        get() = accountStore.currentAccount
         private set
 
 
@@ -58,7 +52,7 @@ class PageSettingViewModel(
 
     init {
 
-        miCore.getAccountStore().observeCurrentAccount.filterNotNull().onEach {
+        accountStore.observeCurrentAccount.filterNotNull().onEach {
             account = it
             selectedPages.postValue(
                 it.pages.sortedBy { p ->
@@ -84,7 +78,7 @@ class PageSettingViewModel(
         }
         Log.d("PageSettingVM", "pages:$list")
         viewModelScope.launch(Dispatchers.IO) {
-            miCore.getAccountStore().replaceAllPage(list).onFailure {
+            accountStore.replaceAllPage(list).onFailure {
                 Log.e("PageSettingVM", "保存失敗", it)
             }
         }
@@ -121,7 +115,7 @@ class PageSettingViewModel(
     fun addUserPageById(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getMisskeyAPIProvider().get(account!!).showUser(
+                misskeyAPIProvider.get(account!!).showUser(
                     RequestUser(userId = userId, i = account?.getI(encryption))
                 ).throwIfHasError().body() ?: throw IllegalStateException()
             }.onSuccess {
@@ -148,7 +142,7 @@ class PageSettingViewModel(
         val pageable = Pageable.Gallery.User(userId = userId)
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val user = miCore.getUserRepository()
+                val user = userRepository
                     .find(User.Id(accountId = account!!.accountId, id = userId))
                 val name =
                     if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName

@@ -35,7 +35,6 @@ import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -45,6 +44,7 @@ import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_S
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.model.account.AccountStore
@@ -132,6 +132,8 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
     @Inject
     lateinit var metaRepository: MetaRepository
 
+    @Inject
+    lateinit var settingStore: SettingStore
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -451,8 +453,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
      * 設定をもとにToolbarを表示するベースとなるViewGroupを非表示・表示＆取得をしている
      */
     private fun getToolbarBase(): ViewGroup {
-        val miCore = applicationContext as MiCore
-        return if (miCore.getSettingStore().isPostButtonAtTheBottom) {
+        return if (settingStore.isPostButtonAtTheBottom) {
             mBinding.noteEditorToolbar.visibility = View.GONE
             mBinding.bottomToolbarBase.visibility = View.VISIBLE
             mBinding.bottomToolbarBase

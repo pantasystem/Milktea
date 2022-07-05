@@ -1,49 +1,50 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.*
-import jp.panta.misskeyandroidclient.di.module.getNoteDataSourceAdder
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import java.io.Serializable
 
-@Suppress("UNCHECKED_CAST")
-@FlowPreview
-@ExperimentalCoroutinesApi
-class SortedUsersViewModel(
-    val miCore: MiCore,
-    type: Type?,
-    orderBy: UserRequestConditions?
+@OptIn(ExperimentalCoroutinesApi::class)
+class SortedUsersViewModel @AssistedInject constructor(
+    private val noteDataSourceAdder: NoteDataSourceAdder,
+    loggerFactory: Logger.Factory,
+    private val userDataSource: UserDataSource,
+    private val accountStore: AccountStore,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val encryption: Encryption,
+    @Assisted type: Type?,
+    @Assisted conditions: UserRequestConditions?
 ) : ViewModel() {
-    private val orderBy: UserRequestConditions = type?.conditions ?: orderBy!!
 
-    val logger = miCore.loggerFactory.create("SortedUsersViewModel")
-
-
-    private val noteDataSourceAdder = miCore.getNoteDataSourceAdder()
-
-    class Factory(
-        val miCore: MiCore,
-        val type: Type?,
-        private val orderBy: UserRequestConditions?
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SortedUsersViewModel(
-                miCore,
-                type,
-                orderBy
-            ) as T
-        }
+    @AssistedFactory
+    interface AssistedViewModelFactory {
+        fun create(type: Type?, conditions: UserRequestConditions?): SortedUsersViewModel
     }
+
+    companion object;
+
+    private val orderBy: UserRequestConditions = type?.conditions ?: conditions!!
+
+    val logger = loggerFactory.create("SortedUsersViewModel")
+
 
     data class UserRequestConditions(
         val origin: RequestUser.Origin?,
@@ -110,7 +111,8 @@ class SortedUsersViewModel(
     private val userIds = MutableStateFlow<List<User.Id>>(emptyList())
 
 
-    val users = miCore.getUserDataSource().state.flatMapLatest { state ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val users = userDataSource.state.flatMapLatest { state ->
         userIds.map { list ->
             list.mapNotNull {
                 state.get(it) as? User.Detail
@@ -123,8 +125,8 @@ class SortedUsersViewModel(
 
     fun loadUsers() {
 
-        val account = miCore.getAccountStore().currentAccount
-        val i = account?.getI(miCore.getEncryption())
+        val account = accountStore.currentAccount
+        val i = account?.getI(encryption)
 
         if (i == null) {
             isRefreshing.value = false
@@ -135,7 +137,7 @@ class SortedUsersViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                miCore.getMisskeyAPIProvider().get(account).getUsers(orderBy.toRequestUser(i))
+                misskeyAPIProvider.get(account).getUsers(orderBy.toRequestUser(i))
                     .body()
             }
                 .map {
@@ -144,7 +146,7 @@ class SortedUsersViewModel(
                             noteDataSourceAdder.addNoteDtoToDataSource(account, noteDTO)
                         }
                         dto.toUser(account, true).also { u ->
-                            miCore.getUserDataSource().add(u)
+                            userDataSource.add(u)
                         }
                     }?.map { u ->
                         u.id
@@ -161,4 +163,16 @@ class SortedUsersViewModel(
     }
 
 
+}
+
+@Suppress("UNCHECKED_CAST")
+fun SortedUsersViewModel.Companion.providerViewModel(
+    factory: SortedUsersViewModel.AssistedViewModelFactory,
+    type: SortedUsersViewModel.Type?,
+    orderBy: SortedUsersViewModel.UserRequestConditions?
+
+) = object : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return factory.create(type, orderBy) as T
+    }
 }

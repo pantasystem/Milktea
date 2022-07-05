@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -41,7 +40,6 @@ class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
-    private val miCore: MiCore,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("SearchUserViewModel")
@@ -70,7 +68,7 @@ class SearchUserViewModel @Inject constructor(
                                     host = it.host
                                 )
                         } else {
-                            miCore.getUserRepository()
+                            userRepository
                                 .searchByName(
                                     accountId = account.accountId,
                                     name = it.word

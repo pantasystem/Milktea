@@ -5,15 +5,15 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
 import jp.panta.misskeyandroidclient.setTheme
@@ -23,12 +23,22 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPick
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ReactionSettingActivity : AppCompatActivity() {
 
     private lateinit var mCustomEmojiDecorator: CustomEmojiDecorator
-    private var mReactionPickerSettingViewModel: ReactionPickerSettingViewModel? = null
+
+
+    val mReactionPickerSettingViewModel: ReactionPickerSettingViewModel by viewModels()
+
+    @Inject lateinit var metaRepository: MetaRepository
+
+    @Inject lateinit var accountStore: AccountStore
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +49,6 @@ class ReactionSettingActivity : AppCompatActivity() {
         setSupportActionBar(binding.reactionSettingToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val miApplication = applicationContext as MiApplication
         mCustomEmojiDecorator = CustomEmojiDecorator()
         val flexBoxLayoutManager = FlexboxLayoutManager(this)
         flexBoxLayoutManager.flexDirection = FlexDirection.ROW
@@ -51,29 +60,24 @@ class ReactionSettingActivity : AppCompatActivity() {
         val touchHelper = ItemTouchHelper(ItemTouchCallback())
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
-        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().onEach {
-            mReactionPickerSettingViewModel = ViewModelProvider(this, ReactionPickerSettingViewModel.Factory(it, miApplication))[ReactionPickerSettingViewModel::class.java]
-            binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel!!
-            val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel!!)
-            binding.reactionSettingListView.adapter = reactionsAdapter
+        binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel
+        val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel)
+        binding.reactionSettingListView.adapter = reactionsAdapter
+        mReactionPickerSettingViewModel.reactionSettingsList.observe(this) { list ->
+            reactionsAdapter.submitList(list.map { rus ->
+                rus.reaction
+            })
+        }
 
-            mReactionPickerSettingViewModel?.reactionSettingsList?.observe(this) { list ->
-                reactionsAdapter.submitList(list.map { rus ->
-                    rus.reaction
-                })
-            }
+        mReactionPickerSettingViewModel.reactionSelectEvent.observe(this) { rus ->
+            showConfirmDeleteReactionDialog(rus.reaction)
+        }
 
-            mReactionPickerSettingViewModel?.reactionSelectEvent?.observe(this) { rus ->
-                showConfirmDeleteReactionDialog(rus.reaction)
-            }
-
-            binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel?.reactionPickerType?.ordinal?: 0)
+        binding.reactionPickerType.setSelection(mReactionPickerSettingViewModel.reactionPickerType.ordinal)
 
 
-        }.launchIn(lifecycleScope)
-
-        miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getMetaRepository().observe(it.instanceDomain)
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            metaRepository.observe(it.instanceDomain)
         }.distinctUntilChanged().mapNotNull {
             it?.emojis
         }.onEach { emojis ->
@@ -81,7 +85,7 @@ class ReactionSettingActivity : AppCompatActivity() {
             binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
             binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
                 val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]
-                mReactionPickerSettingViewModel?.addReaction(emoji)
+                mReactionPickerSettingViewModel.addReaction(emoji)
                 binding.reactionSettingField.setText("")
             }
         }.launchIn(lifecycleScope)
@@ -91,7 +95,7 @@ class ReactionSettingActivity : AppCompatActivity() {
             if(keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER && text != null){
                 if(keyEvent.action == KeyEvent.ACTION_UP){
                     if(text.isNotBlank()){
-                        mReactionPickerSettingViewModel?.addReaction(text.toString())
+                        mReactionPickerSettingViewModel.addReaction(text.toString())
                         binding.reactionSettingField.setText("")
 
                     }
@@ -109,7 +113,7 @@ class ReactionSettingActivity : AppCompatActivity() {
                     1 -> ReactionPickerType.SIMPLE
                     else -> throw IllegalArgumentException("error")
                 }
-                mReactionPickerSettingViewModel?.setReactionPickerType(pickerType)
+                mReactionPickerSettingViewModel.setReactionPickerType(pickerType)
             }
             override fun onNothingSelected(p0: AdapterView<*>?) {
 
@@ -121,7 +125,7 @@ class ReactionSettingActivity : AppCompatActivity() {
 
     override fun onStop(){
         super.onStop()
-        mReactionPickerSettingViewModel?.save()
+        mReactionPickerSettingViewModel.save()
     }
 
     inner class ItemTouchCallback : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT, ItemTouchHelper.ACTION_STATE_IDLE){
@@ -132,12 +136,12 @@ class ReactionSettingActivity : AppCompatActivity() {
         ): Boolean {
             val from = viewHolder.absoluteAdapterPosition
             val to = target.absoluteAdapterPosition
-            val exList = mReactionPickerSettingViewModel?.reactionSettingsList?.value?: emptyList()
+            val exList = mReactionPickerSettingViewModel.reactionSettingsList.value?: emptyList()
             val list = ArrayList(exList)
             val d = list.removeAt(from)
             list.add(to, d)
             //mReactionPickerSettingViewModel?.reactionSettingsList?.postValue(list)
-            mReactionPickerSettingViewModel?.putSortedList(list)
+            mReactionPickerSettingViewModel.putSortedList(list)
             return true
         }
 
@@ -154,7 +158,7 @@ class ReactionSettingActivity : AppCompatActivity() {
 
             }
             .setPositiveButton(android.R.string.ok){ _, _ ->
-                mReactionPickerSettingViewModel?.deleteReaction(reaction)
+                mReactionPickerSettingViewModel.deleteReaction(reaction)
             }
             .show()
     }

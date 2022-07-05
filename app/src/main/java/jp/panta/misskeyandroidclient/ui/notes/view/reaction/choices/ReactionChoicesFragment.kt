@@ -11,21 +11,22 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MiApplication
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentReactionChoicesBinding
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 @AndroidEntryPoint
 class ReactionChoicesFragment : Fragment() {
 
@@ -58,6 +59,11 @@ class ReactionChoicesFragment : Fragment() {
     @Inject lateinit var reactionHistoryDao: ReactionHistoryDao
     @Inject lateinit var reactionUserSettingDao: ReactionUserSettingDao
 
+    @Inject
+    lateinit var metaRepository: MetaRepository
+
+    @Inject
+    lateinit var accountStore: AccountStore
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -105,11 +111,11 @@ class ReactionChoicesFragment : Fragment() {
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun showDefault(adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiApplication
         val defaultReaction = LegacyReaction.defaultReaction
-        val emojiFlow = miApplication.getAccountStore().observeCurrentAccount.filterNotNull().flatMapLatest {
-            miApplication.getMetaRepository().observe(it.instanceDomain)
+        val emojiFlow = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            metaRepository.observe(it.instanceDomain)
         }.mapNotNull {
             it?.emojis
         }.map { emojis ->
@@ -127,10 +133,10 @@ class ReactionChoicesFragment : Fragment() {
     }
 
     private fun showFrequency(adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiCore
-        val ac = miApplication.getAccountStore().currentAccount?: return
+
+        val ac = accountStore.currentAccount?: return
         lifecycleScope.launch(Dispatchers.IO) {
-            val meta = miApplication.getMetaRepository().get(ac.instanceDomain)
+            val meta = metaRepository.get(ac.instanceDomain)
             val list = reactionHistoryDao.sumReactions(ac.instanceDomain).map {
                 it.reaction
             }.map { reaction ->
@@ -159,10 +165,10 @@ class ReactionChoicesFragment : Fragment() {
 
     @ExperimentalCoroutinesApi
     private fun showCategoryBy(category: String, adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiApplication
-        val emojiFlow = miApplication.getAccountStore().observeCurrentAccount.filterNotNull()
+
+        val emojiFlow = accountStore.observeCurrentAccount.filterNotNull()
             .flatMapLatest {
-                miApplication.getMetaRepository().observe(it.instanceDomain)
+                metaRepository.observe(it.instanceDomain)
             }.mapNotNull {
                 it?.emojis
             }.map { emojis ->
@@ -184,10 +190,9 @@ class ReactionChoicesFragment : Fragment() {
     }
 
     private fun showUserSettings(adapter: ReactionChoicesAdapter) {
-        val miApplication = context?.applicationContext as MiApplication
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val instance = miApplication.getAccountStore().currentAccount?.instanceDomain
+                val instance = accountStore.currentAccount?.instanceDomain
                 var reactions =
                     reactionUserSettingDao.findByInstanceDomain(instance!!)?.map {
                         it.reaction

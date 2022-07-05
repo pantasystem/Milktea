@@ -5,12 +5,16 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogEditTabNameBinding
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
 
+@AndroidEntryPoint
 class EditTabNameDialog : AppCompatDialogFragment(){
+
+    private val pageSettingViewModel: PageSettingViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -18,7 +22,6 @@ class EditTabNameDialog : AppCompatDialogFragment(){
         val binding = DataBindingUtil.bind<DialogEditTabNameBinding>(view)
         requireNotNull(binding)
         dialog.setContentView(view)
-        val pageSettingViewModel = ViewModelProvider(requireActivity())[PageSettingViewModel::class.java]
 
         val page = pageSettingViewModel.pageOnUpdateEvent.event
         if(page == null){
