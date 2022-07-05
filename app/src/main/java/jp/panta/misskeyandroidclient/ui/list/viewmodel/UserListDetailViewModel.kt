@@ -7,14 +7,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListStore
 import net.pantasystem.milktea.model.user.User
@@ -22,8 +22,9 @@ import net.pantasystem.milktea.model.user.User
 @FlowPreview
 @ExperimentalCoroutinesApi
 class UserListDetailViewModel @AssistedInject constructor(
-    val miCore: MiCore,
-    val userListStore: UserListStore,
+    private val userListStore: UserListStore,
+    private val userViewDataFactory: UserViewData.Factory,
+    loggerFactory: Logger.Factory,
     @Assisted val listId: UserList.Id,
 ) : ViewModel() {
 
@@ -44,7 +45,6 @@ class UserListDetailViewModel @AssistedInject constructor(
         }
     }
 
-    private val userViewDataFactory = miCore.userViewDataFactory()
 
     val userList = userListStore.state.map {
         it.get(listId)
@@ -59,7 +59,7 @@ class UserListDetailViewModel @AssistedInject constructor(
         }
     }.asLiveData()
 
-    private val logger = miCore.loggerFactory.create("UserListDetailViewModel")
+    private val logger = loggerFactory.create("UserListDetailViewModel")
 
     init {
         load()

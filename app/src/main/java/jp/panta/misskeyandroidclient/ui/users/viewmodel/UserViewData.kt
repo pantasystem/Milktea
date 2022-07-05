@@ -2,7 +2,6 @@ package jp.panta.misskeyandroidclient.ui.users.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +11,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
 open class UserViewData(
     val userId: User.Id?,
@@ -25,12 +26,15 @@ open class UserViewData(
     dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    class Factory(
+    @Singleton
+    class Factory @Inject constructor(
         val userRepository: UserRepository,
         val userDataSource: UserDataSource,
-        val logger: Logger,
+        val logger: Logger.Factory,
     ) {
 
+
+        private val l = logger.create("UserViewData")
 
         fun create(
             userId: User.Id,
@@ -41,7 +45,7 @@ open class UserViewData(
                 userId,
                 userDataSource,
                 userRepository,
-                logger,
+                l,
                 coroutineScope,
                 dispatcher,
             )
@@ -61,7 +65,7 @@ open class UserViewData(
                 accountId,
                 userDataSource,
                 userRepository,
-                logger,
+                l,
                 coroutineScope,
                 dispatcher
             )
@@ -76,7 +80,7 @@ open class UserViewData(
                 user,
                 userDataSource,
                 userRepository,
-                logger,
+                l,
                 coroutineScope,
                 dispatcher,
             )
@@ -170,12 +174,4 @@ open class UserViewData(
         }
     }
 
-}
-
-fun MiCore.userViewDataFactory(): UserViewData.Factory {
-    return UserViewData.Factory(
-        getUserRepository(),
-        getUserDataSource(),
-        loggerFactory.create("UserViewData")
-    )
 }

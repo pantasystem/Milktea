@@ -15,14 +15,12 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionHistoryPaginatorImpl
-import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
@@ -30,7 +28,6 @@ import net.pantasystem.milktea.data.infrastructure.settings.str
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
-import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
@@ -38,7 +35,6 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
@@ -50,7 +46,6 @@ import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -113,8 +108,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
 
-    @Inject
-    lateinit var mFilePropertyDataSource: FilePropertyDataSource
 
 
     @Inject
@@ -135,8 +128,6 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mGroupRepository: GroupRepository
 
-    @Inject
-    lateinit var mGetters: Getters
 
     private lateinit var mReactionHistoryPaginatorFactory: ReactionHistoryPaginator.Factory
 
@@ -152,8 +143,6 @@ class MiApplication : Application(), MiCore {
     lateinit var mFileUploaderProvider: FileUploaderProvider
 
 
-    @Inject
-    lateinit var mNoteReservationPostExecutor: NoteReservationPostExecutor
 
 
     @Inject
@@ -178,15 +167,11 @@ class MiApplication : Application(), MiCore {
     lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
 
 
-    @Inject
-    lateinit var mUnreadNotificationDAO: UnreadNotificationDAO
 
     @Inject
     lateinit var mSubscriptionRegistration: SubscriptionRegistration
 
 
-    @Inject
-    lateinit var mSubscriptionUnRegistration: SubscriptionUnRegistration
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -281,9 +266,6 @@ class MiApplication : Application(), MiCore {
     }
 
 
-    override suspend fun getAccount(accountId: Long): Account {
-        return mAccountRepository.get(accountId)
-    }
 
     override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
         return urlPreviewProvider.getUrlPreviewStore(account, false)
@@ -298,25 +280,15 @@ class MiApplication : Application(), MiCore {
         return mSubscriptionRegistration
     }
 
-    override fun getSubscriptionUnRegstration(): SubscriptionUnRegistration {
-        return mSubscriptionUnRegistration
-    }
 
 
 
-
-    override fun getGetters(): Getters {
-        return mGetters
-    }
 
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
     }
 
-    override fun getNoteDataSource(): NoteDataSource {
-        return mNoteDataSource
-    }
 
 
     override fun getUserDataSource(): UserDataSource {
@@ -327,18 +299,13 @@ class MiApplication : Application(), MiCore {
         return mUserRepository
     }
 
-    override fun getFilePropertyDataSource(): FilePropertyDataSource {
-        return mFilePropertyDataSource
-    }
 
 
     override fun getMetaRepository(): MetaRepository {
         return mMetaRepository
     }
 
-    override fun getNoteReservationPostExecutor(): NoteReservationPostExecutor {
-        return mNoteReservationPostExecutor
-    }
+
 
 
     override fun getCurrentInstanceMeta(): Meta? {

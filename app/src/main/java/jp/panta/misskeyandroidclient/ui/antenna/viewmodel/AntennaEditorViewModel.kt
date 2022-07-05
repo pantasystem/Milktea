@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
@@ -32,12 +31,12 @@ import javax.inject.Inject
 @HiltViewModel
 class AntennaEditorViewModel @Inject constructor(
     val miCore: MiCore,
+    val userViewDataFactory: UserViewData.Factory,
     val accountRepository: AccountRepository,
 ) : ViewModel(){
 
 
     private val logger = miCore.loggerFactory.create("AntennaEditorViewModel")
-    private val userViewDataFactory = miCore.userViewDataFactory()
 
 
     private val _antennaId = MutableStateFlow<Antenna.Id?>(null)

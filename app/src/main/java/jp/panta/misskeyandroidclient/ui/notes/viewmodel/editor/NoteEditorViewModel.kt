@@ -6,13 +6,12 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.userViewDataFactory
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
@@ -28,6 +27,7 @@ import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import java.io.IOException
@@ -37,7 +37,6 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
-    private val miCore: MiCore,
     private val noteRepository: NoteRepository,
     private val userRepository: UserRepository,
     private val filePropertyDataSource: FilePropertyDataSource,
@@ -48,11 +47,11 @@ class NoteEditorViewModel @Inject constructor(
     private val createNoteUseCase: CreateNoteUseCase,
     private val draftNoteService: DraftNoteService,
     private val draftNoteRepository: DraftNoteRepository,
+    private val noteReservationPostExecutor: NoteReservationPostExecutor,
+    private val userViewDataFactory: UserViewData.Factory,
+    private val settingStore: SettingStore
 ) : ViewModel() {
 
-    private val userViewDataFactory by lazy {
-        miCore.userViewDataFactory()
-    }
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -226,7 +225,7 @@ class NoteEditorViewModel @Inject constructor(
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         accountStore.observeCurrentAccount.filterNotNull().onEach {
-            val v = miCore.getSettingStore().getNoteVisibility(it.accountId)
+            val v = settingStore.getNoteVisibility(it.accountId)
             _state.value = _state.value.setVisibility(v)
 
         }.launchIn(viewModelScope + Dispatchers.IO)
@@ -271,7 +270,7 @@ class NoteEditorViewModel @Inject constructor(
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+
     fun post() {
         currentAccount.value?.let { account ->
             viewModelScope.launch(Dispatchers.IO) {
@@ -287,7 +286,7 @@ class NoteEditorViewModel @Inject constructor(
                         val dfNote = draftNoteService.save(_state.value.toCreateNote(account))
                             .getOrThrow()
 
-                        miCore.getNoteReservationPostExecutor().register(dfNote)
+                        noteReservationPostExecutor.register(dfNote)
                     }.onFailure {
                         logger.error("登録失敗", it)
                     }
@@ -447,8 +446,9 @@ class NoteEditorViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 try {
-                    val account = accountStore.currentAccount?: throw UnauthorizedException()
-                    val result = draftNoteService.save(_state.value.toCreateNote(account)).getOrThrow()
+                    val account = accountStore.currentAccount ?: throw UnauthorizedException()
+                    val result =
+                        draftNoteService.save(_state.value.toCreateNote(account)).getOrThrow()
                     isSaveNoteAsDraft.event = result.draftNoteId
                 } catch (e: Exception) {
                     logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
