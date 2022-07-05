@@ -43,7 +43,6 @@ import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -155,10 +154,9 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var lf: Logger.Factory
-    override val loggerFactory: Logger.Factory
-        get() = lf
+
     private val logger: Logger by lazy {
-        loggerFactory.create("MiApplication")
+        lf.create("MiApplication")
     }
 
     @Inject
@@ -181,10 +179,6 @@ class MiApplication : Application(), MiCore {
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)
-
-
-
-
 
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
@@ -271,11 +265,6 @@ class MiApplication : Application(), MiCore {
     override fun getSubscriptionRegistration(): SubscriptionRegistration {
         return mSubscriptionRegistration
     }
-
-
-
-
-
 
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore

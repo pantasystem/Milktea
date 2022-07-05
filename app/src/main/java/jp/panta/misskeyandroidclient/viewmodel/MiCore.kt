@@ -1,7 +1,6 @@
 package jp.panta.misskeyandroidclient.viewmodel
 
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -16,8 +15,6 @@ import net.pantasystem.milktea.model.user.UserRepository
 
 interface MiCore {
 
-
-    val loggerFactory: Logger.Factory
 
 
     fun getUrlPreviewStore(account: Account): UrlPreviewStore?

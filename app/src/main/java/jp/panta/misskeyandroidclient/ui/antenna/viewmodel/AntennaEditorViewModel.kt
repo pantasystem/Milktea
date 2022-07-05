@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.I
@@ -16,7 +15,10 @@ import net.pantasystem.milktea.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.antenna.Antenna
@@ -30,13 +32,15 @@ import javax.inject.Inject
 @Suppress("BlockingMethodInNonBlockingContext")
 @HiltViewModel
 class AntennaEditorViewModel @Inject constructor(
-    val miCore: MiCore,
     val userViewDataFactory: UserViewData.Factory,
+    val loggerFactory: Logger.Factory,
     val accountRepository: AccountRepository,
+    val misskeyAPIProvider: MisskeyAPIProvider,
+    val encryption: Encryption,
 ) : ViewModel(){
 
 
-    private val logger = miCore.loggerFactory.create("AntennaEditorViewModel")
+    private val logger = loggerFactory.create("AntennaEditorViewModel")
 
 
     private val _antennaId = MutableStateFlow<Antenna.Id?>(null)
@@ -117,9 +121,9 @@ class AntennaEditorViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                miCore.getMisskeyAPIProvider().get(account).userList(
+                misskeyAPIProvider.get(account).userList(
                     I(
-                        account.getI(miCore.getEncryption())
+                        account.getI(encryption)
                     )
                 ).body()
             }.onSuccess {
@@ -201,10 +205,10 @@ class AntennaEditorViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                val api = miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12
+                val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
                 val antenna = mAntenna.value
                 val request = AntennaToAdd(
-                    account.getI(miCore.getEncryption()),
+                    account.getI(encryption),
                     _antennaId.value?.antennaId,
                     name.value ?: antenna?.name ?: "",
                     source.value?.remote!!,
@@ -250,10 +254,10 @@ class AntennaEditorViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                (miCore.getMisskeyAPIProvider().get(account) as MisskeyAPIV12).deleteAntenna(
+                (misskeyAPIProvider.get(account) as MisskeyAPIV12).deleteAntenna(
                     AntennaQuery(
                         antennaId = antennaId.antennaId,
-                        i = account.getI(miCore.getEncryption()),
+                        i = account.getI(encryption),
                         limit = null
                     )
                 )
@@ -309,12 +313,12 @@ class AntennaEditorViewModel @Inject constructor(
     private suspend fun fetch(): Antenna? {
         return _antennaId.value?.let{ antennaId ->
             val account = accountRepository.get(antennaId.accountId)
-            val api = miCore.getMisskeyAPIProvider().get(account) as? MisskeyAPIV12
+            val api = misskeyAPIProvider.get(account) as? MisskeyAPIV12
                 ?: return null
             val res = api.showAntenna(
                 AntennaQuery(
                     i = account.getI(
-                        miCore.getEncryption()
+                        encryption
                     ), antennaId = antennaId.antennaId, limit = null
                 )
             )
