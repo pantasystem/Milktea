@@ -13,12 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferenceName
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
-import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.MessageDataSource
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
@@ -28,22 +23,14 @@ import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDi
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
-import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
-import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaCache
-import net.pantasystem.milktea.model.messaging.UnReadMessages
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.model.notification.NotificationDataSource
-import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -51,23 +38,10 @@ import javax.inject.Inject
 class MiApplication : Application(), MiCore {
 
     @Inject
-    lateinit var database: DataBase
-
-    @Inject
-    lateinit var reactionUserSettingDao: ReactionUserSettingDao
+    lateinit var mAccountRepository: AccountRepository
 
     @Inject
     lateinit var mSettingStore: SettingStore
-
-    @Inject
-    lateinit var draftNoteDao: DraftNoteDao
-
-    @Inject
-    lateinit var urlPreviewDAO: UrlPreviewDAO
-
-    @Inject
-    lateinit var mAccountRepository: AccountRepository
-
 
     @Inject
     lateinit var mFetchMeta: FetchMeta
@@ -77,43 +51,14 @@ class MiApplication : Application(), MiCore {
     @Inject
     lateinit var mAccountStore: AccountStore
 
-
     @Inject
     lateinit var mMetaCache: MetaCache
 
     @Inject
-    lateinit var mMisskeyAPIProvider: MisskeyAPIProvider
-
-    @Inject
-    lateinit var mNoteDataSource: NoteDataSource
-
-    @Inject
-    lateinit var mUserDataSource: UserDataSource
-
-    @Inject
-    lateinit var mNotificationDataSource: NotificationDataSource
-
-    @Inject
-    lateinit var mMessageDataSource: MessageDataSource
-
-    @Inject
     lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
-
-
-    @Inject
-    lateinit var mNoteRepository: NoteRepository
-
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
-
-
-    @Inject
-    lateinit var mUnreadMessages: UnReadMessages
-
-
-    @Inject
-    lateinit var mGroupRepository: GroupRepository
 
     @Inject
     lateinit var urlPreviewProvider: UrlPreviewStoreProvider
@@ -121,17 +66,11 @@ class MiApplication : Application(), MiCore {
     lateinit var colorSettingStore: ColorSettingStore
         private set
 
-
-    @Inject
-    lateinit var mFileUploaderProvider: FileUploaderProvider
-
-
     @Inject
     lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
 
     @Inject
     lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
-
 
     @Inject
     lateinit var applicationScope: CoroutineScope
@@ -145,7 +84,6 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
-
 
     @Inject
     lateinit var mSubscriptionRegistration: SubscriptionRegistration
@@ -246,8 +184,6 @@ class MiApplication : Application(), MiCore {
     override fun getSettingStore(): SettingStore {
         return this.mSettingStore
     }
-
-
 
 
     override fun getCurrentInstanceMeta(): Meta? {
