@@ -19,6 +19,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
+import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.ui.PageableView
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -177,6 +178,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_timeline, menu)
+                requireActivity().setMenuTint(menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

@@ -17,6 +17,7 @@ internal class MainActivityMenuProvider(
     val settingStore: SettingStore
 ) : MenuProvider {
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        activity.setMenuTint(menu)
         menuInflater.inflate(R.menu.main, menu)
 
         listOf(

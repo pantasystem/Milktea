@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
+import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.ui.main.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
@@ -42,6 +43,7 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.search_top_menu, menu)
+                requireActivity().setMenuTint(menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

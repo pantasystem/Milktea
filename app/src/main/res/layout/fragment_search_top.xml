@@ -10,9 +10,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:stateListAnimator="@null"
                 android:id="@+id/appBar"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:background="#FFFFFF"
                 >
             <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -22,11 +20,11 @@
                     android:elevation="0dp"
                     />
         </com.google.android.material.appbar.AppBarLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:orientation="vertical"
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:orientation="vertical">
 
 
 
@@ -44,13 +42,13 @@
 
             <androidx.viewpager.widget.ViewPager
                     android:id="@+id/search_view_pager"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/search_tab_layout" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
