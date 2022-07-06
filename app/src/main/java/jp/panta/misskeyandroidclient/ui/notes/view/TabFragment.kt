@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
@@ -16,9 +18,10 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
-import kotlinx.coroutines.Dispatchers
+import net.pantasystem.milktea.common.ui.ToolbarSetter
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.model.account.Account
@@ -37,6 +40,8 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
     @Inject
     lateinit var accountStore: AccountStore
 
+    private val tabViewModel by viewModels<TabViewModel>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -48,38 +53,48 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
             binding.viewPager.adapter = mPagerAdapter
         }
 
-        accountStore.observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
-            .onEach { account ->
-                val pages = account.pages
-                Log.d("TabFragment", "pages:$pages")
-                mPagerAdapter?.setList(
-                    account,
-                    pages.sortedBy {
-                        it.weight
-                    })
-                //mPagerAdapter?.notifyDataSetChanged()
-                binding.tabLayout.setupWithViewPager(binding.viewPager)
+        tabViewModel.currentAccount.filterNotNull().distinctUntilChanged().onEach { account ->
+            val pages = account.pages
+            Log.d("TabFragment", "pages:$pages")
+            mPagerAdapter?.setList(
+                account,
+                pages.sortedBy {
+                    it.weight
+                })
+            binding.tabLayout.setupWithViewPager(binding.viewPager)
 
-                if (pages.size <= 1) {
-                    binding.tabLayout.visibility = View.GONE
-                    binding.elevationView.visibility = View.VISIBLE
+            if (pages.size <= 1) {
+                binding.tabLayout.visibility = View.GONE
+                binding.elevationView.visibility = View.VISIBLE
+            } else {
+                binding.tabLayout.visibility = View.VISIBLE
+                binding.elevationView.visibility = View.GONE
+                binding.tabLayout.elevation
+                if (pages.size > 5) {
+                    binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
                 } else {
-                    binding.tabLayout.visibility = View.VISIBLE
-                    binding.elevationView.visibility = View.GONE
-                    binding.tabLayout.elevation
-                    if (pages.size > 5) {
-                        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
-                    } else {
-                        binding.tabLayout.tabMode = TabLayout.MODE_FIXED
-                    }
+                    binding.tabLayout.tabMode = TabLayout.MODE_FIXED
                 }
-            }.launchIn(lifecycleScope)
+            }
+        }.launchIn(lifecycleScope)
+
+
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as? ToolbarSetter?)?.apply {
+            setToolbar(binding.toolbar)
+            setTitle(R.string.menu_home)
+        }
+    }
 
-    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) :
-        FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    class TimelinePagerAdapter(
+        fragmentManager: FragmentManager,
+        list: List<Page>
+    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private var requestBaseList: List<Page> = list
         private var oldRequestBaseSetting = requestBaseList
 

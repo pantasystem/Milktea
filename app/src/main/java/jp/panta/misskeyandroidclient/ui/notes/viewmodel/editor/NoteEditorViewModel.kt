@@ -163,8 +163,6 @@ class NoteEditorViewModel @Inject constructor(
     private val visibilitySelectedEvent = EventBus<Unit>()
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     val address = visibility.map {
         it as? Visibility.Specified
     }.map {
@@ -174,8 +172,6 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     private fun setUpUserViewData(userId: User.Id): UserViewData {
         return userViewDataFactory.create(userId, viewModelScope, dispatcher)
     }
@@ -399,8 +395,6 @@ class NoteEditorViewModel @Inject constructor(
     }
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     fun setAddress(added: List<User.Id>, removed: List<User.Id>) {
         val list = ((visibility.value as? Visibility.Specified)?.visibleUserIds
             ?: emptyList()).toMutableList()
@@ -466,8 +460,6 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     fun canSaveDraft(): Boolean {
         return !_state.value.text.isNullOrBlank()
                 || !files.value.isNullOrEmpty()
@@ -476,8 +468,6 @@ class NoteEditorViewModel @Inject constructor(
     }
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     fun clear() {
         _state.value = _state.value.clear()
     }

@@ -10,16 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemUserChipBinding
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
-@ExperimentalCoroutinesApi
-class UserChipListAdapter(val lifecycleOwner: LifecycleOwner) : ListAdapter<UserViewData, UserChipListAdapter.VH>(Diff()){
+class UserChipListAdapter(val lifecycleOwner: LifecycleOwner) :
+    ListAdapter<UserViewData, UserChipListAdapter.VH>(Diff()) {
     class VH(val binding: ItemUserChipBinding) : RecyclerView.ViewHolder(binding.root)
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    class Diff : DiffUtil.ItemCallback<UserViewData>(){
+
+    class Diff : DiffUtil.ItemCallback<UserViewData>() {
         override fun areContentsTheSame(oldItem: UserViewData, newItem: UserViewData): Boolean {
             return oldItem.userId == newItem.userId && oldItem.user.value == newItem.user.value
         }

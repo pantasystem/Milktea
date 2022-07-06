@@ -5,15 +5,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-import jp.panta.misskeyandroidclient.SetThemeImpl
-import net.pantasystem.milktea.common.ui.SetTheme
+import jp.panta.misskeyandroidclient.ApplyThemeImpl
+import net.pantasystem.milktea.common.ui.ApplyTheme
 
 @Module
 @InstallIn(ActivityComponent::class)
 object ThemeModule {
 
     @Provides
-    fun provideSetTheme(activity: Activity): SetTheme {
-        return SetThemeImpl(activity)
+    fun provideSetTheme(activity: Activity): ApplyTheme {
+        return ApplyThemeImpl(activity)
     }
 }

@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -56,6 +57,15 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        (requireActivity() as? ToolbarSetter?)?.apply {
+            setToolbar(mBinding.toolbar)
+            setTitle(R.string.notification)
+        }
+
+    }
     inner class PagerAdapter(val pages: List<Page>) :
         FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 

@@ -12,7 +12,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.gallery.databinding.ActivityGalleryPostsBinding
 import net.pantasystem.milktea.gallery.viewmodel.Action
 import net.pantasystem.milktea.gallery.viewmodel.GalleryPostActionViewModel
@@ -27,12 +27,12 @@ class GalleryPostsActivity : AppCompatActivity() {
     private val actionViewModel: GalleryPostActionViewModel by viewModels()
 
     @Inject
-    lateinit var setTheme: SetTheme
+    lateinit var setTheme: ApplyTheme
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.setTheme()
+        setTheme.invoke()
         setContentView(R.layout.activity_gallery_posts)
 
         val action = intent.action ?: Intent.ACTION_VIEW

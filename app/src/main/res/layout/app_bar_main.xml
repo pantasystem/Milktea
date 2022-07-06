@@ -3,25 +3,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity"
             android:id="@+id/app_bar_base">
 
-        <com.google.android.material.appbar.AppBarLayout
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:stateListAnimator="@null"
-                >
-            <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_scrollFlags="scroll|enterAlways"
-                    />
-        </com.google.android.material.appbar.AppBarLayout>
 
         <include
                 android:id="@+id/contentMain"
@@ -80,5 +68,5 @@
 
             </com.google.android.material.bottomnavigation.BottomNavigationView>
         </LinearLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </FrameLayout>
 </layout>

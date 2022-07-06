@@ -14,14 +14,10 @@ import jp.panta.misskeyandroidclient.ui.users.SearchAndSelectUserScreen
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.provideViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SearchAndSelectUserActivity : AppCompatActivity() {
 
@@ -49,8 +45,6 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
     @Inject
     lateinit var factory: SelectedUserViewModel.AssistedViewModelFactory
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     private val selectedUserViewModel: SelectedUserViewModel by viewModels {
         val selectedUserIdList =
             (intent.getSerializableExtra(EXTRA_SELECTED_USER_IDS) as? ArrayList<*>)?.mapNotNull {

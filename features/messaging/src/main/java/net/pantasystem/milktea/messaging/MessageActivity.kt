@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.messaging.databinding.ActivityMessageBinding
 import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
@@ -21,11 +21,11 @@ class MessageActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMessageBinding
 
     @Inject
-    lateinit var setTheme: SetTheme
+    lateinit var setTheme: ApplyTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.setTheme()
+        setTheme.invoke()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_message)
         mBinding.lifecycleOwner = this
 

@@ -74,5 +74,6 @@ dependencies {
 
     // datetime
     implementation libs.kotlin.datetime
+    implementation libs.activity.ktx
 
 }

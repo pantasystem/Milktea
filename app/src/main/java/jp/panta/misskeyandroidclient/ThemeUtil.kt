@@ -6,7 +6,7 @@ import android.util.TypedValue
 import android.view.Menu
 import androidx.appcompat.app.AppCompatDelegate
 import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.isNightTheme
 
@@ -37,10 +37,10 @@ fun Context.setMenuTint(menu: Menu){
     }
 }
 
-class SetThemeImpl(
+class ApplyThemeImpl(
     val activity: Activity,
-) : SetTheme {
-    override fun setTheme() {
+) : ApplyTheme {
+    override fun invoke() {
         activity.setTheme()
     }
 }
