@@ -1,10 +1,10 @@
-package jp.panta.misskeyandroidclient.viewmodel.timeline
+package net.pantasystem.milktea.common_viewmodel
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.model.account.page.Pageable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
 sealed interface SuitableType {
