@@ -40,6 +40,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
@@ -134,6 +135,9 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
 
     @Inject
     lateinit var settingStore: SettingStore
+
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -372,10 +376,7 @@ class NoteEditorActivity : AppCompatActivity(), EmojiSelection {
                 if (it.isUnauthorized) {
                     finish()
                     startActivity(
-                        Intent(
-                            this@NoteEditorActivity,
-                            AuthorizationActivity::class.java
-                        )
+                        authorizationNavigation.newIntent(Unit)
                     )
                 }
             }

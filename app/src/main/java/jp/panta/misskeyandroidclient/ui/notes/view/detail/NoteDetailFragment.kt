@@ -17,7 +17,7 @@ import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.provideFactory
-import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable

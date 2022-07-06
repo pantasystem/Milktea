@@ -8,58 +8,19 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.FuturePagingController
 import net.pantasystem.milktea.common.paginator.PreviousPagingController
-import net.pantasystem.milktea.common.paginator.StateLocker
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryPostsStore
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
-import javax.inject.Singleton
 
 
-interface GalleryPostsStore : StateLocker {
-    val state: Flow<PageableState<List<GalleryPost.Id>>>
 
-    suspend fun loadPrevious()
-    suspend fun loadFuture()
-    suspend fun clear()
-}
 
-@Singleton
-class GalleryPostsStoreFactory @Inject constructor(
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val filePropertyDataSource: FilePropertyDataSource,
-    val userDataSource: UserDataSource,
-    val galleryDataSource: GalleryDataSource,
-    val encryption: Encryption
-){
-    fun create(pageable: Pageable.Gallery,
-               getAccount: suspend () -> Account,): GalleryPostsStore {
-        return if (pageable is Pageable.Gallery.ILikedPosts) {
-            LikedGalleryPostStoreImpl(
-                getAccount,
-                misskeyAPIProvider,
-                filePropertyDataSource,
-                userDataSource,
-                galleryDataSource,
-                encryption
-            )
-        } else {
-            GalleryPostsStoreImpl(
-                pageable,
-                getAccount,
-                misskeyAPIProvider,
-                filePropertyDataSource,
-                userDataSource,
-                galleryDataSource,
-                encryption
-            )
-        }
-    }
-}
 
 
 class GalleryPostsStoreImpl(
@@ -71,6 +32,39 @@ class GalleryPostsStoreImpl(
     galleryDataSource: GalleryDataSource,
     encryption: Encryption
 ) : GalleryPostsStore {
+
+    class Factory @Inject constructor(
+        val misskeyAPIProvider: MisskeyAPIProvider,
+        val filePropertyDataSource: FilePropertyDataSource,
+        val userDataSource: UserDataSource,
+        val galleryDataSource: GalleryDataSource,
+        val encryption: Encryption
+    ) : GalleryPostsStore.Factory{
+        override fun create(pageable: Pageable.Gallery,
+                   getAccount: suspend () -> Account,): GalleryPostsStore {
+            return if (pageable is Pageable.Gallery.ILikedPosts) {
+                LikedGalleryPostStoreImpl(
+                    getAccount,
+                    misskeyAPIProvider,
+                    filePropertyDataSource,
+                    userDataSource,
+                    galleryDataSource,
+                    encryption
+                )
+            } else {
+                GalleryPostsStoreImpl(
+                    pageable,
+                    getAccount,
+                    misskeyAPIProvider,
+                    filePropertyDataSource,
+                    userDataSource,
+                    galleryDataSource,
+                    encryption
+                )
+            }
+        }
+    }
+
 
     override val mutex: Mutex = Mutex()
 

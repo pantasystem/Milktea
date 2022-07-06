@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.url
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemFilePreviewBinding
 import jp.panta.misskeyandroidclient.databinding.ItemUrlPreviewBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.Preview
+import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.MediaActivity
 
 class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCallback()){
@@ -47,13 +49,14 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
         }
     }
     class FilePreviewViewHolder(val binding: ItemFilePreviewBinding) : BaseHolder<Preview.FileWrapper>(binding.root){
+        @SuppressLint("IntentReset")
         override fun bind(preview: Preview.FileWrapper) {
             binding.file = preview.file
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
                 if(preview.file.type?.startsWith("audio") == true){
                     val intent = Intent(binding.root.context, MediaActivity::class.java)
-                    intent.putExtra(MediaActivity.EXTRA_FILE, preview.file)
+                    intent.putExtra(MediaNavigationKeys.EXTRA_FILE, preview.file)
                     context?.startActivity(intent)
                 }else{
                     context?.startActivity(

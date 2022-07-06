@@ -40,9 +40,9 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".GalleryPostsActivity" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name="net.pantasystem.milktea.gallery.GalleryPostsActivity" android:windowSoftInputMode="adjustResize"/>
         <activity
-                android:name=".AuthorizationActivity"
+                android:name="net.pantasystem.milktea.auth.AuthorizationActivity"
                 android:exported="true"
                 android:launchMode="singleInstance">
             <intent-filter tools:ignore="AppLinkUrlError">
