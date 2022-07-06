@@ -88,4 +88,6 @@ dependencies {
     implementation libs.kotlin.datetime
 
     implementation libs.fragment.ktx
+    implementation libs.activity.ktx
+
 }

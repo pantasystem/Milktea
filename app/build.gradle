@@ -237,6 +237,8 @@ dependencies {
     // Jetpack Compose Integration
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
+//    implementation libs.activity.ktx
+    implementation libs.activity.ktx
 }
 
 kapt {

@@ -81,5 +81,6 @@ dependencies {
 
 
     implementation libs.lifecycle.livedata
+    implementation libs.activity.ktx
 
 }

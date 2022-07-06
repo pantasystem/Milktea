@@ -84,5 +84,6 @@ dependencies {
     implementation libs.fragment.ktx
     implementation libs.lifecycle.livedata
 
+    implementation libs.activity.ktx
 
 }
