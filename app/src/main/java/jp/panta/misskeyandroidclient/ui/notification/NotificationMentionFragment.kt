@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
@@ -56,6 +57,15 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        (requireActivity() as MainActivity?)?.apply {
+            setToolbar(mBinding.toolbar)
+            setTitle(R.string.notification)
+        }
+
+    }
     inner class PagerAdapter(val pages: List<Page>) :
         FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 

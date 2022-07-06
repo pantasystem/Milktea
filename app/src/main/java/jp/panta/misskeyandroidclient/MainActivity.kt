@@ -13,35 +13,31 @@ import androidx.activity.viewModels
 import androidx.annotation.MainThread
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.TabFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
-import jp.panta.misskeyandroidclient.ui.search.SearchTopFragment
 import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
-import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -64,7 +60,6 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.gallery.GalleryPostsActivity
-import net.pantasystem.milktea.messaging.MessagingHistoryFragment
 import net.pantasystem.milktea.messaging.MessagingListActivity
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
@@ -79,11 +74,13 @@ import javax.inject.Inject
 
 class MainNavigationImpl @Inject constructor(
     val activity: Activity
-): MainNavigation {
+) : MainNavigation {
     override fun newIntent(args: Unit): Intent {
         return Intent(activity, MainActivity::class.java)
     }
 }
+
+
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -92,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     private val mAccountViewModel: AccountViewModel by viewModels()
 
-    private lateinit var mBottomNavigationAdapter: MainBottomNavigationAdapter
+//    private lateinit var mBottomNavigationAdapter: MainBottomNavigationAdapter
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
@@ -101,7 +98,6 @@ class MainActivity : AppCompatActivity() {
     private val logger: Logger by lazy {
         loggerFactory.create("MainActivity")
     }
-
 
 
     private val binding: ActivityMainBinding by dataBinding()
@@ -133,17 +129,7 @@ class MainActivity : AppCompatActivity() {
         setTheme()
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
 
-        val toggle = ActionBarDrawerToggle(
-            this,
-            binding.drawerLayout,
-            binding.appBarMain.toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
 
         binding.navView.setNavigationItemSelectedListener { item ->
             showNavDrawersActivityBy(item)
@@ -227,54 +213,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         startService(Intent(this, NotificationService::class.java))
-        mBottomNavigationAdapter =
-            MainBottomNavigationAdapter(savedInstanceState, binding.appBarMain.bottomNavigation)
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
+        binding.appBarMain.bottomNavigation.setupWithNavController(navHostFragment.navController)
+
 
     }
 
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    inner class MainBottomNavigationAdapter(
-        savedInstanceState: Bundle?,
-        bottomNavigation: BottomNavigationView
-    ) : BottomNavigationAdapter(
-        bottomNavigation,
-        supportFragmentManager,
-        R.id.navigation_home,
-        R.id.content_main,
-        savedInstanceState
-    ) {
-
-        var currentMenuItem: MenuItem? = null
-
-        override fun viewChanged(menuItem: MenuItem, fragment: Fragment) {
-            super.viewChanged(menuItem, fragment)
-            when (menuItem.itemId) {
-                R.id.navigation_home -> changeTitle(getString(R.string.menu_home))
-                R.id.navigation_search -> changeTitle(getString(R.string.search))
-                R.id.navigation_notification -> changeTitle(getString(R.string.notification))
-                R.id.navigation_message_list -> changeTitle(getString(R.string.message))
-            }
-            currentMenuItem = menuItem
+    fun setToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        setNavigationDrawerToggle(toolbar)
+    }
+    private var toggle: ActionBarDrawerToggle? = null
+    @MainThread
+    private fun setNavigationDrawerToggle(toolbar: Toolbar) {
+        if (toggle != null) {
+            binding.drawerLayout.removeDrawerListener(toggle!!)
         }
-
-        override fun getItem(menuItem: MenuItem): Fragment? {
-            return when (menuItem.itemId) {
-                R.id.navigation_home -> TabFragment()
-                R.id.navigation_search -> SearchTopFragment()
-                R.id.navigation_notification -> NotificationMentionFragment()
-                R.id.navigation_message_list -> MessagingHistoryFragment()
-                else -> null
-            }
-        }
-
-        override fun menuRetouched(menuItem: MenuItem, fragment: Fragment) {
-            if (fragment is ScrollableTop) {
-                fragment.showTop()
-            }
-        }
-
-
+        toggle = ActionBarDrawerToggle(
+            this,
+            binding.drawerLayout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        binding.drawerLayout.addDrawerListener(toggle!!)
+        toggle!!.syncState()
     }
 
 
@@ -375,9 +339,9 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.isDrawerOpen(GravityCompat.START) -> {
                 drawerLayout.closeDrawer(GravityCompat.START)
             }
-            mBottomNavigationAdapter.currentMenuItem?.itemId != R.id.navigation_home -> {
-                mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
-            }
+//            mBottomNavigationAdapter.currentMenuItem?.itemId != R.id.navigation_home -> {
+//                mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
+//            }
             else -> {
                 if (mBackPressedDelegate.back()) {
                     super.onBackPressed()
@@ -448,7 +412,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("MainActivity", "#onSaveInstanceStateが呼び出された")
 
-        mBottomNavigationAdapter.saveState(outState)
+//        mBottomNavigationAdapter.saveState(outState)
     }
 
 
@@ -469,9 +433,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             View.VISIBLE
         }
-        if (settingStore.isClassicUI) {
-            mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
-        }
+//        if (settingStore.isClassicUI) {
+//            mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
+//        }
     }
 
     private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
@@ -570,7 +534,9 @@ class MainActivity : AppCompatActivity() {
         ReportStateHandler().invoke(binding.appBarMain.simpleNotification, state)
     }
 
-    @Inject lateinit var misskeyAPIProvider: MisskeyAPIProvider
+    @Inject
+    lateinit var misskeyAPIProvider: MisskeyAPIProvider
+
     @ExperimentalCoroutinesApi
     private fun getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
         return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {

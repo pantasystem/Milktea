@@ -20,14 +20,18 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:scaleType="centerCrop"
                 tools:ignore="ContentDescription" />
-        <FrameLayout
+        <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/contentMain"
+                android:name="androidx.navigation.fragment.NavHostFragment"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:id="@+id/content_main">
 
-        </FrameLayout>
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/main_nav" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

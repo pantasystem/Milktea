@@ -12,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
+import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
@@ -75,6 +76,15 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
                 }
             }.launchIn(lifecycleScope)
 
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity?)?.apply {
+            setToolbar(binding.toolbar)
+            setTitle(R.string.menu_home)
+        }
     }
 
 
