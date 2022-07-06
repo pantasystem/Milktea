@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
+package net.pantasystem.milktea.gallery.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

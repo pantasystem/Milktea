@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
+package net.pantasystem.milktea.gallery.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,8 +15,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStore
-import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStoreFactory
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -32,7 +30,7 @@ class GalleryPostsViewModel @AssistedInject constructor(
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
-    private val galleryPostsStoreFactory: GalleryPostsStoreFactory,
+    private val galleryPostsStoreFactory: GalleryPostsStore.Factory,
     @Assisted val pageable: Pageable.Gallery,
     @Assisted private var accountId: Long?,
 ) : ViewModel(), GalleryToggleLikeOrUnlike {

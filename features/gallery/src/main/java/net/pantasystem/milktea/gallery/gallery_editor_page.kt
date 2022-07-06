@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,9 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.common_compose.SwitchTile
+import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.model.file.AppFile
 
 sealed interface GalleryEditorPageAction {

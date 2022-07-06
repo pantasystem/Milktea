@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.gallery
 
 
 import android.content.Intent
@@ -7,15 +7,16 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivityGalleryPostsBinding
-import jp.panta.misskeyandroidclient.ui.gallery.GalleryEditorFragment
-import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostTabFragment
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.Action
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.gallery.databinding.ActivityGalleryPostsBinding
+import net.pantasystem.milktea.gallery.viewmodel.Action
+import net.pantasystem.milktea.gallery.viewmodel.GalleryPostActionViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class GalleryPostsActivity : AppCompatActivity() {
@@ -25,10 +26,13 @@ class GalleryPostsActivity : AppCompatActivity() {
     val binding: ActivityGalleryPostsBinding by dataBinding()
     private val actionViewModel: GalleryPostActionViewModel by viewModels()
 
+    @Inject
+    lateinit var setTheme: SetTheme
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        setTheme.setTheme()
         setContentView(R.layout.activity_gallery_posts)
 
         val action = intent.action ?: Intent.ACTION_VIEW
@@ -41,18 +45,21 @@ class GalleryPostsActivity : AppCompatActivity() {
         }
         ft.commit()
 
-        actionViewModel.viewAction.observe(this) {
-            when(it) {
-                is Action.OpenCreationEditor -> {
-                    Log.d("GalleryPostsActivity", "アクションがあった")
-                    val t = supportFragmentManager.beginTransaction()
-                    t.replace(R.id.base, GalleryEditorFragment())
-                    t.addToBackStack(null)
-                    t.commit()
+        lifecycleScope.launchWhenResumed {
+            actionViewModel.viewAction.collect {
+                when(it) {
+                    is Action.OpenCreationEditor -> {
+                        Log.d("GalleryPostsActivity", "アクションがあった")
+                        val t = supportFragmentManager.beginTransaction()
+                        t.replace(R.id.base, GalleryEditorFragment())
+                        t.addToBackStack(null)
+                        t.commit()
+                    }
                 }
-            }
 
+            }
         }
+
 
     }
 

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.gallery.viewmodel
+package net.pantasystem.milktea.gallery.viewmodel
 
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.gallery.GalleryPost

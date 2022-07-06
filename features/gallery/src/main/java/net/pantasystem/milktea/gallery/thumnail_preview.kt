@@ -1,18 +1,18 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import coil.compose.rememberAsyncImagePainter
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
@@ -46,7 +46,7 @@ fun ThumbnailPreview(
 
         if(file.type.startsWith("video")) {
             Image(
-                painter = painterResource(id = R.drawable.ic_play_circle_outline_black_24dp),
+                Icons.Default.PlayCircleOutline,
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = modifier.fillMaxSize(),

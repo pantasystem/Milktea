@@ -1,6 +1,5 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,16 +13,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.AuthorizationActivity
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.provideFactory
-import jp.panta.misskeyandroidclient.viewmodel.timeline.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common_navigation.UserDetailNavigation
-import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
-import net.pantasystem.milktea.media.MediaActivity
+import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.gallery.viewmodel.GalleryPostsViewModel
+import net.pantasystem.milktea.gallery.viewmodel.provideFactory
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
@@ -63,6 +59,12 @@ class GalleryPostsFragment : Fragment() {
     lateinit var userDetailNavigation: UserDetailNavigation
 
 
+    @Inject
+    lateinit var mediaNavigation: MediaNavigation
+
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
+
     val viewModel: GalleryPostsViewModel by viewModels {
         val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
         var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
@@ -91,15 +93,14 @@ class GalleryPostsFragment : Fragment() {
                                     viewModel.toggleFavorite(it.galleryPost.id)
                                 }
                                 is GalleryPostCardAction.OnThumbnailClicked -> {
-                                    startActivity(
-                                        MediaActivity.newInstance(
-                                            requireActivity(),
+                                    startActivity(mediaNavigation.newIntent(
+                                        MediaNavigationArgs.Files(
                                             files = it.files.map { property ->
                                                 property.toFile()
                                             },
                                             index = it.index
                                         )
-                                    )
+                                    ))
                                 }
                                 is GalleryPostCardAction.OnAvatarIconClicked -> {
                                     startActivity(
@@ -126,7 +127,7 @@ class GalleryPostsFragment : Fragment() {
                 if (it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
                     Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
                     // 再認証をする
-                    startActivity(Intent(requireContext(), AuthorizationActivity::class.java))
+                    startActivity(authorizationNavigation.newIntent(Unit))
                 }
             }
         }

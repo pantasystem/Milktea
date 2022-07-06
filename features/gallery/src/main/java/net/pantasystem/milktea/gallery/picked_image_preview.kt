@@ -1,11 +1,11 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.common_compose.FilePreviewActionType
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
+import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 

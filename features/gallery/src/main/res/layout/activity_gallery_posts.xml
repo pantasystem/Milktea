@@ -4,7 +4,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".GalleryPostsActivity"
+            tools:context="net.pantasystem.milktea.gallery.GalleryPostsActivity"
             android:id="@+id/base">
 
     </androidx.constraintlayout.widget.ConstraintLayout>

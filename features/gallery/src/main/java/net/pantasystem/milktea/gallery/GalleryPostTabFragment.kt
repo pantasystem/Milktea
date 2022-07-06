@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import android.os.Bundle
 import android.view.View
@@ -8,11 +8,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentGalleryPostTabBinding
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostActionViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.gallery.databinding.FragmentGalleryPostTabBinding
+import net.pantasystem.milktea.gallery.viewmodel.GalleryPostActionViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 
 @AndroidEntryPoint

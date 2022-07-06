@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalPagerApi::class)
 
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,14 +22,13 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostUiState
+import net.pantasystem.milktea.gallery.viewmodel.GalleryPostUiState
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common_compose.FavoriteButton
-import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.make
 
 
 sealed interface GalleryPostCardAction {
@@ -227,11 +226,11 @@ fun PreviewGalleryPostCard() {
             ),
             currentIndex = 0,
             isFavoriteSending = false,
-            user = UserDTO(
-                id = "test",
+            user = User.Simple.make(
+                id = User.Id(0, "test"),
                 name = "harunon",
                 userName = "harunonsysytem"
-            ).toUser(0L)
+            )
         ),
         onAction = {}, visibleFileIds = emptySet()
     )

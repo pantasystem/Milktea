@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,17 +9,19 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryPostsViewModel
-import jp.panta.misskeyandroidclient.util.compose.rememberViewInteropNestedScrollConnection
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.isScrolledToTheEnd
+import net.pantasystem.milktea.gallery.viewmodel.GalleryPostsViewModel
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GalleryPostCardList(
     viewModel: GalleryPostsViewModel,
@@ -50,7 +52,7 @@ fun GalleryPostCardList(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(rememberViewInteropNestedScrollConnection())
+                .nestedScroll(rememberNestedScrollInteropConnection())
         ) {
             items(content.rawContent) { post ->
                 GalleryPostCard(

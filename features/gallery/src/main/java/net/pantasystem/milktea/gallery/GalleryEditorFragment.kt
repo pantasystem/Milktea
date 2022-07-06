@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.gallery
+package net.pantasystem.milktea.gallery
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
@@ -16,18 +16,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.GalleryPostsActivity
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.EditType
-import jp.panta.misskeyandroidclient.ui.gallery.viewmodel.GalleryEditorViewModel
+import net.pantasystem.milktea.gallery.viewmodel.EditType
+import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import kotlinx.coroutines.*
-import net.pantasystem.milktea.common_navigation.DriveNavigation
-import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
-import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
-import net.pantasystem.milktea.drive.toAppFile
-import net.pantasystem.milktea.media.MediaActivity
+import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.file.toFile
 import javax.inject.Inject
 
@@ -54,6 +50,9 @@ class GalleryEditorFragment : Fragment() {
 
     @Inject
     lateinit var driveNavigation: DriveNavigation
+
+    @Inject
+    lateinit var mediaNavigation: MediaNavigation
 
 
     val viewModel: GalleryEditorViewModel by viewModels()
@@ -89,10 +88,11 @@ class GalleryEditorFragment : Fragment() {
                 onSave()
             }
             is GalleryEditorPageAction.NavigateToMediaPreview -> {
-                val intent = MediaActivity.newInstance(
-                    requireActivity(),
-                    listOf(action.appFile.toFile()),
-                    0
+                val intent = mediaNavigation.newIntent(
+                    MediaNavigationArgs.Files(
+                        listOf(action.appFile.toFile()),
+                        0
+                    )
                 )
                 requireActivity().startActivity(intent)
             }
@@ -163,6 +163,7 @@ class GalleryEditorFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val uri = it.data?.data
             if (uri != null) {
+
                 viewModel.addFile(uri.toAppFile(requireContext()))
             }
         }
