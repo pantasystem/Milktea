@@ -10,9 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ToolbarSetter
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
+import jp.panta.misskeyandroidclient.ui.main.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

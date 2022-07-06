@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import android.os.Bundle
@@ -13,12 +14,15 @@ import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ToolbarSetter
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
+import jp.panta.misskeyandroidclient.ui.main.ToolbarSetter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
@@ -85,8 +89,10 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
     }
 
 
-    class TimelinePagerAdapter(fragmentManager: FragmentManager, list: List<Page>) :
-        FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    class TimelinePagerAdapter(
+        fragmentManager: FragmentManager,
+        list: List<Page>
+    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private var requestBaseList: List<Page> = list
         private var oldRequestBaseSetting = requestBaseList
 
