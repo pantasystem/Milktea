@@ -3,6 +3,8 @@ package jp.panta.misskeyandroidclient.ui.notes.view
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
@@ -17,7 +19,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.ui.PageableView
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -103,7 +104,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setHasOptionsMenu(true)
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         mBinding.listView.layoutManager = mLinearLayoutManager
@@ -173,6 +173,22 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             Log.d("TimelineFragment", "リトライボタンを押しました")
             mViewModel.loadInit()
         }
+
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_timeline, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.refresh_timeline -> {
+                        mViewModel.loadInit()
+                        return true
+                    }
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
 
@@ -192,21 +208,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.menu_timeline, menu)
-        requireContext().setMenuTint(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.refresh_timeline -> {
-                mViewModel.loadInit()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>() {
         override fun areContentsTheSame(

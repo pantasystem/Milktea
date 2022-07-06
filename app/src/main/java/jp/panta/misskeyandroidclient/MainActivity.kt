@@ -4,10 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
@@ -15,6 +12,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
@@ -130,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-
         binding.navView.setNavigationItemSelectedListener { item ->
             showNavDrawersActivityBy(item)
             binding.drawerLayout.closeDrawerWhenOpened()
@@ -217,6 +214,35 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
         binding.appBarMain.bottomNavigation.setupWithNavController(navHostFragment.navController)
 
+        addMenuProvider(object : MenuProvider{
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.main, menu)
+
+                listOf(
+                    menu.findItem(R.id.action_messaging),
+                    menu.findItem(R.id.action_notification),
+                    menu.findItem(R.id.action_search)
+                ).forEach {
+                    it.isVisible = settingStore.isClassicUI
+                }
+
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                val idAndActivityMap = mapOf(
+                    R.id.action_settings to SettingsActivity::class.java,
+                    R.id.action_tab_setting to PageSettingActivity::class.java,
+                    R.id.action_notification to NotificationsActivity::class.java,
+                    R.id.action_messaging to MessagingListActivity::class.java,
+                    R.id.action_search to SearchActivity::class.java
+                )
+
+                val targetActivity = idAndActivityMap[menuItem.itemId]
+                    ?: return true
+                startActivity(Intent(this@MainActivity, targetActivity))
+                return true
+            }
+        })
 
     }
 
@@ -318,9 +344,6 @@ class MainActivity : AppCompatActivity() {
         mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
 
-    fun changeTitle(title: String?) {
-        supportActionBar?.title = title
-    }
 
 
     @FlowPreview
@@ -366,39 +389,37 @@ class MainActivity : AppCompatActivity() {
             this.closeDrawer(GravityCompat.START)
         }
     }
+//
+//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//        menuInflater.inflate(R.menu.main, menu)
+//
+//        listOf(
+//            menu.findItem(R.id.action_messaging),
+//            menu.findItem(R.id.action_notification),
+//            menu.findItem(R.id.action_search)
+//        ).forEach {
+//            it.isVisible = settingStore.isClassicUI
+//        }
+//
+//        return true
+//    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-
-        listOf(
-            menu.findItem(R.id.action_messaging),
-            menu.findItem(R.id.action_notification),
-            menu.findItem(R.id.action_search)
-        ).forEach {
-            it.isVisible = settingStore.isClassicUI
-        }
-
-        //setMenuTint(menu)
-        return true
-    }
-
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val idAndActivityMap = mapOf(
-            R.id.action_settings to SettingsActivity::class.java,
-            R.id.action_tab_setting to PageSettingActivity::class.java,
-            R.id.action_notification to NotificationsActivity::class.java,
-            R.id.action_messaging to MessagingListActivity::class.java,
-            R.id.action_search to SearchActivity::class.java
-        )
-
-        val targetActivity = idAndActivityMap[item.itemId]
-            ?: return super.onOptionsItemSelected(item)
-        startActivity(Intent(this, targetActivity))
-        return true
-    }
+//
+//    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        val idAndActivityMap = mapOf(
+//            R.id.action_settings to SettingsActivity::class.java,
+//            R.id.action_tab_setting to PageSettingActivity::class.java,
+//            R.id.action_notification to NotificationsActivity::class.java,
+//            R.id.action_messaging to MessagingListActivity::class.java,
+//            R.id.action_search to SearchActivity::class.java
+//        )
+//
+//        val targetActivity = idAndActivityMap[item.itemId]
+//            ?: return super.onOptionsItemSelected(item)
+//        startActivity(Intent(this, targetActivity))
+//        return true
+//    }
 
     override fun onStart() {
         super.onStart()
