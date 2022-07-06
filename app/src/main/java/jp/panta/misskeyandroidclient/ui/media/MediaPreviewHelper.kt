@@ -20,6 +20,7 @@ import jp.panta.misskeyandroidclient.ui.notes.view.media.PreviewAbleFileListAdap
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
 import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
+import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.file.File
 
@@ -43,11 +44,11 @@ object MediaPreviewHelper {
         val listener = View.OnClickListener {
             val context = it.context
             val intent = Intent(context, MediaActivity::class.java)
-            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(fileViewDataList.map { fvd ->
+            intent.putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(fileViewDataList.map { fvd ->
                 fvd.file
             }))
             intent.putExtra(
-                MediaActivity.EXTRA_FILE_CURRENT_INDEX,
+                MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX,
                 fileViewDataList.indexOfFirst { f ->
                     f === fileViewData
                 })
@@ -82,11 +83,11 @@ object MediaPreviewHelper {
         val listener = View.OnClickListener {
             val context = it.context
             val intent = Intent(context, MediaActivity::class.java)
-            intent.putExtra(MediaActivity.EXTRA_FILES, ArrayList(previewAbleFileList.map { fvd ->
+            intent.putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(previewAbleFileList.map { fvd ->
                 fvd.file
             }))
             intent.putExtra(
-                MediaActivity.EXTRA_FILE_CURRENT_INDEX,
+                MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX,
                 previewAbleFileList.indexOfFirst { f ->
                     f === previewAbleFile
                 })

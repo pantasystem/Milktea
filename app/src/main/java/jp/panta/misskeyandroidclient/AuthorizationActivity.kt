@@ -1,22 +1,33 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
-import net.pantasystem.milktea.data.infrastructure.auth.from
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.auth.AuthFragment
 import net.pantasystem.milktea.auth.AuthResultFragment
 import net.pantasystem.milktea.auth.Waiting4userAuthorizationFragment
 import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import java.lang.IllegalStateException
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
+import net.pantasystem.milktea.data.infrastructure.auth.from
+import javax.inject.Inject
 
+
+class AuthorizationNavigationImpl @Inject constructor(
+    val activity: Activity
+) : AuthorizationNavigation {
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    override fun newIntent(args: Unit): Intent {
+        return Intent(activity, AuthorizationActivity::class.java)
+    }
+}
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint

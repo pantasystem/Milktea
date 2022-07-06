@@ -87,6 +87,8 @@ dependencies {
     implementation project(path: ':common_compose')
     implementation project(path: ':features:messaging')
     implementation project(path: ':common_navigation')
+    implementation project(path: ':common_viewmodel')
+    implementation project(path: ':features:gallery')
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 

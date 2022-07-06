@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.media
 
+import android.app.Activity
 import android.app.DownloadManager
 import android.content.Intent
 import android.net.Uri
@@ -15,10 +16,34 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common_navigation.MediaNavigation
+import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
+import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.databinding.ActivityMediaBinding
 import net.pantasystem.milktea.model.file.File
 import java.io.Serializable
 import javax.inject.Inject
+
+class MediaNavigationImpl @Inject constructor(
+    val activity: Activity
+) : MediaNavigation {
+    override fun newIntent(args: MediaNavigationArgs): Intent {
+        return when(args) {
+            is MediaNavigationArgs.AFile -> {
+                val intent = Intent(activity, MediaActivity::class.java)
+                intent.putExtra(MediaNavigationKeys.EXTRA_FILE, args.file)
+            }
+            is MediaNavigationArgs.Files -> {
+                val intent = Intent(activity, MediaActivity::class.java)
+                intent.putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(args.files))
+                intent.putExtra(
+                    MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX,
+                    args.index
+                )
+            }
+        }
+    }
+}
 
 @AndroidEntryPoint
 class MediaActivity : AppCompatActivity() {
@@ -29,17 +54,12 @@ class MediaActivity : AppCompatActivity() {
 
 
     companion object{
-        const val TAG = "MediaActivity"
-        const val EXTRA_FILE = "net.pantasystem.milktea.media.MediaActivity.EXTRA_FILE"
-        const val EXTRA_FILES = "net.pantasystem.milktea.media.MediaActivity.EXTRA_FILES"
-        const val EXTRA_FILE_CURRENT_INDEX = "net.pantasystem.milktea.media.MediaActivity.EXTRA_FILES_CURRENT_INDEX"
-
 
 
         fun newInstance(activity: FragmentActivity, files: List<File>, index: Int) : Intent{
             return Intent(activity, MediaActivity::class.java).apply{
-                putExtra(EXTRA_FILES, ArrayList(files))
-                putExtra(EXTRA_FILE_CURRENT_INDEX, index)
+                putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(files))
+                putExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, index)
             }
         }
 
@@ -60,15 +80,15 @@ class MediaActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
-        val file = intent.getSerializableExtra(EXTRA_FILE) as File?
+        val file = intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILE) as File?
 
 
-        val files = (intent.getSerializableExtra(EXTRA_FILES) as List<*>?)?.mapNotNull {
+        val files = (intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILES) as List<*>?)?.mapNotNull {
             it as File?
         }
 
 
-        val fileCurrentIndex = intent.getIntExtra(EXTRA_FILE_CURRENT_INDEX, 0)
+        val fileCurrentIndex = intent.getIntExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, 0)
 
 
 
@@ -83,7 +103,7 @@ class MediaActivity : AppCompatActivity() {
                 listOf<Media>(Media.FileMedia(file))
             }
             else ->{
-                Log.e(TAG, "params must not null")
+                Log.e(MediaNavigationKeys.TAG, "params must not null")
                 throw IllegalArgumentException()
             }
         }
@@ -122,14 +142,14 @@ class MediaActivity : AppCompatActivity() {
     fun setCurrentFileIndex(index: Int){
         try{
             mCurrentMedia = mMedias?.get(index)
-            Log.d(TAG, "現在の画像:$mCurrentMedia")
+            Log.d(MediaNavigationKeys.TAG, "現在の画像:$mCurrentMedia")
         }catch(e: IndexOutOfBoundsException){
-            Log.d(TAG, "お探しのメディアは存在しません。", e)
+            Log.d(MediaNavigationKeys.TAG, "お探しのメディアは存在しません。", e)
         }
     }
 
     private fun downloadFile(file: File){
-        Log.d(TAG, "ダウンロードを開始します:$file")
+        Log.d(MediaNavigationKeys.TAG, "ダウンロードを開始します:$file")
         Toast.makeText(this, String.format(getString(R.string.start_downloading_placeholder, file.name)), Toast.LENGTH_LONG).show()
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
 
@@ -144,7 +164,7 @@ class MediaActivity : AppCompatActivity() {
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         val id = downloadManager.enqueue(request)
 
-        Log.d(TAG, getStatus(downloadManager, id))
+        Log.d(MediaNavigationKeys.TAG, getStatus(downloadManager, id))
 
     }
 
@@ -176,7 +196,7 @@ class MediaActivity : AppCompatActivity() {
         query.setFilterById(id)
         val cursor = downloadManager.query(query)
         if (!cursor.moveToFirst()) {
-            Log.e(TAG, "Empty row")
+            Log.e(MediaNavigationKeys.TAG, "Empty row")
             return "Wrong downloadId"
         }
 

@@ -20,7 +20,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.gallery.GalleryPostsFragment
+import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -278,7 +278,7 @@ class UserDetailActivity : AppCompatActivity() {
                 0 -> TimelineFragment.newInstance(requestTimeline)
                 1 -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
                 2 -> TimelineFragment.newInstance(requestMedia)
-                3 -> GalleryPostsFragment.newInstance(
+                3 -> net.pantasystem.milktea.gallery.GalleryPostsFragment.newInstance(
                     Pageable.Gallery.User(userId),
                     account.accountId
                 )

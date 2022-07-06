@@ -12,6 +12,7 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.NoteEditorActivity
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft.DraftNotesViewModel
+import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.MediaActivity
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -67,7 +68,7 @@ class DraftNotesFragment : Fragment() {
             }
             is DraftNotePageAction.ShowFile -> {
                 val intent = Intent(requireContext(), MediaActivity::class.java)
-                intent.putExtra(MediaActivity.EXTRA_FILE, action.previewActionType.file.toFile())
+                intent.putExtra(MediaNavigationKeys.EXTRA_FILE, action.previewActionType.file.toFile())
                 startActivity(intent)
             }
         }
