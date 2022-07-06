@@ -3,7 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -78,16 +77,18 @@ class MainNavigationImpl @Inject constructor(
     }
 }
 
+interface ToolbarSetter {
+    fun setToolbar(toolbar: Toolbar)
+    fun setTitle(resId: Int)
+}
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     val mNotesViewModel: NotesViewModel by viewModels()
 
     @ExperimentalCoroutinesApi
     private val mAccountViewModel: AccountViewModel by viewModels()
-
-//    private lateinit var mBottomNavigationAdapter: MainBottomNavigationAdapter
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
 
@@ -211,10 +212,11 @@ class MainActivity : AppCompatActivity() {
 
         startService(Intent(this, NotificationService::class.java))
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
         binding.appBarMain.bottomNavigation.setupWithNavController(navHostFragment.navController)
 
-        addMenuProvider(object : MenuProvider{
+        addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.main, menu)
 
@@ -246,11 +248,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun setToolbar(toolbar: Toolbar) {
+    override fun setToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         setNavigationDrawerToggle(toolbar)
     }
+
     private var toggle: ActionBarDrawerToggle? = null
+
     @MainThread
     private fun setNavigationDrawerToggle(toolbar: Toolbar) {
         if (toggle != null) {
@@ -345,7 +349,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     @FlowPreview
     @ExperimentalCoroutinesApi
     private fun ActivityMainBinding.setupHeaderProfile() {
@@ -389,53 +392,13 @@ class MainActivity : AppCompatActivity() {
             this.closeDrawer(GravityCompat.START)
         }
     }
-//
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        menuInflater.inflate(R.menu.main, menu)
-//
-//        listOf(
-//            menu.findItem(R.id.action_messaging),
-//            menu.findItem(R.id.action_notification),
-//            menu.findItem(R.id.action_search)
-//        ).forEach {
-//            it.isVisible = settingStore.isClassicUI
-//        }
-//
-//        return true
-//    }
 
-//
-//    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        val idAndActivityMap = mapOf(
-//            R.id.action_settings to SettingsActivity::class.java,
-//            R.id.action_tab_setting to PageSettingActivity::class.java,
-//            R.id.action_notification to NotificationsActivity::class.java,
-//            R.id.action_messaging to MessagingListActivity::class.java,
-//            R.id.action_search to SearchActivity::class.java
-//        )
-//
-//        val targetActivity = idAndActivityMap[item.itemId]
-//            ?: return super.onOptionsItemSelected(item)
-//        startActivity(Intent(this, targetActivity))
-//        return true
-//    }
 
     override fun onStart() {
         super.onStart()
         setBackgroundImage()
         applyUI()
     }
-
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        Log.d("MainActivity", "#onSaveInstanceStateが呼び出された")
-
-//        mBottomNavigationAdapter.saveState(outState)
-    }
-
 
     private fun setBackgroundImage() {
         val path = settingStore.backgroundImagePath
@@ -454,9 +417,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             View.VISIBLE
         }
-//        if (settingStore.isClassicUI) {
-//            mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
-//        }
+
     }
 
     private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {

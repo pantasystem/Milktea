@@ -15,9 +15,9 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Lifecycle
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
+import jp.panta.misskeyandroidclient.ToolbarSetter
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
@@ -36,7 +36,8 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mBinding.searchViewPager.adapter = SearchPagerAdapter(this.childFragmentManager, requireContext())
+        mBinding.searchViewPager.adapter =
+            SearchPagerAdapter(this.childFragmentManager, requireContext())
         mBinding.searchTabLayout.setupWithViewPager(mBinding.searchViewPager)
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -44,10 +45,15 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when(menuItem.itemId){
+                when (menuItem.itemId) {
                     //R.id.search ->
-                    R.id.search ->{
-                        activity?.startActivity(Intent(requireContext(), SearchActivity::class.java))
+                    R.id.search -> {
+                        activity?.startActivity(
+                            Intent(
+                                requireContext(),
+                                SearchActivity::class.java
+                            )
+                        )
                         activity?.overridePendingTransition(0, 0)
                         return true
                     }
@@ -61,21 +67,24 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
     override fun onResume() {
         super.onResume()
 
-        (requireActivity() as MainActivity?)?.apply {
+        (requireActivity() as? ToolbarSetter)?.apply {
             setToolbar(mBinding.toolbar)
             setTitle(R.string.search)
         }
     }
 
 
-    class SearchPagerAdapter(supportFragmentManager: FragmentManager, context: Context) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
-        val tabList = listOf(context.getString(R.string.title_featured), context.getString(R.string.explore))
+    class SearchPagerAdapter(supportFragmentManager: FragmentManager, context: Context) :
+        FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        val tabList =
+            listOf(context.getString(R.string.title_featured), context.getString(R.string.explore))
+
         override fun getCount(): Int {
             return tabList.size
         }
 
         override fun getItem(position: Int): Fragment {
-            return when(position){
+            return when (position) {
                 0 -> TimelineFragment.newInstance(Pageable.Featured(null))
                 1 -> ExploreFragment()
                 else -> throw IllegalArgumentException("range 0..1, list:$tabList")

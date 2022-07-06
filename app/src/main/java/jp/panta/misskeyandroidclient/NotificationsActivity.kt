@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +21,7 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @FlowPreview
 @AndroidEntryPoint
-class NotificationsActivity : AppCompatActivity() {
+class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -32,8 +33,6 @@ class NotificationsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_notifications)
-        setSupportActionBar(binding.notificationToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         ActionNoteHandler(
             this,
@@ -61,5 +60,10 @@ class NotificationsActivity : AppCompatActivity() {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun setToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 }
