@@ -6,7 +6,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.account.AccountStore
 import javax.inject.Inject
 
@@ -19,11 +19,11 @@ class ChannelActivity : AppCompatActivity() {
     private val channelViewModel: ChannelViewModel by viewModels()
 
     @Inject
-    lateinit var setTheme: SetTheme
+    lateinit var setTheme: ApplyTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.setTheme()
+        setTheme.invoke()
 
         setContent {
             MdcTheme {

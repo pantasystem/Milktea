@@ -5,7 +5,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.messaging.databinding.ActivityMessagingListBinding
 import javax.inject.Inject
 
@@ -15,11 +15,11 @@ class MessagingListActivity : AppCompatActivity() {
     lateinit var mBinding: ActivityMessagingListBinding
 
     @Inject
-    lateinit var setTheme: SetTheme
+    lateinit var setTheme: ApplyTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.setTheme()
+        setTheme.invoke()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_messaging_list)
         setSupportActionBar(mBinding.messagingListToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

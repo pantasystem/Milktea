@@ -17,7 +17,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.drive.viewmodel.*
 import net.pantasystem.milktea.model.account.AccountStore
@@ -119,7 +119,7 @@ class DriveActivity : AppCompatActivity() {
     }
 
     @Inject
-    lateinit var setTheme: SetTheme
+    lateinit var setTheme: ApplyTheme
 
     @OptIn(
         ExperimentalPagerApi::class,
@@ -128,7 +128,7 @@ class DriveActivity : AppCompatActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.setTheme()
+        setTheme.invoke()
 
         ViewTreeLifecycleOwner.set(window.decorView, this)
 

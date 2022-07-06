@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package net.pantasystem.milktea.media
 
 import android.app.Activity
@@ -15,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ui.SetTheme
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
@@ -70,11 +71,11 @@ class MediaActivity : AppCompatActivity() {
     private lateinit var mBinding: ActivityMediaBinding
 
     @Inject
-    lateinit var setTheme: SetTheme
+    lateinit var setTheme: ApplyTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme.setTheme()
+        setTheme.invoke()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_media)
         setSupportActionBar(mBinding.mediaToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
