@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.main
+package net.pantasystem.milktea.common.ui
 
 import androidx.appcompat.widget.Toolbar
 

@@ -20,7 +20,7 @@ import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
-import jp.panta.misskeyandroidclient.ui.main.ToolbarSetter
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
