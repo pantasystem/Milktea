@@ -59,8 +59,6 @@ interface SimpleEditor {
     fun openMenu()
 }
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 @AndroidEntryPoint
 class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEditor {
 
@@ -88,6 +86,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     @Inject
     lateinit var draftNoteService: DraftNoteService
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -322,8 +321,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     private fun startSearchAndSelectUser() {
         val selectedUserIds = mViewModel.address.value.mapNotNull {
             it.userId ?: it.user.value?.id
@@ -336,8 +333,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         selectUserResult.launch(intent)
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     private fun startMentionToSearchAndSelectUser() {
         val intent = Intent(requireContext(), SearchAndSelectUserActivity::class.java)
         selectMentionToUserResult.launch(intent)
@@ -420,8 +415,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     private val selectUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
@@ -433,8 +426,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     private val selectMentionToUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {

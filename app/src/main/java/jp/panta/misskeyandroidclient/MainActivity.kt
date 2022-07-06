@@ -14,12 +14,17 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +41,7 @@ import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScop
 import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
+import jp.panta.misskeyandroidclient.viewmodel.MainUiState
 import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +54,7 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.ui.SetTheme
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -69,25 +76,12 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.ReportState
 import javax.inject.Inject
 
-class MainNavigationImpl @Inject constructor(
-    val activity: Activity
-) : MainNavigation {
-    override fun newIntent(args: Unit): Intent {
-        return Intent(activity, MainActivity::class.java)
-    }
-}
-
-interface ToolbarSetter {
-    fun setToolbar(toolbar: Toolbar)
-    fun setTitle(resId: Int)
-}
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     val mNotesViewModel: NotesViewModel by viewModels()
 
-    @ExperimentalCoroutinesApi
     private val mAccountViewModel: AccountViewModel by viewModels()
 
     private val mBackPressedDelegate = DoubleBackPressedFinishDelegate()
@@ -116,21 +110,46 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
 
+    @Inject
+    lateinit var setTheme: SetTheme
+
+
     private val mainViewModel: MainViewModel by viewModels()
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by viewModels()
 
     private val reportViewModel: ReportViewModel by viewModels()
 
+    private lateinit var toggleNavigationDrawerDelegate: ToggleNavigationDrawerDelegate
+
+    private lateinit var showBottomNavBadgeCountDelegate: ShowBottomNavigationBadgeDelegate
+
+    private lateinit var showNoteCreationResultSnackBar: ShowNoteCreationResultSnackBar
+
+    private lateinit var changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion
+
+
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        setTheme.setTheme()
         setContentView(R.layout.activity_main)
 
 
+        toggleNavigationDrawerDelegate = ToggleNavigationDrawerDelegate(this, binding.drawerLayout)
+        showBottomNavBadgeCountDelegate =
+            ShowBottomNavigationBadgeDelegate(binding.appBarMain.bottomNavigation)
+        showNoteCreationResultSnackBar = ShowNoteCreationResultSnackBar(
+            this,
+            noteTaskExecutor,
+            binding.appBarMain.simpleNotification
+        )
+
+        changeNavMenuVisibilityFromAPIVersion =
+            ChangeNavMenuVisibilityFromAPIVersion(binding.navView)
+
         binding.navView.setNavigationItemSelectedListener { item ->
-            showNavDrawersActivityBy(item)
+            StartActivityFromNavDrawerItems(this).showNavDrawersActivityBy(item)
             binding.drawerLayout.closeDrawerWhenOpened()
             false
         }
@@ -140,7 +159,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }
 
         initAccountViewModelListener()
-        binding.setupHeaderProfile()
+        SetUpNavHeader(binding.navView, this, mAccountViewModel).invoke()
 
         ActionNoteHandler(
             this,
@@ -152,7 +171,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         // NOTE: 各ばーしょんに合わせMenuを制御している
         getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
-            changeMenuVisibilityFrom(api)
+            changeNavMenuVisibilityFromAPIVersion(api)
         }.launchIn(lifecycleScope)
 
 
@@ -167,14 +186,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             }
         }
 
-        // NOTE: メッセージの既読数をバッジに表示する
-        mainViewModel.unreadMessageCount.onEach {
-            showUnreadMessageCountBadge(it)
-        }.launchIn(lifecycleScope)
-
-        // NOTE: 通知の既読数を表示する
-        mainViewModel.unreadNotificationCount.onEach {
-            showNotificationCountBadge(it)
+        mainViewModel.state.onEach { uiState ->
+            showBottomNavBadgeCountDelegate(uiState)
         }.launchIn(lifecycleScope)
 
         // NOTE: 最新の通知をSnackBar等に表示する
@@ -216,97 +229,25 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
         binding.appBarMain.bottomNavigation.setupWithNavController(navHostFragment.navController)
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.main, menu)
-
-                listOf(
-                    menu.findItem(R.id.action_messaging),
-                    menu.findItem(R.id.action_notification),
-                    menu.findItem(R.id.action_search)
-                ).forEach {
-                    it.isVisible = settingStore.isClassicUI
-                }
-
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                val idAndActivityMap = mapOf(
-                    R.id.action_settings to SettingsActivity::class.java,
-                    R.id.action_tab_setting to PageSettingActivity::class.java,
-                    R.id.action_notification to NotificationsActivity::class.java,
-                    R.id.action_messaging to MessagingListActivity::class.java,
-                    R.id.action_search to SearchActivity::class.java
-                )
-
-                val targetActivity = idAndActivityMap[menuItem.itemId]
-                    ?: return true
-                startActivity(Intent(this@MainActivity, targetActivity))
-                return true
-            }
-        })
-
+        addMenuProvider(MainActivityMenuProvider(this, settingStore))
     }
 
     override fun setToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
-        setNavigationDrawerToggle(toolbar)
-    }
-
-    private var toggle: ActionBarDrawerToggle? = null
-
-    @MainThread
-    private fun setNavigationDrawerToggle(toolbar: Toolbar) {
-        if (toggle != null) {
-            binding.drawerLayout.removeDrawerListener(toggle!!)
-        }
-        toggle = ActionBarDrawerToggle(
-            this,
-            binding.drawerLayout,
-            toolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        binding.drawerLayout.addDrawerListener(toggle!!)
-        toggle!!.syncState()
+        toggleNavigationDrawerDelegate.updateToolbar(toolbar)
     }
 
 
     /**
      * シンプルエディターの表示・非表示を行う
      */
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private fun ActivityMainBinding.setSimpleEditor() {
-        val ft = supportFragmentManager.beginTransaction()
-
-        val editor = supportFragmentManager.findFragmentByTag("simpleEditor")
-
-        if (settingStore.isSimpleEditorEnabled) {
-            this.appBarMain.fab.visibility = View.GONE
-            if (editor == null) {
-                ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
-            }
-        } else {
-            this.appBarMain.fab.visibility = View.VISIBLE
-
-            editor?.let {
-                ft.remove(it)
-            }
-
-        }
-        ft.commit()
+        SetSimpleEditor(
+            supportFragmentManager,
+            settingStore,
+            appBarMain.fab
+        ).invoke()
     }
-
-
-    private fun String.showSnackBar(action: Pair<String, (View) -> Unit>? = null) {
-        val snackBar =
-            Snackbar.make(binding.appBarMain.simpleNotification, this, Snackbar.LENGTH_LONG)
-        if (action != null) {
-            snackBar.setAction(action.first, action.second)
-        }
-        snackBar.show()
-    }
-
 
     private val switchAccountButtonObserver = Observer<Int> {
         runOnUiThread {
@@ -338,26 +279,15 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         startActivity(intent)
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun initAccountViewModelListener() {
         mAccountViewModel.switchAccount.removeObserver(switchAccountButtonObserver)
         mAccountViewModel.switchAccount.observe(this, switchAccountButtonObserver)
-
         mAccountViewModel.showFollowings.observe(this, showFollowingsObserver)
         mAccountViewModel.showFollowers.observe(this, showFollowersObserver)
         mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
 
-
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    private fun ActivityMainBinding.setupHeaderProfile() {
-        DataBindingUtil.bind<NavHeaderMainBinding>(this.navView.getHeaderView(0))
-        val headerBinding =
-            DataBindingUtil.getBinding<NavHeaderMainBinding>(this.navView.getHeaderView(0))
-        headerBinding?.lifecycleOwner = this@MainActivity
-        headerBinding?.accountViewModel = mAccountViewModel
-    }
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -365,9 +295,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             drawerLayout.isDrawerOpen(GravityCompat.START) -> {
                 drawerLayout.closeDrawer(GravityCompat.START)
             }
-//            mBottomNavigationAdapter.currentMenuItem?.itemId != R.id.navigation_home -> {
-//                mBottomNavigationAdapter.setCurrentFragment(R.id.navigation_home)
-//            }
             else -> {
                 if (mBackPressedDelegate.back()) {
                     super.onBackPressed()
@@ -421,51 +348,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
     private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
-        when (taskState) {
-            is TaskState.Error -> {
-                getString(R.string.note_creation_failure).showSnackBar(
-                    getString(R.string.retry) to ({
-                        noteTaskExecutor.dispatch(taskState.task)
-                    })
-                )
-            }
-            is TaskState.Success -> {
-                getString(R.string.successfully_created_note).showSnackBar(
-                    getString(R.string.show) to ({
-                        startActivity(
-                            NoteDetailActivity.newIntent(this@MainActivity, taskState.res.id)
-                        )
-                    })
-                )
-            }
-            is TaskState.Executing -> {
-            }
-        }
+        showNoteCreationResultSnackBar(taskState)
     }
 
-    private fun showNotificationCountBadge(count: Int) {
-        val bottomNav = binding.appBarMain.bottomNavigation
-        if (count <= 0) {
-            bottomNav.getBadge(R.id.navigation_notification)
-                ?.clearNumber()
-        }
-        bottomNav.getOrCreateBadge(R.id.navigation_notification)
-            .apply {
-                isVisible = count > 0
-                number = count
-            }
-    }
-
-    private fun showUnreadMessageCountBadge(count: Int) {
-        val bottomNav = binding.appBarMain.bottomNavigation
-        if (count <= 0) {
-            bottomNav.getBadge(R.id.navigation_message_list)?.clearNumber()
-        }
-        bottomNav.getOrCreateBadge(R.id.navigation_message_list).apply {
-            isVisible = count > 0
-            number = count
-        }
-    }
 
     private fun onFabClicked() {
         when (val type = currentPageableTimelineViewModel.currentType.value.suitableType()) {
@@ -489,29 +374,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }
     }
 
-    private fun changeMenuVisibilityFrom(api: MisskeyAPI) {
-        binding.navView.menu.also { menu ->
-            menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
-            menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
-            menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
-        }
-    }
-
-    private fun showNavDrawersActivityBy(item: MenuItem) {
-        val activity = when (item.itemId) {
-            R.id.nav_setting -> SettingsActivity::class.java
-            R.id.nav_drive -> DriveActivity::class.java
-            R.id.nav_favorite -> FavoriteActivity::class.java
-            R.id.nav_list -> ListListActivity::class.java
-            R.id.nav_antenna -> AntennaListActivity::class.java
-            R.id.nav_draft -> DraftNotesActivity::class.java
-            R.id.nav_gallery -> GalleryPostsActivity::class.java
-            R.id.nav_channel -> ChannelActivity::class.java
-            else -> throw IllegalStateException("未定義なNavigation Itemです")
-        }
-        startActivity(Intent(this, activity))
-    }
-
     private fun showSendReportStateFrom(state: ReportState) {
         ReportStateHandler().invoke(binding.appBarMain.simpleNotification, state)
     }
@@ -532,3 +394,210 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
 }
 
+private class ShowNoteCreationResultSnackBar(
+    private val activity: Activity,
+    private val noteTaskExecutor: CreateNoteTaskExecutor,
+    private val view: View
+) {
+
+    operator fun invoke(taskState: TaskState<Note>) {
+        when (taskState) {
+            is TaskState.Error -> {
+                activity.getString(R.string.note_creation_failure).showSnackBar(
+                    activity.getString(R.string.retry) to ({
+                        noteTaskExecutor.dispatch(taskState.task)
+                    })
+                )
+            }
+            is TaskState.Success -> {
+                activity.getString(R.string.successfully_created_note).showSnackBar(
+                    activity.getString(R.string.show) to ({
+                        activity.startActivity(
+                            NoteDetailActivity.newIntent(activity, taskState.res.id)
+                        )
+                    })
+                )
+            }
+            is TaskState.Executing -> {
+            }
+        }
+    }
+
+    private fun String.showSnackBar(action: Pair<String, (View) -> Unit>? = null) {
+        val snackBar =
+            Snackbar.make(view, this, Snackbar.LENGTH_LONG)
+        if (action != null) {
+            snackBar.setAction(action.first, action.second)
+        }
+        snackBar.show()
+    }
+
+
+}
+
+private class ChangeNavMenuVisibilityFromAPIVersion(
+    private val navView: NavigationView
+) {
+    operator fun invoke(api: MisskeyAPI) {
+        navView.menu.also { menu ->
+            menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
+            menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
+            menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
+        }
+    }
+}
+
+private class ShowBottomNavigationBadgeDelegate(
+    private val bottomNavigationView: BottomNavigationView
+) {
+    operator fun invoke(state: MainUiState) {
+        if (state.unreadNotificationCount <= 0) {
+            bottomNavigationView.getBadge(R.id.navigation_notification)
+                ?.clearNumber()
+        }
+        if (state.unreadMessagesCount <= 0) {
+            bottomNavigationView.getBadge(R.id.navigation_message_list)?.clearNumber()
+        }
+        bottomNavigationView.getOrCreateBadge(R.id.navigation_notification)
+            .apply {
+                isVisible = state.unreadNotificationCount > 0
+                number = state.unreadNotificationCount
+            }
+        bottomNavigationView.getOrCreateBadge(R.id.navigation_message_list).apply {
+            isVisible = state.unreadMessagesCount > 0
+            number = state.unreadMessagesCount
+        }
+    }
+}
+
+private class ToggleNavigationDrawerDelegate(
+    private val activity: Activity,
+    private val drawerLayout: DrawerLayout
+) {
+    private var toggle: ActionBarDrawerToggle? = null
+
+    @MainThread
+    fun updateToolbar(toolbar: Toolbar) {
+        if (toggle != null) {
+            drawerLayout.removeDrawerListener(toggle!!)
+        }
+        toggle = ActionBarDrawerToggle(
+            activity,
+            drawerLayout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        toggle!!.syncState()
+    }
+
+}
+
+class MainNavigationImpl @Inject constructor(
+    val activity: Activity
+) : MainNavigation {
+    override fun newIntent(args: Unit): Intent {
+        return Intent(activity, MainActivity::class.java)
+    }
+}
+
+interface ToolbarSetter {
+    fun setToolbar(toolbar: Toolbar)
+    fun setTitle(resId: Int)
+}
+
+
+private class StartActivityFromNavDrawerItems(
+    val mainActivity: MainActivity
+) {
+    fun showNavDrawersActivityBy(item: MenuItem) {
+        val activity = when (item.itemId) {
+            R.id.nav_setting -> SettingsActivity::class.java
+            R.id.nav_drive -> DriveActivity::class.java
+            R.id.nav_favorite -> FavoriteActivity::class.java
+            R.id.nav_list -> ListListActivity::class.java
+            R.id.nav_antenna -> AntennaListActivity::class.java
+            R.id.nav_draft -> DraftNotesActivity::class.java
+            R.id.nav_gallery -> GalleryPostsActivity::class.java
+            R.id.nav_channel -> ChannelActivity::class.java
+            else -> throw IllegalStateException("未定義なNavigation Itemです")
+        }
+        mainActivity.startActivity(Intent(mainActivity, activity))
+    }
+}
+
+private class MainActivityMenuProvider(
+    val activity: MainActivity,
+    val settingStore: SettingStore
+) : MenuProvider {
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.main, menu)
+
+        listOf(
+            menu.findItem(R.id.action_messaging),
+            menu.findItem(R.id.action_notification),
+            menu.findItem(R.id.action_search)
+        ).forEach {
+            it.isVisible = settingStore.isClassicUI
+        }
+
+    }
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        val idAndActivityMap = mapOf(
+            R.id.action_settings to SettingsActivity::class.java,
+            R.id.action_tab_setting to PageSettingActivity::class.java,
+            R.id.action_notification to NotificationsActivity::class.java,
+            R.id.action_messaging to MessagingListActivity::class.java,
+            R.id.action_search to SearchActivity::class.java
+        )
+
+        val targetActivity = idAndActivityMap[menuItem.itemId]
+            ?: return true
+        activity.startActivity(Intent(activity, targetActivity))
+        return true
+    }
+}
+
+private class SetUpNavHeader(
+    private val navView: NavigationView,
+    private val lifecycleOwner: LifecycleOwner,
+    private val accountViewModel: AccountViewModel
+) {
+
+    operator fun invoke() {
+        DataBindingUtil.bind<NavHeaderMainBinding>(this.navView.getHeaderView(0))
+        val headerBinding =
+            DataBindingUtil.getBinding<NavHeaderMainBinding>(this.navView.getHeaderView(0))
+        headerBinding?.lifecycleOwner = lifecycleOwner
+        headerBinding?.accountViewModel = accountViewModel
+    }
+}
+
+private class SetSimpleEditor(
+    val fragmentManager: FragmentManager,
+    val settingStore: SettingStore,
+    val fab: FloatingActionButton,
+) {
+    operator fun invoke() {
+        val ft = fragmentManager.beginTransaction()
+
+        val editor = fragmentManager.findFragmentByTag("simpleEditor")
+
+        if (settingStore.isSimpleEditorEnabled) {
+            fab.visibility = View.GONE
+            if (editor == null) {
+                ft.replace(R.id.simpleEditorBase, SimpleEditorFragment(), "simpleEditor")
+            }
+        } else {
+            fab.visibility = View.VISIBLE
+
+            editor?.let {
+                ft.remove(it)
+            }
+
+        }
+        ft.commit()
+    }
+}

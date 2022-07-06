@@ -69,4 +69,18 @@ class MainViewModel @Inject constructor(
         }.filter { BuildConfig.DEBUG }.catch { e ->
             logger.error("WebSocket　状態取得エラー", e)
         }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+
+    val state: StateFlow<MainUiState> = combine(
+        unreadNotificationCount,
+        unreadMessageCount,
+    ) { unc, umc->
+        MainUiState(unc, umc)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, MainUiState())
+
 }
+
+data class MainUiState (
+    val unreadNotificationCount: Int = 0,
+    val unreadMessagesCount: Int = 0,
+)
