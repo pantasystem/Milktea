@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import jp.panta.misskeyandroidclient.AuthorizationActivity
+import net.pantasystem.milktea.auth.AuthorizationActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel

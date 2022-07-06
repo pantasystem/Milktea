@@ -4,12 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-import jp.panta.misskeyandroidclient.AuthorizationNavigationImpl
+import jp.panta.misskeyandroidclient.MainNavigationImpl
 import jp.panta.misskeyandroidclient.UserDetailNavigationImpl
-import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
-import net.pantasystem.milktea.common_navigation.DriveNavigation
-import net.pantasystem.milktea.common_navigation.MediaNavigation
-import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.auth.AuthorizationNavigationImpl
+import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.drive.DriveNavigationImpl
 import net.pantasystem.milktea.media.MediaNavigationImpl
 
@@ -28,4 +26,7 @@ abstract class NavigationModule {
 
     @Binds
     abstract fun bindMediaNavigation(impl: MediaNavigationImpl): MediaNavigation
+
+    @Binds
+    abstract fun bindMainNavigation(impl: MainNavigationImpl): MainNavigation
 }

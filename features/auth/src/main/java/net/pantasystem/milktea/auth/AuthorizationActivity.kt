@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.auth
 
 import android.app.Activity
 import android.content.Intent
@@ -9,11 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import net.pantasystem.milktea.auth.AuthFragment
-import net.pantasystem.milktea.auth.AuthResultFragment
-import net.pantasystem.milktea.auth.Waiting4userAuthorizationFragment
 import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.from
@@ -35,6 +33,9 @@ class AuthorizationActivity : AppCompatActivity() {
 
     private val mViewModel: AuthViewModel by viewModels()
 
+    @Inject
+    lateinit var mainNavigation: MainNavigation
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
@@ -42,7 +43,7 @@ class AuthorizationActivity : AppCompatActivity() {
         lifecycleScope.launchWhenResumed {
             mViewModel.authorization.collect {
                 if(it is Authorization.Finish) {
-                    startActivity(Intent(this@AuthorizationActivity, MainActivity::class.java))
+                    startActivity(mainNavigation.newIntent(Unit))
                     finish()
                     return@collect
                 }

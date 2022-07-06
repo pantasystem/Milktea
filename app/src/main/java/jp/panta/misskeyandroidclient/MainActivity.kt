@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -44,7 +45,6 @@ import jp.panta.misskeyandroidclient.util.BottomNavigationAdapter
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -55,6 +55,8 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.SuitableType
 import net.pantasystem.milktea.common_viewmodel.suitableType
@@ -75,6 +77,13 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.ReportState
 import javax.inject.Inject
 
+class MainNavigationImpl @Inject constructor(
+    val activity: Activity
+): MainNavigation {
+    override fun newIntent(args: Unit): Intent {
+        return Intent(activity, MainActivity::class.java)
+    }
+}
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -108,6 +117,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var metaRepository: MetaRepository
+
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -164,10 +176,7 @@ class MainActivity : AppCompatActivity() {
             accountStore.state.collect {
                 if (it.isUnauthorized) {
                     this@MainActivity.startActivity(
-                        Intent(
-                            this@MainActivity,
-                            AuthorizationActivity::class.java
-                        )
+                        authorizationNavigation.newIntent(Unit)
                     )
                     finish()
                 }
