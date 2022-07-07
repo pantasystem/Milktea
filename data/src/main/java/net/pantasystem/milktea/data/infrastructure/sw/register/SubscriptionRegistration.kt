@@ -29,7 +29,7 @@ class SubscriptionRegistration(
     private suspend fun register(deviceToken: String, accountId: Long) : SubscriptionState?{
 
         logger.debug("call register(accountId:$accountId)")
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val endpoint = EndpointBuilder(
             deviceToken = deviceToken,
             accountId = accountId,

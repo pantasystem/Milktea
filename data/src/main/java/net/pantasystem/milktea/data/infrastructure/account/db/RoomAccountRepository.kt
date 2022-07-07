@@ -116,7 +116,7 @@ class RoomAccountRepository(
                 pageDAO.insertAll(addedPages)
 
                 exAccount = runBlocking {
-                    get(exAccount!!.accountId)
+                    get(exAccount!!.accountId).getOrThrow()
                 }
                 Log.d("Repo", "ex: $exAccount")
                 publish(AccountRepository.Event.Created(account))
@@ -136,11 +136,13 @@ class RoomAccountRepository(
 
 
     @Throws(AccountNotFoundException::class)
-    override suspend fun get(accountId: Long): Account {
-        return accountDao.getAccountRelation(accountId)?.toAccount()
-            ?: throw AccountNotFoundException(
-                accountId
-            )
+    override suspend fun get(accountId: Long): Result<Account> {
+        return runCatching {
+            accountDao.getAccountRelation(accountId)?.toAccount()
+                ?: throw AccountNotFoundException(
+                    accountId
+                )
+        }
     }
 
     override suspend fun findAll(): List<Account> {

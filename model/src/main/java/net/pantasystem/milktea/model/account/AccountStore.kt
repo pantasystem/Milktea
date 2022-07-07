@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.FetchMeta
-import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -58,7 +56,7 @@ class AccountStore @Inject constructor(
         try {
             val newAccount = accountRepository.add(account, true)
             saveDefaultPages(newAccount)
-            val updatedAccount = accountRepository.get(newAccount.accountId)
+            val updatedAccount = accountRepository.get(newAccount.accountId).getOrThrow()
             setCurrent(updatedAccount)
         } catch (e: Exception) {
             logger.error("アカウントの追加に失敗しました。", e)

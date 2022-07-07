@@ -92,7 +92,7 @@ class ListListViewModel @Inject constructor(
         userList?.let { ul ->
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
-                    val account = accountRepository.get(userList.id.accountId)
+                    val account = accountRepository.get(userList.id.accountId).getOrThrow()
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
                         if (pageable is Pageable.UserListTimeline) {

@@ -105,7 +105,7 @@ class RenotesPagingImpl(
 
     override suspend fun loadPrevious(): Result<List<NoteDTO>> {
         return runCatching {
-            val account = accountRepository.get(targetNoteId.accountId)
+            val account = accountRepository.get(targetNoteId.accountId).getOrThrow()
             val i = account.getI(encryption)
 
             misskeyAPIProvider.get(account.instanceDomain)
@@ -115,7 +115,7 @@ class RenotesPagingImpl(
     }
 
     override suspend fun convertAll(list: List<NoteDTO>): List<Renote> {
-        val account = accountRepository.get(targetNoteId.accountId)
+        val account = accountRepository.get(targetNoteId.accountId).getOrThrow()
         return list.map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }.map {

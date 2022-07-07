@@ -23,7 +23,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     val accountRepository: AccountRepository
 ) : UserListRepository {
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val api = misskeyAPIProvider.get(account)
         val body = api.userList(I(account.getI(encryption)))
             .throwIfHasError()
@@ -34,7 +34,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun create(accountId: Long, name: String): UserList {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val res = misskeyAPIProvider.get(account).createList(
             CreateList(
                 account.getI(encryption),
@@ -45,7 +45,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun update(listId: UserList.Id, name: String) {
-        val account = accountRepository.get(listId.accountId)
+        val account = accountRepository.get(listId.accountId).getOrThrow()
         misskeyAPIProvider.get(account).updateList(
             UpdateList(
                 account.getI(encryption),
@@ -59,7 +59,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         listId: UserList.Id,
         userId: User.Id
     ) {
-        val account = accountRepository.get(listId.accountId)
+        val account = accountRepository.get(listId.accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account)
         misskeyAPI.pushUserToList(
             ListUserOperation(
@@ -74,7 +74,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         listId: UserList.Id,
         userId: User.Id
     ) {
-        val account = accountRepository.get(listId.accountId)
+        val account = accountRepository.get(listId.accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account)
         misskeyAPI.pullUserFromList(
             ListUserOperation(
@@ -86,14 +86,14 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun delete(listId: UserList.Id) {
-        val account = accountRepository.get(listId.accountId)
+        val account = accountRepository.get(listId.accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account)
         misskeyAPI.deleteList(ListId(account.getI(encryption), listId.userListId))
             .throwIfHasError()
     }
 
     override suspend fun findOne(userListId: UserList.Id): UserList {
-        val account = accountRepository.get(userListId.accountId)
+        val account = accountRepository.get(userListId.accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account)
         val res = misskeyAPI.showList(ListId(account.getI(encryption), userListId.userListId))
             .throwIfHasError()

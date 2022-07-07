@@ -240,7 +240,7 @@ class GalleryEditorViewModel @Inject constructor(
                     _accountId = it.accountId
                 }
             }
-            return accountRepository.get(_accountId!!)
+            return accountRepository.get(_accountId!!).getOrThrow()
         }
     }
 }

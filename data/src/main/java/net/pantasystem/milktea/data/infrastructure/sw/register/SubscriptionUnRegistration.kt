@@ -19,7 +19,7 @@ class SubscriptionUnRegistration(
 
 
     suspend fun unregister(deviceToken: String, accountId: Long) {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val apiProvider = misskeyAPIProvider.get(account)
         val endpoint = EndpointBuilder(
             accountId = account.accountId,

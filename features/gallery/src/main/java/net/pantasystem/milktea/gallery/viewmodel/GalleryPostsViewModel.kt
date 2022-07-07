@@ -201,7 +201,7 @@ class GalleryPostsViewModel @AssistedInject constructor(
 
     suspend fun getAccount(): Account {
         return accountId?.let {
-            accountRepository.get(it)
+            accountRepository.get(it).getOrThrow()
         } ?: accountRepository.getCurrentAccount().also {
             accountId = it.accountId
         }

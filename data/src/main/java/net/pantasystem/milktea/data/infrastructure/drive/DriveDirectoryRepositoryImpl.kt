@@ -18,7 +18,7 @@ class DriveDirectoryRepositoryImpl @Inject constructor(
 
     override suspend fun create(createDirectory: CreateDirectory): Result<Directory> {
         return runCatching {
-            val account = accountRepository.get(createDirectory.accountId)
+            val account = accountRepository.get(createDirectory.accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account)
             api.createFolder(CreateFolder(
                 i = account.getI(encryption),

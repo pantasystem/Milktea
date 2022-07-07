@@ -15,7 +15,7 @@ class DeleteNicknameUseCase @Inject constructor(
 ) : UseCase {
 
     suspend operator fun invoke(user: User) {
-        val account = accountRepository.get(user.id.accountId)
+        val account = accountRepository.get(user.id.accountId).getOrThrow()
         userNicknameRepository.delete(
             UserNickname.Id(
                 userName = user.userName,

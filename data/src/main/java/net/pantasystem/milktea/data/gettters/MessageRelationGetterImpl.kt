@@ -52,14 +52,14 @@ class MessageRelationGetterImpl @Inject constructor(
                 MessageRelation.Direct(
                     message,
                     userDataSource.get(message.userId),
-                    accountRepository.get(message.id.accountId)
+                    accountRepository.get(message.id.accountId).getOrThrow()
                 )
             }
             is Message.Group -> {
                 MessageRelation.Group(
                     message,
                     userDataSource.get(message.userId),
-                    accountRepository.get(message.id.accountId)
+                    accountRepository.get(message.id.accountId).getOrThrow()
                 )
             }
         }

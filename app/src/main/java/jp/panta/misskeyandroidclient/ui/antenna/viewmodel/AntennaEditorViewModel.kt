@@ -312,7 +312,7 @@ class AntennaEditorViewModel @Inject constructor(
 
     private suspend fun fetch(): Antenna? {
         return _antennaId.value?.let{ antennaId ->
-            val account = accountRepository.get(antennaId.accountId)
+            val account = accountRepository.get(antennaId.accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account) as? MisskeyAPIV12
                 ?: return null
             val res = api.showAntenna(
@@ -332,7 +332,7 @@ class AntennaEditorViewModel @Inject constructor(
     private suspend fun getAccount(): Account {
         if(mAccount == null) {
             mAccount = _antennaId.value?.let{
-                accountRepository.get(it.accountId)
+                accountRepository.get(it.accountId).getOrThrow()
             }?: accountRepository.getCurrentAccount()
         }
         require(mAccount != null)

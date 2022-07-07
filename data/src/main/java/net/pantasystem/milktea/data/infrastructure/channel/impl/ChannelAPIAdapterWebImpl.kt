@@ -1,10 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.channel.impl
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.channel.*
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.Channel
@@ -32,7 +32,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
 
     override suspend fun create(model: CreateChannel): Result<ChannelDTO> {
         return runCatching {
-            val account = accountRepository.get(model.accountId)
+            val account = accountRepository.get(model.accountId).getOrThrow()
             (misskeyAPIProvider.get(account) as MisskeyAPIV12).createChannel(
                 CreateChannelDTO(
                     i = account.getI(encryption),
@@ -85,11 +85,11 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     }
 
     private suspend fun Channel.Id.getAPI(): MisskeyAPIV12 {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         return misskeyAPIProvider.get(account) as MisskeyAPIV12
     }
 
     private suspend fun Channel.Id.getAccount(): Account {
-        return accountRepository.get(accountId)
+        return accountRepository.get(accountId).getOrThrow()
     }
 }

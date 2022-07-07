@@ -23,7 +23,7 @@ class NotificationRepositoryImpl @Inject constructor(
 
     override suspend fun read(notificationId: Notification.Id) {
         runCatching {
-            val account = accountRepository.get(notificationId.accountId)
+            val account = accountRepository.get(notificationId.accountId).getOrThrow()
             socketProvider.get(account).send(Send.ReadNotification(Send.ReadNotification.Body(notificationId.notificationId)).toJson())
             notificationDataSource.add(notificationDataSource.get(notificationId).read())
         }
@@ -36,7 +36,7 @@ class NotificationRepositoryImpl @Inject constructor(
 
 
     suspend fun dispatch(accountId: Long, notification: ChannelBody.Main.Notification) {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         notificationRelationGetter.get(account, notification.body)
     }
 

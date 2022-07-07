@@ -73,7 +73,7 @@ class RoomAccountRepositoryTest{
             val updatedResult = roomAccountRepository.add(updated, true)
             assertEquals(updatedResult.pages.size, 1)
 
-            val getResult = roomAccountRepository.get(updatedResult.accountId)
+            val getResult = roomAccountRepository.get(updatedResult.accountId).getOrThrow()
             assertEquals(getResult.pages.size, 1)
 
             assertNotEquals(getResult.pages.first().pageId, 0)

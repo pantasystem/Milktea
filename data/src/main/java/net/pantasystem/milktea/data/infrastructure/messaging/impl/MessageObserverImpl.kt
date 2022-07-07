@@ -42,8 +42,8 @@ class MessageObserverImpl @Inject constructor(
                 is MessagingId.Direct -> messagingId.userId.accountId
                 is MessagingId.Group -> messagingId.groupId.accountId
             }
-            emit(accountRepository.get(accountId))
-        }.flatMapLatest { ac ->
+            emit(accountRepository.get(accountId).getOrNull())
+        }.filterNotNull().flatMapLatest { ac ->
             channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {

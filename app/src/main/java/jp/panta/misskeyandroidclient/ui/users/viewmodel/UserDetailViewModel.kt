@@ -75,8 +75,9 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     val profileUrl = userState.filterNotNull().map {
-        val ac = accountRepository.get(it.id.accountId)
-        it.getProfileUrl(ac)
+        accountRepository.get(it.id.accountId).getOrNull()?.let { ac ->
+            it.getProfileUrl(ac)
+        }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -269,7 +270,7 @@ class UserDetailViewModel @AssistedInject constructor(
             return mAc!!
         }
         if (userId != null) {
-            mAc = accountRepository.get(userId.accountId)
+            mAc = accountRepository.get(userId.accountId).getOrThrow()
             return mAc!!
         }
 

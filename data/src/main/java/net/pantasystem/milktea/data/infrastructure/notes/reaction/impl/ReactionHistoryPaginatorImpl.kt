@@ -51,7 +51,7 @@ class ReactionHistoryPaginatorImpl(
 
     override suspend fun next(): Boolean {
         lock.withLock {
-            val account = accountRepository.get(reactionHistoryRequest.noteId.accountId)
+            val account = accountRepository.get(reactionHistoryRequest.noteId.accountId).getOrThrow()
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
             val res = misskeyAPI.reactions(
                 RequestReactionHistoryDTO(

@@ -106,7 +106,7 @@ class InMemoryUserDataSource @Inject constructor(
     private suspend fun createOrUpdate(argUser: User): AddResult {
         // TODO: ここで変更処理までをしてしまうのは責務外なのでいつかリファクタリングをする
         val nickname = runCatching {
-            val ac = accountRepository.get(argUser.id.accountId)
+            val ac = accountRepository.get(argUser.id.accountId).getOrThrow()
             userNicknameRepository.findOne(
                 UserNickname.Id(argUser.userName, argUser.host?: ac.getHost())
             )

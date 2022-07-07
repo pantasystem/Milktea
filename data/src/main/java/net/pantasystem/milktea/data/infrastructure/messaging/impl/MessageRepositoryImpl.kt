@@ -23,7 +23,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     @Throws(IOException::class)
     override suspend fun read(messageId: Message.Id): Boolean {
-        val account = accountRepository.get(messageId.accountId)
+        val account = accountRepository.get(messageId.accountId).getOrThrow()
         val result = misskeyAPIProvider.get(account).readMessage(
             MessageAction(
                 account.getI(encryption),
@@ -46,7 +46,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     @Throws(IOException::class)
     override suspend fun create(createMessage: CreateMessage): Message {
-        val account = accountRepository.get(createMessage.accountId)
+        val account = accountRepository.get(createMessage.accountId).getOrThrow()
         val i = account.getI(encryption)
         val action = when(createMessage) {
             is CreateMessage.Group -> {
@@ -80,7 +80,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     @Throws(IOException::class)
     override suspend fun delete(messageId: Message.Id): Boolean {
-        val account = accountRepository.get(messageId.accountId)
+        val account = accountRepository.get(messageId.accountId).getOrThrow()
         val result = misskeyAPIProvider.get(account).deleteMessage(
             MessageAction(
                 account.getI(encryption),

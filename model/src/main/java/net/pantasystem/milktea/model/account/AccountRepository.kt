@@ -22,7 +22,7 @@ interface AccountRepository{
 
     fun removeEventListener(listener: Listener)
 
-    suspend fun get(accountId: Long): Account
+    suspend fun get(accountId: Long): Result<Account>
 
     suspend fun add(account: Account, isUpdatePages: Boolean = false): Account
 
@@ -61,6 +61,6 @@ fun AccountRepository.watchCurrentAccount() : Flow<Account> {
 @ExperimentalCoroutinesApi
 fun AccountRepository.watchAccount(accountId: Long) : Flow<Account> {
     return this.listenEvent().map {
-        this.get(accountId)
+        this.get(accountId).getOrThrow()
     }
 }
