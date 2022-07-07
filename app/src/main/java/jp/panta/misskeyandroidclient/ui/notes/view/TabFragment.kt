@@ -3,8 +3,9 @@
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -22,7 +23,6 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import net.pantasystem.milktea.common.ui.ToolbarSetter
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import javax.inject.Inject
@@ -30,35 +30,53 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
+    companion object {
+        private const val PAGES = "pages"
+    }
 
-    private var mPagerAdapter: TimelinePagerAdapter? = null
+
+    private lateinit var mPagerAdapter: TimelinePagerAdapter
 
     private val binding: FragmentTabBinding by dataBinding()
 
     @Inject
     lateinit var accountStore: AccountStore
 
-    private val tabViewModel by viewModels<TabViewModel>()
+    private val mTabViewModel by viewModels<TabViewModel>()
+
+    private var mPages: List<Page>? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            mPages = savedInstanceState.getParcelableArrayList(PAGES)
+        }
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        mPagerAdapter = TimelinePagerAdapter(this.childFragmentManager, mPages ?: emptyList())
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
 
-
-        mPagerAdapter = binding.viewPager.adapter as? TimelinePagerAdapter
-        if (mPagerAdapter == null) {
-            mPagerAdapter = TimelinePagerAdapter(this.childFragmentManager, emptyList())
-            binding.viewPager.adapter = mPagerAdapter
-        }
-
+        binding.viewPager.adapter = mPagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
 
         lifecycleScope.launchWhenStarted {
-            tabViewModel.currentAccount.filterNotNull().distinctUntilChanged().collect { account ->
+            mTabViewModel.currentAccount.filterNotNull().distinctUntilChanged().collect { account ->
+                mPages = account.pages
                 val pages = account.pages
-                Log.d("TabFragment", "pages:$pages")
-                mPagerAdapter?.setList(
-                    account,
+                mPagerAdapter.setList(
                     pages.sortedBy {
                         it.weight
                     })
@@ -69,19 +87,22 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
                 } else {
                     binding.tabLayout.visibility = View.VISIBLE
                     binding.elevationView.visibility = View.GONE
-                    binding.tabLayout.elevation
-                    if (pages.size > 5) {
-                        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+                    binding.tabLayout.tabMode = if (pages.size > 5) {
+                        TabLayout.MODE_SCROLLABLE
                     } else {
-                        binding.tabLayout.tabMode = TabLayout.MODE_FIXED
+                        TabLayout.MODE_FIXED
                     }
                 }
             }
         }
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
 
-
-
+        if (mPages != null) {
+            outState.putParcelableArrayList(PAGES, ArrayList(mPages!!))
+        }
     }
 
     override fun onResume() {
@@ -100,7 +121,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         private var requestBaseList: List<Page> = list
         private var oldRequestBaseSetting = requestBaseList
 
-        var account: Account? = null
 
         val scrollableTopFragments = ArrayList<ScrollableTop>()
         private val mFragments = ArrayList<Fragment>()
@@ -110,7 +130,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
 
         override fun getItem(position: Int): Fragment {
-            Log.d("getItem", "$position, ${requestBaseList[position].pageable().javaClass}")
             val item = requestBaseList[position]
             val fragment = PageableFragmentFactory.create(item)
 
@@ -136,11 +155,10 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
 
 
-        fun setList(account: Account, list: List<Page>) {
+        fun setList(list: List<Page>) {
             mFragments.clear()
             oldRequestBaseSetting = requestBaseList
             requestBaseList = list
-            this.account = account
             if (requestBaseList != oldRequestBaseSetting) {
                 notifyDataSetChanged()
             }
@@ -156,7 +174,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
     private fun showTopCurrentFragment() {
         try {
-            mPagerAdapter?.scrollableTopFragments?.forEach {
+            mPagerAdapter.scrollableTopFragments.forEach {
                 it.showTop()
             }
         } catch (e: UninitializedPropertyAccessException) {
