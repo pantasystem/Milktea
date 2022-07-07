@@ -64,7 +64,7 @@ class AccountStore @Inject constructor(
     }
 
     suspend fun setCurrent(account: Account) {
-        accountRepository.setCurrentAccount(account)
+        accountRepository.setCurrentAccount(account).getOrThrow()
         _state.value = state.value.setCurrentAccount(account)
     }
 
@@ -110,7 +110,7 @@ class AccountStore @Inject constructor(
             var accounts: List<Account>
             try {
                 current = accountRepository.getCurrentAccount().getOrThrow()
-                accounts = accountRepository.findAll()
+                accounts = accountRepository.findAll().getOrThrow()
             } catch (e: AccountNotFoundException) {
                 _state.value = AccountState(isLoading = false)
                 return
@@ -119,7 +119,7 @@ class AccountStore @Inject constructor(
             logger.debug("accountId:${current.accountId}, account:$current")
             if (current.pages.isEmpty()) {
                 saveDefaultPages(current)
-                accounts = accountRepository.findAll()
+                accounts = accountRepository.findAll().getOrThrow()
                 current = accountRepository.getCurrentAccount().getOrThrow()
             }
 

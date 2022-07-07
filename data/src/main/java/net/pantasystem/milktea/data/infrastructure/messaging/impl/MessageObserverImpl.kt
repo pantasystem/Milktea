@@ -27,7 +27,7 @@ class MessageObserverImpl @Inject constructor(
     @OptIn(FlowPreview::class)
     override fun observeAllAccountsMessages(): Flow<Message>{
         return suspend {
-            accountRepository.findAll()
+            accountRepository.findAll().getOrThrow()
         }.asFlow().flatMapMerge {
             it.map{ ac ->
                 observeAccountMessages(ac)

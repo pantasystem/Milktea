@@ -16,27 +16,29 @@ class MediatorAccountRepository(
 
     override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
         return roomAccountRepository.add(account, isUpdatePages).also {
-            mAccounts = roomAccountRepository.findAll()
+            mAccounts = roomAccountRepository.findAll().getOrThrow()
         }
     }
 
     override suspend fun delete(account: Account) {
         return roomAccountRepository.delete(account).also {
-            mAccounts = roomAccountRepository.findAll()
+            mAccounts = roomAccountRepository.findAll().getOrThrow()
         }
     }
 
-    override suspend fun findAll(): List<Account> {
-        if(mAccounts.isEmpty()) {
-            mAccounts = roomAccountRepository.findAll()
+    override suspend fun findAll(): Result<List<Account>> {
+        return runCatching {
+            if(mAccounts.isEmpty()) {
+                mAccounts = roomAccountRepository.findAll().getOrThrow()
+            }
+            mAccounts
         }
-        return mAccounts
     }
 
 
     override suspend fun get(accountId: Long): Result<Account> {
         return runCatching {
-            findAll().firstOrNull {
+            findAll().getOrThrow().firstOrNull {
                 it.accountId == accountId
             }?: throw AccountNotFoundException(accountId)
         }
@@ -47,9 +49,11 @@ class MediatorAccountRepository(
         return roomAccountRepository.getCurrentAccount()
     }
 
-    override suspend fun setCurrentAccount(account: Account): Account {
-        return roomAccountRepository.setCurrentAccount(account).also {
-            mAccounts = findAll()
+    override suspend fun setCurrentAccount(account: Account): Result<Account> {
+        return runCatching {
+            roomAccountRepository.setCurrentAccount(account).getOrThrow().also {
+                mAccounts = findAll().getOrThrow()
+            }
         }
     }
 

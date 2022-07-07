@@ -28,9 +28,9 @@ interface AccountRepository{
 
     suspend fun delete(account: Account)
 
-    suspend fun findAll(): List<Account>
+    suspend fun findAll(): Result<List<Account>>
 
-    suspend fun setCurrentAccount(account: Account): Account
+    suspend fun setCurrentAccount(account: Account): Result<Account>
 
     suspend fun getCurrentAccount(): Result<Account>
 }

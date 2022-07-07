@@ -59,7 +59,7 @@ class SubscriptionRegistration(
      * @return 成功件数
      */
     suspend fun registerAll(deviceToken: String) : Int{
-        val accounts = accountRepository.findAll()
+        val accounts = accountRepository.findAll().getOrThrow()
         return coroutineScope {
             accounts.map {
                 async {
