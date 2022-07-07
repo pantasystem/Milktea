@@ -52,6 +52,8 @@ class MessageHistoryViewModel @Inject constructor(
         accountRepository.getCurrentAccount()
     }.filterNotNull().flatMapLatest {
         fetchHistory(false, it)
+    }.catch { e ->
+        emit(ResultState.Error(StateContent.NotExist(), e))
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
@@ -64,6 +66,8 @@ class MessageHistoryViewModel @Inject constructor(
         accountRepository.getCurrentAccount()
     }.filterNotNull().flatMapLatest {
         fetchHistory(true, it)
+    }.catch { e ->
+        emit(ResultState.Error(StateContent.NotExist(), e))
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),

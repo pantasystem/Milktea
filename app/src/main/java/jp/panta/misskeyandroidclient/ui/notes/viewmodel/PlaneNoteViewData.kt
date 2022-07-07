@@ -7,6 +7,7 @@ import jp.panta.misskeyandroidclient.mfm.MFMParser
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
@@ -219,6 +220,8 @@ open class PlaneNoteViewData(
         if (it is NoteDataSource.Event.Updated) {
             update(it.note)
         }
+    }.catch { e ->
+        Log.d("PlaneNoteViewData", "error", e)
     }
 
     var job: Job? = null

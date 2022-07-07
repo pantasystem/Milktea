@@ -82,9 +82,11 @@ class UserDetailViewModel @AssistedInject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
         pinNotesState.map { notes ->
-            notes.map { note ->
+            notes.mapNotNull {
+                noteRelationGetter.get(it).getOrNull()
+            }.map { note ->
                 PlaneNoteViewData(
-                    noteRelationGetter.get(note),
+                    note,
                     getAccount(),
                     noteCaptureAPIAdapter,
                     translationStore

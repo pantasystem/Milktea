@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.gettters
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDeletedException
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.User
@@ -30,16 +29,12 @@ class NoteRelationGetter @Inject constructor(
         promotionId: String? = null,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
-    ): NoteRelation? {
+    ): Result<NoteRelation?> {
         return runCatching {
             notesMap.getOrElse(noteId) {
                 noteRepository.find(noteId)
             }
-        }.onFailure {
-            if (it !is NoteDeletedException) {
-                logger.error("ノートの取得に失敗しました", e = it)
-            }
-        }.getOrNull()?.let {
+        }.mapCatching {
             get(
                 it,
                 deep,
@@ -47,7 +42,7 @@ class NoteRelationGetter @Inject constructor(
                 promotionId = promotionId,
                 usersMap = usersMap,
                 notesMap = notesMap
-            )
+            ).getOrThrow()
         }
     }
 
@@ -57,7 +52,7 @@ class NoteRelationGetter @Inject constructor(
             it.id
         }
         val noteMap = notes.associateBy { it.id }
-        return notes.map {
+        return notes.mapNotNull {
             get(
                 it,
                 true,
@@ -65,7 +60,7 @@ class NoteRelationGetter @Inject constructor(
                 promotionId = null,
                 usersMap = users,
                 notesMap = noteMap
-            )
+            ).getOrNull()
         }
     }
 
@@ -74,7 +69,7 @@ class NoteRelationGetter @Inject constructor(
         noteId: String,
         featuredId: String? = null,
         promotionId: String? = null
-    ): NoteRelation? {
+    ): Result<NoteRelation?> {
         return get(Note.Id(accountId, noteId), featuredId = featuredId, promotionId = promotionId)
     }
 
@@ -86,49 +81,52 @@ class NoteRelationGetter @Inject constructor(
         promotionId: String? = null,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
-    ): NoteRelation {
-        val user = usersMap.getOrElse(note.userId) {
-            userDataSource.get(note.userId)
-        }
-
-        val renote = if (deep) {
-            note.renoteId?.let {
-                get(it, false)
+    ): Result<NoteRelation> {
+        return runCatching {
+            val user = usersMap.getOrElse(note.userId) {
+                userDataSource.get(note.userId)
             }
-        } else null
-        val reply = if (deep) {
-            note.replyId?.let {
-                get(it, false, notesMap = notesMap, usersMap = usersMap)
-            }
-        } else null
 
-        if (featuredId != null) {
-            return NoteRelation.Featured(
-                note,
-                user,
-                renote,
-                reply,
+            val renote = if (deep) {
+                note.renoteId?.let {
+                    get(it, false)
+                }
+            } else null
+            val reply = if (deep) {
+                note.replyId?.let {
+                    get(it, false, notesMap = notesMap, usersMap = usersMap)
+                }
+            } else null
+
+            if (featuredId != null) {
+                return@runCatching NoteRelation.Featured(
+                    note,
+                    user,
+                    renote?.getOrNull(),
+                    reply?.getOrNull(),
+                    note.fileIds?.let { filePropertyDataSource.findIn(it) },
+                    featuredId
+                )
+            }
+
+            if (promotionId != null) {
+                return@runCatching NoteRelation.Promotion(
+                    note,
+                    user,
+                    renote?.getOrNull(),
+                    reply?.getOrNull(),
+                    note.fileIds?.let { filePropertyDataSource.findIn(it) },
+                    promotionId
+                )
+            }
+            return@runCatching NoteRelation.Normal(
+                note = note,
+                user = user,
+                renote = renote?.getOrNull(),
+                reply = reply?.getOrNull(),
                 note.fileIds?.let { filePropertyDataSource.findIn(it) },
-                featuredId
             )
         }
 
-        if (promotionId != null) {
-            return NoteRelation.Promotion(
-                note,
-                user,
-                renote,
-                reply,
-                note.fileIds?.let { filePropertyDataSource.findIn(it) },
-                promotionId
-            )
-        }
-        return NoteRelation.Normal(
-            note = note,
-            user = user,
-            renote = renote,
-            reply = reply,
-            note.fileIds?.let { filePropertyDataSource.findIn(it) },
-        )
     }
 }

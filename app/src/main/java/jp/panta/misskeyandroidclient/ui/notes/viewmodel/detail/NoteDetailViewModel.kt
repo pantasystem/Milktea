@@ -64,7 +64,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                 val account = getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
 
-                val noteDetail = noteRelationGetter.get(note)
+                val noteDetail = noteRelationGetter.get(note).getOrThrow()
 
                 val detail = NoteDetailViewData(
                     noteDetail,
@@ -139,7 +139,7 @@ class NoteDetailViewModel @AssistedInject constructor(
             ).body()?.map {
                 val n = noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it)
                 PlaneNoteViewData(
-                    noteRelationGetter.get(n),
+                    noteRelationGetter.get(n).getOrThrow(),
                     getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore
@@ -164,7 +164,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                 )
             }?.map {
                 PlaneNoteViewData(
-                    it,
+                    it.getOrThrow(),
                     getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore,
@@ -186,7 +186,7 @@ class NoteDetailViewModel @AssistedInject constructor(
             )
         }?.map {
             val planeNoteViewData = PlaneNoteViewData(
-                it,
+                it.getOrThrow(),
                 getAccount(),
                 noteCaptureAdapter,
                 noteTranslationStore,
@@ -199,7 +199,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                             getAccount(),
                             n
                         )
-                    ),
+                    ).getOrThrow(),
                     getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore,
@@ -208,7 +208,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                 }
             }
             NoteConversationViewData(
-                it,
+                it.getOrThrow(),
                 childInChild,
                 getAccount(),
                 noteCaptureAdapter,

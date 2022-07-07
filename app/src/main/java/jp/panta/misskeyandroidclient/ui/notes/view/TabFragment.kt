@@ -18,12 +18,10 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.ScrollableTop
-import net.pantasystem.milktea.common.ui.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
@@ -53,30 +51,34 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
             binding.viewPager.adapter = mPagerAdapter
         }
 
-        tabViewModel.currentAccount.filterNotNull().distinctUntilChanged().onEach { account ->
-            val pages = account.pages
-            Log.d("TabFragment", "pages:$pages")
-            mPagerAdapter?.setList(
-                account,
-                pages.sortedBy {
-                    it.weight
-                })
-            binding.tabLayout.setupWithViewPager(binding.viewPager)
+        binding.tabLayout.setupWithViewPager(binding.viewPager)
 
-            if (pages.size <= 1) {
-                binding.tabLayout.visibility = View.GONE
-                binding.elevationView.visibility = View.VISIBLE
-            } else {
-                binding.tabLayout.visibility = View.VISIBLE
-                binding.elevationView.visibility = View.GONE
-                binding.tabLayout.elevation
-                if (pages.size > 5) {
-                    binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+        lifecycleScope.launchWhenStarted {
+            tabViewModel.currentAccount.filterNotNull().distinctUntilChanged().collect { account ->
+                val pages = account.pages
+                Log.d("TabFragment", "pages:$pages")
+                mPagerAdapter?.setList(
+                    account,
+                    pages.sortedBy {
+                        it.weight
+                    })
+
+                if (pages.size <= 1) {
+                    binding.tabLayout.visibility = View.GONE
+                    binding.elevationView.visibility = View.VISIBLE
                 } else {
-                    binding.tabLayout.tabMode = TabLayout.MODE_FIXED
+                    binding.tabLayout.visibility = View.VISIBLE
+                    binding.elevationView.visibility = View.GONE
+                    binding.tabLayout.elevation
+                    if (pages.size > 5) {
+                        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+                    } else {
+                        binding.tabLayout.tabMode = TabLayout.MODE_FIXED
+                    }
                 }
             }
-        }.launchIn(lifecycleScope)
+        }
+
 
 
 
