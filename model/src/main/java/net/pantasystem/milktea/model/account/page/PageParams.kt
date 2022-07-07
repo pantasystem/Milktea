@@ -1,9 +1,12 @@
 package net.pantasystem.milktea.model.account.page
 
 
+import android.os.Parcelable
 import net.pantasystem.milktea.model.account.page.PageType.*
 import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class PageParams (
     val type: PageType = HOME,
     val withFiles: Boolean? = null,
@@ -27,7 +30,7 @@ data class PageParams (
     var host: String? = null,
     val antennaId: String? = null,
     val channelId: String? = null,
-) : Serializable{
+) : Serializable, Parcelable{
 
 
     // * Global, Local, Hybrid, Home, UserList, Mention, Show, SearchByTag, Featured, Notification, UserTimeline, Search, Antenna
