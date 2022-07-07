@@ -15,6 +15,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
@@ -280,6 +281,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             drawerLayout.isDrawerOpen(GravityCompat.START) -> {
                 drawerLayout.closeDrawer(GravityCompat.START)
             }
+            binding.appBarMain.contentMain.contentMain.findNavController().popBackStack() -> {}
             else -> {
                 if (mBackPressedDelegate.back()) {
                     super.onBackPressed()
