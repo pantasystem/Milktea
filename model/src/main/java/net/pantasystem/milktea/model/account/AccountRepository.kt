@@ -32,7 +32,7 @@ interface AccountRepository{
 
     suspend fun setCurrentAccount(account: Account): Account
 
-    suspend fun getCurrentAccount(): Account
+    suspend fun getCurrentAccount(): Result<Account>
 }
 
 @ExperimentalCoroutinesApi
@@ -54,7 +54,7 @@ fun AccountRepository.listenEvent(): Flow<AccountRepository.Event> {
 @ExperimentalCoroutinesApi
 fun AccountRepository.watchCurrentAccount() : Flow<Account> {
     return this.listenEvent().map {
-        this.getCurrentAccount()
+        this.getCurrentAccount().getOrThrow()
     }
 }
 

@@ -333,7 +333,7 @@ class AntennaEditorViewModel @Inject constructor(
         if(mAccount == null) {
             mAccount = _antennaId.value?.let{
                 accountRepository.get(it.accountId).getOrThrow()
-            }?: accountRepository.getCurrentAccount()
+            }?: accountRepository.getCurrentAccount().getOrThrow()
         }
         require(mAccount != null)
         return mAccount!!

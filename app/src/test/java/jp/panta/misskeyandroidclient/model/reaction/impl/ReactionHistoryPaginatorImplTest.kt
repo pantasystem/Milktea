@@ -81,7 +81,7 @@ package jp.panta.misskeyandroidclient.model.reaction.impl
 //    @Test
 //    fun testLoad(): Unit = runBlocking{
 //
-//        val account = accountRepository.getCurrentAccount()
+//        val account = accountRepository.getCurrentAccount().getOrThrow()
 //        val req = ReactionHistoryRequest(Note.Id(account.accountId, "7zzafqsm9a"), null)
 //        val paginator = reactionHistoryPaginatorFactory.create(req)
 //        dataSource.addAllListener = {
@@ -95,7 +95,7 @@ package jp.panta.misskeyandroidclient.model.reaction.impl
 //    @Test
 //    fun testPaginate(): Unit = runBlocking {
 //        val noteId = "7zzafqsm9a"
-//        val account = accountRepository.getCurrentAccount()
+//        val account = accountRepository.getCurrentAccount().getOrThrow()
 //        val req = ReactionHistoryRequest(Note.Id(account.accountId, noteId), null)
 //        val paginator = reactionHistoryPaginatorFactory.create(req)
 //

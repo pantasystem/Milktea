@@ -49,7 +49,7 @@ class MessageHistoryViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val fetchUserMsgHistories = _actionFetchMessageHistories.map {
         logger.debug("読み込み命令を検出")
-        accountRepository.getCurrentAccount()
+        accountRepository.getCurrentAccount().getOrThrow()
     }.filterNotNull().flatMapLatest {
         fetchHistory(false, it)
     }.catch { e ->
@@ -63,7 +63,7 @@ class MessageHistoryViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val fetchGroupMsgHistories = _actionFetchMessageHistories.map {
         logger.debug("読み込み命令を検出")
-        accountRepository.getCurrentAccount()
+        accountRepository.getCurrentAccount().getOrThrow()
     }.filterNotNull().flatMapLatest {
         fetchHistory(true, it)
     }.catch { e ->

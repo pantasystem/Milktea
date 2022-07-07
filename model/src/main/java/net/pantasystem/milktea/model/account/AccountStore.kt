@@ -109,7 +109,7 @@ class AccountStore @Inject constructor(
             var current: Account
             var accounts: List<Account>
             try {
-                current = accountRepository.getCurrentAccount()
+                current = accountRepository.getCurrentAccount().getOrThrow()
                 accounts = accountRepository.findAll()
             } catch (e: AccountNotFoundException) {
                 _state.value = AccountState(isLoading = false)
@@ -120,7 +120,7 @@ class AccountStore @Inject constructor(
             if (current.pages.isEmpty()) {
                 saveDefaultPages(current)
                 accounts = accountRepository.findAll()
-                current = accountRepository.getCurrentAccount()
+                current = accountRepository.getCurrentAccount().getOrThrow()
             }
 
 

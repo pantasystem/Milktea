@@ -152,15 +152,17 @@ class RoomAccountRepository(
     }
 
     @Throws(AccountNotFoundException::class)
-    override suspend fun getCurrentAccount(): Account {
+    override suspend fun getCurrentAccount(): Result<Account> {
         val currentAccountId = sharedPreferences.getLong(CURRENT_ACCOUNT_ID_KEY, -1)
         val current = accountDao.getAccountRelation(currentAccountId)
-        return if (current == null) {
-            val first = accountDao.findAll().firstOrNull()?.toAccount()
-                ?: throw AccountNotFoundException(currentAccountId)
-            setCurrentAccount(first)
-        } else {
-            current.toAccount()
+        return runCatching {
+            if (current == null) {
+                val first = accountDao.findAll().firstOrNull()?.toAccount()
+                    ?: throw AccountNotFoundException(currentAccountId)
+                setCurrentAccount(first)
+            } else {
+                current.toAccount()
+            }
         }
 
     }

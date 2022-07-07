@@ -43,7 +43,7 @@ class MediatorAccountRepository(
 
     }
 
-    override suspend fun getCurrentAccount(): Account {
+    override suspend fun getCurrentAccount(): Result<Account> {
         return roomAccountRepository.getCurrentAccount()
     }
 

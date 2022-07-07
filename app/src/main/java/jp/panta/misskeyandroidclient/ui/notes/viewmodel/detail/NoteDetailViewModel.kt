@@ -261,7 +261,7 @@ class NoteDetailViewModel @AssistedInject constructor(
             return mAc!!
         }
 
-        mAc = accountRepository.getCurrentAccount()
+        mAc = accountRepository.getCurrentAccount().getOrThrow()
         return mAc!!
     }
 

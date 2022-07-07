@@ -65,7 +65,7 @@ class ListListViewModel @Inject constructor(
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = accountRepository.getCurrentAccount()
+                val account = accountRepository.getCurrentAccount().getOrThrow()
                 loadListList(account.accountId)
             }.onSuccess {
                 logger.debug("success fetch")
@@ -136,7 +136,7 @@ class ListListViewModel @Inject constructor(
     fun createUserList(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = accountRepository.getCurrentAccount()
+                val account = accountRepository.getCurrentAccount().getOrThrow()
                 userListStore.create(account.accountId, name)
             }.onSuccess {
                 logger.debug("作成成功")

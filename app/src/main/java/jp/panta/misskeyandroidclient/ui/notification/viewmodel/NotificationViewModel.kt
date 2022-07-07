@@ -123,7 +123,7 @@ class NotificationViewModel @Inject constructor(
         logger.debug("before launch:${viewModelScope.isActive}")
         viewModelScope.launch(Dispatchers.IO) {
             logger.debug("in launch")
-            val account = accountRepository.getCurrentAccount()
+            val account = accountRepository.getCurrentAccount().getOrThrow()
             val request = NotificationRequest(i = account.getI(encryption), limit = 20)
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
 
@@ -164,7 +164,7 @@ class NotificationViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val account = accountRepository.getCurrentAccount()
+            val account = accountRepository.getCurrentAccount().getOrThrow()
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
 
             val request = NotificationRequest(
