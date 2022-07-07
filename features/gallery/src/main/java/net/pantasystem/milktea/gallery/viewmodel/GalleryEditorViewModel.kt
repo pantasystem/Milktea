@@ -236,11 +236,11 @@ class GalleryEditorViewModel @Inject constructor(
     private suspend fun getAccount(): Account {
         _accountLock.withLock {
             if (_accountId == null) {
-                return accountRepository.getCurrentAccount().also {
+                return accountRepository.getCurrentAccount().getOrThrow().also {
                     _accountId = it.accountId
                 }
             }
-            return accountRepository.get(_accountId!!)
+            return accountRepository.get(_accountId!!).getOrThrow()
         }
     }
 }

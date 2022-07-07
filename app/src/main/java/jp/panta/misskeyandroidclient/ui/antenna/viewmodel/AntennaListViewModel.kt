@@ -79,7 +79,7 @@ class AntennaListViewModel @Inject constructor(
     fun loadInit() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = accountRepository.getCurrentAccount()
+                val account = accountRepository.getCurrentAccount().getOrThrow()
                 val res =
                     (misskeyAPIProvider.get(account) as MisskeyAPIV12).getAntennas(
                         AntennaQuery(

@@ -61,7 +61,7 @@ class NoteCaptureAPIAdapterImpl(
     }
 
     override fun capture(id: Note.Id): Flow<NoteDataSource.Event> = channelFlow {
-        val account = accountRepository.get(id.accountId)
+        val account = accountRepository.get(id.accountId).getOrThrow()
 
         val repositoryEventListener: (NoteDataSource.Event) -> Unit = { ev ->
             trySend(ev)

@@ -16,7 +16,7 @@ class UpdateNicknameUseCase @Inject constructor(
 ) : UseCase {
 
     suspend operator fun invoke(user: User, nickname: String): User {
-        val account = accountRepository.get(user.id.accountId)
+        val account = accountRepository.get(user.id.accountId).getOrThrow()
         val id = UserNickname.Id(
             userName = user.userName,
             host = user.host ?: account.getHost()

@@ -64,7 +64,7 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
             val relations = list.mapNotNull {
-                getters.noteRelationGetter.get(it)
+                getters.noteRelationGetter.get(it).getOrNull()
             }
             cache.getIn(relations)
         }

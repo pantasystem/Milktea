@@ -364,7 +364,7 @@ class NotesViewModel @Inject constructor(
 
     private suspend fun getMisskeyAPI(): MisskeyAPI? {
         return runCatching {
-            val account = accountRepository.getCurrentAccount()
+            val account = accountRepository.getCurrentAccount().getOrThrow()
             misskeyAPIProvider.get(account.instanceDomain)
         }.getOrNull()
     }

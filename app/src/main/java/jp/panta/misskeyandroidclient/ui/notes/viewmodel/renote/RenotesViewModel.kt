@@ -75,9 +75,7 @@ class RenotesViewModel @AssistedInject constructor(
         return this.map { pageable ->
             pageable.suspendConvert { list ->
                 list.mapNotNull {
-                    runCatching {
-                        noteGetter.get(it.noteId)
-                    }.getOrNull()
+                    noteGetter.get(it.noteId).getOrNull()
                 }
             }
         }

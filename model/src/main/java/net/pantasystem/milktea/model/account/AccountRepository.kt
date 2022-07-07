@@ -22,17 +22,17 @@ interface AccountRepository{
 
     fun removeEventListener(listener: Listener)
 
-    suspend fun get(accountId: Long): Account
+    suspend fun get(accountId: Long): Result<Account>
 
-    suspend fun add(account: Account, isUpdatePages: Boolean = false): Account
+    suspend fun add(account: Account, isUpdatePages: Boolean = false): Result<Account>
 
     suspend fun delete(account: Account)
 
-    suspend fun findAll(): List<Account>
+    suspend fun findAll(): Result<List<Account>>
 
-    suspend fun setCurrentAccount(account: Account): Account
+    suspend fun setCurrentAccount(account: Account): Result<Account>
 
-    suspend fun getCurrentAccount(): Account
+    suspend fun getCurrentAccount(): Result<Account>
 }
 
 @ExperimentalCoroutinesApi
@@ -54,13 +54,13 @@ fun AccountRepository.listenEvent(): Flow<AccountRepository.Event> {
 @ExperimentalCoroutinesApi
 fun AccountRepository.watchCurrentAccount() : Flow<Account> {
     return this.listenEvent().map {
-        this.getCurrentAccount()
+        this.getCurrentAccount().getOrThrow()
     }
 }
 
 @ExperimentalCoroutinesApi
 fun AccountRepository.watchAccount(accountId: Long) : Flow<Account> {
     return this.listenEvent().map {
-        this.get(accountId)
+        this.get(accountId).getOrThrow()
     }
 }

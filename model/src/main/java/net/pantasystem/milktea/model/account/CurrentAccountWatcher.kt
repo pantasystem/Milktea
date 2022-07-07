@@ -18,8 +18,8 @@ class CurrentAccountWatcher(
 
     suspend fun getAccount() : Account {
         return currentAccountId?.let {
-            accountRepository.get(it)
-        }?: accountRepository.getCurrentAccount()
+            accountRepository.get(it).getOrThrow()
+        }?: accountRepository.getCurrentAccount().getOrThrow()
     }
 }
 

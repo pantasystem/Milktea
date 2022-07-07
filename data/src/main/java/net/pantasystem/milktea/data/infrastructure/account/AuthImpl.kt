@@ -12,7 +12,7 @@ class AuthImpl @Inject constructor(
 
     override suspend fun check(): Boolean {
         return try {
-            accountRepository.getCurrentAccount()
+            accountRepository.getCurrentAccount().getOrThrow()
             true
         } catch (e: UnauthorizedException) {
             false
@@ -21,7 +21,7 @@ class AuthImpl @Inject constructor(
 
     override suspend fun getCurrentAccount(): Account? {
         return runCatching {
-            accountRepository.getCurrentAccount()
+            accountRepository.getCurrentAccount().getOrThrow()
         }.getOrNull()
     }
 
@@ -37,11 +37,11 @@ class AuthImpl @Inject constructor(
     }
 
     override suspend fun getToken(id: Long): String {
-        return accountRepository.get(id).getI(encryption)
+        return accountRepository.get(id).getOrThrow().getI(encryption)
     }
 
     override suspend fun get(id: Long): Account {
-        return accountRepository.get(id)
+        return accountRepository.get(id).getOrThrow()
     }
 
 }

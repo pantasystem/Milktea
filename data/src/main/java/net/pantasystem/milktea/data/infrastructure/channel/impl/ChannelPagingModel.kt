@@ -74,14 +74,14 @@ class ChannelPagingModel @AssistedInject constructor(
     }
 
     override suspend fun convertAll(list: List<ChannelDTO>): List<Channel.Id> {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         return channelStateModel.addAll(list.map { it.toModel(account) }).map { it.id }
     }
 //    NOTE: MisskeyのAPIがバグってるのか正常に動かない（Postmanからもチェック済み）
 //    override suspend fun loadFuture(): Response<List<ChannelDTO>> {
 //        val sinceId = getSinceId()?.channelId
 //        logger.debug("loadFuture type:$type, sinceId:$sinceId")
-//        val account = accountRepository.get(accountId)
+//        val account = accountRepository.get(accountId).getOrThrow()
 //        val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
 //        val i = account.getI(encryption)
 //        val res = when (type) {
@@ -107,7 +107,7 @@ class ChannelPagingModel @AssistedInject constructor(
 //    }
 
     override suspend fun loadPrevious(): Result<List<ChannelDTO>> {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
         val i = account.getI(encryption)
         val res = when (type) {

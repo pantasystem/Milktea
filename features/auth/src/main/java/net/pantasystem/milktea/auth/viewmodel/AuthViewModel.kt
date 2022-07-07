@@ -155,7 +155,7 @@ class AuthViewModel @Inject constructor(
                 val account = accountRepository.add(
                     a.accessToken.newAccount(a.instanceBaseURL, encryption),
                     false
-                )
+                ).getOrThrow()
                 val user = when (a.accessToken) {
                     is AccessToken.Mastodon -> {
                         (a.accessToken as AccessToken.Mastodon).account.toModel(account)

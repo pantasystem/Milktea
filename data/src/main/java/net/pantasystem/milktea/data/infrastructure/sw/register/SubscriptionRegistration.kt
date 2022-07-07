@@ -29,7 +29,7 @@ class SubscriptionRegistration(
     private suspend fun register(deviceToken: String, accountId: Long) : SubscriptionState?{
 
         logger.debug("call register(accountId:$accountId)")
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val endpoint = EndpointBuilder(
             deviceToken = deviceToken,
             accountId = accountId,
@@ -59,7 +59,7 @@ class SubscriptionRegistration(
      * @return 成功件数
      */
     suspend fun registerAll(deviceToken: String) : Int{
-        val accounts = accountRepository.findAll()
+        val accounts = accountRepository.findAll().getOrThrow()
         return coroutineScope {
             accounts.map {
                 async {

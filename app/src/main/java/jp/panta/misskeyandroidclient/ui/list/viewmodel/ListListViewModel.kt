@@ -65,7 +65,7 @@ class ListListViewModel @Inject constructor(
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = accountRepository.getCurrentAccount()
+                val account = accountRepository.getCurrentAccount().getOrThrow()
                 loadListList(account.accountId)
             }.onSuccess {
                 logger.debug("success fetch")
@@ -92,7 +92,7 @@ class ListListViewModel @Inject constructor(
         userList?.let { ul ->
             viewModelScope.launch(Dispatchers.IO) {
                 runCatching {
-                    val account = accountRepository.get(userList.id.accountId)
+                    val account = accountRepository.get(userList.id.accountId).getOrThrow()
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
                         if (pageable is Pageable.UserListTimeline) {
@@ -136,7 +136,7 @@ class ListListViewModel @Inject constructor(
     fun createUserList(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = accountRepository.getCurrentAccount()
+                val account = accountRepository.getCurrentAccount().getOrThrow()
                 userListStore.create(account.accountId, name)
             }.onSuccess {
                 logger.debug("作成成功")

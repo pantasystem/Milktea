@@ -12,7 +12,7 @@ class ChannelRepositoryImpl(
         return runCatching {
             var channel = channelStateModel.get(id)
             if (channel == null) {
-                val account = accountRepository.get(id.accountId)
+                val account = accountRepository.get(id.accountId).getOrThrow()
                 channel = channelAPIAdapter.findOne(id).getOrThrow()
                     .toModel(account)
                 channelStateModel.add(channel)
@@ -23,7 +23,7 @@ class ChannelRepositoryImpl(
 
     override suspend fun create(model: CreateChannel): Result<Channel> {
         return runCatching {
-            val account = accountRepository.get(model.accountId)
+            val account = accountRepository.get(model.accountId).getOrThrow()
             val channel = channelAPIAdapter.create(model).getOrThrow()
                 .toModel(account)
             channelStateModel.add(channel)
@@ -51,7 +51,7 @@ class ChannelRepositoryImpl(
     override suspend fun update(model: UpdateChannel): Result<Channel> {
         return runCatching {
             val channel = channelAPIAdapter.update(model).getOrThrow()
-            val account = accountRepository.get(model.id.accountId)
+            val account = accountRepository.get(model.id.accountId).getOrThrow()
             channelStateModel.add(channel.toModel(account))
         }
     }

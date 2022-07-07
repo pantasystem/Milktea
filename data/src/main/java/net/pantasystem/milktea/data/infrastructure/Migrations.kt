@@ -2,12 +2,8 @@
 
 package net.pantasystem.milktea.data.infrastructure
 
-import android.content.SharedPreferences
-import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import net.pantasystem.milktea.data.infrastructure.account.newAccount
-import net.pantasystem.milktea.data.infrastructure.core.AccountDao
 
 
 val MIGRATION_1_2 = object : Migration(1, 2){
@@ -74,36 +70,6 @@ val MIGRATION_4_5 = object : Migration(4, 5){
     }
 }
 
-@Suppress("DEPRECATION")
-class AccountMigration(private val accountDao: AccountDao, private val accountRepository: net.pantasystem.milktea.model.account.AccountRepository, private val sharedPreferences: SharedPreferences){
-
-    suspend fun executeMigrate(){
-
-        try{
-            val isMigrate = sharedPreferences.getBoolean("milktea.migrate_account", false)
-            if(isMigrate){
-                return
-            }
-            val oldAccounts = accountDao.findAllSetting()
-
-            val generated = oldAccounts.mapNotNull{ ar ->
-                ar.newAccount(null)
-            }
-            generated.forEach{
-                accountRepository.add(it, true)
-            }
-            accountDao.dropPageTable()
-            accountDao.dropTable()
-            sharedPreferences.edit().apply{
-                putBoolean("milktea.migrate_account", true)
-            }.apply()
-        }catch(e: Exception){
-            Log.d("AccountMigration", "エラー発生", e)
-        }
-
-
-    }
-}
 
 val MIGRATION_5_6 = object : Migration(5, 6){
     override fun migrate(database: SupportSQLiteDatabase) {

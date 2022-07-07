@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -37,12 +38,17 @@ class AlarmNotePostReceiver : BroadcastReceiver() {
         require(accountId >= 0)
 
         coroutineScope.launch {
-            val draftNote =
-                draftNoteDAO.getDraftNote(accountId = accountId, draftNoteId = draftNoteId)
-            draftNote ?: return@launch
-            val account = accountRepository.get(accountId)
-            val createNote = draftNote.toNoteEditingState().toCreateNote(account)
-            createNoteUseCase.invoke(createNote)
+            runCatching {
+                val draftNote =
+                    draftNoteDAO.getDraftNote(accountId = accountId, draftNoteId = draftNoteId)
+                draftNote ?: return@launch
+                val account = accountRepository.get(accountId).getOrThrow()
+                val createNote = draftNote.toNoteEditingState().toCreateNote(account)
+                createNoteUseCase.invoke(createNote)
+            }.onFailure {
+                Log.e("AlarmPostExecutor", "failed create note", it)
+            }
+
         }
 
     }

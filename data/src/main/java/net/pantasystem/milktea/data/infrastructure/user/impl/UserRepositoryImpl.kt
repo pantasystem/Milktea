@@ -1,19 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.user.impl
 
 
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api.misskey.users.RequestUser
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
@@ -51,7 +50,7 @@ class UserRepositoryImpl @Inject constructor(
             return it
         }
 
-        val account = accountRepository.get(userId.accountId)
+        val account = accountRepository.get(userId.accountId).getOrThrow()
         if(localResult.getOrNull() == null) {
             val res = misskeyAPIProvider.get(account).showUser(
                 RequestUser(
@@ -88,7 +87,7 @@ class UserRepositoryImpl @Inject constructor(
         if(local != null) {
             return local
         }
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
         val res = misskeyAPI.showUser(
             RequestUser(
@@ -131,7 +130,7 @@ class UserRepositoryImpl @Inject constructor(
         userName: String,
         host: String?
     ): List<User> {
-        val ac = accountRepository.get(accountId)
+        val ac = accountRepository.get(accountId).getOrThrow()
         val i = ac.getI(encryption)
         val api = misskeyAPIProvider.get(ac)
 
@@ -178,7 +177,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun follow(userId: User.Id): Boolean {
-        val account = accountRepository.get(userId.accountId)
+        val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
         val req = RequestUser(userId = userId.id, i = account.getI(encryption))
         logger.debug("follow req:$req")
@@ -195,7 +194,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unfollow(userId: User.Id): Boolean {
-        val account = accountRepository.get(userId.accountId)
+        val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
 
 
@@ -218,7 +217,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun acceptFollowRequest(userId: User.Id): Boolean {
-        val account = accountRepository.get(userId.accountId)
+        val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
         if(!user.hasPendingFollowRequestToYou) {
             return false
@@ -234,7 +233,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun rejectFollowRequest(userId: User.Id): Boolean {
-        val account = accountRepository.get(userId.accountId)
+        val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
         if(!user.hasPendingFollowRequestToYou) {
             return false
@@ -248,7 +247,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     private suspend fun action(requestAPI: suspend (RequestUser)-> Response<Unit>, userId: User.Id, reducer: (User.Detail)-> User.Detail): Boolean {
-        val account = accountRepository.get(userId.accountId)
+        val account = accountRepository.get(userId.accountId).getOrThrow()
         val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(encryption)))
         res.throwIfHasError()
         if(res.isSuccessful) {
@@ -260,7 +259,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun report(report: Report): Boolean {
-        val account = accountRepository.get(report.userId.accountId)
+        val account = accountRepository.get(report.userId.accountId).getOrThrow()
         val api = report.userId.getMisskeyAPI()
         val res = api.report(
             ReportDTO(
@@ -274,6 +273,6 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
-        return misskeyAPIProvider.get(accountRepository.get(accountId))
+        return misskeyAPIProvider.get(accountRepository.get(accountId).getOrThrow())
     }
 }

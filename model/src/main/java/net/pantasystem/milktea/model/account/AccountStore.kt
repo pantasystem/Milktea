@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.FetchMeta
-import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,9 +54,9 @@ class AccountStore @Inject constructor(
 
     suspend fun addAccount(account: Account) {
         try {
-            val newAccount = accountRepository.add(account, true)
+            val newAccount = accountRepository.add(account, true).getOrThrow()
             saveDefaultPages(newAccount)
-            val updatedAccount = accountRepository.get(newAccount.accountId)
+            val updatedAccount = accountRepository.get(newAccount.accountId).getOrThrow()
             setCurrent(updatedAccount)
         } catch (e: Exception) {
             logger.error("アカウントの追加に失敗しました。", e)
@@ -66,7 +64,7 @@ class AccountStore @Inject constructor(
     }
 
     suspend fun setCurrent(account: Account) {
-        accountRepository.setCurrentAccount(account)
+        accountRepository.setCurrentAccount(account).getOrThrow()
         _state.value = state.value.setCurrentAccount(account)
     }
 
@@ -77,7 +75,7 @@ class AccountStore @Inject constructor(
         val updated = account.copy(pages = account.pages.toMutableList().also { list ->
             list.add(page)
         })
-        _state.value = _state.value.add(accountRepository.add(updated, true))
+        _state.value = _state.value.add(accountRepository.add(updated, true).getOrThrow())
         initialize()
 
         return true
@@ -88,7 +86,7 @@ class AccountStore @Inject constructor(
             val account = _state.value.currentAccount
                 ?: throw IllegalStateException()
             val updated = account.copy(pages = pages)
-            val result = accountRepository.add(updated, true)
+            val result = accountRepository.add(updated, true).getOrThrow()
             initialize()
             result
         }
@@ -100,7 +98,7 @@ class AccountStore @Inject constructor(
             ?: _state.value.currentAccount
             ?: return false
         val updated = account.copy(pages = account.pages.filterNot { it.pageId == page.pageId })
-        _state.value = _state.value.add(accountRepository.add(updated, true))
+        _state.value = _state.value.add(accountRepository.add(updated, true).getOrThrow())
         initialize()
         return true
     }
@@ -111,8 +109,8 @@ class AccountStore @Inject constructor(
             var current: Account
             var accounts: List<Account>
             try {
-                current = accountRepository.getCurrentAccount()
-                accounts = accountRepository.findAll()
+                current = accountRepository.getCurrentAccount().getOrThrow()
+                accounts = accountRepository.findAll().getOrThrow()
             } catch (e: AccountNotFoundException) {
                 _state.value = AccountState(isLoading = false)
                 return
@@ -121,8 +119,8 @@ class AccountStore @Inject constructor(
             logger.debug("accountId:${current.accountId}, account:$current")
             if (current.pages.isEmpty()) {
                 saveDefaultPages(current)
-                accounts = accountRepository.findAll()
-                current = accountRepository.getCurrentAccount()
+                accounts = accountRepository.findAll().getOrThrow()
+                current = accountRepository.getCurrentAccount().getOrThrow()
             }
 
 

@@ -75,16 +75,19 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     val profileUrl = userState.filterNotNull().map {
-        val ac = accountRepository.get(it.id.accountId)
-        it.getProfileUrl(ac)
+        accountRepository.get(it.id.accountId).getOrNull()?.let { ac ->
+            it.getProfileUrl(ac)
+        }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
         pinNotesState.map { notes ->
-            notes.map { note ->
+            notes.mapNotNull {
+                noteRelationGetter.get(it).getOrNull()
+            }.map { note ->
                 PlaneNoteViewData(
-                    noteRelationGetter.get(note),
+                    note,
                     getAccount(),
                     noteCaptureAPIAdapter,
                     translationStore
@@ -267,11 +270,11 @@ class UserDetailViewModel @AssistedInject constructor(
             return mAc!!
         }
         if (userId != null) {
-            mAc = accountRepository.get(userId.accountId)
+            mAc = accountRepository.get(userId.accountId).getOrThrow()
             return mAc!!
         }
 
-        mAc = accountRepository.getCurrentAccount()
+        mAc = accountRepository.getCurrentAccount().getOrThrow()
         return mAc!!
     }
 

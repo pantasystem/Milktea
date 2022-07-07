@@ -3,17 +3,19 @@ package net.pantasystem.milktea.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
+import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -96,7 +98,7 @@ class ChannelViewModel @Inject constructor(
     fun toggleTab(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = accountRepository.get(channelId.accountId)
+                val account = accountRepository.get(channelId.accountId).getOrThrow()
                 val channel = channelRepository.findOne(channelId).getOrThrow()
                 val page = account.newPage(
                     Pageable.ChannelTimeline(channelId = channelId.channelId),

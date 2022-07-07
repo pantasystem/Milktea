@@ -56,7 +56,7 @@ class NoteCaptureAPIAdapterTest {
 
         runBlocking {
 
-            val account = accountRepository.getCurrentAccount()
+            val account = accountRepository.getCurrentAccount().getOrThrow()
             val noteCapture = noteCaptureAPIWithAccountProvider.get(account) as NoteCaptureAPIImpl
 
             val dto = NoteDTO(

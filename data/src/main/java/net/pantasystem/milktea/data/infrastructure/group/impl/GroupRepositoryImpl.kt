@@ -29,7 +29,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun create(createGroup: CreateGroup): Group {
-        val account = accountRepository.get(createGroup.author)
+        val account = accountRepository.get(createGroup.author).getOrThrow()
         val api = getMisskeyAPI(account)
 
         val res = api.createGroup(CreateGroupDTO(i = account.getI(encryption), name = createGroup.name)).throwIfHasError()
@@ -50,7 +50,7 @@ class GroupRepositoryImpl @Inject constructor(
         if(group != null) {
             return group
         }
-        val account = accountRepository.get(groupId.accountId)
+        val account = accountRepository.get(groupId.accountId).getOrThrow()
         val api = getMisskeyAPI(account)
 
         val res = api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId)).throwIfHasError()
@@ -64,7 +64,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun joined(accountId: Long): List<Group> {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
         val groups = api.body()?.map {
             it.toGroup(account.accountId)
@@ -75,7 +75,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun owned(accountId: Long): List<Group> {
-        val account = accountRepository.get(accountId)
+        val account = accountRepository.get(accountId).getOrThrow()
         val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
         val groups = api.body()?.map {
             it.toGroup(account.accountId)
@@ -87,7 +87,7 @@ class GroupRepositoryImpl @Inject constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun pull(pull: Pull): Group {
         var group = find(pull.groupId)
-        val account = accountRepository.get(pull.groupId.accountId)
+        val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
         getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId))
             .throwIfHasError()
 
@@ -100,7 +100,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun transfer(transfer: Transfer): Group {
-        val account = accountRepository.get(transfer.groupId.accountId)
+        val account = accountRepository.get(transfer.groupId.accountId).getOrThrow()
         val body = getMisskeyAPI(account).transferGroup(
             TransferGroupDTO(
             i = account.getI(encryption),
@@ -117,7 +117,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun update(updateGroup: UpdateGroup): Group {
-        val account = accountRepository.get(updateGroup.groupId.accountId)
+        val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
         val body = getMisskeyAPI(account).updateGroup(UpdateGroupDTO(i = account.getI(encryption), groupId = updateGroup.groupId.groupId, name = updateGroup.name))
             .throwIfHasError().body()
         require(body != null)
