@@ -38,12 +38,12 @@ class TestAccountRepository : AccountRepository {
 
     private var currentAccountId = 1L
 
-    override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
+    override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> {
         val ac = account.copy(
             accountId = accounts.size.toLong()
         )
         accounts[accounts.size.toLong()] = ac
-        return ac
+        return Result.success(ac)
     }
 
     override fun addEventListener(listener: AccountRepository.Listener) {
@@ -58,20 +58,24 @@ class TestAccountRepository : AccountRepository {
         accounts.remove(account.accountId)
     }
 
-    override suspend fun findAll(): List<Account> {
-        return accounts.values.toList()
+    override suspend fun findAll(): Result<List<Account>> {
+        return runCatching {
+            accounts.values.toList()
+        }
     }
 
-    override suspend fun get(accountId: Long): Account {
-        return accounts[accountId]?: throw AccountNotFoundException()
+    override suspend fun get(accountId: Long): Result<Account> {
+        return runCatching {
+            accounts[accountId]?: throw AccountNotFoundException()
+        }
     }
 
-    override suspend fun getCurrentAccount(): Account {
+    override suspend fun getCurrentAccount(): Result<Account> {
         return get(currentAccountId)
     }
 
-    override suspend fun setCurrentAccount(account: Account): Account {
+    override suspend fun setCurrentAccount(account: Account): Result<Account> {
         currentAccountId = account.accountId
-        return account
+        return Result.success(account)
     }
 }
