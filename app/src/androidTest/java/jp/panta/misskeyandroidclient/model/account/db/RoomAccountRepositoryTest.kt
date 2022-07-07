@@ -38,7 +38,7 @@ class RoomAccountRepositoryTest{
         val userName = "Panta"
         val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY,"hogehogehoge")
         runBlocking {
-            val result = roomAccountRepository.add(account)
+            val result = roomAccountRepository.add(account).getOrThrow()
 
             assertEquals(account.userName, result.userName)
             assertEquals(account.instanceDomain, result.instanceDomain)
@@ -48,7 +48,7 @@ class RoomAccountRepositoryTest{
 
             val account2 = Account(remoteId, instanceDomain, "Test", Account.InstanceType.MISSKEY, "hogehogehoge")
 
-            val result2 = roomAccountRepository.add(account2)
+            val result2 = roomAccountRepository.add(account2).getOrThrow()
             assertEquals("Test", result2.userName)
             assertEquals(account.instanceDomain, result2.instanceDomain)
             assertEquals(1, result2.accountId)
@@ -65,12 +65,12 @@ class RoomAccountRepositoryTest{
         val userName = "Panta"
         val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY, "hogehogehoge")
         runBlocking {
-            val result = roomAccountRepository.add(account)
+            val result = roomAccountRepository.add(account).getOrThrow()
 
             val updated = result.copy(pages = listOf(Page(result.accountId, "hoge", 0, Pageable.Favorite)))
             assertEquals(result.accountId, updated.accountId)
             assertEquals(updated.accountId, 1)
-            val updatedResult = roomAccountRepository.add(updated, true)
+            val updatedResult = roomAccountRepository.add(updated, true).getOrThrow()
             assertEquals(updatedResult.pages.size, 1)
 
             val getResult = roomAccountRepository.get(updatedResult.accountId).getOrThrow()
