@@ -14,9 +14,11 @@ class MediatorAccountRepository(
 
     private var mAccounts: List<Account> = listOf()
 
-    override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
-        return roomAccountRepository.add(account, isUpdatePages).also {
-            mAccounts = roomAccountRepository.findAll().getOrThrow()
+    override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> {
+        return runCatching {
+            roomAccountRepository.add(account, isUpdatePages).also {
+                mAccounts = roomAccountRepository.findAll().getOrThrow()
+            }.getOrThrow()
         }
     }
 

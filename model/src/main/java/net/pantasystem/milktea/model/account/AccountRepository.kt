@@ -24,7 +24,7 @@ interface AccountRepository{
 
     suspend fun get(accountId: Long): Result<Account>
 
-    suspend fun add(account: Account, isUpdatePages: Boolean = false): Account
+    suspend fun add(account: Account, isUpdatePages: Boolean = false): Result<Account>
 
     suspend fun delete(account: Account)
 

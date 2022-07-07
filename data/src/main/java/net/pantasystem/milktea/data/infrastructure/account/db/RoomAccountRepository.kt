@@ -35,8 +35,8 @@ class RoomAccountRepository(
         }
     }
 
-    override suspend fun add(account: Account, isUpdatePages: Boolean): Account {
-        return roomDataBase.runInTransaction(Callable<Account> {
+    override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> = runCatching{
+        return@runCatching roomDataBase.runInTransaction(Callable<Account> {
             var exAccount: Account? = null
             var isNeedDeepUpdate = isUpdatePages
 
@@ -174,7 +174,7 @@ class RoomAccountRepository(
         return runCatching {
             val current = accountDao.get(account.accountId)
             val ac = if (current == null) {
-                add(account)
+                add(account).getOrThrow()
             } else {
                 account
             }

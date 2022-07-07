@@ -54,7 +54,7 @@ class AccountStore @Inject constructor(
 
     suspend fun addAccount(account: Account) {
         try {
-            val newAccount = accountRepository.add(account, true)
+            val newAccount = accountRepository.add(account, true).getOrThrow()
             saveDefaultPages(newAccount)
             val updatedAccount = accountRepository.get(newAccount.accountId).getOrThrow()
             setCurrent(updatedAccount)
@@ -75,7 +75,7 @@ class AccountStore @Inject constructor(
         val updated = account.copy(pages = account.pages.toMutableList().also { list ->
             list.add(page)
         })
-        _state.value = _state.value.add(accountRepository.add(updated, true))
+        _state.value = _state.value.add(accountRepository.add(updated, true).getOrThrow())
         initialize()
 
         return true
@@ -86,7 +86,7 @@ class AccountStore @Inject constructor(
             val account = _state.value.currentAccount
                 ?: throw IllegalStateException()
             val updated = account.copy(pages = pages)
-            val result = accountRepository.add(updated, true)
+            val result = accountRepository.add(updated, true).getOrThrow()
             initialize()
             result
         }
@@ -98,7 +98,7 @@ class AccountStore @Inject constructor(
             ?: _state.value.currentAccount
             ?: return false
         val updated = account.copy(pages = account.pages.filterNot { it.pageId == page.pageId })
-        _state.value = _state.value.add(accountRepository.add(updated, true))
+        _state.value = _state.value.add(accountRepository.add(updated, true).getOrThrow())
         initialize()
         return true
     }
