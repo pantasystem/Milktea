@@ -70,7 +70,7 @@
         <item name="colorMessageRecipient">@color/colorMessageRecipientDark</item>
         <item name="colorSeparator">@color/colorSeparatorDark</item>
 
-        <item name="android:navigationBarColor">@color/navigationDarkColor</item>
+        <item name="android:navigationBarColor">#1E1E1E</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="colorDotTabSelected">@color/colorDarkAccent</item>
         <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
