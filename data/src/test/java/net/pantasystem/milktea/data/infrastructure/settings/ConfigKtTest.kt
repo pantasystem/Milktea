@@ -89,6 +89,14 @@ class ConfigKtTest {
                     config.isEnableTimelineScrollAnimation,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsCrashlyticsCollectionEnabled -> Assert.assertEquals(
+                    config.isCrashlyticsCollectionEnabled.isEnable,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsConfirmedCrashlyticsCollection -> Assert.assertEquals(
+                    config.isCrashlyticsCollectionEnabled.isConfirmed,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

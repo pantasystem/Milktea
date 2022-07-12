@@ -82,7 +82,13 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         surfaceColorOpacity = map.getValue<PrefType.IntPref>(Keys.SurfaceColorOpacity)?.value
             ?: DefaultConfig.config.surfaceColorOpacity,
         isEnableTimelineScrollAnimation = map.getValue<PrefType.BoolPref>(Keys.IsEnableTimelineScrollAnimation)?.value
-            ?: DefaultConfig.config.isEnableTimelineScrollAnimation
+            ?: DefaultConfig.config.isEnableTimelineScrollAnimation,
+        isCrashlyticsCollectionEnabled = IsCrashlyticsCollectionEnabled(
+            isEnable = map.getValue<PrefType.BoolPref>(Keys.IsCrashlyticsCollectionEnabled)?.value
+                ?: DefaultConfig.config.isCrashlyticsCollectionEnabled.isEnable,
+            isConfirmed = map.getValue<PrefType.BoolPref>(Keys.IsConfirmedCrashlyticsCollection)?.value
+                ?: DefaultConfig.config.isCrashlyticsCollectionEnabled.isConfirmed
+        ),
     )
 }
 
@@ -146,6 +152,12 @@ fun Config.pref(key: Keys): PrefType? {
         }
         Keys.IsEnableTimelineScrollAnimation -> {
             PrefType.BoolPref(isEnableTimelineScrollAnimation)
+        }
+        Keys.IsCrashlyticsCollectionEnabled -> {
+            PrefType.BoolPref(isCrashlyticsCollectionEnabled.isEnable)
+        }
+        Keys.IsConfirmedCrashlyticsCollection -> {
+            PrefType.BoolPref(isCrashlyticsCollectionEnabled.isConfirmed)
         }
     }
 }
