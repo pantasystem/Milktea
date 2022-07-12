@@ -175,6 +175,15 @@ class MiApplication : Application(), MiCore {
         }.onEach {
             setUpMetaMap(it.accounts)
         }.launchIn(applicationScope + Dispatchers.IO)
+
+        applicationScope.launch {
+            mSettingStore.configState.map {
+                it.isCrashlyticsCollectionEnabled
+            }.distinctUntilChanged().collect {
+                FirebaseCrashlytics.getInstance()
+                    .setCrashlyticsCollectionEnabled(it.isEnable)
+            }
+        }
     }
 
 
