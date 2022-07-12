@@ -18,8 +18,8 @@
     <string name="message">Messages</string>
     <string name="start_auth">Authenticate</string>
     <string name="selecting_instance">Selected instance</string>
-<!--    <string name="welcome">Welcome</string>-->
-<!--    <string name="san">-san</string>-->
+    <!--    <string name="welcome">Welcome</string>-->
+    <!--    <string name="san">-san</string>-->
     <string name="following">Following</string>
     <string name="follower">Followers</string>
     <string name="renote">Renote</string>
@@ -54,7 +54,7 @@
     <string name="tab_selectable">Add from below</string>
     <string name="title_featured">Highlights</string>
 
-<!--    <string name="create_folder">Create folder</string>-->
+    <!--    <string name="create_folder">Create folder</string>-->
     <string name="add_account">Add account</string>
     <string name="post">Post</string>
     <string name="please_speak">What\'s on your mind?</string>
@@ -198,7 +198,7 @@
 
     <string name="network_error">Network error</string>
 
-<!--    <string name="folder_name">Folder name</string>-->
+    <!--    <string name="folder_name">Folder name</string>-->
     <string name="selected">Selected</string>
     <string name="more">More</string>
 
@@ -318,8 +318,8 @@
     <string name="add_to_list">Add to list</string>
     <string name="promotion">Promotion</string>
     <string name="waiting_4_approval">Waaaiting for approval</string>
-<!--    <string name="i_have_approved">Approved</string>-->
-<!--    <string name="waiting_4_u_to_approve">Waiting for you to approve</string>-->
+    <!--    <string name="i_have_approved">Approved</string>-->
+    <!--    <string name="waiting_4_u_to_approve">Waiting for you to approve</string>-->
     <string name="learn_note_visibility">Learn note visibility</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
@@ -346,10 +346,6 @@
     <string name="successfully_created_note">Successfully created the note</string>
     <string name="note_creation_failure">Note creation failure</string>
     <string name="sensitive">Sensitive</string>
-<!--    <string name="authentication_url">Authentication URL</string>-->
-<!--    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy authentication-->
-<!--        destination URL to clipboard.-->
-<!--    </string>-->
     <string name="request_follow">%s wants to follow to you</string>
 
     <string name="copied_to_clipboard">Copied to clipboard</string>
@@ -368,9 +364,7 @@
     <string name="report_failed">Report Failed</string>
     <string name="mark_as_nsfw">Mark as NSFW</string>
     <string name="undo_nsfw">Undo NSFW</string>
-<!--    <string name="file_deletion_confirmation">File deletion confirmation</string>-->
     <string name="cancel">Cancel</string>
-<!--    <string name="do_u_want_2_delete_s">Do you want to delete %s?</string>-->
     <string name="remove_attachment">Remove attachment</string>
     <string name="warning_s">Warning:%s</string>
     <string name="reservation_at">Post date and time</string>
@@ -384,13 +378,11 @@
     <string name="view_in_browser">View in browser</string>
     <string name="channel">Channel</string>
 
-<!--    <string name="edit_caption">Edit caption</string>-->
-<!--    <string name="input_caption">Input caption</string>-->
     <string name="animation">Animation</string>
     <string name="avatar_icon_animation">Avatar icon animation</string>
+    <string name="security_setting">Security</string>
+    <string name="send_a_crash_report">Send a crash report</string>
+    <string name="crash_reports_are_useful_for_development">Crash reports are useful for development.</string>
+    <string name="agree">Agree</string>
 
-
-    <!--    <string name="n_people">%d people</string>-->
-<!--    <string name="n_posts">%d posts</string>-->
-<!--    <string name="owned">Owned</string>-->
 </resources>

@@ -389,6 +389,10 @@
 <!--    <string name="input_caption">キャプションを入力</string>-->
     <string name="animation">アニメーション</string>
     <string name="avatar_icon_animation">アバターアイコンアニメーション</string>
+    <string name="security_setting">セキュリティ</string>
+    <string name="send_a_crash_report">クラッシュレポートを送信する</string>
+    <string name="crash_reports_are_useful_for_development">送信されたクラッシュレポートは開発の役に立てられます。</string>
+    <string name="agree">同意</string>
 
     <!--    <string name="n_people">%d人</string>-->
 <!--    <string name="n_posts">%d投稿</string>-->

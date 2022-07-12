@@ -7,6 +7,7 @@ plugins {
     id('com.google.android.gms.oss-licenses-plugin')
     id('dagger.hilt.android.plugin')
     id('com.github.triplet.play')
+    id('com.google.firebase.crashlytics')
 }
 
 
@@ -89,6 +90,8 @@ dependencies {
     implementation project(path: ':common_navigation')
     implementation project(path: ':common_viewmodel')
     implementation project(path: ':features:gallery')
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.4.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
@@ -186,6 +189,8 @@ dependencies {
     implementation libs.fragment.ktx
     implementation platform('com.google.firebase:firebase-bom:28.1.0')
     implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-crashlytics'
+
     implementation libs.androidx.core.ktx
 
     def work_version = "2.7.1"

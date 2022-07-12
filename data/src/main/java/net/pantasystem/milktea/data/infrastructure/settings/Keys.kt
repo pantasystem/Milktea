@@ -17,6 +17,8 @@ val Keys.Companion.allKeys by lazy {
         Keys.SurfaceColorOpacity,
         Keys.ThemeType,
         Keys.IsEnableTimelineScrollAnimation,
+        Keys.IsCrashlyticsCollectionEnabled,
+        Keys.IsConfirmedCrashlyticsCollection
     )
 }
 
@@ -46,6 +48,8 @@ sealed interface Keys {
     object IsIncludeLocalRenotes : Keys
     object SurfaceColorOpacity : Keys
     object IsEnableTimelineScrollAnimation : Keys
+    object IsCrashlyticsCollectionEnabled : Keys
+    object IsConfirmedCrashlyticsCollection : Keys
 
     companion object
 }
@@ -67,5 +71,7 @@ fun Keys.str(): String {
         is Keys.IsIncludeRenotedMyNotes -> "INCLUDE_RENOTED_MY_NOTES"
         is Keys.SurfaceColorOpacity -> "jp.panta.misskeyandroidclient.model.settings.SURFACE_COLOR_OPAQUE_KEY"
         is Keys.IsEnableTimelineScrollAnimation -> "IS_ENABLE_TIMELINE_SCROLL_ANIMATION"
+        is Keys.IsCrashlyticsCollectionEnabled -> "IsCrashlyticsCollectionEnabled"
+        is Keys.IsConfirmedCrashlyticsCollection -> "IsConfirmedCrashlyticsCollection"
     }
 }

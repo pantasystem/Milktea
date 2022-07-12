@@ -27,7 +27,14 @@ sealed interface RememberVisibility {
     }
 }
 
-
+/**
+ * @param isEnable クラシュリティクスによる情報収集が有効
+ * @param isConfirmed 情報収集の確認済み(可否は関係ない)
+ */
+data class IsCrashlyticsCollectionEnabled(
+    val isEnable: Boolean,
+    val isConfirmed: Boolean
+)
 
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -44,8 +51,18 @@ data class Config(
     val isIncludeLocalRenotes: Boolean,
     val surfaceColorOpacity: Int,
     val isEnableTimelineScrollAnimation: Boolean,
+    val isCrashlyticsCollectionEnabled: IsCrashlyticsCollectionEnabled,
 ) {
     companion object
+
+    fun setCrashlyticsCollectionEnabled(enabled: Boolean): Config {
+        return copy(
+            isCrashlyticsCollectionEnabled = isCrashlyticsCollectionEnabled.copy(
+                isEnable = enabled,
+                isConfirmed = true
+            )
+        )
+    }
 }
 
 object DefaultConfig {
@@ -64,6 +81,10 @@ object DefaultConfig {
         isIncludeRenotedMyNotes = true,
         surfaceColorOpacity = 0xff,
         isEnableTimelineScrollAnimation = false,
+        isCrashlyticsCollectionEnabled = IsCrashlyticsCollectionEnabled(
+            isConfirmed = false,
+            isEnable = false,
+        ),
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

@@ -1,7 +1,5 @@
 package net.pantasystem.milktea.data.streaming
 
-import okhttp3.Response
-
 /**
  * WebSocketを表すインターフェース
  */
@@ -16,9 +14,8 @@ interface Socket {
         /**
          * 現在接続を試みていることを表す
          */
-        object Connecting: State()
+        data class Connecting(val isReconnect: Boolean): State()
 
-        object Reconnecting : State()
 
         data class Closing(
             val code: Int,
@@ -37,7 +34,8 @@ interface Socket {
 
         data class Failure(
             val throwable: Throwable,
-            val response: Response?
+            val statusCode: Int?,
+            val message: String?,
         ) : State()
     }
 

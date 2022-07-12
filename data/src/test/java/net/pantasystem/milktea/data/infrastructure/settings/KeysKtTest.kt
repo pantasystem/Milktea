@@ -54,6 +54,8 @@ class KeysKtTest {
                     key.str()
                 )
                 Keys.IsEnableTimelineScrollAnimation -> Assert.assertEquals("IS_ENABLE_TIMELINE_SCROLL_ANIMATION", key.str())
+                Keys.IsCrashlyticsCollectionEnabled -> Assert.assertEquals("IsCrashlyticsCollectionEnabled", key.str())
+                Keys.IsConfirmedCrashlyticsCollection -> Assert.assertEquals("IsConfirmedCrashlyticsCollection", key.str())
             }
         }
     }
@@ -61,8 +63,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(15, Keys.allKeys.size)
-        Assert.assertEquals(15, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(17, Keys.allKeys.size)
+        Assert.assertEquals(17, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
