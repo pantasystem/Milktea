@@ -161,29 +161,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }.launchIn(lifecycleScope)
 
 
-        lifecycleScope.launchWhenStarted {
-            accountStore.state.collect {
-                if (it.isUnauthorized) {
-                    this@MainActivity.startActivity(
-                        authorizationNavigation.newIntent(Unit)
-                    )
-                    finish()
-                }
-            }
-        }
-
         mainViewModel.state.onEach { uiState ->
             showBottomNavBadgeCountDelegate(uiState)
         }.launchIn(lifecycleScope)
 
-        // NOTE: 最新の通知をSnackBar等に表示する
-        mainViewModel.newNotifications.onEach { notificationRelation ->
-            notificationMessageScope {
-                notificationRelation.showSnackBarMessage(binding.appBarMain.simpleNotification)
-            }
-        }.catch { e ->
-            logger.error("通知取得エラー", e = e)
-        }.launchIn(lifecycleScope + Dispatchers.Main)
 
         lifecycleScope.launchWhenResumed {
             mainViewModel.currentAccountSocketStateEvent.collect {
@@ -193,21 +174,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             }
         }
 
-        // NOTE: ノート作成処理の状態をSnackBarで表示する
-        lifecycleScope.launchWhenCreated {
-            noteTaskExecutor.tasks.collect { taskState ->
-                showCreateNoteTaskStatusSnackBar(taskState)
-            }
-        }
-
-        lifecycleScope.launchWhenResumed {
-            reportViewModel.state.distinctUntilChangedBy {
-                it is ReportState.Sending.Success
-                        || it is ReportState.Sending.Failed
-            }.collect { state ->
-                showSendReportStateFrom(state)
-            }
-        }
 
         startService(Intent(this, NotificationService::class.java))
 
@@ -216,6 +182,12 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         binding.appBarMain.bottomNavigation.setupWithNavController(navHostFragment.navController)
 
         addMenuProvider(MainActivityMenuProvider(this, settingStore))
+
+        collectLatestNotifications()
+        collectCrashlyticsCollectionState()
+        collectReportSendingState()
+        collectCreateNoteState()
+        collectUnauthorizedState()
     }
 
     override fun setToolbar(toolbar: Toolbar) {
@@ -379,6 +351,64 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }
     }
 
+    private fun collectCrashlyticsCollectionState() {
+        lifecycleScope.launchWhenCreated {
+            settingStore.configState.map {
+                it.isCrashlyticsCollectionEnabled
+            }.collect { isShow ->
+                if (!isShow.isConfirmed && !isShow.isEnable) {
+                    ConfirmCrashlyticsDialog().show(
+                        supportFragmentManager,
+                        "confirm_crashlytics_dialog"
+                    )
+                }
+            }
+        }
+    }
+
+    private fun collectReportSendingState() {
+        lifecycleScope.launchWhenResumed {
+            reportViewModel.state.distinctUntilChangedBy {
+                it is ReportState.Sending.Success
+                        || it is ReportState.Sending.Failed
+            }.collect { state ->
+                showSendReportStateFrom(state)
+            }
+        }
+    }
+
+    private fun collectCreateNoteState() {
+        // NOTE: ノート作成処理の状態をSnackBarで表示する
+        lifecycleScope.launchWhenCreated {
+            noteTaskExecutor.tasks.collect { taskState ->
+                showCreateNoteTaskStatusSnackBar(taskState)
+            }
+        }
+    }
+
+    private fun collectLatestNotifications() {
+        // NOTE: 最新の通知をSnackBar等に表示する
+        mainViewModel.newNotifications.onEach { notificationRelation ->
+            notificationMessageScope {
+                notificationRelation.showSnackBarMessage(binding.appBarMain.simpleNotification)
+            }
+        }.catch { e ->
+            logger.error("通知取得エラー", e = e)
+        }.launchIn(lifecycleScope + Dispatchers.Main)
+    }
+
+    private fun collectUnauthorizedState() {
+        lifecycleScope.launchWhenStarted {
+            accountStore.state.collect {
+                if (it.isUnauthorized) {
+                    this@MainActivity.startActivity(
+                        authorizationNavigation.newIntent(Unit)
+                    )
+                    finish()
+                }
+            }
+        }
+    }
 }
 
 
