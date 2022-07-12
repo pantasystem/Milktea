@@ -384,7 +384,11 @@
 <!--    <string name="input_caption">输入标题</string>-->
     <string name="animation">头像图标动画</string>
     <string name="avatar_icon_animation">头像图标动画</string>
+    <string name="security_setting">Security</string>
 
+    <string name="send_a_crash_report">发送崩溃报告</string>
+    <string name="crash_reports_are_useful_for_development">崩溃报告对开发很有用</string>
+    <string name="agree">Agree</string>
 
     <!--    <string name="n_people">%d位用户</string>-->
 <!--    <string name="n_posts">%d篇帖文</string>-->
