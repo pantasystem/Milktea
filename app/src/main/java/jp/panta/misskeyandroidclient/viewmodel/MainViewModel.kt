@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.gettters.Getters
@@ -17,6 +18,7 @@ import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvi
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +30,7 @@ class MainViewModel @Inject constructor(
     private val getters: Getters,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val socketProvider: SocketWithAccountProvider,
+    private val configRepository: LocalConfigRepository,
 ) : ViewModel() {
     val logger by lazy {
         loggerFactory.create("MainViewModel")
@@ -78,6 +81,13 @@ class MainViewModel @Inject constructor(
         MainUiState(unc, umc)
     }.stateIn(viewModelScope, SharingStarted.Lazily, MainUiState())
 
+    fun setCrashlyticsCollectionEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            configRepository.save(
+                configRepository.get().getOrThrow().setCrashlyticsCollectionEnabled(enabled)
+            ).getOrThrow()
+        }
+    }
 }
 
 data class MainUiState (
