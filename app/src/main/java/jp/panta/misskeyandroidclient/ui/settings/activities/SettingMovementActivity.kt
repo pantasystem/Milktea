@@ -98,7 +98,8 @@ class SettingMovementActivity : AppCompatActivity() {
                     },
                 ) { padding ->
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(padding)
                     ) {
 
@@ -106,7 +107,9 @@ class SettingMovementActivity : AppCompatActivity() {
                             SettingTitleTile(text = stringResource(id = R.string.timeline))
 
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isIncludeLocalRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -116,7 +119,9 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
 
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isIncludeRenotedMyNotes,
                                 onChanged = {
                                     currentConfigState =
@@ -126,7 +131,9 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
 
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isIncludeMyRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -162,7 +169,9 @@ class SettingMovementActivity : AppCompatActivity() {
                             item {
                                 SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
                                 SwitchTile(
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
                                     checked = rv is RememberVisibility.Remember,
                                     onChanged = {
                                         val config = if (it) {

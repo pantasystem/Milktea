@@ -19,6 +19,9 @@
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
+                android:name=".ui.settings.activities.SecuritySettingActivity"
+                android:exported="false" />
+        <activity
                 android:name="net.pantasystem.milktea.channel.ChannelActivity"
                 android:exported="false" />
 
@@ -43,7 +46,9 @@
             </intent-filter>
         </service>
 
-        <activity android:name="net.pantasystem.milktea.gallery.GalleryPostsActivity" android:windowSoftInputMode="adjustResize"/>
+        <activity
+                android:name="net.pantasystem.milktea.gallery.GalleryPostsActivity"
+                android:windowSoftInputMode="adjustResize" />
         <activity
                 android:name="net.pantasystem.milktea.auth.AuthorizationActivity"
                 android:exported="true"
@@ -75,7 +80,9 @@
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
                 android:theme="@style/LicensePageTheme" />
-        <activity android:name=".SearchAndSelectUserActivity" android:windowSoftInputMode="adjustResize"/>
+        <activity
+                android:name=".SearchAndSelectUserActivity"
+                android:windowSoftInputMode="adjustResize" />
         <activity android:name=".UserListDetailActivity" />
         <activity android:name=".ListListActivity" />
         <activity android:name=".FavoriteActivity" />
@@ -145,8 +152,9 @@
                         android:scheme="https" />
             </intent-filter>
         </activity>
-
-        <activity android:name="net.pantasystem.milktea.messaging.MessageActivity" android:windowSoftInputMode="adjustResize" />
+        <activity
+                android:name="net.pantasystem.milktea.messaging.MessageActivity"
+                android:windowSoftInputMode="adjustResize" />
         <activity android:name="net.pantasystem.milktea.drive.DriveActivity" />
         <activity
                 android:name=".NoteEditorActivity"
