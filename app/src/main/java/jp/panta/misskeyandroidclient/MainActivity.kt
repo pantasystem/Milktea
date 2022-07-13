@@ -39,7 +39,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
@@ -48,7 +47,6 @@ import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.SuitableType
 import net.pantasystem.milktea.common_viewmodel.suitableType
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.gallery.GalleryPostsActivity
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
@@ -56,7 +54,6 @@ import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.ReportState
@@ -89,9 +86,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     @Inject
     lateinit var noteTaskExecutor: CreateNoteTaskExecutor
-
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
@@ -155,8 +149,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         ).initViewModelListener()
 
 
-        // NOTE: 各ばーしょんに合わせMenuを制御している
-        getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
+        // NOTE: 各バージョンに合わせMenuを制御している
+        mainViewModel.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
             changeNavMenuVisibilityFromAPIVersion(api)
         }.launchIn(lifecycleScope)
 
@@ -339,19 +333,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         ReportStateHandler().invoke(binding.appBarMain.simpleNotification, state)
     }
 
-    @Inject
-    lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
-    @ExperimentalCoroutinesApi
-    private fun getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
-        return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.instanceDomain)
-        }.map {
-            it?.let {
-                misskeyAPIProvider.get(it.uri, it.getVersion())
-            }
-        }
-    }
 
     private fun collectCrashlyticsCollectionState() {
         lifecycleScope.launchWhenCreated {

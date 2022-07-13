@@ -8,8 +8,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
@@ -18,6 +20,7 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -33,6 +36,8 @@ class MainViewModel @Inject constructor(
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val socketProvider: SocketWithAccountProvider,
     private val configRepository: LocalConfigRepository,
+    private val metaRepository: MetaRepository,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
     settingStore: SettingStore
 ) : ViewModel() {
     val logger by lazy {
@@ -115,6 +120,18 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
+        return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            metaRepository.observe(it.instanceDomain)
+        }.map {
+            it?.let {
+                misskeyAPIProvider.get(it.uri, it.getVersion())
+            }
+        }
+    }
+
 }
 
 data class MainUiState (
