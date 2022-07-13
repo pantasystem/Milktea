@@ -393,7 +393,10 @@
     <string name="send_a_crash_report">クラッシュレポートを送信する</string>
     <string name="crash_reports_are_useful_for_development">送信されたクラッシュレポートは開発の役に立てられます。</string>
     <string name="agree">同意</string>
-
+    <string name="enable_google_analytics">Google Analyticsを有効にする</string>
+    <string name="consent_to_collect_behavior_history">行動履歴の収集</string>
+    <string name="consent_to_collect_behavior_history_message">行動履歴はGoogle Analyticsによって収集され、開発の役に立てられます。</string>
+    <string name="disagree">同意しない</string>
     <!--    <string name="n_people">%d人</string>-->
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->

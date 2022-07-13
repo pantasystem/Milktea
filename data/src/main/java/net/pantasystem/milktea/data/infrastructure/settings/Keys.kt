@@ -18,7 +18,9 @@ val Keys.Companion.allKeys by lazy {
         Keys.ThemeType,
         Keys.IsEnableTimelineScrollAnimation,
         Keys.IsCrashlyticsCollectionEnabled,
-        Keys.IsConfirmedCrashlyticsCollection
+        Keys.IsConfirmedCrashlyticsCollection,
+        Keys.IsConfirmedAnalyticsCollection,
+        Keys.IsAnalyticsCollectionEnabled,
     )
 }
 
@@ -51,6 +53,9 @@ sealed interface Keys {
     object IsCrashlyticsCollectionEnabled : Keys
     object IsConfirmedCrashlyticsCollection : Keys
 
+    object IsAnalyticsCollectionEnabled : Keys
+    object IsConfirmedAnalyticsCollection : Keys
+
     companion object
 }
 
@@ -73,5 +78,7 @@ fun Keys.str(): String {
         is Keys.IsEnableTimelineScrollAnimation -> "IS_ENABLE_TIMELINE_SCROLL_ANIMATION"
         is Keys.IsCrashlyticsCollectionEnabled -> "IsCrashlyticsCollectionEnabled"
         is Keys.IsConfirmedCrashlyticsCollection -> "IsConfirmedCrashlyticsCollection"
+        is Keys.IsConfirmedAnalyticsCollection -> "IsConfirmedAnalyticsCollection"
+        is Keys.IsAnalyticsCollectionEnabled -> "IsAnalyticsCollectionEnabled"
     }
 }

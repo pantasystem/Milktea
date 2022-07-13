@@ -36,6 +36,11 @@ data class IsCrashlyticsCollectionEnabled(
     val isConfirmed: Boolean
 )
 
+data class IsAnalyticsCollectionEnabled(
+    val isEnabled: Boolean,
+    val isConfirmed: Boolean,
+)
+
 data class Config(
     val isSimpleEditorEnabled: Boolean,
     val reactionPickerType: ReactionPickerType,
@@ -52,6 +57,7 @@ data class Config(
     val surfaceColorOpacity: Int,
     val isEnableTimelineScrollAnimation: Boolean,
     val isCrashlyticsCollectionEnabled: IsCrashlyticsCollectionEnabled,
+    val isAnalyticsCollectionEnabled: IsAnalyticsCollectionEnabled,
 ) {
     companion object
 
@@ -59,6 +65,15 @@ data class Config(
         return copy(
             isCrashlyticsCollectionEnabled = isCrashlyticsCollectionEnabled.copy(
                 isEnable = enabled,
+                isConfirmed = true
+            )
+        )
+    }
+
+    fun setAnalyticsCollectionEnabled(enabled: Boolean): Config {
+        return copy(
+            isAnalyticsCollectionEnabled = isAnalyticsCollectionEnabled.copy(
+                isEnabled = enabled,
                 isConfirmed = true
             )
         )
@@ -85,6 +100,10 @@ object DefaultConfig {
             isConfirmed = false,
             isEnable = false,
         ),
+        isAnalyticsCollectionEnabled = IsAnalyticsCollectionEnabled(
+            isConfirmed = false,
+            isEnabled = false,
+        )
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

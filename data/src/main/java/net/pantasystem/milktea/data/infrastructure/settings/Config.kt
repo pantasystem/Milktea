@@ -89,6 +89,12 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
             isConfirmed = map.getValue<PrefType.BoolPref>(Keys.IsConfirmedCrashlyticsCollection)?.value
                 ?: DefaultConfig.config.isCrashlyticsCollectionEnabled.isConfirmed
         ),
+        isAnalyticsCollectionEnabled = IsAnalyticsCollectionEnabled(
+            isEnabled = map.getValue<PrefType.BoolPref>(Keys.IsAnalyticsCollectionEnabled)?.value
+                ?: DefaultConfig.config.isAnalyticsCollectionEnabled.isEnabled,
+            isConfirmed = map.getValue<PrefType.BoolPref>(Keys.IsConfirmedAnalyticsCollection)?.value
+                ?: DefaultConfig.config.isAnalyticsCollectionEnabled.isConfirmed,
+        )
     )
 }
 
@@ -158,6 +164,12 @@ fun Config.pref(key: Keys): PrefType? {
         }
         Keys.IsConfirmedCrashlyticsCollection -> {
             PrefType.BoolPref(isCrashlyticsCollectionEnabled.isConfirmed)
+        }
+        Keys.IsAnalyticsCollectionEnabled -> {
+            PrefType.BoolPref(isAnalyticsCollectionEnabled.isEnabled)
+        }
+        Keys.IsConfirmedAnalyticsCollection -> {
+            PrefType.BoolPref(isAnalyticsCollectionEnabled.isConfirmed)
         }
     }
 }
