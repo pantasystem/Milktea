@@ -97,6 +97,14 @@ class ConfigKtTest {
                     config.isCrashlyticsCollectionEnabled.isConfirmed,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsAnalyticsCollectionEnabled -> Assert.assertEquals(
+                    config.isAnalyticsCollectionEnabled.isEnabled,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsConfirmedAnalyticsCollection -> Assert.assertEquals(
+                    config.isCrashlyticsCollectionEnabled.isConfirmed,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
