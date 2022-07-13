@@ -68,10 +68,16 @@ class MainViewModel @Inject constructor(
         logger.error("通知取得エラー", e = e)
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    val isShowGoogleAnalyticsDialog = settingStore.configState.map {
-        it.isAnalyticsCollectionEnabled
+    val isShowFirebaseCrashlytics = settingStore.configState.map {
+        it.isCrashlyticsCollectionEnabled
     }.map {
-        !(it.isEnabled || it.isConfirmed)
+        !(it.isEnable || it.isConfirmed)
+    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
+
+    val isShowGoogleAnalyticsDialog = settingStore.configState.map { config ->
+        !(config.isAnalyticsCollectionEnabled.isEnabled
+                || config.isAnalyticsCollectionEnabled.isConfirmed)
+                && config.isCrashlyticsCollectionEnabled.isConfirmed
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
 
     @OptIn(ExperimentalCoroutinesApi::class)

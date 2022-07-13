@@ -355,10 +355,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     private fun collectCrashlyticsCollectionState() {
         lifecycleScope.launchWhenCreated {
-            settingStore.configState.map {
-                it.isCrashlyticsCollectionEnabled
-            }.collect { isShow ->
-                if (!isShow.isConfirmed && !isShow.isEnable) {
+            mainViewModel.isShowFirebaseCrashlytics.collect {
+                if (it) {
                     ConfirmCrashlyticsDialog().show(
                         supportFragmentManager,
                         "confirm_crashlytics_dialog"
