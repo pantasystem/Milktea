@@ -188,6 +188,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         collectReportSendingState()
         collectCreateNoteState()
         collectUnauthorizedState()
+        collectConfirmGoogleAnalyticsState()
+
     }
 
     override fun setToolbar(toolbar: Toolbar) {
@@ -361,6 +363,16 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
                         supportFragmentManager,
                         "confirm_crashlytics_dialog"
                     )
+                }
+            }
+        }
+    }
+
+    private fun collectConfirmGoogleAnalyticsState() {
+        lifecycleScope.launchWhenCreated {
+            mainViewModel.isShowGoogleAnalyticsDialog.collect {
+                if (it) {
+                    ConfirmGoogleAnalyticsDialog().show(supportFragmentManager, "confirm_google_analytics_dialog")
                 }
             }
         }

@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelBody
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
@@ -31,6 +33,7 @@ class MainViewModel @Inject constructor(
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val socketProvider: SocketWithAccountProvider,
     private val configRepository: LocalConfigRepository,
+    settingStore: SettingStore
 ) : ViewModel() {
     val logger by lazy {
         loggerFactory.create("MainViewModel")
@@ -65,6 +68,12 @@ class MainViewModel @Inject constructor(
         logger.error("通知取得エラー", e = e)
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
+    val isShowGoogleAnalyticsDialog = settingStore.configState.map {
+        it.isAnalyticsCollectionEnabled
+    }.map {
+        !(it.isEnabled || it.isConfirmed)
+    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentAccountSocketStateEvent =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
@@ -86,6 +95,18 @@ class MainViewModel @Inject constructor(
             configRepository.save(
                 configRepository.get().getOrThrow().setCrashlyticsCollectionEnabled(enabled)
             ).getOrThrow()
+        }
+    }
+
+    fun setAnalyticsCollectionEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                configRepository.save(
+                    configRepository.get().getOrThrow().setAnalyticsCollectionEnabled(enabled)
+                ).getOrThrow()
+            }.onFailure {
+                FirebaseCrashlytics.getInstance().recordException(it)
+            }
         }
     }
 }
