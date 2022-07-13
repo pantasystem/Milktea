@@ -11,7 +11,7 @@ data class App(
     val name: String,
     val callbackUrl: String? = null,
     val isAuthorized: Boolean? = null,
-    val permission: List<String> = emptyList(),
+    val permission: List<String>? = emptyList(),
     val secret: String? = null
 ) : Serializable {
     fun toModel(): AppType.Misskey {
@@ -20,7 +20,7 @@ data class App(
             name = name,
             callbackUrl = callbackUrl,
             isAuthorized = isAuthorized,
-            permission = permission,
+            permission = permission ?: emptyList(),
             secret = secret
         )
     }
