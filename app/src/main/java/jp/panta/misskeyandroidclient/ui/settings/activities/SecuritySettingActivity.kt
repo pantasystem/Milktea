@@ -76,6 +76,12 @@ class SecuritySettingActivity : AppCompatActivity() {
                             }) {
                                 Text(stringResource(id = R.string.send_a_crash_report))
                             }
+
+                            SwitchTile(checked = configState.isAnalyticsCollectionEnabled.isEnabled, onChanged = {
+                                currentConfigState = configState.setAnalyticsCollectionEnabled(it)
+                            }) {
+                                Text(stringResource(id = R.string.enable_google_analytics))
+                            }
                         }
                     }
 
