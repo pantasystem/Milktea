@@ -384,5 +384,8 @@
     <string name="send_a_crash_report">Send a crash report</string>
     <string name="crash_reports_are_useful_for_development">Crash reports are useful for development.</string>
     <string name="agree">Agree</string>
-
+    <string name="enable_google_analytics">Enable Google Analytics</string>
+    <string name="consent_to_collect_behavior_history">Consent to collect behavior history</string>
+    <string name="consent_to_collect_behavior_history_message">Behavior history is collected by Google Analytics and is useful for development.</string>
+    <string name="disagree">Disagree</string>
 </resources>
