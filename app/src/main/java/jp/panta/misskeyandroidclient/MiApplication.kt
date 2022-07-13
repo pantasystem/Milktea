@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
@@ -182,6 +183,15 @@ class MiApplication : Application(), MiCore {
             }.distinctUntilChanged().collect {
                 FirebaseCrashlytics.getInstance()
                     .setCrashlyticsCollectionEnabled(it.isEnable)
+            }
+        }
+
+        applicationScope.launch {
+            mSettingStore.configState.map {
+                it.isAnalyticsCollectionEnabled
+            }.distinctUntilChanged().collect {
+                FirebaseAnalytics.getInstance(applicationContext)
+                    .setAnalyticsCollectionEnabled(it.isEnabled)
             }
         }
     }
