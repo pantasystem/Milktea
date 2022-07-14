@@ -11,10 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.Activities
-import jp.panta.misskeyandroidclient.FollowFollowerActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -74,55 +70,10 @@ class SearchUserFragment : Fragment() {
     }
 
     fun onAction(it: UserDetailCardListAction) {
-        when (it) {
-            is UserDetailCardListAction.CardAction -> {
-                when (it.cardAction) {
-                    is UserDetailCardAction.FollowersCountClicked -> {
-                        startActivity(
-                            FollowFollowerActivity.newIntent(
-                                requireActivity(),
-                                userId = it.cardAction.userId,
-                                isFollowing = false,
-                            )
-                        )
-                    }
-                    is UserDetailCardAction.FollowingsCountClicked -> {
-                        startActivity(
-                            FollowFollowerActivity.newIntent(
-                                requireActivity(),
-                                userId = it.cardAction.userId,
-                                isFollowing = true,
-                            )
-                        )
-                    }
-                    is UserDetailCardAction.NotesCountClicked -> {
-                        val intent = UserDetailActivity.newInstance(
-                            requireActivity(),
-                            userId = it.cardAction.userId
-                        )
-                        intent.putActivity(Activities.ACTIVITY_IN_APP)
+        UserCardListActionHandler(requireActivity(), toggleFollowViewModel) {
+            viewModel.search()
+        }.onAction(it)
 
-                        requireActivity().startActivity(intent)
-                    }
-                    is UserDetailCardAction.OnCardClicked -> {
-                        val intent = UserDetailActivity.newInstance(
-                            requireActivity(),
-                            userId = it.cardAction.userId
-                        )
-                        intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-                        requireActivity().startActivity(intent)
-                    }
-                    is UserDetailCardAction.ToggleFollow -> {
-                        toggleFollowViewModel.toggleFollow(it.cardAction.userId)
-                    }
-                }
-            }
-
-            UserDetailCardListAction.Refresh -> {
-                viewModel.search()
-            }
-        }
     }
 
 
