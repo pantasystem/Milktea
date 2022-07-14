@@ -143,6 +143,7 @@ fun UserDetailCard(
             if (userDetail.description != null) {
                 Text(
                     text = userDetail.description!!,
+                    maxLines = 5,
                     modifier = Modifier
                         .padding(start = 8.dp, end = 8.dp)
                         .constrainAs(descriptionRef) {
