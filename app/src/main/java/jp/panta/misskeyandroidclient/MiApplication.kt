@@ -109,11 +109,12 @@ class MiApplication : Application(), MiCore {
         }
 
         EmojiCompat.init(
-            BundledEmojiCompatConfig(this)
+            BundledEmojiCompatConfig(this@MiApplication)
                 .setReplaceAll(true)
                 .setMetadataLoadStrategy(LOAD_STRATEGY_MANUAL)
         )
         EmojiCompat.get().load()
+
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)

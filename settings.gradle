@@ -61,7 +61,7 @@ dependencyResolutionManagement {
             alias('androidx-emoji2-views').to("androidx.emoji2:emoji2-views:$emoji2_version")
             alias('androidx-emoji2-views-helper').to("androidx.emoji2:emoji2-views-helper:$emoji2_version")
             alias('androidx-emoji2-bundled').to("androidx.emoji2:emoji2-bundled:$emoji2_version")
-            bundle('emoji2', ['androidx-emoji2', 'androidx-emoji2-views', 'androidx-emoji2-views-helper', 'androidx-emoji2-bundled'])
+            bundle('emoji2', ['androidx-emoji2', 'androidx-emoji2-bundled'])
 
         }
     }
