@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.Activities
+import jp.panta.misskeyandroidclient.FollowFollowerActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
@@ -49,10 +50,6 @@ class FollowFollowerFragment : Fragment() {
         }
     }
 
-//    private lateinit var mLinearLayoutManager: LinearLayoutManager
-//    private val _binding: FragmentFollowFollwerBinding by dataBinding()
-
-
     @Inject
     lateinit var viewModelFactory: FollowFollowerViewModel.ViewModelAssistedFactory
     private val followFollowerViewModel by viewModels<FollowFollowerViewModel> {
@@ -84,10 +81,22 @@ class FollowFollowerFragment : Fragment() {
                                 is UserDetailCardListAction.CardAction -> {
                                     when (it.cardAction) {
                                         is UserDetailCardAction.FollowersCountClicked -> {
-
+                                            startActivity(
+                                                FollowFollowerActivity.newIntent(
+                                                    requireActivity(),
+                                                    userId = it.cardAction.userId,
+                                                    isFollowing = false,
+                                                )
+                                            )
                                         }
                                         is UserDetailCardAction.FollowingsCountClicked -> {
-
+                                            startActivity(
+                                                FollowFollowerActivity.newIntent(
+                                                    requireActivity(),
+                                                    userId = it.cardAction.userId,
+                                                    isFollowing = true,
+                                                )
+                                            )
                                         }
                                         is UserDetailCardAction.NotesCountClicked -> {
                                             val intent = UserDetailActivity.newInstance(

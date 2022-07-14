@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -140,19 +141,18 @@ fun UserDetailCard(
                     }
             )
 
-            if (userDetail.description != null) {
-                Text(
-                    text = userDetail.description!!,
-                    maxLines = 5,
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp)
-                        .constrainAs(descriptionRef) {
-                            start.linkTo(avatarIconRef.start)
-                            top.linkTo(subNameRef.bottom, margin = 2.dp)
-                            end.linkTo(parent.end)
-                        }
-                )
-            }
+            Text(
+                text = userDetail.description ?: "",
+                maxLines = 5,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .padding(start = 8.dp, end = 8.dp)
+                    .constrainAs(descriptionRef) {
+                        start.linkTo(avatarIconRef.start)
+                        top.linkTo(subNameRef.bottom, margin = 2.dp)
+                        end.linkTo(parent.end)
+                    }
+            )
 
 
             Row(
