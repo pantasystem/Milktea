@@ -46,7 +46,7 @@
                         app:transitionDestinationUser="@{hasReplyToNote.replyTo.toShowNote.user}"
                     />
 
-                <androidx.emoji2.widget.EmojiTextView
+                <TextView
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/replyToAvatarIcon"
                         android:id="@+id/replyToUserName"
@@ -56,7 +56,7 @@
 
                         android:layout_marginEnd="8dp"
                         />
-                <androidx.emoji2.widget.EmojiTextView
+                <TextView
                         android:id="@+id/replyToName"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/replyToUserName"
@@ -66,7 +66,7 @@
                         android:textSize="15sp"
                         />
 
-                <androidx.emoji2.widget.EmojiTextView
+                <TextView
                         android:id="@+id/replyToCw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                         />
 
 
-                <androidx.emoji2.widget.EmojiTextView
+                <TextView
                         android:id="@+id/replyToContentFoldingButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
                         android:layout_toEndOf="@id/replyToAvatarIcon"
                         android:visibility="@{SafeUnbox.unbox(hasReplyToNote.replyTo.contentFolding) ? View.GONE : View.VISIBLE }"
                         >
-                    <androidx.emoji2.widget.EmojiTextView
+                    <TextView
                             android:id="@id/text"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"
                             android:textSize="15sp"

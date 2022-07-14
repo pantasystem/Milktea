@@ -51,7 +51,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.emoji2.widget.EmojiTextView
+        <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/mainName"
@@ -68,7 +68,7 @@
                 app:layout_constraintHorizontal_bias="0"
                 />
 
-        <androidx.emoji2.widget.EmojiTextView
+        <TextView
                 android:id="@+id/subName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
 
                     >
 
-                <androidx.emoji2.widget.EmojiTextView
+                <TextView
                         android:id="@+id/cw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
                          />
 
 
-                <androidx.emoji2.widget.EmojiTextView
+                <TextView
                         android:id="@+id/contentFoldingButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -165,7 +165,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                    <androidx.emoji2.widget.EmojiTextView
+                    <TextView
                             android:id="@id/text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -251,7 +251,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"/>
 
-                        <androidx.emoji2.widget.EmojiTextView
+                        <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_toEndOf="@+id/subAvatarIcon"
@@ -271,7 +271,7 @@
 
                                 />
 
-                        <androidx.emoji2.widget.EmojiTextView
+                        <TextView
                                 android:layout_toEndOf="@id/subNoteMainName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -286,7 +286,7 @@
 
                                 />
 
-                        <androidx.emoji2.widget.EmojiTextView
+                        <TextView
                                 android:id="@+id/subCw"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -298,7 +298,7 @@
                                 app:layout_constraintStart_toStartOf="parent"/>
 
 
-                        <androidx.emoji2.widget.EmojiTextView
+                        <TextView
                                 android:id="@+id/subContentFoldingButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -319,7 +319,7 @@
 
                                 />
 
-                        <androidx.emoji2.widget.EmojiTextView
+                        <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/subContentFoldingButton"

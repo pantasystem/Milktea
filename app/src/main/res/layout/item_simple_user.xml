@@ -32,7 +32,7 @@
                     tools:ignore="ContentDescription"
                     app:circleIcon="@{user.avatarUrl}"
                     app:transitionDestinationUser="@{user}"/>
-            <androidx.emoji2.widget.EmojiTextView
+            <TextView
                     android:id="@+id/nameMain"
                     android:layout_toEndOf="@id/avatarIcon"
                     android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                     android:layout_alignParentEnd="true"
 
                     />
-            <androidx.emoji2.widget.EmojiTextView
+            <TextView
                     android:id="@+id/nameSub"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
