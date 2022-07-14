@@ -245,11 +245,22 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val navController = binding.appBarMain.contentMain.contentMain.findNavController()
         when {
             drawerLayout.isDrawerOpen(GravityCompat.START) -> {
                 drawerLayout.closeDrawer(GravityCompat.START)
             }
-            binding.appBarMain.contentMain.contentMain.findNavController().popBackStack() -> {}
+            // NOTE: そのままpopBackStackしてしまうとcurrentDestinationがNullになってしまいクラッシュしてしまう。
+            // NOTE: backQueue == 2の時は初めのDestinationを表示している状態になっている
+            // NOTE: backQueueには初期状態の時点で２つ以上入っている
+            //  destinations stack
+            //    |  fragment  |
+            //    | navigation |
+            //    |------------|
+            // 参考: https://qiita.com/kaleidot725/items/a6010dc4e67c944f44f1
+            navController.backQueue.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
+                navController.popBackStack()
+            }
             else -> {
                 if (mBackPressedDelegate.back()) {
                     super.onBackPressed()

@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Looper
 import android.util.Log
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
@@ -96,10 +97,17 @@ class MiApplication : Application(), MiCore {
     override fun onCreate() {
         super.onCreate()
 
+
+        val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
+        val mainThreadId = Looper.getMainLooper().thread.id
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("MiApplication", "Thread上で致命的なエラーが発生しました thread id:${t.id}, name:${t.name}", e)
+            if (mainThreadId == t.id) {
+                defaultUncaughtExceptionHandler?.uncaughtException(t, e)
+            }
         }
+
         val config = BundledEmojiCompatConfig(this)
             .setReplaceAll(true)
         EmojiCompat.init(config)
