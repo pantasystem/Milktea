@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.rememberAsyncImagePainter
 import jp.panta.misskeyandroidclient.R
+import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.user.FollowState
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.make
@@ -122,18 +123,20 @@ fun UserDetailCard(
                     }
             )
 
-            Text(
+            CustomEmojiText(
                 text = if (isUserNameMain) userDetail.displayUserName else userDetail.displayName,
                 fontWeight = FontWeight.Bold,
+                emojis = userDetail.emojis,
                 modifier = Modifier
                     .constrainAs(mainNameRef) {
                         start.linkTo(avatarIconRef.end, margin = 4.dp)
                         top.linkTo(headerRef.bottom)
                     }
             )
-            Text(
+            CustomEmojiText(
                 text = if (!isUserNameMain) userDetail.displayUserName else userDetail.displayName,
                 fontWeight = FontWeight.Bold,
+                emojis = userDetail.emojis,
                 modifier = Modifier
                     .constrainAs(subNameRef) {
                         start.linkTo(avatarIconRef.end, margin = 4.dp)
@@ -141,10 +144,11 @@ fun UserDetailCard(
                     }
             )
 
-            Text(
+                CustomEmojiText(
                 text = userDetail.description ?: "",
                 maxLines = 5,
                 textAlign = TextAlign.Start,
+                emojis = userDetail.emojis,
                 modifier = Modifier
                     .padding(start = 8.dp, end = 8.dp)
                     .constrainAs(descriptionRef) {
