@@ -5,8 +5,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Looper
 import android.util.Log
-import androidx.emoji.bundled.BundledEmojiCompatConfig
-import androidx.emoji.text.EmojiCompat
+import androidx.emoji2.bundled.BundledEmojiCompatConfig
+import androidx.emoji2.text.EmojiCompat
+import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
@@ -97,7 +98,6 @@ class MiApplication : Application(), MiCore {
     override fun onCreate() {
         super.onCreate()
 
-
         val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         val mainThreadId = Looper.getMainLooper().thread.id
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
@@ -108,9 +108,13 @@ class MiApplication : Application(), MiCore {
             }
         }
 
-        val config = BundledEmojiCompatConfig(this)
-            .setReplaceAll(true)
-        EmojiCompat.init(config)
+        EmojiCompat.init(
+            BundledEmojiCompatConfig(this@MiApplication)
+                .setReplaceAll(true)
+                .setMetadataLoadStrategy(LOAD_STRATEGY_MANUAL)
+        )
+        EmojiCompat.get().load()
+
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
         colorSettingStore = ColorSettingStore(sharedPreferences)

@@ -54,7 +54,7 @@
                     tools:ignore="ContentDescription" />
 
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                     tools:text="mainName"
                     />
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/subName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
 
                     tools:text="name" />
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/following_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
                     android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                     />
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/following"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                     android:layout_marginEnd="12dp"
                     android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                     />
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/follower_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                     android:text="@{ Integer.toString(accountViewModel.user.followersCount) }"
                     android:onClick="@{()-> accountViewModel.showFollowers(accountViewModel.user.id) }"
                     />
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/follower_count"
