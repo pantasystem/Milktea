@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
+    userDataSource: UserDataSource,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("SearchUserViewModel")
@@ -55,7 +57,7 @@ class SearchUserViewModel @Inject constructor(
     val host = MutableLiveData<String>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val searchState = accountStore.observeCurrentAccount.filterNotNull()
+    val searchState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.distinctUntilChanged()
                 .flatMapLatest {
@@ -76,6 +78,12 @@ class SearchUserViewModel @Inject constructor(
                         }
                     }.asLoadingStateFlow()
                 }
+        }.map { state ->
+            state.convert {
+                it.map { u ->
+                    u.id
+                }
+            }
         }.flowOn(Dispatchers.IO)
         .onEach {
             logger.debug("検索状態:$it")
@@ -93,18 +101,32 @@ class SearchUserViewModel @Inject constructor(
         it is ResultState.Loading
     }.asLiveData()
 
-    val users = searchState.map {
-        (it.content as? StateContent.Exist)?.rawContent
-            ?: emptyList()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val users = userDataSource.state.flatMapLatest { userState ->
+        searchState.map { resultState ->
+            (resultState.content as? StateContent.Exist)?.rawContent
+                ?: emptyList()
+        }.map { list ->
+            list.mapNotNull {
+                userState.usersMap[it] as? User.Detail?
+            }
+        }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+//    val users = searchState.map {
+//        (it.content as? StateContent.Exist)?.rawContent
+//            ?: emptyList()
+//    }.flatMapLatest { list ->
+//
+//    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    val userViewDataList = searchState.map {
-        (it.content as? StateContent.Exist)?.rawContent?.map { user ->
-            user as? User.Detail
-        }
-            ?: emptyList()
-    }.asLiveData()
+
+//    val userViewDataList = searchState.map {
+//        (it.content as? StateContent.Exist)?.rawContent?.map { user ->
+//            user as? User.Detail
+//        }
+//            ?: emptyList()
+//    }.asLiveData()
 
     init {
         userName.observeForever {

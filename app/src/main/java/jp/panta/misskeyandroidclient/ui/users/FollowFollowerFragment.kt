@@ -72,67 +72,69 @@ class FollowFollowerFragment : Fragment() {
                 MdcTheme {
                     val state by followFollowerViewModel.state.collectAsState()
                     val users by followFollowerViewModel.users.observeAsState()
-                    UserDetailCardList(
+                    UserDetailCardPageableList(
                         pageableState = state,
                         users = users ?: emptyList(),
                         isUserNameMain = false,
-                        onAction = {
-                            when (it) {
-                                is UserDetailCardListAction.CardAction -> {
-                                    when (it.cardAction) {
-                                        is UserDetailCardAction.FollowersCountClicked -> {
-                                            startActivity(
-                                                FollowFollowerActivity.newIntent(
-                                                    requireActivity(),
-                                                    userId = it.cardAction.userId,
-                                                    isFollowing = false,
-                                                )
-                                            )
-                                        }
-                                        is UserDetailCardAction.FollowingsCountClicked -> {
-                                            startActivity(
-                                                FollowFollowerActivity.newIntent(
-                                                    requireActivity(),
-                                                    userId = it.cardAction.userId,
-                                                    isFollowing = true,
-                                                )
-                                            )
-                                        }
-                                        is UserDetailCardAction.NotesCountClicked -> {
-                                            val intent = UserDetailActivity.newInstance(
-                                                requireActivity(),
-                                                userId = it.cardAction.userId
-                                            )
-                                            intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-                                            requireActivity().startActivity(intent)
-                                        }
-                                        is UserDetailCardAction.OnCardClicked -> {
-                                            val intent = UserDetailActivity.newInstance(
-                                                requireActivity(),
-                                                userId = it.cardAction.userId
-                                            )
-                                            intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-                                            requireActivity().startActivity(intent)
-                                        }
-                                        is UserDetailCardAction.ToggleFollow -> {
-                                            viewModel.toggleFollow(it.cardAction.userId)
-                                        }
-                                    }
-                                }
-                                UserDetailCardListAction.OnBottomReached -> {
-                                    followFollowerViewModel.loadOld()
-                                }
-                                UserDetailCardListAction.Refresh -> {
-                                    followFollowerViewModel.loadInit()
-                                }
-                            }
-                        }
+                        onAction = ::onAction
                     )
                 }
             }
         }.rootView
+    }
+
+    fun onAction(it: UserDetailCardPageableListAction) {
+        when (it) {
+            is UserDetailCardPageableListAction.CardAction -> {
+                when (it.cardAction) {
+                    is UserDetailCardAction.FollowersCountClicked -> {
+                        startActivity(
+                            FollowFollowerActivity.newIntent(
+                                requireActivity(),
+                                userId = it.cardAction.userId,
+                                isFollowing = false,
+                            )
+                        )
+                    }
+                    is UserDetailCardAction.FollowingsCountClicked -> {
+                        startActivity(
+                            FollowFollowerActivity.newIntent(
+                                requireActivity(),
+                                userId = it.cardAction.userId,
+                                isFollowing = true,
+                            )
+                        )
+                    }
+                    is UserDetailCardAction.NotesCountClicked -> {
+                        val intent = UserDetailActivity.newInstance(
+                            requireActivity(),
+                            userId = it.cardAction.userId
+                        )
+                        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+                        requireActivity().startActivity(intent)
+                    }
+                    is UserDetailCardAction.OnCardClicked -> {
+                        val intent = UserDetailActivity.newInstance(
+                            requireActivity(),
+                            userId = it.cardAction.userId
+                        )
+                        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+                        requireActivity().startActivity(intent)
+                    }
+                    is UserDetailCardAction.ToggleFollow -> {
+                        viewModel.toggleFollow(it.cardAction.userId)
+                    }
+                }
+            }
+            UserDetailCardPageableListAction.OnBottomReached -> {
+                followFollowerViewModel.loadOld()
+            }
+            UserDetailCardPageableListAction.Refresh -> {
+                followFollowerViewModel.loadInit()
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

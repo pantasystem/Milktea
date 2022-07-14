@@ -1,27 +1,30 @@
 package jp.panta.misskeyandroidclient.ui.users
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.Activities
-import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.FollowFollowerActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.databinding.FragmentExploreUsersBinding
 import jp.panta.misskeyandroidclient.putActivity
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.ShowUserDetails
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.providerViewModel
 import net.pantasystem.milktea.api.misskey.users.RequestUser
-import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserDetails {
+class SortedUsersFragment : Fragment() {
 
     companion object {
         const val EXTRA_EXPLORE_USERS_TYPE =
@@ -58,7 +61,7 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         }
     }
 
-    val mBinding: FragmentExploreUsersBinding by dataBinding()
+//    val mBinding: FragmentExploreUsersBinding by dataBinding()
     private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
 
 
@@ -76,32 +79,84 @@ class SortedUsersFragment : Fragment(R.layout.fragment_explore_users), ShowUserD
         SortedUsersViewModel.providerViewModel(sortedUserViewModelFactory, type, condition)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MdcTheme {
+                    val users by exploreUsersViewModel.users.observeAsState()
+
+                    UserDetailCardList(
+                        pageableState = ResultState.Fixed(StateContent.Exist(emptyList())),
+                        users = users ?: emptyList(),
+                        isUserNameMain = false,
+                        onAction = ::onAction
+                    )
+                }
+            }
+        }.rootView
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        exploreUsersViewModel.loadUsers()
 
-        exploreUsersViewModel.isRefreshing.observe(viewLifecycleOwner) {
-            mBinding.exploreUsersSwipeRefresh.isRefreshing = it ?: false
-        }
+    }
 
-        mBinding.exploreUsersSwipeRefresh.setOnRefreshListener {
-            exploreUsersViewModel.loadUsers()
-        }
+    fun onAction(it: UserDetailCardListAction) {
+        when (it) {
+            is UserDetailCardListAction.CardAction -> {
+                when (it.cardAction) {
+                    is UserDetailCardAction.FollowersCountClicked -> {
+                        startActivity(
+                            FollowFollowerActivity.newIntent(
+                                requireActivity(),
+                                userId = it.cardAction.userId,
+                                isFollowing = false,
+                            )
+                        )
+                    }
+                    is UserDetailCardAction.FollowingsCountClicked -> {
+                        startActivity(
+                            FollowFollowerActivity.newIntent(
+                                requireActivity(),
+                                userId = it.cardAction.userId,
+                                isFollowing = true,
+                            )
+                        )
+                    }
+                    is UserDetailCardAction.NotesCountClicked -> {
+                        val intent = UserDetailActivity.newInstance(
+                            requireActivity(),
+                            userId = it.cardAction.userId
+                        )
+                        intent.putActivity(Activities.ACTIVITY_IN_APP)
 
-        val adapter = FollowableUserListAdapter(viewLifecycleOwner, this) {
-            toggleFollowViewModel.toggleFollow(it)
-        }
-        mBinding.exploreUsersView.adapter = adapter
-        mBinding.exploreUsersView.layoutManager = LinearLayoutManager(view.context)
-        exploreUsersViewModel.users.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+                        requireActivity().startActivity(intent)
+                    }
+                    is UserDetailCardAction.OnCardClicked -> {
+                        val intent = UserDetailActivity.newInstance(
+                            requireActivity(),
+                            userId = it.cardAction.userId
+                        )
+                        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+                        requireActivity().startActivity(intent)
+                    }
+                    is UserDetailCardAction.ToggleFollow -> {
+                        toggleFollowViewModel.toggleFollow(it.cardAction.userId)
+                    }
+                }
+            }
+
+            UserDetailCardListAction.Refresh -> {
+                exploreUsersViewModel.loadUsers()
+            }
         }
     }
 
-    override fun show(userId: User.Id?) {
-        userId?.let {
-            val intent = UserDetailActivity.newInstance(requireContext(), userId = userId)
-            intent.putActivity(Activities.ACTIVITY_IN_APP)
-            startActivity(intent)
-        }
-    }
+
 }
