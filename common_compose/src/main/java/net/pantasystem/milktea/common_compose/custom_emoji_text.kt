@@ -6,12 +6,14 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -59,13 +61,15 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>): List<EmojiPos> {
 @Composable
 @Stable
 fun CustomEmojiText(
+    modifier: Modifier = Modifier,
     text: String,
     emojis: List<Emoji>,
     fontSize: TextUnit = 14.sp,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
     fontFamily: FontFamily? = null,
-    maxLines: Int = Int.MAX_VALUE,
+    textAlign: TextAlign? = null,
+    maxLines: Int = Int.MAX_VALUE
 ) {
 
     val matches = text.findCustomEmojiInText(emojis)
@@ -103,6 +107,8 @@ fun CustomEmojiText(
         fontStyle = fontStyle,
         fontWeight = fontWeight,
         fontFamily = fontFamily,
-        maxLines = maxLines
+        maxLines = maxLines,
+        modifier = modifier,
+        textAlign = textAlign
     )
 }

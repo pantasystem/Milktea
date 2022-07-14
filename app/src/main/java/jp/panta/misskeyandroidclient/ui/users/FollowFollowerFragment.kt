@@ -1,20 +1,21 @@
 package jp.panta.misskeyandroidclient.ui.users
 
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.wada811.databinding.dataBinding
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.Activities
-import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.FollowFollowerActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.databinding.FragmentFollowFollwerBinding
 import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
@@ -30,14 +31,17 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
+class FollowFollowerFragment : Fragment() {
 
-    companion object{
-        private const val EXTRA_USER_ID = "jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment.EXTRA_USER_ID"
-        private const val EXTRA_TYPE = "jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment.EXTRA_TYPE"
-        fun newInstance(type: RequestType) : FollowFollowerFragment{
-            return FollowFollowerFragment().apply{
-                arguments = Bundle().apply{
+    companion object {
+        private const val EXTRA_USER_ID =
+            "jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment.EXTRA_USER_ID"
+        private const val EXTRA_TYPE =
+            "jp.panta.misskeyandroidclient.ui.users.FollowFollowerFragment.EXTRA_TYPE"
+
+        fun newInstance(type: RequestType): FollowFollowerFragment {
+            return FollowFollowerFragment().apply {
+                arguments = Bundle().apply {
                     putSerializable(EXTRA_USER_ID, type.userId)
                     putString(EXTRA_TYPE, type.string())
                 }
@@ -46,12 +50,9 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
         }
     }
 
-    private lateinit var mLinearLayoutManager: LinearLayoutManager
-    private val _binding: FragmentFollowFollwerBinding by dataBinding()
-
-
-    @Inject lateinit var viewModelFactory: FollowFollowerViewModel.ViewModelAssistedFactory
-    val followFollowerViewModel by viewModels<FollowFollowerViewModel> {
+    @Inject
+    lateinit var viewModelFactory: FollowFollowerViewModel.ViewModelAssistedFactory
+    private val followFollowerViewModel by viewModels<FollowFollowerViewModel> {
         val strType = arguments?.getString(EXTRA_TYPE) ?: "following"
         val userId = arguments?.getSerializable(EXTRA_USER_ID) as User.Id
 
@@ -61,75 +62,84 @@ class FollowFollowerFragment : Fragment(R.layout.fragment_follow_follwer){
 
     val viewModel: ToggleFollowViewModel by activityViewModels()
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                MdcTheme {
+                    val state by followFollowerViewModel.state.collectAsState()
+                    val users by followFollowerViewModel.users.observeAsState()
+                    UserDetailCardPageableList(
+                        pageableState = state,
+                        users = users ?: emptyList(),
+                        isUserNameMain = false,
+                        onAction = ::onAction
+                    )
+                }
+            }
+        }.rootView
+    }
+
+    fun onAction(it: UserDetailCardPageableListAction) {
+        when (it) {
+            is UserDetailCardPageableListAction.CardAction -> {
+                when (it.cardAction) {
+                    is UserDetailCardAction.FollowersCountClicked -> {
+                        startActivity(
+                            FollowFollowerActivity.newIntent(
+                                requireActivity(),
+                                userId = it.cardAction.userId,
+                                isFollowing = false,
+                            )
+                        )
+                    }
+                    is UserDetailCardAction.FollowingsCountClicked -> {
+                        startActivity(
+                            FollowFollowerActivity.newIntent(
+                                requireActivity(),
+                                userId = it.cardAction.userId,
+                                isFollowing = true,
+                            )
+                        )
+                    }
+                    is UserDetailCardAction.NotesCountClicked -> {
+                        val intent = UserDetailActivity.newInstance(
+                            requireActivity(),
+                            userId = it.cardAction.userId
+                        )
+                        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+                        requireActivity().startActivity(intent)
+                    }
+                    is UserDetailCardAction.OnCardClicked -> {
+                        val intent = UserDetailActivity.newInstance(
+                            requireActivity(),
+                            userId = it.cardAction.userId
+                        )
+                        intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+                        requireActivity().startActivity(intent)
+                    }
+                    is UserDetailCardAction.ToggleFollow -> {
+                        viewModel.toggleFollow(it.cardAction.userId)
+                    }
+                }
+            }
+            UserDetailCardPageableListAction.OnBottomReached -> {
+                followFollowerViewModel.loadOld()
+            }
+            UserDetailCardPageableListAction.Refresh -> {
+                followFollowerViewModel.loadInit()
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        mLinearLayoutManager = LinearLayoutManager(view.context)
-
-        _binding.followFollowerList.layoutManager = mLinearLayoutManager
-        _binding.followFollowerList.addOnScrollListener(_scrollListener)
-
-
-        val adapter = FollowableUserListAdapter(
-            viewLifecycleOwner, followFollowerViewModel,
-        ) {
-            viewModel.toggleFollow(it)
-        }
-
-        _binding.followFollowerList.adapter = adapter
-
-        followFollowerViewModel.users.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
-
         followFollowerViewModel.loadInit()
-
-
-        lifecycleScope.launchWhenResumed {
-            followFollowerViewModel.isInitialLoading.collect {
-                _binding.swipeRefresh.isRefreshing = it
-            }
-        }
-
-
-
-        followFollowerViewModel
-
-        followFollowerViewModel.showUserEventBus.observe(viewLifecycleOwner) {
-            val intent = UserDetailActivity.newInstance(requireActivity(), userId = it)
-            intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-            requireActivity().startActivity(intent)
-        }
-
-        _binding.swipeRefresh.setOnRefreshListener {
-            followFollowerViewModel.loadInit()
-        }
-
     }
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    private val _scrollListener = object : RecyclerView.OnScrollListener(){
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
-
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
-            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
-            val itemCount = mLinearLayoutManager.itemCount
-
-
-            if(firstVisibleItemPosition == 0){
-                Log.d("", "先頭")
-            }
-
-            if(endVisibleItemPosition == (itemCount - 1)){
-                Log.d("", "後ろ")
-                followFollowerViewModel.loadOld()
-
-            }
-
-        }
-    }
 }

@@ -7,19 +7,15 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.model.user.RequestType
-import net.pantasystem.milktea.model.user.User
 
 class FollowFollowerViewModel @AssistedInject constructor(
     followFollowerPagingStoreFactory: FollowFollowerPagingStore.Factory,
     @Assisted val type: RequestType
-) : ViewModel(), ShowUserDetails {
+) : ViewModel() {
 
     companion object
 
@@ -30,13 +26,10 @@ class FollowFollowerViewModel @AssistedInject constructor(
 
     private val followFollowerPagingStore = followFollowerPagingStoreFactory.create(type)
 
-    val isInitialLoading = followFollowerPagingStore.state.map {
-        it is PageableState.Loading.Init
-    }
 
     val users = followFollowerPagingStore.users.asLiveData()
+    val state = followFollowerPagingStore.state
 
-    val showUserEventBus = EventBus<User.Id>()
 
 
     fun loadInit() = viewModelScope.launch(Dispatchers.IO) {
@@ -49,11 +42,6 @@ class FollowFollowerViewModel @AssistedInject constructor(
         followFollowerPagingStore.loadPrevious()
     }
 
-
-
-    override fun show(userId: User.Id?) {
-        showUserEventBus.event = userId
-    }
 
 
 }
