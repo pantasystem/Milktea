@@ -6,7 +6,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
-import javax.annotation.concurrent.Immutable
 
 /**
  * Userはfollowやunfollowなどは担当しない
@@ -70,16 +69,17 @@ sealed interface User : Entity {
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
     ) : User {
+        companion object;
         val followState: FollowState
             get() {
-                if(isFollowing) {
+                if (isFollowing) {
                     return FollowState.FOLLOWING
                 }
-                
-                if(isLocked) {
-                    return if(hasPendingFollowRequestFromYou) {
+
+                if (isLocked) {
+                    return if (hasPendingFollowRequestFromYou) {
                         FollowState.PENDING_FOLLOW_REQUEST
-                    }else{
+                    } else {
                         FollowState.UNFOLLOWING_LOCKED
                     }
                 }
@@ -90,16 +90,16 @@ sealed interface User : Entity {
 
 
     val displayUserName: String
-        get() = "@" + this.userName + if(this.host == null){
+        get() = "@" + this.userName + if (this.host == null) {
             ""
-        }else{
+        } else {
             "@" + this.host
-        } 
+        }
 
     val displayName: String
-        get() = nickname?.name?: name?: userName
+        get() = nickname?.name ?: name ?: userName
 
-    
+
     val shortDisplayName: String
         get() = "@" + this.userName
 
@@ -133,5 +133,60 @@ fun User.Simple.Companion.make(
         isBot = isBot,
         host = host,
         nickname = nickname
+    )
+}
+
+
+fun User.Detail.Companion.make(
+    id: User.Id,
+    userName: String,
+    name: String? = null,
+    avatarUrl: String? = null,
+    emojis: List<Emoji> = emptyList(),
+    isCat: Boolean? = null,
+    isBot: Boolean? = null,
+    host: String? = null,
+    nickname: UserNickname? = null,
+    description: String? = null,
+    followersCount: Int? = null,
+    followingCount: Int? = null,
+    hostLower: String? = null,
+    notesCount: Int? = null,
+    pinnedNoteIds: List<Note.Id>? = null,
+    bannerUrl: String? = null,
+    url: String? = null,
+    isFollowing: Boolean = false,
+    isFollower: Boolean = false,
+    isBlocking: Boolean = false,
+    isMuting: Boolean = false,
+    hasPendingFollowRequestFromYou: Boolean = false,
+    hasPendingFollowRequestToYou: Boolean = false,
+    isLocked: Boolean = false,
+): User.Detail {
+    return User.Detail(
+        id,
+        userName,
+        name,
+        avatarUrl,
+        emojis,
+        isCat,
+        isBot,
+        host,
+        nickname,
+        description,
+        followersCount,
+        followingCount,
+        hostLower,
+        notesCount,
+        pinnedNoteIds,
+        bannerUrl,
+        url,
+        isFollowing,
+        isFollower,
+        isBlocking,
+        isMuting,
+        hasPendingFollowRequestFromYou,
+        hasPendingFollowRequestToYou,
+        isLocked
     )
 }
