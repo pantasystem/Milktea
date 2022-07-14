@@ -55,6 +55,14 @@ dependencyResolutionManagement {
             alias('androidx-core-ktx').to('androidx.core:core-ktx:1.7.0')
             alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.4.1')
             alias('activity-ktx').to('androidx.activity:activity-ktx:1.5.0')
+
+            def emoji2_version = "1.2.0-beta01"
+            alias('androidx-emoji2').to("androidx.emoji2:emoji2:$emoji2_version")
+            alias('androidx-emoji2-views').to("androidx.emoji2:emoji2-views:$emoji2_version")
+            alias('androidx-emoji2-views-helper').to("androidx.emoji2:emoji2-views-helper:$emoji2_version")
+            alias('androidx-emoji2-bundled').to("androidx.emoji2:emoji2-bundled:$emoji2_version")
+            bundle('emoji2', ['androidx-emoji2', 'androidx-emoji2-views', 'androidx-emoji2-views-helper', 'androidx-emoji2-bundled'])
+
         }
     }
 }

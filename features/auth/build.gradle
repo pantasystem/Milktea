@@ -52,6 +52,7 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
+    implementation libs.bundles.emoji2
 
     // hilt
     implementation libs.hilt.android
@@ -84,8 +85,8 @@ dependencies {
     kaptTest libs.hilt.compiler
 
     implementation libs.fragment.ktx
-    // EmojiCompat
-    implementation "androidx.emoji:emoji-bundled:1.2.0-alpha03"
+
+
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'

@@ -52,7 +52,7 @@
                 app:foldingContent="@{contentMain}"
                 app:isFolding="@{note.contentFolding}">
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:id="@+id/statusView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                     app:transitionDestinationUser="@{note.toShowNote.user}"
                     tools:srcCompat="@android:drawable/sym_def_app_icon" />
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/statusView"
@@ -92,7 +92,7 @@
                     android:textSize="15sp"
                     tools:text="36秒前" />
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:id="@+id/subName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
 
                     />
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:id="@+id/cw"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -114,7 +114,7 @@
                     tools:text="cwcwcwwcwcw" />
 
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:id="@+id/contentFoldingButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -136,7 +136,7 @@
                     android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }"
                     android:layout_marginBottom="8dp">
 
-                <androidx.emoji.widget.EmojiTextView
+                <androidx.emoji2.widget.EmojiTextView
                         android:id="@id/text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -226,7 +226,7 @@
                             app:circleIcon='@{note.subNoteAvatarUrl}'
                             app:transitionDestinationUser="@{note.subNote.user}" />
 
-                    <androidx.emoji.widget.EmojiTextView
+                    <androidx.emoji2.widget.EmojiTextView
                             android:id="@+id/subNoteMainName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -236,7 +236,7 @@
 
                             android:textStyle="bold" />
 
-                    <androidx.emoji.widget.EmojiTextView
+                    <androidx.emoji2.widget.EmojiTextView
                             android:id="@+id/subNoteSubName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -247,7 +247,7 @@
 
                             />
 
-                    <androidx.emoji.widget.EmojiTextView
+                    <androidx.emoji2.widget.EmojiTextView
                             android:id="@+id/subCw"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -257,7 +257,7 @@
                             tools:text="cwcwcwwcwcw" />
 
 
-                    <androidx.emoji.widget.EmojiTextView
+                    <androidx.emoji2.widget.EmojiTextView
                             android:id="@+id/subContentFoldingButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -272,7 +272,7 @@
 
                             />
 
-                    <androidx.emoji.widget.EmojiTextView
+                    <androidx.emoji2.widget.EmojiTextView
                             android:id="@+id/subNoteText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -321,7 +321,7 @@
 
                     />
 
-            <androidx.emoji.widget.EmojiTextView
+            <androidx.emoji2.widget.EmojiTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/via"
@@ -374,7 +374,7 @@
                         app:srcCompat="@drawable/ic_reply_black_24dp"
                         app:tint="?attr/normalIconTint" />
 
-                <androidx.emoji.widget.EmojiTextView
+                <androidx.emoji2.widget.EmojiTextView
                         android:id="@+id/textView3"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
@@ -397,7 +397,7 @@
                         android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
                         app:tint="?attr/normalIconTint" />
 
-                <androidx.emoji.widget.EmojiTextView
+                <androidx.emoji2.widget.EmojiTextView
                         android:id="@+id/textView4"
                         android:layout_width="50dp"
 
@@ -423,7 +423,7 @@
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                         app:tint="?attr/normalIconTint" />
 
-                <androidx.emoji.widget.EmojiTextView
+                <androidx.emoji2.widget.EmojiTextView
                         android:layout_width="50dp"
 
                         android:layout_height="wrap_content"
