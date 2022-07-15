@@ -22,10 +22,10 @@ class ExploreViewModel @Inject constructor(
     val accountStore: AccountStore,
     val userDataSource: UserDataSource,
     val userRepository: UserRepository
-): ViewModel() {
+) : ViewModel() {
     private val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
 
-    val uiState = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+    private val rawLoadingStates = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
         findUsers.map { list ->
             list.map {
                 it to suspend {
@@ -34,34 +34,52 @@ class ExploreViewModel @Inject constructor(
             }
         }
     }.flatMapLatest { exploreItems ->
-        userDataSource.state.distinctUntilChangedBy {
-            it.usersMap.keys.toSet()
-        }.flatMapLatest { usersState ->
-            combine(exploreItems.map { it.second }) { states ->
-                states.toList()
-            }.map { list ->
-                require(list.size == exploreItems.size) {
-                    "受け取った結果と, 入力値のサイズが異なります"
-                }
-                list.mapIndexed { index, resultState ->
-                    val exploreItem = exploreItems[index].first
-                    ExploreItemState(
-                        findUsersQuery = exploreItem.findUsersQuery,
-                        loadingState = resultState.suspendConvert {
-                            it.second.map { user ->
-                                usersState.get(user.id) as User.Detail
-                            }
-                        },
-                        title = exploreItem.title,
-                    )
-                }
+        combine(exploreItems.map { it.second }) { states ->
+            states.toList()
+        }.map { list ->
+            list.mapIndexed { index, resultState ->
+                val exploreItem = exploreItems[index].first
+                ExploreResultState(
+                    findUsersQuery = exploreItem.findUsersQuery,
+                    loadingState = resultState.suspendConvert {
+                        it.second.map { user ->
+                            user.id
+                        }
+                    },
+                    title = exploreItem.title,
+                )
             }
         }
-    }.map { list ->
-        ExploreUiState(list)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val uiState = userDataSource.state.flatMapLatest { usersState ->
+        rawLoadingStates.map { list ->
+            list.map { state ->
+                state to state.loadingState.convert { ids ->
+                    ids.mapNotNull { id ->
+                        usersState.get(id) as? User.Detail
+                    }
+                }
+            }
+        }.map { list ->
+            list.map {
+                val explore = it.first
+                val resultState = it.second
+                ExploreItemState(
+                    title = explore.title,
+                    loadingState = resultState,
+                    findUsersQuery = explore.findUsersQuery
+                )
+            }
+
+        }
+    }.map {
+        ExploreUiState(it)
     }.catch { e ->
         FirebaseCrashlytics.getInstance().recordException(e)
-    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
+    }.distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
+
 
 
     fun setExplores(list: List<ExploreItem>) {
@@ -75,10 +93,17 @@ data class ExploreItem(
     val title: String,
     val findUsersQuery: FindUsersQuery,
 )
+
 data class ExploreItemState(
     val title: String,
     val findUsersQuery: FindUsersQuery,
     val loadingState: ResultState<List<User.Detail>>
+)
+
+data class ExploreResultState(
+    val title: String,
+    val findUsersQuery: FindUsersQuery,
+    val loadingState: ResultState<List<User.Id>>
 )
 
 data class ExploreUiState(
