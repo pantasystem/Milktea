@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.ui.search
 
 import android.content.Context
@@ -20,10 +22,11 @@ import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.setMenuTint
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
-import net.pantasystem.milktea.common.ui.ToolbarSetter
+import jp.panta.misskeyandroidclient.ui.explore.ExploreType
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.model.account.page.Pageable
 
 
@@ -79,7 +82,11 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
     class SearchPagerAdapter(supportFragmentManager: FragmentManager, context: Context) :
         FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         val tabList =
-            listOf(context.getString(R.string.title_featured), context.getString(R.string.explore))
+            listOf(
+                context.getString(R.string.title_featured),
+                context.getString(R.string.explore),
+                context.getString(R.string.explore_fediverse)
+            )
 
         override fun getCount(): Int {
             return tabList.size
@@ -88,7 +95,8 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
         override fun getItem(position: Int): Fragment {
             return when (position) {
                 0 -> TimelineFragment.newInstance(Pageable.Featured(null))
-                1 -> ExploreFragment()
+                1 -> ExploreFragment.newInstance(ExploreType.Local)
+                2 -> ExploreFragment.newInstance(ExploreType.Fediverse)
                 else -> throw IllegalArgumentException("range 0..1, list:$tabList")
             }
         }
