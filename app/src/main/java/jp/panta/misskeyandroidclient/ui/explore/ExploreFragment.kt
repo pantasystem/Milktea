@@ -19,6 +19,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -69,10 +70,13 @@ class ExploreFragment : Fragment() {
                             stickyHeader {
                                 Surface(
                                     modifier = Modifier
-                                        .padding(4.dp)
                                         .fillMaxWidth()
                                 ) {
-                                    Text(item.title)
+                                    Text(
+                                        item.title,
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
                                 }
                             }
                             when(val content = item.loadingState.content) {
