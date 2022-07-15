@@ -3,6 +3,7 @@ package net.pantasystem.milktea.api.misskey.users
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.model.user.query.FindUsersQuery
 
 @Serializable
 data class RequestUser(
@@ -21,42 +22,17 @@ data class RequestUser(
     val detail: Boolean? = null
 ){
 
-    class Sort{
-        fun follower(): OrderBy {
-            return OrderBy("follower")
-        }
-
-        fun createdAt(): OrderBy {
-            return OrderBy("createdAt")
-        }
-
-        fun updatedAt(): OrderBy {
-            return OrderBy("updatedAt")
-        }
-    }
-
-    class OrderBy(private val sortBy: String){
-        fun asc(): String{
-            return "+$sortBy"
-        }
-
-        fun desc(): String{
-            return "-$sortBy"
-        }
-
-    }
+    companion object
 
 
-    enum class State(val state: String){
-        ALL("all"), ADMIN("admin"), MODERATOR("moderator"), ADMIN_OR_MODERATOR("adminOrModerator"), ALIVE("alive")
-    }
+}
 
-    enum class Origin(val origin: String){
-        LOCAL("local"),
-        COMBINED("combined"),
-        REMOTE("remote")
-
-    }
-
+fun RequestUser.Companion.from(query: FindUsersQuery, i: String): RequestUser {
+    return RequestUser(
+        i = i,
+        origin = query.origin?.origin,
+        sort = query.sort?.str(),
+        state = query.state?.state
+    )
 
 }

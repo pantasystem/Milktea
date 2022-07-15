@@ -1,0 +1,111 @@
+package jp.panta.misskeyandroidclient.ui.explore
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.query.FindUsersQuery
+import javax.inject.Inject
+
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class ExploreViewModel @Inject constructor(
+    val accountStore: AccountStore,
+    val userDataSource: UserDataSource,
+    val userRepository: UserRepository
+) : ViewModel() {
+    private val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
+
+    private val rawLoadingStates = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+        findUsers.map { list ->
+            list.map {
+                it to suspend {
+                    it to userRepository.findUsers(ac.accountId, it.findUsersQuery)
+                }.asLoadingStateFlow()
+            }
+        }
+    }.flatMapLatest { exploreItems ->
+        combine(exploreItems.map { it.second }) { states ->
+            states.toList()
+        }.map { list ->
+            list.mapIndexed { index, resultState ->
+                val exploreItem = exploreItems[index].first
+                ExploreResultState(
+                    findUsersQuery = exploreItem.findUsersQuery,
+                    loadingState = resultState.suspendConvert {
+                        it.second.map { user ->
+                            user.id
+                        }
+                    },
+                    title = exploreItem.title,
+                )
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val uiState = userDataSource.state.flatMapLatest { usersState ->
+        rawLoadingStates.map { list ->
+            list.map { state ->
+                state to state.loadingState.convert { ids ->
+                    ids.mapNotNull { id ->
+                        usersState.get(id) as? User.Detail
+                    }
+                }
+            }
+        }.map { list ->
+            list.map {
+                val explore = it.first
+                val resultState = it.second
+                ExploreItemState(
+                    title = explore.title,
+                    loadingState = resultState,
+                    findUsersQuery = explore.findUsersQuery
+                )
+            }
+
+        }
+    }.map {
+        ExploreUiState(it)
+    }.catch { e ->
+        FirebaseCrashlytics.getInstance().recordException(e)
+    }.distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
+
+
+
+    fun setExplores(list: List<ExploreItem>) {
+        findUsers.update {
+            list
+        }
+    }
+}
+
+data class ExploreItem(
+    val title: String,
+    val findUsersQuery: FindUsersQuery,
+)
+
+data class ExploreItemState(
+    val title: String,
+    val findUsersQuery: FindUsersQuery,
+    val loadingState: ResultState<List<User.Detail>>
+)
+
+data class ExploreResultState(
+    val title: String,
+    val findUsersQuery: FindUsersQuery,
+    val loadingState: ResultState<List<User.Id>>
+)
+
+data class ExploreUiState(
+    val states: List<ExploreItemState>,
+)

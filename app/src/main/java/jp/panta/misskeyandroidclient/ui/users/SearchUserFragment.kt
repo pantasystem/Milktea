@@ -22,7 +22,7 @@ import kotlinx.coroutines.FlowPreview
 class SearchUserFragment : Fragment() {
 
     companion object {
-        const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.ui.users.SearchUserFragment"
+        private const val EXTRA_USER_NAME = "jp.panta.misskeyandroidclient.ui.users.SearchUserFragment"
 
         @JvmStatic
         fun newInstance(userName: String): SearchUserFragment {

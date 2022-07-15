@@ -14,48 +14,34 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.providerViewModel
-import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.user.query.FindUsersQuery
+import net.pantasystem.milktea.model.user.query.from
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SortedUsersFragment : Fragment() {
 
     companion object {
-        const val EXTRA_EXPLORE_USERS_TYPE =
-            "jp.panta.misskeyandroidclient.viewmodel.users.ExploreUsersViewModel.Type"
 
         const val EXTRA_ORIGIN = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_ORIGIN"
         const val EXTRA_SORT = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_SORT"
         const val EXTRA_STATE = "jp.panta.misskeyandroidclient.viewmodel.users.EXTRA_STATE"
 
-        @JvmStatic
-        fun newInstance(type: SortedUsersViewModel.Type): SortedUsersFragment {
-            return SortedUsersFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putSerializable(EXTRA_EXPLORE_USERS_TYPE, type)
-                    }
-                }
-        }
 
-        @JvmStatic
-        fun newInstance(
-            origin: RequestUser.Origin?,
-            sort: String?,
-            state: RequestUser.State?
-        ): SortedUsersFragment {
+        fun newInstance(findUsersQuery: FindUsersQuery): SortedUsersFragment {
             return SortedUsersFragment()
                 .apply {
                     arguments = Bundle().apply {
-                        putSerializable(EXTRA_ORIGIN, origin)
-                        putSerializable(EXTRA_STATE, state)
-                        putString(EXTRA_SORT, sort)
+                        putString(EXTRA_ORIGIN, findUsersQuery.origin?.origin)
+                        putString(EXTRA_SORT, findUsersQuery.sort?.str())
+                        putString(EXTRA_STATE, findUsersQuery.state?.state)
                     }
                 }
         }
     }
+
 
 //    val mBinding: FragmentExploreUsersBinding by dataBinding()
     private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
@@ -65,14 +51,13 @@ class SortedUsersFragment : Fragment() {
     lateinit var sortedUserViewModelFactory: SortedUsersViewModel.AssistedViewModelFactory
 
     private val exploreUsersViewModel: SortedUsersViewModel by viewModels {
-        val type =
-            arguments?.getSerializable(EXTRA_EXPLORE_USERS_TYPE) as? SortedUsersViewModel.Type
-        val condition = SortedUsersViewModel.UserRequestConditions(
-            sort = arguments?.getString(EXTRA_SORT),
-            state = arguments?.getSerializable(EXTRA_STATE) as? RequestUser.State?,
-            origin = arguments?.getSerializable(EXTRA_ORIGIN) as? RequestUser.Origin?
+
+        val findUserQuery = FindUsersQuery(
+            origin = FindUsersQuery.Origin.from(arguments?.getString(EXTRA_ORIGIN) ?: ""),
+            state = FindUsersQuery.State.from(arguments?.getString(EXTRA_STATE) ?: ""),
+            sort = FindUsersQuery.OrderBy.from(arguments?.getString(EXTRA_SORT) ?: "")
         )
-        SortedUsersViewModel.providerViewModel(sortedUserViewModelFactory, type, condition)
+        SortedUsersViewModel.providerViewModel(sortedUserViewModelFactory, findUserQuery)
     }
 
     override fun onCreateView(

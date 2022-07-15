@@ -1,55 +1,173 @@
 package jp.panta.misskeyandroidclient.ui.explore
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
+import androidx.fragment.app.viewModels
+import com.google.android.material.composethemeadapter.MdcTheme
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentExploreBinding
-import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
-import jp.panta.misskeyandroidclient.viewmodel.explore.Explore
-import jp.panta.misskeyandroidclient.viewmodel.tags.SortedHashTagListViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.SortedUsersViewModel
+import jp.panta.misskeyandroidclient.ui.users.UserCardActionHandler
+import jp.panta.misskeyandroidclient.ui.users.UserDetailCard
+import jp.panta.misskeyandroidclient.ui.users.UserDetailCardAction
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.user.query.*
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class ExploreFragment : Fragment(R.layout.fragment_explore){
+@AndroidEntryPoint
+class ExploreFragment : Fragment() {
 
-    val binding: FragmentExploreBinding by dataBinding()
 
+    private val exploreViewModel: ExploreViewModel by viewModels()
+    private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
+
+    companion object {
+        fun newInstance(type: ExploreType): ExploreFragment {
+            return ExploreFragment().apply {
+                arguments = Bundle().apply {
+                    putInt("type", type.ordinal)
+                }
+            }
+        }
+    }
+
+
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val uiState by exploreViewModel.uiState.collectAsState()
+                MdcTheme {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(rememberNestedScrollInteropConnection())
+                    ) {
+                        for(item in uiState.states) {
+                            stickyHeader {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Text(
+                                        item.title,
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                }
+                            }
+                            when(val content = item.loadingState.content) {
+                                is StateContent.Exist -> {
+                                    items(content.rawContent.size) { i ->
+                                        UserDetailCard(
+                                            userDetail = content.rawContent[i],
+                                            isUserNameMain = false,
+                                            onAction = ::onAction
+                                        )
+                                    }
+                                }
+                                is StateContent.NotExist -> {
+                                    item {
+                                        Column(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            when(val state = item.loadingState) {
+                                                is ResultState.Error -> {
+                                                    Text("load error")
+                                                    Text(state.throwable.toString())
+                                                }
+                                                is ResultState.Fixed -> Text("no users")
+                                                is ResultState.Loading -> CircularProgressIndicator()
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }.rootView
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val queries = when (ExploreType.values()[requireArguments().getInt("type")]) {
+            ExploreType.Local -> {
+                listOf(
+                    ExploreItem(
+                        getString(R.string.trending_users),
+                        FindUsersQuery.trendingUser(),
+                    ),
+                    ExploreItem(
+                        getString(R.string.users_with_recent_activity),
+                        FindUsersQuery.usersWithRecentActivity(),
+                    ),
+                    ExploreItem(
+                        getString(R.string.newly_joined_users),
+                        FindUsersQuery.newlyJoinedUsers()
+                    )
 
-        val localExplores = listOf(
-            Explore.UserType( getString(R.string.trending_users), SortedUsersViewModel.Type.TRENDING_USER ),
-            Explore.UserType( getString(R.string.users_with_recent_activity), SortedUsersViewModel.Type.USERS_WITH_RECENT_ACTIVITY ),
-            Explore.UserType( getString(R.string.newly_joined_users), SortedUsersViewModel.Type.NEWLY_JOINED_USERS ),
-            Explore.Tag( getString(R.string.trending_tag), SortedHashTagListViewModel.Conditions(RequestHashTagList.Sort().attachedLocalUsers().asc(), isAttachedToLocalUserOnly = true)
-            )
+                )
+            }
+            ExploreType.Fediverse -> {
+                listOf(
+                    ExploreItem(
+                        getString(R.string.trending_users),
+                        FindUsersQuery.remoteTrendingUser()
+                    ),
+                    ExploreItem(
+                        getString(R.string.users_with_recent_activity),
+                        FindUsersQuery.remoteUsersWithRecentActivity(),
+                    ),
+                    ExploreItem(
+                        getString(R.string.newly_discovered_users),
+                        FindUsersQuery.newlyDiscoveredUsers()
+                    ),
+                )
+            }
+        }
+        exploreViewModel.setExplores(queries)
 
-        )
-
-        val exploreInLocalAdapter = ExploresAdapter()
-        exploreInLocalAdapter.submitList(localExplores)
-        binding.exploresLocalView.adapter = exploreInLocalAdapter
-        binding.exploresLocalView.layoutManager = LinearLayoutManager(view.context)
-
-        val remoteExplores = listOf(
-            Explore.UserType( getString(R.string.trending_users), SortedUsersViewModel.Type.REMOTE_TRENDING_USER ),
-            Explore.UserType( getString(R.string.users_with_recent_activity), SortedUsersViewModel.Type.REMOTE_USERS_WITH_RECENT_ACTIVITY ),
-            Explore.UserType( getString(R.string.newly_discovered_users), SortedUsersViewModel.Type.NEWLY_DISCOVERED_USERS ),
-            Explore.Tag( getString(R.string.trending_tag), SortedHashTagListViewModel.Conditions(RequestHashTagList.Sort().attachedRemoteUsers().asc(), isAttachedToRemoteUserOnly = true))
-
-        )
-
-        val exploreInRemoteAdapter = ExploresAdapter()
-        binding.exploresRemoteView.adapter = exploreInRemoteAdapter
-        binding.exploresRemoteView.layoutManager = LinearLayoutManager(view.context)
-        exploreInRemoteAdapter.submitList(remoteExplores)
     }
+
+    fun onAction(event: UserDetailCardAction) {
+        UserCardActionHandler(requireActivity(), toggleFollowViewModel)
+            .onAction(event)
+    }
+}
+
+enum class ExploreType {
+    Local, Fediverse,
 }
