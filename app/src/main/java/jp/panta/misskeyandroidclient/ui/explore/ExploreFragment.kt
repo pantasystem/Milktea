@@ -13,8 +13,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -47,7 +50,7 @@ class ExploreFragment : Fragment() {
     }
 
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,12 +61,15 @@ class ExploreFragment : Fragment() {
                 val uiState by exploreViewModel.uiState.collectAsState()
                 MdcTheme {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(rememberNestedScrollInteropConnection())
                     ) {
                         for(item in uiState.states) {
                             stickyHeader {
                                 Surface(
-                                    modifier = Modifier.padding(4.dp)
+                                    modifier = Modifier
+                                        .padding(4.dp)
                                         .fillMaxWidth()
                                 ) {
                                     Text(item.title)
