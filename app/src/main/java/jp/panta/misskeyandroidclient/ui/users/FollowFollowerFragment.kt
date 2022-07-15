@@ -13,10 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.Activities
-import jp.panta.misskeyandroidclient.FollowFollowerActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.FollowFollowerViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
@@ -86,47 +82,7 @@ class FollowFollowerFragment : Fragment() {
     fun onAction(it: UserDetailCardPageableListAction) {
         when (it) {
             is UserDetailCardPageableListAction.CardAction -> {
-                when (it.cardAction) {
-                    is UserDetailCardAction.FollowersCountClicked -> {
-                        startActivity(
-                            FollowFollowerActivity.newIntent(
-                                requireActivity(),
-                                userId = it.cardAction.userId,
-                                isFollowing = false,
-                            )
-                        )
-                    }
-                    is UserDetailCardAction.FollowingsCountClicked -> {
-                        startActivity(
-                            FollowFollowerActivity.newIntent(
-                                requireActivity(),
-                                userId = it.cardAction.userId,
-                                isFollowing = true,
-                            )
-                        )
-                    }
-                    is UserDetailCardAction.NotesCountClicked -> {
-                        val intent = UserDetailActivity.newInstance(
-                            requireActivity(),
-                            userId = it.cardAction.userId
-                        )
-                        intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-                        requireActivity().startActivity(intent)
-                    }
-                    is UserDetailCardAction.OnCardClicked -> {
-                        val intent = UserDetailActivity.newInstance(
-                            requireActivity(),
-                            userId = it.cardAction.userId
-                        )
-                        intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-                        requireActivity().startActivity(intent)
-                    }
-                    is UserDetailCardAction.ToggleFollow -> {
-                        viewModel.toggleFollow(it.cardAction.userId)
-                    }
-                }
+                UserCardActionHandler(requireActivity(), viewModel).onAction(it.cardAction)
             }
             UserDetailCardPageableListAction.OnBottomReached -> {
                 followFollowerViewModel.loadOld()

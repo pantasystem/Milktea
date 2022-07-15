@@ -25,7 +25,10 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
+import jp.panta.misskeyandroidclient.ui.users.UserCardActionHandler
 import jp.panta.misskeyandroidclient.ui.users.UserDetailCard
+import jp.panta.misskeyandroidclient.ui.users.UserDetailCardAction
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ResultState
@@ -39,6 +42,7 @@ class ExploreFragment : Fragment() {
 
 
     private val exploreViewModel: ExploreViewModel by viewModels()
+    private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
 
     companion object {
         fun newInstance(type: ExploreType): ExploreFragment {
@@ -85,7 +89,7 @@ class ExploreFragment : Fragment() {
                                         UserDetailCard(
                                             userDetail = content.rawContent[i],
                                             isUserNameMain = false,
-                                            onAction = {}
+                                            onAction = ::onAction
                                         )
                                     }
                                 }
@@ -156,6 +160,11 @@ class ExploreFragment : Fragment() {
         }
         exploreViewModel.setExplores(queries)
 
+    }
+
+    fun onAction(event: UserDetailCardAction) {
+        UserCardActionHandler(requireActivity(), toggleFollowViewModel)
+            .onAction(event)
     }
 }
 
