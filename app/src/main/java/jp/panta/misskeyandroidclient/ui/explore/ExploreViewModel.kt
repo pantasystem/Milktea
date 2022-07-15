@@ -59,7 +59,7 @@ class ExploreViewModel @Inject constructor(
         ExploreUiState(list)
     }.catch { e ->
         FirebaseCrashlytics.getInstance().recordException(e)
-    }.stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
+    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
 
 
     fun setExplores(list: List<ExploreItem>) {
