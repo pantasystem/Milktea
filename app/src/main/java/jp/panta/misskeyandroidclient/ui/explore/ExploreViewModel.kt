@@ -23,7 +23,7 @@ class ExploreViewModel @Inject constructor(
     val userDataSource: UserDataSource,
     val userRepository: UserRepository
 ): ViewModel() {
-    val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
+    private val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
 
     val uiState = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
         findUsers.map { list ->
@@ -34,7 +34,9 @@ class ExploreViewModel @Inject constructor(
             }
         }
     }.flatMapLatest { exploreItems ->
-        userDataSource.state.flatMapLatest { usersState ->
+        userDataSource.state.distinctUntilChangedBy {
+            it.usersMap.keys.toSet()
+        }.flatMapLatest { usersState ->
             combine(exploreItems.map { it.second }) { states ->
                 states.toList()
             }.map { list ->
