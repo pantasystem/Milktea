@@ -29,10 +29,10 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                find(targetNote.id)
+                find(targetNote.id).getOrThrow()
             } doReturn targetNote
             onBlocking {
-                unreaction(targetNote.id)
+                unreaction(targetNote.id).getOrThrow()
             } doReturn true
         }
 
@@ -96,13 +96,13 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                find(targetNote.id)
+                find(targetNote.id).getOrThrow()
             } doReturn targetNote
             onBlocking {
-                unreaction(targetNote.id)
+                unreaction(targetNote.id).getOrThrow()
             } doReturn true
             onBlocking {
-                reaction(createReactionDTO)
+                reaction(createReactionDTO).getOrThrow()
             } doReturn true
         }
 
@@ -173,10 +173,10 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                reaction(createReactionDTO)
+                reaction(createReactionDTO).getOrThrow()
             } doReturn true
             onBlocking {
-                find(targetNote.id)
+                find(targetNote.id).getOrThrow()
             } doReturn targetNote
         }
 
@@ -241,10 +241,10 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                reaction(createReactionDTO)
+                reaction(createReactionDTO).getOrThrow()
             } doReturn true
             onBlocking {
-                find(targetNote.id)
+                find(targetNote.id).getOrThrow()
             } doReturn targetNote
         }
 
@@ -302,10 +302,10 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                reaction(createReactionDTO)
+                reaction(createReactionDTO).getOrThrow()
             } doReturn true
             onBlocking {
-                find(targetNote.id)
+                find(targetNote.id).getOrThrow()
             } doReturn targetNote
         }
 
@@ -364,10 +364,10 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                reaction(createReactionDTO)
+                reaction(createReactionDTO).getOrThrow()
             } doReturn true
             onBlocking {
-                find(targetNote.id)
+                find(targetNote.id).getOrThrow()
             } doReturn targetNote
         }
 
