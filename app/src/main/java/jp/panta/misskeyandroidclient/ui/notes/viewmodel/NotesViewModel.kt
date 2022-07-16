@@ -6,9 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,7 +81,6 @@ class NotesViewModel @Inject constructor(
 
     val showNoteEvent = EventBus<Note>()
 
-    val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
     val showInputReactionEvent = EventBus<Unit>()
 
