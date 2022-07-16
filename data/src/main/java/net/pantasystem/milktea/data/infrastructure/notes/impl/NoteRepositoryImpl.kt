@@ -120,23 +120,28 @@ class NoteRepositoryImpl @Inject constructor(
         return noteDataSource.getIn(noteIds)
     }
 
-    override suspend fun reaction(createReaction: CreateReaction): Boolean {
+    override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCatching {
         val account = getAccount.get(createReaction.noteId.accountId)
         val note = find(createReaction.noteId).getOrThrow()
 
-        return runCatching {
+        runCatching {
             if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
                     .isCaptured(createReaction.noteId.noteId)) {
                 noteDataSource.add(note.onIReacted(createReaction.reaction))
             }
             true
-        }.getOrElse { false }
+        }.getOrElse { e ->
+            if (e is APIError.ClientException) {
+                return@getOrElse false
+            }
+            throw e
+        }
     }
 
-    override suspend fun unreaction(noteId: Note.Id): Boolean {
+    override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCatching {
         val note = find(noteId).getOrThrow()
         val account = getAccount.get(noteId.accountId)
-        return postUnReaction(noteId)
+        postUnReaction(noteId)
                 && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
                 && noteDataSource.add(note.onIUnReacted()) != AddResult.CANCEL))

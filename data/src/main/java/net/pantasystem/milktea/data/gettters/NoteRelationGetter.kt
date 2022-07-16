@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.gettters
 
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
