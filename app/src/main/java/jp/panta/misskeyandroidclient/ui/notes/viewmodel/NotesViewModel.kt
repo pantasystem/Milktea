@@ -256,9 +256,7 @@ class NotesViewModel @Inject constructor(
 
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                noteRepository.delete(noteId)
-            }.onSuccess {
+            noteRepository.delete(noteId).onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "削除に成功しました"
                 }
@@ -273,7 +271,7 @@ class NotesViewModel @Inject constructor(
 
                 val dn = draftNoteRepository.save(note.toDraftNote())
                     .getOrThrow()
-                noteRepository.delete(note.note.id)
+                noteRepository.delete(note.note.id).getOrThrow()
                 dn
             }.onSuccess {
                 withContext(Dispatchers.Main) {
@@ -289,13 +287,9 @@ class NotesViewModel @Inject constructor(
     fun unRenote(planeNoteViewData: PlaneNoteViewData) {
         if (planeNoteViewData.isRenotedByMe) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
-                    noteRepository.delete(planeNoteViewData.note.note.id)
-                }.onSuccess {
-                    if (it) {
-                        withContext(Dispatchers.Main) {
-                            statusMessage.event = "削除に成功しました"
-                        }
+                noteRepository.delete(planeNoteViewData.note.note.id).onSuccess {
+                    withContext(Dispatchers.Main) {
+                        statusMessage.event = "削除に成功しました"
                     }
                 }.onFailure { t ->
                     Log.d(TAG, "unrenote失敗", t)

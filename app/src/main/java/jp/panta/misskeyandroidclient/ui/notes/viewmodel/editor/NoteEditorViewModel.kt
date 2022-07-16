@@ -89,9 +89,7 @@ class NoteEditorViewModel @Inject constructor(
     //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
     val reply = _state.map {
         it.replyId?.let { noteId ->
-            runCatching {
-                noteRepository.find(noteId)
-            }.getOrNull()
+            noteRepository.find(noteId).getOrNull()
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
 
@@ -229,7 +227,7 @@ class NoteEditorViewModel @Inject constructor(
         _state.map {
             it.replyId
         }.distinctUntilChanged().filterNotNull().map {
-            noteRepository.find(it)
+            noteRepository.find(it).getOrThrow()
         }.map {
             userRepository.find(it.userId)
         }.onEach { note ->

@@ -33,10 +33,10 @@ class CreateRenoteUseCaseTest {
         )
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                create(any())
+                create(any()).getOrThrow()
             } doReturn generateEmptyNote()
             onBlocking {
-                find(any())
+                find(any()).getOrThrow()
             } doReturn target
         }
         val useCase = CreateRenoteUseCase(
@@ -62,10 +62,10 @@ class CreateRenoteUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                create(any())
+                create(any()).getOrThrow()
             } doReturn generateEmptyNote()
             onBlocking {
-                find(any())
+                find(any()).getOrThrow()
             } doReturn target
         }
 

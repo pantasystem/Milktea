@@ -63,7 +63,7 @@ class ReactionHistoryPagerViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             noteId.filterNotNull().flatMapLatest {
                 suspend {
-                    noteRepository.find(it)
+                    noteRepository.find(it).getOrThrow()
                 }.asLoadingStateFlow()
             }.collect()
         }

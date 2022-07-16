@@ -39,7 +39,7 @@ class ToggleReactionUseCase @Inject constructor(
                 } else {
                     "👍"
                 }
-            val note = noteRepository.find(noteId)
+            val note = noteRepository.find(noteId).getOrThrow()
             if (note.myReaction.isNullOrBlank()) {
                 if (noteRepository.reaction(CreateReaction(noteId, sendReaction))) {
                     reactionHistoryDao.insert(ReactionHistory(sendReaction, account.instanceDomain))
