@@ -25,47 +25,6 @@ import net.pantasystem.milktea.model.file.File
 object MediaPreviewHelper {
 
 
-//    @BindingAdapter("thumbnailView", "playButton", "fileViewData", "fileViewDataList")
-//    @JvmStatic
-//    fun FrameLayout.setClickWhenShowMediaActivityListener(
-//        thumbnailView: ImageView,
-//        playButton: ImageButton,
-//        fileViewData: FileViewData?,
-//        fileViewDataList: List<FileViewData>?
-//    ) {
-//        //setPreview(thumbnailView, playButton, fileViewData?.file)
-//        fileViewData ?: return
-//
-//        if (fileViewDataList.isNullOrEmpty()) {
-//            return
-//        }
-//        val listener = View.OnClickListener {
-//            val context = it.context
-//            val intent = Intent(context, MediaActivity::class.java)
-//            intent.putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(fileViewDataList.map { fvd ->
-//                fvd.file
-//            }))
-//            intent.putExtra(
-//                MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX,
-//                fileViewDataList.indexOfFirst { f ->
-//                    f === fileViewData
-//                })
-//            if (context is Activity) {
-//                val compat = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                    context,
-//                    thumbnailView,
-//                    "image"
-//                )
-//                context.startActivity(intent, compat.toBundle())
-//
-//            } else {
-//                context.startActivity(intent)
-//            }
-//        }
-//        thumbnailView.setOnClickListener(listener)
-//        playButton.setOnClickListener(listener)
-//    }
-
     @BindingAdapter("thumbnailView", "playButton", "previewAbleFile", "previewAbleFileList")
     @JvmStatic
     fun FrameLayout.setClickWhenShowMediaActivityListener(
@@ -147,20 +106,6 @@ object MediaPreviewHelper {
             .centerCrop()
             .into(this)
     }
-
-//    @BindingAdapter("thumbnailView")
-//    @JvmStatic
-//    fun ImageView.setPreview(file: FileViewData?) {
-//        Log.d("MediaPreviewHelper", "setPreview:${file?.file}")
-//        if (this.visibility == View.GONE || file == null) {
-//            this.setImageResource(0)
-//            return
-//        }
-//        Glide.with(this)
-//            .load(file.file.thumbnailUrl)
-//            .centerCrop()
-//            .into(this)
-//    }
 
     private fun setPreview(
         thumbnailView: ImageView,
