@@ -20,9 +20,7 @@ class CreateNoteUseCase @Inject constructor(
 
     suspend operator fun invoke(createNote: CreateNote): Result<Note> {
         return runCatching {
-            val createNoteResult = runCatching {
-                noteRepository.create(createNote)
-            }
+            val createNoteResult = noteRepository.create(createNote)
             if (createNoteResult.isFailure) {
                 draftNoteService.save(createNote)
             }

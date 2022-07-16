@@ -14,8 +14,8 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.paginator.PreviousPagingController
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelListType
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelPagingModel
+import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
+import net.pantasystem.milktea.data.infrastructure.channel.ChannelPagingModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Pageable

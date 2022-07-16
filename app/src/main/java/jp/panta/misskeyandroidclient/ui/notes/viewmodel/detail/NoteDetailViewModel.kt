@@ -63,6 +63,7 @@ class NoteDetailViewModel @AssistedInject constructor(
             try {
                 val account = getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
+                    .getOrThrow()
 
                 val noteDetail = noteRelationGetter.get(note).getOrThrow()
 

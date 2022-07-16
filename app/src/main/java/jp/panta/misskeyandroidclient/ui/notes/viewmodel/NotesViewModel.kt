@@ -6,9 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,7 +81,6 @@ class NotesViewModel @Inject constructor(
 
     val showNoteEvent = EventBus<Note>()
 
-    val targetFile = EventBus<Pair<FileViewData, MediaViewData>>()
 
     val showInputReactionEvent = EventBus<Unit>()
 
@@ -222,7 +219,7 @@ class NotesViewModel @Inject constructor(
         if (planeNoteViewData.myReaction.value.isNullOrBlank()) {
             return
         }
-        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id)
+        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id).getOrThrow()
     }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
@@ -259,9 +256,7 @@ class NotesViewModel @Inject constructor(
 
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                noteRepository.delete(noteId)
-            }.onSuccess {
+            noteRepository.delete(noteId).onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "削除に成功しました"
                 }
@@ -276,7 +271,7 @@ class NotesViewModel @Inject constructor(
 
                 val dn = draftNoteRepository.save(note.toDraftNote())
                     .getOrThrow()
-                noteRepository.delete(note.note.id)
+                noteRepository.delete(note.note.id).getOrThrow()
                 dn
             }.onSuccess {
                 withContext(Dispatchers.Main) {
@@ -292,13 +287,9 @@ class NotesViewModel @Inject constructor(
     fun unRenote(planeNoteViewData: PlaneNoteViewData) {
         if (planeNoteViewData.isRenotedByMe) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
-                    noteRepository.delete(planeNoteViewData.note.note.id)
-                }.onSuccess {
-                    if (it) {
-                        withContext(Dispatchers.Main) {
-                            statusMessage.event = "削除に成功しました"
-                        }
+                noteRepository.delete(planeNoteViewData.note.note.id).onSuccess {
+                    withContext(Dispatchers.Main) {
+                        statusMessage.event = "削除に成功しました"
                     }
                 }.onFailure { t ->
                     Log.d(TAG, "unrenote失敗", t)

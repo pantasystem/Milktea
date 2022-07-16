@@ -17,7 +17,7 @@ class CreateRenoteUseCase @Inject constructor(
 
     suspend operator fun invoke(noteId: Note.Id): Result<Note> {
         return runCatching {
-            val note = noteRepository.find(noteId)
+            val note = noteRepository.find(noteId).getOrThrow()
             val account = getAccount.get(noteId.accountId)
             if (note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))) {
                 noteRepository.create(CreateNote(
@@ -25,7 +25,7 @@ class CreateRenoteUseCase @Inject constructor(
                     text = null,
                     visibility = note.visibility,
                     renoteId = noteId,
-                ))
+                )).getOrThrow()
             } else {
                 throw IllegalArgumentException()
             }

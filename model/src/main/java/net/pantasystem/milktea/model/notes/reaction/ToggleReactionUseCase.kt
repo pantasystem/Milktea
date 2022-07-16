@@ -39,18 +39,18 @@ class ToggleReactionUseCase @Inject constructor(
                 } else {
                     "👍"
                 }
-            val note = noteRepository.find(noteId)
+            val note = noteRepository.find(noteId).getOrThrow()
             if (note.myReaction.isNullOrBlank()) {
-                if (noteRepository.reaction(CreateReaction(noteId, sendReaction))) {
+                if (noteRepository.reaction(CreateReaction(noteId, sendReaction)).getOrThrow()) {
                     reactionHistoryDao.insert(ReactionHistory(sendReaction, account.instanceDomain))
                 }
             } else if (note.myReaction != sendReaction) {
-                noteRepository.unreaction(noteId)
-                if (noteRepository.reaction(CreateReaction(noteId, sendReaction))) {
+                noteRepository.unreaction(noteId).getOrThrow()
+                if (noteRepository.reaction(CreateReaction(noteId, sendReaction)).getOrThrow()) {
                     reactionHistoryDao.insert(ReactionHistory(sendReaction, account.instanceDomain))
                 }
             } else {
-                noteRepository.unreaction(noteId)
+                noteRepository.unreaction(noteId).getOrThrow()
             }
         }
     }

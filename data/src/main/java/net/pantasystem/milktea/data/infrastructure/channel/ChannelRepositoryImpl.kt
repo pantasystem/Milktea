@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.channel.impl
+package net.pantasystem.milktea.data.infrastructure.channel
 
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.*

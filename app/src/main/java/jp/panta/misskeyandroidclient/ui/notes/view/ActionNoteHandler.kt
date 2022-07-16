@@ -15,10 +15,8 @@ import jp.panta.misskeyandroidclient.ui.notes.view.renote.RenotesBottomSheetDial
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.SelectedReaction
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import jp.panta.misskeyandroidclient.viewmodel.file.FileViewData
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmEvent
 import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
@@ -94,18 +92,7 @@ class ActionNoteHandler(
     private val showNoteEventObserver = Observer<Note> {
         activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
     }
-    private val fileTargetObserver = Observer<Pair<FileViewData, MediaViewData>> {
-        Log.d("ActionNoteHandler", "${it.first.file}")
-        val list = it.second.files.value!!.map { fv ->
-            fv.file
-        }
-        val index = it.second.files.value!!.indexOfFirst { fv ->
-            fv.file == it.first.file
-        }
-        val intent = net.pantasystem.milktea.media.MediaActivity.newInstance(activity, list, index)
-        activity.startActivity(intent)
-        //val intent =
-    }
+
 
     private val reactionInputObserver = Observer<Unit> {
         val dialog = ReactionInputDialog()
@@ -209,8 +196,6 @@ class ActionNoteHandler(
         mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
         mNotesViewModel.reactionTarget.observe(activity, reactionTargetObserver)
 
-        mNotesViewModel.targetFile.removeObserver(fileTargetObserver)
-        mNotesViewModel.targetFile.observe(activity, fileTargetObserver)
 
         mNotesViewModel.showInputReactionEvent.removeObserver(reactionInputObserver)
         mNotesViewModel.showInputReactionEvent.observe(activity, reactionInputObserver)

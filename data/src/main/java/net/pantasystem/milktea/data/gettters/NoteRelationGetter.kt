@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.gettters
 
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
@@ -16,11 +15,7 @@ class NoteRelationGetter @Inject constructor(
     private val noteRepository: NoteRepository,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val loggerFactory: Logger.Factory
 ) {
-    private val logger: Logger by lazy {
-        loggerFactory.create("NoteRelationGetter")
-    }
 
     suspend fun get(
         noteId: Note.Id,
@@ -32,7 +27,7 @@ class NoteRelationGetter @Inject constructor(
     ): Result<NoteRelation?> {
         return runCatching {
             notesMap.getOrElse(noteId) {
-                noteRepository.find(noteId)
+                noteRepository.find(noteId).getOrThrow()
             }
         }.mapCatching {
             get(

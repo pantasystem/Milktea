@@ -6,8 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.data.infrastructure.group.impl.GroupRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.group.impl.InMemoryGroupDataSource
+import net.pantasystem.milktea.data.infrastructure.group.GroupRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.group.InMemoryGroupDataSource
 import javax.inject.Singleton
 
 @Module

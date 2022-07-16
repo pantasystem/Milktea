@@ -42,7 +42,7 @@ class NoteRepositoryImpl @Inject constructor(
         NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
     }
 
-    override suspend fun create(createNote: CreateNote): Note {
+    override suspend fun create(createNote: CreateNote): Result<Note> = runCatching {
         val task = PostNoteTask(
             encryption,
             createNote,
@@ -62,18 +62,19 @@ class NoteRepositoryImpl @Inject constructor(
 
         val noteDTO = result.getOrThrow()
         require(noteDTO != null)
-        return noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
-
+        noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
     }
 
-    override suspend fun delete(noteId: Note.Id): Boolean {
+    override suspend fun delete(noteId: Note.Id): Result<Unit> {
         val account = getAccount.get(noteId.accountId)
-        return misskeyAPIProvider.get(account).delete(
-            DeleteNote(i = account.getI(encryption), noteId = noteId.noteId)
-        ).isSuccessful
+        return runCatching {
+            misskeyAPIProvider.get(account).delete(
+                DeleteNote(i = account.getI(encryption), noteId = noteId.noteId)
+            ).throwIfHasError()
+        }
     }
 
-    override suspend fun find(noteId: Note.Id): Note {
+    override suspend fun find(noteId: Note.Id): Result<Note> = runCatching {
         val account = getAccount.get(noteId.accountId)
 
         var note = try {
@@ -85,7 +86,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
 
         if (note != null) {
-            return note
+            return@runCatching note
         }
 
         logger.debug("request notes/show=$noteId")
@@ -103,7 +104,7 @@ class NoteRepositoryImpl @Inject constructor(
             noteDataSource.remove(noteId)
             null
         }
-        return note ?: throw NoteNotFoundException(noteId)
+        note ?: throw NoteNotFoundException(noteId)
     }
 
     override suspend fun findIn(noteIds: List<Note.Id>): List<Note> {
@@ -119,23 +120,28 @@ class NoteRepositoryImpl @Inject constructor(
         return noteDataSource.getIn(noteIds)
     }
 
-    override suspend fun reaction(createReaction: CreateReaction): Boolean {
+    override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCatching {
         val account = getAccount.get(createReaction.noteId.accountId)
-        val note = find(createReaction.noteId)
+        val note = find(createReaction.noteId).getOrThrow()
 
-        return runCatching {
+        runCatching {
             if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
                     .isCaptured(createReaction.noteId.noteId)) {
                 noteDataSource.add(note.onIReacted(createReaction.reaction))
             }
             true
-        }.getOrElse { false }
+        }.getOrElse { e ->
+            if (e is APIError.ClientException) {
+                return@getOrElse false
+            }
+            throw e
+        }
     }
 
-    override suspend fun unreaction(noteId: Note.Id): Boolean {
-        val note = find(noteId)
+    override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCatching {
+        val note = find(noteId).getOrThrow()
         val account = getAccount.get(noteId.accountId)
-        return postUnReaction(noteId)
+        postUnReaction(noteId)
                 && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
                 && noteDataSource.add(note.onIUnReacted()) != AddResult.CANCEL))
@@ -155,7 +161,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     private suspend fun postUnReaction(noteId: Note.Id): Boolean {
-        val note = find(noteId)
+        val note = find(noteId).getOrThrow()
         val account = getAccount.get(noteId.accountId)
         val res = misskeyAPIProvider.get(account).deleteReaction(
             DeleteNote(

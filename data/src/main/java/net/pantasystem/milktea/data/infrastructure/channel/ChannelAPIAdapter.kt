@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.channel.impl
+package net.pantasystem.milktea.data.infrastructure.channel
 
 import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import net.pantasystem.milktea.model.channel.Channel
