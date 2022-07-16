@@ -12,7 +12,7 @@ interface NoteRepository {
 
     suspend fun findIn(noteIds: List<Note.Id>): List<Note>
 
-    suspend fun reaction(createReaction: CreateReaction): Boolean
+    suspend fun reaction(createReaction: CreateReaction): Result<Boolean>
 
-    suspend fun unreaction(noteId: Note.Id): Boolean
+    suspend fun unreaction(noteId: Note.Id): Result<Boolean>
 }

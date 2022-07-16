@@ -219,7 +219,7 @@ class NotesViewModel @Inject constructor(
         if (planeNoteViewData.myReaction.value.isNullOrBlank()) {
             return
         }
-        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id)
+        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id).getOrThrow()
     }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
