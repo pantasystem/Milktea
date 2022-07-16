@@ -6,10 +6,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelAPIAdapter
+import net.pantasystem.milktea.data.infrastructure.channel.ChannelAPIAdapter
 import net.pantasystem.milktea.model.channel.ChannelStateModel
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelAPIAdapterWebImpl
-import net.pantasystem.milktea.data.infrastructure.channel.impl.ChannelRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.channel.ChannelAPIAdapterWebImpl
+import net.pantasystem.milktea.data.infrastructure.channel.ChannelRepositoryImpl
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.channel.ChannelStateModelOnMemory

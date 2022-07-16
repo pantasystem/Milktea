@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.channel.impl
+package net.pantasystem.milktea.data.infrastructure.channel
 
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

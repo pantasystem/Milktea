@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.group.impl
+package net.pantasystem.milktea.data.infrastructure.group
 
 
 import net.pantasystem.milktea.api.misskey.groups.*

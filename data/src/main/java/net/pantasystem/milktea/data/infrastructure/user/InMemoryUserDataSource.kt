@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.user.impl
+package net.pantasystem.milktea.data.infrastructure.user
 
 
 import kotlinx.coroutines.flow.MutableStateFlow

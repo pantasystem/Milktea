@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.user.impl
+package net.pantasystem.milktea.data.infrastructure.user
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -186,7 +186,7 @@ internal class DefaultPaginator(
     private val logger: Logger?,
     override val idHolder: IdHolder,
 
-) : Paginator {
+    ) : Paginator {
 
 
     private val api =

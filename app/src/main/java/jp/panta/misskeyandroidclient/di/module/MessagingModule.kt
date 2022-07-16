@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.infrastructure.messaging.impl.*
+import net.pantasystem.milktea.data.infrastructure.messaging.*
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.*
 import javax.inject.Singleton

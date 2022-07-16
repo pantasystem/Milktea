@@ -20,8 +20,8 @@ import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotific
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
-import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDAO
-import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameDTO
+import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
+import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao

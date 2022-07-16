@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.model.users.nickname
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import kotlinx.coroutines.runBlocking
-import net.pantasystem.milktea.data.infrastructure.user.impl.InMemoryUserDataSource
-import net.pantasystem.milktea.data.infrastructure.user.impl.UserNicknameRepositoryOnMemoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
+import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOnMemoryImpl
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UserNickname

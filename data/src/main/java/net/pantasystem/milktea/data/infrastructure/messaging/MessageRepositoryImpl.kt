@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.messaging.impl
+package net.pantasystem.milktea.data.infrastructure.messaging
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.gallery.impl
+package net.pantasystem.milktea.data.infrastructure.gallery
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.messaging.impl
+package net.pantasystem.milktea.data.infrastructure.messaging
 
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError

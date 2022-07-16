@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.model.list.UserListRepository
-import net.pantasystem.milktea.data.infrastructure.list.impl.UserListRepositoryWebAPIImpl
+import net.pantasystem.milktea.data.infrastructure.list.UserListRepositoryWebAPIImpl
 import javax.inject.Singleton
 
 @Module

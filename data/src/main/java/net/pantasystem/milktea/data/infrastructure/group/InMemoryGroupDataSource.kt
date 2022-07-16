@@ -1,11 +1,11 @@
-package net.pantasystem.milktea.data.infrastructure.group.impl
+package net.pantasystem.milktea.data.infrastructure.group
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupNotFoundException
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class InMemoryGroupDataSource @Inject constructor(): GroupDataSource {
