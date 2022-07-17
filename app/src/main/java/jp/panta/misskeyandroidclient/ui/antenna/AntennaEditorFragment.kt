@@ -17,6 +17,7 @@ import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.antenna.AntennaSource
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -177,25 +178,25 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
     }
 
     @FlowPreview
-    fun sourceToResourceString(src: AntennaEditorViewModel.Source): String{
+    fun sourceToResourceString(src: AntennaSource): String{
 
         return when(src){
-            AntennaEditorViewModel.Source.ALL -> getString(R.string.all_notes)
-            AntennaEditorViewModel.Source.HOME -> getString(R.string.notes_from_following_users)
-            AntennaEditorViewModel.Source.LIST -> getString(R.string.notes_from_specific_list)
-            AntennaEditorViewModel.Source.USERS -> getString(R.string.notes_from_specific_users)
-            AntennaEditorViewModel.Source.GROUP -> getString(R.string.notes_from_users_in_the_specified_group)
+            AntennaSource.All -> getString(R.string.all_notes)
+            AntennaSource.Home -> getString(R.string.notes_from_following_users)
+            AntennaSource.List -> getString(R.string.notes_from_specific_list)
+            AntennaSource.Users -> getString(R.string.notes_from_specific_users)
+            AntennaSource.Group -> getString(R.string.notes_from_users_in_the_specified_group)
         }
     }
 
     @FlowPreview
-    fun resourceStringToSource(str: String): AntennaEditorViewModel.Source?{
+    fun resourceStringToSource(str: String): AntennaSource?{
         return when(str){
-            getString(R.string.all_notes) -> AntennaEditorViewModel.Source.ALL
-            getString(R.string.notes_from_following_users) -> AntennaEditorViewModel.Source.HOME
-            getString(R.string.notes_from_specific_list) ->  AntennaEditorViewModel.Source.LIST
-            getString(R.string.notes_from_specific_users) ->  AntennaEditorViewModel.Source.USERS
-            getString(R.string.notes_from_users_in_the_specified_group) -> AntennaEditorViewModel.Source.GROUP
+            getString(R.string.all_notes) -> AntennaSource.All
+            getString(R.string.notes_from_following_users) -> AntennaSource.Home
+            getString(R.string.notes_from_specific_list) ->  AntennaSource.List
+            getString(R.string.notes_from_specific_users) ->  AntennaSource.Users
+            getString(R.string.notes_from_users_in_the_specified_group) -> AntennaSource.Group
             else -> null
         }
     }

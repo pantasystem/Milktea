@@ -1,10 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
@@ -14,15 +11,15 @@ import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
-import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.antenna.*
 import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -37,6 +34,7 @@ class AntennaEditorViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val encryption: Encryption,
+    private val antennaRepository: AntennaRepository,
 ) : ViewModel(){
 
 
@@ -65,23 +63,41 @@ class AntennaEditorViewModel @Inject constructor(
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
-    enum class Source(val remote: String){
-        HOME("home"), ALL("all"), USERS("users"), LIST("list"), GROUP("group")
-    }
 
     val name = MediatorLiveData<String>().apply{
         addSource(this@AntennaEditorViewModel.antenna){
             this.value = it?.name?: ""
         }
     }
-    val source = MediatorLiveData<Source>().apply{
+    val source = MediatorLiveData<AntennaSource>().apply{
         addSource(this@AntennaEditorViewModel.antenna){ a ->
             Log.d("AntennaEditorVM", "antenna:$a")
-            this.value = Source.values().firstOrNull {
-                a?.src ==  it.remote
-            }?: Source.ALL
+            this.value = AntennaSource.values().firstOrNull {
+                a?.src ==  it
+            }?: AntennaSource.All
         }
     }
+
+    val isAll = Transformations.map(source) {
+        it is AntennaSource.All
+    }
+
+    val isHome = Transformations.map(source) {
+        it is AntennaSource.Home
+    }
+
+    val isList = Transformations.map(source) {
+        it is AntennaSource.List
+    }
+
+    val isUsers = Transformations.map(source) {
+        it is AntennaSource.Users
+    }
+
+    val isGroup = Transformations.map(source) {
+        it is AntennaSource.Users
+    }
+
     val keywords = MediatorLiveData<String>().apply{
         addSource(this@AntennaEditorViewModel.antenna){
             this.value = setupKeywords(it?.keywords)
@@ -205,14 +221,13 @@ class AntennaEditorViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
                 val antenna = mAntenna.value
-                val request = AntennaToAdd(
-                    account.getI(encryption),
-                    _antennaId.value?.antennaId,
+                val params = SaveAntennaParam(
                     name.value ?: antenna?.name ?: "",
-                    source.value?.remote!!,
-                    userList.value?.id,
+                    source.value ?: AntennaSource.All,
+                    userList.value?.id?.let {
+                        UserList.Id(account.accountId, it)
+                    },
                     null,
                     toListKeywords(keywords.value ?: ""),
                     toListKeywords(excludeKeywords.value ?: ""),
@@ -221,21 +236,19 @@ class AntennaEditorViewModel @Inject constructor(
                     withFile.value ?: false,
                     withReplies.value ?: false,
                     notify.value ?: false,
-
                     )
-                val res = if(_antennaId.value == null) {
-                    api.createAntenna(request)
-                }else{
-                    api.updateAntenna(request)
+                if (antenna == null) {
+                    antennaRepository.create(account.accountId, params)
+                        .getOrThrow()
+                } else {
+                    antennaRepository.update(antenna.id, params)
+                        .getOrThrow()
                 }
-
-                res.body()?.toEntity(account)
             }.onSuccess {
                 withContext(Dispatchers.Main) {
-                    antennaAddedStateEvent.event = it != null
+                    antennaAddedStateEvent.event = true
                     mAntenna.value = it
                 }
-
             }.onFailure {
                 withContext(Dispatchers.Main) {
                     antennaAddedStateEvent.event = false
