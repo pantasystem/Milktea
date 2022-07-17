@@ -61,4 +61,19 @@ class AntennaRepositoryImpl @Inject constructor(
             .body()
             ?.toEntity(account)!!
     }
+
+    override suspend fun find(antennaId: Antenna.Id): Result<Antenna> = runCatching {
+        val account = getAccount.get(antennaId.accountId)
+        val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
+
+        val res = api.showAntenna(
+            AntennaQuery(
+                i = account.getI(
+                    encryption
+                ), antennaId = antennaId.antennaId, limit = null
+            )
+        )
+        res.throwIfHasError()
+        res.body()?.toEntity(account)!!
+    }
 }
