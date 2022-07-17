@@ -17,13 +17,14 @@ import jp.panta.misskeyandroidclient.databinding.DialogReactionHistoryPagerBindi
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerUiState
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionHistoryPagerViewModel
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
@@ -48,7 +49,10 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
     lateinit var binding: DialogReactionHistoryPagerBinding
 
-    val pagerViewModel by viewModels<ReactionHistoryPagerViewModel>()
+    private val pagerViewModel by viewModels<ReactionHistoryPagerViewModel>()
+
+    @Inject
+    internal lateinit var reactionHistoryDataSource: ReactionHistoryDataSource
 
     private val aId: Long by lazy(LazyThreadSafetyMode.NONE) {
         requireArguments().getLong(EXTRA_ACCOUNT_ID, -1).apply {
@@ -162,9 +166,8 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        val miCore = requireContext().applicationContext as MiCore
         requireActivity().lifecycleScope.launch(Dispatchers.IO) {
-            miCore.getReactionHistoryDataSource().clear(noteId)
+            reactionHistoryDataSource.clear(noteId)
         }
     }
 }
