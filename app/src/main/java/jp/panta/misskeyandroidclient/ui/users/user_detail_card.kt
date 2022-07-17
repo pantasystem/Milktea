@@ -144,7 +144,7 @@ fun UserDetailCard(
                     }
             )
 
-                CustomEmojiText(
+            CustomEmojiText(
                 text = userDetail.description ?: "",
                 maxLines = 5,
                 textAlign = TextAlign.Start,
@@ -180,22 +180,26 @@ fun UserDetailCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
+                    "${userDetail.followingCount ?: 0} ${stringResource(id = R.string.following)}",
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clickable {
+                            onAction(UserDetailCardAction.FollowingsCountClicked(userDetail.id))
+                        },
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
                     "${userDetail.followersCount ?: 0} ${stringResource(id = R.string.follower)}",
                     color = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(2.dp).clickable {
-                        onAction(UserDetailCardAction.FollowersCountClicked(userDetail.id))
-                    },
-
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clickable {
+                            onAction(UserDetailCardAction.FollowersCountClicked(userDetail.id))
+                        }
                 )
-                Spacer(modifier = Modifier.width(4.dp))
 
-                Text(
-                    "${userDetail.followersCount ?: 0} ${stringResource(id = R.string.following)}",
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(2.dp).clickable {
-                        onAction(UserDetailCardAction.FollowingsCountClicked(userDetail.id))
-                    },
-                )
             }
 
 
