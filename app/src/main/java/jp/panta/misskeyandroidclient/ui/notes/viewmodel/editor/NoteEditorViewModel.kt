@@ -198,6 +198,18 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setReplyTo(noteId: Note.Id?) {
         _state.value = _state.value.changeReplyTo(noteId)
+        if (noteId == null) {
+            return
+        }
+        viewModelScope.launch {
+            noteRepository.find(noteId).mapCatching {
+                userRepository.find(it.userId)
+            }.onSuccess { user ->
+                _state.update { state ->
+                    state.addMentionUserNames(listOf(user.displayUserName), 0).state
+                }
+            }
+        }
     }
 
     fun setDraftNoteId(id: Long) {
@@ -224,17 +236,17 @@ class NoteEditorViewModel @Inject constructor(
 
         }.launchIn(viewModelScope + Dispatchers.IO)
         // NOTE: replyIdが入ったとき対象のユーザーを
-        _state.map {
-            it.replyId
-        }.distinctUntilChanged().filterNotNull().map {
-            noteRepository.find(it).getOrThrow()
-        }.map {
-            userRepository.find(it.userId)
-        }.onEach { note ->
-            _state.update { state ->
-                state.addMentionUserNames(listOf(note.displayUserName), 0).state
-            }
-        }.launchIn(viewModelScope)
+//        _state.map {
+//            it.replyId
+//        }.distinctUntilChanged().filterNotNull().map {
+//            noteRepository.find(it).getOrThrow()
+//        }.map {
+//            userRepository.find(it.userId)
+//        }.onEach { note ->
+//            _state.update { state ->
+//                state.addMentionUserNames(listOf(note.displayUserName), 0).state
+//            }
+//        }.launchIn(viewModelScope)
 
     }
 

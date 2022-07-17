@@ -50,8 +50,10 @@ class AntennaEditorActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val antennaId = intent.getSerializableExtra(EXTRA_ANTENNA_ID) as? Antenna.Id
-
         if(savedInstanceState == null){
+            if (antennaId != null) {
+                viewModel.setAntennaId(antennaId)
+            }
             val ft = supportFragmentManager.beginTransaction()
             ft.replace(R.id.antennaEditorBase, AntennaEditorFragment.newInstance(antennaId))
             ft.commit()
