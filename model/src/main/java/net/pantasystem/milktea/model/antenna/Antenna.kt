@@ -3,12 +3,13 @@ package net.pantasystem.milktea.model.antenna
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.list.UserList
 
 data class Antenna (
     val id: Id,
     val name: String,
     val src: AntennaSource,
-    val userListId: String?,
+    val userListId: UserList.Id?,
     val userGroupId: Group.Id?,
     val keywords: List<List<String>>,
     val excludeKeywords: List<List<String>>,
