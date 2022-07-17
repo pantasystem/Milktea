@@ -4,6 +4,8 @@ package net.pantasystem.milktea.api.misskey.v12.antenna
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.antenna.AntennaSource
+import net.pantasystem.milktea.model.antenna.from
 import net.pantasystem.milktea.model.group.Group
 import java.io.Serializable as JSerializable
 
@@ -31,7 +33,7 @@ data class AntennaDTO(
         return Antenna(
             Antenna.Id(account.accountId, id),
             name,
-            src,
+            AntennaSource.from(src),
             userListId,
             userGroupId?.let{
                 Group.Id(account.accountId, it)

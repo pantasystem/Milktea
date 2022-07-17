@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.api.misskey.v12.antenna
 
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.model.antenna.SaveAntennaParam
+import net.pantasystem.milktea.model.antenna.str
 
 /**
  * @param i ユーザーのの認証
@@ -34,4 +36,30 @@ data class AntennaToAdd(
     val notify: Boolean = false,
     val hasUnreadNote: Boolean = false
 
-)
+) {
+    companion object
+}
+
+
+fun AntennaToAdd.Companion.from(
+    i: String,
+    params: SaveAntennaParam,
+    antennaId: String? = null
+): AntennaToAdd {
+    return AntennaToAdd(
+        i,
+        antennaId,
+        params.name,
+        params.src.str(),
+        params.userListId?.userListId,
+        params.userGroupId?.groupId,
+        params.keywords,
+        params.excludeKeywords,
+        params.users,
+        params.caseSensitive,
+        params.withFile,
+        params.withReplies,
+        params.notify,
+        params.hasUnreadNote,
+    )
+}
