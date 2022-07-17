@@ -7,19 +7,13 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.list.UserListDTO
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.antenna.*
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListRepository
 import net.pantasystem.milktea.model.user.User
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -29,11 +23,10 @@ import javax.inject.Inject
 @Suppress("BlockingMethodInNonBlockingContext")
 @HiltViewModel
 class AntennaEditorViewModel @Inject constructor(
-    val userViewDataFactory: UserViewData.Factory,
-    val loggerFactory: Logger.Factory,
-    val accountRepository: AccountRepository,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
+    private val userViewDataFactory: UserViewData.Factory,
+    loggerFactory: Logger.Factory,
+    private val accountRepository: AccountRepository,
+    private val userListRepository: UserListRepository,
     private val antennaRepository: AntennaRepository,
 ) : ViewModel(){
 
@@ -78,13 +71,7 @@ class AntennaEditorViewModel @Inject constructor(
         }
     }
 
-    val isAll = Transformations.map(source) {
-        it is AntennaSource.All
-    }
 
-    val isHome = Transformations.map(source) {
-        it is AntennaSource.Home
-    }
 
     val isList = Transformations.map(source) {
         it is AntennaSource.List
@@ -133,15 +120,11 @@ class AntennaEditorViewModel @Inject constructor(
     }
 
 
-    val userListList = MediatorLiveData<List<UserListDTO>>().apply{
+    val userListList = MediatorLiveData<List<UserList>>().apply{
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = getAccount()
-                misskeyAPIProvider.get(account).userList(
-                    I(
-                        account.getI(encryption)
-                    )
-                ).body()
+                userListRepository.findByAccountId(account.accountId)
             }.onSuccess {
                 postValue(it)
             }
@@ -149,7 +132,7 @@ class AntennaEditorViewModel @Inject constructor(
     }
 
 
-    val userList = MediatorLiveData<UserListDTO?>().apply{
+    val userList = MediatorLiveData<UserList?>().apply{
         addSource(userListList){ list ->
             this.value = list.firstOrNull {
                 it.id == this@AntennaEditorViewModel.antenna.value?.userListId
@@ -225,9 +208,7 @@ class AntennaEditorViewModel @Inject constructor(
                 val params = SaveAntennaParam(
                     name.value ?: antenna?.name ?: "",
                     source.value ?: AntennaSource.All,
-                    userList.value?.id?.let {
-                        UserList.Id(account.accountId, it)
-                    },
+                    userList.value?.id,
                     null,
                     toListKeywords(keywords.value ?: ""),
                     toListKeywords(excludeKeywords.value ?: ""),
@@ -265,20 +246,9 @@ class AntennaEditorViewModel @Inject constructor(
     fun removeRemote(){
         val antennaId = _antennaId.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val account = getAccount()
-                (misskeyAPIProvider.get(account) as MisskeyAPIV12).deleteAntenna(
-                    AntennaQuery(
-                        antennaId = antennaId.antennaId,
-                        i = account.getI(encryption),
-                        limit = null
-                    )
-                )
-            }.onSuccess {
-                if(it.isSuccessful) {
-                    withContext(Dispatchers.Main) {
-                        antennaRemovedEvent.event = Unit
-                    }
+            antennaRepository.delete(antennaId).onSuccess {
+                withContext(Dispatchers.Main) {
+                    antennaRemovedEvent.event = Unit
                 }
             }
         }
@@ -325,19 +295,7 @@ class AntennaEditorViewModel @Inject constructor(
 
     private suspend fun fetch(): Antenna? {
         return _antennaId.value?.let{ antennaId ->
-            val account = accountRepository.get(antennaId.accountId).getOrThrow()
-            val api = misskeyAPIProvider.get(account) as? MisskeyAPIV12
-                ?: return null
-            val res = api.showAntenna(
-                AntennaQuery(
-                    i = account.getI(
-                        encryption
-                    ), antennaId = antennaId.antennaId, limit = null
-                )
-            )
-            res.throwIfHasError()
-            res.body()?.toEntity(account)
-
+            antennaRepository.find(antennaId).getOrNull()
         }
     }
 
