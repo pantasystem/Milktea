@@ -35,7 +35,6 @@ import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaCache
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -58,9 +57,6 @@ class MiApplication : Application(), MiCore {
 
     @Inject
     lateinit var mMetaCache: MetaCache
-
-    @Inject
-    lateinit var mReactionHistoryDataSource: ReactionHistoryDataSource
 
     @Inject
     lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -249,10 +245,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-
-    override fun getReactionHistoryDataSource(): ReactionHistoryDataSource {
-        return mReactionHistoryDataSource
-    }
 
 
     private val sharedPreferencesChangedListener =

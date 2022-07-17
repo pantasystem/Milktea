@@ -2,35 +2,27 @@ package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
 
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.model.antenna.Antenna
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.antenna.Antenna
+import net.pantasystem.milktea.model.antenna.AntennaRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class AntennaListViewModel @Inject constructor(
-    val accountStore: AccountStore,
-    val accountRepository: AccountRepository,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption
+    private val accountStore: AccountStore,
+    private val accountRepository: AccountRepository,
+    private val antennaRepository: AntennaRepository,
 ) : ViewModel() {
 
-    companion object {
-        const val TAG = "AntennaViewModel"
-    }
 
     val antennas = MediatorLiveData<List<Antenna>>()
 
@@ -80,18 +72,7 @@ class AntennaListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = accountRepository.getCurrentAccount().getOrThrow()
-                val res =
-                    (misskeyAPIProvider.get(account) as MisskeyAPIV12).getAntennas(
-                        AntennaQuery(
-                            i = account.getI(encryption),
-                            limit = null,
-                            antennaId = null
-                        )
-                    ).body()
-                        ?: throw IllegalStateException("アンテナの取得に失敗しました")
-                res.map { dto ->
-                    dto.toEntity(account)
-                }
+                antennaRepository.findByAccountId(account.accountId).getOrThrow()
             }.onSuccess {
                 antennas.postValue(it)
             }
@@ -111,8 +92,8 @@ class AntennaListViewModel @Inject constructor(
                 accountStore.addPage(
                     PageableTemplate(accountStore.currentAccount!!)
                         .antenna(
-                        antenna
-                    )
+                            antenna
+                        )
                 )
             } else {
                 accountStore.removePage(paged)
@@ -137,30 +118,11 @@ class AntennaListViewModel @Inject constructor(
 
     fun deleteAntenna(antenna: Antenna) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val i = accountStore.currentAccount?.getI(encryption)
-                    ?: return@launch
-                getMisskeyAPI()?.deleteAntenna(
-                    AntennaQuery(
-                        i = i,
-                        antennaId = antenna.id.antennaId,
-                        limit = null
-                    )
-                )?.throwIfHasError()
-            }.onSuccess {
+            antennaRepository.delete(antenna.id).onSuccess {
                 loadInit()
             }.onFailure {
                 deleteResultEvent.event = false
-
             }
-
         }
-
-
-    }
-
-    private fun getMisskeyAPI(): MisskeyAPIV12? {
-        return misskeyAPIProvider
-            .get(accountStore.currentAccount!!) as? MisskeyAPIV12
     }
 }
