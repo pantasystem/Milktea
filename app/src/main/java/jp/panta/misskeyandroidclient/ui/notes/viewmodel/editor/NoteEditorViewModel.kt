@@ -235,19 +235,6 @@ class NoteEditorViewModel @Inject constructor(
             _state.value = _state.value.setVisibility(v)
 
         }.launchIn(viewModelScope + Dispatchers.IO)
-        // NOTE: replyIdが入ったとき対象のユーザーを
-//        _state.map {
-//            it.replyId
-//        }.distinctUntilChanged().filterNotNull().map {
-//            noteRepository.find(it).getOrThrow()
-//        }.map {
-//            userRepository.find(it.userId)
-//        }.onEach { note ->
-//            _state.update { state ->
-//                state.addMentionUserNames(listOf(note.displayUserName), 0).state
-//            }
-//        }.launchIn(viewModelScope)
-
     }
 
     fun changeText(text: String) {
@@ -286,12 +273,7 @@ class NoteEditorViewModel @Inject constructor(
                     val createNote = _state.value.toCreateNote(account)
                     createNoteTaskExecutor.dispatch(createNote.task(createNoteUseCase))
                 } else {
-                    runCatching {
-
-
-                        val dfNote = draftNoteService.save(_state.value.toCreateNote(account))
-                            .getOrThrow()
-
+                    draftNoteService.save(_state.value.toCreateNote(account)).mapCatching { dfNote ->
                         noteReservationPostExecutor.register(dfNote)
                     }.onFailure {
                         logger.error("登録失敗", it)
