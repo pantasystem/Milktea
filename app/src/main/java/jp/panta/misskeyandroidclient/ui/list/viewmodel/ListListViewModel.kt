@@ -64,9 +64,8 @@ class ListListViewModel @Inject constructor(
 
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val account = accountRepository.getCurrentAccount().getOrThrow()
-                loadListList(account.accountId)
+            accountRepository.getCurrentAccount().mapCatching { account ->
+                userListStore.findByAccount(account.accountId)
             }.onSuccess {
                 logger.debug("success fetch")
             }.onFailure {
@@ -74,11 +73,6 @@ class ListListViewModel @Inject constructor(
             }
 
         }
-    }
-
-
-    private suspend fun loadListList(accountId: Long): List<UserList> {
-        return userListStore.findByAccount(accountId)
     }
 
 
