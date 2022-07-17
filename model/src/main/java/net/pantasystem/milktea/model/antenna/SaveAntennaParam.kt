@@ -37,7 +37,7 @@ sealed interface AntennaSource {
     object Users : AntennaSource
     object List : AntennaSource
     object Group : AntennaSource
-
+    companion object
 }
 
 fun AntennaSource.str(): String {
@@ -47,5 +47,26 @@ fun AntennaSource.str(): String {
         AntennaSource.Home -> "home"
         AntennaSource.List -> "list"
         AntennaSource.Users -> "users"
+    }
+}
+
+fun AntennaSource.Companion.values(): List<AntennaSource> {
+    return listOf(
+        AntennaSource.Home,
+        AntennaSource.All,
+        AntennaSource.Users,
+        AntennaSource.List,
+        AntennaSource.Group,
+    )
+}
+
+fun AntennaSource.Companion.from(src: String): AntennaSource {
+    return when(src) {
+        "all" -> AntennaSource.All
+        "group" -> AntennaSource.Group
+        "home" -> AntennaSource.Home
+        "list" -> AntennaSource.List
+        "users" -> AntennaSource.Users
+        else -> AntennaSource.All
     }
 }
