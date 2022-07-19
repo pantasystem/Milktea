@@ -9,6 +9,6 @@ data class Directory(
     val name: String,
     val foldersCount: Int,
     val filesCount: Int,
-    val parentId: String?,
-    val parent: Directory?
+    val parentId: String? = null,
+    val parent: Directory? = null
 )

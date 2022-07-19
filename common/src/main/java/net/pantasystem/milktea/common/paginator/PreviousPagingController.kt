@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.common.paginator
 
+import android.util.Log
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
@@ -24,6 +25,7 @@ class PreviousPagingController<DTO, E>(
                 val res = previousLoader.loadPrevious().getOrThrow()
                 entityConverter.convertAll(res)
             }.onFailure {
+                Log.i("PreviousPagingCt", "load error", it)
                 val errorState = PageableState.Error(
                     state.getState().content,
                     it
