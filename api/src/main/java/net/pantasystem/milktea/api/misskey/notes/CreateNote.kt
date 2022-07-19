@@ -8,7 +8,7 @@ data class CreateNote(
     val i: String,
     val visibility: String = "public",
     val visibleUserIds: List<String>? = null,
-    val text: String?,
+    val text: String? = null,
     val cw: String? = null,
     val viaMobile: Boolean? = null,
     val localOnly: Boolean? = null,
@@ -23,6 +23,8 @@ data class CreateNote(
 
 
     ){
+
+    @Serializable
     data class Response(val createdNote: NoteDTO)
 
 

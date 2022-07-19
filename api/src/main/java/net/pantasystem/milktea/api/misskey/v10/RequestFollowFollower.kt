@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.api.misskey.v10
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class RequestFollowFollower(
     val i: String?,
     val userId: String?,

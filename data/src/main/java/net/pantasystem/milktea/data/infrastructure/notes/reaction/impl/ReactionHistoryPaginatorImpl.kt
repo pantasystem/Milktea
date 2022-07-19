@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.user.UserDataSource
+import java.util.*
 import javax.inject.Inject
 
 class ReactionHistoryPaginatorImpl(
@@ -72,7 +73,7 @@ class ReactionHistoryPaginatorImpl(
                 ReactionHistory(
                     ReactionHistory.Id(it.id, account.accountId),
                     reactionHistoryRequest.noteId,
-                    it.createdAt,
+                    Date(it.createdAt.toEpochMilliseconds()),
                     user,
                     it.type
                 )

@@ -54,10 +54,10 @@ class NoteRepositoryImpl @Inject constructor(
             task.execute(
                 uploader.get(createNote.author)
             ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
-        }.runCatching {
-            this.getOrThrow().let {
-                misskeyAPIProvider.get(createNote.author).create(it).body()?.createdNote
-            }
+        }.mapCatching {
+            misskeyAPIProvider.get(createNote.author).create(it).body()?.createdNote
+        }.onFailure {
+            logger.error("create note error", it)
         }
 
         val noteDTO = result.getOrThrow()

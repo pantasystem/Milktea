@@ -11,11 +11,11 @@ data class NotificationDTO(
     val id: String,
     @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
     val type: String,
-    val userId: String,
-    val user: UserDTO?,
+    val userId: String? = null,
+    val user: UserDTO? = null,
     val note: NoteDTO? = null,
     val noteId: String? = null,
     val reaction: String? = null,
-    val isRead: Boolean?,
+    val isRead: Boolean? = null,
     val choice: Int? = null
 )

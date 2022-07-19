@@ -13,8 +13,7 @@ import java.io.Serializable
 data class UserDTO(
     val id: String,
 
-    @SerializedName("username")
-    @SerialName("username")
+    @SerialName("username") @SerializedName("username")
     val userName: String,
 
     val name: String? = null,

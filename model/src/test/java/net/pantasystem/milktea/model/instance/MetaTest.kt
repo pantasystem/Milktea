@@ -2,8 +2,8 @@ package net.pantasystem.milktea.model.instance
 
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.reaction.Reaction
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MetaTest {

@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.api.misskey.notification
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class NotificationRequest (
     val i: String,
     val limit: Int? = null,

@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.api.misskey.notes
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.model.account.page.Pageable
 import java.io.Serializable as JavaSerializable
@@ -82,10 +83,10 @@ data class NoteRequest(
 
 
     data class Conditions(
-        @SerializedName("sinceId") val sinceId: String? = null,
-        @SerializedName("untilId") val untilId: String? = null,
-        @SerializedName("sinceDate") val sinceDate: Long? = null,
-        @SerializedName("untilDate") val untilDate: Long? = null
+        @SerialName("sinceId") @SerializedName("sinceId") val sinceId: String? = null,
+        @SerialName("untilId") @SerializedName("untilId") val untilId: String? = null,
+        @SerialName("sinceDate") @SerializedName("sinceDate") val sinceDate: Long? = null,
+        @SerialName("untilDate") @SerializedName("untilDate") val untilDate: Long? = null
     )
 
     data class Include(
