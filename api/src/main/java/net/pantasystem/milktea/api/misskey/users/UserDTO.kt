@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.api.misskey.users
 
-import com.google.gson.annotations.SerializedName
+
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -13,7 +13,7 @@ import java.io.Serializable
 data class UserDTO(
     val id: String,
 
-    @SerialName("username") @SerializedName("username")
+    @SerialName("username")
     val userName: String,
 
     val name: String? = null,
@@ -46,14 +46,14 @@ data class UserDTO(
     val isLocked: Boolean? = null
 ) : Serializable {
     val displayUserName: String
-        get() = "@" + this.userName + if(this.host == null){
+        get() = "@" + this.userName + if (this.host == null) {
             ""
-        }else{
+        } else {
             "@" + this.host
         }
 
     val displayName: String
-        get() = name?: userName
+        get() = name ?: userName
 
     val shortDisplayName: String
         get() = "@" + this.userName
