@@ -11,6 +11,6 @@ data class PollDTO(
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
-    data class ChoiceDTO(val text: String, val votes: Int, val isVoted: Boolean) : Serializable
+    data class ChoiceDTO(val text: String, val votes: Int, val isVoted: Boolean = false) : Serializable
 }
 
