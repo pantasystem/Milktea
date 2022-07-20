@@ -287,7 +287,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 isRead ?: true
             )
         }
-        "pollEnded" -> {
+        "pollEnded", "poll_finished" -> {
             require(note != null)
             PollEndedNotification(
                 id,
