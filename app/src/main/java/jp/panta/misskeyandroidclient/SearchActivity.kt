@@ -90,7 +90,7 @@ class SearchActivity : AppCompatActivity() {
     @ExperimentalCoroutinesApi
     private val queryTextListener = object : SearchView.OnQueryTextListener{
         override fun onQueryTextChange(newText: String?): Boolean {
-            mSearchUserViewModel.userName.value = newText?: ""
+            mSearchUserViewModel.setUserName(newText?: "")
             return true
         }
 

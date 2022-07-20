@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
@@ -34,7 +36,6 @@ class SearchUserFragment : Fragment() {
         }
     }
 
-//    val mBinding: FragmentSearchUserBinding by dataBinding()
 
     val viewModel: SearchUserViewModel by viewModels()
 
@@ -65,9 +66,14 @@ class SearchUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.search()
-
+        lifecycleScope.launchWhenResumed {
+            viewModel.errors.collect {
+                Toast.makeText(requireContext(), "Load error:$it", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
+
+
 
     fun onAction(it: UserDetailCardListAction) {
         UserCardListActionHandler(requireActivity(), toggleFollowViewModel) {

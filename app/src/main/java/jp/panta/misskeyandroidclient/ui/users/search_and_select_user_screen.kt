@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,13 +28,12 @@ fun SearchAndSelectUserScreen(
     onNavigateUp: () -> Unit,
 ) {
 
+    val uiState by searchUserViewModel.uiState.collectAsState()
 
     val users by searchUserViewModel.users.collectAsState()
     val selectedUserIds by selectedUserViewModel.selectedUserIds.collectAsState()
     val selectedUsers by selectedUserViewModel.selectedUserList.collectAsState()
 
-    val userName by searchUserViewModel.userName.observeAsState()
-    val host by searchUserViewModel.host.observeAsState()
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -114,24 +112,24 @@ fun SearchAndSelectUserScreen(
                 ) {
                     Text("@")
                     TextField(
-                        value = userName ?: "",
+                        value = uiState.query.word,
                         modifier = Modifier.weight(1f),
                         placeholder = {
                             Text(stringResource(id = R.string.user_name))
                         },
                         onValueChange = { text ->
-                            searchUserViewModel.userName.value = text
+                            searchUserViewModel.setUserName(text)
                         },
                     )
                     Text("@")
                     TextField(
-                        value = host ?: "",
+                        value = uiState.query.host ?: "",
                         modifier = Modifier.weight(1f),
                         placeholder = {
                             Text(stringResource(id = R.string.host))
                         },
                         onValueChange = { text ->
-                            searchUserViewModel.host.value = text
+                            searchUserViewModel.setHost(text)
                         }
                     )
                 }

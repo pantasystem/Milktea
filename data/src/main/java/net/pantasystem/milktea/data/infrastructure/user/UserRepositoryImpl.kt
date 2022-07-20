@@ -152,7 +152,7 @@ class UserRepositoryImpl @Inject constructor(
             .throwIfHasError()
 
         return results.body()!!.map {
-            it.toUser(ac, false).also { u ->
+            it.toUser(ac, true).also { u ->
                 userDataSource.add(u)
                 userDataSource.get(u.id)
             }
