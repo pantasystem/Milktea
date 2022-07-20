@@ -1,13 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
@@ -32,10 +30,6 @@ data class SearchUser(
 
 }
 
-/**
- * SearchAndSelectUserViewModelを将来的にこのSearchUserViewModelと
- * SelectedUserViewModelに分離する予定
- */
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
@@ -47,56 +41,82 @@ class SearchUserViewModel @Inject constructor(
     private val logger = loggerFactory.create("SearchUserViewModel")
 
 
-    private val searchUserRequests = MutableSharedFlow<SearchUser>(
-        replay = 0,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-        extraBufferCapacity = 25
-    )
+    private val searchUserRequests = MutableStateFlow<SearchUser>(SearchUser("", null))
 
-    val userName = MutableLiveData<String>()
-    val host = MutableLiveData<String>()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val searchState = accountStore.observeCurrentAccount.filterNotNull()
+    val filteredByUserNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
-            searchUserRequests.distinctUntilChanged()
-                .flatMapLatest {
-                    suspend {
-                        if (it.isUserName) {
-                            userRepository
-                                .searchByUserName(
-                                    accountId = account.accountId,
-                                    userName = it.word,
-                                    host = it.host
-                                )
-                        } else {
-                            userRepository
-                                .searchByName(
-                                    accountId = account.accountId,
-                                    name = it.word
-                                )
-                        }
-                    }.asLoadingStateFlow()
-                }
+            searchUserRequests.flatMapLatest {
+                suspend {
+                    userRepository
+                        .searchByUserName(
+                            accountId = account.accountId,
+                            userName = it.word,
+                            host = it.host
+                        )
+                }.asLoadingStateFlow()
+            }
         }.map { state ->
-            state.convert {
-                it.map { u ->
-                    u.id
-                }
+            state.convert { list ->
+                list.map { it.id }
             }
         }.flowOn(Dispatchers.IO)
-        .onEach {
-            logger.debug("検索状態:$it")
-        }
-        .catch { error ->
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val filteredByNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
+        .flatMapLatest { account ->
+            searchUserRequests.flatMapLatest {
+                suspend {
+                    userRepository.searchByName(account.accountId, it.word)
+                }.asLoadingStateFlow()
+            }
+        }.map { state ->
+            state.convert { list ->
+                list.map { it.id }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    val searchState =
+        combine(filteredByNameLoadingState, filteredByUserNameLoadingState) { users1, users2 ->
+            val content1 = (users1.content as? StateContent.Exist?)?.rawContent
+                ?: emptyList()
+            val content2 = (users2.content as? StateContent.Exist?)?.rawContent
+                ?: emptyList()
+            val users = content2 + content1
+            val isNotExists =
+                users1.content is StateContent.NotExist && users2.content is StateContent.NotExist
+            val isLoading = users1 is ResultState.Loading && users2 is ResultState.Loading
+            val isFailure = users1 is ResultState.Error && users2 is ResultState.Error
+            val content = if (isNotExists) StateContent.NotExist() else StateContent.Exist(users)
+            val throwable = (users1 as? ResultState.Error?)?.throwable
+                ?: (users2 as? ResultState.Error?)?.throwable
+            if (isLoading) {
+                ResultState.Loading(content)
+            } else if (isFailure) {
+                ResultState.Error(content, throwable = throwable!!)
+            } else {
+                ResultState.Fixed(content)
+            }
+        }.catch { error ->
             logger.info("ユーザー検索処理に失敗しました", e = error)
-        }
-        .stateIn(
+        }.stateIn(
             viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
                 StateContent.NotExist()
             )
         )
 
+
+    val uiState = combine(searchState, searchUserRequests) { state, request ->
+        SearchUserUiState(request, state)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        SearchUserUiState(
+            SearchUser("", null),
+            ResultState.Loading(StateContent.NotExist())
+        )
+    )
     val isLoading = searchState.map {
         it is ResultState.Loading
     }.asLiveData()
@@ -113,40 +133,34 @@ class SearchUserViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-//    val users = searchState.map {
-//        (it.content as? StateContent.Exist)?.rawContent
-//            ?: emptyList()
-//    }.flatMapLatest { list ->
-//
-//    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    val errors = filteredByUserNameLoadingState.map {
+        it as? ResultState.Error?
+    }.mapNotNull {
+        it?.throwable
+    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
 
-
-//    val userViewDataList = searchState.map {
-//        (it.content as? StateContent.Exist)?.rawContent?.map { user ->
-//            user as? User.Detail
-//        }
-//            ?: emptyList()
-//    }.asLiveData()
-
-    init {
-        userName.observeForever {
-            search()
+    fun setUserName(text: String) {
+        searchUserRequests.update {
+            it.copy(word = text)
         }
+    }
 
-        host.observeForever {
-            search()
+    fun setHost(text: String?) {
+        searchUserRequests.update {
+            it.copy(host = text)
         }
     }
 
     fun search() {
-        val userName = this.userName.value ?: return
-        val host = this.host.value
-
-        val request = SearchUser(
-            host = host,
-            word = userName
-        )
-        searchUserRequests.tryEmit(request)
+        searchUserRequests.update {
+            it
+        }
     }
 
+
 }
+
+data class SearchUserUiState(
+    val query: SearchUser,
+    val result: ResultState<List<User.Id>>,
+)
