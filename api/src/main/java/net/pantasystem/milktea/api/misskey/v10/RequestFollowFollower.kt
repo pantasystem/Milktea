@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class RequestFollowFollower(
     val i: String?,
     val userId: String?,
-    val cursor: String?,
+    val cursor: String? = null,
     val username: String? = null,
     val host: String? = null,
     val limit: Int = 20,
