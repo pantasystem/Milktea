@@ -1,10 +1,16 @@
 package net.pantasystem.milktea.model.instance
 
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.BufferedInputStream
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 
 class MetaTest {
 
@@ -30,5 +36,32 @@ class MetaTest {
         )
         assertTrue(meta.isOwnEmojiBy(Reaction("a")))
         assertTrue(meta.isOwnEmojiBy(Reaction(":b:")))
+    }
+
+    @Test
+    fun decodeJsonGiveV12Meta() {
+        val file = File(javaClass.classLoader!!.getResource("v12_meta_case1.json").file)
+        val reader = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream())))
+        val textJson = reader.readLines().reduce { acc, s -> acc + s }.trimIndent()
+        val decoder = Json {
+            ignoreUnknownKeys = true
+        }
+        val meta= decoder.decodeFromString<Meta>(textJson)
+        assertEquals("Misskey.io", meta.name)
+        assertEquals("12.110.1", meta.version)
+    }
+
+    @Test
+    fun decodeJsonGiveV10Meta() {
+        val file = File(javaClass.classLoader!!.getResource("v10_meta_case1.json").file)
+        val reader = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream())))
+        val textJson = reader.readLines().reduce { acc, s -> acc + s }.trimIndent()
+        val decoder = Json {
+            ignoreUnknownKeys = true
+        }
+        val meta = decoder.decodeFromString<Meta>(textJson)
+        assertEquals("めいすきー", meta.name)
+        assertEquals("10.102.584-m544", meta.version)
+
     }
 }
