@@ -18,6 +18,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.Keys
@@ -42,52 +43,55 @@ import javax.inject.Inject
 class MiApplication : Application(), MiCore {
 
     @Inject
-    lateinit var mAccountRepository: AccountRepository
+    internal lateinit var mAccountRepository: AccountRepository
 
     @Inject
-    lateinit var mSettingStore: SettingStore
+    internal lateinit var mSettingStore: SettingStore
 
     @Inject
-    lateinit var mFetchMeta: FetchMeta
+    internal lateinit var mFetchMeta: FetchMeta
 
     private lateinit var sharedPreferences: SharedPreferences
 
     @Inject
-    lateinit var mAccountStore: AccountStore
+    internal lateinit var mAccountStore: AccountStore
 
     @Inject
-    lateinit var mMetaCache: MetaCache
+    internal lateinit var mMetaCache: MetaCache
 
     @Inject
-    lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
+    internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
 
     @Inject
-    lateinit var urlPreviewProvider: UrlPreviewStoreProvider
+    internal lateinit var urlPreviewProvider: UrlPreviewStoreProvider
 
-    lateinit var colorSettingStore: ColorSettingStore
+    internal lateinit var colorSettingStore: ColorSettingStore
         private set
 
     @Inject
-    lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
+    internal lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
 
     @Inject
-    lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
+    internal lateinit var channelAPIMainEventDispatcherAdapter: ChannelAPIMainEventDispatcherAdapter
 
     @Inject
-    lateinit var applicationScope: CoroutineScope
+    internal lateinit var applicationScope: CoroutineScope
 
     @Inject
-    lateinit var lf: Logger.Factory
+    internal lateinit var lf: Logger.Factory
 
     private val logger: Logger by lazy {
         lf.create("MiApplication")
     }
 
     @Inject
-    lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
+    internal lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
 
     @Inject
-    lateinit var mSubscriptionRegistration: SubscriptionRegistration
+    internal lateinit var mSubscriptionRegistration: SubscriptionRegistration
+
+    @Inject
+    internal lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -240,7 +244,9 @@ class MiApplication : Application(), MiCore {
         try {
             val meta = mFetchMeta.fetch(instanceDomain, isForceFetch = true)
             mMetaCache.put(instanceDomain, meta)
+            misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             logger.error("metaの読み込み一連処理に失敗したでち", e)
         }
     }
