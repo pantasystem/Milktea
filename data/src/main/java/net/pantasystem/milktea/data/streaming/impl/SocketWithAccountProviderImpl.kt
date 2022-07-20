@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.streaming.impl
 
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.streaming.Socket
 import net.pantasystem.milktea.data.streaming.network.SocketImpl
 import net.pantasystem.milktea.model.account.Account

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import javax.inject.Inject
 
@@ -38,11 +39,18 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
         super.onViewCreated(view, savedInstanceState)
 
         val pageableTypeNameMap = PageTypeNameMap(view.context)
+
         val pagerItems = listOf(
-            PageableTemplate(null)
-                .notification(pageableTypeNameMap.get(PageType.NOTIFICATION)),
-            PageableTemplate(null)
-                .mention(pageableTypeNameMap.get(PageType.MENTION))
+            TitleWithPageable(
+                pageableTypeNameMap.get(PageType.NOTIFICATION),
+                PageableTemplate(null)
+                    .notification(pageableTypeNameMap.get(PageType.NOTIFICATION)).pageable(),
+            ),
+            TitleWithPageable(
+                pageableTypeNameMap.get(PageType.MENTION),
+                PageableTemplate(null)
+                    .mention(pageableTypeNameMap.get(PageType.MENTION)).pageable(),
+            )
         )
 
         val notificationPagerAdapter = PagerAdapter(pagerItems)
@@ -66,11 +74,11 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
         }
 
     }
-    inner class PagerAdapter(val pages: List<Page>) :
+    inner class PagerAdapter(val pages: List<TitleWithPageable>) :
         FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         private fun createFragment(position: Int): Fragment {
-            return PageableFragmentFactory.create(pages[position])
+            return PageableFragmentFactory.create(pages[position].pageable)
         }
 
         override fun getPageTitle(position: Int): CharSequence {
@@ -88,3 +96,8 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
     }
 }
+
+data class TitleWithPageable(
+    val title: String,
+    val pageable: Pageable,
+)

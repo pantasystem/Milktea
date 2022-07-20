@@ -13,11 +13,11 @@ import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.model.messaging.MessageRelationGetter
+import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.messaging.MessageRelation
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import javax.inject.Inject
 
 @FlowPreview
@@ -40,6 +40,9 @@ class NotificationService : Service() {
 
     @Inject
     lateinit var messageRelationGetter: MessageRelationGetter
+
+    @Inject
+    lateinit var accountStore: AccountStore
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -66,17 +69,13 @@ class NotificationService : Service() {
     @ExperimentalCoroutinesApi
     private fun startObserve() {
 
-        val miApplication = applicationContext
-        if (miApplication is MiApplication) {
-
-
-            messageObserver.observeAllAccountsMessages().onEach {
-                val msgRelation = messageRelationGetter.get(it)
-                showMessageNotification(msgRelation)
-            }.launchIn(coroutineScope + Dispatchers.IO)
-
-        }
-
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            messageObserver.observeAccountMessages(it)
+        }.map {
+            messageRelationGetter.get(it)
+        }.flowOn(Dispatchers.IO).onEach {
+            showMessageNotification(it)
+        }.launchIn(coroutineScope)
 
     }
 

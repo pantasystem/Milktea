@@ -17,15 +17,16 @@ import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.provideFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
-import kotlinx.coroutines.*
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
+
 @AndroidEntryPoint
 class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
 

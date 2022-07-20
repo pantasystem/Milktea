@@ -13,8 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -23,8 +21,6 @@ import net.pantasystem.milktea.gallery.viewmodel.provideFactory
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class GalleryPostsFragment : Fragment() {
 

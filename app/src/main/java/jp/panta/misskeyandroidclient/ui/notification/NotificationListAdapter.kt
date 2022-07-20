@@ -12,19 +12,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 
-@FlowPreview
-@ExperimentalCoroutinesApi
-class NotificationListAdapter @ExperimentalCoroutinesApi constructor(
+class NotificationListAdapter constructor(
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationViewData>,
     val notesViewModel: NotesViewModel,
     val notificationViewModel: NotificationViewModel,
