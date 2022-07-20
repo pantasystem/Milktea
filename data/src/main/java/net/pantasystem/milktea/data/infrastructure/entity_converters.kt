@@ -198,24 +198,24 @@ fun NotificationDTO.toNotification(account: Account): Notification {
     return when (this.type) {
         "follow" -> {
             FollowNotification(
-                id, createdAt, User.Id(account.accountId, this.userId), isRead ?: true
+                id, createdAt, User.Id(account.accountId, this.userId!!), isRead ?: true
             )
         }
         "followRequestAccepted" -> {
             FollowRequestAcceptedNotification(
-                id, createdAt, User.Id(account.accountId, this.userId), isRead ?: true
+                id, createdAt, User.Id(account.accountId, this.userId!!), isRead ?: true
             )
         }
         "receiveFollowRequest" -> {
             ReceiveFollowRequestNotification(
-                id, createdAt, User.Id(account.accountId, this.userId), isRead ?: true
+                id, createdAt, User.Id(account.accountId, this.userId!!), isRead ?: true
             )
         }
         "mention" -> {
             MentionNotification(
                 id,
                 createdAt,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 Note.Id(
                     account.accountId,
                     note?.id ?: throw IllegalStateException("noteId参照不能")
@@ -227,7 +227,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
             ReplyNotification(
                 id,
                 createdAt,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 Note.Id(
                     account.accountId,
                     note?.id ?: throw IllegalStateException("noteId参照不能")
@@ -239,7 +239,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
             RenoteNotification(
                 id,
                 createdAt,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 Note.Id(
                     account.accountId,
                     note?.id ?: throw IllegalStateException("noteId参照不能")
@@ -251,7 +251,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
             QuoteNotification(
                 id,
                 createdAt,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 Note.Id(
                     account.accountId,
                     note?.id ?: throw IllegalStateException("noteId参照不能")
@@ -269,7 +269,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
             ReactionNotification(
                 id,
                 createdAt,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 n.id,
                 reaction!!,
                 isRead ?: true
@@ -282,7 +282,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 id,
                 Note.Id(account.accountId, noteId ?: note?.id!!),
                 createdAt,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 choice!!,
                 isRead ?: true
             )
@@ -301,7 +301,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 id,
                 createdAt,
                 isRead ?: false,
-                User.Id(account.accountId, this.userId),
+                User.Id(account.accountId, this.userId!!),
                 this.type
             )
         }

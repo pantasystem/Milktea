@@ -51,7 +51,6 @@ dependencies {
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-    implementation 'com.google.code.gson:gson:2.8.9'
     implementation libs.kotlin.datetime
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
@@ -73,7 +72,6 @@ dependencies {
     def retrofit = '2.9.0'
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
 

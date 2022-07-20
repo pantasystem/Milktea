@@ -4,7 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
-import com.google.gson.Gson
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.common.Encryption
 import okhttp3.*
@@ -23,7 +24,7 @@ import net.pantasystem.milktea.model.file.AppFile
 class OkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
-    val gson: Gson,
+    val json: Json,
     val encryption: Encryption
 ) : FileUploader {
     override suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO {
@@ -55,7 +56,7 @@ class OkHttpDriveFileUploader(
             val response = client.newCall(request).execute()
             val code = response.code
             if(code in 200 until 300){
-                gson.fromJson(response.body?.string(), FilePropertyDTO::class.java)
+                json.decodeFromString<FilePropertyDTO>(response.body!!.string())
             }else{
                 Log.d("OkHttpConnection", "code: $code, error${response.body?.string()}")
                 throw FileUploadFailedException(

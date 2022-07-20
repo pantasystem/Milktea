@@ -30,14 +30,14 @@ data class GalleryPost(
     val createdAt: Instant,
     val updatedAt: Instant,
     val title: String,
-    val description: String,
+    val description: String? = null,
     val userId: String,
     val user: UserDTO,
     val files: List<FilePropertyDTO>,
-    val tags: List<String>?,
+    val tags: List<String>? = null,
     val isSensitive: Boolean,
-    val likedCount: Int?,
-    val isLiked: Boolean?
+    val likedCount: Int? = null,
+    val isLiked: Boolean? = null
 )
 
 @Serializable

@@ -7,8 +7,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.GsonFactory
 import net.pantasystem.milktea.data.infrastructure.drive.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -41,7 +41,9 @@ object DriveFileModule {
         return OkHttpFileUploaderProvider(
             OkHttpClient(),
             context,
-            GsonFactory.create(),
+            json = Json {
+                ignoreUnknownKeys = true
+            },
             encryption
         )
     }

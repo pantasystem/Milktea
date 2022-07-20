@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.api.misskey.drive
 
+import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.model.drive.UpdateFileProperty
 
+@Serializable
 data class UpdateFileDTO (
     val i: String,
     val fileId: String,

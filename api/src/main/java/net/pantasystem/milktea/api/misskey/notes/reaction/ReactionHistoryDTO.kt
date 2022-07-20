@@ -1,11 +1,13 @@
 package net.pantasystem.milktea.api.misskey.notes.reaction
 
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.api.misskey.users.UserDTO
-import java.util.*
 
+@Serializable
 data class ReactionHistoryDTO (
     val id: String,
-    val createdAt: Date,
+    val createdAt: Instant,
     val user: UserDTO,
     val type: String,
 )

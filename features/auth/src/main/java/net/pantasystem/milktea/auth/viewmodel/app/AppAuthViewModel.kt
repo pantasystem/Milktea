@@ -1,31 +1,34 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.Session
-import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.data.infrastructure.auth.custom.*
-import net.pantasystem.milktea.auth.viewmodel.Permissions
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.auth.viewmodel.Permissions
 import net.pantasystem.milktea.common.BuildConfig
-import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
+import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
+import net.pantasystem.milktea.model.app.AppType
+import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.model.instance.Meta
 import java.util.regex.Pattern
 import javax.inject.Inject
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.instance.FetchMeta
-import net.pantasystem.milktea.model.instance.Meta
 
 sealed interface AuthErrors {
     val throwable: Throwable
@@ -128,6 +131,8 @@ class AppAuthViewModel @Inject constructor(
                         val misskey = withContext(Dispatchers.IO) {
                             runCatching {
                                 metaStore.fetch(url)
+                            }.onFailure {
+                                Log.e("AppAuthViewModel", "fetch meta error", it)
                             }.getOrNull()
                         }
                         val mastodon =

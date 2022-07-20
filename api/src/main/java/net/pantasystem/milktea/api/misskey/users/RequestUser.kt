@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.api.misskey.users
 
-import com.google.gson.annotations.SerializedName
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
@@ -9,7 +9,7 @@ import net.pantasystem.milktea.model.user.query.FindUsersQuery
 data class RequestUser(
     val i: String?,
     val userId: String? = null,
-    @SerialName("username") @SerializedName("username") val userName: String? = null,
+    @SerialName("username") val userName: String? = null,
     val host: String? = null,
     val sort: String? = null,
     val state: String? = null,
@@ -20,7 +20,7 @@ data class RequestUser(
     val limit: Int? = null,
     val query: String? = null,
     val detail: Boolean? = null
-){
+) {
 
     companion object
 

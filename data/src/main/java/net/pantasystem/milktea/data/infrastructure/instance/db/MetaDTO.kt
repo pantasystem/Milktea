@@ -2,42 +2,41 @@ package net.pantasystem.milktea.data.infrastructure.instance.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 import net.pantasystem.milktea.model.instance.Meta
 
 @Entity(tableName = "meta_table")
 data class MetaDTO(
-    @PrimaryKey(autoGenerate = false) @SerializedName("uri") val uri: String,
-    @SerializedName("bannerUrl") val bannerUrl: String?,
-    @SerializedName("cacheRemoteFiles") val cacheRemoteFiles: Boolean?,
-    @SerializedName("description") val description: String?,
-    @SerializedName("disableGlobalTimeline") val disableGlobalTimeline: Boolean?,
-    @SerializedName("disableLocalTimeline") val disableLocalTimeline: Boolean?,
-    @SerializedName("disableRegistration") val disableRegistration: Boolean?,
-    @SerializedName("driveCapacityPerLocalUserMb") val driveCapacityPerLocalUserMb: Int?,
-    @SerializedName("driveCapacityPerRemoteUserMb") val driveCapacityPerRemoteUserMb: Int?,
-    @SerializedName("enableDiscordIntegration") val enableDiscordIntegration: Boolean?,
-    @SerializedName("enableEmail") val enableEmail: Boolean?,
-    @SerializedName("enableEmojiReaction") val enableEmojiReaction: Boolean?,
-    @SerializedName("enableGithubIntegration") val enableGithubIntegration: Boolean?,
-    @SerializedName("enableRecaptcha") val enableRecaptcha: Boolean?,
-    @SerializedName("enableServiceWorker") val enableServiceWorker: Boolean?,
-    @SerializedName("enableTwitterIntegration") val enableTwitterIntegration: Boolean?,
-    @SerializedName("errorImageUrl") val errorImageUrl: String?,
-    @SerializedName("feedbackUrl") val feedbackUrl: String?,
-    @SerializedName("iconUrl") val iconUrl: String?,
-    @SerializedName("maintainerEmail") val maintainerEmail: String?,
-    @SerializedName("maintainerName") val maintainerName: String?,
-    @SerializedName("mascotImageUrl") val mascotImageUrl: String?,
-    @SerializedName("maxNoteTextLength") val maxNoteTextLength: Int?,
-    @SerializedName("name") val name: String?,
-    @SerializedName("recaptchaSiteKey") val recaptchaSiteKey: String?,
-    @SerializedName("secure") val secure: Boolean?,
-    @SerializedName("swPublickey") val swPublicKey: String?,
-    @SerializedName("ToSUrl") val toSUrl: String?,
-    @SerializedName("version") val version: String
-){
-    
+    @PrimaryKey(autoGenerate = false) val uri: String,
+    val bannerUrl: String?,
+    val cacheRemoteFiles: Boolean?,
+    val description: String?,
+    val disableGlobalTimeline: Boolean?,
+    val disableLocalTimeline: Boolean?,
+    val disableRegistration: Boolean?,
+    val driveCapacityPerLocalUserMb: Int?,
+    val driveCapacityPerRemoteUserMb: Int?,
+    val enableDiscordIntegration: Boolean?,
+    val enableEmail: Boolean?,
+    val enableEmojiReaction: Boolean?,
+    val enableGithubIntegration: Boolean?,
+    val enableRecaptcha: Boolean?,
+    val enableServiceWorker: Boolean?,
+    val enableTwitterIntegration: Boolean?,
+    val errorImageUrl: String?,
+    val feedbackUrl: String?,
+    val iconUrl: String?,
+    val maintainerEmail: String?,
+    val maintainerName: String?,
+    val mascotImageUrl: String?,
+    val maxNoteTextLength: Int?,
+    val name: String?,
+    val recaptchaSiteKey: String?,
+    val secure: Boolean?,
+    val swPublicKey: String?,
+    val toSUrl: String?,
+    val version: String
+) {
+
     constructor(meta: Meta) : this(
         bannerUrl = meta.bannerUrl,
         cacheRemoteFiles = meta.cacheRemoteFiles,
