@@ -29,7 +29,7 @@ import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotificati
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
     private val accountRepository: AccountRepository,

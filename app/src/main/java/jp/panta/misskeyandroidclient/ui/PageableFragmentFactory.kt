@@ -12,7 +12,6 @@ import net.pantasystem.milktea.model.account.page.Pageable
 
 object PageableFragmentFactory {
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     fun create(page: Page): Fragment{
         return when(val pageable = page.pageable()){
             is Pageable.Show ->{
@@ -29,5 +28,22 @@ object PageableFragmentFactory {
             }
         }
 
+    }
+
+    fun create(pageable: Pageable): Fragment {
+        return when(pageable){
+            is Pageable.Show ->{
+                NoteDetailFragment.newInstance(pageable.noteId)
+            }
+            is Pageable.Notification ->{
+                NotificationFragment()
+            }
+            is Pageable.Gallery -> {
+                return GalleryPostsFragment.newInstance(pageable, null)
+            }
+            else ->{
+                TimelineFragment.newInstance(pageable)
+            }
+        }
     }
 }

@@ -17,13 +17,11 @@ import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
-import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 
-@ExperimentalCoroutinesApi
-@FlowPreview
+
 @AndroidEntryPoint
 class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
 
@@ -77,7 +75,6 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         currentPageableTimelineViewModel.setCurrentPageable(Pageable.Notification())
     }
 
-    @ExperimentalCoroutinesApi
     private val mScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)

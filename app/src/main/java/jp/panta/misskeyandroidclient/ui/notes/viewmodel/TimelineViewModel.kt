@@ -8,6 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -17,6 +18,7 @@ import net.pantasystem.milktea.data.gettters.Getters
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
@@ -24,6 +26,7 @@ import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notes.TimelineStore
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TimelineViewModel @AssistedInject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     noteStreaming: NoteStreaming,
@@ -33,6 +36,7 @@ class TimelineViewModel @AssistedInject constructor(
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
+    private val accountStore: AccountStore,
     @Assisted val account: Account?,
     @Assisted val accountId: Long? = account?.accountId,
     @Assisted val pageable: Pageable,
@@ -90,13 +94,25 @@ class TimelineViewModel @AssistedInject constructor(
     )
 
     init {
-        noteStreaming.connect(currentAccountWatcher::getAccount, pageable).map {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().map { 
+                currentAccountWatcher.getAccount()
+            }.distinctUntilChanged().catch {
+                logger.error("observe account error", it)
+            }.collect {
+                loadInit()
+            }
+        }
+
+        accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
+            noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
+        }.map {
             timelineStore.onReceiveNote(it.id)
-        }.flowOn(Dispatchers.IO).catch { e ->
-            logger.warning("ストリーミング受信中にエラー発生", e = e)
+        }.catch {
+            logger.error("receive not error", it)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        loadInit()
     }
 
 

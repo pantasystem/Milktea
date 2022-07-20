@@ -13,7 +13,6 @@ import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
@@ -55,8 +54,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun loadDetail() {
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -235,7 +233,6 @@ class NoteDetailViewModel @AssistedInject constructor(
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
     }
 
-    @ExperimentalCoroutinesApi
     private fun <T : PlaneNoteViewData> T.capture(): T {
         val self = this
         viewModelScope.launch(Dispatchers.IO) {
@@ -244,7 +241,6 @@ class NoteDetailViewModel @AssistedInject constructor(
         return this
     }
 
-    @ExperimentalCoroutinesApi
     private fun <T : PlaneNoteViewData> List<T>.captureAll() {
         this.forEach {
             it.capture()
