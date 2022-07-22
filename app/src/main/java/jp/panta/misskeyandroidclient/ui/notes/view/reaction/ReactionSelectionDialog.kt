@@ -72,9 +72,12 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         mNoteViewModel = notesViewModel
         binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
 
+        val adapter = ReactionChoicesPagerAdapter()
+        binding.reactionChoicesViewPager.adapter = adapter
+
         lifecycleScope.launchWhenResumed {
             viewModel.categories.collect { categories ->
-                binding.reactionChoicesViewPager.adapter = ReactionChoicesPagerAdapter(categories.toSet())
+                adapter.setList(categories.toList())
             }
         }
 
@@ -101,11 +104,9 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         dismiss()
     }
 
-    inner class ReactionChoicesPagerAdapter(
-        category: Set<String>
-    ) : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class ReactionChoicesPagerAdapter : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
-        private val categoryList = category.toList()
+        private var categoryList: List<String> = emptyList()
         override fun getCount(): Int {
             return 3 + categoryList.size
         }
@@ -144,6 +145,12 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
                 }
             }
         }
+
+        fun setList(list: List<String>) {
+            categoryList = list
+            notifyDataSetChanged()
+        }
+
     }
 
 }
