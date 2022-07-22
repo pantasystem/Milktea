@@ -8,7 +8,6 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.renote.RenotesBottomSheetDialog
@@ -94,10 +93,6 @@ class ActionNoteHandler(
     }
 
 
-    private val reactionInputObserver = Observer<Unit> {
-        val dialog = ReactionInputDialog()
-        dialog.show(activity.supportFragmentManager, "")
-    }
 
     private val openNoteEditor = Observer<DraftNote?> { note ->
         activity.startActivity(NoteEditorActivity.newBundle(activity, draftNoteId = note.draftNoteId))
@@ -196,9 +191,6 @@ class ActionNoteHandler(
         mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
         mNotesViewModel.reactionTarget.observe(activity, reactionTargetObserver)
 
-
-        mNotesViewModel.showInputReactionEvent.removeObserver(reactionInputObserver)
-        mNotesViewModel.showInputReactionEvent.observe(activity, reactionInputObserver)
 
         mNotesViewModel.openNoteEditor.removeObserver(openNoteEditor)
         mNotesViewModel.openNoteEditor.observe(activity, openNoteEditor)

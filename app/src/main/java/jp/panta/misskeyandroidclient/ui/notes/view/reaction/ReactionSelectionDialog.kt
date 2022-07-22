@@ -65,7 +65,9 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
         val searchedReactionAdapter = ReactionChoicesAdapter {
             notesViewModel.postReaction(it)
+            dismiss()
         }
+
         binding.searchSuggestionsView.adapter = searchedReactionAdapter
         binding.searchSuggestionsView.layoutManager = flexBoxLayoutManager
 

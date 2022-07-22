@@ -82,8 +82,6 @@ class NotesViewModel @Inject constructor(
     val showNoteEvent = EventBus<Note>()
 
 
-    val showInputReactionEvent = EventBus<Unit>()
-
     val openNoteEditor = EventBus<DraftNote?>()
 
     val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
