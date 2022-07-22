@@ -3,10 +3,9 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import javax.inject.Inject
@@ -24,14 +23,27 @@ class ReactionSelectionDialogViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val filteredEmojis = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+        metaRepository.observe(ac.instanceDomain)
+    }.filterNotNull().mapNotNull {
+        it.emojis
+    }.flatMapLatest { emojis ->
+        searchWord.map { word ->
+            word.replace(":", "")
+        }.map { word ->
+            emojis.filter { emoji ->
+                emoji.name.startsWith(word)
+                        || emoji.aliases?.any { alias ->
+                    alias.startsWith(word)
+                } ?: false
+            }
+        }
+    }.map { emojis ->
+        emojis.map {
+            ":${it.name}:"
+        }
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 }
 
-data class ReactionSelectionDialogUiState(
-    val searchWord: String?,
-
-) {
-    fun filteredEmojis() {
-
-    }
-}

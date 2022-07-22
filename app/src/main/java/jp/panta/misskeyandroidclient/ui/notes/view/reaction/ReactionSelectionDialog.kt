@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
@@ -18,6 +20,7 @@ import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelectionDialogViewModel
+import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.account.AccountStore
@@ -40,6 +43,12 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
     val viewModel: ReactionSelectionDialogViewModel by viewModels()
 
+    private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
+        val flexBoxLayoutManager = FlexboxLayoutManager(requireContext())
+        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+        flexBoxLayoutManager
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,6 +64,13 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         val binding = DialogSelectReactionBinding.bind(view)
         binding.reactionSelectionViewModel = viewModel
         binding.lifecycleOwner = this
+
+        val searchedReactionAdapter = ReactionChoicesAdapter {
+            notesViewModel.postReaction(it)
+        }
+        binding.searchSuggestionsView.adapter = searchedReactionAdapter
+        binding.searchSuggestionsView.layoutManager = flexBoxLayoutManager
+
 
         val activity = activity
         val ar  = accountStore.currentAccount
@@ -82,6 +98,11 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         }.launchIn(lifecycleScope)
 
 
+        lifecycleScope.launchWhenResumed {
+            viewModel.filteredEmojis.collect { list ->
+                searchedReactionAdapter.submitList(list)
+            }
+        }
 
 
     }
