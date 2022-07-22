@@ -22,6 +22,7 @@
                 >
             <com.google.android.material.textfield.TextInputEditText
                     android:text="@={reactionSelectionViewModel.searchWord}"
+                    android:textSize="12sp"
                     android:id="@+id/searchReactionEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
