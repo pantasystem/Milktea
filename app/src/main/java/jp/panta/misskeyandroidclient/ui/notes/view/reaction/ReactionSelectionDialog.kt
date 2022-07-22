@@ -9,16 +9,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelectionDialogViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -38,6 +38,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     @Inject
     lateinit var accountStore: AccountStore
 
+    val viewModel: ReactionSelectionDialogViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,6 +53,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DialogSelectReactionBinding.bind(view)
+        binding.reactionSelectionViewModel = viewModel
+        binding.lifecycleOwner = this
 
         val activity = activity
         val ar  = accountStore.currentAccount
@@ -78,10 +82,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         }.launchIn(lifecycleScope)
 
 
-        binding.reactionInputKeyboard.setOnClickListener {
-            ReactionInputDialog().show(parentFragmentManager, "")
-            dismiss()
-        }
 
 
     }
@@ -117,7 +117,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
                 }
             }
         }
-        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun getItem(position: Int): Fragment {
             return when(position){
                 0 ->{

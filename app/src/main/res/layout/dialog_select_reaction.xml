@@ -1,40 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+                name="reactionSelectionViewModel"
+                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelectionDialogViewModel" />
+        <import type="android.view.View" />
+    </data>
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             >
 
-
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchReactionInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                >
+            <com.google.android.material.textfield.TextInputEditText
+                    android:text="@={reactionSelectionViewModel.searchWord}"
+                    android:id="@+id/searchReactionEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search Custom Emojis..."/>
+        </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.tabs.TabLayout
                 android:id="@+id/reaction_choices_tab"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:tabMode="scrollable"
-                android:layout_toStartOf="@id/reaction_input_keyboard"
                 app:tabTextColor="?attr/normalIconTint"
-
+                android:elevation="0dp"
+                android:layout_below="@id/searchReactionInputLayout"
+                style="@style/Widget.MaterialComponents.Toolbar.Surface"
+                android:visibility="@{ reactionSelectionViewModel.isSearchMode ? View.GONE : View.VISIBLE }"
                 >
 
 
         </com.google.android.material.tabs.TabLayout>
-        <ImageButton
-                android:id="@+id/reaction_input_keyboard"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:src="@drawable/ic_keyboard_black_24dp"
-                tools:ignore="ContentDescription"
-                app:tint="?attr/normalIconTint" />
+
 
         <jp.panta.misskeyandroidclient.ui.BottomSheetViewPager
                 android:id="@+id/reaction_choices_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/reaction_choices_tab"/>
+                android:layout_below="@id/reaction_choices_tab"
+                android:visibility="@{ reactionSelectionViewModel.isSearchMode ? View.GONE : View.VISIBLE }"
+                />
 
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/searchSuggestionsView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/reaction_choices_tab"
+                android:visibility="@{ reactionSelectionViewModel.isSearchMode ? View.VISIBLE : View.GONE }"
+                />
     </RelativeLayout>
 </layout>
