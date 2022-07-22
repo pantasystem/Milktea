@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
@@ -21,8 +22,6 @@ import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoi
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelectionDialogViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
@@ -58,7 +57,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         return inflater.inflate(R.layout.dialog_select_reaction, container, false)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DialogSelectReactionBinding.bind(view)
@@ -71,31 +69,14 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         binding.searchSuggestionsView.adapter = searchedReactionAdapter
         binding.searchSuggestionsView.layoutManager = flexBoxLayoutManager
 
-
-        val activity = activity
-        val ar  = accountStore.currentAccount
-
-        activity?: return
-        ar?: return
-
         mNoteViewModel = notesViewModel
+        binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
 
-
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.instanceDomain)
-        }.mapNotNull {
-            it?.emojis
-        }.map { emojis ->
-            emojis.filter {
-                it.category != null
-            }.groupBy {
-                it.category?: ""
-            }.keys
-        }.onEach { category ->
-            val pagerAdapter = ReactionChoicesPagerAdapter(category)
-            binding.reactionChoicesViewPager.adapter = pagerAdapter
-            binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launchWhenResumed {
+            viewModel.categories.collect { categories ->
+                binding.reactionChoicesViewPager.adapter = ReactionChoicesPagerAdapter(categories.toSet())
+            }
+        }
 
 
         lifecycleScope.launchWhenResumed {
@@ -104,6 +85,14 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
             }
         }
 
+        binding.searchReactionEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                notesViewModel.postReaction(viewModel.searchWord.value)
+                dismiss()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
 
     }
 

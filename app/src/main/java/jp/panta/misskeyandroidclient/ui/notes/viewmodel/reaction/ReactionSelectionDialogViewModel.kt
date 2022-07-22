@@ -20,7 +20,8 @@ class ReactionSelectionDialogViewModel @Inject constructor(
 
     val isSearchMode = searchWord.map {
         it.isNotBlank()
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    }.distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -43,7 +44,25 @@ class ReactionSelectionDialogViewModel @Inject constructor(
         emojis.map {
             ":${it.name}:"
         }
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    }.distinctUntilChanged()
+        .flowOn(Dispatchers.IO)
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val categories = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        metaRepository.observe(it.instanceDomain)
+    }.mapNotNull {
+        it?.emojis
+    }.map { emojis ->
+        emojis.filter {
+            it.category != null
+        }.groupBy {
+            it.category ?: ""
+        }.keys
+    }.distinctUntilChanged()
+        .flowOn(Dispatchers.IO)
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
 
 }
 
