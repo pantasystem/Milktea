@@ -394,6 +394,7 @@
     <string name="disagree">不同意</string>
 
     <string name="consent_to_collect_behavior_history">动作历史集合</string>
+    <string name="search_custom_emojis">搜索表情符号</string>
 
 
     <!--    <string name="n_people">%d位用户</string>-->
