@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.model.notes.reaction.usercustom
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReactionUserSettingDao{
@@ -9,7 +10,7 @@ interface ReactionUserSettingDao{
     fun findByInstanceDomain(instanceDomain: String): List<ReactionUserSetting>?
 
     @Query("select * from reaction_user_setting where instance_domain = :instanceDomain order by weight asc")
-    fun observeByInstanceDomain(instanceDomain: String): List<ReactionUserSetting>?
+    fun observeByInstanceDomain(instanceDomain: String): Flow<List<ReactionUserSetting>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

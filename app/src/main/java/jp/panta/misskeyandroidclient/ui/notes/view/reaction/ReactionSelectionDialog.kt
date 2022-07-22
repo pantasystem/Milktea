@@ -6,20 +6,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.flexbox.AlignItems
+import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogSelectReactionBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoicesFragment
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionInputDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelectionDialogViewModel
+import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
@@ -38,6 +40,14 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     @Inject
     lateinit var accountStore: AccountStore
 
+    val viewModel: ReactionSelectionDialogViewModel by viewModels()
+
+    private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
+        val flexBoxLayoutManager = FlexboxLayoutManager(requireContext())
+        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+        flexBoxLayoutManager
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,42 +57,45 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         return inflater.inflate(R.layout.dialog_select_reaction, container, false)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DialogSelectReactionBinding.bind(view)
+        binding.reactionSelectionViewModel = viewModel
+        binding.lifecycleOwner = this
 
-        val activity = activity
-        val ar  = accountStore.currentAccount
-
-        activity?: return
-        ar?: return
+        val searchedReactionAdapter = ReactionChoicesAdapter {
+            notesViewModel.postReaction(it)
+        }
+        binding.searchSuggestionsView.adapter = searchedReactionAdapter
+        binding.searchSuggestionsView.layoutManager = flexBoxLayoutManager
 
         mNoteViewModel = notesViewModel
+        binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
 
+        val adapter = ReactionChoicesPagerAdapter()
+        binding.reactionChoicesViewPager.adapter = adapter
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.instanceDomain)
-        }.mapNotNull {
-            it?.emojis
-        }.map { emojis ->
-            emojis.filter {
-                it.category != null
-            }.groupBy {
-                it.category?: ""
-            }.keys
-        }.onEach { category ->
-            val pagerAdapter = ReactionChoicesPagerAdapter(category)
-            binding.reactionChoicesViewPager.adapter = pagerAdapter
-            binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
-        }.launchIn(lifecycleScope)
-
-
-        binding.reactionInputKeyboard.setOnClickListener {
-            ReactionInputDialog().show(parentFragmentManager, "")
-            dismiss()
+        lifecycleScope.launchWhenResumed {
+            viewModel.categories.collect { categories ->
+                adapter.setList(categories.toList())
+            }
         }
 
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.filteredEmojis.collect { list ->
+                searchedReactionAdapter.submitList(list)
+            }
+        }
+
+        binding.searchReactionEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                notesViewModel.postReaction(viewModel.searchWord.value)
+                dismiss()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
 
     }
 
@@ -91,11 +104,9 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         dismiss()
     }
 
-    inner class ReactionChoicesPagerAdapter(
-        category: Set<String>
-    ) : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class ReactionChoicesPagerAdapter : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
 
-        private val categoryList = category.toList()
+        private var categoryList: List<String> = emptyList()
         override fun getCount(): Int {
             return 3 + categoryList.size
         }
@@ -117,7 +128,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
                 }
             }
         }
-        @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
         override fun getItem(position: Int): Fragment {
             return when(position){
                 0 ->{
@@ -135,6 +145,12 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
                 }
             }
         }
+
+        fun setList(list: List<String>) {
+            categoryList = list
+            notifyDataSetChanged()
+        }
+
     }
 
 }
