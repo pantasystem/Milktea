@@ -72,6 +72,7 @@
                         android:layout_gravity="center"
                         android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
                         android:text="@string/sensitive_content"
+                        app:emojiCompatEnabled="false"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -128,6 +129,7 @@
                         android:text="@string/sensitive_content"
                         android:layout_gravity="center"
                         android:visibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
+                        app:emojiCompatEnabled="false"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -197,6 +199,7 @@
                         android:layout_gravity="center"
                         android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
                         android:text="@string/sensitive_content"
+                        app:emojiCompatEnabled="false"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -253,7 +256,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="@string/sensitive_content"
-                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}" />
+                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
+                        app:emojiCompatEnabled="false"
+                        />
                 <ImageButton
                         android:layout_width="40dp"
                         android:layout_height="40dp"

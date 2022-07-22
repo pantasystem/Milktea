@@ -98,7 +98,8 @@
                 android:id="@+id/elapsedTime"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:textColor="?attr/colorPrimary"/>
+                android:textColor="?attr/colorPrimary"
+                app:emojiCompatEnabled="false" />
 
         <jp.panta.misskeyandroidclient.ui.components.AutoCollapsingLayout
                 android:layout_width="0dp"
@@ -123,6 +124,7 @@
 
                     android:id="@+id/autoExpandableButton"
                     android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
+                    app:emojiCompatEnabled="false"
 
                     />
 
@@ -157,6 +159,7 @@
                         noteId="@{note.id}"
                         targetView="@{contentMain}"
                         isVisible="@{note.contentFolding}"
+                        app:emojiCompatEnabled="false"
                          />
 
                 <LinearLayout
@@ -316,7 +319,7 @@
                                 onToggleCw="@{ note::changeSubContentFolding }"
                                 targetView="@{ subNoteText }"
                                 isVisible="@{ note.subContentFolding }"
-
+                                app:emojiCompatEnabled="false"
                                 />
 
                         <TextView
@@ -400,7 +403,8 @@
                 app:layout_constraintStart_toEndOf="@+id/imageButton"
                 tools:text="99999999999"
                 app:layout_constraintTop_toTopOf="@id/imageButton"
-                app:layout_constraintBottom_toBottomOf="@id/imageButton" />
+                app:layout_constraintBottom_toBottomOf="@id/imageButton"
+                app:emojiCompatEnabled="false"/>
 
 
         <ImageButton
@@ -437,6 +441,7 @@
                 tools:text="10"
                 app:layout_constraintTop_toTopOf="@id/imageButton2"
                 app:layout_constraintBottom_toBottomOf="@id/imageButton2"
+                app:emojiCompatEnabled="false"
 
                 />
 
@@ -474,7 +479,9 @@
                 android:maxLines="1"
                 tools:text="10000"
                 app:layout_constraintTop_toTopOf="@id/imageButton3"
-                app:layout_constraintBottom_toBottomOf="@id/imageButton3" />
+                app:layout_constraintBottom_toBottomOf="@id/imageButton3"
+                app:emojiCompatEnabled="false"
+                />
 
         <ImageButton
                 android:layout_width="@dimen/note_bottom_action_icon_size"
