@@ -27,7 +27,7 @@ sealed class APIError(msg: String) : Exception(msg){
     data class ForbiddenException(override val error: Error?) : APIError("error:$error")
     data class IAmAIException(override val error: Error?) : APIError("error:$error")
     data class InternalServerException(override val error: Error?) : APIError("error:$error")
-    data class SomethingException(override val error: Error?) : APIError("error:$error")
+    data class SomethingException(override val error: Error?, val statusCode: Int) : APIError("error:$error, statusCode:$statusCode")
     data class NotFoundException(override val error: Error?) : APIError("error:$error")
 }
 
@@ -48,7 +48,7 @@ fun<T> Response<T>.throwIfHasError(): Response<T> {
             404 -> throw APIError.NotFoundException(it)
             418 -> throw APIError.IAmAIException(it)
             500 -> throw APIError.InternalServerException(it)
-            else -> APIError.SomethingException(it)
+            else -> APIError.SomethingException(it, code())
 
         }
     }
