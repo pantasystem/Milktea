@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.messaging
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -35,8 +36,8 @@ class MessageRepositoryImpl @Inject constructor(
             )
         ).isSuccessful
 
-        if(result) {
-            messageDataSource.find(messageId)?.read()?.let{
+        if (result) {
+            messageDataSource.find(messageId)?.read()?.let {
                 messageDataSource.add(it)
             }
         }
@@ -48,7 +49,7 @@ class MessageRepositoryImpl @Inject constructor(
     override suspend fun create(createMessage: CreateMessage): Message {
         val account = accountRepository.get(createMessage.accountId).getOrThrow()
         val i = account.getI(encryption)
-        val action = when(createMessage) {
+        val action = when (createMessage) {
             is CreateMessage.Group -> {
                 MessageAction(
                     i,
@@ -71,8 +72,9 @@ class MessageRepositoryImpl @Inject constructor(
             }
         }
 
-        val body: MessageDTO = misskeyAPIProvider.get(account).createMessage(action).body()
-            ?: throw IllegalStateException("メッセージの作成に失敗しました")
+        val body: MessageDTO = misskeyAPIProvider.get(account).createMessage(action)
+            .throwIfHasError()
+            .body() ?: throw IllegalStateException("メッセージの作成に失敗しました")
 
         return messageAdder.add(account, body).message
 
@@ -92,7 +94,7 @@ class MessageRepositoryImpl @Inject constructor(
             )
         ).isSuccessful
 
-        if(result) {
+        if (result) {
             messageDataSource.delete(messageId)
         }
 
