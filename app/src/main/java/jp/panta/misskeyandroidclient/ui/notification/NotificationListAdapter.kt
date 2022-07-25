@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardAction
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -24,9 +26,12 @@ class NotificationListAdapter constructor(
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationViewData>,
     val notesViewModel: NotesViewModel,
     val notificationViewModel: NotificationViewModel,
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    onNoteCardAction: (NoteCardAction) -> Unit
     ) : ListAdapter<NotificationViewData, NotificationListAdapter.NotificationHolder>(diffUtilCallBack){
     class NotificationHolder(val binding: ItemNotificationBinding) : RecyclerView.ViewHolder(binding.root)
+
+    val noteCardActionListenerAdapter = NoteCardActionListenerAdapter(onNoteCardAction)
 
     override fun onBindViewHolder(holder: NotificationHolder, position: Int) {
         holder.binding.notesViewModel = notesViewModel
@@ -52,7 +57,9 @@ class NotificationListAdapter constructor(
     private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView){
 
         val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-        val adapter = ReactionCountAdapter(notesViewModel)
+        val adapter = ReactionCountAdapter {
+            noteCardActionListenerAdapter.onReactionCountAction(it)
+        }
         adapter.note = note
         reactionView.adapter = adapter
 

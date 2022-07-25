@@ -15,6 +15,9 @@
         <variable
                 name="notificationViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel" />
+        <variable
+                name="noteCardActionListener"
+                type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -143,7 +146,7 @@
                 <include android:id="@+id/simpleNote"
                         layout="@layout/item_simple_note"
                         app:note="@{notification.noteViewData}"
-                        app:notesViewModel="@{notesViewModel}"
+                        app:noteCardActionListener="@{noteCardActionListener}"
                         />
             </FrameLayout>
             <TextView

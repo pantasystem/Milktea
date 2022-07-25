@@ -13,6 +13,9 @@
         <variable
                 name="noteDetailViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel" />
+        <variable
+                name="noteCardActionListener"
+                type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
@@ -40,7 +43,7 @@
                         android:id="@+id/childNote"
                         layout="@layout/item_simple_note"
                         app:note="@{childrenViewData}"
-                        app:notesViewModel="@{notesViewModel}"
+                        app:noteCardActionListener="@{noteCardActionListener}"
                         />
 
             </FrameLayout>
@@ -73,7 +76,7 @@
                     android:textColor="?attr/colorAccent"
                     android:text="@string/show_reply"
                     android:visibility="@{SafeUnbox.unboxBool(childrenViewData.hasConversation) ? View.GONE : View.VISIBLE}"
-                    android:onClick="@{()-> notesViewModel.setTargetToNote(childrenViewData)}"
+                    android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(childrenViewData.toShowNote.note)}"
                     />
 
         </LinearLayout>

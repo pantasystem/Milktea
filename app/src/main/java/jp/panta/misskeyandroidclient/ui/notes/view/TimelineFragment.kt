@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -15,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.wada811.databinding.dataBinding
+import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentSwipeRefreshRecyclerViewBinding
@@ -69,7 +70,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     lateinit var timelineViewModelFactory: TimelineViewModel.ViewModelAssistedFactory
 
     private val mViewModel: TimelineViewModel by viewModels<TimelineViewModel> {
-        TimelineViewModel.provideViewModel(timelineViewModelFactory, null, mPage?.accountId, mPageable)
+        TimelineViewModel.provideViewModel(
+            timelineViewModelFactory,
+            null,
+            mPage?.accountId,
+            mPageable
+        )
     }
 
     @Inject
@@ -93,8 +99,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private var mFirstVisibleItemPosition: Int? = null
 
 
-
-    val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
+//    val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
     val notesViewModel by activityViewModels<NotesViewModel>()
 
@@ -107,44 +112,56 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
-        mBinding.listView.layoutManager = mLinearLayoutManager
-
-        mBinding.listView.addOnScrollListener(mScrollListener)
-        mBinding.listView.layoutManager = mLinearLayoutManager
-
-
-        mBinding.refresh.setOnRefreshListener {
-            mViewModel.loadNew()
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel) {
+            NoteCardActionHandler(requireActivity() as AppCompatActivity, notesViewModel, settingStore).onAction(it)
         }
 
-        mViewModel.isLoading.observe(viewLifecycleOwner) {
-            if (it != null && !it) {
-                mBinding.refresh.isRefreshing = false
+        withBinding<FragmentSwipeRefreshRecyclerViewBinding> { mBinding ->
+            mBinding.listView.layoutManager = mLinearLayoutManager
+
+            mBinding.listView.addOnScrollListener(mScrollListener)
+            mBinding.listView.layoutManager = mLinearLayoutManager
+
+
+            mBinding.refresh.setOnRefreshListener {
+                mViewModel.loadNew()
             }
-        }
 
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel)
-        mBinding.listView.adapter = adapter
+            mViewModel.isLoading.observe(viewLifecycleOwner) {
+                if (it != null && !it) {
+                    mBinding.refresh.isRefreshing = false
+                }
+            }
 
-        lifecycleScope.launchWhenResumed {
-            mViewModel.timelineState.collect { state ->
-                val notes = (state.content as? StateContent.Exist)?.rawContent ?: emptyList()
-                adapter.submitList(notes)
 
-                mBinding.timelineProgressBar.isVisible =
-                    state is PageableState.Loading && state.content is StateContent.NotExist
+            mBinding.listView.adapter = adapter
 
-                mBinding.refresh.isVisible = state.content is StateContent.Exist
-                when (state.content) {
-                    is StateContent.Exist -> {
-                        mBinding.timelineEmptyView.visibility = View.GONE
-                    }
-                    is StateContent.NotExist -> {
-                        mBinding.timelineEmptyView.isVisible = state is PageableState.Error
+            lifecycleScope.launchWhenResumed {
+                mViewModel.timelineState.collect { state ->
+                    val notes = (state.content as? StateContent.Exist)?.rawContent ?: emptyList()
+                    adapter.submitList(notes)
+
+                    mBinding.timelineProgressBar.isVisible =
+                        state is PageableState.Loading && state.content is StateContent.NotExist
+
+                    mBinding.refresh.isVisible = state.content is StateContent.Exist
+                    when (state.content) {
+                        is StateContent.Exist -> {
+                            mBinding.timelineEmptyView.visibility = View.GONE
+                        }
+                        is StateContent.NotExist -> {
+                            mBinding.timelineEmptyView.isVisible = state is PageableState.Error
+                        }
                     }
                 }
             }
+
+            mBinding.retryLoadButton.setOnClickListener {
+                Log.d("TimelineFragment", "リトライボタンを押しました")
+                mViewModel.loadInit()
+            }
         }
+
 
         lifecycleScope.launchWhenResumed {
             mViewModel.errorEvent.collect { error ->
@@ -170,10 +187,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }
 
-        mBinding.retryLoadButton.setOnClickListener {
-            Log.d("TimelineFragment", "リトライボタンを押しました")
-            mViewModel.loadInit()
-        }
+
 
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -208,7 +222,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         isShowing = false
         Log.d("TimelineFragment", "onPause")
     }
-
 
 
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>() {

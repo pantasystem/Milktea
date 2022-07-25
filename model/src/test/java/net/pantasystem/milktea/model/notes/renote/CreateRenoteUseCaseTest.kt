@@ -30,6 +30,7 @@ class CreateRenoteUseCaseTest {
     fun invoke() {
         val target = generateEmptyNote().copy(
             visibility = Visibility.Public(true),
+            text = "test"
         )
         val noteRepository = mock<NoteRepository> {
             onBlocking {
@@ -57,7 +58,8 @@ class CreateRenoteUseCaseTest {
     fun invoke_GiveIllegalRenote() {
         val target = generateEmptyNote().copy(
             visibility = Visibility.Specified(emptyList()),
-            userId = User.Id(accountId = account.accountId, id = account.remoteId + "other")
+            userId = User.Id(accountId = account.accountId, id = account.remoteId + "other"),
+            text = "test"
         )
 
         val noteRepository = mock<NoteRepository> {
@@ -83,4 +85,5 @@ class CreateRenoteUseCaseTest {
 
 
     }
+
 }

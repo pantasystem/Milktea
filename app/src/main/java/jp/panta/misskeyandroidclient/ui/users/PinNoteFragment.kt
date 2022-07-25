@@ -2,15 +2,17 @@ package jp.panta.misskeyandroidclient.ui.users
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
+import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -18,6 +20,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -26,7 +29,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
-    val mBinding: FragmentPinNoteBinding by dataBinding()
 
     companion object {
 
@@ -52,6 +54,9 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
     @Inject
     lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
+
+    @Inject
+    internal lateinit var settingStore: SettingStore
 
     @ExperimentalCoroutinesApi
     val userViewModel: UserDetailViewModel by activityViewModels {
@@ -86,9 +91,20 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
             ): Boolean {
                 return oldItem.id == newItem.id
             }
-        }, viewLifecycleOwner, notesViewModel)
-        mBinding.pinNotesView.adapter = adapter
-        mBinding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
+        }, viewLifecycleOwner, notesViewModel) {
+            NoteCardActionHandler(
+                requireActivity() as AppCompatActivity,
+                notesViewModel,
+                settingStore
+            ).onAction(
+                it
+            )
+        }
+        withBinding<FragmentPinNoteBinding> { binding ->
+            binding.pinNotesView.adapter = adapter
+            binding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
+        }
+
         userViewModel.pinNotes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }

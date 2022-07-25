@@ -9,11 +9,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
-class ReactionCountAdapter(val notesViewModel: NotesViewModel) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
+class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction) -> Unit) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
     reactionDiffUtilItemCallback
 ){
     class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
@@ -45,13 +44,22 @@ class ReactionCountAdapter(val notesViewModel: NotesViewModel) : ListAdapter<Rea
         }
         holder.binding.reaction = item//Pair(java.lang.String(item.first), Integer.valueOf(item.second))
         holder.binding.note = note
-        holder.binding.notesViewModel = notesViewModel
         holder.binding.root.setOnLongClickListener {
             val id = note?.toShowNote?.note?.id
             if (id != null) {
-                notesViewModel.setShowReactionHistoryDialog(id, item.reaction)
+                note?.let {
+                    reactionCountActionListener(ReactionCountAction.OnLongClicked(it, item.reaction))
+                }
+                true
+            } else {
+                false
             }
-            false
+        }
+        holder.binding.root.setOnClickListener {
+            note?.let {
+                reactionCountActionListener(ReactionCountAction.OnClicked(it, item.reaction))
+            }
+
         }
         holder.binding.executePendingBindings()
         //holder.binding.lifecycleOwner = lifecycleOwner
@@ -61,4 +69,9 @@ class ReactionCountAdapter(val notesViewModel: NotesViewModel) : ListAdapter<Rea
         val binding = DataBindingUtil.inflate<ItemReactionBinding>(LayoutInflater.from(parent.context), R.layout.item_reaction, parent, false)
         return ReactionHolder(binding)
     }
+}
+
+sealed interface ReactionCountAction {
+    data class OnClicked(val note: PlaneNoteViewData, val reaction: String): ReactionCountAction
+    data class OnLongClicked(val note: PlaneNoteViewData, val reaction: String): ReactionCountAction
 }

@@ -28,17 +28,12 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
-
-data class SelectedReaction(val noteId: Note.Id, val reaction: String)
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -59,13 +54,7 @@ class NotesViewModel @Inject constructor(
 
     private val errorStatusMessage = EventBus<String>()
 
-    val reNoteTarget = EventBus<PlaneNoteViewData>()
-
-    val quoteRenoteTarget = EventBus<PlaneNoteViewData>()
-
-    val replyTarget = EventBus<PlaneNoteViewData>()
-
-    val reactionTarget = EventBus<PlaneNoteViewData>()
+    val quoteRenoteTarget = EventBus<Note>()
 
     val shareTarget = EventBus<PlaneNoteViewData>()
 
@@ -79,30 +68,8 @@ class NotesViewModel @Inject constructor(
 
     val targetUser = EventBus<User>()
 
-    val showNoteEvent = EventBus<Note>()
-
-
     val openNoteEditor = EventBus<DraftNote?>()
 
-    val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
-
-    val showRenotesEvent = EventBus<Note.Id?>()
-
-    /**
-     * リモートのリアクションを選択したときに
-     * ローカルの絵文字からそれに近い候補を表示するためのダイアログを表示するイベント
-     */
-    val showRemoteReactionEmojiSuggestionDialog = EventBus<SelectedReaction?>()
-
-    fun setTargetToReNote(note: PlaneNoteViewData) {
-        //reNoteTarget.postValue(note)
-        Log.d("NotesViewModel", "登録しました: $note")
-        reNoteTarget.event = note
-    }
-
-    fun setTargetToReply(note: PlaneNoteViewData) {
-        replyTarget.event = note
-    }
 
     fun setTargetToShare(note: PlaneNoteViewData) {
         shareTarget.event = note
@@ -113,34 +80,10 @@ class NotesViewModel @Inject constructor(
         targetUser.event = user
     }
 
-    fun setTargetToNote() {
-        showNoteEvent.event = shareTarget.event?.toShowNote?.note
-    }
 
-    fun setTargetToNote(note: PlaneNoteViewData) {
-        showNoteEvent.event = note.toShowNote.note
-    }
-
-    fun setShowNote(note: Note) {
-        showNoteEvent.event = note
-    }
-
-    fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
-        noteId?.let {
-            showReactionHistoryEvent.event =
-                ReactionHistoryRequest(noteId, type)
-        }
-    }
-
-    fun showRenotes(noteId: Note.Id?) {
-        showRenotesEvent.event = noteId
-    }
-
-    fun postRenote() {
-        val renoteId = reNoteTarget.event?.toShowNote?.note?.id
-            ?: return
+    fun renote(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            renoteUseCase(renoteId).onSuccess {
+            renoteUseCase(noteId).onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "renoteしました"
                 }
@@ -150,39 +93,26 @@ class NotesViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
-    fun putQuoteRenoteTarget() {
-        quoteRenoteTarget.event = reNoteTarget.event
-    }
-
-    /**
-     * イベントにリアクション送信ボタンを押したことを登録する
-     */
-    fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData) {
-        //Log.d("NotesViewModel", "getAccount()?: $getAccount()?")
-        val myReaction = planeNoteViewData.myReaction.value
-        if (myReaction != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    syncDeleteReaction(planeNoteViewData)
-                } catch (e: Exception) {
-                    Log.d(TAG, "error", e)
+    fun showQuoteNoteEditor(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            recursiveSearchHasContentNote(noteId).onSuccess { note ->
+                withContext(Dispatchers.Main) {
+                    quoteRenoteTarget.event = note
                 }
             }
-        } else {
-            reactionTarget.event = planeNoteViewData
+
         }
     }
 
-
-    fun postReaction(reaction: String) {
-        val targetNote = reactionTarget.event
-        require(targetNote != null) {
-            "targetNoteはNotNullである必要があります。"
+    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> = runCatching {
+        val note = noteRepository.find(noteId).getOrThrow()
+        if (note.hasContent()) {
+            note
+        } else {
+            recursiveSearchHasContentNote(note.renoteId!!).getOrThrow()
         }
-        postReaction(targetNote, reaction)
     }
 
     /**
@@ -193,32 +123,17 @@ class NotesViewModel @Inject constructor(
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String) {
 
         val id = planeNoteViewData.toShowNote.note.id
-        if (!Reaction(reaction).isLocal()) {
-            showRemoteReactionEmojiSuggestionDialog.event =
-                SelectedReaction(noteId = id, reaction = reaction)
-            return
-        }
+        toggleReaction(id, reaction)
+    }
+
+    fun toggleReaction(noteId: Note.Id, reaction: String) {
         viewModelScope.launch(Dispatchers.IO) {
-
-            toggleReactionUseCase(id, reaction).onFailure {
-
-            }.onSuccess {
+            toggleReactionUseCase(noteId, reaction).onFailure {
 
             }
-
         }
     }
 
-    /**
-     * 同期リアクション削除
-     * 既にリアクションが含まれている場合のみ実行される
-     */
-    private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData) {
-        if (planeNoteViewData.myReaction.value.isNullOrBlank()) {
-            return
-        }
-        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id).getOrThrow()
-    }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
         note ?: return
@@ -282,20 +197,17 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun unRenote(planeNoteViewData: PlaneNoteViewData) {
-        if (planeNoteViewData.isRenotedByMe) {
-            viewModelScope.launch(Dispatchers.IO) {
-                noteRepository.delete(planeNoteViewData.note.note.id).onSuccess {
-                    withContext(Dispatchers.Main) {
-                        statusMessage.event = "削除に成功しました"
-                    }
-                }.onFailure { t ->
-                    Log.d(TAG, "unrenote失敗", t)
+
+    fun unRenote(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            noteRepository.delete(noteId).onSuccess {
+                withContext(Dispatchers.Main) {
+                    statusMessage.event = "削除に成功しました"
                 }
+            }.onFailure { t ->
+                Log.d(TAG, "unrenote失敗", t)
             }
-
         }
-
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData) {
@@ -306,8 +218,8 @@ class NotesViewModel @Inject constructor(
                         i = getAccount()?.getI(encryption)!!,
                         noteId = planeNoteViewData.toShowNote.note.id.noteId
                     )
-                )
-                    ?.throwIfHasError()
+                )?.throwIfHasError()
+
                 val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
                 if (nowNoteId == planeNoteViewData.toShowNote.note.id.noteId) {
                     val state = response?.body()!!
@@ -328,15 +240,7 @@ class NotesViewModel @Inject constructor(
         }
         if (SafeUnbox.unbox(poll.canVote)) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
-                    getMisskeyAPI()?.vote(
-                        Vote(
-                            i = getAccount()?.getI(encryption)!!,
-                            choice = choice.index,
-                            noteId = noteId.noteId
-                        )
-                    )?.throwIfHasError()
-                }.onSuccess {
+                noteRepository.vote(noteId, choice).onSuccess {
                     Log.d(TAG, "投票に成功しました")
                 }.onFailure {
                     Log.d(TAG, "投票に失敗しました")

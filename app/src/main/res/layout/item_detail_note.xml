@@ -17,9 +17,10 @@
 
         <import type="jp.panta.misskeyandroidclient.R" />
 
+
         <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
+                name="noteCardActionListener"
+                type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -187,7 +188,7 @@
                         tools:listitem="@layout/item_choice"
                         noteId="@{note.toShowNote.note.id}"
                         poll="@{note.poll}"
-                        notesViewModel="@{notesViewModel}"
+                        noteCardActionListenerAdapter="@{noteCardActionListener}"
 
                         />
 
@@ -210,7 +211,7 @@
                         android:layout_below="@+id/url_preview_list"
                         android:layout_marginTop="3dp"
                         android:background="@drawable/shape_rounded_square_line"
-                        android:onClick="@{()-> notesViewModel.setShowNote(note.subNote.note)}"
+                        android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(note.toShowNote.note)}"
                         android:padding="8dp"
                         android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                         app:mainNameView="@{subNoteMainName}"
@@ -368,7 +369,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/reply_title"
-                        android:onClick="@{ () -> notesViewModel.setTargetToReply(note) }"
+                        android:onClick="@{ ()-> noteCardActionListener.onReplyButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_reply_black_24dp"
@@ -390,7 +391,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/renote"
-                        android:onClick="@{ ()-> notesViewModel.setTargetToReNote(note) }"
+                        android:onClick="@{ ()-> noteCardActionListener.onRenoteButtonClicked(note)}"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_re_note"
@@ -416,7 +417,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/reaction"
-                        android:onClick="@{ () -> notesViewModel.setTargetToReaction(note) }"
+                        android:onClick="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:isReacted="@{note.myReaction != null}"
@@ -441,7 +442,7 @@
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
                         android:contentDescription="@string/more"
-                        android:onClick="@{()-> notesViewModel.setTargetToShare(note)}"
+                        android:onClick="@{() -> noteCardActionListener.onOptionButtonClicked(note)}"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_more_horiz_black_24dp"

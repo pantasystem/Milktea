@@ -10,12 +10,11 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemChoiceBinding
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 class PollListAdapter(
     val noteId: Note.Id,
     val poll: Poll,
-    val notesViewModel: NotesViewModel,
+    val onVoteSelected: (OnVoted) -> Unit
 ) : ListAdapter<Poll.Choice, PollListAdapter.ChoiceHolder>(object : DiffUtil.ItemCallback<Poll.Choice>() {
     override fun areContentsTheSame(oldItem: Poll.Choice, newItem: Poll.Choice): Boolean {
         return oldItem == newItem
@@ -31,7 +30,9 @@ class PollListAdapter(
     override fun onBindViewHolder(holder: ChoiceHolder, position: Int) {
         holder.binding.poll = poll
         holder.binding.choice = poll.choices[position]
-        holder.binding.notesViewModel = notesViewModel
+        holder.binding.radioChoice.setOnClickListener {
+            onVoteSelected(OnVoted(noteId, poll.choices[position], poll))
+        }
         holder.binding.noteId = noteId
         holder.binding.executePendingBindings()
     }
@@ -42,3 +43,9 @@ class PollListAdapter(
         return ChoiceHolder(binding)
     }
 }
+
+data class OnVoted(
+    val noteId: Note.Id,
+    val choice: Poll.Choice,
+    val poll: Poll,
+)

@@ -20,6 +20,8 @@ import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
@@ -126,7 +128,8 @@ class NoteRepositoryImpl @Inject constructor(
 
         runCatching {
             if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
-                    .isCaptured(createReaction.noteId.noteId)) {
+                    .isCaptured(createReaction.noteId.noteId)
+            ) {
                 noteDataSource.add(note.onIReacted(createReaction.reaction))
             }
             true
@@ -145,6 +148,18 @@ class NoteRepositoryImpl @Inject constructor(
                 && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
                 && noteDataSource.add(note.onIUnReacted()) != AddResult.CANCEL))
+    }
+
+
+    override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCatching {
+        val account = getAccount.get(noteId.accountId)
+        misskeyAPIProvider.get(account).vote(
+            Vote(
+                i = getAccount.get(noteId.accountId).getI(encryption),
+                choice = choice.index,
+                noteId = noteId.noteId
+            )
+        ).throwIfHasError()
     }
 
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {

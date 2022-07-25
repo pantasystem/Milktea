@@ -6,14 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.renote.RenotesBottomSheetDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.SelectedReaction
 import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
@@ -23,8 +17,6 @@ import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
-import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.Report
 
@@ -35,23 +27,23 @@ class ActionNoteHandler(
     val confirmViewModel: ConfirmViewModel,
     val settingStore: SettingStore,
 
-) {
+    ) {
 
-    private val replyTargetObserver = Observer<PlaneNoteViewData> {
-        activity.startActivity(
-            NoteEditorActivity.newBundle(
-                activity,
-                replyTo = it.toShowNote.note.id
-            )
-        )
-    }
+//    private val replyTargetObserver = Observer<PlaneNoteViewData> {
+//        activity.startActivity(
+//            NoteEditorActivity.newBundle(
+//                activity,
+//                replyTo = it.toShowNote.note.id
+//            )
+//        )
+//    }
 
-    private val reNoteTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "renote clicked :$it")
-        val dialog = RenoteBottomSheetDialog()
-        dialog.show(activity.supportFragmentManager, "timelineFragment")
-
-    }
+//    private val reNoteTargetObserver = Observer<PlaneNoteViewData> {
+//        Log.d("MainActivity", "renote clicked :$it")
+//        val dialog = RenoteBottomSheetDialog.newInstance(it.id)
+//        dialog.show(activity.supportFragmentManager, "timelineFragment")
+//
+//    }
     private val shareTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
@@ -70,32 +62,20 @@ class ActionNoteHandler(
         Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
     }
 
-    private val quoteRenoteTargetObserver = Observer<PlaneNoteViewData> {
-        val intent = NoteEditorActivity.newBundle(activity, quoteTo = it.toShowNote.note.id)
+    private val quoteRenoteTargetObserver = Observer<Note> {
+        val intent = NoteEditorActivity.newBundle(activity, quoteTo = it.id)
         activity.startActivity(intent)
-    }
-
-    private val reactionTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
-        when (settingStore.reactionPickerType) {
-            ReactionPickerType.LIST -> {
-                ReactionSelectionDialog().show(activity.supportFragmentManager, "MainActivity")
-            }
-            ReactionPickerType.SIMPLE -> {
-                ReactionPickerDialog().show(activity.supportFragmentManager, "Activity")
-            }
-        }
-    }
-
-
-    private val showNoteEventObserver = Observer<Note> {
-        activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
     }
 
 
 
     private val openNoteEditor = Observer<DraftNote?> { note ->
-        activity.startActivity(NoteEditorActivity.newBundle(activity, draftNoteId = note.draftNoteId))
+        activity.startActivity(
+            NoteEditorActivity.newBundle(
+                activity,
+                draftNoteId = note.draftNoteId
+            )
+        )
     }
 
     private val confirmDeletionEventObserver = Observer<PlaneNoteViewData> {
@@ -138,18 +118,18 @@ class ActionNoteHandler(
         }
     }
 
-    private val showReactionHistoryDialogObserver: (ReactionHistoryRequest?) -> Unit = { req ->
-        req?.let {
-            ReactionHistoryPagerDialog.newInstance(req.noteId, it.type)
-                .show(activity.supportFragmentManager, "")
-        }
-    }
+//    private val showReactionHistoryDialogObserver: (ReactionHistoryRequest?) -> Unit = { req ->
+//        req?.let {
+//            ReactionHistoryPagerDialog.newInstance(req.noteId, it.type)
+//                .show(activity.supportFragmentManager, "")
+//        }
+//    }
 
-    private val showRenotesDialogObserver: (Note.Id?) -> Unit = { id ->
-        id?.let {
-            RenotesBottomSheetDialog.newInstance(id).show(activity.supportFragmentManager, "")
-        }
-    }
+//    private val showRenotesDialogObserver: (Note.Id?) -> Unit = { id ->
+//        id?.let {
+//            RenotesBottomSheetDialog.newInstance(id).show(activity.supportFragmentManager, "")
+//        }
+//    }
 
 
     private val reportDialogObserver: (Report?) -> Unit = { report ->
@@ -159,22 +139,23 @@ class ActionNoteHandler(
         }
     }
 
-    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit = { reaction ->
-        if (reaction != null) {
-            RemoteReactionEmojiSuggestionDialog.newInstance(
-                accountId = reaction.noteId.accountId,
-                noteId = reaction.noteId.noteId,
-                reaction = reaction.reaction
-            ).show(activity.supportFragmentManager, "")
-        }
-    }
+//    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit =
+//        { reaction ->
+//            if (reaction != null) {
+//                RemoteReactionEmojiSuggestionDialog.newInstance(
+//                    accountId = reaction.noteId.accountId,
+//                    noteId = reaction.noteId.noteId,
+//                    reaction = reaction.reaction
+//                ).show(activity.supportFragmentManager, "")
+//            }
+//        }
 
     fun initViewModelListener() {
-        mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
-        mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
+//        mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
+//        mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
 
-        mNotesViewModel.reNoteTarget.removeObserver(reNoteTargetObserver)
-        mNotesViewModel.reNoteTarget.observe(activity, reNoteTargetObserver)
+//        mNotesViewModel.reNoteTarget.removeObserver(reNoteTargetObserver)
+//        mNotesViewModel.reNoteTarget.observe(activity, reNoteTargetObserver)
 
         mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
         mNotesViewModel.shareTarget.observe(activity, shareTargetObserver)
@@ -188,15 +169,9 @@ class ActionNoteHandler(
         mNotesViewModel.quoteRenoteTarget.removeObserver(quoteRenoteTargetObserver)
         mNotesViewModel.quoteRenoteTarget.observe(activity, quoteRenoteTargetObserver)
 
-        mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
-        mNotesViewModel.reactionTarget.observe(activity, reactionTargetObserver)
-
-
         mNotesViewModel.openNoteEditor.removeObserver(openNoteEditor)
         mNotesViewModel.openNoteEditor.observe(activity, openNoteEditor)
 
-        mNotesViewModel.showNoteEvent.removeObserver(showNoteEventObserver)
-        mNotesViewModel.showNoteEvent.observe(activity, showNoteEventObserver)
 
         mNotesViewModel.confirmDeletionEvent.removeObserver(confirmDeletionEventObserver)
         mNotesViewModel.confirmDeletionEvent.observe(activity, confirmDeletionEventObserver)
@@ -213,19 +188,24 @@ class ActionNoteHandler(
         confirmViewModel.confirmedEvent.removeObserver(confirmedEventObserver)
         confirmViewModel.confirmedEvent.observe(activity, confirmedEventObserver)
 
-        mNotesViewModel.showReactionHistoryEvent.removeObserver(showReactionHistoryDialogObserver)
-        mNotesViewModel.showReactionHistoryEvent.observe(
-            activity,
-            showReactionHistoryDialogObserver
-        )
+//        mNotesViewModel.showReactionHistoryEvent.removeObserver(showReactionHistoryDialogObserver)
+//        mNotesViewModel.showReactionHistoryEvent.observe(
+//            activity,
+//            showReactionHistoryDialogObserver
+//        )
 
-        mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
-        mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
+//        mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
+//        mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
 
         mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
         mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)
 
-        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(showRemoteReactionEmojiSuggestionDialogObserver)
-        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(activity, showRemoteReactionEmojiSuggestionDialogObserver)
+//        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(
+//            showRemoteReactionEmojiSuggestionDialogObserver
+//        )
+//        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(
+//            activity,
+//            showRemoteReactionEmojiSuggestionDialogObserver
+//        )
     }
 }

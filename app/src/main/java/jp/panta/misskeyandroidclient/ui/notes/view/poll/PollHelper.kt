@@ -4,23 +4,25 @@ import android.view.View
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 
 object PollHelper {
 
-    @BindingAdapter("noteId", "poll", "notesViewModel")
+    @BindingAdapter("noteId", "poll", "noteCardActionListenerAdapter")
     @JvmStatic
-    fun RecyclerView.bindPollChoices(noteId: Note.Id?, poll: Poll?, notesViewModel: NotesViewModel?) {
-        if (noteId == null || poll == null || notesViewModel == null) {
+    fun RecyclerView.bindPollChoices(noteId: Note.Id?, poll: Poll?, noteCardActionListenerAdapter: NoteCardActionListenerAdapter?) {
+        if (noteId == null || poll == null || noteCardActionListenerAdapter == null) {
             this.visibility = View.GONE
             return
         } else {
             this.visibility = View.VISIBLE
         }
 
-        val adapter = PollListAdapter(noteId = noteId, poll, notesViewModel)
+        val adapter = PollListAdapter(noteId = noteId, poll) {
+            noteCardActionListenerAdapter.onPollChoiceClicked(it.noteId, poll, it.choice)
+        }
         val layoutManager = this.layoutManager as? LinearLayoutManager
             ?: LinearLayoutManager(this.context)
 

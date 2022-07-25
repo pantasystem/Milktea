@@ -30,8 +30,11 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 class TimelineListAdapter(
     diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
     private val lifecycleOwner: LifecycleOwner,
-    private val notesViewModel: NotesViewModel
+    private val notesViewModel: NotesViewModel,
+    val onAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolderBase<ViewDataBinding>>(diffUtilCallBack){
+
+    val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
     abstract class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : RecyclerView.ViewHolder(view){
         abstract val binding: T
@@ -39,6 +42,7 @@ class TimelineListAdapter(
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
         abstract val notesViewModel: NotesViewModel
+        abstract val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
 
         private var reactionCountAdapter: ReactionCountAdapter? = null
 
@@ -95,7 +99,9 @@ class TimelineListAdapter(
             reactionCountAdapter = if(reactionCountAdapter != null && reactionCountAdapter?.note?.id == note.id){
                 reactionCountAdapter!!
             }else{
-                ReactionCountAdapter(notesViewModel)
+                ReactionCountAdapter {
+                    noteCardActionListenerAdapter.onReactionCountAction(it)
+                }
             }
             reactionCountAdapter?.note = note
             reactionCountsView.adapter = reactionCountAdapter
@@ -133,10 +139,13 @@ class TimelineListAdapter(
         override val notesViewModel: NotesViewModel
             get() = this@TimelineListAdapter.notesViewModel
 
+        override val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
+            get() = this@TimelineListAdapter.cardActionListener
 
         override fun onBind(note: PlaneNoteViewData) {
             binding.note = note
             binding.notesViewModel = notesViewModel
+            binding.noteCardActionListener = noteCardActionListenerAdapter
 
         }
 
@@ -154,11 +163,16 @@ class TimelineListAdapter(
         override val notesViewModel: NotesViewModel
             get() = this@TimelineListAdapter.notesViewModel
 
+        override val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
+            get() = this@TimelineListAdapter.cardActionListener
+
         override fun onBind(note: PlaneNoteViewData) {
             if(note is HasReplyToNoteViewData){
                 binding.hasReplyToNote = note
 
                 binding.notesViewModel = notesViewModel
+                binding.noteCardActionListener = noteCardActionListenerAdapter
+
             }
         }
         override fun getAvatarIcon(): ImageView {

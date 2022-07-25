@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package jp.panta.misskeyandroidclient.ui.notes.view.reaction
 
 import android.os.Bundle
@@ -24,12 +25,24 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelecti
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReactionSelectionDialog : BottomSheetDialogFragment(),
     ReactionSelection {
+
+    companion object {
+        fun newInstance(noteId: Note.Id): ReactionSelectionDialog {
+            return ReactionSelectionDialog().apply {
+                arguments = Bundle().apply {
+                    putLong("ACCOUNT_ID", noteId.accountId)
+                    putString("NOTE_ID", noteId.noteId)
+                }
+            }
+        }
+    }
 
     private var mNoteViewModel: NotesViewModel? = null
     val notesViewModel by activityViewModels<NotesViewModel>()
@@ -41,6 +54,13 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     lateinit var accountStore: AccountStore
 
     val viewModel: ReactionSelectionDialogViewModel by viewModels()
+
+    private val noteId: Note.Id by lazy {
+        Note.Id(
+            requireArguments().getLong("ACCOUNT_ID"),
+            requireArguments().getString("NOTE_ID")!!
+        )
+    }
 
     private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
         val flexBoxLayoutManager = FlexboxLayoutManager(requireContext())
@@ -63,8 +83,10 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         binding.reactionSelectionViewModel = viewModel
         binding.lifecycleOwner = this
 
+
+
         val searchedReactionAdapter = ReactionChoicesAdapter {
-            notesViewModel.postReaction(it)
+            notesViewModel.toggleReaction(noteId, it)
             dismiss()
         }
 
@@ -92,7 +114,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
         binding.searchReactionEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
-                notesViewModel.postReaction(viewModel.searchWord.value)
+                notesViewModel.toggleReaction(noteId, viewModel.searchWord.value)
                 dismiss()
                 return@setOnEditorActionListener true
             }
@@ -102,11 +124,12 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     }
 
     override fun selectReaction(reaction: String) {
-        mNoteViewModel?.postReaction(reaction)
+        mNoteViewModel?.toggleReaction(noteId, reaction)
         dismiss()
     }
 
-    inner class ReactionChoicesPagerAdapter : FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    inner class ReactionChoicesPagerAdapter :
+        FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         private var categoryList: List<String> = emptyList()
         override fun getCount(): Int {
@@ -114,36 +137,40 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         }
 
         override fun getPageTitle(position: Int): CharSequence {
-            return when(position){
-                0 ->{
+            return when (position) {
+                0 -> {
                     getString(R.string.user)
                 }
-                1 ->{
+                1 -> {
                     getString(R.string.often_use)
                 }
-                2 ->{
+                2 -> {
                     getString(R.string.all)
                 }
 
-                else ->{
+                else -> {
                     categoryList[position - 3]
                 }
             }
         }
+
         override fun getItem(position: Int): Fragment {
-            return when(position){
-                0 ->{
+            return when (position) {
+                0 -> {
                     ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.USER)
                 }
-                1 ->{
+                1 -> {
                     ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.FREQUENCY)
                 }
-                2 ->{
+                2 -> {
                     ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.DEFAULT)
                 }
-                else ->{
+                else -> {
                     val categoryName = categoryList[position - 3]
-                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.CATEGORY, categoryName)
+                    ReactionChoicesFragment.newInstance(
+                        ReactionChoicesFragment.Type.CATEGORY,
+                        categoryName
+                    )
                 }
             }
         }

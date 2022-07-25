@@ -5,15 +5,17 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.MainThread
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
+import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.provideFactory
@@ -21,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
@@ -63,7 +66,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         }
     }
 
-    private val binding: FragmentNoteDetailBinding by dataBinding()
 
 
     val notesViewModel: NotesViewModel by activityViewModels()
@@ -72,6 +74,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
 
     @Inject
     lateinit var noteDetailViewModelAssistedFactory: NoteDetailViewModel.ViewModelAssistedFactory
+
+    @Inject
+    internal lateinit var settingStore: SettingStore
 
     val page: Pageable.Show by lazy {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
@@ -99,23 +104,28 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
             noteDetailViewModel = noteDetailViewModel,
             notesViewModel = notesViewModel,
             viewLifecycleOwner = viewLifecycleOwner
-        )
+        ) {
+            NoteCardActionHandler(requireActivity() as AppCompatActivity, notesViewModel, settingStore).onAction(it)
+        }
         noteDetailViewModel.notes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
 
-        binding.notesView.adapter = adapter
-        binding.notesView.layoutManager = LinearLayoutManager(context)
+        withBinding<FragmentNoteDetailBinding> { binding ->
+            binding.notesView.adapter = adapter
+            binding.notesView.layoutManager = LinearLayoutManager(context)
 
-        binding.showInBrowser.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val url = noteDetailViewModel.getUrl()
-                withContext(Dispatchers.Main) {
-                    showShareLink(url)
+            binding.showInBrowser.setOnClickListener {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val url = noteDetailViewModel.getUrl()
+                    withContext(Dispatchers.Main) {
+                        showShareLink(url)
+                    }
                 }
             }
         }
+
     }
 
     override fun onResume() {

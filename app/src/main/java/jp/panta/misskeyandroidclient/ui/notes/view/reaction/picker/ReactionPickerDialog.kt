@@ -24,12 +24,25 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReactionPickerDialog : AppCompatDialogFragment(){
+
+    companion object {
+        fun newInstance(noteId: Note.Id): ReactionPickerDialog {
+            return ReactionPickerDialog().apply {
+                arguments = Bundle().apply {
+                    putString("NOTE_ID", noteId.noteId)
+                    putLong("ACCOUNT_ID", noteId.accountId)
+                }
+            }
+        }
+    }
+
     val notesViewModel by activityViewModels<NotesViewModel>()
     @Inject
     lateinit var reactionUserSettingDao: ReactionUserSettingDao
@@ -49,11 +62,15 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
         val ac = accountStore.currentAccount
 
+        val noteId = Note.Id(
+            requireArguments().getLong("ACCOUNT_ID"),
+            requireArguments().getString("NOTE_ID")!!,
+        )
 
         val adapter =
             ReactionChoicesAdapter {
                 dismiss()
-                notesViewModel.postReaction(it)
+                notesViewModel.toggleReaction(noteId, it)
             }
         binding.reactionsView.adapter = adapter
 
@@ -94,7 +111,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             binding.reactionField.setAdapter(autoCompleteAdapter)
             binding.reactionField.setOnItemClickListener { _, _, i, _ ->
                 val reaction = autoCompleteAdapter.suggestions[i]
-                notesViewModel.postReaction(reaction)
+                notesViewModel.toggleReaction(noteId, reaction)
                 dismiss()
             }
         }.launchIn(lifecycleScope)
@@ -105,7 +122,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         binding.reactionField.setOnEditorActionListener { v, _, event ->
             if(event != null && event.keyCode == KeyEvent.KEYCODE_ENTER){
                 if(event.action == KeyEvent.ACTION_UP){
-                    notesViewModel.postReaction(v.text.toString())
+                    notesViewModel.toggleReaction(noteId, v.text.toString())
                     (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(v.windowToken, 0)
                     dismiss()
                 }
