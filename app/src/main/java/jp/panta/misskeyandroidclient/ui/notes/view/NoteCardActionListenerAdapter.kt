@@ -1,58 +1,60 @@
 package jp.panta.misskeyandroidclient.ui.notes.view
 
-import net.pantasystem.milktea.model.notes.NoteRelation
+import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAction
+import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
 
 class NoteCardActionListenerAdapter(
     val onAction: (NoteCardAction) -> Unit,
 ) {
 
-    fun onReplyButtonClicked(note: NoteRelation) {
+    fun onReplyButtonClicked(note: PlaneNoteViewData) {
         onAction(NoteCardAction.OnReplyButtonClicked(note))
     }
 
-    fun onRenoteButtonClicked(note: NoteRelation) {
+    fun onRenoteButtonClicked(note: PlaneNoteViewData) {
         onAction(NoteCardAction.OnRenoteButtonClicked(note))
     }
 
-    fun onOptionButtonClicked(note: NoteRelation) {
+    fun onOptionButtonClicked(note: PlaneNoteViewData) {
         onAction(NoteCardAction.OnOptionButtonClicked(note))
     }
 
-    fun onReactionButtonClicked(note: NoteRelation) {
+    fun onReactionButtonClicked(note: PlaneNoteViewData) {
         onAction(NoteCardAction.OnReactionButtonClicked(note))
     }
 
-    fun onReactionClicked(note: NoteRelation, reaction: String) {
+    fun onReactionClicked(note: PlaneNoteViewData, reaction: String) {
         onAction(NoteCardAction.OnReactionClicked(note, reaction))
     }
 
-    fun onReactionLongClicked(note: NoteRelation, reaction: String) {
+    fun onReactionLongClicked(note: PlaneNoteViewData, reaction: String) {
         onAction(NoteCardAction.OnReactionLongClicked(note, reaction))
     }
 
-    fun onPollChoiceClicked(note: NoteRelation, choice: Poll.Choice) {
-        onAction(NoteCardAction.OnPollChoiceClicked(note, choice))
+    fun onPollChoiceClicked(noteId: Note.Id, poll: Poll, choice: Poll.Choice) {
+        onAction(NoteCardAction.OnPollChoiceClicked(noteId, poll, choice))
     }
 
-    fun onRenoteButtonLongClicked(note: NoteRelation) {
+    fun onRenoteButtonLongClicked(note: PlaneNoteViewData) {
         onAction(NoteCardAction.OnRenoteButtonLongClicked(note))
     }
 
-    fun onNoteCardClicked(note: NoteRelation) {
+    fun onNoteCardClicked(note: Note) {
         onAction(NoteCardAction.OnNoteCardClicked(note))
     }
 
-//    fun onReactionCountAction(action: ReactionCountAction) {
-//        when(action) {
-//            is ReactionCountAction.OnReactionClicked -> {
-//                onAction(NoteCardAction.OnReactionClicked(action.note, action.reaction))
-//            }
-//            is ReactionCountAction.OnReactionLongClicked -> {
-//                onAction(NoteCardAction.OnReactionLongClicked(action.note, action.reaction))
-//            }
-//        }
-//    }
+    fun onReactionCountAction(action: ReactionCountAction) {
+        when(action) {
+            is ReactionCountAction.OnClicked -> {
+                onAction(NoteCardAction.OnReactionClicked(action.note, action.reaction))
+            }
+            is ReactionCountAction.OnLongClicked -> {
+                onAction(NoteCardAction.OnReactionLongClicked(action.note, action.reaction))
+            }
+        }
+    }
 
 }
 
@@ -60,14 +62,13 @@ class NoteCardActionListenerAdapter(
 
 
 sealed interface NoteCardAction {
-    val note: NoteRelation
-    data class OnReplyButtonClicked(override val note: NoteRelation) : NoteCardAction
-    data class OnRenoteButtonClicked(override val note: NoteRelation) : NoteCardAction
-    data class OnOptionButtonClicked(override val note: NoteRelation) : NoteCardAction
-    data class OnReactionButtonClicked(override val note: NoteRelation) : NoteCardAction
-    data class OnReactionClicked(override val note: NoteRelation, val reaction: String) : NoteCardAction
-    data class OnReactionLongClicked(override val note: NoteRelation, val reaction: String) : NoteCardAction
-    data class OnPollChoiceClicked(override val note: NoteRelation, val choice: Poll.Choice) : NoteCardAction
-    data class OnRenoteButtonLongClicked(override val note: NoteRelation) : NoteCardAction
-    data class OnNoteCardClicked(override val note: NoteRelation) : NoteCardAction
+    data class OnReplyButtonClicked(val note: PlaneNoteViewData) : NoteCardAction
+    data class OnRenoteButtonClicked(val note: PlaneNoteViewData) : NoteCardAction
+    data class OnOptionButtonClicked(val note: PlaneNoteViewData) : NoteCardAction
+    data class OnReactionButtonClicked(val note: PlaneNoteViewData) : NoteCardAction
+    data class OnReactionClicked(val note: PlaneNoteViewData, val reaction: String) : NoteCardAction
+    data class OnReactionLongClicked(val note: PlaneNoteViewData, val reaction: String) : NoteCardAction
+    data class OnPollChoiceClicked(val noteId: Note.Id, val poll: Poll, val choice: Poll.Choice) : NoteCardAction
+    data class OnRenoteButtonLongClicked(val note: PlaneNoteViewData) : NoteCardAction
+    data class OnNoteCardClicked(val note: Note) : NoteCardAction
 }

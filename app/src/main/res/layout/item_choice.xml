@@ -12,9 +12,7 @@
         <variable
                 name="noteId"
                 type="net.pantasystem.milktea.model.notes.Note.Id" />
-        <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
+
     </data>
     <FrameLayout
             android:layout_width="match_parent"
@@ -31,10 +29,10 @@
                 tools:text="候補１"
                 android:text='@{choice.text}'
                 android:enabled="@{SafeUnbox.unbox(poll.canVote)}"
-                android:onClick="@{()-> notesViewModel.vote(noteId, poll, choice)}"
                 android:checked="@{SafeUnbox.unbox(choice.isVoted)}"
                 android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginBottom="4dp"
+                android:id="@+id/radioChoice"
                 />
 
         <ProgressBar

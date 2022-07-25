@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
-import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction) -> Unit) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
@@ -49,7 +48,7 @@ class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction
             val id = note?.toShowNote?.note?.id
             if (id != null) {
                 note?.let {
-                    reactionCountActionListener(ReactionCountAction.OnLongClicked(it.note, item.reaction))
+                    reactionCountActionListener(ReactionCountAction.OnLongClicked(it, item.reaction))
                 }
                 true
             } else {
@@ -58,7 +57,7 @@ class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction
         }
         holder.binding.root.setOnClickListener {
             note?.let {
-                reactionCountActionListener(ReactionCountAction.OnClicked(it.note, item.reaction))
+                reactionCountActionListener(ReactionCountAction.OnClicked(it, item.reaction))
             }
 
         }
@@ -73,6 +72,6 @@ class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction
 }
 
 sealed interface ReactionCountAction {
-    data class OnClicked(val noteRelation: NoteRelation, val reaction: String): ReactionCountAction
-    data class OnLongClicked(val noteRelation: NoteRelation, val reaction: String): ReactionCountAction
+    data class OnClicked(val note: PlaneNoteViewData, val reaction: String): ReactionCountAction
+    data class OnLongClicked(val note: PlaneNoteViewData, val reaction: String): ReactionCountAction
 }

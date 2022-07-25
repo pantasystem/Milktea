@@ -7,10 +7,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
+import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -26,7 +27,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
-    val mBinding: FragmentPinNoteBinding by dataBinding()
 
     companion object {
 
@@ -86,9 +86,14 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
             ): Boolean {
                 return oldItem.id == newItem.id
             }
-        }, viewLifecycleOwner, notesViewModel)
-        mBinding.pinNotesView.adapter = adapter
-        mBinding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
+        }, viewLifecycleOwner, notesViewModel) {
+            NoteCardActionHandler(notesViewModel).onAction(it)
+        }
+        withBinding<FragmentPinNoteBinding> { binding ->
+            binding.pinNotesView.adapter = adapter
+            binding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
+        }
+
         userViewModel.pinNotes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }

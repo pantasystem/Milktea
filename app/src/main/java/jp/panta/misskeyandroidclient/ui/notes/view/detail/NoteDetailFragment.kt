@@ -10,10 +10,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.dataBinding
+import com.wada811.databinding.withBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNoteDetailBinding
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.provideFactory
@@ -63,7 +64,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         }
     }
 
-    private val binding: FragmentNoteDetailBinding by dataBinding()
 
 
     val notesViewModel: NotesViewModel by activityViewModels()
@@ -99,23 +99,28 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
             noteDetailViewModel = noteDetailViewModel,
             notesViewModel = notesViewModel,
             viewLifecycleOwner = viewLifecycleOwner
-        )
+        ) {
+            NoteCardActionHandler(notesViewModel).onAction(it)
+        }
         noteDetailViewModel.notes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
 
-        binding.notesView.adapter = adapter
-        binding.notesView.layoutManager = LinearLayoutManager(context)
+        withBinding<FragmentNoteDetailBinding> { binding ->
+            binding.notesView.adapter = adapter
+            binding.notesView.layoutManager = LinearLayoutManager(context)
 
-        binding.showInBrowser.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val url = noteDetailViewModel.getUrl()
-                withContext(Dispatchers.Main) {
-                    showShareLink(url)
+            binding.showInBrowser.setOnClickListener {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val url = noteDetailViewModel.getUrl()
+                    withContext(Dispatchers.Main) {
+                        showShareLink(url)
+                    }
                 }
             }
         }
+
     }
 
     override fun onResume() {

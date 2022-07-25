@@ -16,6 +16,8 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemConversationBinding
 import jp.panta.misskeyandroidclient.databinding.ItemDetailNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardAction
+import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAction
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -40,7 +42,8 @@ class NoteDetailAdapter(
         override fun areItemsTheSame(oldItem: PlaneNoteViewData, newItem: PlaneNoteViewData): Boolean {
             return oldItem.id == newItem.id
         }
-    }
+    },
+    val onAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<PlaneNoteViewData, NoteDetailAdapter.ViewHolder>(diffUtil){
 
     companion object{
@@ -53,6 +56,8 @@ class NoteDetailAdapter(
     class NoteHolder(val binding: ItemNoteBinding) : ViewHolder(binding.root)
     class DetailNoteHolder(val binding: ItemDetailNoteBinding) : ViewHolder(binding.root)
     class ConversationHolder(val binding: ItemConversationBinding) : ViewHolder(binding.root)
+
+    val noteCardActionListenerAdapter = NoteCardActionListenerAdapter(onAction)
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -91,11 +96,12 @@ class NoteDetailAdapter(
                 setReactionCounter(note, holder.binding.simpleNote.reactionView)
 
                 holder.binding.lifecycleOwner = viewLifecycleOwner
+                holder.binding.noteCardActionListener = noteCardActionListenerAdapter
                 holder.binding.executePendingBindings()
             }
             is DetailNoteHolder ->{
                 holder.binding.note = note as NoteDetailViewData
-                holder.binding.notesViewModel = notesViewModel
+                holder.binding.noteCardActionListener = noteCardActionListenerAdapter
                 setReactionCounter(note, holder.binding.reactionView)
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.executePendingBindings()
@@ -107,9 +113,10 @@ class NoteDetailAdapter(
                 setReactionCounter(note, holder.binding.childNote.reactionView)
 
                 holder.binding.noteDetailViewModel = noteDetailViewModel
-                val adapter = NoteChildConversationAdapter(notesViewModel, viewLifecycleOwner)
+                val adapter = NoteChildConversationAdapter(notesViewModel, viewLifecycleOwner, onAction)
                 holder.binding.conversationView.adapter = adapter
                 holder.binding.conversationView.layoutManager = LinearLayoutManager(holder.itemView.context)
+                holder.binding.noteCardActionListener = noteCardActionListenerAdapter
                 note.conversation.observe(viewLifecycleOwner) {
                     adapter.submitList(it)
                 }
