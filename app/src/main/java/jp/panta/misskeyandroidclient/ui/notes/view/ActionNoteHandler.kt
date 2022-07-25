@@ -199,8 +199,8 @@ class ActionNoteHandler(
             showReactionHistoryDialogObserver
         )
 
-        mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
-        mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
+//        mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
+//        mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
 
         mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
         mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)

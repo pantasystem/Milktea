@@ -30,7 +30,6 @@ import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.reaction.Reaction
-import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.User
@@ -79,9 +78,7 @@ class NotesViewModel @Inject constructor(
 
     val openNoteEditor = EventBus<DraftNote?>()
 
-    val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
-
-    val showRenotesEvent = EventBus<Note.Id?>()
+//    val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
 
     /**
      * リモートのリアクションを選択したときに
@@ -109,16 +106,12 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
-        noteId?.let {
-            showReactionHistoryEvent.event =
-                ReactionHistoryRequest(noteId, type)
-        }
-    }
-
-    fun showRenotes(noteId: Note.Id?) {
-        showRenotesEvent.event = noteId
-    }
+//    fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
+//        noteId?.let {
+//            showReactionHistoryEvent.event =
+//                ReactionHistoryRequest(noteId, type)
+//        }
+//    }
 
     fun postRenote() {
         val renoteId = reNoteTarget.event?.toShowNote?.note?.id
