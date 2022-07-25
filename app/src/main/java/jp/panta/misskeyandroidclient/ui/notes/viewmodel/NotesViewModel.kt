@@ -29,7 +29,6 @@ import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.User
@@ -37,7 +36,7 @@ import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
 
-data class SelectedReaction(val noteId: Note.Id, val reaction: String)
+
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -58,11 +57,9 @@ class NotesViewModel @Inject constructor(
 
     private val errorStatusMessage = EventBus<String>()
 
-    val reNoteTarget = EventBus<PlaneNoteViewData>()
+//    val reNoteTarget = EventBus<PlaneNoteViewData>()
 
-    val quoteRenoteTarget = EventBus<PlaneNoteViewData>()
-
-    val replyTarget = EventBus<PlaneNoteViewData>()
+    val quoteRenoteTarget = EventBus<Note>()
 
     val shareTarget = EventBus<PlaneNoteViewData>()
 
@@ -78,23 +75,6 @@ class NotesViewModel @Inject constructor(
 
     val openNoteEditor = EventBus<DraftNote?>()
 
-//    val showReactionHistoryEvent = EventBus<ReactionHistoryRequest?>()
-
-    /**
-     * リモートのリアクションを選択したときに
-     * ローカルの絵文字からそれに近い候補を表示するためのダイアログを表示するイベント
-     */
-    val showRemoteReactionEmojiSuggestionDialog = EventBus<SelectedReaction?>()
-
-    fun setTargetToReNote(note: PlaneNoteViewData) {
-        //reNoteTarget.postValue(note)
-        Log.d("NotesViewModel", "登録しました: $note")
-        reNoteTarget.event = note
-    }
-
-    fun setTargetToReply(note: PlaneNoteViewData) {
-        replyTarget.event = note
-    }
 
     fun setTargetToShare(note: PlaneNoteViewData) {
         shareTarget.event = note
@@ -106,18 +86,9 @@ class NotesViewModel @Inject constructor(
     }
 
 
-//    fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
-//        noteId?.let {
-//            showReactionHistoryEvent.event =
-//                ReactionHistoryRequest(noteId, type)
-//        }
-//    }
-
-    fun postRenote() {
-        val renoteId = reNoteTarget.event?.toShowNote?.note?.id
-            ?: return
+    fun renote(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            renoteUseCase(renoteId).onSuccess {
+            renoteUseCase(noteId).onSuccess {
                 withContext(Dispatchers.Main) {
                     statusMessage.event = "renoteしました"
                 }
@@ -127,13 +98,31 @@ class NotesViewModel @Inject constructor(
                 }
             }
         }
+    }
+//
+//    fun putQuoteRenoteTarget() {
+//        quoteRenoteTarget.event = reNoteTarget.event
+//    }
 
+    fun showQuoteNoteEditor(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            recursiveSearchHasContentNote(noteId).onSuccess { note ->
+                withContext(Dispatchers.Main) {
+                    quoteRenoteTarget.event = note
+                }
+            }
+
+        }
     }
 
-    fun putQuoteRenoteTarget() {
-        quoteRenoteTarget.event = reNoteTarget.event
+    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> = runCatching {
+        val note = noteRepository.find(noteId).getOrThrow()
+        if (note.hasContent()) {
+            note
+        } else {
+            recursiveSearchHasContentNote(note.renoteId!!).getOrThrow()
+        }
     }
-
 
     /**
      * リアクションを送信する
@@ -147,11 +136,6 @@ class NotesViewModel @Inject constructor(
     }
 
     fun toggleReaction(noteId: Note.Id, reaction: String) {
-        if (!Reaction(reaction).isLocal()) {
-            showRemoteReactionEmojiSuggestionDialog.event =
-                SelectedReaction(noteId = noteId, reaction = reaction)
-            return
-        }
         viewModelScope.launch(Dispatchers.IO) {
             toggleReactionUseCase(noteId, reaction).onFailure {
             }.onSuccess {
@@ -224,20 +208,17 @@ class NotesViewModel @Inject constructor(
 
     }
 
-    fun unRenote(planeNoteViewData: PlaneNoteViewData) {
-        if (planeNoteViewData.isRenotedByMe) {
-            viewModelScope.launch(Dispatchers.IO) {
-                noteRepository.delete(planeNoteViewData.note.note.id).onSuccess {
-                    withContext(Dispatchers.Main) {
-                        statusMessage.event = "削除に成功しました"
-                    }
-                }.onFailure { t ->
-                    Log.d(TAG, "unrenote失敗", t)
+
+    fun unRenote(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            noteRepository.delete(noteId).onSuccess {
+                withContext(Dispatchers.Main) {
+                    statusMessage.event = "削除に成功しました"
                 }
+            }.onFailure { t ->
+                Log.d(TAG, "unrenote失敗", t)
             }
-
         }
-
     }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData) {

@@ -17,18 +17,27 @@ class CreateRenoteUseCase @Inject constructor(
 
     suspend operator fun invoke(noteId: Note.Id): Result<Note> {
         return runCatching {
-            val note = noteRepository.find(noteId).getOrThrow()
+            val note = recursiveSearchHasContentNote(noteId).getOrThrow()
             val account = getAccount.get(noteId.accountId)
             if (note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))) {
                 noteRepository.create(CreateNote(
                     author = account,
                     text = null,
                     visibility = note.visibility,
-                    renoteId = noteId,
+                    renoteId = note.id,
                 )).getOrThrow()
             } else {
                 throw IllegalArgumentException()
             }
+        }
+    }
+
+    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> = runCatching {
+        val note = noteRepository.find(noteId).getOrThrow()
+        if (note.hasContent()) {
+            note
+        } else {
+            recursiveSearchHasContentNote(note.renoteId!!).getOrThrow()
         }
     }
 }

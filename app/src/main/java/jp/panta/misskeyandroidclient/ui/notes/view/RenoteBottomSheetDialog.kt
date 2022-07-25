@@ -10,15 +10,40 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogRenoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.model.notes.Note
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
 
+    companion object {
+        fun newInstance(noteId: Note.Id, isRenotedByMe: Boolean): RenoteBottomSheetDialog {
+            return RenoteBottomSheetDialog().apply {
+                arguments = Bundle().apply {
+                    putLong("ACCOUNT_ID", noteId.accountId)
+                    putString("NOTE_ID", noteId.noteId)
+                    putBoolean("IS_RENOTED_BY_ME", isRenotedByMe)
+                }
+            }
+        }
+    }
+
     val notesViewModel by activityViewModels<NotesViewModel>()
 
     @Inject
     lateinit var accountStore: AccountStore
+
+
+    val noteId: Note.Id by lazy {
+        Note.Id(
+            requireArguments().getLong("ACCOUNT_ID"),
+            requireArguments().getString("NOTE_ID")!!
+        )
+    }
+
+    val isRenotedByMe by lazy {
+        requireArguments().getBoolean("IS_RENOTED_BY_ME", false)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
@@ -32,8 +57,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
 
         if(account != null){
 
-            val target = notesViewModel.reNoteTarget.event
-            if(target?.isRenotedByMe == true){
+            if(isRenotedByMe){
                 binding.unRenoteBase.visibility = View.VISIBLE
 
             }else{
@@ -41,19 +65,17 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment(){
             }
 
             binding.unRenote.setOnClickListener {
-                target?.let{
-                    notesViewModel.unRenote(target)
-                    dismiss()
-                }
+                notesViewModel.unRenote(noteId)
+                dismiss()
             }
 
             binding.renote.setOnClickListener{
-                notesViewModel.postRenote()
+                notesViewModel.renote(noteId)
                 dismiss()
             }
 
             binding.quoteRenote.setOnClickListener {
-                notesViewModel.putQuoteRenoteTarget()
+                notesViewModel.showQuoteNoteEditor(noteId)
                 dismiss()
             }
 
