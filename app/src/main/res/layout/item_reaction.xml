@@ -13,9 +13,7 @@
                 name="note"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData" />
 
-        <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
+
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
     </data>
     <LinearLayout
@@ -34,7 +32,6 @@
             reactionNote="@{note}"
             reactionBackground="@{reaction}"
 
-            android:onClick="@{ () -> notesViewModel.postReaction(note, reaction.reaction) }"
 
             >
         <ImageView
