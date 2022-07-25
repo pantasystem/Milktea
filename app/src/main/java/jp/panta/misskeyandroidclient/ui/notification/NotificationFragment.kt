@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.wada811.databinding.withBinding
+import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
@@ -39,6 +39,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     @Inject
     internal lateinit var settingStore: SettingStore
 
+    private val mBinding: FragmentNotificationBinding by dataBinding()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -58,29 +60,22 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         }
 
 
-        withBinding<FragmentNotificationBinding> { mBinding ->
-            mBinding.notificationListView.adapter = adapter
-            mBinding.notificationListView.layoutManager = mLinearLayoutManager
-        }
+        mBinding.notificationListView.adapter = adapter
+        mBinding.notificationListView.layoutManager = mLinearLayoutManager
 
 
         mViewModel.notificationsLiveData.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
-        withBinding<FragmentNotificationBinding> { binding ->
-            mViewModel.isLoading.observe(viewLifecycleOwner) {
-                binding.notificationSwipeRefresh.isRefreshing = it
-            }
-
-            binding.notificationSwipeRefresh.setOnRefreshListener {
-                mViewModel.loadInit()
-            }
-            binding.notificationListView.addOnScrollListener(mScrollListener)
+        mViewModel.isLoading.observe(viewLifecycleOwner) {
+            mBinding.notificationSwipeRefresh.isRefreshing = it
         }
 
-
-
+        mBinding.notificationSwipeRefresh.setOnRefreshListener {
+            mViewModel.loadInit()
+        }
+        mBinding.notificationListView.addOnScrollListener(mScrollListener)
 
 
     }

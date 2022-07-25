@@ -8,7 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wada811.databinding.withBinding
+import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPinNoteBinding
@@ -71,6 +71,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
         return@activityViewModels UserDetailViewModel.provideFactory(assistedFactory, userName!!)
     }
 
+    val binding: FragmentPinNoteBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -100,10 +101,9 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
                 it
             )
         }
-        withBinding<FragmentPinNoteBinding> { binding ->
-            binding.pinNotesView.adapter = adapter
-            binding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
-        }
+
+        binding.pinNotesView.adapter = adapter
+        binding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
 
         userViewModel.pinNotes.observe(viewLifecycleOwner) {
             adapter.submitList(it)
