@@ -28,14 +28,11 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.poll.Vote
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
-
-
 
 
 @HiltViewModel
@@ -56,8 +53,6 @@ class NotesViewModel @Inject constructor(
     val statusMessage = EventBus<String>()
 
     private val errorStatusMessage = EventBus<String>()
-
-//    val reNoteTarget = EventBus<PlaneNoteViewData>()
 
     val quoteRenoteTarget = EventBus<Note>()
 
@@ -229,8 +224,8 @@ class NotesViewModel @Inject constructor(
                         i = getAccount()?.getI(encryption)!!,
                         noteId = planeNoteViewData.toShowNote.note.id.noteId
                     )
-                )
-                    ?.throwIfHasError()
+                )?.throwIfHasError()
+
                 val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
                 if (nowNoteId == planeNoteViewData.toShowNote.note.id.noteId) {
                     val state = response?.body()!!
@@ -251,15 +246,7 @@ class NotesViewModel @Inject constructor(
         }
         if (SafeUnbox.unbox(poll.canVote)) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
-                    getMisskeyAPI()?.vote(
-                        Vote(
-                            i = getAccount()?.getI(encryption)!!,
-                            choice = choice.index,
-                            noteId = noteId.noteId
-                        )
-                    )?.throwIfHasError()
-                }.onSuccess {
+                noteRepository.vote(noteId, choice).onSuccess {
                     Log.d(TAG, "投票に成功しました")
                 }.onFailure {
                     Log.d(TAG, "投票に失敗しました")
