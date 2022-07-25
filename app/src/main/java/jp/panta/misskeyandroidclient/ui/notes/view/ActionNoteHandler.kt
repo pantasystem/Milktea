@@ -29,21 +29,7 @@ class ActionNoteHandler(
 
     ) {
 
-//    private val replyTargetObserver = Observer<PlaneNoteViewData> {
-//        activity.startActivity(
-//            NoteEditorActivity.newBundle(
-//                activity,
-//                replyTo = it.toShowNote.note.id
-//            )
-//        )
-//    }
 
-//    private val reNoteTargetObserver = Observer<PlaneNoteViewData> {
-//        Log.d("MainActivity", "renote clicked :$it")
-//        val dialog = RenoteBottomSheetDialog.newInstance(it.id)
-//        dialog.show(activity.supportFragmentManager, "timelineFragment")
-//
-//    }
     private val shareTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
@@ -118,20 +104,6 @@ class ActionNoteHandler(
         }
     }
 
-//    private val showReactionHistoryDialogObserver: (ReactionHistoryRequest?) -> Unit = { req ->
-//        req?.let {
-//            ReactionHistoryPagerDialog.newInstance(req.noteId, it.type)
-//                .show(activity.supportFragmentManager, "")
-//        }
-//    }
-
-//    private val showRenotesDialogObserver: (Note.Id?) -> Unit = { id ->
-//        id?.let {
-//            RenotesBottomSheetDialog.newInstance(id).show(activity.supportFragmentManager, "")
-//        }
-//    }
-
-
     private val reportDialogObserver: (Report?) -> Unit = { report ->
         report?.let {
             ReportDialog.newInstance(report.userId, report.comment)
@@ -139,23 +111,9 @@ class ActionNoteHandler(
         }
     }
 
-//    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit =
-//        { reaction ->
-//            if (reaction != null) {
-//                RemoteReactionEmojiSuggestionDialog.newInstance(
-//                    accountId = reaction.noteId.accountId,
-//                    noteId = reaction.noteId.noteId,
-//                    reaction = reaction.reaction
-//                ).show(activity.supportFragmentManager, "")
-//            }
-//        }
 
     fun initViewModelListener() {
-//        mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
-//        mNotesViewModel.replyTarget.observe(activity, replyTargetObserver)
 
-//        mNotesViewModel.reNoteTarget.removeObserver(reNoteTargetObserver)
-//        mNotesViewModel.reNoteTarget.observe(activity, reNoteTargetObserver)
 
         mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
         mNotesViewModel.shareTarget.observe(activity, shareTargetObserver)
@@ -188,24 +146,8 @@ class ActionNoteHandler(
         confirmViewModel.confirmedEvent.removeObserver(confirmedEventObserver)
         confirmViewModel.confirmedEvent.observe(activity, confirmedEventObserver)
 
-//        mNotesViewModel.showReactionHistoryEvent.removeObserver(showReactionHistoryDialogObserver)
-//        mNotesViewModel.showReactionHistoryEvent.observe(
-//            activity,
-//            showReactionHistoryDialogObserver
-//        )
-
-//        mNotesViewModel.showRenotesEvent.removeObserver(showRenotesDialogObserver)
-//        mNotesViewModel.showRenotesEvent.observe(activity, showRenotesDialogObserver)
-
         mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
         mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)
 
-//        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(
-//            showRemoteReactionEmojiSuggestionDialogObserver
-//        )
-//        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(
-//            activity,
-//            showRemoteReactionEmojiSuggestionDialogObserver
-//        )
     }
 }
