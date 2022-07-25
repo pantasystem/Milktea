@@ -94,10 +94,6 @@ class NotesViewModel @Inject constructor(
             }
         }
     }
-//
-//    fun putQuoteRenoteTarget() {
-//        quoteRenoteTarget.event = reNoteTarget.event
-//    }
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -133,10 +129,8 @@ class NotesViewModel @Inject constructor(
     fun toggleReaction(noteId: Note.Id, reaction: String) {
         viewModelScope.launch(Dispatchers.IO) {
             toggleReactionUseCase(noteId, reaction).onFailure {
-            }.onSuccess {
 
             }
-
         }
     }
 

@@ -66,12 +66,13 @@ class NoteCardActionHandler(
                 ReactionHistoryPagerDialog.newInstance(
                     action.note.toShowNote.note.id,
                     action.reaction
-                )
-                    .show(activity.supportFragmentManager, "")
+                ).show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnRenoteButtonClicked -> {
-                RenoteBottomSheetDialog.newInstance(action.note.note.note.id, action.note.isMyNote && action.note.note.note.isRenote())
-                    .show(activity.supportFragmentManager, "")
+                RenoteBottomSheetDialog.newInstance(
+                    action.note.note.note.id,
+                    action.note.isMyNote && action.note.note.note.isRenote()
+                ).show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnRenoteButtonLongClicked -> {
                 RenotesBottomSheetDialog.newInstance(action.note.toShowNote.note.id)
