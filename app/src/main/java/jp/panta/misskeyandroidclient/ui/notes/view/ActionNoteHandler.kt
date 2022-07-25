@@ -6,10 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.renote.RenotesBottomSheetDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -24,7 +22,6 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
-import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.Report
 
@@ -75,11 +72,6 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
-
-
-    private val showNoteEventObserver = Observer<Note> {
-        activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = it.id))
-    }
 
 
     private val openNoteEditor = Observer<DraftNote?> { note ->
@@ -185,8 +177,6 @@ class ActionNoteHandler(
         mNotesViewModel.openNoteEditor.removeObserver(openNoteEditor)
         mNotesViewModel.openNoteEditor.observe(activity, openNoteEditor)
 
-        mNotesViewModel.showNoteEvent.removeObserver(showNoteEventObserver)
-        mNotesViewModel.showNoteEvent.observe(activity, showNoteEventObserver)
 
         mNotesViewModel.confirmDeletionEvent.removeObserver(confirmDeletionEventObserver)
         mNotesViewModel.confirmDeletionEvent.observe(activity, confirmDeletionEventObserver)

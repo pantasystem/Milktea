@@ -65,7 +65,6 @@ class NotesViewModel @Inject constructor(
 
     val replyTarget = EventBus<PlaneNoteViewData>()
 
-
     val shareTarget = EventBus<PlaneNoteViewData>()
 
     val confirmDeletionEvent = EventBus<PlaneNoteViewData>()
@@ -77,9 +76,6 @@ class NotesViewModel @Inject constructor(
     val shareNoteState = MutableLiveData<NoteState>()
 
     val targetUser = EventBus<User>()
-
-    val showNoteEvent = EventBus<Note>()
-
 
     val openNoteEditor = EventBus<DraftNote?>()
 
@@ -112,17 +108,6 @@ class NotesViewModel @Inject constructor(
         targetUser.event = user
     }
 
-    fun setTargetToNote() {
-        showNoteEvent.event = shareTarget.event?.toShowNote?.note
-    }
-
-    fun setTargetToNote(note: PlaneNoteViewData) {
-        showNoteEvent.event = note.toShowNote.note
-    }
-
-    fun setShowNote(note: Note) {
-        showNoteEvent.event = note
-    }
 
     fun setShowReactionHistoryDialog(noteId: Note.Id?, type: String?) {
         noteId?.let {
@@ -183,16 +168,6 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 同期リアクション削除
-     * 既にリアクションが含まれている場合のみ実行される
-     */
-    private suspend fun syncDeleteReaction(planeNoteViewData: PlaneNoteViewData) {
-        if (planeNoteViewData.myReaction.value.isNullOrBlank()) {
-            return
-        }
-        noteRepository.unreaction(planeNoteViewData.toShowNote.note.id).getOrThrow()
-    }
 
     fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
         note ?: return

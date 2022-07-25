@@ -76,7 +76,7 @@
                     android:textColor="?attr/colorAccent"
                     android:text="@string/show_reply"
                     android:visibility="@{SafeUnbox.unboxBool(childrenViewData.hasConversation) ? View.GONE : View.VISIBLE}"
-                    android:onClick="@{()-> notesViewModel.setTargetToNote(childrenViewData)}"
+                    android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(childrenViewData.toShowNote.note)}"
                     />
 
         </LinearLayout>

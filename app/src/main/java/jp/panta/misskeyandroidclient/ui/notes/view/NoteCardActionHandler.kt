@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import androidx.appcompat.app.AppCompatActivity
+import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.picker.ReactionPickerDialog
@@ -17,7 +18,7 @@ class NoteCardActionHandler(
     fun onAction(action: NoteCardAction) {
         when (action) {
             is NoteCardAction.OnNoteCardClicked -> {
-                notesViewModel.setShowNote(action.note)
+                activity.startActivity(NoteDetailActivity.newIntent(activity, noteId = action.note.id))
             }
             is NoteCardAction.OnOptionButtonClicked -> {
                 notesViewModel.setTargetToShare(action.note)

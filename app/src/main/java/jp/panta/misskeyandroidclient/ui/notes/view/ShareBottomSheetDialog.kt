@@ -12,19 +12,20 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import jp.panta.misskeyandroidclient.NoteDetailActivity
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentShareBottomSheetBinding
-import net.pantasystem.milktea.model.user.report.toReport
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
+import net.pantasystem.milktea.model.user.report.toReport
 
-class ShareBottomSheetDialog : BottomSheetDialogFragment(){
+class ShareBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog =  super.onCreateDialog(savedInstanceState)
+        val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.fragment_share_bottom_sheet, null)
         dialog.setContentView(view)
         val dataBinding = DataBindingUtil.bind<FragmentShareBottomSheetBinding>(view)
         dialog.setContentView(view)
-        if(dataBinding == null){
+        if (dataBinding == null) {
             Log.e("ShareBottomSheetDialog", "Bindingを取得するのに失敗しました")
             dismiss()
             return dialog
@@ -37,7 +38,12 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
         dataBinding.lifecycleOwner = this
 
         dataBinding.showDetail.setOnClickListener {
-            viewModel.setTargetToNote()
+            requireActivity().startActivity(
+                NoteDetailActivity.newIntent(
+                    requireActivity(),
+                    noteId = note?.toShowNote?.note?.id!!
+                )
+            )
             dismiss()
         }
 
@@ -46,15 +52,15 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
-        dataBinding.addFavorite.setOnClickListener{
+        dataBinding.addFavorite.setOnClickListener {
             viewModel.addFavorite()
             dismiss()
         }
 
-        dataBinding.shareNote.setOnClickListener{
+        dataBinding.shareNote.setOnClickListener {
             val baseUrl = viewModel.getAccount()?.instanceDomain
             val url = "$baseUrl/notes/${note?.id?.noteId}"
-            val intent = Intent().apply{
+            val intent = Intent().apply {
                 action = ACTION_SEND
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, url)
@@ -68,10 +74,11 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
-        val clipboardManager = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+        val clipboardManager =
+            context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
 
-        dataBinding.copyContent.setOnClickListener{
-            if(clipboardManager == null || note == null){
+        dataBinding.copyContent.setOnClickListener {
+            if (clipboardManager == null || note == null) {
                 dismiss()
                 return@setOnClickListener
             }
@@ -79,13 +86,18 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
             dismiss()
         }
 
-        dataBinding.copyUrl.setOnClickListener{
-            if(clipboardManager == null || note == null){
+        dataBinding.copyUrl.setOnClickListener {
+            if (clipboardManager == null || note == null) {
                 dismiss()
                 return@setOnClickListener
             }
             val baseUrl = viewModel.getAccount()?.instanceDomain
-            clipboardManager.setPrimaryClip(ClipData.newPlainText("", "$baseUrl/notes/${note.id.noteId}"))
+            clipboardManager.setPrimaryClip(
+                ClipData.newPlainText(
+                    "",
+                    "$baseUrl/notes/${note.id.noteId}"
+                )
+            )
             dismiss()
 
         }
@@ -96,7 +108,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment(){
         }
 
         dataBinding.deleteAndEditNoteButton.setOnClickListener {
-            note?.let{ n ->
+            note?.let { n ->
                 viewModel.confirmDeleteAndEditEvent.event = n
             }
             dismiss()
