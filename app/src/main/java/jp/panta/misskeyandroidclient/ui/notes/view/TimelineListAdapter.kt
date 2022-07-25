@@ -20,7 +20,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemHasReplyToNoteBinding
 import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.poll.PollListAdapter
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAction
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.HasReplyToNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -101,15 +100,7 @@ class TimelineListAdapter(
                 reactionCountAdapter!!
             }else{
                 ReactionCountAdapter {
-                    when(it) {
-                        is ReactionCountAction.OnClicked -> {
-                            notesViewModel.postReaction(note, it.reaction)
-                        }
-                        is ReactionCountAction.OnLongClicked -> {
-
-                            notesViewModel.setShowReactionHistoryDialog(note.toShowNote.note.id, it.reaction)
-                        }
-                    }
+                    noteCardActionListenerAdapter.onReactionCountAction(it)
                 }
             }
             reactionCountAdapter?.note = note

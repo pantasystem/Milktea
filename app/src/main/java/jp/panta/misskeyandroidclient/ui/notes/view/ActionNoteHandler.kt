@@ -35,7 +35,7 @@ class ActionNoteHandler(
     val confirmViewModel: ConfirmViewModel,
     val settingStore: SettingStore,
 
-) {
+    ) {
 
     private val replyTargetObserver = Observer<PlaneNoteViewData> {
         activity.startActivity(
@@ -75,17 +75,6 @@ class ActionNoteHandler(
         activity.startActivity(intent)
     }
 
-    private val reactionTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "リアクションの対象ノートを選択:${it.toShowNote}")
-        when (settingStore.reactionPickerType) {
-            ReactionPickerType.LIST -> {
-                ReactionSelectionDialog().show(activity.supportFragmentManager, "MainActivity")
-            }
-            ReactionPickerType.SIMPLE -> {
-                ReactionPickerDialog().show(activity.supportFragmentManager, "Activity")
-            }
-        }
-    }
 
 
     private val showNoteEventObserver = Observer<Note> {
@@ -93,9 +82,13 @@ class ActionNoteHandler(
     }
 
 
-
     private val openNoteEditor = Observer<DraftNote?> { note ->
-        activity.startActivity(NoteEditorActivity.newBundle(activity, draftNoteId = note.draftNoteId))
+        activity.startActivity(
+            NoteEditorActivity.newBundle(
+                activity,
+                draftNoteId = note.draftNoteId
+            )
+        )
     }
 
     private val confirmDeletionEventObserver = Observer<PlaneNoteViewData> {
@@ -159,15 +152,16 @@ class ActionNoteHandler(
         }
     }
 
-    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit = { reaction ->
-        if (reaction != null) {
-            RemoteReactionEmojiSuggestionDialog.newInstance(
-                accountId = reaction.noteId.accountId,
-                noteId = reaction.noteId.noteId,
-                reaction = reaction.reaction
-            ).show(activity.supportFragmentManager, "")
+    private val showRemoteReactionEmojiSuggestionDialogObserver: (SelectedReaction?) -> Unit =
+        { reaction ->
+            if (reaction != null) {
+                RemoteReactionEmojiSuggestionDialog.newInstance(
+                    accountId = reaction.noteId.accountId,
+                    noteId = reaction.noteId.noteId,
+                    reaction = reaction.reaction
+                ).show(activity.supportFragmentManager, "")
+            }
         }
-    }
 
     fun initViewModelListener() {
         mNotesViewModel.replyTarget.removeObserver(replyTargetObserver)
@@ -187,10 +181,6 @@ class ActionNoteHandler(
 
         mNotesViewModel.quoteRenoteTarget.removeObserver(quoteRenoteTargetObserver)
         mNotesViewModel.quoteRenoteTarget.observe(activity, quoteRenoteTargetObserver)
-
-        mNotesViewModel.reactionTarget.removeObserver(reactionTargetObserver)
-        mNotesViewModel.reactionTarget.observe(activity, reactionTargetObserver)
-
 
         mNotesViewModel.openNoteEditor.removeObserver(openNoteEditor)
         mNotesViewModel.openNoteEditor.observe(activity, openNoteEditor)
@@ -225,7 +215,12 @@ class ActionNoteHandler(
         mNotesViewModel.confirmReportEvent.removeObserver(reportDialogObserver)
         mNotesViewModel.confirmReportEvent.observe(activity, reportDialogObserver)
 
-        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(showRemoteReactionEmojiSuggestionDialogObserver)
-        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(activity, showRemoteReactionEmojiSuggestionDialogObserver)
+        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.removeObserver(
+            showRemoteReactionEmojiSuggestionDialogObserver
+        )
+        mNotesViewModel.showRemoteReactionEmojiSuggestionDialog.observe(
+            activity,
+            showRemoteReactionEmojiSuggestionDialogObserver
+        )
     }
 }

@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.ui.users
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +20,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
@@ -52,6 +54,9 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
     @Inject
     lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
+
+    @Inject
+    internal lateinit var settingStore: SettingStore
 
     @ExperimentalCoroutinesApi
     val userViewModel: UserDetailViewModel by activityViewModels {
@@ -87,7 +92,13 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
                 return oldItem.id == newItem.id
             }
         }, viewLifecycleOwner, notesViewModel) {
-            NoteCardActionHandler(notesViewModel).onAction(it)
+            NoteCardActionHandler(
+                requireActivity() as AppCompatActivity,
+                notesViewModel,
+                settingStore
+            ).onAction(
+                it
+            )
         }
         withBinding<FragmentPinNoteBinding> { binding ->
             binding.pinNotesView.adapter = adapter

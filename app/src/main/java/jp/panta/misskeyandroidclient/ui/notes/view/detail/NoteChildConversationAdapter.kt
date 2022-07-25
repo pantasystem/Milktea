@@ -14,7 +14,6 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemSimpleNoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardAction
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAction
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -57,15 +56,7 @@ class NoteChildConversationAdapter(
 
         val reactionList = note.reactionCounts.value?.toList()?: emptyList()
         val adapter = ReactionCountAdapter {
-            when(it) {
-                is ReactionCountAction.OnClicked -> {
-                    notesViewModel.postReaction(note, it.reaction)
-                }
-                is ReactionCountAction.OnLongClicked -> {
-
-                    notesViewModel.setShowReactionHistoryDialog(note.toShowNote.note.id, it.reaction)
-                }
-            }
+            actionAdapter.onReactionCountAction(it)
         }
         adapter.note = note
         reactionView.adapter = adapter

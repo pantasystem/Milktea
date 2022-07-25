@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.MainThread
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
@@ -73,6 +75,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     @Inject
     lateinit var noteDetailViewModelAssistedFactory: NoteDetailViewModel.ViewModelAssistedFactory
 
+    @Inject
+    internal lateinit var settingStore: SettingStore
+
     val page: Pageable.Show by lazy {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
             ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
@@ -100,7 +105,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
             notesViewModel = notesViewModel,
             viewLifecycleOwner = viewLifecycleOwner
         ) {
-            NoteCardActionHandler(notesViewModel).onAction(it)
+            NoteCardActionHandler(requireActivity() as AppCompatActivity, notesViewModel, settingStore).onAction(it)
         }
         noteDetailViewModel.notes.observe(viewLifecycleOwner) {
             adapter.submitList(it)

@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.view
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -112,7 +113,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel) {
-            NoteCardActionHandler(notesViewModel).onAction(it)
+            NoteCardActionHandler(requireActivity() as AppCompatActivity, notesViewModel, settingStore).onAction(it)
         }
 
         withBinding<FragmentSwipeRefreshRecyclerViewBinding> { mBinding ->

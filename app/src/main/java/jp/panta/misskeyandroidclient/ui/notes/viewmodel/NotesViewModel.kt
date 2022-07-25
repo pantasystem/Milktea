@@ -65,7 +65,6 @@ class NotesViewModel @Inject constructor(
 
     val replyTarget = EventBus<PlaneNoteViewData>()
 
-    val reactionTarget = EventBus<PlaneNoteViewData>()
 
     val shareTarget = EventBus<PlaneNoteViewData>()
 
@@ -157,33 +156,6 @@ class NotesViewModel @Inject constructor(
         quoteRenoteTarget.event = reNoteTarget.event
     }
 
-    /**
-     * イベントにリアクション送信ボタンを押したことを登録する
-     */
-    fun setTargetToReaction(planeNoteViewData: PlaneNoteViewData) {
-        //Log.d("NotesViewModel", "getAccount()?: $getAccount()?")
-        val myReaction = planeNoteViewData.myReaction.value
-        if (myReaction != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    syncDeleteReaction(planeNoteViewData)
-                } catch (e: Exception) {
-                    Log.d(TAG, "error", e)
-                }
-            }
-        } else {
-            reactionTarget.event = planeNoteViewData
-        }
-    }
-
-
-    fun postReaction(reaction: String) {
-        val targetNote = reactionTarget.event
-        require(targetNote != null) {
-            "targetNoteはNotNullである必要があります。"
-        }
-        postReaction(targetNote, reaction)
-    }
 
     /**
      * リアクションを送信する
@@ -193,15 +165,17 @@ class NotesViewModel @Inject constructor(
     fun postReaction(planeNoteViewData: PlaneNoteViewData, reaction: String) {
 
         val id = planeNoteViewData.toShowNote.note.id
+        toggleReaction(id, reaction)
+    }
+
+    fun toggleReaction(noteId: Note.Id, reaction: String) {
         if (!Reaction(reaction).isLocal()) {
             showRemoteReactionEmojiSuggestionDialog.event =
-                SelectedReaction(noteId = id, reaction = reaction)
+                SelectedReaction(noteId = noteId, reaction = reaction)
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-
-            toggleReactionUseCase(id, reaction).onFailure {
-
+            toggleReactionUseCase(noteId, reaction).onFailure {
             }.onSuccess {
 
             }
