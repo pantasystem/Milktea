@@ -15,12 +15,10 @@ import jp.panta.misskeyandroidclient.databinding.ItemSimpleNoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardAction
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 class NoteChildConversationAdapter(
-    val notesViewModel: NotesViewModel,
     val lifecycleOwner: LifecycleOwner,
     val onAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<PlaneNoteViewData, NoteChildConversationAdapter.SimpleNoteHolder>(object : DiffUtil.ItemCallback<PlaneNoteViewData>(){

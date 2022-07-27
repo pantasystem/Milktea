@@ -113,7 +113,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, notesViewModel) {
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner) {
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
                 notesViewModel,

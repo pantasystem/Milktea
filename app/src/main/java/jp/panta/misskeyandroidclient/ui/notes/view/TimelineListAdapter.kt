@@ -22,7 +22,6 @@ import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.poll.PollListAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.HasReplyToNoteViewData
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -30,7 +29,6 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 class TimelineListAdapter(
     diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
     private val lifecycleOwner: LifecycleOwner,
-    private val notesViewModel: NotesViewModel,
     val onAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolderBase<ViewDataBinding>>(diffUtilCallBack){
 
@@ -41,7 +39,6 @@ class TimelineListAdapter(
         private var mNoteIdAndPollListAdapter: Pair<Note.Id, PollListAdapter>? = null
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
-        abstract val notesViewModel: NotesViewModel
         abstract val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
 
         private var reactionCountAdapter: ReactionCountAdapter? = null
@@ -136,15 +133,13 @@ class TimelineListAdapter(
             get() = this@TimelineListAdapter.lifecycleOwner
         override val reactionCountsView: RecyclerView
             get() = binding.simpleNote.reactionView
-        override val notesViewModel: NotesViewModel
-            get() = this@TimelineListAdapter.notesViewModel
+
 
         override val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
             get() = this@TimelineListAdapter.cardActionListener
 
         override fun onBind(note: PlaneNoteViewData) {
             binding.note = note
-            binding.notesViewModel = notesViewModel
             binding.noteCardActionListener = noteCardActionListenerAdapter
 
         }
@@ -160,8 +155,6 @@ class TimelineListAdapter(
 
         override val reactionCountsView: RecyclerView
             get() = binding.simpleNote.reactionView
-        override val notesViewModel: NotesViewModel
-            get() = this@TimelineListAdapter.notesViewModel
 
         override val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
             get() = this@TimelineListAdapter.cardActionListener
@@ -170,7 +163,6 @@ class TimelineListAdapter(
             if(note is HasReplyToNoteViewData){
                 binding.hasReplyToNote = note
 
-                binding.notesViewModel = notesViewModel
                 binding.noteCardActionListener = noteCardActionListenerAdapter
 
             }

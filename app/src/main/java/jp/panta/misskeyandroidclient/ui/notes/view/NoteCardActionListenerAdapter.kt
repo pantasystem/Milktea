@@ -4,6 +4,7 @@ import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAction
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.user.User
 
 class NoteCardActionListenerAdapter(
     val onAction: (NoteCardAction) -> Unit,
@@ -25,12 +26,10 @@ class NoteCardActionListenerAdapter(
         onAction(NoteCardAction.OnReactionButtonClicked(note))
     }
 
-    fun onReactionClicked(note: PlaneNoteViewData, reaction: String) {
-        onAction(NoteCardAction.OnReactionClicked(note, reaction))
-    }
-
-    fun onReactionLongClicked(note: PlaneNoteViewData, reaction: String) {
-        onAction(NoteCardAction.OnReactionLongClicked(note, reaction))
+    fun onUserClicked(user: User?) {
+        if (user != null) {
+            onAction(NoteCardAction.OnUserClicked(user))
+        }
     }
 
     fun onPollChoiceClicked(noteId: Note.Id, poll: Poll, choice: Poll.Choice) {
@@ -71,4 +70,5 @@ sealed interface NoteCardAction {
     data class OnPollChoiceClicked(val noteId: Note.Id, val poll: Poll, val choice: Poll.Choice) : NoteCardAction
     data class OnRenoteButtonLongClicked(val note: PlaneNoteViewData) : NoteCardAction
     data class OnNoteCardClicked(val note: Note) : NoteCardAction
+    data class OnUserClicked(val user: User) : NoteCardAction
 }

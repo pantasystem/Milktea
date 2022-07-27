@@ -11,9 +11,6 @@
         <import type="jp.panta.misskeyandroidclient.R"/>
 
         <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
-        <variable
                 name="noteCardActionListener"
                 type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
     </data>
@@ -39,7 +36,7 @@
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:paddingTop="8dp"
-                    android:onClick="@{()-> notesViewModel.setTargetToUser(note.note.user)}"
+                    android:onClick="@{()-> noteCardActionListener.onUserClicked(note.note.user)}"
                     app:statusMessageTargetViewNote="@{note}"
             />
             <include

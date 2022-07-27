@@ -7,9 +7,6 @@
         <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox"/>
         <variable name="hasReplyToNote" type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.HasReplyToNoteViewData"/>
         <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
-        <variable
                 name="noteCardActionListener"
                 type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
     </data>
