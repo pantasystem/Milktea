@@ -65,7 +65,6 @@ class NotesViewModel @Inject constructor(
 
     val shareNoteState = MutableLiveData<NoteState>()
 
-//    val targetUser = EventBus<User>()
 
     val openNoteEditor = EventBus<DraftNote?>()
 
@@ -74,10 +73,6 @@ class NotesViewModel @Inject constructor(
         shareTarget.event = note
         loadNoteState(note)
     }
-
-//    fun setTargetToUser(user: User) {
-//        targetUser.event = user
-//    }
 
 
     fun renote(noteId: Note.Id) {
