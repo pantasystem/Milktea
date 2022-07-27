@@ -38,6 +38,7 @@ class NotificationListAdapter constructor(
         holder.binding.notification = getItem(position)
         holder.binding.simpleNote
         holder.binding.notificationViewModel = notificationViewModel
+        holder.binding.noteCardActionListener = noteCardActionListenerAdapter
 
         val note = getItem(position).noteViewData
         note?: return
