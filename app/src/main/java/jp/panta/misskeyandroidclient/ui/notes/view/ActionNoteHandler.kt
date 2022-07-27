@@ -4,7 +4,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import jp.panta.misskeyandroidclient.*
+import jp.panta.misskeyandroidclient.NoteEditorActivity
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
@@ -17,13 +18,12 @@ import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.Report
 
 
 class ActionNoteHandler(
     val activity: AppCompatActivity,
-    val mNotesViewModel: NotesViewModel,
+    private val mNotesViewModel: NotesViewModel,
     val confirmViewModel: ConfirmViewModel,
     val settingStore: SettingStore,
 
@@ -33,15 +33,6 @@ class ActionNoteHandler(
     private val shareTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "share clicked :$it")
         ShareBottomSheetDialog().show(activity.supportFragmentManager, "MainActivity")
-    }
-    private val targetUserObserver = Observer<User> {
-        Log.d("MainActivity", "user clicked :$it")
-        val intent = UserDetailActivity.newInstance(activity, userId = it.id)
-
-        intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-
-        activity.startActivity(intent)
     }
 
     private val statusMessageObserver = Observer<String> {
