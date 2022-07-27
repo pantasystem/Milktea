@@ -10,9 +10,6 @@
         <import type="jp.panta.misskeyandroidclient.R"/>
 
         <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
-        <variable
                 name="notificationViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel" />
         <variable
@@ -84,7 +81,7 @@
                         tools:srcCompat="@mipmap/ic_launcher_round"
                         android:layout_marginEnd="5dp"
                         app:circleIcon="@{notification.avatarIconUrl}"
-                        android:onClick="@{()-> notesViewModel.setTargetToUser(notification.user)}"
+                        android:onClick="@{()-> noteCardActionListener.onUserClicked(notification.user)}"
                         android:visibility="@{ notification.user == null ? View.GONE : View.VISIBLE }"
                         tools:ignore="ContentDescription" />
 

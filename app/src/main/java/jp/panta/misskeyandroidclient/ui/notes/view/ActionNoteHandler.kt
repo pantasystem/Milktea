@@ -118,8 +118,6 @@ class ActionNoteHandler(
         mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
         mNotesViewModel.shareTarget.observe(activity, shareTargetObserver)
 
-        mNotesViewModel.targetUser.removeObserver(targetUserObserver)
-        mNotesViewModel.targetUser.observe(activity, targetUserObserver)
 
         mNotesViewModel.statusMessage.removeObserver(statusMessageObserver)
         mNotesViewModel.statusMessage.observe(activity, statusMessageObserver)

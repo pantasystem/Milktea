@@ -1,8 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.view
 
 import androidx.appcompat.app.AppCompatActivity
-import jp.panta.misskeyandroidclient.NoteDetailActivity
-import jp.panta.misskeyandroidclient.NoteEditorActivity
+import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionSelectionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.RemoteReactionEmojiSuggestionDialog
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.history.ReactionHistoryPagerDialog
@@ -84,6 +83,13 @@ class NoteCardActionHandler(
                         activity,
                         replyTo = action.note.toShowNote.note.id
                     )
+                )
+            }
+            is NoteCardAction.OnUserClicked -> {
+                val intent = UserDetailActivity.newInstance(activity, action.user.id)
+                intent.putActivity(Activities.ACTIVITY_IN_APP)
+                activity.startActivity(
+                    intent
                 )
             }
         }

@@ -15,7 +15,6 @@ import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardAction
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
@@ -24,7 +23,6 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 class NotificationListAdapter constructor(
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationViewData>,
-    val notesViewModel: NotesViewModel,
     val notificationViewModel: NotificationViewModel,
     private val lifecycleOwner: LifecycleOwner,
     onNoteCardAction: (NoteCardAction) -> Unit
@@ -34,7 +32,6 @@ class NotificationListAdapter constructor(
     val noteCardActionListenerAdapter = NoteCardActionListenerAdapter(onNoteCardAction)
 
     override fun onBindViewHolder(holder: NotificationHolder, position: Int) {
-        holder.binding.notesViewModel = notesViewModel
         holder.binding.notification = getItem(position)
         holder.binding.simpleNote
         holder.binding.notificationViewModel = notificationViewModel

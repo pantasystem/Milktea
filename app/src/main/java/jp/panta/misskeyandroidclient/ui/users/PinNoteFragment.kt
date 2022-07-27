@@ -92,7 +92,7 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
             ): Boolean {
                 return oldItem.id == newItem.id
             }
-        }, viewLifecycleOwner, notesViewModel) {
+        }, viewLifecycleOwner) {
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
                 notesViewModel,

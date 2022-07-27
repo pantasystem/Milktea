@@ -8,9 +8,6 @@
                 name="childrenViewData"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteConversationViewData" />
         <variable
-                name="notesViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel" />
-        <variable
                 name="noteDetailViewModel"
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewModel" />
         <variable

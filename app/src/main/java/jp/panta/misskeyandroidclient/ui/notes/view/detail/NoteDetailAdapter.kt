@@ -91,7 +91,6 @@ class NoteDetailAdapter(
         when(holder){
             is NoteHolder ->{
                 holder.binding.note = note
-                holder.binding.notesViewModel = notesViewModel
                 setReactionCounter(note, holder.binding.simpleNote.reactionView)
 
                 holder.binding.lifecycleOwner = viewLifecycleOwner
@@ -108,11 +107,10 @@ class NoteDetailAdapter(
             is ConversationHolder ->{
                 Log.d("NoteDetailAdapter", "conversation: ${(note as NoteConversationViewData).conversation.value?.size}")
                 holder.binding.childrenViewData = note
-                holder.binding.notesViewModel = notesViewModel
                 setReactionCounter(note, holder.binding.childNote.reactionView)
 
                 holder.binding.noteDetailViewModel = noteDetailViewModel
-                val adapter = NoteChildConversationAdapter(notesViewModel, viewLifecycleOwner, onAction)
+                val adapter = NoteChildConversationAdapter(viewLifecycleOwner, onAction)
                 holder.binding.conversationView.adapter = adapter
                 holder.binding.conversationView.layoutManager = LinearLayoutManager(holder.itemView.context)
                 holder.binding.noteCardActionListener = noteCardActionListenerAdapter

@@ -30,7 +30,6 @@ import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
-import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
@@ -66,7 +65,7 @@ class NotesViewModel @Inject constructor(
 
     val shareNoteState = MutableLiveData<NoteState>()
 
-    val targetUser = EventBus<User>()
+//    val targetUser = EventBus<User>()
 
     val openNoteEditor = EventBus<DraftNote?>()
 
@@ -76,9 +75,9 @@ class NotesViewModel @Inject constructor(
         loadNoteState(note)
     }
 
-    fun setTargetToUser(user: User) {
-        targetUser.event = user
-    }
+//    fun setTargetToUser(user: User) {
+//        targetUser.event = user
+//    }
 
 
     fun renote(noteId: Note.Id) {
