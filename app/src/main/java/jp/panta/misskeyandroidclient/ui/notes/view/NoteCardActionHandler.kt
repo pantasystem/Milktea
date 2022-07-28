@@ -39,6 +39,11 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnReactionButtonClicked -> {
+                val myReaction = action.note.myReaction.value
+                if (myReaction != null) {
+                    notesViewModel.toggleReaction(action.note.toShowNote.note.id, myReaction)
+                    return
+                }
                 when (settingStore.reactionPickerType) {
                     ReactionPickerType.LIST -> {
                         ReactionSelectionDialog.newInstance(action.note.toShowNote.note.id)
