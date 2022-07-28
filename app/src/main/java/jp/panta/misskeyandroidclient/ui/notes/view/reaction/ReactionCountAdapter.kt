@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,13 +13,16 @@ import jp.panta.misskeyandroidclient.databinding.ItemReactionBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
-class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction) -> Unit) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
+class ReactionCountAdapter(
+    val lifecycleOwner: LifecycleOwner,
+    val reactionCountActionListener: (ReactionCountAction) -> Unit
+) : ListAdapter<ReactionCount, ReactionCountAdapter.ReactionHolder>(
     reactionDiffUtilItemCallback
-){
-    class ReactionHolder(val binding: ItemReactionBinding): RecyclerView.ViewHolder(binding.root)
+) {
+    class ReactionHolder(val binding: ItemReactionBinding) : RecyclerView.ViewHolder(binding.root)
 
-    companion object{
-        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<ReactionCount>(){
+    companion object {
+        private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<ReactionCount>() {
             override fun areContentsTheSame(
                 oldItem: ReactionCount,
                 newItem: ReactionCount
@@ -38,17 +42,23 @@ class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction
     var note: PlaneNoteViewData? = null
 
     override fun onBindViewHolder(holder: ReactionHolder, position: Int) {
-        val item =  getItem(position)
+        val item = getItem(position)
         if (note == null) {
             Log.w("ReactionCountAdapter", "noteがNullです。正常に処理が行われない可能性があります。")
         }
-        holder.binding.reaction = item//Pair(java.lang.String(item.first), Integer.valueOf(item.second))
+        holder.binding.reaction =
+            item//Pair(java.lang.String(item.first), Integer.valueOf(item.second))
         holder.binding.note = note
         holder.binding.root.setOnLongClickListener {
             val id = note?.toShowNote?.note?.id
             if (id != null) {
                 note?.let {
-                    reactionCountActionListener(ReactionCountAction.OnLongClicked(it, item.reaction))
+                    reactionCountActionListener(
+                        ReactionCountAction.OnLongClicked(
+                            it,
+                            item.reaction
+                        )
+                    )
                 }
                 true
             } else {
@@ -62,16 +72,22 @@ class ReactionCountAdapter(val reactionCountActionListener: (ReactionCountAction
 
         }
         holder.binding.executePendingBindings()
-        //holder.binding.lifecycleOwner = lifecycleOwner
+        holder.binding.lifecycleOwner = lifecycleOwner
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReactionHolder {
-        val binding = DataBindingUtil.inflate<ItemReactionBinding>(LayoutInflater.from(parent.context), R.layout.item_reaction, parent, false)
+        val binding = DataBindingUtil.inflate<ItemReactionBinding>(
+            LayoutInflater.from(parent.context),
+            R.layout.item_reaction,
+            parent,
+            false
+        )
         return ReactionHolder(binding)
     }
 }
 
 sealed interface ReactionCountAction {
-    data class OnClicked(val note: PlaneNoteViewData, val reaction: String): ReactionCountAction
-    data class OnLongClicked(val note: PlaneNoteViewData, val reaction: String): ReactionCountAction
+    data class OnClicked(val note: PlaneNoteViewData, val reaction: String) : ReactionCountAction
+    data class OnLongClicked(val note: PlaneNoteViewData, val reaction: String) :
+        ReactionCountAction
 }

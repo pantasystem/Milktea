@@ -55,7 +55,7 @@ class NotificationListAdapter constructor(
     private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView){
 
         val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-        val adapter = ReactionCountAdapter {
+        val adapter = ReactionCountAdapter(lifecycleOwner) {
             noteCardActionListenerAdapter.onReactionCountAction(it)
         }
         adapter.note = note

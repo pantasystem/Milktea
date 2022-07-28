@@ -50,15 +50,19 @@ class TimelineListAdapter(
             flexBoxLayoutManager
         }
 
-        private val reactionCountsObserver = Observer<List<ReactionCount>> { counts ->
-            if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
-                bindReactionCountVisibility()
+        @Suppress("ObjectLiteralToLambda")
+        private val reactionCountsObserver = object : Observer<List<ReactionCount>> {
+            override fun onChanged(counts: List<ReactionCount>?) {
 
-                reactionCountAdapter?.submitList(counts) {
-                    reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
-                        DefaultItemAnimator()
-                    }else{
-                        reactionCountsView.itemAnimator
+                if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
+                    bindReactionCountVisibility()
+
+                    reactionCountAdapter?.submitList(counts) {
+                        reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
+                            DefaultItemAnimator()
+                        }else{
+                            reactionCountsView.itemAnimator
+                        }
                     }
                 }
             }
@@ -96,7 +100,7 @@ class TimelineListAdapter(
             reactionCountAdapter = if(reactionCountAdapter != null && reactionCountAdapter?.note?.id == note.id){
                 reactionCountAdapter!!
             }else{
-                ReactionCountAdapter {
+                ReactionCountAdapter(lifecycleOwner) {
                     noteCardActionListenerAdapter.onReactionCountAction(it)
                 }
             }
