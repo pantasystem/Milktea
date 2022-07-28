@@ -29,7 +29,7 @@
             android:layout_marginBottom="4dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
 
-            reactionNote="@{note}"
+            myReaction="@{note.myReaction}"
             reactionBackground="@{reaction}"
 
 
