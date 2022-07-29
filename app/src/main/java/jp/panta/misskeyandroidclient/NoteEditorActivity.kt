@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
+import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.editor.NoteEditorFragment
@@ -67,21 +67,15 @@ class NoteEditorActivity : AppCompatActivity() {
 
     val mViewModel: NoteEditorViewModel by viewModels()
 
-    private lateinit var mBinding: ActivityNoteEditorBinding
+    private val binding: ActivityNoteEditorBinding by dataBinding()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
         setContentView(R.layout.activity_note_editor)
-        val binding = DataBindingUtil.setContentView<ActivityNoteEditorBinding>(
-            this,
-            R.layout.activity_note_editor
-        )
-        mBinding = binding
 
         binding.lifecycleOwner = this
-        binding.viewModel = mViewModel
 
         var text: String? = null
         if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true) {
