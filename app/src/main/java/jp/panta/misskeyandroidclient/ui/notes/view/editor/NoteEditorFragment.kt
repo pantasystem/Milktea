@@ -196,7 +196,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
 
-        val userChipAdapter = UserChipListAdapter(this)
+        val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
         binding.addressUsersView.adapter = userChipAdapter
         binding.addressUsersView.applyFlexBoxLayout(requireContext())
 
@@ -204,10 +204,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
         noteEditorToolbar.viewModel = noteEditorViewModel
-        accountViewModel.switchAccount.observe(this) {
+        accountViewModel.switchAccount.observe(viewLifecycleOwner) {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         }
-        accountViewModel.showProfile.observe(this) {
+        accountViewModel.showProfile.observe(viewLifecycleOwner) {
             val intent =
                 UserDetailActivity.newInstance(requireActivity(), userId = User.Id(it.accountId, it.remoteId))
 
