@@ -8,18 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteEditorBinding
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.editor.NoteEditorFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
-import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -77,25 +69,6 @@ class NoteEditorActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityNoteEditorBinding
 
-    @Inject
-    lateinit var accountStore: AccountStore
-
-    val accountViewModel: AccountViewModel by viewModels()
-
-    @Inject
-    lateinit var driveFileRepository: DriveFileRepository
-
-    @Inject
-    lateinit var filePropertyDataSource: FilePropertyDataSource
-
-    @Inject
-    lateinit var metaRepository: MetaRepository
-
-    @Inject
-    lateinit var settingStore: SettingStore
-
-    @Inject
-    lateinit var authorizationNavigation: AuthorizationNavigation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

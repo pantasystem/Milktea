@@ -1,11 +1,14 @@
 package jp.panta.misskeyandroidclient.ui.emojis.viewmodel
 
 import androidx.lifecycle.ViewModel
-import net.pantasystem.milktea.model.emoji.Emoji
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import net.pantasystem.milktea.model.emoji.Emoji
+import javax.inject.Inject
 
 
-class EmojiSelectionViewModel : ViewModel(), EmojiSelection {
+@HiltViewModel
+class EmojiSelectionViewModel @Inject constructor(): ViewModel(), EmojiSelection {
 
     val selectedEmoji = EventBus<Emoji>()
     val selectedEmojiName = EventBus<String>()

@@ -32,6 +32,7 @@ import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.confirm.ConfirmDialog
 import jp.panta.misskeyandroidclient.ui.emojis.CustomEmojiPickerDialog
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
+import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
@@ -117,6 +118,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     
     private val noteEditorViewModel: NoteEditorViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
+    private val emojiSelectionViewModel: EmojiSelectionViewModel by activityViewModels()
 
     @Inject internal lateinit var accountStore: AccountStore
     @Inject internal lateinit var metaRepository: MetaRepository
@@ -304,14 +306,14 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }.launchIn(lifecycleScope)
 
-        noteEditorViewModel.isPost.observe(this) {
+        noteEditorViewModel.isPost.observe(viewLifecycleOwner) {
             if (it) {
                 noteEditorToolbar.postButton.isEnabled = false
                 requireActivity().finish()
             }
         }
 
-        noteEditorViewModel.showVisibilitySelectionEvent.observe(this) {
+        noteEditorViewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner) {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialog()
             dialog.show(childFragmentManager, "NoteEditor")
@@ -323,14 +325,21 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        noteEditorViewModel.showPollTimePicker.observe(this) {
+        noteEditorViewModel.showPollTimePicker.observe(viewLifecycleOwner) {
             PollTimePickerDialog().show(childFragmentManager, "TimePicker")
         }
 
-        noteEditorViewModel.showPollDatePicker.observe(this) {
+        noteEditorViewModel.showPollDatePicker.observe(viewLifecycleOwner) {
             PollDatePickerDialog().show(childFragmentManager, "DatePicker")
         }
 
+        emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner) {
+            onSelect(it)
+        }
+
+        emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner) {
+            onSelect(it)
+        }
 
 
         binding.selectFileFromDrive.setOnClickListener {
@@ -374,7 +383,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
-        confirmViewModel.confirmedEvent.observe(this) {
+        confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
             when (it.eventType) {
                 CONFIRM_SAVE_AS_DRAFT_OR_DELETE -> {
                     if (it.resultType == ResultType.POSITIVE) {
@@ -386,11 +395,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        confirmViewModel.confirmEvent.observe(this) {
+        confirmViewModel.confirmEvent.observe(viewLifecycleOwner) {
             ConfirmDialog().show(childFragmentManager, "confirm")
         }
 
-        noteEditorViewModel.isSaveNoteAsDraft.observe(this) {
+        noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
             Handler(Looper.getMainLooper()).post {
                 if (it == null) {
                     Toast.makeText(requireContext(), "下書きに失敗しました", Toast.LENGTH_LONG).show()
