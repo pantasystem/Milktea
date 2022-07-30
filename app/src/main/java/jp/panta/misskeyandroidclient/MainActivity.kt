@@ -12,9 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -34,11 +32,8 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
@@ -160,10 +155,12 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         }.launchIn(lifecycleScope)
 
 
-        lifecycleScope.launchWhenResumed {
-            mainViewModel.currentAccountSocketStateEvent.collect {
-                webSocketStateMessageScope {
-                    it.showToastMessage()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainViewModel.currentAccountSocketStateEvent.collect {
+                    webSocketStateMessageScope {
+                        it.showToastMessage()
+                    }
                 }
             }
         }
@@ -345,7 +342,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
 
-
     private fun collectCrashlyticsCollectionState() {
         lifecycleScope.launchWhenCreated {
             mainViewModel.isShowFirebaseCrashlytics.collect {
@@ -363,20 +359,26 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         lifecycleScope.launchWhenCreated {
             mainViewModel.isShowGoogleAnalyticsDialog.collect {
                 if (it) {
-                    ConfirmGoogleAnalyticsDialog().show(supportFragmentManager, "confirm_google_analytics_dialog")
+                    ConfirmGoogleAnalyticsDialog().show(
+                        supportFragmentManager,
+                        "confirm_google_analytics_dialog"
+                    )
                 }
             }
         }
     }
 
     private fun collectReportSendingState() {
-        lifecycleScope.launchWhenResumed {
-            reportViewModel.state.distinctUntilChangedBy {
-                it is ReportState.Sending.Success
-                        || it is ReportState.Sending.Failed
-            }.collect { state ->
-                showSendReportStateFrom(state)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                reportViewModel.state.distinctUntilChangedBy {
+                    it is ReportState.Sending.Success
+                            || it is ReportState.Sending.Failed
+                }.collect { state ->
+                    showSendReportStateFrom(state)
+                }
             }
+
         }
     }
 

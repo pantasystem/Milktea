@@ -10,10 +10,13 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.databinding.FragmentAppAuthBinding
 import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
@@ -62,16 +65,18 @@ class AuthFragment : Fragment() {
                 ).show()
             }
         }
-        lifecycleScope.launchWhenResumed {
-            appAuthViewModel.errors.collect {
-                binding.errorMsgView.visibility = if (it == null) View.GONE else View.VISIBLE
-                if (it != null) {
-                    binding.errorMsgView.text = when (it) {
-                        is AuthErrors.GetMetaError -> {
-                            getString(R.string.warning_s, it.throwable.toString())
-                        }
-                        is AuthErrors.GenerateTokenError -> {
-                            getString(R.string.error_s, it.throwable.toString())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                appAuthViewModel.errors.collect {
+                    binding.errorMsgView.visibility = if (it == null) View.GONE else View.VISIBLE
+                    if (it != null) {
+                        binding.errorMsgView.text = when (it) {
+                            is AuthErrors.GetMetaError -> {
+                                getString(R.string.warning_s, it.throwable.toString())
+                            }
+                            is AuthErrors.GenerateTokenError -> {
+                                getString(R.string.error_s, it.throwable.toString())
+                            }
                         }
                     }
                 }

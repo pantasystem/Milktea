@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFollowFollowerBinding
 import jp.panta.misskeyandroidclient.ui.TitleSettable
@@ -21,6 +23,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.user.RequestType
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -76,8 +79,10 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
         val errorHandler = ToggleFollowErrorHandler(mBinding.layoutBase) {
             toggleFollowFollowerViewModel.toggleFollow(it)
         }
-        lifecycleScope.launchWhenResumed {
-            toggleFollowFollowerViewModel.errors.collect(errorHandler::invoke)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                toggleFollowFollowerViewModel.errors.collect(errorHandler::invoke)
+            }
         }
 
     }

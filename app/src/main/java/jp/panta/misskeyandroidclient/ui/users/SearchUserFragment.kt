@@ -10,13 +10,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -66,9 +69,11 @@ class SearchUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.errors.collect {
-                Toast.makeText(requireContext(), "Load error:$it", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.errors.collect {
+                    Toast.makeText(requireContext(), "Load error:$it", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

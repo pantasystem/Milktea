@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TimelineViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.provideViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -140,7 +142,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         mBinding.listView.adapter = adapter
 
-        lifecycleScope.launchWhenResumed {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             mViewModel.timelineState.collect { state ->
                 val notes = (state.content as? StateContent.Exist)?.rawContent ?: emptyList()
                 adapter.submitList(notes)
@@ -158,6 +161,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     }
                 }
             }
+            }
+
         }
 
         mBinding.retryLoadButton.setOnClickListener {
@@ -166,9 +171,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         }
 
 
-        lifecycleScope.launchWhenResumed {
-            mViewModel.errorEvent.collect { error ->
-                TimelineErrorHandler(requireContext())(error)
+        lifecycleScope.launch{
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mViewModel.errorEvent.collect { error ->
+                    TimelineErrorHandler(requireContext())(error)
+                }
             }
         }
 

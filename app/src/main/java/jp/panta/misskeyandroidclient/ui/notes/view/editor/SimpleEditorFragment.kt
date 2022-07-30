@@ -13,9 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -170,12 +168,14 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
 
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.poll.collect { poll ->
-                if (poll == null) {
-                    removePollFragment()
-                } else {
-                    setPollFragment()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.poll.collect { poll ->
+                    if (poll == null) {
+                        removePollFragment()
+                    } else {
+                        setPollFragment()
+                    }
                 }
             }
         }
@@ -191,9 +191,11 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             dialog.show(childFragmentManager, "NoteEditor")
         }
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.address.collect {
-                userChipAdapter.submitList(it)
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.address.collect {
+                    userChipAdapter.submitList(it)
+                }
             }
         }
 

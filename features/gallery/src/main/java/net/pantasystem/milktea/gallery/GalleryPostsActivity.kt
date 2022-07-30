@@ -7,11 +7,14 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.gallery.databinding.ActivityGalleryPostsBinding
 import net.pantasystem.milktea.gallery.viewmodel.Action
@@ -45,19 +48,21 @@ class GalleryPostsActivity : AppCompatActivity() {
         }
         ft.commit()
 
-        lifecycleScope.launchWhenResumed {
-            actionViewModel.viewAction.collect {
-                when(it) {
-                    is Action.OpenCreationEditor -> {
-                        Log.d("GalleryPostsActivity", "アクションがあった")
-                        val t = supportFragmentManager.beginTransaction()
-                        t.replace(R.id.base, GalleryEditorFragment())
-                        t.addToBackStack(null)
-                        t.commit()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                actionViewModel.viewAction.collect {
+                    when(it) {
+                        is Action.OpenCreationEditor -> {
+                            Log.d("GalleryPostsActivity", "アクションがあった")
+                            val t = supportFragmentManager.beginTransaction()
+                            t.replace(R.id.base, GalleryEditorFragment())
+                            t.addToBackStack(null)
+                            t.commit()
+                        }
                     }
                 }
-
             }
+
         }
 
 
