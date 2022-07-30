@@ -7,13 +7,16 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.databinding.FragmentAuthResultBinding
+import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
+import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -34,13 +37,15 @@ class AuthResultFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launchWhenCreated {
-            viewModel.authorization.collect {
-                if(it is Authorization.Approved) {
-                    if (it.accessToken is AccessToken.Misskey) {
-                        binding.user = (it.accessToken as AccessToken.Misskey).user
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.authorization.collect {
+                    if(it is Authorization.Approved) {
+                        if (it.accessToken is AccessToken.Misskey) {
+                            binding.user = (it.accessToken as AccessToken.Misskey).user
+                        }
+                        binding.continueAuth.isEnabled = true
                     }
-                    binding.continueAuth.isEnabled = true
                 }
             }
         }

@@ -343,26 +343,30 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
 
     private fun collectCrashlyticsCollectionState() {
-        lifecycleScope.launchWhenCreated {
-            mainViewModel.isShowFirebaseCrashlytics.collect {
-                if (it) {
-                    ConfirmCrashlyticsDialog().show(
-                        supportFragmentManager,
-                        "confirm_crashlytics_dialog"
-                    )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mainViewModel.isShowFirebaseCrashlytics.collect {
+                    if (it) {
+                        ConfirmCrashlyticsDialog().show(
+                            supportFragmentManager,
+                            "confirm_crashlytics_dialog"
+                        )
+                    }
                 }
             }
         }
     }
 
     private fun collectConfirmGoogleAnalyticsState() {
-        lifecycleScope.launchWhenCreated {
-            mainViewModel.isShowGoogleAnalyticsDialog.collect {
-                if (it) {
-                    ConfirmGoogleAnalyticsDialog().show(
-                        supportFragmentManager,
-                        "confirm_google_analytics_dialog"
-                    )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mainViewModel.isShowGoogleAnalyticsDialog.collect {
+                    if (it) {
+                        ConfirmGoogleAnalyticsDialog().show(
+                            supportFragmentManager,
+                            "confirm_google_analytics_dialog"
+                        )
+                    }
                 }
             }
         }
@@ -384,9 +388,11 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     private fun collectCreateNoteState() {
         // NOTE: ノート作成処理の状態をSnackBarで表示する
-        lifecycleScope.launchWhenCreated {
-            noteTaskExecutor.tasks.collect { taskState ->
-                showCreateNoteTaskStatusSnackBar(taskState)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                noteTaskExecutor.tasks.collect { taskState ->
+                    showCreateNoteTaskStatusSnackBar(taskState)
+                }
             }
         }
     }
@@ -403,13 +409,15 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
     private fun collectUnauthorizedState() {
-        lifecycleScope.launchWhenStarted {
-            accountStore.state.collect {
-                if (it.isUnauthorized) {
-                    this@MainActivity.startActivity(
-                        authorizationNavigation.newIntent(Unit)
-                    )
-                    finish()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                accountStore.state.collect {
+                    if (it.isUnauthorized) {
+                        this@MainActivity.startActivity(
+                            authorizationNavigation.newIntent(Unit)
+                        )
+                        finish()
+                    }
                 }
             }
         }

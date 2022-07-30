@@ -378,13 +378,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
-        lifecycleScope.launchWhenStarted {
-            accountStore.state.collect {
-                if (it.isUnauthorized) {
-                    requireActivity().finish()
-                    startActivity(
-                        authorizationNavigation.newIntent(Unit)
-                    )
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                accountStore.state.collect {
+                    if (it.isUnauthorized) {
+                        requireActivity().finish()
+                        startActivity(
+                            authorizationNavigation.newIntent(Unit)
+                        )
+                    }
                 }
             }
         }
