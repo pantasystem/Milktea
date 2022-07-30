@@ -78,8 +78,12 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
         val activity = requireActivity()
 
         override fun onSelect(emoji: String) {
+            val parentFr = parentFragment
             if(activity is EmojiSelection){
                 activity.onSelect(emoji)
+            } else if (parentFr is EmojiSelection) {
+                parentFr.onSelect(emoji)
+
             }else{
                 mSelectionViewModel?.onSelect(emoji)
             }

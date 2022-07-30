@@ -423,8 +423,6 @@ class NoteEditorViewModel @Inject constructor(
     }
 
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     fun saveDraft() {
         if (!canSaveDraft()) {
             return
