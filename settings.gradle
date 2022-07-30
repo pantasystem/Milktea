@@ -22,7 +22,7 @@ dependencyResolutionManagement {
             bundle("compose-material", ["compose-material-material", "compose-material-material-icons-core", "compose-material-material-icons-extended"])
 
             alias("compose-ui-ui-test-junit4").to("androidx.compose.ui:ui-test-junit4:1.2.0-beta02")
-            alias("compose-runtime-runtime-livedata").to("androidx.compose.runtime:runtime-livedata:1.2.0-beta02")
+            alias("compose-runtime-runtime-livedata").to("androidx.compose.runtime:runtime-livedata:1.3.0-alpha01")
             alias("android-material-compose-theme-adapter").to("com.google.android.material:compose-theme-adapter:1.1.6")
             alias("accompanist-swiperefresh").to("com.google.accompanist:accompanist-swiperefresh:0.14.0")
             alias("activity-compose").to("androidx.activity:activity-compose:1.4.0")
@@ -56,7 +56,7 @@ dependencyResolutionManagement {
             alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.5.0')
             alias('activity-ktx').to('androidx.activity:activity-ktx:1.5.0')
 
-            def emoji2_version = "1.2.0-beta01"
+            def emoji2_version = "1.2.0-rc01"
             alias('androidx-emoji2').to("androidx.emoji2:emoji2:$emoji2_version")
             alias('androidx-emoji2-views').to("androidx.emoji2:emoji2-views:$emoji2_version")
             alias('androidx-emoji2-views-helper').to("androidx.emoji2:emoji2-views-helper:$emoji2_version")
