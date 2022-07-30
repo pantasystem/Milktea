@@ -86,13 +86,6 @@ class NoteEditorViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 
-    //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
-    val reply = _state.map {
-        it.replyId?.let { noteId ->
-            noteRepository.find(noteId).getOrNull()
-        }
-    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
-
 
     val hasCw = _state.map {
         it.hasCw
