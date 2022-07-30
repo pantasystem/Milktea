@@ -19,8 +19,10 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,6 +44,7 @@ import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
@@ -278,14 +281,16 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        lifecycleScope.launchWhenResumed {
-            noteEditorViewModel.poll.distinctUntilChangedBy {
-                it == null
-            }.collect { poll ->
-                if (poll == null) {
-                    removePollFragment()
-                } else {
-                    setPollFragment()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                noteEditorViewModel.poll.distinctUntilChangedBy {
+                    it == null
+                }.collect { poll ->
+                    if (poll == null) {
+                        removePollFragment()
+                    } else {
+                        setPollFragment()
+                    }
                 }
             }
         }
@@ -319,9 +324,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             dialog.show(childFragmentManager, "NoteEditor")
         }
 
-        lifecycleScope.launchWhenResumed {
-            noteEditorViewModel.address.collect {
-                userChipAdapter.submitList(it)
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                noteEditorViewModel.address.collect {
+                    userChipAdapter.submitList(it)
+                }
             }
         }
 
