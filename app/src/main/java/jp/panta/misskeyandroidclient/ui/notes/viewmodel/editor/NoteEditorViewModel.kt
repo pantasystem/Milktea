@@ -86,16 +86,6 @@ class NoteEditorViewModel @Inject constructor(
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 
-    //val replyToNoteId = MutableLiveData<Note.Id>(replyId)
-    val reply = _state.map {
-        it.replyId?.let { noteId ->
-            noteRepository.find(noteId).getOrNull()
-        }
-    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = null)
-
-    val renoteId = _state.map {
-        it.renoteId
-    }.asLiveData()
 
     val hasCw = _state.map {
         it.hasCw
@@ -451,10 +441,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun canSaveDraft(): Boolean {
-        return !_state.value.text.isNullOrBlank()
-                || !files.value.isNullOrEmpty()
-                || !poll.value?.choices.isNullOrEmpty()
-                || address.value.isNotEmpty()
+        return _state.value.shouldDiscardingConfirmation()
     }
 
 

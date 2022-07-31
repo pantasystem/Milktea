@@ -6,22 +6,22 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentPollEditorBinding
-import net.pantasystem.milktea.model.notes.PollExpiresAt
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.notes.PollExpiresAt
 import kotlin.time.Duration.Companion.days
-import kotlin.time.ExperimentalTime
 
 @AndroidEntryPoint
 class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
@@ -40,10 +40,13 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         val layoutManager = LinearLayoutManager(this.context)
         mBinding.choices.layoutManager = layoutManager
         mNoteEditorViewModel = viewModel
-        lifecycleScope.launchWhenResumed {
-            viewModel.poll.filterNotNull().collect { poll ->
-                mBinding.pollEditingState = poll
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.poll.filterNotNull().collect { poll ->
+                    mBinding.pollEditingState = poll
+                }
             }
+
 
         }
         mBinding.noteEditorViewModel = viewModel
@@ -55,15 +58,17 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         )
         mBinding.choices.adapter = adapter
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.poll.map {
-                it?.choices?: emptyList()
-            }.distinctUntilChangedBy { list ->
-                list.map {
-                    it.id.toString()
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.poll.map {
+                    it?.choices?: emptyList()
+                }.distinctUntilChangedBy { list ->
+                    list.map {
+                        it.id.toString()
+                    }
+                }.collect {
+                    adapter.submitList(it)
                 }
-            }.collect {
-                adapter.submitList(it)
             }
         }
 

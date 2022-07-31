@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
@@ -22,6 +24,7 @@ import jp.panta.misskeyandroidclient.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
@@ -72,25 +75,27 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         binding.viewPager.adapter = mPagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
 
-        lifecycleScope.launchWhenStarted {
-            mTabViewModel.currentAccount.filterNotNull().distinctUntilChanged().collect { account ->
-                mPages = account.pages
-                val pages = account.pages
-                mPagerAdapter.setList(
-                    pages.sortedBy {
-                        it.weight
-                    })
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mTabViewModel.currentAccount.filterNotNull().distinctUntilChanged().collect { account ->
+                    mPages = account.pages
+                    val pages = account.pages
+                    mPagerAdapter.setList(
+                        pages.sortedBy {
+                            it.weight
+                        })
 
-                if (pages.size <= 1) {
-                    binding.tabLayout.visibility = View.GONE
-                    binding.elevationView.visibility = View.VISIBLE
-                } else {
-                    binding.tabLayout.visibility = View.VISIBLE
-                    binding.elevationView.visibility = View.GONE
-                    binding.tabLayout.tabMode = if (pages.size > 5) {
-                        TabLayout.MODE_SCROLLABLE
+                    if (pages.size <= 1) {
+                        binding.tabLayout.visibility = View.GONE
+                        binding.elevationView.visibility = View.VISIBLE
                     } else {
-                        TabLayout.MODE_FIXED
+                        binding.tabLayout.visibility = View.VISIBLE
+                        binding.elevationView.visibility = View.GONE
+                        binding.tabLayout.tabMode = if (pages.size > 5) {
+                            TabLayout.MODE_SCROLLABLE
+                        } else {
+                            TabLayout.MODE_FIXED
+                        }
                     }
                 }
             }

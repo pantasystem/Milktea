@@ -5,10 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
@@ -40,15 +43,18 @@ class AuthorizationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
 
-        lifecycleScope.launchWhenResumed {
-            mViewModel.authorization.collect {
-                if(it is Authorization.Finish) {
-                    startActivity(mainNavigation.newIntent(Unit))
-                    finish()
-                    return@collect
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mViewModel.authorization.collect {
+                    if(it is Authorization.Finish) {
+                        startActivity(mainNavigation.newIntent(Unit))
+                        finish()
+                        return@collect
+                    }
+                    changeFragment(it)
                 }
-                changeFragment(it)
             }
+
 
         }
     }

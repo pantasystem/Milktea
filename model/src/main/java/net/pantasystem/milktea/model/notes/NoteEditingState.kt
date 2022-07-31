@@ -281,6 +281,15 @@ data class NoteEditingState(
 
         return this
     }
+
+    fun shouldDiscardingConfirmation(): Boolean {
+        val address = (visibility as? Visibility.Specified)?.visibleUserIds
+            ?: emptyList()
+        return !text.isNullOrBlank()
+                || files.isNotEmpty()
+                || !poll?.choices.isNullOrEmpty()
+                || address.isNotEmpty()
+    }
 }
 
 sealed interface PollExpiresAt {

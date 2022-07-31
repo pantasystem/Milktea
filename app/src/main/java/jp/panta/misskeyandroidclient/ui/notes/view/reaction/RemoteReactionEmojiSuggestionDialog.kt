@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -13,6 +15,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogRemoteReactionEmojiSuggestionBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.RemoteReactionEmojiSuggestionViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 
@@ -59,33 +62,35 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
         val flexBoxLayoutManager = FlexboxLayoutManager(binding.suggestedEmojis.context)
         flexBoxLayoutManager.alignItems = AlignItems.STRETCH
         binding.suggestedEmojis.layoutManager = flexBoxLayoutManager
-        lifecycleScope.launchWhenResumed {
-            viewModel.filteredEmojis.collect { state ->
-                when (state) {
-                    is ResultState.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.suggestedEmojis.visibility = View.GONE
-                        binding.errorMessage.visibility = View.GONE
-                    }
-                    is ResultState.Fixed -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.suggestedEmojis.visibility = View.VISIBLE
-                        val emojis = (state.content as? StateContent.Exist)?.rawContent?: emptyList()
-                        if (emojis.isEmpty()) {
-                            binding.errorMessage.visibility = View.VISIBLE
-                            binding.errorMessage.text = getString(R.string.the_remote_emoji_does_not_exist_in_this_instance)
-                        } else {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.filteredEmojis.collect { state ->
+                    when (state) {
+                        is ResultState.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.suggestedEmojis.visibility = View.GONE
                             binding.errorMessage.visibility = View.GONE
                         }
-                        adapter.submitList(emojis.map {
-                            ":${it.name}:"
-                        })
-                    }
-                    is ResultState.Error -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.suggestedEmojis.visibility = View.GONE
-                        binding.errorMessage.visibility = View.VISIBLE
-                        binding.errorMessage.text = state.throwable.stackTraceToString()
+                        is ResultState.Fixed -> {
+                            binding.progressBar.visibility = View.GONE
+                            binding.suggestedEmojis.visibility = View.VISIBLE
+                            val emojis = (state.content as? StateContent.Exist)?.rawContent?: emptyList()
+                            if (emojis.isEmpty()) {
+                                binding.errorMessage.visibility = View.VISIBLE
+                                binding.errorMessage.text = getString(R.string.the_remote_emoji_does_not_exist_in_this_instance)
+                            } else {
+                                binding.errorMessage.visibility = View.GONE
+                            }
+                            adapter.submitList(emojis.map {
+                                ":${it.name}:"
+                            })
+                        }
+                        is ResultState.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            binding.suggestedEmojis.visibility = View.GONE
+                            binding.errorMessage.visibility = View.VISIBLE
+                            binding.errorMessage.text = state.throwable.stackTraceToString()
+                        }
                     }
                 }
             }

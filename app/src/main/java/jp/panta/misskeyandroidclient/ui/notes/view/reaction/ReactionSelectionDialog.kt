@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -23,6 +25,7 @@ import jp.panta.misskeyandroidclient.ui.notes.view.reaction.choices.ReactionChoi
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.ReactionSelectionDialogViewModel
 import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
@@ -99,16 +102,21 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         val adapter = ReactionChoicesPagerAdapter()
         binding.reactionChoicesViewPager.adapter = adapter
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.categories.collect { categories ->
-                adapter.setList(categories.toList())
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.categories.collect { categories ->
+                    adapter.setList(categories.toList())
+                }
             }
+
         }
 
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.filteredEmojis.collect { list ->
-                searchedReactionAdapter.submitList(list)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.filteredEmojis.collect { list ->
+                    searchedReactionAdapter.submitList(list)
+                }
             }
         }
 

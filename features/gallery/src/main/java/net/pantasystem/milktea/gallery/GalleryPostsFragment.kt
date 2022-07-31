@@ -10,9 +10,12 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -118,12 +121,14 @@ class GalleryPostsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.error.collect {
-                if (it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
-                    Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
-                    // 再認証をする
-                    startActivity(authorizationNavigation.newIntent(Unit))
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.error.collect {
+                    if (it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
+                        Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
+                        // 再認証をする
+                        startActivity(authorizationNavigation.newIntent(Unit))
+                    }
                 }
             }
         }

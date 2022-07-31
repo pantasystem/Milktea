@@ -9,7 +9,9 @@ import android.widget.TextView
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
@@ -98,30 +100,33 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
         binding.reactionHistoryTab.setupWithViewPager(binding.reactionHistoryPager)
 
-        lifecycleScope.launchWhenCreated {
-            pagerViewModel.uiState.collect { uiState ->
-                val list = uiState.types
-                val types = list.toMutableList().also {
-                    it.add(
-                        0,
-                        ReactionHistoryRequest(
-                            noteId,
-                            null
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                pagerViewModel.uiState.collect { uiState ->
+                    val list = uiState.types
+                    val types = list.toMutableList().also {
+                        it.add(
+                            0,
+                            ReactionHistoryRequest(
+                                noteId,
+                                null
+                            )
                         )
-                    )
-                }
-                val index = showCurrentReaction.let { type ->
+                    }
+                    val index = showCurrentReaction.let { type ->
 
-                    types.indexOfFirst {
-                        it.type == type
+                        types.indexOfFirst {
+                            it.type == type
+                        }
+                    }
+                    withContext(Dispatchers.Main) {
+                        showPager(noteId, types)
+                        binding.reactionHistoryPager.currentItem = index
+                        setCustomEmojiSpanIntoTabs(uiState)
                     }
                 }
-                withContext(Dispatchers.Main) {
-                    showPager(noteId, types)
-                    binding.reactionHistoryPager.currentItem = index
-                    setCustomEmojiSpanIntoTabs(uiState)
-                }
             }
+
         }
 
 
