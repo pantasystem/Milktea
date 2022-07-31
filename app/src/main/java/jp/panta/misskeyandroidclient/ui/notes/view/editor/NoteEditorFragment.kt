@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.notes.view.editor
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
@@ -79,7 +81,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
         private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
         private const val EXTRA_TEXT = "EXTRA_TEXT"
-        
+
         fun newInstance(
             replyTo: Note.Id? = null,
             quoteTo: Note.Id? = null,
@@ -88,8 +90,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             channelId: Channel.Id? = null,
             text: String? = null,
         ): NoteEditorFragment {
-            return NoteEditorFragment().apply { 
-                arguments = Bundle().apply { 
+            return NoteEditorFragment().apply {
+                arguments = Bundle().apply {
                     if (replyTo != null) {
                         putString(EXTRA_REPLY_TO_NOTE_ID, replyTo.noteId)
                         putLong(EXTRA_ACCOUNT_ID, replyTo.accountId)
@@ -101,11 +103,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     if (draftNoteId != null) {
                         putLong(EXTRA_DRAFT_NOTE_ID, draftNoteId)
                     }
-                    
+
                     if (mentions != null) {
                         putStringArray(EXTRA_MENTIONS, mentions.toTypedArray())
                     }
-                    
+
                     if (channelId != null) {
                         putString(EXTRA_CHANNEL_ID, channelId.channelId)
                         putLong(EXTRA_ACCOUNT_ID, channelId.accountId)
@@ -118,7 +120,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
     }
     private val binding: FragmentNoteEditorBinding by dataBinding()
-    
+
     private val noteEditorViewModel: NoteEditorViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val emojiSelectionViewModel: EmojiSelectionViewModel by activityViewModels()
@@ -175,7 +177,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     private val text by lazy(LazyThreadSafetyMode.NONE) {
         requireArguments().getString(EXTRA_TEXT, null)
     }
-    
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -424,8 +426,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
         binding.inputMain.requestFocus()
-        
-        
+
+
     }
 
 
@@ -443,6 +445,14 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
             binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
             binding.inputMain.setSelection(newPos)
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            finishOrConfirmSaveAsDraftOrDelete()
         }
     }
 
