@@ -20,7 +20,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
@@ -41,6 +40,7 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
@@ -278,7 +278,7 @@ class UserDetailActivity : AppCompatActivity() {
                 0 -> TimelineFragment.newInstance(requestTimeline)
                 1 -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
                 2 -> TimelineFragment.newInstance(requestMedia)
-                3 -> net.pantasystem.milktea.gallery.GalleryPostsFragment.newInstance(
+                3 -> GalleryPostsFragment.newInstance(
                     Pageable.Gallery.User(userId),
                     account.accountId
                 )
@@ -387,10 +387,6 @@ class UserDetailActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
 
     private fun finishAndGoToMainActivity() {
         if (mParentActivity == null || mParentActivity == Activities.ACTIVITY_OUT_APP) {

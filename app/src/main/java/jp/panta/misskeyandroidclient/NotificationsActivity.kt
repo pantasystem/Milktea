@@ -9,13 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNotificationsBinding
-import net.pantasystem.milktea.common.ui.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import javax.inject.Inject
 
@@ -51,10 +51,6 @@ class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
         ft.commit()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
