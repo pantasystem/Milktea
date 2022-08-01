@@ -30,10 +30,6 @@ class MessagingListActivity : AppCompatActivity() {
         )
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){

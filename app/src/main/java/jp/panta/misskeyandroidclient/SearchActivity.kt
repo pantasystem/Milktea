@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.SearchView
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,6 +65,11 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
+        onBackPressedDispatcher.addCallback {
+            finish()
+            overridePendingTransition(0, 0)
+        }
+
     }
 
     fun showUserDetail(user: User) {
@@ -121,12 +127,5 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-
-        finish()
-        overridePendingTransition(0, 0)
     }
 }

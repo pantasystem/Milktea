@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -73,6 +74,9 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
 
         }
 
+        onBackPressedDispatcher.addCallback {
+            setResultFinish()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,11 +85,6 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-    override fun onBackPressed() {
-        setResultFinish()
-    }
-
 
     private fun setResultFinish() {
         val selectedDiff = selectedUserViewModel.getSelectedUserIdsChangedDiff()

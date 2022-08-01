@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.6.21'
+    ext.kotlin_version = '1.7.0'
     repositories {
         google()
         maven { url "https://jitpack.io" }
@@ -10,20 +10,20 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21"
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         classpath "com.google.android.gms:oss-licenses-plugin:0.10.5"
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.gms:google-services:4.3.13'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
         classpath 'com.github.triplet.gradle:play-publisher:4.0.0-SNAPSHOT'
     }
     ext {
-        compose_version = '1.2.0-beta02'
-        coroutines_version = '1.6.1'
+        compose_version = '1.2.0'
+        coroutines_version = '1.6.2'
         retrofit = '2.9.0'
         room_version = "2.4.2"
     }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -163,6 +164,13 @@ class DriveActivity : AppCompatActivity() {
             }
         }
 
+        onBackPressedDispatcher.addCallback {
+            if (!_driveViewModel.pop()) {
+                remove()
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
+
 
     }
 
@@ -219,12 +227,6 @@ class DriveActivity : AppCompatActivity() {
         _fileViewModel.uploadFile(uri.toAppFile(this))
     }
 
-    override fun onBackPressed() {
-        if (_driveViewModel.pop()) {
-            return
-        }
-        super.onBackPressed()
-    }
 
 
 }

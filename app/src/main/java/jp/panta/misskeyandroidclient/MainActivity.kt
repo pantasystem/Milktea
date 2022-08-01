@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
@@ -58,7 +59,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ToolbarSetter {
 
-    val mNotesViewModel: NotesViewModel by viewModels()
+    private val mNotesViewModel: NotesViewModel by viewModels()
 
     private val mAccountViewModel: AccountViewModel by viewModels()
 
@@ -181,6 +182,41 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         collectUnauthorizedState()
         collectConfirmGoogleAnalyticsState()
 
+        onBackPressedDispatcher.addCallback {
+            val drawerLayout: DrawerLayout = binding.drawerLayout
+            val navController = binding.appBarMain.contentMain.contentMain.findNavController()
+            when {
+                drawerLayout.isDrawerOpen(GravityCompat.START) -> {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+                // NOTE: そのままpopBackStackしてしまうとcurrentDestinationがNullになってしまいクラッシュしてしまう。
+                // NOTE: backQueue == 2の時は初めのDestinationを表示している状態になっている
+                // NOTE: backQueueには初期状態の時点で２つ以上入っている
+                //  destinations stack
+                //    |  fragment  |
+                //    | navigation |
+                //    |------------|
+                // 参考: https://qiita.com/kaleidot725/items/a6010dc4e67c944f44f1
+                navController.backQueue.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
+                    navController.popBackStack()
+                }
+                else -> {
+                    if (mBackPressedDelegate.back()) {
+                        remove()
+                        onBackPressedDispatcher.onBackPressed()
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.please_again_to_finish),
+                            Toast.LENGTH_SHORT
+                        ).apply {
+                            setGravity(Gravity.CENTER, 0, 0)
+                            show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun setToolbar(toolbar: Toolbar) {
@@ -240,40 +276,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
 
-    override fun onBackPressed() {
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val navController = binding.appBarMain.contentMain.contentMain.findNavController()
-        when {
-            drawerLayout.isDrawerOpen(GravityCompat.START) -> {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            }
-            // NOTE: そのままpopBackStackしてしまうとcurrentDestinationがNullになってしまいクラッシュしてしまう。
-            // NOTE: backQueue == 2の時は初めのDestinationを表示している状態になっている
-            // NOTE: backQueueには初期状態の時点で２つ以上入っている
-            //  destinations stack
-            //    |  fragment  |
-            //    | navigation |
-            //    |------------|
-            // 参考: https://qiita.com/kaleidot725/items/a6010dc4e67c944f44f1
-            navController.backQueue.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
-                navController.popBackStack()
-            }
-            else -> {
-                if (mBackPressedDelegate.back()) {
-                    super.onBackPressed()
-                } else {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.please_again_to_finish),
-                        Toast.LENGTH_SHORT
-                    ).apply {
-                        setGravity(Gravity.CENTER, 0, 0)
-                        show()
-                    }
-                }
-            }
-        }
-    }
+
 
 
     @MainThread
