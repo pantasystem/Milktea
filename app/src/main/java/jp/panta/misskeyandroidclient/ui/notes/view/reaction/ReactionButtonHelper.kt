@@ -10,9 +10,9 @@ object ReactionButtonHelper {
     @BindingAdapter("isReacted")
     fun ImageButton.setIsReacted(isReacted: Boolean?){
         if(isReacted == true){
-            this.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp)
+            this.setImageResource(R.drawable.ic_remove_black_24dp)
         }else{
-            this.setImageResource(R.drawable.ic_add_circle_outline_black_24dp)
+            this.setImageResource(R.drawable.ic_add_black_24dp)
         }
     }
 }
