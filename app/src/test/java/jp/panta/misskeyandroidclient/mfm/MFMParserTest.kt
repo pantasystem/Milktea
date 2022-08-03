@@ -219,21 +219,8 @@ class MFMParserTest{
     fun memOverflowText() {
         val text = """
             plain
-            *test*
             **test**
-            ***test***
-            > test
             test [search]
-
-            ```
-            test
-            ```
-
-            test`test`test
-            [test](https://example.com)
-            #test
-
-            test.
         """.trimIndent()
         println(MFMParser.parse(text))
     }
