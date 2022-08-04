@@ -1,7 +1,8 @@
 package jp.panta.misskeyandroidclient.mfm
 
 import net.pantasystem.milktea.model.emoji.Emoji
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 
 class MFMParserTest{
@@ -212,5 +213,15 @@ class MFMParserTest{
     fun percentUrlTest(){
         val url = "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%97%E3%83%B3%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2"
         println(MFMParser.parse(url))
+    }
+
+    @Test
+    fun memOverflowText() {
+        val text = """
+            plain
+            **test**
+            test [search]
+        """.trimIndent()
+        println(MFMParser.parse(text))
     }
 }

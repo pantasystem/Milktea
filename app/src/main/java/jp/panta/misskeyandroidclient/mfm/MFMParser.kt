@@ -319,10 +319,10 @@ object MFMParser{
             val text = matcher.group(1)?: return null
             return Search(
                 text = text,
-                start = matcher.start(),
-                end = matcher.end(),
-                insideStart = matcher.start(1),
-                insideEnd = matcher.end(1)
+                start = finallyDetected + matcher.start(),
+                end = parent.insideEnd + matcher.end(),
+                insideStart = finallyDetected + matcher.start(1),
+                insideEnd = parent.insideEnd + matcher.end(1)
             )
         }
 
