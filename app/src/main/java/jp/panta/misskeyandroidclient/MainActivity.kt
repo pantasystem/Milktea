@@ -158,19 +158,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             showBottomNavBadgeCountDelegate(uiState)
         }.launchIn(lifecycleScope)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                mainViewModel.isRequestPushNotificationPermission.collect { requestPermission ->
-                    if ( requestPermission &&
-                        checkSelfPermission(
-                            Manifest.permission.POST_NOTIFICATIONS
-                        ) == PackageManager.PERMISSION_DENIED
-                    ) {
-                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
-            }
-        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -197,6 +184,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         collectCreateNoteState()
         collectUnauthorizedState()
         collectConfirmGoogleAnalyticsState()
+        collectRequestPostNotificationState()
 
         onBackPressedDispatcher.addCallback {
             val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -433,6 +421,22 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
                             authorizationNavigation.newIntent(Unit)
                         )
                         finish()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun collectRequestPostNotificationState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mainViewModel.isRequestPushNotificationPermission.collect { requestPermission ->
+                    if ( requestPermission &&
+                        checkSelfPermission(
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_DENIED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
                 }
             }
