@@ -3,20 +3,21 @@ package jp.panta.misskeyandroidclient.model.notes.impl
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
-import net.pantasystem.milktea.data.streaming.NoteUpdated
 import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
-import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPIImpl
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api_streaming.NoteCaptureAPIImpl
+import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -80,9 +81,39 @@ class NoteCaptureAPIAdapterTest {
                 }
             }
 
-            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+            noteCapture.onMessage(
+                NoteUpdated(
+                    NoteUpdated.Body.Reacted(
+                        id = note.id.noteId,
+                        body = NoteUpdated.Body.Reacted.Body(
+                            reaction = "hoge",
+                            account.remoteId
+                        )
+                    )
+                )
+            )
+            noteCapture.onMessage(
+                NoteUpdated(
+                    NoteUpdated.Body.Reacted(
+                        id = note.id.noteId,
+                        body = NoteUpdated.Body.Reacted.Body(
+                            reaction = "hoge",
+                            account.remoteId
+                        )
+                    )
+                )
+            )
+            noteCapture.onMessage(
+                NoteUpdated(
+                    NoteUpdated.Body.Reacted(
+                        id = note.id.noteId,
+                        body = NoteUpdated.Body.Reacted.Body(
+                            reaction = "hoge",
+                            account.remoteId
+                        )
+                    )
+                )
+            )
 
 
         }

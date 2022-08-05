@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.streaming.impl
 
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.streaming.Socket
-import net.pantasystem.milktea.data.streaming.network.SocketImpl
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException

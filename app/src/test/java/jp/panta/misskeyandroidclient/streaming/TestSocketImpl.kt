@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import net.pantasystem.milktea.data.streaming.Socket
-import net.pantasystem.milktea.data.streaming.SocketMessageEventListener
-import net.pantasystem.milktea.data.streaming.SocketStateEventListener
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.SocketMessageEventListener
+import net.pantasystem.milktea.api_streaming.SocketStateEventListener
+
 
 class TestSocketImpl : Socket {
 

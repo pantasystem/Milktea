@@ -1,7 +1,6 @@
-package net.pantasystem.milktea.data.streaming
+package net.pantasystem.milktea.api_streaming
 
 
-import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaDTO
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,9 +9,11 @@ import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaDTO
 import net.pantasystem.milktea.common.serializations.DateSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.*
+
 
 
 

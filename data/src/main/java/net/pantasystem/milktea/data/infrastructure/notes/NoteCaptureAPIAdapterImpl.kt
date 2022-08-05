@@ -3,8 +3,8 @@ package net.pantasystem.milktea.data.infrastructure.notes
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.streaming.NoteUpdated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note

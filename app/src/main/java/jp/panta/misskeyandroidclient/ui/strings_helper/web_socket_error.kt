@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.strings_helper
 import android.content.Context
 import android.widget.Toast
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.api_streaming.Socket
 
 
 fun Context.webSocketStateMessageScope(block: WebSocketStateMessageScope.()->Unit) {

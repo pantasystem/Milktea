@@ -2,10 +2,10 @@ package net.pantasystem.milktea.data.infrastructure.notes
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
-import net.pantasystem.milktea.data.streaming.channel.connectUserTimeline
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
+import net.pantasystem.milktea.api_streaming.channel.connectUserTimeline
+import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note

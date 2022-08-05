@@ -1,9 +1,9 @@
-package net.pantasystem.milktea.data.streaming.network
+package net.pantasystem.milktea.api_streaming.network
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api_streaming.*
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.streaming.*
 import okhttp3.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -11,7 +11,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
-    val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(1, TimeUnit.HOURS)
         .readTimeout(1, TimeUnit.HOURS)

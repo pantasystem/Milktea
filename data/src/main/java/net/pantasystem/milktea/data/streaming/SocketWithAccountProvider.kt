@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.streaming
 
+import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.model.account.Account
 
 interface SocketWithAccountProvider {

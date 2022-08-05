@@ -3,17 +3,16 @@ package jp.panta.misskeyandroidclient.streaming
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
-import net.pantasystem.milktea.data.streaming.Send
-import org.junit.Assert
-import org.junit.Assert.*
+import net.pantasystem.milktea.api_streaming.Send
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SendBodyTest {
 
     @Test
     fun testParseMain() {
-        val main: Send = Send.Connect(Send.Connect.Body(channel = Send.Connect.Type.HOME_TIMELINE, id = "hoge"))
+        val main: Send = Send.Connect(
+            Send.Connect.Body(channel = Send.Connect.Type.HOME_TIMELINE, id = "hoge"))
 
         val h = Json.encodeToString(main)
         println(h)
@@ -30,7 +29,8 @@ class SendBodyTest {
 
     @Test
     fun testParseSubNote() {
-        val obj: Send = Send.SubscribeNote(Send.SubscribeNote.Body("hogepiyo"))
+        val obj: Send = Send.SubscribeNote(
+            Send.SubscribeNote.Body("hogepiyo"))
         val h = Json.encodeToString(obj)
 
         println(h)

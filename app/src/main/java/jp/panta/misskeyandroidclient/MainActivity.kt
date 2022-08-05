@@ -35,7 +35,7 @@ import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScop
 import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
-import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
+import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

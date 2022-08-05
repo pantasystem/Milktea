@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.main
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.viewmodel.MainUiState
+import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainUiState
 
 
 internal class ShowBottomNavigationBadgeDelegate(

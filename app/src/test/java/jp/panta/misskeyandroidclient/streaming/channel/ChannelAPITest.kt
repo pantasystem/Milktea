@@ -1,19 +1,19 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.Socket
-import net.pantasystem.milktea.data.streaming.network.SocketImpl
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
+import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import okhttp3.OkHttpClient
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,12 +25,14 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient,logger)
+        val socket =
+            SocketImpl(wssURL, okHttpClient, logger)
         socket.blockingConnect()
 
         var count = 0
         launch {
-            ChannelAPI(socket, logger).connect(ChannelAPI.Type.Global).collect {
+            ChannelAPI(socket, logger)
+                .connect(ChannelAPI.Type.Global).collect {
                 println(it)
                 assertTrue(it is ChannelBody.ReceiveNote)
                 count ++
@@ -49,7 +51,8 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, logger)
+        val socket =
+            SocketImpl(wssURL, okHttpClient, logger)
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 

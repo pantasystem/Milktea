@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
+import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.data.streaming.ChannelBody
 
 /**
  * StreamingAPIのMainイベントを各種DataSourceに適応します。

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.streaming
+package net.pantasystem.milktea.api_streaming
 
 
 fun interface SocketStateEventListener {

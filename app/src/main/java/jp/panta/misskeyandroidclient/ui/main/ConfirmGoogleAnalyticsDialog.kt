@@ -7,7 +7,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.viewmodel.MainViewModel
+import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 
 @AndroidEntryPoint
 class ConfirmGoogleAnalyticsDialog : DialogFragment() {
