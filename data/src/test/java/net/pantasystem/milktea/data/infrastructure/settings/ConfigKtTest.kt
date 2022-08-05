@@ -105,6 +105,10 @@ class ConfigKtTest {
                     config.isCrashlyticsCollectionEnabled.isConfirmed,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsConfirmedPostNotification -> Assert.assertEquals(
+                    config.isConfirmedPostNotification,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

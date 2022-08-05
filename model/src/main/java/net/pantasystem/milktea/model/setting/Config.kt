@@ -53,7 +53,7 @@ data class IsAnalyticsCollectionEnabled(
  * @param theme テーマカラー
  * @param isCrashlyticsCollectionEnabled クラシュリティクスの許可状態
  * @param isAnalyticsCollectionEnabled アナリティクスの許可状態
- * @param isShownConfirmPushNotification プッシュ通知の顕現許可の状態
+ * @param isConfirmedPostNotification プッシュ通知の顕現許可の状態
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -72,7 +72,7 @@ data class Config(
     val isEnableTimelineScrollAnimation: Boolean,
     val isCrashlyticsCollectionEnabled: IsCrashlyticsCollectionEnabled,
     val isAnalyticsCollectionEnabled: IsAnalyticsCollectionEnabled,
-    val isShownConfirmPushNotification: Boolean,
+    val isConfirmedPostNotification: Boolean,
 ) {
     companion object
 
@@ -119,7 +119,7 @@ object DefaultConfig {
             isConfirmed = false,
             isEnabled = false,
         ),
-        isShownConfirmPushNotification = false,
+        isConfirmedPostNotification = false,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

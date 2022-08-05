@@ -94,7 +94,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
                 ?: DefaultConfig.config.isAnalyticsCollectionEnabled.isEnabled,
             isConfirmed = map.getValue<PrefType.BoolPref>(Keys.IsConfirmedAnalyticsCollection)?.value
                 ?: DefaultConfig.config.isAnalyticsCollectionEnabled.isConfirmed,
-        )
+        ),
+        isConfirmedPostNotification = map.getValue<PrefType.BoolPref>(
+            Keys.IsConfirmedPostNotification
+        )?.value ?: false
     )
 }
 
@@ -170,6 +173,9 @@ fun Config.pref(key: Keys): PrefType? {
         }
         Keys.IsConfirmedAnalyticsCollection -> {
             PrefType.BoolPref(isAnalyticsCollectionEnabled.isConfirmed)
+        }
+        Keys.IsConfirmedPostNotification -> {
+            PrefType.BoolPref(isConfirmedPostNotification)
         }
     }
 }
