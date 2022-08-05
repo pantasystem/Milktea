@@ -41,6 +41,20 @@ data class IsAnalyticsCollectionEnabled(
     val isConfirmed: Boolean,
 )
 
+/**
+ * @param isSimpleEditorEnabled シンプルエディターを使用するのか
+ * @param reactionPickerType リアクションピッカーの種別　
+ * @param backgroundImagePath 背景画像のパス
+ * @param isClassicUI BottomNavを使用しないタイプのUI
+ * @param isUserNameDefault User@usernameを主体とする表示
+ * @param isPostButtonAtTheBottom ノート編集画面の投稿ボタンを下に持ってくる
+ * @param urlPreviewConfig OGPの設定
+ * @param noteExpandedHeightSize ノートを強制的に折り畳むサイズ
+ * @param theme テーマカラー
+ * @param isCrashlyticsCollectionEnabled クラシュリティクスの許可状態
+ * @param isAnalyticsCollectionEnabled アナリティクスの許可状態
+ * @param isShownConfirmPushNotification プッシュ通知の顕現許可の状態
+ */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
     val reactionPickerType: ReactionPickerType,
@@ -58,6 +72,7 @@ data class Config(
     val isEnableTimelineScrollAnimation: Boolean,
     val isCrashlyticsCollectionEnabled: IsCrashlyticsCollectionEnabled,
     val isAnalyticsCollectionEnabled: IsAnalyticsCollectionEnabled,
+    val isShownConfirmPushNotification: Boolean,
 ) {
     companion object
 
@@ -103,7 +118,8 @@ object DefaultConfig {
         isAnalyticsCollectionEnabled = IsAnalyticsCollectionEnabled(
             isConfirmed = false,
             isEnabled = false,
-        )
+        ),
+        isShownConfirmPushNotification = false,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
