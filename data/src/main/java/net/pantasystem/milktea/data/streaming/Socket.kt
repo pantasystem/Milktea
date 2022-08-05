@@ -62,9 +62,11 @@ interface Socket {
 
     /**
      * メッセージを送信します。
+     * @param msg 送信するメッセージ
+     * @param isAutoConnect trueにすると未接続状態の時に自動的に接続しようとします。
      * @return Queueに追加された場合はtrueそうでない場合はfalseが返されます。
      */
-    fun send(msg: String): Boolean
+    fun send(msg: String, isAutoConnect: Boolean = true): Boolean
 
     fun onNetworkActive()
     fun onNetworkInActive()

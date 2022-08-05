@@ -160,10 +160,13 @@ class SocketImpl(
         }
     }
 
-    override fun send(msg: String): Boolean {
+    override fun send(msg: String, isAutoConnect: Boolean): Boolean {
         logger.debug("メッセージ送信: $msg, state${state()}")
         if (state() != Socket.State.Connected) {
             logger.debug("送信をキャンセル state:${state()}")
+            if (isAutoConnect) {
+                connect()
+            }
             return false
         }
 
