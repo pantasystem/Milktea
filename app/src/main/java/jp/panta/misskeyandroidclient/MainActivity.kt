@@ -1,12 +1,15 @@
 package jp.panta.misskeyandroidclient
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
@@ -155,6 +158,19 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             showBottomNavBadgeCountDelegate(uiState)
         }.launchIn(lifecycleScope)
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mainViewModel.isRequestPushNotificationPermission.collect { requestPermission ->
+                    if ( requestPermission &&
+                        checkSelfPermission(
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_DENIED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            }
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -274,9 +290,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         mAccountViewModel.showFollowers.observe(this, showFollowersObserver)
         mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
-
-
-
 
 
     @MainThread
@@ -424,6 +437,13 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
                 }
             }
         }
+    }
+
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        mainViewModel.onPushNotificationConfirmed()
     }
 }
 

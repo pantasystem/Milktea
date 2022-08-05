@@ -85,6 +85,10 @@ class MainViewModel @Inject constructor(
                 && config.isCrashlyticsCollectionEnabled.isConfirmed
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
 
+    val isRequestPushNotificationPermission = settingStore.configState.map { config ->
+        !config.isConfirmedPostNotification
+    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentAccountSocketStateEvent =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
@@ -129,6 +133,17 @@ class MainViewModel @Inject constructor(
             it?.let {
                 misskeyAPIProvider.get(it.uri, it.getVersion())
             }
+        }
+    }
+
+    fun onPushNotificationConfirmed() {
+        viewModelScope.launch(Dispatchers.IO) {
+            configRepository.get().mapCatching {
+                configRepository.save(it.copy(isConfirmedPostNotification = true))
+            }.onFailure {
+
+            }
+
         }
     }
 
