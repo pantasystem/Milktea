@@ -1,16 +1,20 @@
 package jp.panta.misskeyandroidclient
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.*
@@ -181,6 +185,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         collectCreateNoteState()
         collectUnauthorizedState()
         collectConfirmGoogleAnalyticsState()
+        collectRequestPostNotificationState()
 
         onBackPressedDispatcher.addCallback {
             val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -274,9 +279,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         mAccountViewModel.showFollowers.observe(this, showFollowersObserver)
         mAccountViewModel.showProfile.observe(this, showProfileObserver)
     }
-
-
-
 
 
     @MainThread
@@ -424,6 +426,30 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
                 }
             }
         }
+    }
+
+    private fun collectRequestPostNotificationState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mainViewModel.isRequestPushNotificationPermission.collect { requestPermission ->
+                    if ( requestPermission &&
+                        ContextCompat.checkSelfPermission(
+                            this@MainActivity,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_DENIED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            }
+        }
+    }
+
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        mainViewModel.onPushNotificationConfirmed()
     }
 }
 

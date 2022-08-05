@@ -21,7 +21,7 @@ class TestSocketImpl : Socket {
         return true
     }
 
-    override fun send(msg: String): Boolean {
+    override fun send(msg: String, isAutoConnect: Boolean): Boolean {
         println("send: $msg")
         return true
     }

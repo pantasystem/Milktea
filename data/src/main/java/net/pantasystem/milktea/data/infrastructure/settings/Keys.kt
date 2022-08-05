@@ -21,6 +21,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsConfirmedCrashlyticsCollection,
         Keys.IsConfirmedAnalyticsCollection,
         Keys.IsAnalyticsCollectionEnabled,
+        Keys.IsConfirmedPostNotification,
     )
 }
 
@@ -56,6 +57,7 @@ sealed interface Keys {
     object IsAnalyticsCollectionEnabled : Keys
     object IsConfirmedAnalyticsCollection : Keys
 
+    object IsConfirmedPostNotification : Keys
     companion object
 }
 
@@ -80,5 +82,6 @@ fun Keys.str(): String {
         is Keys.IsConfirmedCrashlyticsCollection -> "IsConfirmedCrashlyticsCollection"
         is Keys.IsConfirmedAnalyticsCollection -> "IsConfirmedAnalyticsCollection"
         is Keys.IsAnalyticsCollectionEnabled -> "IsAnalyticsCollectionEnabled"
+        is Keys.IsConfirmedPostNotification -> "IsConfirmedPostNotification"
     }
 }
