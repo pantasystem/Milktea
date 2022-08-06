@@ -212,16 +212,6 @@ class MiApplication : Application(), MiCore {
         return urlPreviewProvider.getUrlPreviewStore(account, false)
     }
 
-
-    override fun getSubscriptionRegistration(): SubscriptionRegistration {
-        return mSubscriptionRegistration
-    }
-
-    override fun getSettingStore(): SettingStore {
-        return this.mSettingStore
-    }
-
-
     private suspend fun setUpMetaMap(accounts: List<Account>) {
         coroutineScope {
             accounts.map { ac ->
