@@ -13,7 +13,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
@@ -27,7 +26,6 @@ import net.pantasystem.milktea.data.infrastructure.settings.str
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
@@ -39,7 +37,7 @@ import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
 @HiltAndroidApp
-class MiApplication : Application(), MiCore {
+class MiApplication : Application() {
 
     @Inject
     internal lateinit var mAccountRepository: AccountRepository
