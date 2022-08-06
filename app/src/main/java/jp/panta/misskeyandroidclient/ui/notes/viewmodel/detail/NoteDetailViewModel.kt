@@ -9,7 +9,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,6 +21,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -40,7 +40,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val noteRepository: NoteRepository,
     private val noteTranslationStore: NoteTranslationStore,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val miCore: MiCore,
+    private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -227,7 +227,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData) {
         UrlPreviewLoadTask(
-            miCore.getUrlPreviewStore(getAccount()),
+            urlPreviewStoreProvider.getUrlPreviewStore(getAccount()),
             planeNoteViewData.urls,
             viewModelScope
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)

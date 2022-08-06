@@ -9,15 +9,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogEditNicknameBinding
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
 class EditNicknameDialog : AppCompatDialogFragment() {
 
-    lateinit var miCore: MiCore
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         val view = View.inflate(context, R.layout.dialog_edit_nickname, null)

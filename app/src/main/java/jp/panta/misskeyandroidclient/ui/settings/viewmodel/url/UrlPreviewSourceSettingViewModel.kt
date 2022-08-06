@@ -2,32 +2,35 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel.url
 
 import android.os.Handler
 import android.os.Looper
-import androidx.lifecycle.*
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.model.account.AccountStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
+import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
-import jp.panta.misskeyandroidclient.viewmodel.MiCore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.account.AccountStore
 import javax.inject.Inject
 
 @HiltViewModel
 class UrlPreviewSourceSettingViewModel @Inject constructor(
     val accountStore: AccountStore,
     val settingStore: SettingStore,
-    val urlPreviewDAO: UrlPreviewDAO,
-    val miCore: MiCore
+    private val urlPreviewDAO: UrlPreviewDAO,
+    private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
 
 ) :
     ViewModel() {
 
 
     private var mUrlPreviewStore = accountStore.currentAccount?.let { it ->
-        miCore.getUrlPreviewStore(it)
+        urlPreviewStoreProvider.getUrlPreviewStore(it)
     }
     val urlPreviewSourceType =
         object : MutableLiveData<Int>(settingStore.urlPreviewSetting.getSourceType()) {

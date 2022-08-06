@@ -207,11 +207,6 @@ class MiApplication : Application(), MiCore {
         }
     }
 
-
-    override fun getUrlPreviewStore(account: Account): UrlPreviewStore {
-        return urlPreviewProvider.getUrlPreviewStore(account, false)
-    }
-
     private suspend fun setUpMetaMap(accounts: List<Account>) {
         coroutineScope {
             accounts.map { ac ->
