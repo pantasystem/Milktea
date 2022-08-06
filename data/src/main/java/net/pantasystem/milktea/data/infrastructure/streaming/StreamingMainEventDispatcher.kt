@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
+import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.streaming.ChannelBody
 
 
 interface StreamingMainEventDispatcher {

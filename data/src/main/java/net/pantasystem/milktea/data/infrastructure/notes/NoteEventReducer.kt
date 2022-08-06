@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
-import net.pantasystem.milktea.data.streaming.NoteUpdated
+import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -42,7 +42,7 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
     val emojis = e.body.emoji?.let {
         this.emojis?.let {
             it.toMutableList().also { eList ->
-                eList.add(e.body.emoji)
+                eList.add(e.body.emoji!!)
             }
         }
     }?: this.emojis

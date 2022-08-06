@@ -3,10 +3,10 @@ package net.pantasystem.milktea.data.infrastructure.messaging
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.data.gettters.MessageAdder
-import net.pantasystem.milktea.data.streaming.ChannelBody
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPI
-import net.pantasystem.milktea.data.streaming.channel.ChannelAPIWithAccountProvider
+import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
@@ -55,6 +55,7 @@ class MessageObserverImpl @Inject constructor(
             }
         }
     }
+
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun observeAccountMessages(ac: Account): Flow<Message>{

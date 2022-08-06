@@ -1,7 +1,6 @@
-package net.pantasystem.milktea.data.streaming.notes
+package net.pantasystem.milktea.api_streaming
 
 
-import net.pantasystem.milktea.data.streaming.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*

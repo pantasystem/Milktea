@@ -1,6 +1,6 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 

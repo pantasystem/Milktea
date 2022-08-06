@@ -1,15 +1,16 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import net.pantasystem.milktea.data.streaming.Socket
-import net.pantasystem.milktea.data.streaming.StreamingEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.StreamingEvent
+import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
-import net.pantasystem.milktea.data.streaming.network.SocketImpl
 import okhttp3.OkHttpClient
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SocketImplTest {
@@ -55,7 +56,8 @@ class SocketImplTest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, logger)
+        val socket =
+            SocketImpl(wssURL, okHttpClient, logger)
 
         runBlocking {
 

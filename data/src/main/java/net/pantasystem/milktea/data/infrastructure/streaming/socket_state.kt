@@ -1,10 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import net.pantasystem.milktea.data.streaming.Socket
+import net.pantasystem.milktea.api_streaming.Socket
 
 
 fun Socket.stateEvent() : Flow<Socket.State>{

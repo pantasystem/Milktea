@@ -1,8 +1,8 @@
-package net.pantasystem.milktea.data.streaming.channel
+package net.pantasystem.milktea.api_streaming.channel
 
-import net.pantasystem.milktea.data.streaming.ChannelBody
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import net.pantasystem.milktea.api_streaming.ChannelBody
 
 
 fun ChannelAPI.connectUserTimeline(userId: String): Flow<ChannelBody> {

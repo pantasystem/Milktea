@@ -1,12 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
-import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPI
-import net.pantasystem.milktea.data.streaming.notes.NoteCaptureAPIImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.api_streaming.NoteCaptureAPI
+import net.pantasystem.milktea.api_streaming.NoteCaptureAPIImpl
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import javax.inject.Inject
 
@@ -32,7 +32,8 @@ class NoteCaptureAPIWithAccountProviderImpl @Inject constructor(
             }
 
             val socket = socketWithAccountProvider.get(account)
-            channelAPI = NoteCaptureAPIImpl(socket, loggerFactory)
+            channelAPI =
+                NoteCaptureAPIImpl(socket, loggerFactory)
             accountIdWithNoteCaptureAPI[account.accountId] = channelAPI
 
             return@runBlocking channelAPI

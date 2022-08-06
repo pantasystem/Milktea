@@ -1,13 +1,16 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
+import kotlinx.coroutines.flow.Flow
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.Send
+import net.pantasystem.milktea.api_streaming.toJson
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRepository
-import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.data.streaming.*
-import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.model.account.AccountRepository
 import javax.inject.Inject
 
 class NotificationRepositoryImpl @Inject constructor(
@@ -24,7 +27,9 @@ class NotificationRepositoryImpl @Inject constructor(
     override suspend fun read(notificationId: Notification.Id) {
         runCatching {
             val account = accountRepository.get(notificationId.accountId).getOrThrow()
-            socketProvider.get(account).send(Send.ReadNotification(Send.ReadNotification.Body(notificationId.notificationId)).toJson())
+            socketProvider.get(account).send(
+                Send.ReadNotification(
+                    Send.ReadNotification.Body(notificationId.notificationId)).toJson())
             notificationDataSource.add(notificationDataSource.get(notificationId).read())
         }
     }

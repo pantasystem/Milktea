@@ -1,10 +1,9 @@
-package net.pantasystem.milktea.data.streaming
+package net.pantasystem.milktea.api_streaming
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.Serializable
 
 /**
  * 注意：decode時やparse時はSendのserializerを使わないとうまくtypeフィールドが追加されない。

@@ -1,10 +1,10 @@
-package net.pantasystem.milktea.data.streaming.channel
+package net.pantasystem.milktea.data.streaming
 
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.Account
 import javax.inject.Inject
 
 

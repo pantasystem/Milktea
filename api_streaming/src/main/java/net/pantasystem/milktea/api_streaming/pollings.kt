@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.streaming
+package net.pantasystem.milktea.api_streaming
 
 import android.util.Log
 import kotlinx.coroutines.*
@@ -8,10 +8,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.util.*
 
 const val TTL_COUNT = 3
 internal class PollingJob(
