@@ -10,13 +10,16 @@ import androidx.annotation.StyleRes
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
+import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import javax.inject.Inject
 
 /**
  * ノートのコンテンツのサイズが言って以上超えた時に
  * 折りたたむためのコンポーネント
  */
+@AndroidEntryPoint
 class AutoCollapsingLayout : FrameLayout {
 
 
@@ -28,9 +31,11 @@ class AutoCollapsingLayout : FrameLayout {
     private var expandableButtonId: Int? = null
     private var currentAnimator: Animator? = null
 
+    @Inject
+    internal lateinit var settingStore: SettingStore
+
     init {
-        limitedMaxHeight =
-            (context.applicationContext as MiApplication).getSettingStore().noteExpandedHeightSize
+        limitedMaxHeight = settingStore.noteExpandedHeightSize
     }
 
 

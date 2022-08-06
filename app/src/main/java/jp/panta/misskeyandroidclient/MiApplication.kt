@@ -34,7 +34,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.instance.FetchMeta
-import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaCache
 import javax.inject.Inject
 
@@ -222,12 +221,6 @@ class MiApplication : Application(), MiCore {
         return this.mSettingStore
     }
 
-
-    override fun getCurrentInstanceMeta(): Meta? {
-        return mAccountStore.currentAccount?.instanceDomain?.let { url ->
-            mMetaCache.get(url)
-        }
-    }
 
     private suspend fun setUpMetaMap(accounts: List<Account>) {
         coroutineScope {

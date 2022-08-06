@@ -3,18 +3,21 @@ package jp.panta.misskeyandroidclient.ui.notes.view
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.MiApplication
+import dagger.hilt.android.EntryPointAccessors
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.notes.NoteRelation
-import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
+import jp.panta.misskeyandroidclient.ui.BindingProvider
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
+import net.pantasystem.milktea.model.notes.NoteRelation
+
 
 object StatusMessageHelper {
 
     @JvmStatic
     @BindingAdapter("statusMessageTargetViewNote")
     fun TextView.setStatusMessage(statusMessageTargetViewNote: PlaneNoteViewData){
-        val settingStore = (context.applicationContext as MiApplication).getSettingStore()
+        val settingStore = EntryPointAccessors.fromApplication(context.applicationContext, BindingProvider::class.java)
+            .settingStore()
         val isUserNameDefault = settingStore.isUserNameDefault
         val note = statusMessageTargetViewNote.note
         val name = if(isUserNameDefault){
