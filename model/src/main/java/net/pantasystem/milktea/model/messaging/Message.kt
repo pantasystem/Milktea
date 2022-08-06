@@ -51,6 +51,7 @@ sealed class Message {
         override val isRead: Boolean,
         override val emojis: List<Emoji>,
         val groupId: GroupEntity.Id,
+        val reads: List<User.Id>
     ) : Message() {
         override fun read(): Message {
             return this.copy(isRead = true)

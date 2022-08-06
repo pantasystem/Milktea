@@ -23,6 +23,7 @@ data class MessageDTO(
     val fileId: String? = null,
     val file: FilePropertyDTO? = null,
     val isRead: Boolean,
-    val emojis: List<Emoji>? = null
+    val emojis: List<Emoji>? = null,
+    val reads: List<String>? = null,
 ): JavaSerializable
 
