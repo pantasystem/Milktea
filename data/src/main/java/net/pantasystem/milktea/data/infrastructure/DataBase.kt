@@ -14,6 +14,9 @@ import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
+import net.pantasystem.milktea.data.infrastructure.group.GroupDao
+import net.pantasystem.milktea.data.infrastructure.group.GroupMemberIdRecord
+import net.pantasystem.milktea.data.infrastructure.group.GroupRecord
 import net.pantasystem.milktea.data.infrastructure.instance.db.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
@@ -52,16 +55,18 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         DriveFileRecord::class,
         DraftFileJunctionRef::class,
         DraftLocalFile::class,
-
+        GroupRecord::class,
+        GroupMemberIdRecord::class,
     ],
-    version = 16,
+    version = 17,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
         AutoMigration(from = 13, to = 14),
         AutoMigration(from = 14, to = 15),
-        AutoMigration(from = 15, to = 16)
+        AutoMigration(from = 15, to = 16),
+        AutoMigration(from = 16, to = 17)
     ],
 )
 @TypeConverters(
@@ -100,4 +105,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun utf8EmojiDAO(): Utf8EmojisDAO
 
     abstract fun driveFileRecordDAO(): DriveFileRecordDao
+
+    abstract fun groupDao(): GroupDao
 }

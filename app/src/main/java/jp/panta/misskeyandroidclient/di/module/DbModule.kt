@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.*
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
+import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
@@ -76,4 +77,8 @@ object DbModule {
     @Provides
     @Singleton
     fun driveFileDAO(db: DataBase): DriveFileRecordDao = db.driveFileRecordDAO()
+
+    @Provides
+    @Singleton
+    fun groupDAO(db: DataBase): GroupDao = db.groupDao()
 }

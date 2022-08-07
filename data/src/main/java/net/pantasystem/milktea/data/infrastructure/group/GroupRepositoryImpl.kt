@@ -1,18 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.group
 
 
-import net.pantasystem.milktea.api.misskey.groups.*
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.model.instance.IllegalVersionException
+import net.pantasystem.milktea.api.misskey.groups.*
+import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.group.*
+import net.pantasystem.milktea.model.instance.IllegalVersionException
 import javax.inject.Inject
 
 class GroupRepositoryImpl @Inject constructor(
@@ -40,7 +40,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun find(groupId: Group.Id): Group {
+    override suspend fun syncOne(groupId: Group.Id): Group {
         var group = runCatching {
             groupDataSource.find(groupId)
         }.onFailure {
@@ -63,7 +63,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun joined(accountId: Long): List<Group> {
+    override suspend fun syncByJoined(accountId: Long): List<Group> {
         val account = accountRepository.get(accountId).getOrThrow()
         val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
         val groups = api.body()?.map {
@@ -74,7 +74,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun owned(accountId: Long): List<Group> {
+    override suspend fun syncByOwned(accountId: Long): List<Group> {
         val account = accountRepository.get(accountId).getOrThrow()
         val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
         val groups = api.body()?.map {
@@ -86,7 +86,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun pull(pull: Pull): Group {
-        var group = find(pull.groupId)
+        var group = syncOne(pull.groupId)
         val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
         getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId))
             .throwIfHasError()

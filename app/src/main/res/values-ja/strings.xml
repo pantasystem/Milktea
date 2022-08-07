@@ -398,6 +398,7 @@
     <string name="consent_to_collect_behavior_history_message">行動履歴はGoogle Analyticsによって収集され、開発の役に立てられます。</string>
     <string name="disagree">同意しない</string>
     <string name="search_custom_emojis">絵文字を検索</string>
+    <string name="groups">Groups</string>
     <!--    <string name="n_people">%d人</string>-->
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->

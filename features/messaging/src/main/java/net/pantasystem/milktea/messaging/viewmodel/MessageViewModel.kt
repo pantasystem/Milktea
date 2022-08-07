@@ -95,7 +95,7 @@ class MessageViewModel @Inject constructor(
                     userRepository.find(messagingId.userId).displayUserName
                 }
                 is MessagingId.Group -> {
-                    groupRepository.find(messagingId.groupId).name
+                    groupRepository.syncOne(messagingId.groupId).name
                 }
             }
         }
