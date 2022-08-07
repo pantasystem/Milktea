@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.group
 
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.AddResult
 
 interface GroupDataSource {
@@ -11,4 +12,8 @@ interface GroupDataSource {
     suspend fun addAll(groups: List<Group>) : List<AddResult>
 
     suspend fun delete(groupId: Group.Id) : Boolean
+
+    fun observeOwnedGroups(accountId: Long) : Flow<List<Group>>
+
+    fun observeJoinedGroups(accountId: Long) : Flow<List<Group>>
 }
