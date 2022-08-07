@@ -34,6 +34,11 @@
                 android:id="@+id/nav_gallery"
                 android:title="@string/gallery"
                 android:icon="@drawable/ic_menu_gallery" />
+
+        <item
+                android:id="@+id/nav_group"
+                android:icon="@drawable/ic_groups"
+                android:title="@string/groups" />
         <item
                 android:id="@+id/nav_setting"
                 android:title="@string/setting"

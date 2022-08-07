@@ -389,4 +389,5 @@
     <string name="consent_to_collect_behavior_history_message">Behavior history is collected by Google Analytics and is useful for development.</string>
     <string name="disagree">Disagree</string>
     <string name="search_custom_emojis">Search Custom Emojis…</string>
+    <string name="groups">Groups</string>
 </resources>

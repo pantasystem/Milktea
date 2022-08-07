@@ -28,13 +28,13 @@ class GroupListViewModel @Inject constructor(
     private val joinedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         groupDataSource.observeJoinedGroups(account.accountId)
     }.flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val ownedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         groupDataSource.observeOwnedGroups(account.accountId)
     }.flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     private val syncEvents = MutableSharedFlow<UUID>()
 
@@ -46,7 +46,7 @@ class GroupListViewModel @Inject constructor(
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(1000),
+        SharingStarted.Lazily,
         ResultState.Loading(StateContent.NotExist())
     )
 
@@ -58,7 +58,7 @@ class GroupListViewModel @Inject constructor(
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(1000),
+        SharingStarted.Lazily,
         ResultState.Loading(StateContent.NotExist())
     )
 

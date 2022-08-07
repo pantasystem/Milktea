@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.*
 import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.gallery.GalleryPostsActivity
+import net.pantasystem.milktea.group.GroupActivity
 
 internal class StartActivityFromNavDrawerItems(
     val mainActivity: MainActivity
@@ -20,6 +21,7 @@ internal class StartActivityFromNavDrawerItems(
             R.id.nav_draft -> DraftNotesActivity::class.java
             R.id.nav_gallery -> GalleryPostsActivity::class.java
             R.id.nav_channel -> ChannelActivity::class.java
+            R.id.nav_group -> GroupActivity::class.java
             else -> throw IllegalStateException("未定義なNavigation Itemです")
         }
         mainActivity.startActivity(Intent(mainActivity, activity))

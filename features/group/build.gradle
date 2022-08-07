@@ -60,6 +60,14 @@ dependencies {
     implementation libs.bundles.compose.ui
     implementation libs.bundles.compose.foundation
     implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
 
     // hilt
     implementation libs.hilt.android
@@ -71,4 +79,7 @@ dependencies {
 
     implementation libs.lifecycle.extenstions
     implementation libs.lifecycle.viewmodel
+    implementation libs.fragment.ktx
+    implementation libs.activity.ktx
+
 }

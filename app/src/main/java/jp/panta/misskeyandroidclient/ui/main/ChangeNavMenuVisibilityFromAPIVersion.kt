@@ -14,6 +14,7 @@ internal class ChangeNavMenuVisibilityFromAPIVersion(
             menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
             menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
             menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
+            menu.findItem(R.id.nav_group).isVisible = false
         }
     }
 }

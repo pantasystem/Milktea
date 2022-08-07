@@ -258,7 +258,7 @@ suspend fun MessageRelation.toHistory(
             MessageHistoryRelation.Direct(this.message, this.user, recipient, account)
         }
         is Message.Group -> {
-            val group = groupRepository.find(msg.groupId)
+            val group = groupRepository.syncOne(msg.groupId)
             MessageHistoryRelation.Group(this.message, this.user, group, account)
         }
     }
