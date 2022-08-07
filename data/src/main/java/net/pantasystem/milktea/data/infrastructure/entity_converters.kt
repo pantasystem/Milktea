@@ -80,9 +80,12 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
             User.Id(account.accountId, userId),
             fileId,
             file?.toFileProperty(account),
-            isRead,
+            isRead = reads?.contains(account.remoteId) ?: false,
             emojis?: emptyList(),
             Group.Id(account.accountId, groupId!!),
+            reads = reads?.map {
+                User.Id(account.accountId, it)
+            }?: emptyList()
         )
     }
     return message to list
