@@ -5,6 +5,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
@@ -30,8 +32,14 @@ class GroupActivity : AppCompatActivity() {
                 val uiState by groupListViewModel.uiState.collectAsState()
                 Scaffold(
                     Modifier.fillMaxSize()
-                ) {
-                    Text(uiState.toString())
+                ) { padding ->
+                    LazyColumn(
+                        modifier = Modifier.padding(padding).fillMaxSize()
+                    ) {
+                        items(count = uiState.joinedGroups.size) {
+                            Text(uiState.joinedGroups[it].name)
+                        }
+                    }
                 }
             }
         }
