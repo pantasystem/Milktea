@@ -91,6 +91,7 @@ dependencies {
     implementation project(path: ':common_viewmodel')
     implementation project(path: ':features:gallery')
     implementation project(path: ':api_streaming')
+    implementation project(path: ':features:group')
     testImplementation project(path: ':api_streaming')
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'

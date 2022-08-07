@@ -30,7 +30,20 @@ data class GroupRecord(
     val name: String,
     val ownerId: String,
     @PrimaryKey(autoGenerate = true) val id: Long
-)
+) {
+    companion object {
+        fun from(model: Group): GroupRecord {
+            return GroupRecord(
+                model.id.groupId,
+                model.id.accountId,
+                model.createdAt,
+                model.name,
+                model.ownerId.id,
+                id = 0L
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "group_member_v1",

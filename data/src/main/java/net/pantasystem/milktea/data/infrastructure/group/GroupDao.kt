@@ -9,6 +9,9 @@ interface GroupDao {
     @Insert
     suspend fun insert(group: GroupRecord): Long
 
+    @Update
+    suspend fun update(group: GroupRecord)
+
     @Insert
     suspend fun insertUserIds(members: List<GroupMemberIdRecord>): List<Long>
 
@@ -17,6 +20,9 @@ interface GroupDao {
 
     @Delete
     suspend fun delete(group: GroupRecord)
+
+    @Query("delete from group_v1 where accountId = :accountId and serverId = :serverId")
+    suspend fun delete(accountId: Long, serverId: String)
 
     @Query("delete from group_v1 where accountId = :accountId")
     suspend fun clearByAccountId(accountId: Long)
@@ -77,6 +83,7 @@ interface GroupDao {
             and serverId = :serverId
         """
     )
+    @Transaction
     suspend fun findOne(accountId: Long, serverId: String): GroupRelatedRecord?
 
 }

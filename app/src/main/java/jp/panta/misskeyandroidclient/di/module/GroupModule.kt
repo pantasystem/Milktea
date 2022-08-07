@@ -4,10 +4,10 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import net.pantasystem.milktea.data.infrastructure.group.GroupDataSourceImpl
+import net.pantasystem.milktea.data.infrastructure.group.GroupRepositoryImpl
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.data.infrastructure.group.GroupRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.group.InMemoryGroupDataSource
 import javax.inject.Singleton
 
 @Module
@@ -15,7 +15,7 @@ import javax.inject.Singleton
 abstract class GroupModule {
     @Binds
     @Singleton
-    abstract fun groupDataSource(ds: InMemoryGroupDataSource) : GroupDataSource
+    abstract fun groupDataSource(ds: GroupDataSourceImpl) : GroupDataSource
 
     @Binds
     @Singleton
