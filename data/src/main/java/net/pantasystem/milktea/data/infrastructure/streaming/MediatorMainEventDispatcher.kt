@@ -13,7 +13,7 @@ import net.pantasystem.milktea.data.infrastructure.messaging.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject

@@ -21,7 +21,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import java.lang.IllegalStateException

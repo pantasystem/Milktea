@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository

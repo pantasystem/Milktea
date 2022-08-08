@@ -16,7 +16,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.messaging.*
 import net.pantasystem.milktea.model.user.UserRepository

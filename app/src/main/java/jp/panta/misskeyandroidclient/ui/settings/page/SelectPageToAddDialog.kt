@@ -14,7 +14,7 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewM
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.galleryTypes
 import javax.inject.Inject

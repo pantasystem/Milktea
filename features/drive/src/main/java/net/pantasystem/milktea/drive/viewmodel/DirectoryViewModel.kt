@@ -16,7 +16,7 @@ import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.CreateDirectory
 import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore

@@ -39,8 +39,6 @@ dependencies {
     implementation libs.appcompat.appcompat
     implementation libs.android.material.material
     implementation project(path: ':model')
-    implementation project(path: ':model')
-    implementation project(path: ':model')
     implementation project(path: ':common')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

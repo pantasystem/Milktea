@@ -80,6 +80,7 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':model')
     implementation project(path: ':api')
+    implementation project(path: ':app_store')
     implementation project(path: ':features:auth')
     implementation project(path: ':features:channel')
     implementation project(path: ':features:drive')

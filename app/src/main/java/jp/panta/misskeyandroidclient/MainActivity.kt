@@ -52,7 +52,7 @@ import net.pantasystem.milktea.gallery.GalleryPostsActivity
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User

@@ -56,7 +56,7 @@ import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.media.MediaActivity
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty

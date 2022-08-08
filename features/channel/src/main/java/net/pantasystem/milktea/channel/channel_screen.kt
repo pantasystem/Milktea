@@ -17,7 +17,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 
 data class ChannelTypeWithTitle(
     val type: ChannelListType,

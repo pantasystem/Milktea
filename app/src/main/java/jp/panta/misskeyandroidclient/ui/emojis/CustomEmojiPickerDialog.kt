@@ -16,7 +16,7 @@ import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
 import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
 import javax.inject.Inject
