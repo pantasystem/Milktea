@@ -16,7 +16,7 @@ import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
+import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import javax.inject.Inject
 
 

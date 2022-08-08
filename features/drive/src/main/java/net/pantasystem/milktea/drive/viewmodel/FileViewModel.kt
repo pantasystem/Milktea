@@ -15,6 +15,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.drive.DriveStore
+import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.*
 import net.pantasystem.milktea.model.file.AppFile

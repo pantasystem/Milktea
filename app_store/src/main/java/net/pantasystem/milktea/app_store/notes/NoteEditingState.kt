@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes
+package net.pantasystem.milktea.app_store.notes
 
 
 import kotlinx.datetime.Instant
@@ -6,8 +6,12 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.from
+import net.pantasystem.milktea.model.notes.CreateNote
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftPoll
+import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
 import net.pantasystem.milktea.model.user.User
 import java.util.*
@@ -394,5 +398,22 @@ fun PollEditingState.toDraftPoll(): DraftPoll {
         },
         multiple = multiple,
         expiresAt = expiresAt.expiresAt()?.toEpochMilliseconds()
+    )
+}
+
+fun NoteEditingState.toCreateNote(account: Account): CreateNote {
+    return CreateNote(
+        author = account,
+        visibility = visibility,
+        text = text,
+        cw = cw,
+        viaMobile = false,
+        files = files,
+        replyId = replyId,
+        renoteId = renoteId,
+        poll = poll?.toCreatePoll(),
+        draftNoteId = draftNoteId,
+        channelId = channelId,
+        scheduleWillPostAt = reservationPostingAt
     )
 }

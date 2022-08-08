@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.model.notes.PollExpiresAt
+import net.pantasystem.milktea.app_store.notes.PollExpiresAt
 import kotlin.time.Duration.Companion.days
 
 @AndroidEntryPoint

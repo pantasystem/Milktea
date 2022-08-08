@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.model.gallery.GalleryPostsStore
+import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 

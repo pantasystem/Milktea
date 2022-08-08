@@ -1,8 +1,12 @@
-package net.pantasystem.milktea.model.drive
+package net.pantasystem.milktea.app_store.drive
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.Directory
+import net.pantasystem.milktea.model.drive.DirectoryPath
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
 
 
 data class DriveState (

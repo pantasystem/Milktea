@@ -24,7 +24,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.model.user.RequestType
+import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 

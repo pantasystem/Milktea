@@ -45,19 +45,3 @@ fun CreateNote.task(createNoteUseCase: CreateNoteUseCase) : CreateNoteTask {
     return CreateNoteTask(createNoteUseCase, this)
 }
 
-fun NoteEditingState.toCreateNote(account: Account): CreateNote {
-    return CreateNote(
-        author = account,
-        visibility = visibility,
-        text = text,
-        cw = cw,
-        viaMobile = false,
-        files = files,
-        replyId = replyId,
-        renoteId = renoteId,
-        poll = poll?.toCreatePoll(),
-        draftNoteId = draftNoteId,
-        channelId = channelId,
-        scheduleWillPostAt = reservationPostingAt
-    )
-}

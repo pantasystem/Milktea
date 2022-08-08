@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.*

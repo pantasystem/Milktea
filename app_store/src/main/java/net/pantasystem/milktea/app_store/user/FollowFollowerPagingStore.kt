@@ -1,8 +1,9 @@
-package net.pantasystem.milktea.model.user
+package net.pantasystem.milktea.app_store.user
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.user.User
 
 sealed interface RequestType {
     companion object

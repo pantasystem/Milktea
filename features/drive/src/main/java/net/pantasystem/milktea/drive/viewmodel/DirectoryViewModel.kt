@@ -19,9 +19,9 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.CreateDirectory
-import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore
+import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
-import net.pantasystem.milktea.model.drive.DriveStore
+import net.pantasystem.milktea.app_store.drive.DriveStore
 
 
 class DirectoryViewModel @AssistedInject constructor(

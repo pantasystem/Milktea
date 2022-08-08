@@ -1,10 +1,12 @@
-package net.pantasystem.milktea.model.gallery
+package net.pantasystem.milktea.app_store.gallery
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryRepository
 
 class GalleryPostSendFavoriteStore(
     private val galleryRepository: GalleryRepository

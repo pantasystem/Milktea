@@ -8,7 +8,7 @@ import net.pantasystem.milktea.data.infrastructure.gallery.GalleryPostsStoreImpl
 import net.pantasystem.milktea.data.infrastructure.gallery.GalleryRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.gallery.InMemoryGalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
-import net.pantasystem.milktea.model.gallery.GalleryPostsStore
+import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
 import net.pantasystem.milktea.model.gallery.GalleryRepository
 import javax.inject.Singleton
 

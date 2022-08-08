@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
-import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore
+import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import javax.inject.Inject
 
 class DriveDirectoryPagingStoreImpl @Inject constructor(

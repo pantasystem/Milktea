@@ -18,10 +18,10 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import net.pantasystem.milktea.model.user.RequestType
+import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.from
-import net.pantasystem.milktea.model.user.string
+import net.pantasystem.milktea.app_store.user.from
+import net.pantasystem.milktea.app_store.user.string
 import javax.inject.Inject
 
 @FlowPreview
