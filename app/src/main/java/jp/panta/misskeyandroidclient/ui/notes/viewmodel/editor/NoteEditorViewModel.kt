@@ -31,7 +31,6 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserRepository
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -39,8 +38,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
-    private val noteRepository: NoteRepository,
-    private val userRepository: UserRepository,
+    private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
@@ -86,7 +84,6 @@ class NoteEditorViewModel @Inject constructor(
                 dispatcher
             )
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
-
 
 
     val hasCw = _state.map {
@@ -194,11 +191,9 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            noteRepository.find(noteId).mapCatching {
-                userRepository.find(it.userId)
-            }.onSuccess { user ->
+            getAllMentionUsersUseCase(noteId).onSuccess { users ->
                 _state.update { state ->
-                    state.addMentionUserNames(listOf(user.displayUserName), 0).state
+                    state.addMentionUserNames(users.map { it.displayUserName }, 0).state
                 }
             }
         }
@@ -265,9 +260,10 @@ class NoteEditorViewModel @Inject constructor(
                     val createNote = _state.value.toCreateNote(account)
                     createNoteTaskExecutor.dispatch(createNote.task(createNoteUseCase))
                 } else {
-                    draftNoteService.save(_state.value.toCreateNote(account)).mapCatching { dfNote ->
-                        noteReservationPostExecutor.register(dfNote)
-                    }.onFailure {
+                    draftNoteService.save(_state.value.toCreateNote(account))
+                        .mapCatching { dfNote ->
+                            noteReservationPostExecutor.register(dfNote)
+                        }.onFailure {
                         logger.error("登録失敗", it)
                     }
                 }
