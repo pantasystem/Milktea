@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.SafeUnbox
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.model.messaging.MessageRelationGetter

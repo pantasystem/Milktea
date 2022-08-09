@@ -9,11 +9,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.messaging.MessagePagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.model.account.AccountStore
 import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.model.messaging.*
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessageObserver
+import net.pantasystem.milktea.model.messaging.MessageRelationGetter
+import net.pantasystem.milktea.model.messaging.MessagingId
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 

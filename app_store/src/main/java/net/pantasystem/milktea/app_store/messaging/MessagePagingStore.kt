@@ -1,7 +1,9 @@
-package net.pantasystem.milktea.model.messaging
+package net.pantasystem.milktea.app_store.messaging
 
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.messaging.MessagingId
 
 data class MessagingPagingState(
     val pageState: PageableState<List<Message.Id>>,

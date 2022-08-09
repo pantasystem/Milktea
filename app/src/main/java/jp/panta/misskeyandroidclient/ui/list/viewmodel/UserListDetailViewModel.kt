@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.list.UserListStore
+import net.pantasystem.milktea.app_store.userlist.UserListStore
 import net.pantasystem.milktea.model.user.User
 
 @FlowPreview

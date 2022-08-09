@@ -13,6 +13,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.app_store.gallery.GalleryPostSendFavoriteStore
+import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.Account

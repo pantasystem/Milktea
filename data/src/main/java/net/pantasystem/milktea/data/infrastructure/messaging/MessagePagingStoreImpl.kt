@@ -18,9 +18,9 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.messaging.Message
-import net.pantasystem.milktea.model.messaging.MessagePagingStore
+import net.pantasystem.milktea.app_store.messaging.MessagePagingStore
 import net.pantasystem.milktea.model.messaging.MessagingId
-import net.pantasystem.milktea.model.messaging.MessagingPagingState
+import net.pantasystem.milktea.app_store.messaging.MessagingPagingState
 import javax.inject.Inject
 
 class MessagePagingStoreImpl @Inject constructor(

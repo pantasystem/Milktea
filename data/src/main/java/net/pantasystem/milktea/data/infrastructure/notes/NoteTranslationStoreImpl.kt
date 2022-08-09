@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.translation.Translate
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationsState
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider

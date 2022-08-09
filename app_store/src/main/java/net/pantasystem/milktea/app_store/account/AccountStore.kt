@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.account
+package net.pantasystem.milktea.app_store.account
 
 
 import kotlinx.coroutines.flow.Flow
@@ -6,6 +6,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountNotFoundException
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaRepository

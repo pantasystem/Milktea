@@ -23,7 +23,7 @@ import jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPick
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import javax.inject.Inject

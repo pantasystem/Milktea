@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource

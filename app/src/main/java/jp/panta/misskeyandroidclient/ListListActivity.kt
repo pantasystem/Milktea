@@ -21,7 +21,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject

@@ -4,7 +4,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 
 /**
  * ノートの詳細表示となる一つのオブジェクト

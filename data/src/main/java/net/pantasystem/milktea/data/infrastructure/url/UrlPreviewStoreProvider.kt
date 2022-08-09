@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.url
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,7 +14,7 @@ class UrlPreviewStoreProvider @Inject constructor(
     val urlPreviewDAO: UrlPreviewDAO,
     val accountStore: AccountStore,
 
-) {
+    ) {
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
 

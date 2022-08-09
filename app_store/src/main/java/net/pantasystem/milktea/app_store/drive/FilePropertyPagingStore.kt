@@ -1,8 +1,10 @@
-package net.pantasystem.milktea.model.drive
+package net.pantasystem.milktea.app_store.drive
 
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.Directory
+import net.pantasystem.milktea.model.drive.FileProperty
 
 interface FilePropertyPagingStore {
     val state: Flow<PageableState<List<FileProperty.Id>>>

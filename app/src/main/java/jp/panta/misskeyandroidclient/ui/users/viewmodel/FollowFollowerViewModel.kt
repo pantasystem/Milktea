@@ -9,8 +9,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.model.user.FollowFollowerPagingStore
-import net.pantasystem.milktea.model.user.RequestType
+import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
+import net.pantasystem.milktea.app_store.user.RequestType
 
 class FollowFollowerViewModel @AssistedInject constructor(
     followFollowerPagingStoreFactory: FollowFollowerPagingStore.Factory,

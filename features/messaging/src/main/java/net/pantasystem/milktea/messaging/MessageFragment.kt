@@ -16,7 +16,7 @@ import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.messaging.viewmodel.MessageEditorViewModel
 import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.MessagingId

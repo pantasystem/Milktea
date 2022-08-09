@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':api')
     implementation project(path: ':model')
+    implementation project(path: ':app_store')
     implementation project(path: ':api_streaming')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

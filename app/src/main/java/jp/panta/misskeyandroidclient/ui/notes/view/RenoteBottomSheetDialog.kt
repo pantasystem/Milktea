@@ -9,7 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.DialogRenoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.notes.Note
 import javax.inject.Inject
 

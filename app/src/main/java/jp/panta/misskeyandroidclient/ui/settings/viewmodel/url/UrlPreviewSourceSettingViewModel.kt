@@ -15,7 +15,7 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +25,7 @@ class UrlPreviewSourceSettingViewModel @Inject constructor(
     private val urlPreviewDAO: UrlPreviewDAO,
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
 
-) :
+    ) :
     ViewModel() {
 
 

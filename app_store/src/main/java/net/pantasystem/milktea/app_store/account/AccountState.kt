@@ -1,4 +1,6 @@
-package net.pantasystem.milktea.model.account
+package net.pantasystem.milktea.app_store.account
+
+import net.pantasystem.milktea.model.account.Account
 
 
 data class AccountState(

@@ -9,6 +9,7 @@ import jp.panta.misskeyandroidclient.viewmodel.url.UrlPreviewLoadTask
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.model.account.Account

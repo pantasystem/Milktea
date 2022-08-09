@@ -41,6 +41,7 @@ dependencies {
     implementation libs.android.material.material
     implementation project(path: ':common')
     implementation project(path: ':model')
+    implementation project(path: ':app_store')
     implementation project(path: ':common_navigation')
     implementation project(path: ':common_navigation')
     testImplementation 'junit:junit:4.13.2'

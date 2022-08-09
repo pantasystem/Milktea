@@ -18,8 +18,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.user.FollowFollowerPagingStore
-import net.pantasystem.milktea.model.user.RequestType
+import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
+import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject

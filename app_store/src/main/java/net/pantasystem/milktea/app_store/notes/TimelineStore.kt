@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes
+package net.pantasystem.milktea.app_store.notes
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRelation
 
 interface TimelineStore {
     interface Factory {

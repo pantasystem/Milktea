@@ -46,6 +46,7 @@ dependencies {
     implementation libs.appcompat.appcompat
     implementation libs.android.material.material
     implementation project(path: ':model')
+    implementation project(path: ':app_store')
     implementation project(path: ':common_compose')
     implementation project(path: ':common')
     implementation project(path: ':common_navigation')

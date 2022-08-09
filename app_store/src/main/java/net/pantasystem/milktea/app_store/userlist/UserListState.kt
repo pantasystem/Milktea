@@ -1,4 +1,6 @@
-package net.pantasystem.milktea.model.list
+package net.pantasystem.milktea.app_store.userlist
+
+import net.pantasystem.milktea.model.list.UserList
 
 data class UserListState(
     val userListsMap: Map<UserList.Id, UserList>,

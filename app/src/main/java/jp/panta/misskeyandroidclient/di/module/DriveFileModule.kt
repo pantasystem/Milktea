@@ -12,7 +12,7 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.infrastructure.drive.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.FilePropertyPagingStore
+import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 

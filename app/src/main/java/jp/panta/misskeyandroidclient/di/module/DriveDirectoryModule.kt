@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.drive.DriveDirectoryPagingStoreImpl
 import net.pantasystem.milktea.data.infrastructure.drive.DriveDirectoryRepositoryImpl
-import net.pantasystem.milktea.model.drive.DriveDirectoryPagingStore
+import net.pantasystem.milktea.app_store.drive.DriveDirectoryPagingStore
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import javax.inject.Singleton
 

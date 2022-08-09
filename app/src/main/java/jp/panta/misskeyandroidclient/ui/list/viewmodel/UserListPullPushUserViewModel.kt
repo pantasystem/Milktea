@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.list.ListUserOperation
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import javax.inject.Inject
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.account.Account

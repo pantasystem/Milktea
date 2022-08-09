@@ -1,7 +1,9 @@
-package net.pantasystem.milktea.model.list
+package net.pantasystem.milktea.app_store.userlist
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListRepository
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton

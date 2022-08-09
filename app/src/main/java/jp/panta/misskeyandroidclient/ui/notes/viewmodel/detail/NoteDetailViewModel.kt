@@ -28,7 +28,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.NoteTranslationStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class NoteDetailViewModel @AssistedInject constructor(

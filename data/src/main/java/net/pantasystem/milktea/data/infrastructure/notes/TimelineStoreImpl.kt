@@ -24,7 +24,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.TimelineStore
+import net.pantasystem.milktea.app_store.notes.TimelineStore
 import retrofit2.Response
 import javax.inject.Inject
 

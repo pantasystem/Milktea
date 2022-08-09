@@ -6,9 +6,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import net.pantasystem.milktea.app_store.messaging.MessagePagingStore
 import net.pantasystem.milktea.data.infrastructure.messaging.*
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.messaging.*
+import net.pantasystem.milktea.model.messaging.MessageObserver
+import net.pantasystem.milktea.model.messaging.MessageRepository
+import net.pantasystem.milktea.model.messaging.MessagingRepository
+import net.pantasystem.milktea.model.messaging.UnReadMessages
 import javax.inject.Singleton
 
 @Module

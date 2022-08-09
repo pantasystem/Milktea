@@ -17,7 +17,7 @@ import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelPagingModel
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.newPage
 import net.pantasystem.milktea.model.channel.Channel

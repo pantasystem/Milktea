@@ -19,7 +19,7 @@ import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.model.account.AccountStore
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
