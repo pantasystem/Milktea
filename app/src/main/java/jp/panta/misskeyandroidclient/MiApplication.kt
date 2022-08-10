@@ -12,7 +12,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
-import jp.panta.misskeyandroidclient.util.platform.activeNetworkFlow
+import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger

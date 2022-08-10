@@ -5,7 +5,7 @@
         <variable
                 name="item"
                 type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.BooleanSharedItem" />
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:orientation="horizontal"

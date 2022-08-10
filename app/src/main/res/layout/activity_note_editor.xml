@@ -3,7 +3,7 @@
         xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

@@ -1,13 +1,14 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient.util.platform
+package net.pantasystem.milktea.common_android.platform
 
 import android.content.Context
 import android.content.IntentFilter
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkInfo
 import android.os.Build
 import androidx.annotation.RequiresApi
-import net.pantasystem.milktea.common.receive
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

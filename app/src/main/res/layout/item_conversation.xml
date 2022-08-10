@@ -13,7 +13,7 @@
         <variable
                 name="noteCardActionListener"
                 type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

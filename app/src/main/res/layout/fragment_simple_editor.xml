@@ -19,7 +19,7 @@
                 name="simpleEditor"
                 type="jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditor" />
 
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
 
     <LinearLayout
