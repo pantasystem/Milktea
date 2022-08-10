@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.notes.viewmodel.draft
+package net.pantasystem.milktea.data.infrastructure.notes.draft
 
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
