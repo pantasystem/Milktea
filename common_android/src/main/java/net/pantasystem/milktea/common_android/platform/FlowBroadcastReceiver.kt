@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.common
+package net.pantasystem.milktea.common_android.platform
 
 import android.content.BroadcastReceiver
 import android.content.Context
