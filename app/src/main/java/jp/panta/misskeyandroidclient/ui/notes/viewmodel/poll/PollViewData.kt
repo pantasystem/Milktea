@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.notes.viewmodel.poll
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import net.pantasystem.milktea.model.notes.poll.Poll
-import jp.panta.misskeyandroidclient.ui.SafeUnbox
+import net.pantasystem.milktea.common_android.ui.SafeUnbox
 import java.lang.IndexOutOfBoundsException
 
 class PollViewData(private val poll: Poll, val noteId: String){

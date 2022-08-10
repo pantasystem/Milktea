@@ -12,7 +12,7 @@
         <import type="android.view.View" />
 
 
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
 
 
         <import type="jp.panta.misskeyandroidclient.R" />

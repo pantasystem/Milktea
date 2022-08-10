@@ -11,7 +11,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.ui.SafeUnbox
+import net.pantasystem.milktea.common_android.ui.SafeUnbox
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore

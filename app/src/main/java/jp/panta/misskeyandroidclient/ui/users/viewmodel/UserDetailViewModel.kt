@@ -5,7 +5,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger

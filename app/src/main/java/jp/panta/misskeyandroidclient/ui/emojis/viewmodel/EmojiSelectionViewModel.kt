@@ -2,7 +2,7 @@ package jp.panta.misskeyandroidclient.ui.emojis.viewmodel
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.emoji.Emoji
 import javax.inject.Inject
 

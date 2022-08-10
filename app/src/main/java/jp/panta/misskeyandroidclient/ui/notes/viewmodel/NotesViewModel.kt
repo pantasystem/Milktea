@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.panta.misskeyandroidclient.ui.SafeUnbox
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import net.pantasystem.milktea.common_android.ui.SafeUnbox
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient.util.platform
+package net.pantasystem.milktea.common_android.platform
 
 import android.content.Context
 import android.content.IntentFilter

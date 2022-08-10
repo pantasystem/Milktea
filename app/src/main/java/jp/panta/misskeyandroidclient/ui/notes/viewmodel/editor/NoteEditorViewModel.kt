@@ -6,7 +6,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock

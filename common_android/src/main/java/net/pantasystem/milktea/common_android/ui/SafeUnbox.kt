@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui
+package net.pantasystem.milktea.common_android.ui
 
 import androidx.databinding.InverseMethod
 
@@ -30,7 +30,7 @@ object SafeUnbox {
     }
 
     @JvmStatic
-    @InverseMethod("box")
+    @androidx.databinding.InverseMethod("box")
     fun unbox(boxed: Float?): Float{
         return boxed?: 0F
     }
@@ -41,7 +41,7 @@ object SafeUnbox {
     }
 
     @JvmStatic
-    @InverseMethod("box")
+    @androidx.databinding.InverseMethod("box")
     fun unbox(boxed: Int?): Int{
         return boxed?: 0
     }
@@ -52,21 +52,21 @@ object SafeUnbox {
     }
 
     @JvmStatic
-    @InverseMethod("boxString")
+    @androidx.databinding.InverseMethod("boxString")
     fun unboxString(boxed: String?) = boxed?: ""
 
     @JvmStatic
     fun boxString(unboxed: String): String? = unboxed
 
     @JvmStatic
-    @InverseMethod("boxInt")
+    @androidx.databinding.InverseMethod("boxInt")
     fun unboxInt(boxed: Int?) = boxed?: 0
 
     @JvmStatic
     fun boxInt(unboxed: Int): Int? = unboxed
 
     @JvmStatic
-    @InverseMethod("boxBool")
+    @androidx.databinding.InverseMethod("boxBool")
     fun unboxBool(boxed: Boolean?) = boxed?: false
 
     @JvmStatic

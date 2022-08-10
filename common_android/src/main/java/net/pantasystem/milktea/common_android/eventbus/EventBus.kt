@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util.eventbus
+package net.pantasystem.milktea.common_android.eventbus
 
 import android.util.Log
 import androidx.lifecycle.Lifecycle

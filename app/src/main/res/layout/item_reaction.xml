@@ -14,7 +14,7 @@
                 type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData" />
 
 
-        <import type="jp.panta.misskeyandroidclient.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
     <LinearLayout
             android:layout_width="wrap_content"

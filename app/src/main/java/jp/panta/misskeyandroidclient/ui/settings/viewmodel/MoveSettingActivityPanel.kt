@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.settings.viewmodel
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import jp.panta.misskeyandroidclient.util.eventbus.EventBus
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 
 class MoveSettingActivityPanel<A : AppCompatActivity>(
     @StringRes val titleStringRes: Int,
