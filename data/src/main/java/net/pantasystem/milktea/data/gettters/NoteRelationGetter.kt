@@ -43,7 +43,12 @@ class NoteRelationGetter @Inject constructor(
 
     suspend fun getIn(noteIds: List<Note.Id>): List<NoteRelation> {
         val notes = noteRepository.findIn(noteIds)
-        val users = userDataSource.getIn(notes.map { it.userId }).associateBy {
+        val acIdAndNoteIdMap = noteIds.groupBy {
+            it.accountId
+        }
+        val users = acIdAndNoteIdMap.map { list ->
+            userDataSource.getIn(list.key, list.value.map { it.noteId })
+        }.flatten().associateBy {
             it.id
         }
         val noteMap = notes.associateBy { it.id }

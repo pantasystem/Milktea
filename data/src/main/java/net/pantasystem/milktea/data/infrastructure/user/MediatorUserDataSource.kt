@@ -52,19 +52,13 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getIn(userIds: List<User.Id>): List<User> {
+    override suspend fun getIn(accountId: Long, serverIds: List<String>): List<User> {
 
         return withContext(Dispatchers.IO) {
-            val accAndId = userIds.groupBy {
-                it.accountId
-            }
-            accAndId.map { group ->
-                userDao.getInServerIds(group.key, group.value.map { it.id })
-            }.map { list ->
-                list.map {
-                    it.toModel()
-                }
-            }.flatten().also {
+
+            userDao.getInServerIds(accountId, serverIds).map {
+                it.toModel()
+            }.also {
                 inMem.addAll(it)
             }
         }
@@ -147,15 +141,27 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override suspend fun remove(user: User): Boolean {
-        return inMem.remove(user)
+        return runCatching {
+            inMem.remove(user)
+            userDao.delete(user.id.accountId, user.id.id)
+            true
+        }.getOrElse {
+            false
+        }
     }
 
     override suspend fun all(): List<User> {
         return inMem.all()
     }
 
-    override fun observeIn(userIds: List<User.Id>): Flow<List<User>> {
-        return inMem.observeIn(userIds).distinctUntilChanged()
+    override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
+        return userDao.observeInServerIds(accountId, serverIds).map { list ->
+            list.map { user ->
+                user.toModel()
+            }
+        }.flowOn(Dispatchers.IO).onEach {
+            inMem.addAll(it)
+        }.distinctUntilChanged()
     }
 
     override fun observe(userId: User.Id): Flow<User> {

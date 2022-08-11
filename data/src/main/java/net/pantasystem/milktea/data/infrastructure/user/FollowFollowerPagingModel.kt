@@ -72,17 +72,16 @@ class FollowFollowerPagingStoreImpl(
             it.content
         }.filter {
             it is StateContent.Exist
-        }.map {
-            val ids = (it as StateContent.Exist).rawContent
-            userDataSource.observeIn(ids).map { list ->
+        }.flatMapLatest { stateContent ->
+            val ids = (stateContent as StateContent.Exist).rawContent
+            val accountId = ids.map { it.accountId }.distinct().first()
+            userDataSource.observeIn(accountId, ids.map { it.id }).map { list ->
                 list.mapNotNull { user ->
                     user as User.Detail?
                 }
             }
-        }.flatMapLatest {
-            it.map {
-                it
-            }
+        }.catch {
+            loggerFactory.create("FollowFollowerPagingModel").error("error", it)
         }
 
     private val idHolder = IdHolder()

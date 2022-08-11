@@ -26,38 +26,41 @@ class ExploreViewModel @Inject constructor(
 ) : ViewModel() {
     private val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
 
-    private val rawLoadingStates = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        findUsers.map { list ->
-            list.map {
-                it to suspend {
-                    it to userRepository.findUsers(ac.accountId, it.findUsersQuery)
-                }.asLoadingStateFlow()
+    private val rawLoadingStates =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+            findUsers.map { list ->
+                list.map {
+                    it to suspend {
+                        it to userRepository.findUsers(ac.accountId, it.findUsersQuery)
+                    }.asLoadingStateFlow()
+                }
             }
-        }
-    }.flatMapLatest { exploreItems ->
-        combine(exploreItems.map { it.second }) { states ->
-            states.toList()
-        }.map { list ->
-            list.mapIndexed { index, resultState ->
-                val exploreItem = exploreItems[index].first
-                ExploreResultState(
-                    findUsersQuery = exploreItem.findUsersQuery,
-                    loadingState = resultState.suspendConvert {
-                        it.second.map { user ->
-                            user.id
-                        }
-                    },
-                    title = exploreItem.title,
-                )
+        }.flatMapLatest { exploreItems ->
+            combine(exploreItems.map { it.second }) { states ->
+                states.toList()
+            }.map { list ->
+                list.mapIndexed { index, resultState ->
+                    val exploreItem = exploreItems[index].first
+                    ExploreResultState(
+                        findUsersQuery = exploreItem.findUsersQuery,
+                        loadingState = resultState.suspendConvert {
+                            it.second.map { user ->
+                                user.id
+                            }
+                        },
+                        title = exploreItem.title,
+                    )
+                }
             }
-        }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     val uiState = rawLoadingStates.map { list ->
         list.map { state ->
             val rawContent = (state.loadingState.content as? StateContent.Exist)
-                ?.rawContent?: emptyList()
-            state to userDataSource.observeIn(rawContent).mapNotNull { users ->
+                ?.rawContent ?: emptyList()
+            state to userDataSource.observeIn(accountStore.currentAccountId!!, rawContent.map {
+                it.id
+            }).mapNotNull { users ->
                 users.mapNotNull {
                     it as? User.Detail?
                 }
@@ -87,7 +90,6 @@ class ExploreViewModel @Inject constructor(
         FirebaseCrashlytics.getInstance().recordException(e)
     }.distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
-
 
 
     fun setExplores(list: List<ExploreItem>) {

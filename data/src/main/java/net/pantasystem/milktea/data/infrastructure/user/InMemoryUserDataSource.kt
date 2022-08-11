@@ -66,7 +66,10 @@ class InMemoryUserDataSource @Inject constructor(
         } ?: throw UserNotFoundException(userId)
     }
 
-    override suspend fun getIn(userIds: List<User.Id>): List<User> {
+    override suspend fun getIn(accountId: Long, serverIds: List<String>): List<User> {
+        val userIds = serverIds.map {
+            User.Id(accountId, it)
+        }
         return usersLock.withLock {
             userIds.mapNotNull {
                 userMap[it]
@@ -158,7 +161,10 @@ class InMemoryUserDataSource @Inject constructor(
         }.filterNotNull()
     }
 
-    override fun observeIn(userIds: List<User.Id>): Flow<List<User>> {
+    override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
+        val userIds = serverIds.map {
+            User.Id(accountId, it)
+        }
         return _state.map { state ->
             userIds.mapNotNull {
                 state.get(it)

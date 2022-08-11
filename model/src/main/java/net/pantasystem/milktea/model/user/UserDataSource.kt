@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.user
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.AddResult
 
 data class UsersState (
@@ -49,7 +48,7 @@ interface UserDataSource {
 
     suspend fun get(userId: User.Id): User
 
-    suspend fun getIn(userIds: List<User.Id>): List<User>
+    suspend fun getIn(accountId: Long, serverIds: List<String>): List<User>
 
     suspend fun get(accountId: Long, userName: String, host: String?): User
 
@@ -61,7 +60,7 @@ interface UserDataSource {
 
     suspend fun all(): List<User>
 
-    fun observeIn(userIds: List<User.Id>): Flow<List<User>>
+    fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>>
     fun observe(userId: User.Id): Flow<User>
     fun observe(acct: String): Flow<User>
 

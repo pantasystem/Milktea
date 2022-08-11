@@ -50,7 +50,7 @@ class SortedUsersViewModel @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val users = userIds.flatMapLatest { list ->
-        userDataSource.observeIn(list).map { users ->
+        userDataSource.observeIn(accountStore.currentAccountId!!, list.map { it.id }).map { users ->
             users.mapNotNull {
                 it as? User.Detail
             }
@@ -109,6 +109,6 @@ fun SortedUsersViewModel.Companion.providerViewModel(
     findUsersQuery: FindUsersQuery?,
 ) = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return factory.create(findUsersQuery ?: FindUsersQuery(null,null,null)) as T
+        return factory.create(findUsersQuery ?: FindUsersQuery(null, null, null)) as T
     }
 }
