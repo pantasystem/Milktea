@@ -1,9 +1,7 @@
 package jp.panta.misskeyandroidclient.model.users.nickname
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
-
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOnMemoryImpl
@@ -14,8 +12,7 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -36,8 +33,6 @@ class DeleteNicknameUseCaseTest {
         val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
         this.nicknameRepository = nicknameRepository
         userDataSource = InMemoryUserDataSource(
-            accountRepository = accountRepository,
-            userNicknameRepository = nicknameRepository,
             loggerFactory = TestLogger.Factory()
         )
 
@@ -49,8 +44,9 @@ class DeleteNicknameUseCaseTest {
             emptyList(),
             null,
             null,
-            host = null,
-            nickname = null
+            host = "misskey.io",
+            nickname = null,
+            isSameHost = true,
         )
         deleteNicknameUseCase = DeleteNicknameUseCase(
             accountRepository = accountRepository,

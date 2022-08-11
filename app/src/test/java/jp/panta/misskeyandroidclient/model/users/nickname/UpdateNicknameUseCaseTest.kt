@@ -8,8 +8,7 @@ import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOn
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UserNickname
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class UpdateNicknameUseCaseTest {
@@ -22,8 +21,6 @@ class UpdateNicknameUseCaseTest {
         val account = accountRepository.accounts.values.first()
         val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
         val userDataSource = InMemoryUserDataSource(
-            accountRepository = accountRepository,
-            userNicknameRepository = nicknameRepository,
             loggerFactory = TestLogger.Factory()
         )
         val updateNicknameUseCase = UpdateNicknameUseCase(
@@ -41,8 +38,9 @@ class UpdateNicknameUseCaseTest {
             emptyList(),
             null,
             null,
-            host = null,
-            nickname = null
+            host = "misskey.io",
+            nickname = null,
+            isSameHost = true
         )
         userDataSource.add(user)
 
