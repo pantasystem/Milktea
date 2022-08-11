@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
 import net.pantasystem.milktea.data.infrastructure.user.db.UserDetailedStateRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.user.UserNotFoundException
 import javax.inject.Inject
 
 class MediatorUserDataSource @Inject constructor(
-    private val dataBase: DataBase,
+    private val userDao: UserDao,
     private val inMem: InMemoryUserDataSource,
 
 ) : UserDataSource {
@@ -31,7 +31,7 @@ class MediatorUserDataSource @Inject constructor(
             runCatching {
                 inMem.get(userId)
             }.getOrNull()
-                ?: (dataBase.userDao().get(userId.accountId, userId.id)?.toModel()?.also {
+                ?: (userDao.get(userId.accountId, userId.id)?.toModel()?.also {
                     inMem.add(it)
                 } ?: throw UserNotFoundException(userId))
         }
@@ -43,9 +43,9 @@ class MediatorUserDataSource @Inject constructor(
                 inMem.get(accountId, userName, host)
             }.getOrNull()
                 ?: (if (host == null) {
-                    dataBase.userDao().getByUserName(accountId, userName)
+                    userDao.getByUserName(accountId, userName)
                 } else {
-                    dataBase.userDao().getByUserName(accountId, userName, host)
+                    userDao.getByUserName(accountId, userName, host)
                 })?.toModel()?.also {
                     inMem.add(it)
                 } ?: throw UserNotFoundException(userName = userName, host = host, userId = null)
@@ -59,7 +59,7 @@ class MediatorUserDataSource @Inject constructor(
                 it.accountId
             }
             accAndId.map { group ->
-                dataBase.userDao().getInServerIds(group.key, group.value.map { it.id })
+                userDao.getInServerIds(group.key, group.value.map { it.id })
             }.map { list ->
                 list.map {
                     it.toModel()
@@ -93,14 +93,14 @@ class MediatorUserDataSource @Inject constructor(
                     return@withContext result
                 }
                 else -> {
-                    val record = dataBase.userDao().get(user.id.accountId, user.id.id)
+                    val record = userDao.get(user.id.accountId, user.id.id)
                     val dbId = if (record == null) {
-                        dataBase.userDao().insert(newRecord)
+                        userDao.insert(newRecord)
                     } else {
-                        dataBase.userDao().update(newRecord.copy(id = record.user.id))
+                        userDao.update(newRecord.copy(id = record.user.id))
                         record.user.id
                     }
-                    dataBase.userDao().insertEmojis(
+                    userDao.insertEmojis(
                         user.emojis.map {
                             UserEmojiRecord(
                                 userId = dbId,
@@ -111,7 +111,7 @@ class MediatorUserDataSource @Inject constructor(
                         }
                     )
                     if (user is User.Detail) {
-                        dataBase.userDao().insert(
+                        userDao.insert(
                             UserDetailedStateRecord(
                                 bannerUrl = user.bannerUrl,
                                 isMuting = user.isMuting,
@@ -159,7 +159,7 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override fun observe(userId: User.Id): Flow<User> {
-        return dataBase.userDao().observe(userId.accountId, userId.id).mapNotNull {
+        return userDao.observe(userId.accountId, userId.id).mapNotNull {
             it?.toModel()
         }.onEach {
             inMem.add(it)
@@ -170,7 +170,7 @@ class MediatorUserDataSource @Inject constructor(
         val userNameAndHost = acct.split("@").filter { it.isNotBlank() }
         val userName = userNameAndHost[0]
         val host = userNameAndHost.getOrNull(1)
-        return dataBase.userDao().let {
+        return userDao.let {
             if(host == null) {
                 it.observeByUserName(userName).filterNotNull()
             } else {
