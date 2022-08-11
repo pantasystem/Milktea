@@ -83,7 +83,7 @@ class SearchUserViewModel @Inject constructor(
                 ?: emptyList()
             val content2 = (users2.content as? StateContent.Exist?)?.rawContent
                 ?: emptyList()
-            val users = content2 + content1
+            val users = (content2 + content1).distinctBy { it.id }
             val isNotExists =
                 users1.content is StateContent.NotExist && users2.content is StateContent.NotExist
             val isLoading = users1 is ResultState.Loading && users2 is ResultState.Loading
