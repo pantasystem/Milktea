@@ -32,4 +32,8 @@ interface UserRepository {
     suspend fun report(report: Report) : Boolean
 
     suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User>
+
+    suspend fun sync(userId: User.Id): Result<Unit>
+
+    suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>>
 }

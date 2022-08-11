@@ -19,7 +19,7 @@ data class RequestUser(
     val untilId: String? = null,
     val limit: Int? = null,
     val query: String? = null,
-    val detail: Boolean? = null
+    val detail: Boolean? = null,
 ) {
 
     companion object

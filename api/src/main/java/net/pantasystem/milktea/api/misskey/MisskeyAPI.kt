@@ -2,11 +2,17 @@ package net.pantasystem.milktea.api.misskey
 
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.app.ShowApp
+import net.pantasystem.milktea.api.misskey.auth.App
+import net.pantasystem.milktea.api.misskey.drive.*
+import net.pantasystem.milktea.api.misskey.favorite.Favorite
+import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
 import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
 import net.pantasystem.milktea.api.misskey.notes.*
+import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
+import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
 import net.pantasystem.milktea.api.misskey.notes.reaction.ReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.translation.Translate
@@ -18,17 +24,10 @@ import net.pantasystem.milktea.api.misskey.register.SubscriptionState
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
-import net.pantasystem.milktea.api.misskey.auth.App
-import net.pantasystem.milktea.api.misskey.drive.*
-import net.pantasystem.milktea.api.misskey.favorite.Favorite
-import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
-import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
-import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
-
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.notes.poll.Vote
 import retrofit2.Response
@@ -63,6 +62,9 @@ interface MisskeyAPI {
 
     @POST("api/users/show")
     suspend fun showUser(@Body requestUser: RequestUser): Response<UserDTO>
+
+    @POST("api/users/show")
+    suspend fun showUsers(@Body requestUser: RequestUser): Response<List<UserDTO>>
 
     @POST("api/users/search")
     suspend fun searchUser(@Body requestUser: RequestUser): Response<List<UserDTO>>
