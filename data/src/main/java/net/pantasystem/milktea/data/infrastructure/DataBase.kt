@@ -64,7 +64,7 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         PinnedNoteIdRecord::class,
 
     ],
-    version = 18,
+    version = 19,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -74,7 +74,9 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         AutoMigration(from = 15, to = 16),
         AutoMigration(from = 16, to = 17),
         AutoMigration(from = 17, to = 18),
+        AutoMigration(from = 18, to = 19)
     ],
+    views = [UserView::class]
 )
 @TypeConverters(
     PageTypeConverter::class,

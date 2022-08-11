@@ -5,6 +5,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.nickname.UserNickname
 
 @Entity(
     tableName = "user",
@@ -130,8 +131,25 @@ data class PinnedNoteIdRecord(
     @PrimaryKey(autoGenerate = true) val id: Long
 )
 
+@DatabaseView(
+    "select user.*, nicknames.nickname from user left join nicknames on user.userName = nicknames.username and user.host = nicknames.host"
+)
+data class UserView(
+    val serverId: String,
+    val accountId: Long,
+    val userName: String,
+    val name: String?,
+    val avatarUrl: String?,
+    val isCat: Boolean?,
+    val isBot: Boolean?,
+    val host: String,
+    val isSameHost: Boolean,
+    val id: Long,
+    val nickname: String?
+)
+
 data class UserRelated(
-    @Embedded val user: UserRecord,
+    @Embedded val user: UserView,
     @Relation(
         parentColumn = "id",
         entityColumn = "userId"
@@ -165,7 +183,12 @@ data class UserRelated(
                 isCat = user.isCat,
                 isSameHost = user.isSameHost,
                 name = user.name,
-                nickname = null,
+                nickname = user.nickname?.let {
+                    UserNickname(
+                        id = UserNickname.Id(user.userName, user.host),
+                        name = user.nickname
+                    )
+                }
             )
         } else {
             return User.Detail(
@@ -183,7 +206,12 @@ data class UserRelated(
                 isCat = user.isCat,
                 isSameHost = user.isSameHost,
                 name = user.name,
-                nickname = null,
+                nickname = user.nickname?.let {
+                    UserNickname(
+                        id = UserNickname.Id(user.userName, user.host),
+                        name = user.nickname
+                    )
+                },
                 bannerUrl = detail.bannerUrl,
                 description = detail.description,
                 followingCount = detail.followingCount,
