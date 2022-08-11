@@ -10,13 +10,10 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UsersState
-import net.pantasystem.milktea.model.user.nickname.UserNickname
-import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
 import javax.inject.Inject
 
 class InMemoryUserDataSource @Inject constructor(
     loggerFactory: Logger.Factory?,
-    private val userNicknameRepository: UserNicknameRepository,
 ) : UserDataSource {
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 
@@ -102,16 +99,7 @@ class InMemoryUserDataSource @Inject constructor(
 
     }
 
-    private suspend fun createOrUpdate(argUser: User): AddResult {
-        val nickname = runCatching {
-            userNicknameRepository.findOne(
-                UserNickname.Id(argUser.userName, argUser.host)
-            )
-        }.getOrNull()
-        val user = when (argUser) {
-            is User.Detail -> argUser.copy(nickname = nickname)
-            is User.Simple -> argUser.copy(nickname = nickname)
-        }
+    private suspend fun createOrUpdate(user: User): AddResult {
         usersLock.withLock {
             val u = userMap[user.id]
             if (u == null) {
