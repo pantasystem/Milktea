@@ -115,4 +115,10 @@ abstract class UserDao {
         delete from user where accountId = :accountId and serverId = :serverId
     """)
     abstract suspend fun delete(accountId: Long, serverId: String)
+
+    @Query("""
+        select * from user_view where accountId = :accountId and (name like :word or userName like :word) 
+    """)
+    @Transaction
+    abstract suspend fun searchByName(accountId: Long, word: String): List<UserRelated>
 }

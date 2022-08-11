@@ -151,7 +151,7 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun all(): List<User> {
+    fun all(): List<User> {
         return userMap.values.toList()
     }
 
@@ -175,6 +175,14 @@ class InMemoryUserDataSource @Inject constructor(
     override fun observe(acct: String): Flow<User> {
         return _state.mapNotNull {
             it.get(acct)
+        }
+    }
+
+    override suspend fun searchByName(accountId: Long, name: String): List<User> {
+        return all().filter {
+            it.id.accountId == accountId
+        }.filter {
+            it.displayName.startsWith(name)
         }
     }
 

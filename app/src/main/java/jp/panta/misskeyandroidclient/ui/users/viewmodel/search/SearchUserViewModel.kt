@@ -126,11 +126,13 @@ class SearchUserViewModel @Inject constructor(
         (it.content as? StateContent.Exist)?.rawContent
             ?: emptyList()
     }.flatMapLatest { ids ->
-        userDataSource.observeIn(ids).map { users ->
+        userDataSource.observeIn(accountStore.currentAccountId!!, ids.map { it.id }).map { users ->
             users.mapNotNull { user ->
                 user as? User.Detail?
             }
         }
+    }.catch {
+        logger.error("observe error", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 

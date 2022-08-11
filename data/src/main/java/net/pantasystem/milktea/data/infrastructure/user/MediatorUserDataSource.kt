@@ -66,6 +66,13 @@ class MediatorUserDataSource @Inject constructor(
 
     override suspend fun add(user: User): AddResult {
         return withContext(Dispatchers.IO) {
+            val existsUserInMemory = runCatching {
+                inMem.get(user.id)
+            }.getOrNull()
+            if (existsUserInMemory == user) {
+                return@withContext AddResult.Canceled
+            }
+
             val result = inMem.add(user)
 
             if (result == AddResult.Canceled) {
@@ -150,9 +157,6 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun all(): List<User> {
-        return inMem.all()
-    }
 
     override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
         return userDao.observeInServerIds(accountId, serverIds).map { list ->
@@ -191,6 +195,16 @@ class MediatorUserDataSource @Inject constructor(
 
     override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
         return inMem.observe(userName, host, accountId).distinctUntilChanged()
+    }
+
+    override suspend fun searchByName(accountId: Long, name: String): List<User> {
+        return withContext(Dispatchers.IO) {
+            userDao.searchByName(accountId, "%$name").map {
+                it.toModel()
+            }.also {
+                inMem.addAll(it)
+            }
+        }
     }
 
 

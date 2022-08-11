@@ -125,11 +125,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchByName(accountId: Long, name: String): List<User> {
-        return userDataSource.all().asSequence().filter {
-            it.id.accountId == accountId
-        }.filter {
-            it.displayName.startsWith(name)
-        }.toList()
+        return userDataSource.searchByName(accountId, name)
     }
 
     override suspend fun searchByUserName(

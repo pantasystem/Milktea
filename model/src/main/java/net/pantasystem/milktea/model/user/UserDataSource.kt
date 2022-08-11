@@ -58,11 +58,12 @@ interface UserDataSource {
 
     suspend fun remove(user: User): Boolean
 
-    suspend fun all(): List<User>
 
     fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>>
     fun observe(userId: User.Id): Flow<User>
     fun observe(acct: String): Flow<User>
 
     fun observe(userName: String, host: String? = null, accountId: Long? = null): Flow<User?>
+
+    suspend fun searchByName(accountId: Long, name: String): List<User>
 }
