@@ -58,12 +58,14 @@ class DeleteNicknameUseCaseTest {
     }
 
     @Test
-    fun deleteNickname() = runBlocking {
-        val nickname = UserNickname(nicknameId, "changed name")
-        nicknameRepository.save(nickname)
-        userDataSource.add(user)
-        assertEquals("changed name", userDataSource.get(user.id).displayName)
-        deleteNicknameUseCase.invoke(user)
-        assertEquals("name1", userDataSource.get(user.id).displayName)
+    fun deleteNickname() {
+        runBlocking {
+            val nickname = UserNickname(nicknameId, "changed name")
+            userDataSource.add(user.copy(nickname = nickname))
+            nicknameRepository.save(nickname)
+            assertEquals("changed name", userDataSource.get(user.id).displayName)
+            deleteNicknameUseCase.invoke(user)
+            assertEquals("name1", userDataSource.get(user.id).displayName)
+        }
     }
 }
