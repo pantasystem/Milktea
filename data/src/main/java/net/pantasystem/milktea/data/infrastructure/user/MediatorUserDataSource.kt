@@ -3,10 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
-import net.pantasystem.milktea.data.infrastructure.user.db.UserDetailedStateRecord
-import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
-import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -101,16 +98,26 @@ class MediatorUserDataSource @Inject constructor(
                         userDao.update(newRecord.copy(id = record.user.id))
                         record.user.id
                     }
-                    userDao.insertEmojis(
-                        user.emojis.map {
-                            UserEmojiRecord(
-                                userId = dbId,
-                                name = it.name,
-                                uri = it.uri,
-                                url = it.url,
-                            )
+
+                    // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
+                    // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
+                    if (record?.toModel()?.emojis?.toSet() != user.emojis.toSet()) {
+                        // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
+                        if (record != null) {
+                            userDao.detachAllUserEmojis(dbId)
                         }
-                    )
+                        userDao.insertEmojis(
+                            user.emojis.map {
+                                UserEmojiRecord(
+                                    userId = dbId,
+                                    name = it.name,
+                                    uri = it.uri,
+                                    url = it.url,
+                                )
+                            }
+                        )
+                    }
+
                     if (user is User.Detail) {
                         userDao.insert(
                             UserDetailedStateRecord(
@@ -131,6 +138,21 @@ class MediatorUserDataSource @Inject constructor(
                                 userId = dbId
                             )
                         )
+
+                        // NOTE: 更新の必要性を判定
+                        if ((record?.toModel() as? User.Detail?)?.pinnedNoteIds?.toSet() != user.pinnedNoteIds?.toSet()) {
+                            // NOTE: 更新系の場合は一度削除する
+                            if (record != null) {
+                                userDao.detachAllPinnedNoteIds(dbId)
+                            }
+
+                            if (!user.pinnedNoteIds.isNullOrEmpty()) {
+                                userDao.insertPinnedNoteIds(user.pinnedNoteIds!!.map {
+                                    PinnedNoteIdRecord(it.noteId, userId = dbId, 0L)
+                                })
+                            }
+
+                        }
                     }
                 }
 
