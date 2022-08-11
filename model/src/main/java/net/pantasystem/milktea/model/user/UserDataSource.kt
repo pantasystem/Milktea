@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.user
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.AddResult
 
@@ -60,4 +61,10 @@ interface UserDataSource {
     suspend fun remove(user: User): Boolean
 
     suspend fun all(): List<User>
+
+    fun observeIn(userIds: List<User.Id>): Flow<List<User>>
+    fun observe(userId: User.Id): Flow<User>
+    fun observe(acct: String): Flow<User>
+
+    fun observe(userName: String, host: String? = null, accountId: Long? = null): Flow<User?>
 }

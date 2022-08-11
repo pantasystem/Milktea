@@ -66,11 +66,7 @@ class SelectedUserViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
     val selectedUserList = selectedUserIds.flatMapLatest { ids ->
-        userDataSource.state.map { state ->
-            ids.mapNotNull {
-                state.get(it)
-            }
-        }
+        userDataSource.observeIn(ids.toList())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 

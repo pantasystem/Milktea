@@ -6,9 +6,10 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -52,29 +53,36 @@ class ExploreViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    val uiState = userDataSource.state.flatMapLatest { usersState ->
-        rawLoadingStates.map { list ->
-            list.map { state ->
-                state to state.loadingState.convert { ids ->
-                    ids.mapNotNull { id ->
-                        usersState.get(id) as? User.Detail
-                    }
+    val uiState = rawLoadingStates.map { list ->
+        list.map { state ->
+            val rawContent = (state.loadingState.content as? StateContent.Exist)
+                ?.rawContent?: emptyList()
+            state to userDataSource.observeIn(rawContent).mapNotNull { users ->
+                users.mapNotNull {
+                    it as? User.Detail?
                 }
             }
-        }.map { list ->
-            list.map {
-                val explore = it.first
-                val resultState = it.second
+        }
+    }.map { statePair ->
+        val flows = statePair.map { pair ->
+            pair.second
+        }
+        combine(flows) { users ->
+            users.mapIndexed { index, list ->
+                val explore = statePair[index].first
                 ExploreItemState(
                     title = explore.title,
-                    loadingState = resultState,
+                    loadingState = explore.loadingState.convert {
+                        list
+                    },
                     findUsersQuery = explore.findUsersQuery
                 )
             }
-
         }
-    }.map {
-        ExploreUiState(it)
+    }.flatMapLatest { flow ->
+        flow.map {
+            ExploreUiState(it)
+        }
     }.catch { e ->
         FirebaseCrashlytics.getInstance().recordException(e)
     }.distinctUntilChanged()

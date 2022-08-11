@@ -48,12 +48,8 @@ class AccountViewModel @Inject constructor(
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    val user = currentAccount.flatMapLatest { account ->
-        userDataSource.state.map { state ->
-            account?.let {
-                state.get(User.Id(account.accountId, account.remoteId))
-            }
-        }.map {
+    val user = currentAccount.filterNotNull().flatMapLatest { account ->
+        userDataSource.observe(User.Id(account.accountId, account.remoteId)).map {
             it as? User.Detail
         }
     }.asLiveData()

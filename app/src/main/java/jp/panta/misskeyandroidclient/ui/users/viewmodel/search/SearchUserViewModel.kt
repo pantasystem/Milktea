@@ -7,11 +7,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -122,16 +122,17 @@ class SearchUserViewModel @Inject constructor(
     }.asLiveData()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val users = userDataSource.state.flatMapLatest { userState ->
-        searchState.map { resultState ->
-            (resultState.content as? StateContent.Exist)?.rawContent
-                ?: emptyList()
-        }.map { list ->
-            list.mapNotNull {
-                userState.usersMap[it] as? User.Detail?
+    val users = searchState.map {
+        (it.content as? StateContent.Exist)?.rawContent
+            ?: emptyList()
+    }.flatMapLatest { ids ->
+        userDataSource.observeIn(ids).map { users ->
+            users.mapNotNull { user ->
+                user as? User.Detail?
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
 
     val errors = filteredByUserNameLoadingState.map {
         it as? ResultState.Error?

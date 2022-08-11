@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.from
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
@@ -49,11 +49,12 @@ class SortedUsersViewModel @AssistedInject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val users = userDataSource.state.flatMapLatest { state ->
-        userIds.map { list ->
-            list.mapNotNull {
-                state.get(it) as? User.Detail
+    val users = userIds.flatMapLatest { list ->
+        userDataSource.observeIn(list).map { users ->
+            users.mapNotNull {
+                it as? User.Detail
             }
+
         }
     }.flowOn(Dispatchers.IO).asLiveData()
 

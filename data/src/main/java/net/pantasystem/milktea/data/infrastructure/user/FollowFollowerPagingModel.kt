@@ -9,6 +9,8 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10
 import net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
+import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
+import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
@@ -18,8 +20,6 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
-import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
@@ -68,15 +68,20 @@ class FollowFollowerPagingStoreImpl(
         get() = _state
     @OptIn(ExperimentalCoroutinesApi::class)
     override val users: Flow<List<User.Detail>>
-        get() = userDataSource.state.flatMapLatest { s ->
-            state.map {
-                it.content
-            }.filter {
-                it is StateContent.Exist
-            }.map {
-                (it as StateContent.Exist).rawContent.mapNotNull { userId ->
-                    s.get(userId) as? User.Detail
+        get() = state.map {
+            it.content
+        }.filter {
+            it is StateContent.Exist
+        }.map {
+            val ids = (it as StateContent.Exist).rawContent
+            userDataSource.observeIn(ids).map { list ->
+                list.mapNotNull { user ->
+                    user as User.Detail?
                 }
+            }
+        }.flatMapLatest {
+            it.map {
+                it
             }
         }
 

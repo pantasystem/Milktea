@@ -5,6 +5,7 @@ import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
@@ -89,14 +90,12 @@ open class UserViewData(
 
 
 
-    val user: LiveData<User.Detail?> = userDataSource.state.map { state ->
-        if (userId != null) {
-            state.get(userId)
-        } else {
-            require(userName != null)
-            state.get(userName = userName, host = host, accountId = accountId)
-        }
-    }.map {
+    val user: LiveData<User.Detail?> = if (userId != null) {
+        userDataSource.observe(userId)
+    } else {
+        require(userName != null)
+        userDataSource.observe(userName = userName, host = host, accountId = accountId)
+    }.filterNotNull().map {
         it as? User.Detail
     }.asLiveData()
 
