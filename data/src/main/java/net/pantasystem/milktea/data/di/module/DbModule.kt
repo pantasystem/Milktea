@@ -15,6 +15,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
+import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import javax.inject.Singleton
@@ -81,4 +82,8 @@ object DbModule {
     @Provides
     @Singleton
     fun groupDAO(db: DataBase): GroupDao = db.groupDao()
+
+    @Provides
+    @Singleton
+    fun provideUserDao(db: DataBase): UserDao = db.userDao()
 }

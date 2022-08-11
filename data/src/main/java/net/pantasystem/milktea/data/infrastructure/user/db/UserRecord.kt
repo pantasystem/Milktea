@@ -132,7 +132,8 @@ data class PinnedNoteIdRecord(
 )
 
 @DatabaseView(
-    "select user.*, nicknames.nickname from user left join nicknames on user.userName = nicknames.username and user.host = nicknames.host"
+    "select user.*, nicknames.nickname from user left join nicknames on user.userName = nicknames.username and user.host = nicknames.host",
+    viewName = "user_view"
 )
 data class UserView(
     val serverId: String,

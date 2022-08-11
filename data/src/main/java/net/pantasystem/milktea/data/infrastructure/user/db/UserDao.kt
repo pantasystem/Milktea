@@ -31,7 +31,7 @@ abstract class UserDao {
 
     @Query(
         """
-            select * from userview where accountId = :accountId and serverId in (:serverIds)
+            select * from user_view where accountId = :accountId and serverId in (:serverIds)
         """
     )
     @Transaction
@@ -39,75 +39,80 @@ abstract class UserDao {
 
     @Query(
         """
-            select * from userview where id in (:ids)
+            select * from user_view where id in (:ids)
         """
     )
     @Transaction
     abstract fun observeInIds(ids: List<Long>): Flow<List<UserRelated>>
 
     @Query("""
-        select * from userview where id = :id
+        select * from user_view where id = :id
     """)
     @Transaction
     abstract suspend fun get(id: Long): UserRelated?
 
     @Query("""
-        select * from userview where accountId = :accountId and serverId = :serverId
+        select * from user_view where accountId = :accountId and serverId = :serverId
     """)
     @Transaction
     abstract suspend fun get(accountId: Long, serverId: String): UserRelated?
 
     @Query("""
-        select * from userview where accountId = :accountId and serverId = :serverId
+        select * from user_view where accountId = :accountId and serverId = :serverId
     """)
     @Transaction
     abstract fun observe(accountId: Long, serverId: String): Flow<UserRelated?>
 
     @Query("""
-        select * from userview where id = :id
+        select * from user_view where id = :id
     """)
     @Transaction
     abstract fun observe(id: Long): Flow<UserRelated?>
 
     @Query("""
-        select * from userview where accountId = :accountId and userName = :userName and host = :host
+        select * from user_view where accountId = :accountId and userName = :userName and host = :host
     """)
     @Transaction
     abstract suspend fun getByUserName(accountId: Long, userName: String, host: String): UserRelated?
 
     @Query("""
-        select * from userview where accountId = :accountId and userName = :userName
+        select * from user_view where accountId = :accountId and userName = :userName
     """)
     @Transaction
     abstract suspend fun getByUserName(accountId: Long, userName: String): UserRelated?
 
     @Query("""
-        select * from userview where accountId = :accountId and userName = :userName and host = :host
+        select * from user_view where accountId = :accountId and userName = :userName and host = :host
     """)
     @Transaction
     abstract fun observeByUserName(accountId: Long, userName: String, host: String): Flow<UserRelated?>
 
     @Query("""
-        select * from userview where accountId = :accountId and userName = :userName
+        select * from user_view where accountId = :accountId and userName = :userName
     """)
     @Transaction
     abstract fun observeByUserName(accountId: Long, userName: String): Flow<UserRelated?>
 
     @Query("""
-        select * from userview where userName = :userName
+        select * from user_view where userName = :userName
     """)
     @Transaction
     abstract fun observeByUserName(userName: String): Flow<UserRelated?>
 
     @Query("""
-        select * from userview where userName = :userName and host = :host
+        select * from user_view where userName = :userName and host = :host
     """)
     @Transaction
     abstract fun observeByUserName(userName: String, host: String): Flow<UserRelated?>
 
     @Query("""
-        select * from userview where accountId = :accountId and serverId in (:serverIds)
+        select * from user_view where accountId = :accountId and serverId in (:serverIds)
     """)
     @Transaction
     abstract suspend fun getInServerIds(accountId: Long, serverIds: List<String>): List<UserRelated>
+
+    @Query("""
+        delete from user where accountId = :accountId and serverId = :serverId
+    """)
+    abstract suspend fun delete(accountId: Long, serverId: String)
 }

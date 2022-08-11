@@ -27,42 +27,47 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override suspend fun get(userId: User.Id): User {
-        return runCatching {
-            inMem.get(userId)
-        }.getOrNull()
-            ?: (dataBase.userDao().get(userId.accountId, userId.id)?.toModel()?.also {
-                inMem.add(it)
-            } ?: throw UserNotFoundException(userId))
-
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                inMem.get(userId)
+            }.getOrNull()
+                ?: (dataBase.userDao().get(userId.accountId, userId.id)?.toModel()?.also {
+                    inMem.add(it)
+                } ?: throw UserNotFoundException(userId))
+        }
     }
 
     override suspend fun get(accountId: Long, userName: String, host: String?): User {
-        return runCatching {
-            inMem.get(accountId, userName, host)
-        }.getOrNull()
-            ?: (if (host == null) {
-                dataBase.userDao().getByUserName(accountId, userName)
-            } else {
-                dataBase.userDao().getByUserName(accountId, userName, host)
-            })?.toModel()?.also {
-                inMem.add(it)
-            } ?: throw UserNotFoundException(userName = userName, host = host, userId = null)
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                inMem.get(accountId, userName, host)
+            }.getOrNull()
+                ?: (if (host == null) {
+                    dataBase.userDao().getByUserName(accountId, userName)
+                } else {
+                    dataBase.userDao().getByUserName(accountId, userName, host)
+                })?.toModel()?.also {
+                    inMem.add(it)
+                } ?: throw UserNotFoundException(userName = userName, host = host, userId = null)
+        }
     }
 
     override suspend fun getIn(userIds: List<User.Id>): List<User> {
 
-        val accAndId = userIds.groupBy {
-            it.accountId
-        }
-        val users = accAndId.map { group ->
-            dataBase.userDao().getInServerIds(group.key, group.value.map { it.id })
-        }.map { list ->
-            list.map {
-                it.toModel()
+        return withContext(Dispatchers.IO) {
+            val accAndId = userIds.groupBy {
+                it.accountId
             }
-        }.flatten()
-        inMem.addAll(users)
-        return users
+            accAndId.map { group ->
+                dataBase.userDao().getInServerIds(group.key, group.value.map { it.id })
+            }.map { list ->
+                list.map {
+                    it.toModel()
+                }
+            }.flatten().also {
+                inMem.addAll(it)
+            }
+        }
     }
 
     override suspend fun add(user: User): AddResult {
