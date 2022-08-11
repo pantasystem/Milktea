@@ -25,10 +25,7 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
-import net.pantasystem.milktea.data.infrastructure.user.db.PinnedNoteIdRecord
-import net.pantasystem.milktea.data.infrastructure.user.db.UserDetailedStateRecord
-import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
-import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
@@ -117,4 +114,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun driveFileRecordDAO(): DriveFileRecordDao
 
     abstract fun groupDao(): GroupDao
+
+    abstract fun userDao(): UserDao
 }

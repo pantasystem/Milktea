@@ -45,9 +45,9 @@ class InMemoryUserDataSource @Inject constructor(
 
     override suspend fun add(user: User): AddResult {
         return createOrUpdate(user).also {
-            if (it == AddResult.CREATED) {
+            if (it == AddResult.Created) {
                 publish(UserDataSource.Event.Created(user.id, user))
-            } else if (it == AddResult.UPDATED) {
+            } else if (it == AddResult.Updated) {
                 publish(UserDataSource.Event.Updated(user.id, user))
             }
         }
@@ -115,7 +115,7 @@ class InMemoryUserDataSource @Inject constructor(
                 userMap = userMap.toMutableMap().also { map ->
                     map[user.id] = user
                 }
-                return AddResult.CREATED
+                return AddResult.Created
             }
             when {
                 user is User.Detail -> {
@@ -144,7 +144,7 @@ class InMemoryUserDataSource @Inject constructor(
                 }
             }
 
-            return AddResult.UPDATED
+            return AddResult.Updated
         }
     }
 

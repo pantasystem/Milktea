@@ -52,10 +52,10 @@ class InMemoryNoteDataSourceTest {
             )
             delay(10)
 
-            assertEquals(AddResult.CREATED, result)
+            assertEquals(AddResult.Created, result)
             delay(10)
 
-            assertEquals(AddResult.UPDATED, noteDataSource.add(note))
+            assertEquals(AddResult.Updated, noteDataSource.add(note))
             delay(10)
 
 
@@ -82,7 +82,7 @@ class InMemoryNoteDataSourceTest {
         )
 
         val dtoParsed = dto.toNote(account)
-        assertEquals(AddResult.UPDATED, noteDataSource.add(dtoParsed))
+        assertEquals(AddResult.Updated, noteDataSource.add(dtoParsed))
 
         assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id))
     }

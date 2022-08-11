@@ -32,13 +32,13 @@ class MediatorFilePropertyDataSource @Inject constructor(
         try {
             if (record == null) {
                 driveFileRecordDao.insert(DriveFileRecord.from(fileProperty))
-                return AddResult.CREATED
+                return AddResult.Created
             } else if (record.toFileProperty() != fileProperty) {
                 driveFileRecordDao.update(DriveFileRecord.from(fileProperty).copy(id = record.id))
-                return AddResult.UPDATED
+                return AddResult.Updated
             }
         } catch (e: Exception) {
-            return AddResult.CANCEL
+            return AddResult.Canceled
         }
 
         return result

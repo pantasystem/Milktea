@@ -27,7 +27,7 @@ class GroupDataSourceImpl @Inject constructor(
                         GroupMemberIdRecord(id, it.id, 0L)
                     }
                 )
-                AddResult.CREATED
+                AddResult.Created
             } else {
                 groupDao.update(newEntity.copy(id = record.group.id))
                 groupDao.detachMembers(record.group.id)
@@ -36,7 +36,7 @@ class GroupDataSourceImpl @Inject constructor(
                         GroupMemberIdRecord(record.group.id, it.id, 0L)
                     }
                 )
-                AddResult.UPDATED
+                AddResult.Updated
             }
         }
     }

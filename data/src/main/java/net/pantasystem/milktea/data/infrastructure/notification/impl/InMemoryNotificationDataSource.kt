@@ -31,9 +31,9 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
 
     override suspend fun add(notification: Notification): AddResult {
         return createOrUpdate(notification).also {
-            if(it == AddResult.CREATED) {
+            if(it == AddResult.Created) {
                 publish(NotificationDataSource.Event.Created(notification.id, notification))
-            }else if(it == AddResult.UPDATED) {
+            }else if(it == AddResult.Updated) {
                 publish(NotificationDataSource.Event.Updated(notification.id, notification))
             }
         }
@@ -69,7 +69,7 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         notificationsMapLock.withLock {
             val exNotification = notificationIdAndNotification[notification.id]
             notificationIdAndNotification[notification.id] = notification
-            return if(exNotification == null) AddResult.CREATED else AddResult.UPDATED
+            return if(exNotification == null) AddResult.Created else AddResult.Updated
         }
     }
 

@@ -147,7 +147,7 @@ class NoteRepositoryImpl @Inject constructor(
         postUnReaction(noteId)
                 && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
-                && noteDataSource.add(note.onIUnReacted()) != AddResult.CANCEL))
+                && noteDataSource.add(note.onIUnReacted()) != AddResult.Canceled))
     }
 
 

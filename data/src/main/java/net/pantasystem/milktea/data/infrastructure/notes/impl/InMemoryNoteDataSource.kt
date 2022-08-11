@@ -71,9 +71,9 @@ class InMemoryNoteDataSource @Inject constructor(
      */
     override suspend fun add(note: Note): AddResult {
        return createOrUpdate(note).also {
-           if(it == AddResult.CREATED) {
+           if(it == AddResult.Created) {
                publish(NoteDataSource.Event.Created(note.id, note))
-           }else if(it == AddResult.UPDATED) {
+           }else if(it == AddResult.Updated) {
                publish(NoteDataSource.Event.Updated(note.id, note))
            }
        }
@@ -129,9 +129,9 @@ class InMemoryNoteDataSource @Inject constructor(
 
             deleteNoteIds.remove(note.id)
             return if(n == null){
-                AddResult.CREATED
+                AddResult.Created
             } else {
-                AddResult.UPDATED
+                AddResult.Updated
             }
         }
     }
