@@ -79,6 +79,11 @@ class FollowFollowerPagingStoreImpl(
                 list.mapNotNull { user ->
                     user as User.Detail?
                 }
+            }.map {
+                val userMap = it.associateBy { it.id }
+                ids.mapNotNull { userId ->
+                    userMap[userId]
+                }
             }
         }.catch {
             loggerFactory.create("FollowFollowerPagingModel").error("error", it)
