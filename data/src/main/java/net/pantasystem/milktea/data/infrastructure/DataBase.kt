@@ -25,6 +25,10 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
+import net.pantasystem.milktea.data.infrastructure.user.db.PinnedNoteIdRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserDetailedStateRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserEmojiRecord
+import net.pantasystem.milktea.data.infrastructure.user.db.UserRecord
 import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
@@ -57,8 +61,13 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         DraftLocalFile::class,
         GroupRecord::class,
         GroupMemberIdRecord::class,
+        UserRecord::class,
+        UserDetailedStateRecord::class,
+        UserEmojiRecord::class,
+        PinnedNoteIdRecord::class,
+
     ],
-    version = 17,
+    version = 18,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -66,7 +75,8 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         AutoMigration(from = 13, to = 14),
         AutoMigration(from = 14, to = 15),
         AutoMigration(from = 15, to = 16),
-        AutoMigration(from = 16, to = 17)
+        AutoMigration(from = 16, to = 17),
+        AutoMigration(from = 17, to = 18),
     ],
 )
 @TypeConverters(

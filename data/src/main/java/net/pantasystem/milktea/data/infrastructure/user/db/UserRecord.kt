@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import net.pantasystem.milktea.model.account.Account
 
 @Entity(
+    tableName = "user",
     foreignKeys = [
         ForeignKey(
             parentColumns = ["accountId"],
@@ -37,35 +38,11 @@ data class UserRecord(
     val isBot: Boolean?,
     val host: String,
     val isSameHost: Boolean,
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 )
 
 @Entity(
-    foreignKeys = [
-        ForeignKey(
-            parentColumns = ["id"],
-            entity = UserRecord::class,
-            childColumns = ["userId"],
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        ),
-    ],
-    indices = [
-        Index(
-            "name", "userId", unique = true
-        ),
-        Index("userId")
-    ]
-)
-data class UserEmojiRecord(
-    val name: String,
-    val url: String?,
-    val uri: String?,
-    val userId: Long,
-    @PrimaryKey(autoGenerate = true) val id: Long,
-)
-
-@Entity(
+    tableName = "user_detailed_state",
     foreignKeys = [
         ForeignKey(
             parentColumns = ["id"],
@@ -98,6 +75,33 @@ data class UserDetailedStateRecord(
 )
 
 @Entity(
+    tableName = "user_emoji",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            entity = UserRecord::class,
+            childColumns = ["userId"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        ),
+    ],
+    indices = [
+        Index(
+            "name", "userId", unique = true
+        ),
+        Index("userId")
+    ]
+)
+data class UserEmojiRecord(
+    val name: String,
+    val url: String?,
+    val uri: String?,
+    val userId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+)
+
+@Entity(
+    tableName = "pinned_note_id",
     foreignKeys = [
         ForeignKey(
             parentColumns = ["id"],
