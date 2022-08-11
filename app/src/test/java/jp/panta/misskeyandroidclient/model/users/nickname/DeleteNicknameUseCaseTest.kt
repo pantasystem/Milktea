@@ -1,12 +1,9 @@
 package jp.panta.misskeyandroidclient.model.users.nickname
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOnMemoryImpl
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
@@ -18,18 +15,13 @@ import org.junit.Test
 
 class DeleteNicknameUseCaseTest {
 
-    private lateinit var accountRepository: AccountRepository
     private lateinit var nicknameRepository: UserNicknameRepository
     private lateinit var userDataSource: UserDataSource
     private lateinit var user: User.Simple
-    private lateinit var account: Account
     private lateinit var deleteNicknameUseCase: DeleteNicknameUseCase
     private lateinit var nicknameId: UserNickname.Id
     @Before
     fun setUp() {
-        val accountRepository = TestAccountRepository()
-        this.accountRepository = accountRepository
-        account = accountRepository.accounts.values.first()
         val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
         this.nicknameRepository = nicknameRepository
         userDataSource = InMemoryUserDataSource(
@@ -49,12 +41,11 @@ class DeleteNicknameUseCaseTest {
             isSameHost = true,
         )
         deleteNicknameUseCase = DeleteNicknameUseCase(
-            accountRepository = accountRepository,
             userDataSource = userDataSource,
             userNicknameRepository = nicknameRepository
         )
 
-        nicknameId = UserNickname.Id(userName = user.userName, host = account.getHost())
+        nicknameId = UserNickname.Id(userName = user.userName, host = "misskey.io")
     }
 
     @Test
