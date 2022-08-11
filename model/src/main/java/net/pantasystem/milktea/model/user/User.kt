@@ -20,8 +20,9 @@ sealed interface User : Entity {
     val emojis: List<Emoji>
     val isCat: Boolean?
     val isBot: Boolean?
-    val host: String?
+    val host: String
     val nickname: UserNickname?
+    val isSameHost: Boolean
 
 
     data class Id(
@@ -37,8 +38,9 @@ sealed interface User : Entity {
         override val emojis: List<Emoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
-        override val host: String?,
+        override val host: String,
         override val nickname: UserNickname?,
+        override val isSameHost: Boolean
     ) : User {
         companion object
     }
@@ -51,7 +53,7 @@ sealed interface User : Entity {
         override val emojis: List<Emoji>,
         override val isCat: Boolean?,
         override val isBot: Boolean?,
-        override val host: String?,
+        override val host: String,
         override val nickname: UserNickname?,
         val description: String?,
         val followersCount: Int?,
@@ -68,8 +70,9 @@ sealed interface User : Entity {
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
+        override val isSameHost: Boolean
     ) : User {
-        companion object;
+        companion object
         val followState: FollowState
             get() {
                 if (isFollowing) {
@@ -90,7 +93,7 @@ sealed interface User : Entity {
 
 
     val displayUserName: String
-        get() = "@" + this.userName + if (this.host == null) {
+        get() = "@" + this.userName + if (isSameHost) {
             ""
         } else {
             "@" + this.host
@@ -122,6 +125,7 @@ fun User.Simple.Companion.make(
     isBot: Boolean? = null,
     host: String? = null,
     nickname: UserNickname? = null,
+    isSameHost: Boolean? = null,
 ): User.Simple {
     return User.Simple(
         id,
@@ -131,8 +135,9 @@ fun User.Simple.Companion.make(
         emojis = emojis,
         isCat = isCat,
         isBot = isBot,
-        host = host,
-        nickname = nickname
+        host = host ?: "",
+        nickname = nickname,
+        isSameHost = isSameHost ?: false,
     )
 }
 
@@ -162,6 +167,7 @@ fun User.Detail.Companion.make(
     hasPendingFollowRequestFromYou: Boolean = false,
     hasPendingFollowRequestToYou: Boolean = false,
     isLocked: Boolean = false,
+    isSameHost: Boolean = false,
 ): User.Detail {
     return User.Detail(
         id,
@@ -171,7 +177,7 @@ fun User.Detail.Companion.make(
         emojis,
         isCat,
         isBot,
-        host,
+        host ?: "",
         nickname,
         description,
         followersCount,
@@ -187,6 +193,7 @@ fun User.Detail.Companion.make(
         isMuting,
         hasPendingFollowRequestFromYou,
         hasPendingFollowRequestToYou,
-        isLocked
+        isLocked,
+        isSameHost,
     )
 }

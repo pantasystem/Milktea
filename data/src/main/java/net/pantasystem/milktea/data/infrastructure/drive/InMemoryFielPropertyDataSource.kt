@@ -23,7 +23,7 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
         val result: AddResult
         lock.withLock {
             map = map.toMutableMap().also {
-                result = if(it.put(fileProperty.id, fileProperty) == null) AddResult.CREATED else AddResult.UPDATED
+                result = if(it.put(fileProperty.id, fileProperty) == null) AddResult.Created else AddResult.Updated
             }
         }
         _state.value = _state.value.copy(

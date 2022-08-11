@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.model.user
 
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.AddResult
 
 data class UsersState (
@@ -45,11 +45,10 @@ interface UserDataSource {
 
     fun removeEventListener(listener: Listener)
 
-    val state: StateFlow<UsersState>
 
     suspend fun get(userId: User.Id): User
 
-    suspend fun getIn(userIds: List<User.Id>): List<User>
+    suspend fun getIn(accountId: Long, serverIds: List<String>): List<User>
 
     suspend fun get(accountId: Long, userName: String, host: String?): User
 
@@ -59,5 +58,12 @@ interface UserDataSource {
 
     suspend fun remove(user: User): Boolean
 
-    suspend fun all(): List<User>
+
+    fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>>
+    fun observe(userId: User.Id): Flow<User>
+    fun observe(acct: String): Flow<User>
+
+    fun observe(userName: String, host: String? = null, accountId: Long? = null): Flow<User?>
+
+    suspend fun searchByName(accountId: Long, name: String): List<User>
 }

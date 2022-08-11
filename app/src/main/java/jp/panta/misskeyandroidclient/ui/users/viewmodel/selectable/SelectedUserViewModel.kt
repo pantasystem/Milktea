@@ -8,6 +8,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import java.io.Serializable
@@ -32,6 +34,8 @@ data class SelectedUserUiState(
 @OptIn(ExperimentalCoroutinesApi::class)
 class SelectedUserViewModel @AssistedInject constructor(
     val userDataSource: UserDataSource,
+    val loggerFactory: Logger.Factory,
+    val accountStore: AccountStore,
     @Assisted val exSelectedUserIds: List<User.Id>,
     @Assisted val exSelectedUsers: List<User>,
 ) : ViewModel() {
@@ -66,11 +70,11 @@ class SelectedUserViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
     val selectedUserList = selectedUserIds.flatMapLatest { ids ->
-        userDataSource.state.map { state ->
-            ids.mapNotNull {
-                state.get(it)
-            }
-        }
+        val accountId = ids.map { it.accountId }.distinct().firstOrNull()
+            ?: accountStore.currentAccountId!!
+        userDataSource.observeIn(accountId, ids.toList().map { it.id })
+    }.catch {
+        loggerFactory.create("SelectedUserVM").error("failed observe selected user list", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 

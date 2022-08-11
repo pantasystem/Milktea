@@ -162,7 +162,7 @@ fun NoteDTO.toNote(account: Account): Note {
         createdAt = this.createdAt,
         text = this.text,
         cw = this.cw,
-        userId = User.Id(account.accountId, this.userId),
+        userId = User.Id(account.accountId, this.userId, ),
         replyId = this.replyId?.let{ Note.Id(account.accountId, this.replyId!!) },
         renoteId = this.renoteId?.let{ Note.Id(account.accountId, this.renoteId!!) },
         viaMobile = this.viaMobile,
@@ -312,13 +312,10 @@ fun NotificationDTO.toNotification(account: Account): Notification {
 }
 
 fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
-    return toUser(account.accountId, isDetail)
-}
-fun UserDTO.toUser(accountId: Long, isDetail: Boolean = false): User {
     if (isDetail) {
 
         return User.Detail(
-            id = User.Id(accountId, this.id),
+            id = User.Id(account.accountId, this.id),
             avatarUrl = this.avatarUrl,
             emojis = this.emojis ?: emptyList(),
             isBot = this.isBot,
@@ -329,12 +326,12 @@ fun UserDTO.toUser(accountId: Long, isDetail: Boolean = false): User {
             description = this.description,
             followersCount = this.followersCount,
             followingCount = this.followingCount,
-            host = this.host,
+            host = this.host ?: account.getHost(),
             url = this.url,
             hostLower = this.hostLower,
             notesCount = this.notesCount,
             pinnedNoteIds = this.pinnedNoteIds?.map {
-                Note.Id(accountId, it)
+                Note.Id(account.accountId, it)
             },
             isFollowing = this.isFollowing ?: false,
             isFollower = this.isFollowed ?: false,
@@ -344,18 +341,20 @@ fun UserDTO.toUser(accountId: Long, isDetail: Boolean = false): User {
             hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
             isLocked = isLocked ?: false,
             nickname = null,
+            isSameHost = host == null,
         )
     } else {
         return User.Simple(
-            id = User.Id(accountId, this.id),
+            id = User.Id(account.accountId, this.id),
             avatarUrl = this.avatarUrl,
             emojis = this.emojis ?: emptyList(),
             isBot = this.isBot,
             isCat = this.isCat,
             name = this.name,
             userName = this.userName,
-            host = this.host,
-            nickname = null
+            host = this.host ?: account.getHost(),
+            nickname = null,
+            isSameHost = host == null,
         )
     }
 

@@ -88,10 +88,11 @@ fun PreviewItemSimpleUser() {
         userName = "harunon",
         name = null,
         emojis = emptyList(),
-        host = null,
+        host = "misskey.io",
         id = User.Id(0L, ""),
         isBot = true,
         isCat = true,
         nickname = null,
+        isSameHost = true
     ), onSelected = {})
 }

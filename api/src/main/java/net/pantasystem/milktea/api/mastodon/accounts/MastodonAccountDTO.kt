@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.api.mastodon.accounts
 
-import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.user.User
@@ -60,10 +60,12 @@ data class MastodonAccountDTO (
                     category = it.category,
                 )
             },
-            host = acct.split("@").getOrNull(1),
+            host = acct.split("@").getOrNull(1) ?: account.getHost(),
             isBot = bot,
             isCat = false,
             nickname = null,
+            isSameHost = acct.split("@").getOrNull(1) == null
+                    || acct.split("@").getOrNull(1) == account.getHost()
         )
     }
 }

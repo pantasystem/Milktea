@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.data.infrastructure.user.FollowFollowerPagingStoreImpl
-import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
+import net.pantasystem.milktea.data.infrastructure.user.MediatorUserDataSource
 import net.pantasystem.milktea.data.infrastructure.user.UserRepositoryImpl
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -18,7 +18,7 @@ abstract class UserModule {
 
     @Binds
     @Singleton
-    abstract fun userDataSource(dataSource: InMemoryUserDataSource): UserDataSource
+    abstract fun userDataSource(dataSource: MediatorUserDataSource): UserDataSource
 
     @Binds
     @Singleton

@@ -39,16 +39,16 @@ class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
             if(galleries[galleryPost.id] == null){
                 map[galleryPost.id] = galleryPost
                 galleries = map
-                AddResult.CREATED
+                AddResult.Created
             }else{
                 map[galleryPost.id] = galleryPost
                 galleries = map
-                AddResult.UPDATED
+                AddResult.Updated
             }
         }
-        if(result == AddResult.CREATED) {
+        if(result == AddResult.Created) {
             galleryEvents.tryEmit(GalleryDataSource.Event.Created(galleryPost.id, galleryPost))
-        }else if(result == AddResult.UPDATED) {
+        }else if(result == AddResult.Updated) {
             galleryEvents.tryEmit(GalleryDataSource.Event.Updated(galleryPost.id, galleryPost))
         }
         return result

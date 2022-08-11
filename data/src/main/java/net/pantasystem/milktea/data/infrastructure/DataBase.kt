@@ -25,6 +25,7 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
+import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
@@ -57,8 +58,13 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         DraftLocalFile::class,
         GroupRecord::class,
         GroupMemberIdRecord::class,
+        UserRecord::class,
+        UserDetailedStateRecord::class,
+        UserEmojiRecord::class,
+        PinnedNoteIdRecord::class,
+
     ],
-    version = 17,
+    version = 19,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -66,8 +72,11 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         AutoMigration(from = 13, to = 14),
         AutoMigration(from = 14, to = 15),
         AutoMigration(from = 15, to = 16),
-        AutoMigration(from = 16, to = 17)
+        AutoMigration(from = 16, to = 17),
+        AutoMigration(from = 17, to = 18),
+        AutoMigration(from = 18, to = 19)
     ],
+    views = [UserView::class]
 )
 @TypeConverters(
     PageTypeConverter::class,
@@ -107,4 +116,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun driveFileRecordDAO(): DriveFileRecordDao
 
     abstract fun groupDao(): GroupDao
+
+    abstract fun userDao(): UserDao
 }

@@ -12,12 +12,13 @@ class UserTest : TestCase() {
             id = User.Id(0, "id"),
             avatarUrl = "",
             emojis = emptyList(),
-            host = null,
+            host = "",
             isBot = false,
             isCat = false,
             name = "Panta",
             userName = "Panta",
-            nickname = null
+            nickname = null,
+            isSameHost = true,
         )
 
         val profileUrl = user.getProfileUrl(
@@ -42,7 +43,8 @@ class UserTest : TestCase() {
             isCat = false,
             name = "Panta",
             userName = "Panta",
-            nickname = null
+            nickname = null,
+            isSameHost = false,
         )
 
         val profileUrl = user.getProfileUrl(Account(

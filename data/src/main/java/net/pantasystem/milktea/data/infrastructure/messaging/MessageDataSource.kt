@@ -111,10 +111,10 @@ class InMemoryMessageDataSource(
         synchronized(messageIdAndMessage) {
             messageIdAndMessage[message.id]?.let{
                 messageIdAndMessage[message.id] = message
-                return AddResult.UPDATED
+                return AddResult.Updated
             }
             messageIdAndMessage[message.id] = message
-            return AddResult.CREATED
+            return AddResult.Created
         }
     }
 

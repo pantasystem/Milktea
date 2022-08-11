@@ -1,26 +1,19 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UsersState
-import net.pantasystem.milktea.model.user.nickname.UserNickname
-import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
 import javax.inject.Inject
 
-// TODO: 色々と依存していてよくわからないのでアーキテクチャレベルでリファクタリングをする
 class InMemoryUserDataSource @Inject constructor(
     loggerFactory: Logger.Factory?,
-    private val userNicknameRepository: UserNicknameRepository,
-    private val accountRepository: AccountRepository,
 ) : UserDataSource {
     private val logger = loggerFactory?.create("InMemoryUserDataSource")
 
@@ -29,7 +22,7 @@ class InMemoryUserDataSource @Inject constructor(
     private val usersLock = Mutex()
 
     private val _state = MutableStateFlow(UsersState())
-    override val state: StateFlow<UsersState>
+    val state: StateFlow<UsersState>
         get() = _state
 
 
@@ -49,9 +42,9 @@ class InMemoryUserDataSource @Inject constructor(
 
     override suspend fun add(user: User): AddResult {
         return createOrUpdate(user).also {
-            if(it == AddResult.CREATED) {
+            if (it == AddResult.Created) {
                 publish(UserDataSource.Event.Created(user.id, user))
-            }else if(it == AddResult.UPDATED) {
+            } else if (it == AddResult.Updated) {
                 publish(UserDataSource.Event.Updated(user.id, user))
             }
         }
@@ -67,10 +60,13 @@ class InMemoryUserDataSource @Inject constructor(
     override suspend fun get(userId: User.Id): User {
         return usersLock.withLock {
             userMap[userId]
-        }?: throw UserNotFoundException(userId)
+        } ?: throw UserNotFoundException(userId)
     }
 
-    override suspend fun getIn(userIds: List<User.Id>): List<User> {
+    override suspend fun getIn(accountId: Long, serverIds: List<String>): List<User> {
+        val userIds = serverIds.map {
+            User.Id(accountId, it)
+        }
         return usersLock.withLock {
             userIds.mapNotNull {
                 userMap[it]
@@ -85,8 +81,8 @@ class InMemoryUserDataSource @Inject constructor(
             }.map {
                 it.value
             }.firstOrNull {
-                it.userName == userName && (it.host == host || it.host.isNullOrBlank() == host.isNullOrBlank())
-            }?: throw UserNotFoundException(null)
+                it.userName == userName && (it.host == host || host.isNullOrBlank())
+            } ?: throw UserNotFoundException(null)
         }
     }
 
@@ -96,32 +92,21 @@ class InMemoryUserDataSource @Inject constructor(
             val result = map.remove(user.id)
             userMap = map
             result
-        }?.also{
+        }?.also {
             publish(UserDataSource.Event.Removed(user.id))
         } != null
 
 
     }
 
-    private suspend fun createOrUpdate(argUser: User): AddResult {
-        // TODO: ここで変更処理までをしてしまうのは責務外なのでいつかリファクタリングをする
-        val nickname = runCatching {
-            val ac = accountRepository.get(argUser.id.accountId).getOrThrow()
-            userNicknameRepository.findOne(
-                UserNickname.Id(argUser.userName, argUser.host?: ac.getHost())
-            )
-        }.getOrNull()
-        val user = when(argUser) {
-            is User.Detail -> argUser.copy(nickname = nickname)
-            is User.Simple -> argUser.copy(nickname = nickname)
-        }
+    private suspend fun createOrUpdate(user: User): AddResult {
         usersLock.withLock {
             val u = userMap[user.id]
-            if(u == null) {
+            if (u == null) {
                 userMap = userMap.toMutableMap().also { map ->
                     map[user.id] = user
                 }
-                return AddResult.CREATED
+                return AddResult.Created
             }
             when {
                 user is User.Detail -> {
@@ -150,12 +135,53 @@ class InMemoryUserDataSource @Inject constructor(
                 }
             }
 
-            return AddResult.UPDATED
+            return AddResult.Updated
         }
     }
 
-    override suspend fun all(): List<User> {
+    fun all(): List<User> {
         return userMap.values.toList()
+    }
+
+    override fun observe(userId: User.Id): Flow<User> {
+        return _state.map {
+            it.get(userId)
+        }.filterNotNull()
+    }
+
+    override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
+        val userIds = serverIds.map {
+            User.Id(accountId, it)
+        }
+        return _state.map { state ->
+            userIds.mapNotNull {
+                state.get(it)
+            }
+        }
+    }
+
+    override fun observe(acct: String): Flow<User> {
+        return _state.mapNotNull {
+            it.get(acct)
+        }
+    }
+
+    override suspend fun searchByName(accountId: Long, name: String): List<User> {
+        return all().filter {
+            it.id.accountId == accountId
+        }.filter {
+            it.displayName.startsWith(name)
+        }
+    }
+
+    override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
+        return state.map { state ->
+            state.usersMap.values.filter { user ->
+                accountId == null || accountId == user.id.accountId
+            }.firstOrNull {
+                it.userName == userName && it.host == host
+            }
+        }
     }
 
     private fun publish(e: UserDataSource.Event) {

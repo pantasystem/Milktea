@@ -5,17 +5,17 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -49,17 +49,15 @@ class UserDetailViewModel @AssistedInject constructor(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
 
-    val userState = userDataSource.state.map { state ->
-        when {
-            userId != null -> {
-                state.get(userId)
-            }
-            fqdnUserName != null -> {
-                state.get(fqdnUserName)
-            }
-            else -> {
-                throw IllegalArgumentException()
-            }
+    val userState = when {
+        userId != null -> {
+            userDataSource.observe(userId)
+        }
+        fqdnUserName != null -> {
+            userDataSource.observe(fqdnUserName)
+        }
+        else -> {
+            throw IllegalArgumentException()
         }
     }.mapNotNull {
         logger.debug("flow user:$it")

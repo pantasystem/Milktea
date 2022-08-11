@@ -125,11 +125,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchByName(accountId: Long, name: String): List<User> {
-        return userDataSource.all().asSequence().filter {
-            it.id.accountId == accountId
-        }.filter {
-            it.displayName.startsWith(name)
-        }.toList()
+        return userDataSource.searchByName(accountId, name)
     }
 
     override suspend fun searchByUserName(
@@ -302,7 +298,45 @@ class UserRepositoryImpl @Inject constructor(
             it.toUser(account, true)
         }?.onEach {
             userDataSource.add(it)
-        }?: emptyList()
+        } ?: emptyList()
+    }
+
+    override suspend fun sync(userId: User.Id): Result<Unit> {
+        return runCatching {
+            val account = accountRepository.get(userId.accountId)
+                .getOrThrow()
+            val user = misskeyAPIProvider.get(account)
+                .showUser(
+                    RequestUser(i = account.getI(encryption), userId = userId.id, detail = true)
+                ).throwIfHasError()
+                .body()!!.toUser(account, true)
+            userDataSource.add(user)
+        }
+    }
+
+    override suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>> {
+        return runCatching {
+            val accountId = userIds.map { it.accountId }.distinct().firstOrNull()
+            if (accountId == null) {
+                emptyList()
+            } else {
+                val account = accountRepository.get(accountId)
+                    .getOrThrow()
+                val users = misskeyAPIProvider.get(account)
+                    .showUsers(
+                        RequestUser(
+                            i = account.getI(encryption),
+                            userIds = userIds.map { it.id },
+                            detail = true
+                        )
+                    ).throwIfHasError()
+                    .body()!!.map {
+                        it.toUser(account, true)
+                    }
+                userDataSource.addAll(users)
+                users.map { it.id }
+            }
+        }
     }
 
     private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
