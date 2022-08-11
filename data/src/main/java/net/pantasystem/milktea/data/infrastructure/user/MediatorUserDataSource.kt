@@ -221,7 +221,7 @@ class MediatorUserDataSource @Inject constructor(
 
     override suspend fun searchByName(accountId: Long, name: String): List<User> {
         return withContext(Dispatchers.IO) {
-            userDao.searchByName(accountId, "%$name").map {
+            userDao.searchByName(accountId, "$name%").map {
                 it.toModel()
             }.also {
                 inMem.addAll(it)
