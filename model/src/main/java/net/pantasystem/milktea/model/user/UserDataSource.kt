@@ -46,7 +46,6 @@ interface UserDataSource {
 
     fun removeEventListener(listener: Listener)
 
-    val state: StateFlow<UsersState>
 
     suspend fun get(userId: User.Id): User
 

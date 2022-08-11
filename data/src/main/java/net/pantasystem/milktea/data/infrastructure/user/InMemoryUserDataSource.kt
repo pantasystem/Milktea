@@ -25,7 +25,7 @@ class InMemoryUserDataSource @Inject constructor(
     private val usersLock = Mutex()
 
     private val _state = MutableStateFlow(UsersState())
-    override val state: StateFlow<UsersState>
+    val state: StateFlow<UsersState>
         get() = _state
 
 
