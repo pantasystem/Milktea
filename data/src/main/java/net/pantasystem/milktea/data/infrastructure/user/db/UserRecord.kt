@@ -1,28 +1,85 @@
 package net.pantasystem.milktea.data.infrastructure.user.db
 
-import net.pantasystem.milktea.model.user.User
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import net.pantasystem.milktea.model.account.Account
 
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["accountId"],
+            childColumns = ["accountId"],
+            entity = Account::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(
+            "serverId", "accountId", unique = true
+        ),
+        Index(
+            "userName"
+        ),
+        Index("accountId"),
+        Index("host")
+    ]
+)
 data class UserRecord(
-    val id: User.Id,
+    val serverId: String,
+    val accountId: Long,
     val userName: String,
     val name: String?,
     val avatarUrl: String?,
     val isCat: Boolean?,
     val isBot: Boolean?,
     val host: String,
-    val isSameHost: Boolean
-
+    val isSameHost: Boolean,
+    @PrimaryKey(autoGenerate = true) val id: Long,
 )
 
-data class UserEmoji(
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            entity = UserRecord::class,
+            childColumns = ["userId"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        ),
+    ],
+    indices = [
+        Index(
+            "name", "userId", unique = true
+        ),
+        Index("userId")
+    ]
+)
+data class UserEmojiRecord(
     val name: String,
     val url: String?,
     val uri: String?,
     val userId: Long,
-    val id: Long
+    @PrimaryKey(autoGenerate = true) val id: Long,
 )
 
-data class UserDetailedState(
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index("userId", unique = true),
+    ]
+)
+data class UserDetailedStateRecord(
     val description: String?,
     val followersCount: Int?,
     val followingCount: Int?,
@@ -37,9 +94,26 @@ data class UserDetailedState(
     val hasPendingFollowRequestFromYou: Boolean,
     val hasPendingFollowRequestToYou: Boolean,
     val isLocked: Boolean,
+    @PrimaryKey(autoGenerate = false) val userId: Long
 )
 
-data class PinnedNoteId(
+@Entity(
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
+    indices = [
+        Index("noteId", "userId", unique = true),
+        Index("userId")
+    ]
+)
+data class PinnedNoteIdRecord(
     val noteId: String,
-    val userId: Long
+    val userId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long
 )
