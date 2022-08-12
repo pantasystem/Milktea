@@ -44,6 +44,10 @@ class SearchUserFragment : Fragment() {
 
     private val toggleFollowViewModel: ToggleFollowViewModel by viewModels()
 
+    val username: String? by lazy {
+        arguments?.getString(EXTRA_USER_NAME)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,7 +72,9 @@ class SearchUserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        if (username != null) {
+            viewModel.setUserName(username!!)
+        }
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.errors.collect {
