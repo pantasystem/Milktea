@@ -6,7 +6,7 @@ enableFeaturePreview("VERSION_CATALOGS")
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            alias("kotlin-datetime").to("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+            alias("kotlin-datetime").to("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
             // compose libs
             alias("compose-ui-ui").to("androidx.compose.ui:ui:1.2.0-beta02")
