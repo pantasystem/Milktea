@@ -3,7 +3,9 @@ package jp.panta.misskeyandroidclient.ui.text
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.text.TextPaint
 import android.text.style.ReplacementSpan
+import android.util.Log
 import com.bumptech.glide.request.target.CustomTarget
 
 abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan(){
@@ -11,6 +13,7 @@ abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan()
 
     var imageDrawable: Drawable? = null
 
+    private var textSize = 0
 
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
@@ -25,6 +28,12 @@ abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan()
         return (paint.textSize * 1.2).toInt()
     }
 
+    override fun updateDrawState(ds: TextPaint) {
+        super.updateDrawState(ds)
+        updateImageDrawableSize(ds)
+    }
+
+
     override fun draw(
         canvas: Canvas,
         text: CharSequence?,
@@ -36,14 +45,12 @@ abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan()
         bottom: Int,
         paint: Paint
     ) {
+
         val drawable = imageDrawable
         drawable?: return
 
         canvas.save()
-
-        val emojiSize = (paint.textSize * 1.1).toInt()
-        drawable.setBounds(0, 0, emojiSize, emojiSize)
-
+        updateImageDrawableSize(paint)
         var transY = (bottom - drawable.bounds.bottom).toFloat()
         transY -= paint.fontMetrics.descent / 2
         canvas.translate(x, transY)
@@ -52,7 +59,13 @@ abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan()
     }
 
 
-
+    private fun updateImageDrawableSize(paint: Paint) {
+        val emojiSize = (paint.textSize * 1.1).toInt()
+        if (emojiSize != textSize) {
+            textSize = emojiSize
+            imageDrawable?.setBounds(0, 0, emojiSize, emojiSize)
+        }
+    }
 
     abstract
     val target: CustomTarget<T>
