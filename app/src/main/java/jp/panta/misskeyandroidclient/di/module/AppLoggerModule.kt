@@ -5,7 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.logger.AndroidDefaultLogger
+import jp.panta.misskeyandroidclient.impl.AndroidDefaultLogger
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)

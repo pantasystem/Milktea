@@ -1,6 +1,7 @@
-package net.pantasystem.milktea.common.logger
+package jp.panta.misskeyandroidclient.impl
 
 import android.util.Log
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 
@@ -15,7 +16,11 @@ class AndroidDefaultLogger(
     }
 
     override fun error(msg: String, e: Throwable?, tag: String) {
-        Log.e(tag, msg, e)
+        if (BuildConfig.DEBUG) {
+            Log.e(tag, msg, e)
+        } else {
+            FirebaseCrashlytics.getInstance().log("$tag: E:$msg, ${e ?: ""}")
+        }
     }
 
     override fun info(msg: String, tag: String, e: Throwable?) {
