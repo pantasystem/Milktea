@@ -19,7 +19,11 @@ class AndroidDefaultLogger(
         if (BuildConfig.DEBUG) {
             Log.e(tag, msg, e)
         } else {
-            FirebaseCrashlytics.getInstance().log("$tag: E:$msg, ${e ?: ""}")
+            if (e == null) {
+                FirebaseCrashlytics.getInstance().log("$tag: E:$msg")
+            } else {
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
         }
     }
 
