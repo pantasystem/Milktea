@@ -110,6 +110,7 @@ object MFMDecorator {
                     Glide.with(textView)
                         .asDrawable()
                         .load(emojiElement.emoji.url)
+                        .override(textView.textSize.toInt())
                         .into(emojiSpan.target)
                 }
                 spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
