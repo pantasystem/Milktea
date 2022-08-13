@@ -38,7 +38,6 @@ class CustomEmojiDecorator {
                 builder.setSpan(span, matcher.start(), matcher.end(), 0)
             }
         }
-        emojiAdapter.subscribe()
         return builder
     }
 }

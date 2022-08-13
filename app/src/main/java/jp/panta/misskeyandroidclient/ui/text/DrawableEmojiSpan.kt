@@ -46,7 +46,7 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
                     resource.start()
                 }
                 else -> {
-                    adapter.throttleUpdate()
+                    adapter.update()
                 }
             }
         }

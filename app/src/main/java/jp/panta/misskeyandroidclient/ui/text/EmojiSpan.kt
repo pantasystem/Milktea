@@ -5,7 +5,6 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
-import android.util.Log
 import com.bumptech.glide.request.target.CustomTarget
 
 abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan(){
