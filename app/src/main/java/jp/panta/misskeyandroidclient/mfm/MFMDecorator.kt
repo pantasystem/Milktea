@@ -23,7 +23,6 @@ object MFMDecorator {
 
     fun decorate(textView: TextView, node: Root): Spanned{
         val emojiAdapter = EmojiAdapter(textView)
-        emojiAdapter.subscribe()
         return Visitor(WeakReference(textView), node, node, emojiAdapter).decorate()
             ?: SpannedString(node.sourceText)
     }

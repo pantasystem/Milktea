@@ -6,11 +6,12 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.disposables.Disposable
 import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
 import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
@@ -21,6 +22,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
@@ -51,7 +53,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     lateinit var accountStore: AccountStore
 
 
-    private var mPullPushUserViewModelEventDisposable: Disposable? = null
 
     private lateinit var mBinding: ActivityListListBinding
 
@@ -78,8 +79,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
                 pullPushUserViewModel.account.value = it
             }.launchIn(lifecycleScope)
 
-            if(mPullPushUserViewModelEventDisposable?.isDisposed == true){
-                mPullPushUserViewModelEventDisposable = pullPushUserViewModel.pullPushEvent.subscribe {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.RESUMED) {
                     mListListViewModel.fetch()
                 }
             }
@@ -142,10 +143,5 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
 
-        mPullPushUserViewModelEventDisposable?.dispose()
-        mPullPushUserViewModelEventDisposable = null
-    }
 }

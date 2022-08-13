@@ -5,19 +5,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
-import net.pantasystem.milktea.common.Encryption
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.list.ListUserOperation
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.app_store.account.AccountStore
-import javax.inject.Inject
-import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
+import javax.inject.Inject
 
 @HiltViewModel
 class UserListPullPushUserViewModel @Inject constructor(
@@ -40,8 +40,10 @@ class UserListPullPushUserViewModel @Inject constructor(
 
     val account = MutableLiveData<Account>(accountStore.currentAccount)
 
-    private val subject = PublishSubject.create<Event>()
-    val pullPushEvent: Observable<Event> = subject
+//    private val subject = PublishSubject.create<Event>()
+//    val pullPushEvent: Observable<Event> = subject
+    private val _pullPushEvent = MutableSharedFlow<Event>()
+    val pullPushEvent: SharedFlow<Event> = _pullPushEvent
 
 
     fun toggle(userList: UserList, userId: User.Id) {
@@ -78,9 +80,7 @@ class UserListPullPushUserViewModel @Inject constructor(
                 )
                     .throwIfHasError()
             }.onSuccess {
-                subject.onNext(
-                    Event(type = type, userId = userId, listId = userList.id)
-                )
+                _pullPushEvent.tryEmit(Event(type = type, userId = userId, listId = userList.id))
             }.onFailure {
                 Log.d(this.javaClass.simpleName, "ユーザーを${type}するのに失敗した")
             }
