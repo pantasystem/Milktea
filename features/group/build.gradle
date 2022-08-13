@@ -82,4 +82,7 @@ dependencies {
     implementation libs.fragment.ktx
     implementation libs.activity.ktx
 
+    implementation libs.kotlin.datetime
+    implementation "androidx.navigation:navigation-compose:$nav_version"
+
 }
