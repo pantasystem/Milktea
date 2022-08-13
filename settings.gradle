@@ -54,7 +54,7 @@ dependencyResolutionManagement {
             alias('android-material-material').to('com.google.android.material:material:1.6.0')
             alias('androidx-core-ktx').to('androidx.core:core-ktx:1.7.0')
             alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.5.1')
-            alias('activity-ktx').to('androidx.activity:activity-ktx:1.5.0')
+            alias('activity-ktx').to('androidx.activity:activity-ktx:1.5.1')
 
             def emoji2_version = "1.2.0-rc01"
             alias('androidx-emoji2').to("androidx.emoji2:emoji2:$emoji2_version")
