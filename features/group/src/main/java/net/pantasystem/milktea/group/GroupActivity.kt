@@ -20,7 +20,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class GroupActivity : AppCompatActivity() {
 
-    private val groupListViewModel by viewModels<GroupListViewModel>()
+    private val groupListViewModel by viewModels<GroupViewModel>()
 
     @Inject
     lateinit var applyTheme: ApplyTheme
@@ -34,8 +34,13 @@ class GroupActivity : AppCompatActivity() {
                     Modifier.fillMaxSize()
                 ) { padding ->
                     LazyColumn(
-                        modifier = Modifier.padding(padding).fillMaxSize()
+                        modifier = Modifier
+                            .padding(padding)
+                            .fillMaxSize()
                     ) {
+                        item {
+                            Text(uiState.toString())
+                        }
                         items(count = uiState.joinedGroups.size) {
                             Text(uiState.joinedGroups[it].name)
                         }

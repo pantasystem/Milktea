@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
@@ -19,14 +21,17 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class GroupListViewModel @Inject constructor(
+class GroupViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val accountStore: AccountStore,
     private val groupDataSource: GroupDataSource,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
+    val logger = loggerFactory.create("GroupViewModel")
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val joinedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+    val joinedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         groupDataSource.observeJoinedGroups(account.accountId)
     }.flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -37,29 +42,31 @@ class GroupListViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val syncEvents = MutableSharedFlow<UUID>()
+    private val syncEvents = MutableSharedFlow<UUID>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 100)
 
-    private val ownedGroupSyncState = syncEvents.flatMapLatest {
+    val ownedGroupSyncState = syncEvents.flatMapLatest {
         accountStore.observeCurrentAccount
     }.filterNotNull().flatMapLatest {
+
         suspend {
             groupRepository.syncByOwned(it.accountId)
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.Lazily,
+        SharingStarted.Eagerly,
         ResultState.Loading(StateContent.NotExist())
     )
 
     private val joinedGroupSyncState = syncEvents.flatMapLatest {
         accountStore.observeCurrentAccount
     }.filterNotNull().flatMapLatest {
+        logger.debug("joinedGroupSyncState")
         suspend {
             groupRepository.syncByJoined(it.accountId)
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.Lazily,
+        SharingStarted.Eagerly,
         ResultState.Loading(StateContent.NotExist())
     )
 

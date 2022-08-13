@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.group
 
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.groups.*
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
@@ -29,102 +31,115 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun create(createGroup: CreateGroup): Group {
-        val account = accountRepository.get(createGroup.author).getOrThrow()
-        val api = getMisskeyAPI(account)
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(createGroup.author).getOrThrow()
+            val api = getMisskeyAPI(account)
 
-        val res = api.createGroup(CreateGroupDTO(i = account.getI(encryption), name = createGroup.name)).throwIfHasError()
-        val group = res.body()?.toGroup(account.accountId)
-        require(group != null)
-        groupDataSource.add(group)
-        return group
-    }
-
-    @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun syncOne(groupId: Group.Id): Group {
-        var group = runCatching {
-            groupDataSource.find(groupId)
-        }.onFailure {
-            logger.debug("ローカルには存在しません。:${groupId}")
-        }.getOrNull()
-
-        if(group != null) {
-            return group
+            val res = api.createGroup(CreateGroupDTO(i = account.getI(encryption), name = createGroup.name)).throwIfHasError()
+            val group = res.body()?.toGroup(account.accountId)
+            require(group != null)
+            groupDataSource.add(group)
+            group
         }
-        val account = accountRepository.get(groupId.accountId).getOrThrow()
-        val api = getMisskeyAPI(account)
-
-        val res = api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId)).throwIfHasError()
-        val body = res.body()
-            ?: throw GroupNotFoundException(groupId)
-        group = body.toGroup(account.accountId)
-        groupDataSource.add(group)
-
-        return group
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
+    override suspend fun syncOne(groupId: Group.Id): Group {
+        return withContext(Dispatchers.IO) {
+            var group = runCatching {
+                groupDataSource.find(groupId)
+            }.onFailure {
+                logger.debug("ローカルには存在しません。:${groupId}")
+            }.getOrNull()
+
+            if(group != null) {
+                return@withContext group
+            }
+            val account = accountRepository.get(groupId.accountId).getOrThrow()
+            val api = getMisskeyAPI(account)
+
+            val res = api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId)).throwIfHasError()
+            val body = res.body()
+                ?: throw GroupNotFoundException(groupId)
+            group = body.toGroup(account.accountId)
+            groupDataSource.add(group)
+
+            group
+        }
+
+    }
+
     override suspend fun syncByJoined(accountId: Long): List<Group> {
-        val account = accountRepository.get(accountId).getOrThrow()
-        val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
-        val groups = api.body()?.map {
-            it.toGroup(account.accountId)
-        }?: emptyList()
-        groupDataSource.addAll(groups)
-        return groups
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(accountId).getOrThrow()
+            val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
+            val groups = api.body()?.map {
+                it.toGroup(account.accountId)
+            }?: emptyList()
+            groupDataSource.addAll(groups)
+            groups
+        }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun syncByOwned(accountId: Long): List<Group> {
-        val account = accountRepository.get(accountId).getOrThrow()
-        val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
-        val groups = api.body()?.map {
-            it.toGroup(account.accountId)
-        }?: emptyList()
-        groupDataSource.addAll(groups)
-        return groups
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(accountId).getOrThrow()
+            val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
+            val groups = api.body()?.map {
+                it.toGroup(account.accountId)
+            }?: emptyList()
+            groupDataSource.addAll(groups)
+            groups
+        }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun pull(pull: Pull): Group {
-        var group = syncOne(pull.groupId)
-        val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
-        getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId))
-            .throwIfHasError()
+        return withContext(Dispatchers.IO) {
+            var group = syncOne(pull.groupId)
+            val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
+            getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId))
+                .throwIfHasError()
 
-        group = group.copy( userIds = group.userIds.filterNot {
-            pull.userId == pull.userId
-        })
-        groupDataSource.add(group)
-        return group
+            group = group.copy( userIds = group.userIds.filterNot {
+                pull.userId == pull.userId
+            })
+            groupDataSource.add(group)
+            group
+        }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun transfer(transfer: Transfer): Group {
-        val account = accountRepository.get(transfer.groupId.accountId).getOrThrow()
-        val body = getMisskeyAPI(account).transferGroup(
-            TransferGroupDTO(
-            i = account.getI(encryption),
-            groupId = transfer.groupId.groupId,
-            userId = transfer.userId.id
-        )
-        ).throwIfHasError().body()
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(transfer.groupId.accountId).getOrThrow()
+            val body = getMisskeyAPI(account).transferGroup(
+                TransferGroupDTO(
+                    i = account.getI(encryption),
+                    groupId = transfer.groupId.groupId,
+                    userId = transfer.userId.id
+                )
+            ).throwIfHasError().body()
 
-        require(body != null)
-        return body.toGroup(account.accountId).also {
-            groupDataSource.add(it)
+            require(body != null)
+            body.toGroup(account.accountId).also {
+                groupDataSource.add(it)
+            }
         }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun update(updateGroup: UpdateGroup): Group {
-        val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
-        val body = getMisskeyAPI(account).updateGroup(UpdateGroupDTO(i = account.getI(encryption), groupId = updateGroup.groupId.groupId, name = updateGroup.name))
-            .throwIfHasError().body()
-        require(body != null)
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
+            val body = getMisskeyAPI(account).updateGroup(UpdateGroupDTO(i = account.getI(encryption), groupId = updateGroup.groupId.groupId, name = updateGroup.name))
+                .throwIfHasError().body()
+            require(body != null)
 
-        val group = body.toGroup(account.accountId)
-        groupDataSource.add(group)
-        return group
+            val group = body.toGroup(account.accountId)
+            groupDataSource.add(group)
+            group
+        }
     }
 
     private fun getMisskeyAPI(account: Account): MisskeyAPIV11 {
