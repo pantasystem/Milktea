@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class UserDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insert(user: UserRecord): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertUsers(users: List<UserRecord>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
