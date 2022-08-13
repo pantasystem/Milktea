@@ -42,7 +42,7 @@ class GroupActivity : AppCompatActivity() {
                             Text(uiState.toString())
                         }
                         items(count = uiState.joinedGroups.size) {
-                            Text(uiState.joinedGroups[it].name)
+                            Text(uiState.joinedGroups[it].group.name)
                         }
                     }
                 }

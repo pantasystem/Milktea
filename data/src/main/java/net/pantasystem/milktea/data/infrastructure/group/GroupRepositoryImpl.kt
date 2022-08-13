@@ -15,6 +15,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.group.*
 import net.pantasystem.milktea.model.instance.IllegalVersionException
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 class GroupRepositoryImpl @Inject constructor(
@@ -22,7 +23,8 @@ class GroupRepositoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val groupDataSource: GroupDataSource,
     private val encryption: Encryption,
-    private val loggerFactory: Logger.Factory
+    private val loggerFactory: Logger.Factory,
+    private val userRepository: UserRepository,
 ) : GroupRepository {
 
     private val logger: Logger by lazy {
@@ -62,6 +64,7 @@ class GroupRepositoryImpl @Inject constructor(
                 ?: throw GroupNotFoundException(groupId)
             group = body.toGroup(account.accountId)
             groupDataSource.add(group)
+            userRepository.syncIn(group.userIds).getOrThrow()
 
             group
         }
@@ -76,6 +79,10 @@ class GroupRepositoryImpl @Inject constructor(
                 it.toGroup(account.accountId)
             }?: emptyList()
             groupDataSource.addAll(groups)
+            val userIds = groups.map {
+                it.userIds
+            }.flatten()
+            userRepository.syncIn(userIds).getOrThrow()
             groups
         }
     }
@@ -89,6 +96,10 @@ class GroupRepositoryImpl @Inject constructor(
                 it.toGroup(account.accountId)
             }?: emptyList()
             groupDataSource.addAll(groups)
+            val userIds = groups.map {
+                it.userIds
+            }.flatten()
+            userRepository.syncIn(userIds).getOrThrow()
             groups
         }
     }

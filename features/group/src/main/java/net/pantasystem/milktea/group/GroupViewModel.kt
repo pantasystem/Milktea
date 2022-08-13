@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.group.GroupWithMember
 import net.pantasystem.milktea.model.user.User
 import java.util.*
 import javax.inject.Inject
@@ -104,8 +105,8 @@ class GroupViewModel @Inject constructor(
 }
 
 data class GroupListUiState(
-    val joinedGroups: List<Group>,
-    val ownedGroups: List<Group>,
+    val joinedGroups: List<GroupWithMember>,
+    val ownedGroups: List<GroupWithMember>,
     val syncJoinedGroupsState: ResultState<List<Group>>,
     val syncOwnedGroupsState: ResultState<List<Group>>,
 )

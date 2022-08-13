@@ -13,7 +13,7 @@ interface GroupDataSource {
 
     suspend fun delete(groupId: Group.Id) : Boolean
 
-    fun observeOwnedGroups(accountId: Long) : Flow<List<Group>>
+    fun observeOwnedGroups(accountId: Long) : Flow<List<GroupWithMember>>
 
-    fun observeJoinedGroups(accountId: Long) : Flow<List<Group>>
+    fun observeJoinedGroups(accountId: Long) : Flow<List<GroupWithMember>>
 }

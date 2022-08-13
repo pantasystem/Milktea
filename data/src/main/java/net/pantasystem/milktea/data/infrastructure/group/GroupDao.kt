@@ -49,7 +49,8 @@ interface GroupDao {
         select * from group_v1 where exists (
             select 1 from group_member_v1 
                 where group_v1.id = group_member_v1.groupId 
-                    and group_member_v1.groupId = :userId
+                    and group_member_v1.groupId = group_v1.id
+                    and group_member_v1.userId = :userId
                     and group_v1.accountId = :accountId
         )
     """

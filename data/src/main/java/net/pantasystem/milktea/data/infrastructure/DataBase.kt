@@ -16,6 +16,7 @@ import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberIdRecord
+import net.pantasystem.milktea.data.infrastructure.group.GroupMemberView
 import net.pantasystem.milktea.data.infrastructure.group.GroupRecord
 import net.pantasystem.milktea.data.infrastructure.instance.db.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
@@ -64,7 +65,7 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         PinnedNoteIdRecord::class,
 
     ],
-    version = 19,
+    version = 20,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -74,9 +75,10 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         AutoMigration(from = 15, to = 16),
         AutoMigration(from = 16, to = 17),
         AutoMigration(from = 17, to = 18),
-        AutoMigration(from = 18, to = 19)
+        AutoMigration(from = 18, to = 19),
+        AutoMigration(from = 19, to = 20),
     ],
-    views = [UserView::class]
+    views = [UserView::class, GroupMemberView::class,]
 )
 @TypeConverters(
     PageTypeConverter::class,
