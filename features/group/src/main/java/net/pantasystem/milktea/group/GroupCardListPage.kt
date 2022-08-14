@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import net.pantasystem.milktea.model.group.GroupWithMember
 
 @Composable
@@ -25,7 +26,7 @@ fun GroupCardListPage(uiState: GroupListUiState, onAction: (GroupCardListAction)
                     }
                 },
                 title = {
-
+                    Text(stringResource(R.string.groups))
                 },
                 backgroundColor = MaterialTheme.colors.surface
             )

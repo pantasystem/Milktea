@@ -29,10 +29,10 @@ class GroupListViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
-    val logger = loggerFactory.create("GroupViewModel")
+    private val logger = loggerFactory.create("GroupViewModel")
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val joinedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+    private val joinedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         groupDataSource.observeJoinedGroups(account.accountId)
     }.flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -45,7 +45,7 @@ class GroupListViewModel @Inject constructor(
 
     private val syncEvents = MutableSharedFlow<UUID>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 100)
 
-    val ownedGroupSyncState = syncEvents.flatMapLatest {
+    private val ownedGroupSyncState = syncEvents.flatMapLatest {
         accountStore.observeCurrentAccount
     }.filterNotNull().flatMapLatest {
 

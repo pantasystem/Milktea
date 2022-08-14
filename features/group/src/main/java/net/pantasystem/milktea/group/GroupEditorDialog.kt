@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -25,12 +26,19 @@ fun GroupEditorDialog(
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text(if(isNew) "グループ作成" else "編集", fontSize = 24.sp)
+                Text(
+                    if (isNew) {
+                        stringResource(R.string.create_group)
+                    } else {
+                        stringResource(R.string.edit_group)
+                    },
+                    fontSize = 24.sp
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = name,
                     placeholder = {
-                        Text("グループ名")
+                        Text(stringResource(R.string.group_name))
                     },
                     onValueChange = { text ->
                         onAction(GroupEditorDialogAction.OnNameChanged(text))
@@ -40,16 +48,16 @@ fun GroupEditorDialog(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = {onAction(GroupEditorDialogAction.OnDismiss)}) {
-                        Text("Cancel")
+                    TextButton(onClick = { onAction(GroupEditorDialogAction.OnDismiss) }) {
+                        Text(stringResource(R.string.cancel))
                     }
                     TextButton(
                         enabled = name.isNotBlank(),
                         onClick = {
-                        onAction(GroupEditorDialogAction.OnSave)
+                            onAction(GroupEditorDialogAction.OnSave)
                         }
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }
