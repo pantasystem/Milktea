@@ -12,6 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -22,6 +24,9 @@ class GroupActivity : AppCompatActivity() {
     @Inject
     lateinit var applyTheme: ApplyTheme
 
+    @Inject
+    lateinit var userDetailNavigation: UserDetailNavigation
+
     private val groupDetailViewModel: GroupDetailViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +35,6 @@ class GroupActivity : AppCompatActivity() {
         setContent {
             val navController = rememberNavController()
             val uiState by groupListViewModel.uiState.collectAsState()
-            val detailUiState by groupDetailViewModel.uiState.collectAsState()
 
             fun popBackStack() {
                 if (!navController.popBackStack()) {
@@ -42,7 +46,7 @@ class GroupActivity : AppCompatActivity() {
                 NavHost(navController = navController, startDestination = "groups") {
                     composable("groups") {
                         GroupCardListPage(uiState = uiState, onAction = { action ->
-                            when(action) {
+                            when (action) {
                                 is GroupCardListAction.OnClick -> {
                                     groupDetailViewModel.setState(
                                         GroupDetailUiStateType.Show(action.group.group.id)
@@ -50,7 +54,11 @@ class GroupActivity : AppCompatActivity() {
                                     navController.navigate("detail")
                                 }
                                 GroupCardListAction.OnFabClick -> {
-                                    groupDetailViewModel.setState(GroupDetailUiStateType.Editing(null))
+                                    groupDetailViewModel.setState(
+                                        GroupDetailUiStateType.Editing(
+                                            null
+                                        )
+                                    )
                                     navController.navigate("detail")
                                 }
                                 GroupCardListAction.OnNavigateUp -> {
@@ -61,26 +69,22 @@ class GroupActivity : AppCompatActivity() {
                     }
 
                     composable("detail") {
-                        GroupDetailPage(detailUiState, onAction = { action ->
-                            when(action) {
-                                GroupDetailPageAction.OnNavigateUp -> {
-                                    groupDetailViewModel.cancelEditing()
-                                    popBackStack()
+                        GroupDetailStatePage(
+                            groupDetailViewModel = groupDetailViewModel,
+                            onAction = { action ->
+                                when (action) {
+                                    is GroupDetailStatePageAction.OnShowUser -> {
+                                        userDetailNavigation.newIntent(
+                                            UserDetailNavigationArgs.UserId(
+                                                action.user.id
+                                            )
+                                        )
+                                    }
+                                    GroupDetailStatePageAction.PopBackStack -> popBackStack()
                                 }
-                                is GroupDetailPageAction.OnInputName -> {
-                                    groupDetailViewModel.setName(action.text)
-                                }
-                                GroupDetailPageAction.OnConfirmedSave -> {
-                                    groupDetailViewModel.save()
-                                }
-                                GroupDetailPageAction.OnEditingCanceled -> {
-                                    groupDetailViewModel.cancelEditing()
-                                }
-                            }
-                        })
+                            })
                     }
                 }
-                
 
 
             }

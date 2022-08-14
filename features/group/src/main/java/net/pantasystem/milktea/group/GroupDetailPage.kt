@@ -46,22 +46,22 @@ fun GroupDetailPage(uiState: GroupDetailUiState, onAction: (GroupDetailPageActio
                     IconButton(onClick = { onAction(GroupDetailPageAction.OnNavigateUp) }) {
                         Icon(Icons.Default.ArrowBack, null)
                     }
-                }
+                },
+                backgroundColor = MaterialTheme.colors.surface
             )
         }
     ) {
         LazyColumn(Modifier.padding(it)) {
-            when(uiState.type) {
-                is GroupDetailUiStateType.Editing -> {
-                    if (uiState.type.groupId == null) {
-
-                    } else {
-
+            items(uiState.members.size) { index ->
+                val member = uiState.members[index]
+                GroupMemberCard(
+                    member = member,
+                    ownerId = uiState.group?.ownerId,
+                    isOwnGroup = false,
+                    onAction = { action ->
+                        onAction(GroupDetailPageAction.OnMemberAction(action))
                     }
-                }
-                is GroupDetailUiStateType.Show -> {
-
-                }
+                )
             }
         }
     }
@@ -72,4 +72,5 @@ sealed interface GroupDetailPageAction {
     data class OnInputName(val text: String) : GroupDetailPageAction
     object OnConfirmedSave : GroupDetailPageAction
     object OnEditingCanceled : GroupDetailPageAction
+    data class OnMemberAction(val action: GroupMemberCardAction) : GroupDetailPageAction
 }
