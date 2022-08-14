@@ -2459,7 +2459,7 @@
     ],
     "views": [
       {
-        "viewName": "UserView",
+        "viewName": "user_view",
         "createSql": "CREATE VIEW `${VIEW_NAME}` AS select user.*, nicknames.nickname from user left join nicknames on user.userName = nicknames.username and user.host = nicknames.host"
       }
     ],
