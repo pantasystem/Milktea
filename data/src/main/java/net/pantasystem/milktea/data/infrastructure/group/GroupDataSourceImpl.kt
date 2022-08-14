@@ -97,4 +97,15 @@ class GroupDataSourceImpl @Inject constructor(
             }
         }.distinctUntilChanged().flowOn(Dispatchers.IO)
     }
+
+    override fun observeOne(groupId: Group.Id): Flow<GroupWithMember> {
+        return groupDao.observeOne(groupId.accountId, groupId.groupId).distinctUntilChanged().filterNotNull().map { record ->
+            GroupWithMember(
+                record.toModel(),
+                record.members.map {
+                    GroupMember(User.Id(record.group.accountId, it.serverId), it.avatarUrl)
+                }
+            )
+        }.filterNotNull().flowOn(Dispatchers.IO)
+    }
 }

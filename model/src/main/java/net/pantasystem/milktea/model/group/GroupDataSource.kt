@@ -16,4 +16,6 @@ interface GroupDataSource {
     fun observeOwnedGroups(accountId: Long) : Flow<List<GroupWithMember>>
 
     fun observeJoinedGroups(accountId: Long) : Flow<List<GroupWithMember>>
+
+    fun observeOne(groupId: Group.Id) : Flow<GroupWithMember>
 }

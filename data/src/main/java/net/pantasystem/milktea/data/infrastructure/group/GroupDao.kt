@@ -87,4 +87,12 @@ interface GroupDao {
     @Transaction
     suspend fun findOne(accountId: Long, serverId: String): GroupRelatedRecord?
 
+    @Query(
+        """
+        select * from group_v1 where accountId = :accountId
+            and serverId = :serverId
+        """
+    )
+    @Transaction
+    fun observeOne(accountId: Long, serverId: String): Flow<GroupRelatedRecord?>
 }
