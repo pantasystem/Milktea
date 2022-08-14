@@ -23,10 +23,11 @@ class GroupDetailViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     private val groupRepository: GroupRepository,
     private val groupDataSource: GroupDataSource,
-): ViewModel() {
-    private val uiStateType = MutableStateFlow<GroupDetailUiStateType>(GroupDetailUiStateType.Editing(null))
+) : ViewModel() {
+    private val uiStateType =
+        MutableStateFlow<GroupDetailUiStateType>(GroupDetailUiStateType.Editing(null))
 
-    val groupSyncState = uiStateType.mapNotNull { type ->
+    private val groupSyncState = uiStateType.mapNotNull { type ->
         type.groupId
     }.flatMapLatest {
         suspend {
@@ -34,7 +35,7 @@ class GroupDetailViewModel @Inject constructor(
         }.asLoadingStateFlow()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
 
-    val membersSyncState = uiStateType.mapNotNull { type ->
+    private val membersSyncState = uiStateType.mapNotNull { type ->
         type.groupId
     }.flatMapLatest {
         groupDataSource.observeOne(it)
@@ -44,34 +45,62 @@ class GroupDetailViewModel @Inject constructor(
         }.asLoadingStateFlow()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ResultState.Loading(StateContent.NotExist()))
 
-    val members = uiStateType.mapNotNull { type ->
+    private val members = uiStateType.mapNotNull { type ->
         type.groupId
     }.flatMapLatest {
         groupDataSource.observeOne(it)
-    }.flatMapLatest {
-        userDataSource.observeIn(it.group.id.accountId, it.group.userIds.map { it.id })
-    }
+    }.flatMapLatest { groupWithMember ->
+        userDataSource.observeIn(
+            groupWithMember.group.id.accountId,
+            groupWithMember.group.userIds.map { it.id })
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    val group = uiStateType.mapNotNull { type ->
+    private val group = uiStateType.mapNotNull { type ->
         type.groupId
     }.flatMapLatest {
         groupDataSource.observeOne(it)
-    }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val uiState = combine(uiStateType, group, groupSyncState, membersSyncState, members) { type, g, gss, mss, m ->
+    val uiState = combine(
+        uiStateType,
+        group,
+        groupSyncState,
+        membersSyncState,
+        members
+    ) { type, g, gss, mss, m ->
+        // NOTE: groupIdがnullの状態の時はグループ関連のデータを空かnullにしたい
+        // NOTE: 源流となるflowがgroupIdがnullの時はfilterするようにしてしまっているので、ここでempty, nullを割り当てている
         GroupDetailUiState(
             type,
-            g.group,
-            m,
-            mss,
-            gss,
+            if (type.groupId == null) null else g?.group,
+            if (type.groupId == null) emptyList() else m,
+            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else mss,
+            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else gss,
         )
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(500),
+        GroupDetailUiState(GroupDetailUiStateType.Editing(null), null)
+    )
 
 
     fun setState(stateType: GroupDetailUiStateType) {
         uiStateType.update {
             stateType
+        }
+    }
+
+    fun setName(name: String) {
+        uiStateType.update {
+            when (it) {
+                is GroupDetailUiStateType.Editing -> {
+                    it.copy(name = name)
+                }
+                is GroupDetailUiStateType.Show -> {
+                    // NOTE: 表示モードの時に編集しようとした時は、編集モードに移行するようにしている。
+                    GroupDetailUiStateType.Editing(it.groupId, name = name)
+                }
+            }
         }
     }
 }
@@ -87,10 +116,13 @@ data class GroupDetailUiState(
 
 sealed interface GroupDetailUiStateType {
     val groupId: Group.Id?
-    data class Editing(override val groupId: Group.Id?, val name: String = "") : GroupDetailUiStateType {
+
+    data class Editing(override val groupId: Group.Id?, val name: String = "") :
+        GroupDetailUiStateType {
         val isCreate: Boolean
             get() = groupId == null
     }
+
     data class Show(override val groupId: Group.Id) : GroupDetailUiStateType
 }
 
