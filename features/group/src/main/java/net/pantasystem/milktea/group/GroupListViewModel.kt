@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class GroupViewModel @Inject constructor(
+class GroupListViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val accountStore: AccountStore,
     private val groupDataSource: GroupDataSource,

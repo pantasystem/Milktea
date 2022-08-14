@@ -57,7 +57,7 @@ fun GroupEditorDialog(
     }
 }
 
-interface GroupEditorDialogAction {
+sealed interface GroupEditorDialogAction {
     object OnDismiss : GroupEditorDialogAction
     data class OnNameChanged(val text: String) : GroupEditorDialogAction
     object OnSave : GroupEditorDialogAction

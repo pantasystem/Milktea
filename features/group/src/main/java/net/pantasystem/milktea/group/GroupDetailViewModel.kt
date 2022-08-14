@@ -3,14 +3,15 @@ package net.pantasystem.milktea.group
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.model.group.Group
-import net.pantasystem.milktea.model.group.GroupDataSource
-import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.group.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -23,13 +24,14 @@ class GroupDetailViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     private val groupRepository: GroupRepository,
     private val groupDataSource: GroupDataSource,
+    private val accountStore: AccountStore,
 ) : ViewModel() {
     private val uiStateType =
         MutableStateFlow<GroupDetailUiStateType>(GroupDetailUiStateType.Editing(null))
 
     private val groupSyncState = uiStateType.mapNotNull { type ->
         type.groupId
-    }.flatMapLatest {
+    }.distinctUntilChanged().flatMapLatest {
         suspend {
             groupRepository.syncOne(it)
         }.asLoadingStateFlow()
@@ -37,7 +39,7 @@ class GroupDetailViewModel @Inject constructor(
 
     private val membersSyncState = uiStateType.mapNotNull { type ->
         type.groupId
-    }.flatMapLatest {
+    }.distinctUntilChanged().flatMapLatest {
         groupDataSource.observeOne(it)
     }.flatMapLatest {
         suspend {
@@ -47,7 +49,7 @@ class GroupDetailViewModel @Inject constructor(
 
     private val members = uiStateType.mapNotNull { type ->
         type.groupId
-    }.flatMapLatest {
+    }.distinctUntilChanged().flatMapLatest {
         groupDataSource.observeOne(it)
     }.flatMapLatest { groupWithMember ->
         userDataSource.observeIn(
@@ -57,7 +59,7 @@ class GroupDetailViewModel @Inject constructor(
 
     private val group = uiStateType.mapNotNull { type ->
         type.groupId
-    }.flatMapLatest {
+    }.distinctUntilChanged().flatMapLatest {
         groupDataSource.observeOne(it)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
@@ -76,6 +78,14 @@ class GroupDetailViewModel @Inject constructor(
             if (type.groupId == null) emptyList() else m,
             if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else mss,
             if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else gss,
+            when (type) {
+                is GroupDetailUiStateType.Editing -> {
+                    type.name
+                }
+                is GroupDetailUiStateType.Show -> {
+                    g?.group?.name ?: ""
+                }
+            }
         )
     }.stateIn(
         viewModelScope,
@@ -86,9 +96,18 @@ class GroupDetailViewModel @Inject constructor(
 
     fun setState(stateType: GroupDetailUiStateType) {
         uiStateType.update {
-            stateType
+            val group = this.group.value
+            if (
+                stateType is GroupDetailUiStateType.Editing
+                && stateType.groupId == group?.group?.id
+            ) {
+                stateType.copy(name = group?.group?.name ?: "")
+            } else {
+                stateType
+            }
         }
     }
+
 
     fun setName(name: String) {
         uiStateType.update {
@@ -99,6 +118,39 @@ class GroupDetailViewModel @Inject constructor(
                 is GroupDetailUiStateType.Show -> {
                     // NOTE: 表示モードの時に編集しようとした時は、編集モードに移行するようにしている。
                     GroupDetailUiStateType.Editing(it.groupId, name = name)
+                }
+            }
+        }
+    }
+
+    fun cancelEditing() {
+        uiStateType.update { type ->
+            if (type.groupId == null) {
+                type
+            } else {
+                GroupDetailUiStateType.Show(type.groupId!!)
+            }
+        }
+    }
+
+    fun save() {
+        val type = uiStateType.value
+        if (type is GroupDetailUiStateType.Editing) {
+            viewModelScope.launch(Dispatchers.IO) {
+                runCatching {
+                    if (type.groupId == null) {
+                        groupRepository.create(
+                            CreateGroup(accountStore.currentAccountId!!, type.name)
+                        )
+                    } else {
+                        groupRepository.update(UpdateGroup(type.groupId!!, type.name))
+                    }
+                }.onFailure {
+
+                }.onSuccess { group ->
+                    uiStateType.update {
+                        GroupDetailUiStateType.Show(group.id)
+                    }
                 }
             }
         }
@@ -117,11 +169,7 @@ data class GroupDetailUiState(
 sealed interface GroupDetailUiStateType {
     val groupId: Group.Id?
 
-    data class Editing(override val groupId: Group.Id?, val name: String = "") :
-        GroupDetailUiStateType {
-        val isCreate: Boolean
-            get() = groupId == null
-    }
+    data class Editing(override val groupId: Group.Id?, val name: String = "") : GroupDetailUiStateType
 
     data class Show(override val groupId: Group.Id) : GroupDetailUiStateType
 }
