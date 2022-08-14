@@ -40,6 +40,11 @@ fun GroupDetailStatePage(
             is GroupDetailPageAction.OnInviteUsers -> {
                 onAction(GroupDetailStatePageAction.OnInviteUsers(action.group))
             }
+            is GroupDetailPageAction.OnEdit -> {
+                groupDetailViewModel.setState(GroupDetailUiStateType.Editing(
+                    detailUiState.type.groupId
+                ))
+            }
         }
     })
 }

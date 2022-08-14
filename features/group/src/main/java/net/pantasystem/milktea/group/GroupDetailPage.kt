@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,7 +50,16 @@ fun GroupDetailPage(uiState: GroupDetailUiState, onAction: (GroupDetailPageActio
                         Icon(Icons.Default.ArrowBack, null)
                     }
                 },
-                backgroundColor = MaterialTheme.colors.surface
+                backgroundColor = MaterialTheme.colors.surface,
+                actions = {
+                    if (uiState.isOwner) {
+                        IconButton(onClick = {
+                            onAction(GroupDetailPageAction.OnEdit)
+                        }) {
+                            Icon(Icons.Default.Edit, contentDescription = null)
+                        }
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -83,6 +93,7 @@ sealed interface GroupDetailPageAction {
     data class OnInputName(val text: String) : GroupDetailPageAction
     object OnConfirmedSave : GroupDetailPageAction
     object OnEditingCanceled : GroupDetailPageAction
+    object OnEdit : GroupDetailPageAction
     data class OnMemberAction(val action: GroupMemberCardAction) : GroupDetailPageAction
     data class OnInviteUsers(val group: Group) : GroupDetailPageAction
 }
