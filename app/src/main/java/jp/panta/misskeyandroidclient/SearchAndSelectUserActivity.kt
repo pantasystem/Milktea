@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,21 +16,35 @@ import jp.panta.misskeyandroidclient.ui.users.SearchAndSelectUserScreen
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.provideViewModel
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
 import javax.inject.Inject
+
+class SearchAndSelectUserNavigationImpl @Inject constructor(
+    val activity: Activity
+) : SearchAndSelectUserNavigation {
+    override fun newIntent(args: SearchAndSelectUserNavigationArgs): Intent {
+        return SearchAndSelectUserActivity.newIntent(
+            activity,
+            args.selectableMaximumSize,
+            args.selectedUserIds
+        )
+    }
+}
 
 @AndroidEntryPoint
 class SearchAndSelectUserActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_SELECTABLE_MAXIMUM_SIZE =
-            "jp.panta.misskeyandroidclient.EXTRA_SELECTABLE_MAXIMUM_SIZE"
+            SearchAndSelectUserNavigation.EXTRA_SELECTABLE_MAXIMUM_SIZE
         private const val EXTRA_SELECTED_USER_IDS =
-            "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_IDS"
+            SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_IDS
 
         const val EXTRA_SELECTED_USER_CHANGED_DIFF =
-            "jp.panta.misskeyandroidclient.EXTRA_SELECTED_USER_CHANGED_DIFF"
+            SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF
 
         fun newIntent(
             context: Context,

@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.group
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
@@ -12,8 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_navigation.UserDetailNavigation
-import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.common_navigation.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -26,6 +27,9 @@ class GroupActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
+
+    @Inject
+    lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
 
     private val groupDetailViewModel: GroupDetailViewModel by viewModels()
 
@@ -84,14 +88,16 @@ class GroupActivity : AppCompatActivity() {
                                     }
                                     GroupDetailStatePageAction.PopBackStack -> popBackStack()
                                     is GroupDetailStatePageAction.OnInviteUsers -> {
-
+                                        requestSearchAndUserResult.launch(
+                                            searchAndSelectUserNavigation.newIntent(
+                                                SearchAndSelectUserNavigationArgs()
+                                            )
+                                        )
                                     }
                                 }
                             })
                     }
                 }
-
-
             }
 
 
@@ -102,5 +108,15 @@ class GroupActivity : AppCompatActivity() {
         super.onResume()
 
         groupListViewModel.sync()
+    }
+
+    private val requestSearchAndUserResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        val resultCode = result.resultCode
+        if(resultCode == Activity.RESULT_OK && data != null){
+            (data.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult)?.let {
+                groupDetailViewModel.inviteUsers(it.added)
+            }
+        }
     }
 }

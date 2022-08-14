@@ -15,9 +15,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityAntennaEditorBinding
 import jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.user.User
 
@@ -110,7 +110,7 @@ class AntennaEditorActivity : AppCompatActivity() {
         val data = result.data
         val resultCode = result.resultCode
         if(resultCode == Activity.RESULT_OK && data != null){
-            (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult)?.let {
+            (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult)?.let {
                 val userNames = it.selectedUserNames
                 mViewModel?.setUserNames(userNames)
             }

@@ -153,6 +153,18 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun invite(invite: Invite): Result<Unit> = runCatching<Unit> {
+        return@runCatching withContext(Dispatchers.IO) {
+            val account = accountRepository.get(invite.groupId.accountId).getOrThrow()
+            getMisskeyAPI(account).invite(
+                InviteUserDTO(
+                groupId= invite.groupId.groupId,
+                i = account.getI(encryption),
+                    userId = invite.userId.id,
+                )
+            ).throwIfHasError()
+        }
+    }
     private fun getMisskeyAPI(account: Account): MisskeyAPIV11 {
         return misskeyAPIProvider.get(account.instanceDomain) as? MisskeyAPIV11
             ?: throw IllegalVersionException()

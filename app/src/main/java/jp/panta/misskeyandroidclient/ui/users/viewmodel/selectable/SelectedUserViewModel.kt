@@ -10,9 +10,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
-import java.io.Serializable
 
 data class SelectedUserUiState(
     val selectedUserIds: Set<User.Id>
@@ -50,12 +50,6 @@ class SelectedUserViewModel @AssistedInject constructor(
     }
 
 
-    data class ChangedDiffResult(
-        val selected: List<User.Id>,
-        val added: List<User.Id>,
-        val removed: List<User.Id>,
-        val selectedUserNames: List<String>,
-    ) : Serializable
 
     companion object;
 

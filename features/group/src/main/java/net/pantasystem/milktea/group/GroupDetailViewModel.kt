@@ -3,11 +3,10 @@ package net.pantasystem.milktea.group
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
@@ -26,7 +25,10 @@ class GroupDetailViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val groupDataSource: GroupDataSource,
     private val accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
+
+    private val logger = loggerFactory.create("GroupDetailViewModel")
     private val uiStateType =
         MutableStateFlow<GroupDetailUiStateType>(GroupDetailUiStateType.Editing(null))
 
@@ -148,19 +150,25 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-//    fun confirmRejectUser() {
-//        val stateType = uiStateType.value
-//        if (stateType is GroupDetailUiStateType.Rejecting) {
-//            groupRepository
-//        }
-//        uiStateType.update {
-//            if (it is GroupDetailUiStateType.Rejecting) {
-//                val it.user
-//            } else {
-//                it
-//            }
-//        }
-//    }
+    fun inviteUsers(userIds: List<User.Id>) {
+        viewModelScope.launch {
+            runCatching {
+                userIds.map {
+                    async {
+                        groupRepository.invite(
+                            Invite(
+                            uiStateType.value.groupId!!,
+                            it
+                        )
+                        )
+                    }
+                }.awaitAll()
+            }.onFailure {
+                logger.error("メンバーの追加に失敗", it)
+            }
+        }
+    }
+
 
     fun save() {
         val type = uiStateType.value

@@ -29,7 +29,8 @@ data class RejectInvitationDTO(
 @Serializable
 data class InviteUserDTO(
     val i: String,
-    val userId: String
+    val userId: String,
+    val groupId: String,
 )
 
 @Serializable
