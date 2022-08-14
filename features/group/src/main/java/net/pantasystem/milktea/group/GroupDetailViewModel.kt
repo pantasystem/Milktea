@@ -11,6 +11,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -63,21 +64,29 @@ class GroupDetailViewModel @Inject constructor(
         groupDataSource.observeOne(it)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val uiState = combine(
-        uiStateType,
-        group,
+    private val syncState = combine(
         groupSyncState,
         membersSyncState,
+    ) { g, m ->
+        SyncState(m, g)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, SyncState())
+
+    val uiState = combine(
+        accountStore.observeCurrentAccount,
+        uiStateType,
+        group,
+        syncState,
         members
-    ) { type, g, gss, mss, m ->
+    ) { ac, type, g, sync,  m ->
         // NOTE: groupIdがnullの状態の時はグループ関連のデータを空かnullにしたい
         // NOTE: 源流となるflowがgroupIdがnullの時はfilterするようにしてしまっているので、ここでempty, nullを割り当てている
         GroupDetailUiState(
+            ac,
             type,
             if (type.groupId == null) null else g?.group,
             if (type.groupId == null) emptyList() else m,
-            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else mss,
-            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else gss,
+            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else sync.syncMembersState,
+            if (type.groupId == null) ResultState.Fixed(StateContent.NotExist()) else sync.syncGroupState,
             when (type) {
                 is GroupDetailUiStateType.Editing -> {
                     type.name
@@ -85,12 +94,15 @@ class GroupDetailViewModel @Inject constructor(
                 is GroupDetailUiStateType.Show -> {
                     g?.group?.name ?: ""
                 }
+                is GroupDetailUiStateType.Rejecting -> {
+                    g?.group?.name ?: ""
+                }
             }
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(500),
-        GroupDetailUiState(GroupDetailUiStateType.Editing(null), null)
+        GroupDetailUiState(null, GroupDetailUiStateType.Editing(null), null)
     )
 
 
@@ -119,6 +131,9 @@ class GroupDetailViewModel @Inject constructor(
                     // NOTE: 表示モードの時に編集しようとした時は、編集モードに移行するようにしている。
                     GroupDetailUiStateType.Editing(it.groupId, name = name)
                 }
+                is GroupDetailUiStateType.Rejecting -> {
+                    GroupDetailUiStateType.Editing(it.groupId, name = name)
+                }
             }
         }
     }
@@ -132,6 +147,20 @@ class GroupDetailViewModel @Inject constructor(
             }
         }
     }
+
+//    fun confirmRejectUser() {
+//        val stateType = uiStateType.value
+//        if (stateType is GroupDetailUiStateType.Rejecting) {
+//            groupRepository
+//        }
+//        uiStateType.update {
+//            if (it is GroupDetailUiStateType.Rejecting) {
+//                val it.user
+//            } else {
+//                it
+//            }
+//        }
+//    }
 
     fun save() {
         val type = uiStateType.value
@@ -158,18 +187,30 @@ class GroupDetailViewModel @Inject constructor(
 }
 
 data class GroupDetailUiState(
+    val account: Account?,
     val type: GroupDetailUiStateType,
     val group: Group?,
     val members: List<User> = emptyList(),
     val syncMembersState: ResultState<List<User.Id>> = ResultState.Fixed(StateContent.NotExist()),
     val syncGroupState: ResultState<Group> = ResultState.Fixed(StateContent.NotExist()),
     val title: String = "",
-)
+) {
+    val isOwner: Boolean get() {
+        return account?.let {
+            User.Id(it.accountId, it.remoteId)
+        } == group?.ownerId
+    }
+}
 
+data class SyncState(
+    val syncMembersState: ResultState<List<User.Id>> = ResultState.Fixed(StateContent.NotExist()),
+    val syncGroupState: ResultState<Group> = ResultState.Fixed(StateContent.NotExist()),
+)
 sealed interface GroupDetailUiStateType {
     val groupId: Group.Id?
 
     data class Editing(override val groupId: Group.Id?, val name: String = "") : GroupDetailUiStateType
+    data class Rejecting(override val groupId: Group.Id?, val user: User) : GroupDetailUiStateType
 
     data class Show(override val groupId: Group.Id) : GroupDetailUiStateType
 }

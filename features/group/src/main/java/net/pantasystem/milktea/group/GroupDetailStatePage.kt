@@ -3,6 +3,7 @@ package net.pantasystem.milktea.group
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.user.User
 
 @Composable
@@ -36,6 +37,9 @@ fun GroupDetailStatePage(
                     }
                 }
             }
+            is GroupDetailPageAction.OnInviteUsers -> {
+                onAction(GroupDetailStatePageAction.OnInviteUsers(action.group))
+            }
         }
     })
 }
@@ -43,4 +47,5 @@ fun GroupDetailStatePage(
 sealed interface GroupDetailStatePageAction {
     object PopBackStack : GroupDetailStatePageAction
     data class OnShowUser(val user: User) : GroupDetailStatePageAction
+    data class OnInviteUsers(val group: Group) : GroupDetailStatePageAction
 }

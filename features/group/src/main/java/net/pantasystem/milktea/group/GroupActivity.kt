@@ -74,13 +74,18 @@ class GroupActivity : AppCompatActivity() {
                             onAction = { action ->
                                 when (action) {
                                     is GroupDetailStatePageAction.OnShowUser -> {
-                                        userDetailNavigation.newIntent(
-                                            UserDetailNavigationArgs.UserId(
-                                                action.user.id
+                                        startActivity(
+                                            userDetailNavigation.newIntent(
+                                                UserDetailNavigationArgs.UserId(
+                                                    action.user.id
+                                                )
                                             )
                                         )
                                     }
                                     GroupDetailStatePageAction.PopBackStack -> popBackStack()
+                                    is GroupDetailStatePageAction.OnInviteUsers -> {
+
+                                    }
                                 }
                             })
                     }

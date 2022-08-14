@@ -5,8 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import net.pantasystem.milktea.model.group.Group
 
 
 @Composable
@@ -49,6 +51,15 @@ fun GroupDetailPage(uiState: GroupDetailUiState, onAction: (GroupDetailPageActio
                 },
                 backgroundColor = MaterialTheme.colors.surface
             )
+        },
+        floatingActionButton = {
+            if (uiState.isOwner) {
+                FloatingActionButton(onClick = {
+                    onAction(GroupDetailPageAction.OnInviteUsers(uiState.group!!))
+                }) {
+                    Icon(Icons.Default.GroupAdd, contentDescription = null)
+                }
+            }
         }
     ) {
         LazyColumn(Modifier.padding(it)) {
@@ -57,7 +68,7 @@ fun GroupDetailPage(uiState: GroupDetailUiState, onAction: (GroupDetailPageActio
                 GroupMemberCard(
                     member = member,
                     ownerId = uiState.group?.ownerId,
-                    isOwnGroup = false,
+                    isOwnGroup = uiState.isOwner,
                     onAction = { action ->
                         onAction(GroupDetailPageAction.OnMemberAction(action))
                     }
@@ -73,4 +84,5 @@ sealed interface GroupDetailPageAction {
     object OnConfirmedSave : GroupDetailPageAction
     object OnEditingCanceled : GroupDetailPageAction
     data class OnMemberAction(val action: GroupMemberCardAction) : GroupDetailPageAction
+    data class OnInviteUsers(val group: Group) : GroupDetailPageAction
 }
