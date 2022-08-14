@@ -67,6 +67,24 @@ data class GroupMemberIdRecord(
     @PrimaryKey(autoGenerate = true) val id: Long,
 )
 
+@DatabaseView(
+    """
+        select m.groupId, u.id as userId, u.avatarUrl, u.serverId from group_member_v1 as m 
+            inner join group_v1 as g
+            inner join user as u
+            on m.groupId = g.id
+                and m.userId = u.serverId
+                and g.accountId = u.accountId
+    """,
+    viewName = "group_member_view"
+)
+data class GroupMemberView(
+    val groupId: Long,
+    val avatarUrl: String?,
+    val userId: Long,
+    val serverId: String,
+)
+
 data class GroupRelatedRecord(
     @Embedded val group: GroupRecord,
     @Relation(
@@ -75,6 +93,13 @@ data class GroupRelatedRecord(
         entity = GroupMemberIdRecord::class
     )
     val userIds: List<GroupMemberIdRecord>,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "groupId",
+        entity = GroupMemberView::class
+    )
+    val members: List<GroupMemberView>,
 ) {
     fun toModel(): Group {
         return Group(

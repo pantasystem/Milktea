@@ -6,9 +6,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.group.Group
-import net.pantasystem.milktea.model.group.GroupDataSource
-import net.pantasystem.milktea.model.group.GroupNotFoundException
+import net.pantasystem.milktea.model.group.*
+import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
 class GroupDataSourceImpl @Inject constructor(
@@ -64,28 +63,49 @@ class GroupDataSourceImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun observeJoinedGroups(accountId: Long): Flow<List<Group>> {
+    override fun observeJoinedGroups(accountId: Long): Flow<List<GroupWithMember>> {
         return flow {
             emit(getAccount.get(accountId))
         }.flatMapLatest {
             groupDao.observeJoinedGroups(accountId, it.remoteId).distinctUntilChanged()
         }.filterNotNull().map {
             it.map { record ->
-                record.toModel()
+                GroupWithMember(
+                    record.toModel(),
+                    record.members.map {
+                        GroupMember(User.Id(record.group.accountId, it.serverId), it.avatarUrl)
+                    }
+                )
             }
         }.distinctUntilChanged().flowOn(Dispatchers.IO)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun observeOwnedGroups(accountId: Long): Flow<List<Group>> {
+    override fun observeOwnedGroups(accountId: Long): Flow<List<GroupWithMember>> {
         return flow {
             emit(getAccount.get(accountId))
         }.flatMapLatest {
             groupDao.observeOwnedGroups(accountId, it.remoteId).distinctUntilChanged()
         }.filterNotNull().map { groups ->
-            groups.map {
-                it.toModel()
+            groups.map { record ->
+                GroupWithMember(
+                    record.toModel(),
+                    record.members.map {
+                        GroupMember(User.Id(record.group.accountId, it.serverId), it.avatarUrl)
+                    }
+                )
             }
         }.distinctUntilChanged().flowOn(Dispatchers.IO)
+    }
+
+    override fun observeOne(groupId: Group.Id): Flow<GroupWithMember> {
+        return groupDao.observeOne(groupId.accountId, groupId.groupId).distinctUntilChanged().filterNotNull().map { record ->
+            GroupWithMember(
+                record.toModel(),
+                record.members.map {
+                    GroupMember(User.Id(record.group.accountId, it.serverId), it.avatarUrl)
+                }
+            )
+        }.filterNotNull().flowOn(Dispatchers.IO)
     }
 }

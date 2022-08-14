@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -28,6 +29,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.main.*
+import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
@@ -35,10 +37,10 @@ import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScop
 import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ReportViewModel
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
-import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
@@ -52,7 +54,6 @@ import net.pantasystem.milktea.gallery.GalleryPostsActivity
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
@@ -437,6 +438,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
                             this@MainActivity,
                             Manifest.permission.POST_NOTIFICATIONS
                         ) == PackageManager.PERMISSION_DENIED
+                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
                     ) {
                         requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }

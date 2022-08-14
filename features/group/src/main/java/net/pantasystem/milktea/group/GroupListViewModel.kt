@@ -5,14 +5,18 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.group.GroupWithMember
+import net.pantasystem.milktea.model.user.User
 import java.util.*
 import javax.inject.Inject
 
@@ -22,43 +26,48 @@ class GroupListViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val accountStore: AccountStore,
     private val groupDataSource: GroupDataSource,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
+
+    private val logger = loggerFactory.create("GroupViewModel")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val joinedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         groupDataSource.observeJoinedGroups(account.accountId)
     }.flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val ownedGroups = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         groupDataSource.observeOwnedGroups(account.accountId)
     }.flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val syncEvents = MutableSharedFlow<UUID>()
+    private val syncEvents = MutableSharedFlow<UUID>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 100)
 
     private val ownedGroupSyncState = syncEvents.flatMapLatest {
         accountStore.observeCurrentAccount
     }.filterNotNull().flatMapLatest {
+
         suspend {
             groupRepository.syncByOwned(it.accountId)
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.Lazily,
+        SharingStarted.Eagerly,
         ResultState.Loading(StateContent.NotExist())
     )
 
     private val joinedGroupSyncState = syncEvents.flatMapLatest {
         accountStore.observeCurrentAccount
     }.filterNotNull().flatMapLatest {
+        logger.debug("joinedGroupSyncState")
         suspend {
             groupRepository.syncByJoined(it.accountId)
         }.asLoadingStateFlow()
     }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
-        SharingStarted.Lazily,
+        SharingStarted.Eagerly,
         ResultState.Loading(StateContent.NotExist())
     )
 
@@ -96,8 +105,13 @@ class GroupListViewModel @Inject constructor(
 }
 
 data class GroupListUiState(
-    val joinedGroups: List<Group>,
-    val ownedGroups: List<Group>,
+    val joinedGroups: List<GroupWithMember>,
+    val ownedGroups: List<GroupWithMember>,
     val syncJoinedGroupsState: ResultState<List<Group>>,
     val syncOwnedGroupsState: ResultState<List<Group>>,
+)
+
+data class GroupItem(
+    val group: Group,
+    val users: List<User>
 )

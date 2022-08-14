@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 19,
-    "identityHash": "7b9e9101227a6e2d24d277013269c6ff",
+    "version": 20,
+    "identityHash": "c2cb7cf803d76456f90d9f986adab9a9",
     "entities": [
       {
         "tableName": "connection_information",
@@ -2461,11 +2461,15 @@
       {
         "viewName": "user_view",
         "createSql": "CREATE VIEW `${VIEW_NAME}` AS select user.*, nicknames.nickname from user left join nicknames on user.userName = nicknames.username and user.host = nicknames.host"
+      },
+      {
+        "viewName": "group_member_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS select m.groupId, u.id as userId, u.avatarUrl from group_member_v1 as m \n            inner join group_v1 as g\n            inner join user as u\n            on m.groupId = g.id\n                and g.serverId = u.serverId\n                and g.accountId = u.accountId"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b9e9101227a6e2d24d277013269c6ff')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2cb7cf803d76456f90d9f986adab9a9')"
     ]
   }
 }

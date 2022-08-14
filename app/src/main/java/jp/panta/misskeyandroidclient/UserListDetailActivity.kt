@@ -28,6 +28,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserV
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
@@ -170,7 +171,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             val data = result.data
             if (resultCode == RESULT_OK) {
                 val changedDiff =
-                    data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? SelectedUserViewModel.ChangedDiffResult
+                    data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
                 val added = changedDiff?.added
                 val removed = changedDiff?.removed
                 Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")

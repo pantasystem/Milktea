@@ -18,10 +18,10 @@ import jp.panta.misskeyandroidclient.ui.settings.page.PageSettingActionDialog
 import jp.panta.misskeyandroidclient.ui.settings.page.PagesAdapter
 import jp.panta.misskeyandroidclient.ui.settings.page.SelectPageToAddDialog
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.page.PageSettingViewModel
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.channel.ChannelActivity
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.model.account.page.PageType
 
 @FlowPreview
@@ -139,7 +139,7 @@ class PageSettingActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE || requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE){
             if(resultCode == RESULT_OK && data != null){
-                val changeDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as SelectedUserViewModel.ChangedDiffResult
+                val changeDiff = data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
                 val userId = changeDiff.selected.firstOrNull()?.id
                 if(userId != null) {
                     if(resultCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {

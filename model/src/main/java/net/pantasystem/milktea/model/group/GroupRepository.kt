@@ -15,4 +15,6 @@ interface GroupRepository {
     suspend fun transfer(transfer: Transfer) : Group
 
     suspend fun pull(pull: Pull) : Group
+
+    suspend fun invite(invite: Invite) : Result<Unit>
 }

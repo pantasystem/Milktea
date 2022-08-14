@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cancel">取消</string>
+    <string name="save">节省</string>
+    <string name="group_name">团队名字</string>
+    <string name="create_group">创建组</string>
+    <string name="edit_group">编辑组</string>
+    <string name="groups">组列表</string>
+</resources>

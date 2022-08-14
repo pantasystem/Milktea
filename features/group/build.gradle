@@ -49,6 +49,7 @@ dependencies {
     implementation project(path: ':model')
     implementation project(path: ':common')
     implementation project(path: ':app_store')
+    implementation project(path: ':common_navigation')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
@@ -81,5 +82,8 @@ dependencies {
     implementation libs.lifecycle.viewmodel
     implementation libs.fragment.ktx
     implementation libs.activity.ktx
+
+    implementation libs.kotlin.datetime
+    implementation "androidx.navigation:navigation-compose:$nav_version"
 
 }
