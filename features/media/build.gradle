@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
 
     //PhotoView
-    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
     implementation libs.glide.glide
     kapt libs.glide.compiler
