@@ -38,7 +38,7 @@ dependencyResolutionManagement {
 
             alias("lifecycle-extenstions").to("androidx.lifecycle:lifecycle-extensions:2.2.0")
             alias("lifecycle-viewmodel").to("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
-            alias("lifecycle-livedata").to("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
+            alias("lifecycle-livedata").to("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
             bundle('lifecycle', ['lifecycle-extenstions', 'lifecycle-viewmodel'])
 
