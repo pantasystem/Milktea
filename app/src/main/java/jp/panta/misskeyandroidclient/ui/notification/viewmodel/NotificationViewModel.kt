@@ -11,6 +11,8 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
@@ -20,9 +22,9 @@ import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotific
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.model.notification.GroupInvitedNotification
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
@@ -42,9 +44,9 @@ class NotificationViewModel @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val notificationRelationGetter: NotificationRelationGetter,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val unreadNotificationDAO: UnreadNotificationDAO
+    private val unreadNotificationDAO: UnreadNotificationDAO,
+    private val groupRepository: GroupRepository,
 ) : ViewModel() {
-
 
 
     val isLoading = MutableLiveData<Boolean>()
@@ -233,6 +235,38 @@ class NotificationViewModel @Inject constructor(
                     _error.tryEmit(it)
                 }
             }
+        }
+    }
+
+    fun acceptGroupInvitation(notification: Notification) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (notification is GroupInvitedNotification) {
+                groupRepository.accept(notification.invitationId)
+                    .onSuccess {
+                        loadInit()
+                    }
+                    .onFailure {
+                        logger.error("failed rejectGroupInvitation", it)
+                        _error.tryEmit(it)
+                    }
+            }
+        }
+
+    }
+
+    fun rejectGroupInvitation(notification: Notification) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (notification is GroupInvitedNotification) {
+                groupRepository.reject(notification.invitationId)
+                    .onSuccess {
+                        loadInit()
+                    }
+                    .onFailure {
+                        logger.error("failed rejectGroupInvitation", it)
+                        _error.tryEmit(it)
+                    }
+            }
+
         }
     }
 
