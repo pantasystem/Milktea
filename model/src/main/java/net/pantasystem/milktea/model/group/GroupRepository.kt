@@ -17,4 +17,8 @@ interface GroupRepository {
     suspend fun pull(pull: Pull) : Group
 
     suspend fun invite(invite: Invite) : Result<Unit>
+
+    suspend fun accept(invitationId: InvitationId) : Result<Unit>
+
+    suspend fun reject(invitationId: InvitationId) : Result<Unit>
 }
