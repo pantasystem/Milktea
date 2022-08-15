@@ -1,8 +1,9 @@
 package net.pantasystem.milktea.model.notification
 
-import net.pantasystem.milktea.model.EntityId
-import net.pantasystem.milktea.model.notes.Note
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.model.EntityId
+import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 
 
@@ -175,5 +176,16 @@ data class UnknownNotification(
 ) : Notification(), HasUser {
     override fun read(): Notification {
         return this.copy(isRead = true)
+    }
+}
+
+data class GroupInvitedNotification(
+    override val id: Id,
+    override val isRead: Boolean,
+    override val createdAt: Instant,
+    val group: Group,
+) : Notification() {
+    override fun read(): Notification {
+        return copy(isRead = true)
     }
 }

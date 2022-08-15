@@ -299,6 +299,15 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 Note.Id(account.accountId, note!!.id)
             )
         }
+        "groupInvited" -> {
+            require(invitation != null)
+            GroupInvitedNotification(
+                id,
+                isRead = isRead?: true,
+                createdAt,
+                group = invitation!!.group.toGroup(account.accountId)
+            )
+        }
         else -> {
             return UnknownNotification(
                 id,
