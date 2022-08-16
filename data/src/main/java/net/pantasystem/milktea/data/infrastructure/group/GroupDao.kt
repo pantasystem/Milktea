@@ -12,7 +12,7 @@ interface GroupDao {
     @Update
     suspend fun update(group: GroupRecord)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUserIds(members: List<GroupMemberIdRecord>): List<Long>
 
     @Delete
