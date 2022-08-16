@@ -61,6 +61,9 @@ fun GroupDetailPage(uiState: GroupDetailUiState, onAction: (GroupDetailPageActio
                         }
                     }
                     IconButton(onClick = {
+                        uiState.group?.let {
+                            onAction(GroupDetailPageAction.ShowMessaging(it))
+                        }
 
                     }) {
                         Icon(Icons.Default.Message, contentDescription = null)

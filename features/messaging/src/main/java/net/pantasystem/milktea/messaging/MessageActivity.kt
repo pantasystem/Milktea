@@ -1,14 +1,28 @@
 package net.pantasystem.milktea.messaging
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.MessageNavigation
+import net.pantasystem.milktea.common_navigation.MessageNavigationArgs
 import net.pantasystem.milktea.messaging.databinding.ActivityMessageBinding
 import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
+
+class MessageNavigationImpl @Inject constructor(
+    val activity: Activity
+) : MessageNavigation {
+    override fun newIntent(args: MessageNavigationArgs): Intent {
+        val intent = Intent(activity, MessageActivity::class.java)
+        intent.putExtra(MessageActivity.EXTRA_MESSAGING_ID, args.messagingId)
+        return intent
+    }
+}
 
 @AndroidEntryPoint
 class MessageActivity : AppCompatActivity() {
