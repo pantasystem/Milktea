@@ -15,6 +15,7 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,6 +31,9 @@ class GroupActivity : AppCompatActivity() {
 
     @Inject
     lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
+
+    @Inject
+    lateinit var messageNavigation: MessageNavigation
 
     private val groupDetailViewModel: GroupDetailViewModel by viewModels()
 
@@ -93,6 +97,11 @@ class GroupActivity : AppCompatActivity() {
                                                 SearchAndSelectUserNavigationArgs()
                                             )
                                         )
+                                    }
+                                    is GroupDetailStatePageAction.OnShowMessage -> {
+                                        startActivity(messageNavigation.newIntent(
+                                            MessageNavigationArgs(MessagingId.Group(action.group.id))
+                                        ))
                                     }
                                 }
                             })

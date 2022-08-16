@@ -27,6 +27,9 @@ fun GroupDetailStatePage(
             GroupDetailPageAction.OnEditingCanceled -> {
                 groupDetailViewModel.cancelEditing()
             }
+            is GroupDetailPageAction.ShowMessaging -> {
+                onAction(GroupDetailStatePageAction.OnShowMessage(action.group))
+            }
             is GroupDetailPageAction.OnMemberAction -> {
                 when(action.action) {
                     is GroupMemberCardAction.OnClick -> {
@@ -53,4 +56,5 @@ sealed interface GroupDetailStatePageAction {
     object PopBackStack : GroupDetailStatePageAction
     data class OnShowUser(val user: User) : GroupDetailStatePageAction
     data class OnInviteUsers(val group: Group) : GroupDetailStatePageAction
+    data class OnShowMessage(val group: Group) : GroupDetailStatePageAction
 }
