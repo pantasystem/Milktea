@@ -12,26 +12,26 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteStreaming
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.app_store.notes.TimelineStore
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TimelineViewModel @AssistedInject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     noteStreaming: NoteStreaming,
     accountRepository: AccountRepository,
-    private val getters: Getters,
+    private val noteRelationGetter: NoteRelationGetter,
     loggerFactory: Logger.Factory,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
@@ -68,7 +68,7 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
             val relations = list.mapNotNull {
-                getters.noteRelationGetter.get(it).getOrNull()
+                noteRelationGetter.get(it).getOrNull()
             }
             cache.getIn(relations)
         }

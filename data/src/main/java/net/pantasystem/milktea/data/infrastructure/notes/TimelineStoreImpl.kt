@@ -12,19 +12,19 @@ import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.Getters
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.app_store.notes.TimelineStore
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -33,19 +33,19 @@ class TimelineStoreImpl(
     val pageableTimeline: Pageable,
     val noteAdder: NoteDataSourceAdder,
     val noteDataSource: NoteDataSource,
-    val getters: Getters,
     val getAccount: suspend () -> Account,
     val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val coroutineScope: CoroutineScope,
+    val noteRelationGetter: NoteRelationGetter,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
         private val noteAdder: NoteDataSourceAdder,
         private val noteDataSource: NoteDataSource,
-        private val getters: Getters,
         private val encryption: Encryption,
         private val misskeyAPIProvider: MisskeyAPIProvider,
+        private val noteRelationGetter: NoteRelationGetter,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -56,11 +56,11 @@ class TimelineStoreImpl(
                 pageable,
                 noteAdder,
                 noteDataSource,
-                getters,
                 getAccount,
                 encryption,
                 misskeyAPIProvider,
                 coroutineScope,
+                noteRelationGetter,
             )
         }
     }
@@ -104,7 +104,7 @@ class TimelineStoreImpl(
         noteDataSource.state.flatMapLatest {
             timelineState.map { pageableState ->
                 pageableState.suspendConvert { list ->
-                    getters.noteRelationGetter.getIn(list.distinct())
+                    noteRelationGetter.getIn(list.distinct())
                 }
             }
         }.distinctUntilChanged()

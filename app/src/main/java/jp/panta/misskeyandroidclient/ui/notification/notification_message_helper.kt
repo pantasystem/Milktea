@@ -18,7 +18,7 @@ class NotificationMessageScope(val context: Context) {
     }
 
     private fun NotificationRelation.getMessage(): String {
-        return when (this.notification) {
+        return when (val notification = this.notification) {
             is FollowNotification -> context.getString(
                 R.string.followed_by,
                 this.user?.displayUserName ?: ""
@@ -56,6 +56,7 @@ class NotificationMessageScope(val context: Context) {
                 this.user?.displayUserName ?: ""
             )
             is PollEndedNotification -> context.getString(R.string.poll_ended)
+            is GroupInvitedNotification -> context.getString(R.string.notification_group_invited_message, notification.group.name)
             is UnknownNotification -> context.getString(R.string.unknown_notification)
         }
     }

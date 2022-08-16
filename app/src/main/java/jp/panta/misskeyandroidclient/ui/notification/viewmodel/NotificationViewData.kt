@@ -1,9 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.notification.viewmodel
 
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
 
@@ -25,6 +27,7 @@ class NotificationViewData(
         FOLLOW_REQUEST_ACCEPTED("followRequestAccepted"),
         POLL_ENDED("pollEnded"),
         UNKNOWN("unknown"),
+        GROUP_INVITED("groupInvited")
 
     }
 
@@ -48,6 +51,7 @@ class NotificationViewData(
         is ReceiveFollowRequestNotification -> Type.RECEIVE_FOLLOW_REQUEST
         is FollowRequestAcceptedNotification -> Type.FOLLOW_REQUEST_ACCEPTED
         is PollEndedNotification -> Type.POLL_ENDED
+        is GroupInvitedNotification -> Type.GROUP_INVITED
         is UnknownNotification -> Type.UNKNOWN
     }
     val statusType: String = type.default
@@ -60,6 +64,9 @@ class NotificationViewData(
     val reaction =
         (notification.notification as? ReactionNotification)?.reaction
 
+    val groupInvitedMessageSource: StringSource? = (notification.notification as? GroupInvitedNotification?)?.let {
+        StringSource(R.string.notification_group_invited_message, it.group.name)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
