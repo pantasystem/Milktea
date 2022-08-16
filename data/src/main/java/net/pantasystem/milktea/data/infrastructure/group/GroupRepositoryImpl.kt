@@ -37,7 +37,12 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(createGroup.author).getOrThrow()
             val api = getMisskeyAPI(account)
 
-            val res = api.createGroup(CreateGroupDTO(i = account.getI(encryption), name = createGroup.name)).throwIfHasError()
+            val res = api.createGroup(
+                CreateGroupDTO(
+                    i = account.getI(encryption),
+                    name = createGroup.name
+                )
+            ).throwIfHasError()
             val group = res.body()?.toGroup(account.accountId)
             require(group != null)
             groupDataSource.add(group)
@@ -53,13 +58,15 @@ class GroupRepositoryImpl @Inject constructor(
                 logger.debug("ローカルには存在しません。:${groupId}")
             }.getOrNull()
 
-            if(group != null) {
+            if (group != null) {
                 return@withContext group
             }
             val account = accountRepository.get(groupId.accountId).getOrThrow()
             val api = getMisskeyAPI(account)
 
-            val res = api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId)).throwIfHasError()
+            val res =
+                api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId))
+                    .throwIfHasError()
             val body = res.body()
                 ?: throw GroupNotFoundException(groupId)
             group = body.toGroup(account.accountId)
@@ -74,10 +81,11 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun syncByJoined(accountId: Long): List<Group> {
         return withContext(Dispatchers.IO) {
             val account = accountRepository.get(accountId).getOrThrow()
-            val api = getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
+            val api =
+                getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
             val groups = api.body()?.map {
                 it.toGroup(account.accountId)
-            }?: emptyList()
+            } ?: emptyList()
             groupDataSource.addAll(groups)
             val userIds = groups.map {
                 it.userIds
@@ -91,10 +99,11 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun syncByOwned(accountId: Long): List<Group> {
         return withContext(Dispatchers.IO) {
             val account = accountRepository.get(accountId).getOrThrow()
-            val api = getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
+            val api =
+                getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
             val groups = api.body()?.map {
                 it.toGroup(account.accountId)
-            }?: emptyList()
+            } ?: emptyList()
             groupDataSource.addAll(groups)
             val userIds = groups.map {
                 it.userIds
@@ -109,10 +118,16 @@ class GroupRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             var group = syncOne(pull.groupId)
             val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
-            getMisskeyAPI(account).pullUser(RemoveUserDTO(i = account.getI(encryption), userId = pull.userId.id, groupId = pull.groupId.groupId))
+            getMisskeyAPI(account).pullUser(
+                RemoveUserDTO(
+                    i = account.getI(encryption),
+                    userId = pull.userId.id,
+                    groupId = pull.groupId.groupId
+                )
+            )
                 .throwIfHasError()
 
-            group = group.copy( userIds = group.userIds.filterNot {
+            group = group.copy(userIds = group.userIds.filterNot {
                 pull.userId == pull.userId
             })
             groupDataSource.add(group)
@@ -143,7 +158,13 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun update(updateGroup: UpdateGroup): Group {
         return withContext(Dispatchers.IO) {
             val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
-            val body = getMisskeyAPI(account).updateGroup(UpdateGroupDTO(i = account.getI(encryption), groupId = updateGroup.groupId.groupId, name = updateGroup.name))
+            val body = getMisskeyAPI(account).updateGroup(
+                UpdateGroupDTO(
+                    i = account.getI(encryption),
+                    groupId = updateGroup.groupId.groupId,
+                    name = updateGroup.name
+                )
+            )
                 .throwIfHasError().body()
             require(body != null)
 
@@ -158,13 +179,38 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(invite.groupId.accountId).getOrThrow()
             getMisskeyAPI(account).invite(
                 InviteUserDTO(
-                groupId= invite.groupId.groupId,
-                i = account.getI(encryption),
+                    groupId = invite.groupId.groupId,
+                    i = account.getI(encryption),
                     userId = invite.userId.id,
                 )
             ).throwIfHasError()
         }
     }
+
+    override suspend fun accept(invitationId: InvitationId): Result<Unit> = runCatching {
+        return@runCatching withContext(Dispatchers.IO) {
+            val account = accountRepository.get(invitationId.accountId).getOrThrow()
+            getMisskeyAPI(account).acceptInvitation(
+                AcceptInvitationDTO(
+                    i = account.getI(encryption),
+                    invitationId = invitationId.invitationId
+                )
+            ).throwIfHasError()
+        }
+    }
+
+    override suspend fun reject(invitationId: InvitationId): Result<Unit> = runCatching {
+        return@runCatching withContext(Dispatchers.IO) {
+            val account = accountRepository.get(invitationId.accountId).getOrThrow()
+            getMisskeyAPI(account).rejectInvitation(
+                RejectInvitationDTO(
+                    i = account.getI(encryption),
+                    invitationId = invitationId.invitationId
+                )
+            ).throwIfHasError()
+        }
+    }
+
     private fun getMisskeyAPI(account: Account): MisskeyAPIV11 {
         return misskeyAPIProvider.get(account.instanceDomain) as? MisskeyAPIV11
             ?: throw IllegalVersionException()

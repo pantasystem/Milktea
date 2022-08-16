@@ -22,10 +22,10 @@ interface MisskeyAPIV11Diff {
     @POST("api/users/groups/delete")
     suspend fun deleteGroup(@Body body: DeleteGroupDTO) : Response<Unit>
 
-    @POST("api/users/invitations/accept")
+    @POST("api/users/groups/invitations/accept")
     suspend fun acceptInvitation(@Body body: AcceptInvitationDTO) : Response<Unit>
 
-    @POST("api/users/invitations/reject")
+    @POST("api/users/groups/invitations/reject")
     suspend fun rejectInvitation(@Body body: RejectInvitationDTO) : Response<Unit>
 
     @POST("api/users/groups/invite")

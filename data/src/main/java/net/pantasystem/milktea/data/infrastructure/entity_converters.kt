@@ -14,6 +14,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.group.Group
+import net.pantasystem.milktea.model.group.InvitationId
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.notes.Note
@@ -297,6 +298,18 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 createdAt,
                 isRead = isRead ?: true,
                 Note.Id(account.accountId, note!!.id)
+            )
+        }
+        "groupInvited" -> {
+            require(invitation != null)
+            require(userId != null)
+            GroupInvitedNotification(
+                id,
+                isRead = isRead?: true,
+                createdAt,
+                group = invitation!!.group.toGroup(account.accountId),
+                User.Id(account.accountId, userId!!),
+                InvitationId(account.accountId, invitation!!.id),
             )
         }
         else -> {
