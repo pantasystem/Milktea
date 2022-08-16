@@ -105,8 +105,8 @@ class GroupListViewModel @Inject constructor(
                 it.members
             }.flatten()).map { member ->
                 member.userId
-            }
-        }.map {
+            }.distinct()
+        }.distinctUntilChanged().map {
             userRepository.syncIn(it)
         }.catch {
             logger.error("ユーザーの同期エラー", it)
