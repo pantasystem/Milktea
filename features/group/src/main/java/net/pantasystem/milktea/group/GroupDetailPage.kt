@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GroupAdd
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import net.pantasystem.milktea.model.group.Group
@@ -59,6 +60,11 @@ fun GroupDetailPage(uiState: GroupDetailUiState, onAction: (GroupDetailPageActio
                             Icon(Icons.Default.Edit, contentDescription = null)
                         }
                     }
+                    IconButton(onClick = {
+
+                    }) {
+                        Icon(Icons.Default.Message, contentDescription = null)
+                    }
                 }
             )
         },
@@ -96,4 +102,5 @@ sealed interface GroupDetailPageAction {
     object OnEdit : GroupDetailPageAction
     data class OnMemberAction(val action: GroupMemberCardAction) : GroupDetailPageAction
     data class OnInviteUsers(val group: Group) : GroupDetailPageAction
+    data class ShowMessaging(val group: Group) : GroupDetailPageAction
 }
