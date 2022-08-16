@@ -16,7 +16,7 @@ import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.group.GroupWithMember
-import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
 import java.util.*
 import javax.inject.Inject
 
@@ -26,6 +26,7 @@ class GroupListViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val accountStore: AccountStore,
     private val groupDataSource: GroupDataSource,
+    private val userRepository: UserRepository,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -96,6 +97,19 @@ class GroupListViewModel @Inject constructor(
 
     init {
         sync()
+        combine(joinedGroups, ownedGroups) { joined, owned ->
+            (joined.map {
+                it.members
+            }.flatten() + owned.map {
+                it.members
+            }.flatten()).map { member ->
+                member.userId
+            }.distinct()
+        }.distinctUntilChanged().map {
+            userRepository.syncIn(it)
+        }.catch {
+            logger.error("ユーザーの同期エラー", it)
+        }.launchIn(viewModelScope)
     }
 
     fun sync() {
@@ -109,9 +123,4 @@ data class GroupListUiState(
     val ownedGroups: List<GroupWithMember>,
     val syncJoinedGroupsState: ResultState<List<Group>>,
     val syncOwnedGroupsState: ResultState<List<Group>>,
-)
-
-data class GroupItem(
-    val group: Group,
-    val users: List<User>
 )
