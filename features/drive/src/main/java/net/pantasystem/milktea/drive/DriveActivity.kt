@@ -3,8 +3,8 @@ package net.pantasystem.milktea.drive
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -22,6 +21,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.drive.DriveState
 import net.pantasystem.milktea.app_store.drive.DriveStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_android.platform.PermissionUtil
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.drive.viewmodel.*
 import net.pantasystem.milktea.model.drive.DirectoryPath
@@ -112,7 +112,6 @@ class DriveActivity : AppCompatActivity() {
     @Inject
     lateinit var fileViewModelFactory: FileViewModel.AssistedViewModelFactory
 
-    @ExperimentalCoroutinesApi
     private val _fileViewModel: FileViewModel by viewModels {
         FileViewModel.provideFactory(fileViewModelFactory, driveStore)
     }
@@ -183,7 +182,6 @@ class DriveActivity : AppCompatActivity() {
         CreateFolderDialog().show(supportFragmentManager, "CreateFolder")
     }
 
-    @ExperimentalCoroutinesApi
     private fun showFileManager() {
         if (checkPermissions()) {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -196,19 +194,23 @@ class DriveActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions(): Boolean {
-        val permissionCheck =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        return permissionCheck == PackageManager.PERMISSION_GRANTED
+        return PermissionUtil.checkReadStoragePermission(this)
     }
 
-    @ExperimentalCoroutinesApi
     private fun requestPermission() {
         if (!checkPermissions()) {
-            registerForReadExternalStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (Build.VERSION.SDK_INT >= 33) {
+                requestReadMediasPermissionResult.launch(
+                    PermissionUtil.getReadMediaPermissions().toTypedArray()
+                )
+            } else {
+                registerForReadExternalStoragePermissionResult.launch(
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            }
         }
     }
 
-    @ExperimentalCoroutinesApi
     val registerForOpenFileActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val uri = result.data?.data
@@ -217,7 +219,6 @@ class DriveActivity : AppCompatActivity() {
             }
         }
 
-    @ExperimentalCoroutinesApi
     val registerForReadExternalStoragePermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             if (it) {
@@ -225,8 +226,13 @@ class DriveActivity : AppCompatActivity() {
             }
         }
 
+    private val requestReadMediasPermissionResult =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            if (results.any { it.value }) {
+                showFileManager()
+            }
+        }
 
-    @ExperimentalCoroutinesApi
     private fun uploadFile(uri: Uri) {
         _fileViewModel.uploadFile(uri.toAppFile(this))
     }

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -41,14 +42,16 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewMod
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiCompleteAdapter
 import jp.panta.misskeyandroidclient.ui.text.CustomEmojiTokenizer
 import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.selectable.SelectedUserViewModel
 import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_android.platform.PermissionUtil
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
 import net.pantasystem.milktea.data.infrastructure.confirm.ConfirmCommand
@@ -56,8 +59,6 @@ import net.pantasystem.milktea.data.infrastructure.confirm.ResultType
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.drive.toAppFile
 import net.pantasystem.milktea.media.MediaActivity
-import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -120,24 +121,42 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
     }
+
     private val binding: FragmentNoteEditorBinding by dataBinding()
 
     private val noteEditorViewModel: NoteEditorViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val emojiSelectionViewModel: EmojiSelectionViewModel by activityViewModels()
 
-    @Inject internal lateinit var accountStore: AccountStore
-    @Inject internal lateinit var metaRepository: MetaRepository
-    @Inject internal lateinit var filePropertyDataSource: FilePropertyDataSource
-    @Inject internal lateinit var filePropertyRepository: DriveFileRepository
-    @Inject internal lateinit var settingStore: SettingStore
-    @Inject internal lateinit var driveNavigation: net.pantasystem.milktea.common_navigation.DriveNavigation
-    @Inject internal lateinit var authorizationNavigation: AuthorizationNavigation
+    @Inject
+    internal lateinit var accountStore: AccountStore
+
+    @Inject
+    internal lateinit var metaRepository: MetaRepository
+
+    @Inject
+    internal lateinit var filePropertyDataSource: FilePropertyDataSource
+
+    @Inject
+    internal lateinit var filePropertyRepository: DriveFileRepository
+
+    @Inject
+    internal lateinit var settingStore: SettingStore
+
+    @Inject
+    internal lateinit var driveNavigation: net.pantasystem.milktea.common_navigation.DriveNavigation
+
+    @Inject
+    internal lateinit var authorizationNavigation: AuthorizationNavigation
 
     internal lateinit var confirmViewModel: ConfirmViewModel
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
-        if (requireArguments().getLong(EXTRA_ACCOUNT_ID, -1) == -1L) null else requireArguments().getLong(
+        if (requireArguments().getLong(
+                EXTRA_ACCOUNT_ID,
+                -1
+            ) == -1L
+        ) null else requireArguments().getLong(
             EXTRA_ACCOUNT_ID,
             -1
         )
@@ -163,7 +182,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     }
 
     private val draftNoteId by lazy(LazyThreadSafetyMode.NONE) {
-        requireArguments().getLong(EXTRA_DRAFT_NOTE_ID, - 1).let {
+        requireArguments().getLong(EXTRA_DRAFT_NOTE_ID, -1).let {
             if (it == -1L) null else it
         }
     }
@@ -215,7 +234,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
         accountViewModel.showProfile.observe(viewLifecycleOwner) {
             val intent =
-                UserDetailActivity.newInstance(requireActivity(), userId = User.Id(it.accountId, it.remoteId))
+                UserDetailActivity.newInstance(
+                    requireActivity(),
+                    userId = User.Id(it.accountId, it.remoteId)
+                )
 
             intent.putActivity(Activities.ACTIVITY_IN_APP)
 
@@ -433,7 +455,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
     override fun onSelect(emoji: Emoji) {
-        val pos =  binding.inputMain.selectionEnd
+        val pos = binding.inputMain.selectionEnd
         noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
             binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
             binding.inputMain.setSelection(newPos)
@@ -461,7 +483,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.viewModel = noteEditorViewModel
         binding.accountViewModel = accountViewModel
         binding.lifecycleOwner = viewLifecycleOwner
-        
+
     }
 
     private fun setPollFragment() {
@@ -478,6 +500,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             ft.commit()
         }
     }
+
     /**
      * 設定をもとにToolbarを表示するベースとなるViewGroupを非表示・表示＆取得をしている
      */
@@ -509,24 +532,50 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         val selectedSize = noteEditorViewModel.state.value.totalFilesCount
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = noteEditorViewModel.maxFileCount.value - selectedSize
-        val intent = driveNavigation.newIntent(DriveNavigationArgs(
-            selectableFileMaxSize = selectableMaxSize,
-            accountId = accountStore.currentAccountId,
-        ))
+        val intent = driveNavigation.newIntent(
+            DriveNavigationArgs(
+                selectableFileMaxSize = selectableMaxSize,
+                accountId = accountStore.currentAccountId,
+            )
+        )
 
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         openDriveActivityResult.launch(intent)
     }
 
     private fun checkPermission(): Boolean {
-        val permissionCheck =
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-        return permissionCheck == PackageManager.PERMISSION_GRANTED
+        val permissions = if (Build.VERSION.SDK_INT >= 33) {
+            listOf(
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO
+            ).all {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    it
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+        } else {
+            val permissionCheck =
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            permissionCheck == PackageManager.PERMISSION_GRANTED
+        }
+        return permissions
     }
 
     private fun requestPermission() {
-        if (!checkPermission()) {
-            requestReadStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (!PermissionUtil.checkReadStoragePermission(requireContext())) {
+            if (Build.VERSION.SDK_INT >= 33) {
+                requestReadMediasPermissionResult.launch(
+                    PermissionUtil.getReadMediaPermissions().toTypedArray()
+                )
+            } else {
+                requestReadStoragePermissionResult.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+
         }
     }
 
@@ -547,7 +596,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             it.userId
         }
 
-        val intent = SearchAndSelectUserActivity.newIntent(requireActivity(), selectedUserIds = selectedUserIds)
+        val intent = SearchAndSelectUserActivity.newIntent(
+            requireActivity(),
+            selectedUserIds = selectedUserIds
+        )
 
         selectUserResult.launch(intent)
     }
@@ -628,9 +680,27 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             if (it) {
                 showFileManager()
             } else {
-                Toast.makeText(requireContext(), "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
+
+    private val requestReadMediasPermissionResult =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            if (results.any { it.value }) {
+                showFileManager()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
 
     private val selectUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -642,6 +712,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 }
             }
         }
+
 
     private val selectMentionToUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
