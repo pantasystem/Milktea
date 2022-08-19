@@ -41,12 +41,14 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginBottom="8dp"
+                        android:gravity="center"
+
                         >
                     <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/https"
-                            android:textSize="20sp"
+                            android:textSize="16sp"
                             />
                     <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
@@ -61,6 +63,15 @@
                                 android:inputType="textEmailAddress"
                                 android:text="@={appAuthViewModel.instanceDomain}"/>
                     </com.google.android.material.textfield.TextInputLayout>
+                    <ImageButton
+                            android:id="@+id/clearHostNameButton"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:src="@drawable/ic_close_black_24dp"
+                            style="@style/Widget.AppCompat.ActionButton"
+                            android:onClick="@{() -> appAuthViewModel.clearHostName() }"
+                            tools:ignore="ContentDescription"
+                            />
                 </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout

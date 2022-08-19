@@ -63,7 +63,7 @@ class AppAuthViewModel @Inject constructor(
 
     private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
-    val instanceDomain = MutableStateFlow("")
+    val instanceDomain = MutableStateFlow("misskey.io")
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
@@ -118,6 +118,10 @@ class AppAuthViewModel @Inject constructor(
                 null
             }
         }
+    }
+
+    fun clearHostName() {
+        instanceDomain.value = ""
     }
 
     private fun getMeta(instanceDomain: String): Flow<ResultState<InstanceType>> {
