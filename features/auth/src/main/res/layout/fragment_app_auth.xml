@@ -65,8 +65,8 @@
                     </com.google.android.material.textfield.TextInputLayout>
                     <ImageButton
                             android:id="@+id/clearHostNameButton"
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_width="32dp"
                             android:src="@drawable/ic_close_black_24dp"
                             style="@style/Widget.AppCompat.ActionButton"
                             android:onClick="@{() -> appAuthViewModel.clearHostName() }"
