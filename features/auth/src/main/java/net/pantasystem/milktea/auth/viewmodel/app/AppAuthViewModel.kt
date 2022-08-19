@@ -128,6 +128,8 @@ class AppAuthViewModel @Inject constructor(
         }
 
     init {
+        // NOTE: misskey.ioにログインしているアカウントが一つもなければmisskey.ioをデフォルト表示する
+        // NOTE: またioにログインしていた場合は空にする
         viewModelScope.launch(Dispatchers.IO) {
             accountRepository.findAll().onSuccess { accounts ->
                 if (!accounts.any { it.getHost() == "misskey.io" }) {
