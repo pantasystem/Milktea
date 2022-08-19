@@ -14,15 +14,13 @@ import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.auth.viewmodel.Permissions
-import net.pantasystem.milktea.common.BuildConfig
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
@@ -32,6 +30,7 @@ import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
 
 sealed interface AuthErrors {
     val throwable: Throwable
+
     data class GetMetaError(
         override val throwable: Throwable,
     ) : AuthErrors
@@ -55,22 +54,30 @@ class AppAuthViewModel @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val metaStore: FetchMeta,
-) : ViewModel(){
-    companion object{
+    loggerFactory: Logger.Factory,
+    accountRepository: AccountRepository,
+) : ViewModel() {
+    companion object {
         const val CALL_BACK_URL = "misskey://app_auth_callback"
     }
 
+    private val logger = loggerFactory.create("AppAuthViewModel")
 
-    private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+    private val urlPattern =
+        Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
     val instanceDomain = MutableStateFlow("")
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
-        StateContent.NotExist()))
+    }.flowOn(Dispatchers.IO).stateIn(
+        viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
+            StateContent.NotExist()
+        )
+    )
 
     private val _generatingTokenState = MutableStateFlow<ResultState<Session>>(
-        ResultState.Fixed(StateContent.NotExist()))
+        ResultState.Fixed(StateContent.NotExist())
+    )
     private val generatingTokenState: StateFlow<ResultState<Session>> = _generatingTokenState
     private val generateTokenError = generatingTokenState.map {
         it as? ResultState.Error
@@ -105,26 +112,44 @@ class AppAuthViewModel @Inject constructor(
     val waiting4UserAuthorization = MutableLiveData<Authorization.Waiting4UserAuthorization?>()
 
 
-
-    val errors = combine(generateTokenError, fetchingMetaError) { generateTokenError, fetchingMetaError ->
-        when {
-            generateTokenError != null -> {
-                AuthErrors.GenerateTokenError(generateTokenError)
-            }
-            fetchingMetaError != null -> {
-                AuthErrors.GetMetaError(fetchingMetaError)
-            }
-            else -> {
-                null
+    val errors =
+        combine(generateTokenError, fetchingMetaError) { generateTokenError, fetchingMetaError ->
+            when {
+                generateTokenError != null -> {
+                    AuthErrors.GenerateTokenError(generateTokenError)
+                }
+                fetchingMetaError != null -> {
+                    AuthErrors.GetMetaError(fetchingMetaError)
+                }
+                else -> {
+                    null
+                }
             }
         }
+
+    init {
+        // NOTE: misskey.ioにログインしているアカウントが一つもなければmisskey.ioをデフォルト表示する
+        // NOTE: またioにログインしていた場合は空にする
+        viewModelScope.launch(Dispatchers.IO) {
+            accountRepository.findAll().onSuccess { accounts ->
+                if (!accounts.any { it.getHost() == "misskey.io" }) {
+                    instanceDomain.value = "misskey.io"
+                }
+            }.onFailure {
+                logger.error("findAll accounts failure", it)
+            }
+        }
+    }
+
+    fun clearHostName() {
+        instanceDomain.value = ""
     }
 
     private fun getMeta(instanceDomain: String): Flow<ResultState<InstanceType>> {
         return flow {
             val url = toEnableUrl(instanceDomain)
             emit(ResultState.Fixed(StateContent.NotExist()))
-            if(urlPattern.matcher(url).find()){
+            if (urlPattern.matcher(url).find()) {
                 emit(ResultState.Loading(StateContent.NotExist()))
                 runCatching {
                     coroutineScope {
@@ -160,8 +185,9 @@ class AppAuthViewModel @Inject constructor(
                     Log.d("AppAuthVM", "meta:$it")
                     emit(
                         ResultState.Fixed(
-                        StateContent.Exist(it)
-                    ))
+                            StateContent.Exist(it)
+                        )
+                    )
                 }
             }
 
@@ -169,18 +195,18 @@ class AppAuthViewModel @Inject constructor(
 
     }
 
-    fun auth(){
+    fun auth() {
         val url = this.instanceDomain.value
         val instanceBase = toEnableUrl(url)
-        val appName = this.appName.value?: return
+        val appName = this.appName.value ?: return
         val meta = (this.metaState.value.content as? StateContent.Exist)?.rawContent
             ?: return
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO) {
             _generatingTokenState.value = ResultState.Loading(generatingTokenState.value.content)
             runCatching {
                 val app = createApp(instanceBase, meta, appName)
                 this@AppAuthViewModel.app.postValue(app)
-                when(app) {
+                when (app) {
                     is AppType.Mastodon -> {
                         val authState = app.createAuth(instanceBase, "read write")
                         customAuthStore.setCustomAuthBridge(authState)
@@ -228,15 +254,21 @@ class AppAuthViewModel @Inject constructor(
     }
 
 
-    private suspend fun createApp(url: String, instanceType: InstanceType, appName: String): AppType {
+    private suspend fun createApp(
+        url: String,
+        instanceType: InstanceType,
+        appName: String
+    ): AppType {
         when (instanceType) {
             is InstanceType.Mastodon -> {
                 val app = mastodonAPIProvider.get(url)
-                    .createApp(CreateTootApp(
-                        clientName = appName,
-                        redirectUris = CALL_BACK_URL,
-                        scopes = "read write"
-                    )).throwIfHasError().body()
+                    .createApp(
+                        CreateTootApp(
+                            clientName = appName,
+                            redirectUris = CALL_BACK_URL,
+                            scopes = "read write"
+                        )
+                    ).throwIfHasError().body()
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
                 return AppType.fromDTO(app)
             }
@@ -259,14 +291,14 @@ class AppAuthViewModel @Inject constructor(
 
     }
 
-    private fun toEnableUrl(base: String) : String{
-        var url = if(base.startsWith("https://")){
+    private fun toEnableUrl(base: String): String {
+        var url = if (base.startsWith("https://")) {
             base
-        }else{
+        } else {
             "https://$base"
         }.replace(" ", "").replace("\t", "").replace("　", "")
 
-        if(url.endsWith("/")) {
+        if (url.endsWith("/")) {
             url = url.substring(url.indices)
         }
         return url

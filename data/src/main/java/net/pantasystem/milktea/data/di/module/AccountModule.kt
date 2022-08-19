@@ -10,12 +10,10 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.common.getPreferences
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.AuthImpl
+import net.pantasystem.milktea.data.infrastructure.account.ClientIdRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.account.db.MediatorAccountRepository
 import net.pantasystem.milktea.data.infrastructure.account.db.RoomAccountRepository
-import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.Auth
-import net.pantasystem.milktea.model.account.AuthById
-import net.pantasystem.milktea.model.account.GetAccount
+import net.pantasystem.milktea.model.account.*
 import javax.inject.Singleton
 
 @Module
@@ -34,6 +32,13 @@ object AccountModule {
     }
 
 
+    @Singleton
+    @Provides
+    fun provideClientIdRepository(
+        @ApplicationContext context: Context,
+    ) : ClientIdRepository {
+        return ClientIdRepositoryImpl(context.getPreferences())
+    }
 }
 
 @Module
