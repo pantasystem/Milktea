@@ -13,17 +13,14 @@ import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
-import net.pantasystem.milktea.common.BuildConfig
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
@@ -57,23 +54,19 @@ class AppAuthViewModel @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val metaStore: FetchMeta,
-    accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
+    accountRepository: AccountRepository,
 ) : ViewModel() {
     companion object {
         const val CALL_BACK_URL = "misskey://app_auth_callback"
     }
 
+    private val logger = loggerFactory.create("AppAuthViewModel")
 
     private val urlPattern =
         Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
-    val instanceDomain = MutableStateFlow(
-        if (accountStore.currentAccount == null) {
-            "misskey.io"
-        } else {
-            ""
-        }
-    )
+    val instanceDomain = MutableStateFlow("")
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
     }.flowOn(Dispatchers.IO).stateIn(
@@ -133,6 +126,18 @@ class AppAuthViewModel @Inject constructor(
                 }
             }
         }
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            accountRepository.findAll().onSuccess { accounts ->
+                if (!accounts.any { it.getHost() == "misskey.io" }) {
+                    instanceDomain.value = "misskey.io"
+                }
+            }.onFailure {
+                logger.error("findAll accounts failure", it)
+            }
+        }
+    }
 
     fun clearHostName() {
         instanceDomain.value = ""
