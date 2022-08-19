@@ -12,11 +12,12 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
-import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferenceName
+import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
@@ -30,7 +31,7 @@ import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaCache
 import javax.inject.Inject
@@ -90,6 +91,8 @@ class MiApplication : Application() {
     @Inject
     internal lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
+    @Inject
+    internal lateinit var clientIdRepository: ClientIdRepository
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -203,6 +206,10 @@ class MiApplication : Application() {
                     .setAnalyticsCollectionEnabled(it.isEnabled)
             }
         }
+
+        FirebaseAnalytics.getInstance(this).setUserId(
+            clientIdRepository.getOrCreate().clientId
+        )
     }
 
     private suspend fun setUpMetaMap(accounts: List<Account>) {
