@@ -46,17 +46,17 @@ interface UserDataSource {
     fun removeEventListener(listener: Listener)
 
 
-    suspend fun get(userId: User.Id): User
+    suspend fun get(userId: User.Id): Result<User>
 
-    suspend fun getIn(accountId: Long, serverIds: List<String>): List<User>
+    suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>>
 
-    suspend fun get(accountId: Long, userName: String, host: String?): User
+    suspend fun get(accountId: Long, userName: String, host: String?): Result<User>
 
-    suspend fun add(user: User): AddResult
+    suspend fun add(user: User): Result<AddResult>
 
-    suspend fun addAll(users: List<User>): List<AddResult>
+    suspend fun addAll(users: List<User>): Result<List<AddResult>>
 
-    suspend fun remove(user: User): Boolean
+    suspend fun remove(user: User): Result<Boolean>
 
 
     fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>>

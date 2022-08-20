@@ -42,8 +42,8 @@ class UserRepositoryImpl @Inject constructor(
         val localResult = runCatching {
             userDataSource.get(userId).let {
                 if (detail) {
-                    it as? User.Detail
-                } else it
+                    it.getOrThrow() as? User.Detail
+                } else it.getOrThrow()
             }
         }.onFailure {
             logger.debug("ローカルにユーザーは存在しませんでした。:$userId")
@@ -69,7 +69,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
                 val result = userDataSource.add(user)
                 logger.debug("add result: $result")
-                return userDataSource.get(userId)
+                return userDataSource.get(userId).getOrThrow()
             }
         }
 
@@ -85,8 +85,8 @@ class UserRepositoryImpl @Inject constructor(
         val local = runCatching {
             userDataSource.get(accountId, userName, host).let {
                 if (detail) {
-                    it as? User.Detail
-                } else it
+                    it.getOrThrow() as? User.Detail
+                } else it.getOrThrow()
             }
         }.getOrNull()
 
@@ -113,7 +113,7 @@ class UserRepositoryImpl @Inject constructor(
             }
             val user = it.toUser(account, detail)
             userDataSource.add(user)
-            return userDataSource.get(user.id)
+            return userDataSource.get(user.id).getOrThrow()
         }
 
         throw UserNotFoundException(

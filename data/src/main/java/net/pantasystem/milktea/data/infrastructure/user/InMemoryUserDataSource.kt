@@ -40,8 +40,8 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun add(user: User): AddResult {
-        return createOrUpdate(user).also {
+    override suspend fun add(user: User): Result<AddResult> = runCatching {
+        return@runCatching createOrUpdate(user).also {
             if (it == AddResult.Created) {
                 publish(UserDataSource.Event.Created(user.id, user))
             } else if (it == AddResult.Updated) {
@@ -51,31 +51,33 @@ class InMemoryUserDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(users: List<User>): List<AddResult> {
-        return users.map {
-            add(it)
-        }
-    }
-
-    override suspend fun get(userId: User.Id): User {
-        return usersLock.withLock {
-            userMap[userId]
-        } ?: throw UserNotFoundException(userId)
-    }
-
-    override suspend fun getIn(accountId: Long, serverIds: List<String>): List<User> {
-        val userIds = serverIds.map {
-            User.Id(accountId, it)
-        }
-        return usersLock.withLock {
-            userIds.mapNotNull {
-                userMap[it]
+    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCatching {
+        users.map {
+            add(it).getOrElse {
+                AddResult.Canceled
             }
         }
     }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): User {
-        return usersLock.withLock {
+    override suspend fun get(userId: User.Id): Result<User> = runCatching {
+        usersLock.withLock {
+            userMap[userId]
+        } ?: throw UserNotFoundException(userId)
+    }
+
+    override suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>> {
+        val userIds = serverIds.map {
+            User.Id(accountId, it)
+        }
+        return Result.success(usersLock.withLock {
+            userIds.mapNotNull {
+                userMap[it]
+            }
+        })
+    }
+
+    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCatching {
+        usersLock.withLock {
             userMap.filterKeys {
                 it.accountId == accountId
             }.map {
@@ -86,8 +88,8 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun remove(user: User): Boolean {
-        return usersLock.withLock {
+    override suspend fun remove(user: User): Result<Boolean> = runCatching {
+        usersLock.withLock {
             val map = userMap.toMutableMap()
             val result = map.remove(user.id)
             userMap = map

@@ -23,54 +23,47 @@ class MediatorUserDataSource @Inject constructor(
         inMem.removeEventListener(listener)
     }
 
-    override suspend fun get(userId: User.Id): User {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                inMem.get(userId)
-            }.getOrNull()
+    override suspend fun get(userId: User.Id): Result<User> = runCatching {
+        withContext(Dispatchers.IO) {
+            inMem.get(userId).getOrNull()
                 ?: (userDao.get(userId.accountId, userId.id)?.toModel()?.also {
-                    inMem.add(it)
+                    inMem.add(it).getOrThrow()
                 } ?: throw UserNotFoundException(userId))
         }
     }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): User {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                inMem.get(accountId, userName, host)
-            }.getOrNull()
+    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCatching {
+        withContext(Dispatchers.IO) {
+            inMem.get(accountId, userName, host).getOrNull()
                 ?: (if (host == null) {
                     userDao.getByUserName(accountId, userName)
                 } else {
                     userDao.getByUserName(accountId, userName, host)
                 })?.toModel()?.also {
-                    inMem.add(it)
+                    inMem.add(it).getOrThrow()
                 } ?: throw UserNotFoundException(userName = userName, host = host, userId = null)
         }
     }
 
-    override suspend fun getIn(accountId: Long, serverIds: List<String>): List<User> {
+    override suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>> = runCatching {
 
-        return withContext(Dispatchers.IO) {
-
+        withContext(Dispatchers.IO) {
             userDao.getInServerIds(accountId, serverIds).map {
                 it.toModel()
             }.also {
-                inMem.addAll(it)
+                inMem.addAll(it).getOrThrow()
             }
         }
     }
 
-    override suspend fun add(user: User): AddResult {
-        return withContext(Dispatchers.IO) {
-            val existsUserInMemory = runCatching {
-                inMem.get(user.id)
-            }.getOrNull()
+    override suspend fun add(user: User): Result<AddResult> = runCatching {
+        withContext(Dispatchers.IO) {
+            val existsUserInMemory = inMem.get(user.id).getOrNull()
             if (existsUserInMemory == user) {
                 return@withContext AddResult.Canceled
             }
 
-            val result = inMem.add(user)
+            val result = inMem.add(user).getOrThrow()
 
             if (result == AddResult.Canceled) {
                 return@withContext result
@@ -163,15 +156,17 @@ class MediatorUserDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(users: List<User>): List<AddResult> {
-        return users.map {
-            add(it)
+    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCatching {
+        users.map {
+            add(it).getOrElse {
+                AddResult.Canceled
+            }
         }
     }
 
-    override suspend fun remove(user: User): Boolean {
-        return runCatching {
-            inMem.remove(user)
+    override suspend fun remove(user: User): Result<Boolean> = runCatching {
+        runCatching {
+            inMem.remove(user).getOrThrow()
             userDao.delete(user.id.accountId, user.id.id)
             true
         }.getOrElse {
