@@ -33,7 +33,7 @@ class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
 
     override val state: StateFlow<Map<GalleryPost.Id, GalleryPost>> = _state
 
-    override suspend fun add(galleryPost: GalleryPost): AddResult {
+    override suspend fun add(galleryPost: GalleryPost): Result<AddResult> = runCatching {
         val result = lock.withLock {
             val map = galleries.toMutableMap()
             if(galleries[galleryPost.id] == null){
@@ -51,36 +51,40 @@ class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
         }else if(result == AddResult.Updated) {
             galleryEvents.tryEmit(GalleryDataSource.Event.Updated(galleryPost.id, galleryPost))
         }
-        return result
+        result
     }
 
-    override suspend fun addAll(posts: List<GalleryPost>): List<AddResult> {
-        return posts.map {
-            add(it)
-        }
+    override suspend fun addAll(posts: List<GalleryPost>): Result<List<AddResult>> {
+        return Result.success(
+            posts.map {
+                add(it).getOrElse {
+                    AddResult.Canceled
+                }
+            }
+        )
     }
 
 
 
-    override suspend fun find(galleryPostId: GalleryPost.Id): GalleryPost {
-        return galleries[galleryPostId] ?: throw GalleryNotFoundException(galleryPostId)
+    override suspend fun find(galleryPostId: GalleryPost.Id): Result<GalleryPost> = runCatching {
+        galleries[galleryPostId] ?: throw GalleryNotFoundException(galleryPostId)
     }
 
-    override suspend fun remove(galleryPostId: GalleryPost.Id): Boolean {
+    override suspend fun remove(galleryPostId: GalleryPost.Id): Result<Boolean> = runCatching {
         val result = lock.withLock {
             val map = galleries.toMutableMap()
             map.remove(galleryPostId) != null
         }
         galleryEvents.tryEmit(GalleryDataSource.Event.Deleted(galleryPostId))
-        return result
+        result
     }
 
-    override suspend fun findAll(): List<GalleryPost> {
-        return galleries.values.toList()
+    override suspend fun findAll(): Result<List<GalleryPost>> = runCatching {
+        galleries.values.toList()
     }
 
-    override suspend fun filterByAccountId(accountId: Long): List<GalleryPost> {
-        return findAll().filter {
+    override suspend fun filterByAccountId(accountId: Long): Result<List<GalleryPost>> = runCatching {
+        findAll().getOrThrow().filter {
             it.id.accountId == accountId
         }
     }

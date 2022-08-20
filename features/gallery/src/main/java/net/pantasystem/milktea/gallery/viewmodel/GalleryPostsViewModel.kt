@@ -104,9 +104,7 @@ class GalleryPostsViewModel @AssistedInject constructor(
                 runBlocking {
                     it.map { id ->
                         async {
-                            runCatching {
-                                galleryDataSource.find(id)
-                            }.getOrNull()
+                            galleryDataSource.find(id).getOrNull()
                         }
 
                     }.awaitAll().filterNotNull().map { post ->

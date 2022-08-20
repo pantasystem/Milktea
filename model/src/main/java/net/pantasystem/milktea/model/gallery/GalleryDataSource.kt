@@ -16,11 +16,11 @@ interface GalleryDataSource {
     fun events(): Flow<Event>
     val state: StateFlow<Map<GalleryPost.Id, GalleryPost>>
 
-    suspend fun add(galleryPost: GalleryPost) : AddResult
-    suspend fun remove(galleryPostId: GalleryPost.Id) : Boolean
-    suspend fun find(galleryPostId: GalleryPost.Id) : GalleryPost
-    suspend fun addAll(posts: List<GalleryPost>) : List<AddResult>
-    suspend fun findAll() : List<GalleryPost>
-    suspend fun filterByAccountId(accountId: Long) : List<GalleryPost>
+    suspend fun add(galleryPost: GalleryPost) : Result<AddResult>
+    suspend fun remove(galleryPostId: GalleryPost.Id) : Result<Boolean>
+    suspend fun find(galleryPostId: GalleryPost.Id) : Result<GalleryPost>
+    suspend fun addAll(posts: List<GalleryPost>) : Result<List<AddResult>>
+    suspend fun findAll() : Result<List<GalleryPost>>
+    suspend fun filterByAccountId(accountId: Long) : Result<List<GalleryPost>>
 }
 
