@@ -84,6 +84,6 @@ class InMemoryNoteDataSourceTest {
         val dtoParsed = dto.toNote(account)
         assertEquals(AddResult.Updated, noteDataSource.add(dtoParsed))
 
-        assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id))
+        assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id).getOrThrow())
     }
 }

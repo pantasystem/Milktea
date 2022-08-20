@@ -1,6 +1,5 @@
 package jp.panta.misskeyandroidclient.model.users.nickname
 
-import jp.panta.misskeyandroidclient.logger.TestLogger
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOnMemoryImpl
@@ -17,9 +16,7 @@ class UpdateNicknameUseCaseTest {
     fun testUpdate() {
         runBlocking {
             val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
-            val userDataSource = InMemoryUserDataSource(
-                loggerFactory = TestLogger.Factory()
-            )
+            val userDataSource = InMemoryUserDataSource()
             val updateNicknameUseCase = UpdateNicknameUseCase(
                 userDataSource,
                 nicknameRepository
@@ -46,7 +43,7 @@ class UpdateNicknameUseCaseTest {
             val result = updateNicknameUseCase.invoke(user, "updated nickname")
             assertEquals("updated nickname", nicknameRepository.findOne(targetId).name)
             assertEquals("updated nickname", result.displayName)
-            assertEquals("updated nickname", userDataSource.get(user.id).displayName)
+            assertEquals("updated nickname", userDataSource.get(user.id).getOrThrow().displayName)
         }
     }
 }
