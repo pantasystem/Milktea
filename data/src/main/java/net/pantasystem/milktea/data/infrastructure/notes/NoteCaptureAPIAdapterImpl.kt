@@ -150,7 +150,7 @@ class NoteCaptureAPIAdapterImpl(
     private suspend fun handleRemoteEvent(account: Account, e: NoteUpdated.Body) {
         val noteId = Note.Id(account.accountId, e.id)
         try {
-            val note = noteDataSource.get(noteId)
+            val note = noteDataSource.get(noteId).getOrThrow()
             when (e) {
                 is NoteUpdated.Body.Deleted -> {
                     noteDataSource.remove(noteId)

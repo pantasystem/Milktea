@@ -82,7 +82,7 @@ class UserDetailViewModel @AssistedInject constructor(
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
         pinNotesState.map { notes ->
             notes.mapNotNull {
-                noteRelationGetter.get(it).getOrNull()
+                noteRelationGetter.get(it.getOrThrow()).getOrNull()
             }.map { note ->
                 PlaneNoteViewData(
                     note,

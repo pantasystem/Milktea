@@ -80,7 +80,7 @@ class NoteRepositoryImpl @Inject constructor(
         val account = getAccount.get(noteId.accountId)
 
         var note = try {
-            noteDataSource.get(noteId)
+            noteDataSource.get(noteId).getOrThrow()
         } catch (e: NoteDeletedException) {
             throw e
         } catch (e: Throwable) {
@@ -110,7 +110,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findIn(noteIds: List<Note.Id>): List<Note> {
-        val notes = noteDataSource.getIn(noteIds)
+        val notes = noteDataSource.getIn(noteIds).getOrThrow()
         val notExistsIds = noteIds.filterNot {
             notes.any { note -> note.id == it }
         }
@@ -119,7 +119,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
 
         fetchIn(notExistsIds)
-        return noteDataSource.getIn(noteIds)
+        return noteDataSource.getIn(noteIds).getOrThrow()
     }
 
     override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCatching {
@@ -147,7 +147,7 @@ class NoteRepositoryImpl @Inject constructor(
         postUnReaction(noteId)
                 && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
                 || (note.myReaction != null
-                && noteDataSource.add(note.onIUnReacted()) != AddResult.Canceled))
+                && noteDataSource.add(note.onIUnReacted()).getOrThrow() != AddResult.Canceled))
     }
 
 
