@@ -23,6 +23,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
@@ -174,9 +176,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         startService(Intent(this, NotificationService::class.java))
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
-        binding.appBarMain.bottomNavigation.setupWithNavController(navHostFragment.navController)
+        setupNavigation()
+        setupOnBackPressedDispatcherCallBack()
 
         addMenuProvider(MainActivityMenuProvider(this, settingStore))
 
@@ -188,41 +189,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         collectConfirmGoogleAnalyticsState()
         collectRequestPostNotificationState()
 
-        onBackPressedDispatcher.addCallback {
-            val drawerLayout: DrawerLayout = binding.drawerLayout
-            val navController = binding.appBarMain.contentMain.contentMain.findNavController()
-            when {
-                drawerLayout.isDrawerOpen(GravityCompat.START) -> {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                }
-                // NOTE: そのままpopBackStackしてしまうとcurrentDestinationがNullになってしまいクラッシュしてしまう。
-                // NOTE: backQueue == 2の時は初めのDestinationを表示している状態になっている
-                // NOTE: backQueueには初期状態の時点で２つ以上入っている
-                //  destinations stack
-                //    |  fragment  |
-                //    | navigation |
-                //    |------------|
-                // 参考: https://qiita.com/kaleidot725/items/a6010dc4e67c944f44f1
-                navController.backQueue.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
-                    navController.popBackStack()
-                }
-                else -> {
-                    if (mBackPressedDelegate.back()) {
-                        remove()
-                        onBackPressedDispatcher.onBackPressed()
-                    } else {
-                        Toast.makeText(
-                            this@MainActivity,
-                            getString(R.string.please_again_to_finish),
-                            Toast.LENGTH_SHORT
-                        ).apply {
-                            setGravity(Gravity.CENTER, 0, 0)
-                            show()
-                        }
-                    }
-                }
-            }
-        }
+
     }
 
     override fun setToolbar(toolbar: Toolbar) {
@@ -296,6 +263,55 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         applyUI()
     }
 
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.contentMain) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.appBarMain.bottomNavigation.setupWithNavController(navController)
+        navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
+            FirebaseAnalytics.getInstance(this).logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+                param(FirebaseAnalytics.Param.SCREEN_NAME, destination.label.toString())
+                param(FirebaseAnalytics.Param.SCREEN_CLASS, destination.label.toString())
+            }
+        }
+    }
+
+    private fun setupOnBackPressedDispatcherCallBack() {
+        onBackPressedDispatcher.addCallback {
+            val drawerLayout: DrawerLayout = binding.drawerLayout
+            val navController = binding.appBarMain.contentMain.contentMain.findNavController()
+            when {
+                drawerLayout.isDrawerOpen(GravityCompat.START) -> {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+                // NOTE: そのままpopBackStackしてしまうとcurrentDestinationがNullになってしまいクラッシュしてしまう。
+                // NOTE: backQueue == 2の時は初めのDestinationを表示している状態になっている
+                // NOTE: backQueueには初期状態の時点で２つ以上入っている
+                //  destinations stack
+                //    |  fragment  |
+                //    | navigation |
+                //    |------------|
+                // 参考: https://qiita.com/kaleidot725/items/a6010dc4e67c944f44f1
+                navController.backQueue.filterNot { it.destination.id == R.id.main_nav }.size > 1 -> {
+                    navController.popBackStack()
+                }
+                else -> {
+                    if (mBackPressedDelegate.back()) {
+                        remove()
+                        onBackPressedDispatcher.onBackPressed()
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.please_again_to_finish),
+                            Toast.LENGTH_SHORT
+                        ).apply {
+                            setGravity(Gravity.CENTER, 0, 0)
+                            show()
+                        }
+                    }
+                }
+            }
+        }
+    }
     private fun setBackgroundImage() {
         val path = settingStore.backgroundImagePath
         Glide.with(this)
