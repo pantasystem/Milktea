@@ -93,14 +93,14 @@ class GalleryEditorViewModel @Inject constructor(
                 when (it) {
                     is EditType.Update -> {
                         val gallery = galleryRepository.find(it.postId)
-                        val files = filePropertyDataSource.findIn(gallery.fileIds)
+                        val files = filePropertyDataSource.findIn(gallery.fileIds).getOrNull()
                         state.value.copy(
                             title = gallery.title,
                             description = gallery.description,
                             isSensitive = gallery.isSensitive,
-                            pickedImages = files.map { file -> file.id }.map { fileId ->
+                            pickedImages = files?.map { file -> file.id }?.map { fileId ->
                                 AppFile.Remote(fileId)
-                            },
+                            }?: emptyList(),
                         )
                     }
                     is EditType.Create -> {
@@ -162,20 +162,21 @@ class GalleryEditorViewModel @Inject constructor(
 
     fun addFilePropertyIds(ids: List<FileProperty.Id>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val files = filePropertyDataSource.findIn(ids)
-
-            _state.update { state ->
-                val list = state.pickedImages.toMutableList().also { list ->
-                    list.addAll(
-                        files.map {
-                            AppFile.Remote(it.id)
-                        }
+            filePropertyDataSource.findIn(ids).onSuccess { files ->
+                _state.update { state ->
+                    val list = state.pickedImages.toMutableList().also { list ->
+                        list.addAll(
+                            files.map {
+                                AppFile.Remote(it.id)
+                            }
+                        )
+                    }
+                    state.copy(
+                        pickedImages = list
                     )
                 }
-                state.copy(
-                    pickedImages = list
-                )
             }
+
         }
     }
 

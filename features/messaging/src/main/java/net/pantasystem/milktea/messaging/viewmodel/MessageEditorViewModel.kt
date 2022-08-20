@@ -38,7 +38,7 @@ class MessageEditorViewModel @Inject constructor(
     fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { uiState ->
-                uiState.copy(file = filePropertyDataSource.find(filePropertyId))
+                uiState.copy(file = filePropertyDataSource.find(filePropertyId).getOrNull())
             }
         }
     }

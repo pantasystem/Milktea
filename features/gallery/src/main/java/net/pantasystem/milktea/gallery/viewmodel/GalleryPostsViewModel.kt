@@ -22,7 +22,10 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.gallery.*
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
+import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.gallery.GalleryPostRelation
+import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.model.user.UserRepository
 
 class GalleryPostsViewModel @AssistedInject constructor(
@@ -107,13 +110,13 @@ class GalleryPostsViewModel @AssistedInject constructor(
                         }
 
                     }.awaitAll().filterNotNull().map { post ->
-                        post to filePropertyDataSource.findIn(post.fileIds)
+                        post to filePropertyDataSource.findIn(post.fileIds).getOrElse { emptyList() }
                     }.filter { postWithFiles ->
                         postWithFiles.second.isNotEmpty()
                     }.map { postWithFiles ->
                         GalleryPostRelation(
                             postWithFiles.first,
-                            filePropertyDataSource.findIn(postWithFiles.first.fileIds),
+                            filePropertyDataSource.findIn(postWithFiles.first.fileIds).getOrElse { emptyList() },
                             userRepository.find(postWithFiles.first.userId, false)
                         )
                     }
@@ -157,14 +160,14 @@ class GalleryPostsViewModel @AssistedInject constructor(
         }
     }
 
-    fun loadFuture() {
-        if (galleryPostsStore.mutex.isLocked) {
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            galleryPostsStore.loadFuture()
-        }
-    }
+//    fun loadFuture() {
+//        if (galleryPostsStore.mutex.isLocked) {
+//            return
+//        }
+//        viewModelScope.launch(Dispatchers.IO) {
+//            galleryPostsStore.loadFuture()
+//        }
+//    }
 
     fun loadPrevious() {
         if (galleryPostsStore.mutex.isLocked) {

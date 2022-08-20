@@ -6,7 +6,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
@@ -14,6 +13,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteEditingState
 import net.pantasystem.milktea.app_store.notes.toCreateNote
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.account.Account
@@ -314,9 +314,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                filePropertyDataSource.findIn(ids)
-            }.onSuccess {
+            filePropertyDataSource.findIn(ids).onSuccess {
                 addAllFileProperty(it)
             }
         }

@@ -19,7 +19,7 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
 
     private val lock = Mutex()
 
-    override suspend fun add(fileProperty: FileProperty): AddResult {
+    override suspend fun add(fileProperty: FileProperty): Result<AddResult> {
         val result: AddResult
         lock.withLock {
             map = map.toMutableMap().also {
@@ -29,20 +29,22 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
         _state.value = _state.value.copy(
             map = map
         )
-        return result
+        return Result.success(result)
     }
 
-    override suspend fun addAll(list: List<FileProperty>): List<AddResult> {
-        return list.map {
-            add(it)
+    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCatching {
+        list.map {
+            add(it).getOrElse {
+                AddResult.Canceled
+            }
         }
     }
 
-    override suspend fun find(filePropertyId: FileProperty.Id): FileProperty {
-        return map[filePropertyId]?: throw FilePropertyNotFoundException(filePropertyId)
+    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCatching {
+        map[filePropertyId]?: throw FilePropertyNotFoundException(filePropertyId)
     }
 
-    override suspend fun remove(fileProperty: FileProperty): Boolean {
+    override suspend fun remove(fileProperty: FileProperty): Result<Boolean> {
         val result: Boolean
         lock.withLock {
             map = map.toMutableMap().also {
@@ -52,7 +54,7 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
         _state.value = _state.value.copy(
             map = map
         )
-        return result
+        return Result.success(result)
 
     }
 
