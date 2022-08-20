@@ -19,10 +19,10 @@ interface NotificationDataSource {
     fun addEventListener(listener: Listener)
     fun removeEventListener(listener: Listener)
 
-    suspend fun get(notificationId: Notification.Id): Notification
-    suspend fun add(notification: Notification): AddResult
-    suspend fun remove(notificationId: Notification.Id) : Boolean
-    suspend fun addAll(notifications: Collection<Notification>): List<AddResult>
+    suspend fun get(notificationId: Notification.Id): Result<Notification>
+    suspend fun add(notification: Notification): Result<AddResult>
+    suspend fun remove(notificationId: Notification.Id) : Result<Boolean>
+    suspend fun addAll(notifications: Collection<Notification>): Result<List<AddResult>>
 
 
 }
