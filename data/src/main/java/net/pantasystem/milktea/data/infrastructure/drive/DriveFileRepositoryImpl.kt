@@ -25,9 +25,7 @@ class DriveFileRepositoryImpl @Inject constructor(
     private val driveFileUploaderProvider: FileUploaderProvider,
 ) : DriveFileRepository {
     override suspend fun find(id: FileProperty.Id): FileProperty {
-        val file = runCatching {
-            driveFileDataSource.find(id)
-        }.getOrNull()
+        val file = driveFileDataSource.find(id).getOrNull()
         if (file != null) {
             return file
         }
@@ -63,8 +61,8 @@ class DriveFileRepositoryImpl @Inject constructor(
             val property = driveFileUploaderProvider.get(getAccount.get(accountId))
                 .upload(file, true)
                 .toFileProperty(getAccount.get(accountId))
-            driveFileDataSource.add(property)
-            driveFileDataSource.find(property.id)
+            driveFileDataSource.add(property).getOrThrow()
+            driveFileDataSource.find(property.id).getOrThrow()
         }
     }
 

@@ -26,18 +26,18 @@ interface FilePropertyDataSource {
 
     val state: StateFlow<FilePropertyDataSourceState>
 
-    suspend fun add(fileProperty: FileProperty) : AddResult
+    suspend fun add(fileProperty: FileProperty) : Result<AddResult>
 
-    suspend fun addAll(list: List<FileProperty>) : List<AddResult>
+    suspend fun addAll(list: List<FileProperty>) : Result<List<AddResult>>
 
-    suspend fun remove(fileProperty: FileProperty) : Boolean
+    suspend fun remove(fileProperty: FileProperty) : Result<Boolean>
 
-    suspend fun find(filePropertyId: FileProperty.Id) : FileProperty
+    suspend fun find(filePropertyId: FileProperty.Id) : Result<FileProperty>
 
-    suspend fun findIn(ids: List<FileProperty.Id>) : List<FileProperty> {
-        return ids.mapNotNull {
+    suspend fun findIn(ids: List<FileProperty.Id>) : Result<List<FileProperty>> = runCatching {
+        ids.mapNotNull {
             runCatching {
-                find(it)
+                find(it).getOrNull()
             }.getOrNull()
         }
     }

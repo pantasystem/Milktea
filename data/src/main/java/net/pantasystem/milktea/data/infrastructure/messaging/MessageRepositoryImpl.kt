@@ -37,7 +37,7 @@ class MessageRepositoryImpl @Inject constructor(
         ).isSuccessful
 
         if (result) {
-            messageDataSource.find(messageId)?.read()?.let {
+            messageDataSource.find(messageId).getOrNull()?.read()?.let {
                 messageDataSource.add(it)
             }
         }

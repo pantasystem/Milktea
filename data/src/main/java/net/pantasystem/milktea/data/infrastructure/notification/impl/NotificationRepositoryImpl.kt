@@ -30,7 +30,7 @@ class NotificationRepositoryImpl @Inject constructor(
             socketProvider.get(account).send(
                 Send.ReadNotification(
                     Send.ReadNotification.Body(notificationId.notificationId)).toJson())
-            notificationDataSource.add(notificationDataSource.get(notificationId).read())
+            notificationDataSource.add(notificationDataSource.get(notificationId).getOrThrow().read())
         }
     }
 

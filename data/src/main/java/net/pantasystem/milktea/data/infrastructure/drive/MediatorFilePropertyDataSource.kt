@@ -24,7 +24,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
     override val state: StateFlow<FilePropertyDataSourceState>
         get() = inMemoryFilePropertyDataSource.state
 
-    override suspend fun add(fileProperty: FileProperty): AddResult {
+    override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCatching {
         val result = inMemoryFilePropertyDataSource.add(fileProperty)
         val record = runCatching {
             driveFileRecordDao.findOne(fileProperty.id.accountId, fileProperty.id.fileId)
@@ -32,21 +32,21 @@ class MediatorFilePropertyDataSource @Inject constructor(
         try {
             if (record == null) {
                 driveFileRecordDao.insert(DriveFileRecord.from(fileProperty))
-                return AddResult.Created
+                return@runCatching AddResult.Created
             } else if (record.toFileProperty() != fileProperty) {
                 driveFileRecordDao.update(DriveFileRecord.from(fileProperty).copy(id = record.id))
-                return AddResult.Updated
+                return@runCatching AddResult.Updated
             }
         } catch (e: Exception) {
-            return AddResult.Canceled
+            return@runCatching AddResult.Canceled
         }
 
         return result
     }
 
-    override suspend fun addAll(list: List<FileProperty>): List<AddResult> {
+    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCatching {
         if (list.isEmpty()) {
-            return emptyList()
+            return@runCatching emptyList()
         }
         val results = inMemoryFilePropertyDataSource.addAll(list)
         val insertResults = driveFileRecordDao.insertAll(list.map {
@@ -86,28 +86,26 @@ class MediatorFilePropertyDataSource @Inject constructor(
         return results
     }
 
-    override suspend fun find(filePropertyId: FileProperty.Id): FileProperty {
-        var result = runCatching {
-            inMemoryFilePropertyDataSource.find(filePropertyId)
-        }.getOrNull()
+    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCatching {
+        var result = inMemoryFilePropertyDataSource.find(filePropertyId).getOrNull()
         if (result != null) {
-            return result
+            return@runCatching result
         }
         result = runCatching {
             driveFileRecordDao.findOne(filePropertyId.accountId, filePropertyId.fileId)
                 ?.toFileProperty()
         }.getOrNull()
 
-        return result ?: throw FilePropertyNotFoundException(filePropertyId)
+        result ?: throw FilePropertyNotFoundException(filePropertyId)
     }
 
-    override suspend fun remove(fileProperty: FileProperty): Boolean {
-        return try {
+    override suspend fun remove(fileProperty: FileProperty): Result<Boolean> = runCatching {
+        try {
             driveFileRecordDao.delete(fileProperty.id.accountId, fileProperty.id.fileId)
             true
         } catch (e: Exception) {
             false
-        } && inMemoryFilePropertyDataSource.remove(fileProperty)
+        } && inMemoryFilePropertyDataSource.remove(fileProperty).getOrThrow()
     }
 
 
@@ -147,10 +145,10 @@ class MediatorFilePropertyDataSource @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun findIn(ids: List<FileProperty.Id>): List<FileProperty> {
-        val inMemories = inMemoryFilePropertyDataSource.findIn(ids)
+    override suspend fun findIn(ids: List<FileProperty.Id>): Result<List<FileProperty>> = runCatching {
+        val inMemories = inMemoryFilePropertyDataSource.findIn(ids).getOrThrow()
         if (inMemories.size == ids.size) {
-            return inMemories
+            return@runCatching inMemories
         }
         val sets = inMemories.map { it.id }.toSet()
         val notExistsIds = ids.filterNot {
@@ -163,7 +161,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
         val map = (inMemories + onDb).associateBy {
             it.id
         }
-        return ids.mapNotNull {
+        return@runCatching ids.mapNotNull {
             map[it]
         }
     }

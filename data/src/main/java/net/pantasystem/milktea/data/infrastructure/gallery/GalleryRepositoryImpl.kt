@@ -79,7 +79,7 @@ class GalleryRepositoryImpl @Inject constructor(
 
     override suspend fun find(id: GalleryPost.Id): GalleryPost {
         try {
-            return galleryDataSource.find(id)
+            return galleryDataSource.find(id).getOrThrow()
         }catch (e: GalleryNotFoundException) {
 
         }

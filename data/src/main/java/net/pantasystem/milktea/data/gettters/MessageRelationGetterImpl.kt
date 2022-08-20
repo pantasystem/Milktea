@@ -40,7 +40,7 @@ class MessageRelationGetterImpl @Inject constructor(
 
     @Throws(MessageNotFoundException::class)
     override suspend fun get(messageId: Message.Id): MessageRelation {
-        val message = messageDataSource.find(messageId)
+        val message = messageDataSource.find(messageId).getOrNull()
             ?: throw MessageNotFoundException(messageId)
         return get(message)
     }
@@ -51,14 +51,14 @@ class MessageRelationGetterImpl @Inject constructor(
             is Message.Direct -> {
                 MessageRelation.Direct(
                     message,
-                    userDataSource.get(message.userId),
+                    userDataSource.get(message.userId).getOrThrow(),
                     accountRepository.get(message.id.accountId).getOrThrow()
                 )
             }
             is Message.Group -> {
                 MessageRelation.Group(
                     message,
-                    userDataSource.get(message.userId),
+                    userDataSource.get(message.userId).getOrThrow(),
                     accountRepository.get(message.id.accountId).getOrThrow()
                 )
             }

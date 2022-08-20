@@ -50,7 +50,7 @@ class NotificationRelationGetter @Inject constructor(
         val noteRelation = (notification as? HasNote)?.let{
             noteRelationGetter.get(it.noteId)
         }
-        return NotificationRelation(notification, user, noteRelation?.getOrNull())
+        return NotificationRelation(notification.getOrThrow(), user?.getOrNull(), noteRelation?.getOrNull())
     }
 
     suspend fun get(accountId: Long, notificationId: String): NotificationRelation {

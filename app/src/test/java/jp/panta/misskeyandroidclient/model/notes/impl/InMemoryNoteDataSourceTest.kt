@@ -49,13 +49,13 @@ class InMemoryNoteDataSourceTest {
         runBlocking {
             val result = noteDataSource.add(
                 note
-            )
+            ).getOrThrow()
             delay(10)
 
             assertEquals(AddResult.Created, result)
             delay(10)
 
-            assertEquals(AddResult.Updated, noteDataSource.add(note))
+            assertEquals(AddResult.Updated, noteDataSource.add(note).getOrThrow())
             delay(10)
 
 
@@ -82,8 +82,8 @@ class InMemoryNoteDataSourceTest {
         )
 
         val dtoParsed = dto.toNote(account)
-        assertEquals(AddResult.Updated, noteDataSource.add(dtoParsed))
+        assertEquals(AddResult.Updated, noteDataSource.add(dtoParsed).getOrThrow())
 
-        assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id))
+        assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id).getOrThrow())
     }
 }

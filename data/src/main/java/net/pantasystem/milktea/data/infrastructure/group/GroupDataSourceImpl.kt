@@ -15,8 +15,8 @@ class GroupDataSourceImpl @Inject constructor(
     private val getAccount: GetAccount,
 ) : GroupDataSource {
 
-    override suspend fun add(group: Group): AddResult {
-        return withContext(Dispatchers.IO) {
+    override suspend fun add(group: Group): Result<AddResult> = runCatching {
+        withContext(Dispatchers.IO) {
             val record = groupDao.findOne(group.id.accountId, group.id.groupId)
             val newEntity = GroupRecord.from(group)
             if (record == null) {
@@ -40,22 +40,24 @@ class GroupDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun addAll(groups: List<Group>): List<AddResult> {
-        return groups.map {
-            add(it)
+    override suspend fun addAll(groups: List<Group>): Result<List<AddResult>> = runCatching {
+        groups.map {
+            add(it).getOrElse {
+                AddResult.Canceled
+            }
         }
     }
 
-    override suspend fun delete(groupId: Group.Id): Boolean {
-        return withContext(Dispatchers.IO) {
+    override suspend fun delete(groupId: Group.Id): Result<Boolean> = runCatching {
+        withContext(Dispatchers.IO) {
             val exists = groupDao.findOne(groupId.accountId, groupId.groupId) != null
             groupDao.delete(groupId.accountId, groupId.groupId)
             exists
         }
     }
 
-    override suspend fun find(groupId: Group.Id): Group {
-        return withContext(Dispatchers.IO) {
+    override suspend fun find(groupId: Group.Id): Result<Group> = runCatching {
+        withContext(Dispatchers.IO) {
             groupDao.findOne(groupId.accountId, groupId.groupId)
                 ?.toModel()
                 ?: throw GroupNotFoundException(groupId)

@@ -11,15 +11,15 @@ import net.pantasystem.milktea.model.messaging.MessagingId
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 
 interface MessageDataSource {
-    suspend fun add(message: Message): AddResult
+    suspend fun add(message: Message): Result<AddResult>
 
-    suspend fun addAll(messages: List<Message>): List<AddResult>
+    suspend fun addAll(messages: List<Message>): Result<List<AddResult>>
 
-    suspend fun delete(messageId: Message.Id): Boolean
+    suspend fun delete(messageId: Message.Id): Result<Boolean>
 
-    suspend fun find(messageId: Message.Id): Message?
+    suspend fun find(messageId: Message.Id): Result<Message?>
 
-    suspend fun readAllMessages(accountId: Long)
+    suspend fun readAllMessages(accountId: Long): Result<Unit>
 }
 
 class InMemoryMessageDataSource(
@@ -33,26 +33,26 @@ class InMemoryMessageDataSource(
         }
     )
 
-    override suspend fun add(message: Message): AddResult {
-        return createOrUpdate(message).also {
+    override suspend fun add(message: Message): Result<AddResult> = runCatching {
+        createOrUpdate(message).also {
             updateState()
         }
     }
 
-    override suspend fun addAll(messages: List<Message>): List<AddResult> {
-        return messages.map {
-            add(it)
+    override suspend fun addAll(messages: List<Message>): Result<List<AddResult>> = runCatching {
+        messages.map {
+            add(it).getOrElse { AddResult.Canceled }
         }
     }
 
-    override suspend fun delete(messageId: Message.Id): Boolean {
-        return remove(messageId).also {
+    override suspend fun delete(messageId: Message.Id): Result<Boolean> = runCatching {
+        remove(messageId).also {
             updateState()
         }
     }
 
-    override suspend fun find(messageId: Message.Id): Message? {
-        return get(messageId)
+    override suspend fun find(messageId: Message.Id): Result<Message?> {
+        return Result.success(get(messageId))
     }
 
     override fun findByMessagingId(messagingId: MessagingId): Flow<List<Message>> {
@@ -86,7 +86,7 @@ class InMemoryMessageDataSource(
         }
     }
 
-    override suspend fun readAllMessages(accountId: Long) {
+    override suspend fun readAllMessages(accountId: Long): Result<Unit> = runCatching {
         readAllMessagesByAccountId(accountId)
         updateState()
     }

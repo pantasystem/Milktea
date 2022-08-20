@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.User
@@ -13,64 +14,52 @@ import javax.inject.Inject
 class MediatorUserDataSource @Inject constructor(
     private val userDao: UserDao,
     private val inMem: InMemoryUserDataSource,
-
+    loggerFactory: Logger.Factory
 ) : UserDataSource {
-    override fun addEventListener(listener: UserDataSource.Listener) {
-        inMem.addEventListener(listener)
-    }
 
-    override fun removeEventListener(listener: UserDataSource.Listener) {
-        inMem.removeEventListener(listener)
-    }
+    val logger = loggerFactory.create("MediatorUserDataSource")
 
-    override suspend fun get(userId: User.Id): User {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                inMem.get(userId)
-            }.getOrNull()
+    override suspend fun get(userId: User.Id): Result<User> = runCatching {
+        withContext(Dispatchers.IO) {
+            inMem.get(userId).getOrNull()
                 ?: (userDao.get(userId.accountId, userId.id)?.toModel()?.also {
-                    inMem.add(it)
+                    inMem.add(it).getOrThrow()
                 } ?: throw UserNotFoundException(userId))
         }
     }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): User {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                inMem.get(accountId, userName, host)
-            }.getOrNull()
+    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCatching {
+        withContext(Dispatchers.IO) {
+            inMem.get(accountId, userName, host).getOrNull()
                 ?: (if (host == null) {
                     userDao.getByUserName(accountId, userName)
                 } else {
                     userDao.getByUserName(accountId, userName, host)
                 })?.toModel()?.also {
-                    inMem.add(it)
+                    inMem.add(it).getOrThrow()
                 } ?: throw UserNotFoundException(userName = userName, host = host, userId = null)
         }
     }
 
-    override suspend fun getIn(accountId: Long, serverIds: List<String>): List<User> {
+    override suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>> = runCatching {
 
-        return withContext(Dispatchers.IO) {
-
+        withContext(Dispatchers.IO) {
             userDao.getInServerIds(accountId, serverIds).map {
                 it.toModel()
             }.also {
-                inMem.addAll(it)
+                inMem.addAll(it).getOrThrow()
             }
         }
     }
 
-    override suspend fun add(user: User): AddResult {
-        return withContext(Dispatchers.IO) {
-            val existsUserInMemory = runCatching {
-                inMem.get(user.id)
-            }.getOrNull()
+    override suspend fun add(user: User): Result<AddResult> = runCatching {
+        withContext(Dispatchers.IO) {
+            val existsUserInMemory = inMem.get(user.id).getOrNull()
             if (existsUserInMemory == user) {
                 return@withContext AddResult.Canceled
             }
 
-            val result = inMem.add(user)
+            val result = inMem.add(user).getOrThrow()
 
             if (result == AddResult.Canceled) {
                 return@withContext result
@@ -163,15 +152,17 @@ class MediatorUserDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(users: List<User>): List<AddResult> {
-        return users.map {
-            add(it)
+    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCatching {
+        users.map {
+            add(it).getOrElse {
+                AddResult.Canceled
+            }
         }
     }
 
-    override suspend fun remove(user: User): Boolean {
-        return runCatching {
-            inMem.remove(user)
+    override suspend fun remove(user: User): Result<Boolean> = runCatching {
+        runCatching {
+            inMem.remove(user).getOrThrow()
             userDao.delete(user.id.accountId, user.id.id)
             true
         }.getOrElse {
@@ -187,7 +178,10 @@ class MediatorUserDataSource @Inject constructor(
             }
         }.flowOn(Dispatchers.IO).onEach {
             inMem.addAll(it)
-        }.distinctUntilChanged()
+        }.distinctUntilChanged().catch {
+            logger.error("observeIn error", it)
+            throw it
+        }
     }
 
     override fun observe(userId: User.Id): Flow<User> {
@@ -195,7 +189,10 @@ class MediatorUserDataSource @Inject constructor(
             it?.toModel()
         }.onEach {
             inMem.add(it)
-        }.flowOn(Dispatchers.IO).distinctUntilChanged()
+        }.flowOn(Dispatchers.IO).distinctUntilChanged().catch {
+            logger.error("observe by userId error", it)
+            throw it
+        }
     }
 
     override fun observe(acct: String): Flow<User> {
@@ -212,11 +209,17 @@ class MediatorUserDataSource @Inject constructor(
             it.toModel()
         }.onEach {
             inMem.add(it)
-        }.flowOn(Dispatchers.IO).distinctUntilChanged()
+        }.flowOn(Dispatchers.IO).distinctUntilChanged().catch {
+            logger.error("observe by acct error, acct:$acct", it)
+            throw it
+        }
     }
 
     override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
-        return inMem.observe(userName, host, accountId).distinctUntilChanged()
+        return inMem.observe(userName, host, accountId).distinctUntilChanged().catch {
+            logger.error("observe error", it)
+            throw it
+        }
     }
 
     override suspend fun searchByName(accountId: Long, name: String): List<User> {

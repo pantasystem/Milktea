@@ -1,12 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationNotFoundException
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSource {
@@ -29,8 +29,8 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
-    override suspend fun add(notification: Notification): AddResult {
-        return createOrUpdate(notification).also {
+    override suspend fun add(notification: Notification): Result<AddResult> = runCatching {
+        createOrUpdate(notification).also {
             if(it == AddResult.Created) {
                 publish(NotificationDataSource.Event.Created(notification.id, notification))
             }else if(it == AddResult.Updated) {
@@ -39,18 +39,20 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
-    override suspend fun addAll(notifications: Collection<Notification>): List<AddResult> {
-        return notifications.map {
-            add(it)
+    override suspend fun addAll(notifications: Collection<Notification>): Result<List<AddResult>> = runCatching {
+        notifications.map {
+            add(it).getOrElse {
+                AddResult.Canceled
+            }
         }
     }
 
-    override suspend fun get(notificationId: Notification.Id): Notification {
-        return find(notificationId)?: throw NotificationNotFoundException(notificationId)
+    override suspend fun get(notificationId: Notification.Id): Result<Notification> = runCatching {
+        find(notificationId)?: throw NotificationNotFoundException(notificationId)
     }
 
-    override suspend fun remove(notificationId: Notification.Id): Boolean {
-        return delete(notificationId).also {
+    override suspend fun remove(notificationId: Notification.Id): Result<Boolean> = runCatching {
+        delete(notificationId).also {
             if(it){
                 publish(NotificationDataSource.Event.Deleted(notificationId))
             }

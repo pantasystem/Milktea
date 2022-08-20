@@ -47,7 +47,7 @@ class NoteRelationGetter @Inject constructor(
             it.accountId
         }
         val users = acIdAndNoteIdMap.map { list ->
-            userDataSource.getIn(list.key, list.value.map { it.noteId })
+            userDataSource.getIn(list.key, list.value.map { it.noteId }).getOrElse { emptyList() }
         }.flatten().associateBy {
             it.id
         }
@@ -84,7 +84,7 @@ class NoteRelationGetter @Inject constructor(
     ): Result<NoteRelation> {
         return runCatching {
             val user = usersMap.getOrElse(note.userId) {
-                userDataSource.get(note.userId)
+                userDataSource.get(note.userId).getOrThrow()
             }
 
             val renote = if (deep) {
@@ -104,7 +104,7 @@ class NoteRelationGetter @Inject constructor(
                     user,
                     renote?.getOrNull(),
                     reply?.getOrNull(),
-                    note.fileIds?.let { filePropertyDataSource.findIn(it) },
+                    note.fileIds?.let { filePropertyDataSource.findIn(it).getOrNull() },
                     featuredId
                 )
             }
@@ -115,7 +115,7 @@ class NoteRelationGetter @Inject constructor(
                     user,
                     renote?.getOrNull(),
                     reply?.getOrNull(),
-                    note.fileIds?.let { filePropertyDataSource.findIn(it) },
+                    note.fileIds?.let { filePropertyDataSource.findIn(it).getOrNull() },
                     promotionId
                 )
             }
@@ -124,7 +124,7 @@ class NoteRelationGetter @Inject constructor(
                 user = user,
                 renote = renote?.getOrNull(),
                 reply = reply?.getOrNull(),
-                note.fileIds?.let { filePropertyDataSource.findIn(it) },
+                note.fileIds?.let { filePropertyDataSource.findIn(it).getOrNull() },
             )
         }
 
