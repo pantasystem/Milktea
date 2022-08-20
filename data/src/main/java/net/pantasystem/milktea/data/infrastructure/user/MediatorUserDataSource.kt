@@ -15,13 +15,7 @@ class MediatorUserDataSource @Inject constructor(
     private val inMem: InMemoryUserDataSource,
 
 ) : UserDataSource {
-    override fun addEventListener(listener: UserDataSource.Listener) {
-        inMem.addEventListener(listener)
-    }
 
-    override fun removeEventListener(listener: UserDataSource.Listener) {
-        inMem.removeEventListener(listener)
-    }
 
     override suspend fun get(userId: User.Id): Result<User> = runCatching {
         withContext(Dispatchers.IO) {

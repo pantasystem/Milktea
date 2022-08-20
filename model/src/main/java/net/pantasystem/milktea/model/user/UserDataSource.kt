@@ -30,22 +30,6 @@ data class UsersState (
 interface UserDataSource {
 
 
-    sealed class Event{
-        abstract val userId: User.Id
-        data class Updated(override val userId: User.Id, val user: User): Event()
-        data class Removed(override val userId: User.Id): Event()
-        data class Created(override val userId: User.Id, val user: User): Event()
-    }
-
-    fun interface Listener {
-        fun on(e: Event)
-    }
-
-    fun addEventListener(listener: Listener)
-
-    fun removeEventListener(listener: Listener)
-
-
     suspend fun get(userId: User.Id): Result<User>
 
     suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>>

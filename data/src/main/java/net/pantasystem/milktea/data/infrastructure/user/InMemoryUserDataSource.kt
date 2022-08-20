@@ -4,7 +4,6 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -12,10 +11,7 @@ import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UsersState
 import javax.inject.Inject
 
-class InMemoryUserDataSource @Inject constructor(
-    loggerFactory: Logger.Factory?,
-) : UserDataSource {
-    private val logger = loggerFactory?.create("InMemoryUserDataSource")
+class InMemoryUserDataSource @Inject constructor() : UserDataSource {
 
     private var userMap = mapOf<User.Id, User>()
 
@@ -26,27 +22,11 @@ class InMemoryUserDataSource @Inject constructor(
         get() = _state
 
 
-    private var listeners = setOf<UserDataSource.Listener>()
 
-    override fun addEventListener(listener: UserDataSource.Listener) {
-        this.listeners = listeners.toMutableSet().apply {
-            add(listener)
-        }
-    }
-
-    override fun removeEventListener(listener: UserDataSource.Listener) {
-        this.listeners = listeners.toMutableSet().apply {
-            remove(listener)
-        }
-    }
 
     override suspend fun add(user: User): Result<AddResult> = runCatching {
         return@runCatching createOrUpdate(user).also {
-            if (it == AddResult.Created) {
-                publish(UserDataSource.Event.Created(user.id, user))
-            } else if (it == AddResult.Updated) {
-                publish(UserDataSource.Event.Updated(user.id, user))
-            }
+            publish()
         }
 
     }
@@ -95,7 +75,7 @@ class InMemoryUserDataSource @Inject constructor(
             userMap = map
             result
         }?.also {
-            publish(UserDataSource.Event.Removed(user.id))
+            publish()
         } != null
 
 
@@ -186,13 +166,9 @@ class InMemoryUserDataSource @Inject constructor(
         }
     }
 
-    private fun publish(e: UserDataSource.Event) {
+    private fun publish() {
         _state.value = _state.value.copy(
             usersMap = userMap
         )
-        logger?.debug("publish events:$e")
-        listeners.forEach { listener ->
-            listener.on(e)
-        }
     }
 }
