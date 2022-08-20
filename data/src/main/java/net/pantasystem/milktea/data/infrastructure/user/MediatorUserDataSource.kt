@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.User
@@ -13,9 +14,10 @@ import javax.inject.Inject
 class MediatorUserDataSource @Inject constructor(
     private val userDao: UserDao,
     private val inMem: InMemoryUserDataSource,
-
+    loggerFactory: Logger.Factory
 ) : UserDataSource {
 
+    val logger = loggerFactory.create("MediatorUserDataSource")
 
     override suspend fun get(userId: User.Id): Result<User> = runCatching {
         withContext(Dispatchers.IO) {
@@ -176,7 +178,10 @@ class MediatorUserDataSource @Inject constructor(
             }
         }.flowOn(Dispatchers.IO).onEach {
             inMem.addAll(it)
-        }.distinctUntilChanged()
+        }.distinctUntilChanged().catch {
+            logger.error("observeIn error", it)
+            throw it
+        }
     }
 
     override fun observe(userId: User.Id): Flow<User> {
@@ -184,7 +189,10 @@ class MediatorUserDataSource @Inject constructor(
             it?.toModel()
         }.onEach {
             inMem.add(it)
-        }.flowOn(Dispatchers.IO).distinctUntilChanged()
+        }.flowOn(Dispatchers.IO).distinctUntilChanged().catch {
+            logger.error("observe by userId error", it)
+            throw it
+        }
     }
 
     override fun observe(acct: String): Flow<User> {
@@ -201,11 +209,17 @@ class MediatorUserDataSource @Inject constructor(
             it.toModel()
         }.onEach {
             inMem.add(it)
-        }.flowOn(Dispatchers.IO).distinctUntilChanged()
+        }.flowOn(Dispatchers.IO).distinctUntilChanged().catch {
+            logger.error("observe by acct error, acct:$acct", it)
+            throw it
+        }
     }
 
     override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
-        return inMem.observe(userName, host, accountId).distinctUntilChanged()
+        return inMem.observe(userName, host, accountId).distinctUntilChanged().catch {
+            logger.error("observe error", it)
+            throw it
+        }
     }
 
     override suspend fun searchByName(accountId: Long, name: String): List<User> {
