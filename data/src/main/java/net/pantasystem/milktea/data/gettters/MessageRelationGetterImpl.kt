@@ -40,7 +40,7 @@ class MessageRelationGetterImpl @Inject constructor(
 
     @Throws(MessageNotFoundException::class)
     override suspend fun get(messageId: Message.Id): MessageRelation {
-        val message = messageDataSource.find(messageId)
+        val message = messageDataSource.find(messageId).getOrNull()
             ?: throw MessageNotFoundException(messageId)
         return get(message)
     }
