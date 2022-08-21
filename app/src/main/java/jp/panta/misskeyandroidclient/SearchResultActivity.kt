@@ -17,9 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
+import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.SearchUserFragment
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
@@ -27,9 +27,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
@@ -59,6 +59,9 @@ class SearchResultActivity : AppCompatActivity() {
     @Inject
     lateinit var accountStore: AccountStore
 
+    @Inject
+    lateinit var pageableFragmentFactory: PageableFragmentFactory
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,7 +84,7 @@ class SearchResultActivity : AppCompatActivity() {
         val isTag = keyword.startsWith("#")
         mIsTag = isTag
 
-        val pager = PagerAdapter(this, keyword, supportFragmentManager)
+        val pager = PagerAdapter(this, supportFragmentManager, pageableFragmentFactory, keyword)
         binding.searchResultPager.adapter = pager
         binding.searchResultTab.setupWithViewPager(binding.searchResultPager)
 
@@ -183,8 +186,9 @@ class SearchResultActivity : AppCompatActivity() {
 
     class PagerAdapter(
         private val context: Context,
+        fragmentManager: FragmentManager,
+        private val pageableFragmentFactory: PageableFragmentFactory,
         private val keyword: String,
-        fragmentManager: FragmentManager
     ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         private val isTag = keyword.startsWith("#")
@@ -215,13 +219,13 @@ class SearchResultActivity : AppCompatActivity() {
                     } else {
                         Pageable.Search(query = keyword)
                     }
-                    TimelineFragment.newInstance(request)
+                    pageableFragmentFactory.create(request)
                 }
                 SEARCH_USERS -> {
                     SearchUserFragment.newInstance(keyword)
                 }
                 else -> {
-                    TimelineFragment.newInstance(
+                    pageableFragmentFactory.create(
                         Pageable.Search(query = keyword)
                     )
                 }

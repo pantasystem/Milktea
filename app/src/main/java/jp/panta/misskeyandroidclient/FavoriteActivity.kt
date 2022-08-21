@@ -8,8 +8,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
+import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
@@ -27,6 +27,9 @@ class FavoriteActivity : AppCompatActivity() {
     @Inject
     lateinit var settingStore: SettingStore
 
+    @Inject
+    lateinit var pageableFragmentFactory: PageableFragmentFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -42,7 +45,7 @@ class FavoriteActivity : AppCompatActivity() {
             ViewModelProvider(this)[ConfirmViewModel::class.java],
             settingStore
         ).initViewModelListener()
-        val fragment = TimelineFragment.newInstance(
+        val fragment = pageableFragmentFactory.create(
             Pageable.Favorite
         )
 
