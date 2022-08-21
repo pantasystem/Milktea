@@ -11,7 +11,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.common_android.ui
+package net.pantasystem.milktea.common_android_ui
 
 import androidx.fragment.app.Fragment
 import net.pantasystem.milktea.model.account.page.Page

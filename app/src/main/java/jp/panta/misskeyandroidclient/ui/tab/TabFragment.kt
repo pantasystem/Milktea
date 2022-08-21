@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common.ui.ToolbarSetter
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.note.viewmodel.TabViewModel
 import javax.inject.Inject

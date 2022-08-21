@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactoryImpl
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import javax.inject.Singleton
 
 @Module

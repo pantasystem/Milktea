@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel

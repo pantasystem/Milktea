@@ -25,7 +25,7 @@ import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.ChangedDiffResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page

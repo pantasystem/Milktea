@@ -16,7 +16,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.Activities
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel

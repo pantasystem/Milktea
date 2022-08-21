@@ -33,7 +33,7 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android.ui.Activities
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
