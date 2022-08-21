@@ -47,6 +47,7 @@ dependencies {
     implementation project(path: ':common_compose')
     implementation project(path: ':model')
     implementation project(path: ':data')
+    implementation project(path: ':app_store')
     implementation libs.lifecycle.extenstions
     implementation libs.lifecycle.viewmodel
 

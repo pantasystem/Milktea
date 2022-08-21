@@ -21,7 +21,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.setMenuTint
-import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.ui.explore.ExploreType
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -4,19 +4,16 @@ import androidx.fragment.app.Fragment
 import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.ui.notification.NotificationFragment
+import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
-interface PageableFragmentFactory {
-    fun create(page: Page): Fragment
-    fun create(pageable: Pageable): Fragment
-}
 
 class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory {
 
-    override fun create(page: Page): Fragment{
+    override fun create(page: Page): Fragment {
         return when(val pageable = page.pageable()){
             is Pageable.Show ->{
                 NoteDetailFragment.newInstance(page)
