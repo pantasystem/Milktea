@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.viewmodel
+package jp.panta.misskeyandroidclient.ui.tab
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
