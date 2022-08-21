@@ -19,7 +19,6 @@ import jp.panta.misskeyandroidclient.databinding.ItemNoteBinding
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardAction
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter
 import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionCountAdapter
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteConversationViewData
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewData
@@ -27,7 +26,6 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.detail.NoteDetailViewMod
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
 class NoteDetailAdapter(
-    private val notesViewModel: NotesViewModel,
     private val noteDetailViewModel: NoteDetailViewModel,
     private val viewLifecycleOwner: LifecycleOwner,
     diffUtil: DiffUtil.ItemCallback<PlaneNoteViewData> = object : DiffUtil.ItemCallback<PlaneNoteViewData>(){

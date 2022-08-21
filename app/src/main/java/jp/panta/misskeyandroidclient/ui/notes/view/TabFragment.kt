@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
-import jp.panta.misskeyandroidclient.ui.ScrollableTop
+import net.pantasystem.milktea.common.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull

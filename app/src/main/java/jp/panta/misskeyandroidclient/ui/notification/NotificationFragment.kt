@@ -14,7 +14,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
-import jp.panta.misskeyandroidclient.ui.ScrollableTop
+import net.pantasystem.milktea.common.ui.ScrollableTop
 import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData

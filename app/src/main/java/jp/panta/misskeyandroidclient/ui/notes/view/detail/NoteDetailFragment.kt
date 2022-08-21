@@ -102,7 +102,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         noteDetailViewModel.loadDetail()
         val adapter = NoteDetailAdapter(
             noteDetailViewModel = noteDetailViewModel,
-            notesViewModel = notesViewModel,
             viewLifecycleOwner = viewLifecycleOwner
         ) {
             NoteCardActionHandler(

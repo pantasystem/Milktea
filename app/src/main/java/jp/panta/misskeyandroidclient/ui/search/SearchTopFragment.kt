@@ -39,7 +39,7 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
     private val mBinding: FragmentSearchTopBinding by dataBinding()
 
     @Inject
-    private lateinit var pageableFragmentFactory: PageableFragmentFactory
+    internal lateinit var pageableFragmentFactory: PageableFragmentFactory
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

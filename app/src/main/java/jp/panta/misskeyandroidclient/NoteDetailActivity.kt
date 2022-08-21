@@ -13,13 +13,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNoteDetailBinding
+import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -55,12 +53,14 @@ class NoteDetailActivity : AppCompatActivity() {
     val notesViewModel: NotesViewModel by viewModels()
 
     @Inject
-    lateinit var settingStore: SettingStore
+    internal lateinit var settingStore: SettingStore
+
+    @Inject
+    internal lateinit var pageableFragmentFactory: PageableFragmentFactory
 
 
     private val accountViewModel: AccountViewModel by viewModels()
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -91,7 +91,9 @@ class NoteDetailActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(
             R.id.fragment_base,
-            NoteDetailFragment.newInstance(noteId!!, accountId = mAccountId)
+            pageableFragmentFactory.create(Pageable.Show(
+                noteId!!
+            ))
         )
         ft.commit()
 
