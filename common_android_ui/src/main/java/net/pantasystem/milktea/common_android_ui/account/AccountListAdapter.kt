@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.account
+package net.pantasystem.milktea.common_android_ui.account
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,12 +7,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common_android_ui.R
+import net.pantasystem.milktea.common_android_ui.databinding.ItemAccountBinding
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 
 @FlowPreview
 @ExperimentalCoroutinesApi

@@ -27,27 +27,25 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.*
-import net.pantasystem.milktea.note.R
-
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common_android.platform.PermissionUtil
-import net.pantasystem.milktea.common_compose.FilePreviewTarget
-import net.pantasystem.milktea.model.confirm.ConfirmCommand
-import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android.platform.PermissionUtil
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
+import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
+import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.confirm.ConfirmCommand
+import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -57,8 +55,12 @@ import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteEditorBinding
 import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
+import net.pantasystem.milktea.note.view.emojis.CustomEmojiPickerDialog
+import net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelection
+import net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelectionViewModel
 import net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel
 import javax.inject.Inject
 

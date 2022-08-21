@@ -1,11 +1,11 @@
 package jp.panta.misskeyandroidclient.ui.users
 
 import android.app.Activity
-import jp.panta.misskeyandroidclient.Activities
 import jp.panta.misskeyandroidclient.FollowFollowerActivity
 import jp.panta.misskeyandroidclient.UserDetailActivity
-import jp.panta.misskeyandroidclient.putActivity
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
+import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.putActivity
 
 class UserCardListActionHandler(
     activity: Activity,

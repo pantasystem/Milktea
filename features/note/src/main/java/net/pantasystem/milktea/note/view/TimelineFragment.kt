@@ -19,16 +19,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.setMenuTint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.PageableView
 import net.pantasystem.milktea.common.ui.ScrollableTop
-import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
-import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
@@ -86,6 +86,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
+
+    @Inject
+    lateinit var setMenuTint: ApplyMenuTint
 
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
@@ -208,7 +211,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_timeline, menu)
-                requireActivity().setMenuTint(menu)
+                setMenuTint(requireActivity(), menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

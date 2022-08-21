@@ -1,7 +1,6 @@
-package jp.panta.misskeyandroidclient.ui.account
+package net.pantasystem.milktea.common_android_ui.account
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -10,14 +9,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import net.pantasystem.milktea.auth.AuthorizationActivity
-import jp.panta.misskeyandroidclient.R
+import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common_android_ui.R
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AccountSwitchingDialog : BottomSheetDialogFragment() {
+
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -33,7 +38,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
         }
 
         view.findViewById<Button>(R.id.add_account).setOnClickListener {
-            startActivity(Intent(activity, AuthorizationActivity::class.java))
+            startActivity(authorizationNavigation.newIntent(Unit))
             dismiss()
         }
         val accountsView = view.findViewById<RecyclerView>(R.id.accounts_view)

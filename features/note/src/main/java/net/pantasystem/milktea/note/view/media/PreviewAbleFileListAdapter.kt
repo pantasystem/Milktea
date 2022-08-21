@@ -5,9 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.databinding.ItemMediaPreviewBinding
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.MediaViewData
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.media.PreviewAbleFile
+import net.pantasystem.milktea.note.databinding.ItemMediaPreviewBinding
 import net.pantasystem.milktea.note.viewmodel.media.MediaViewData
 import net.pantasystem.milktea.note.viewmodel.media.PreviewAbleFile
 

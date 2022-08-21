@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.emojis
+package net.pantasystem.milktea.note.view.emojis
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +8,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.ItemCustomEmojiChoiceBinding
-import jp.panta.misskeyandroidclient.databinding.ItemEmojisCategoryBinding
-import jp.panta.misskeyandroidclient.databinding.ItemTextEmojiChoiceBinding
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis
+import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.ItemCustomEmojiChoiceBinding
+import net.pantasystem.milktea.note.databinding.ItemEmojisCategoryBinding
+import net.pantasystem.milktea.note.databinding.ItemTextEmojiChoiceBinding
+import net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelection
+import net.pantasystem.milktea.note.view.emojis.viewmodel.Emojis
 
 class EmojiListAdapter(
     private val emojiSelection: EmojiSelection,

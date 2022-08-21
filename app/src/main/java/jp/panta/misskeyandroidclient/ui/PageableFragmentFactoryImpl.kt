@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.ui
 
 import androidx.fragment.app.Fragment
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
-import jp.panta.misskeyandroidclient.ui.notes.view.detail.NoteDetailFragment
 import jp.panta.misskeyandroidclient.ui.notification.NotificationFragment
 import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.note.view.TimelineFragment
+import net.pantasystem.milktea.note.view.detail.NoteDetailFragment
 import javax.inject.Inject
 
 

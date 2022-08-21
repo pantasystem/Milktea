@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.emojis
+package net.pantasystem.milktea.note.view.emojis
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter

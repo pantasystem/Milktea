@@ -12,14 +12,15 @@ import androidx.core.app.TaskStackBuilder
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_navigation.MainNavigation
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
@@ -71,6 +72,9 @@ class NoteDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var mainNavigation: MainNavigation
 
+    @Inject
+    lateinit var setMenuTint: ApplyMenuTint
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -112,7 +116,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.note_detail_menu, menu)
-        setMenuTint(menu)
+        setMenuTint(this, menu)
         return super.onCreateOptionsMenu(menu)
     }
 

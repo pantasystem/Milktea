@@ -10,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemFilePreviewBinding
 import net.pantasystem.milktea.note.databinding.ItemUrlPreviewBinding
@@ -54,9 +53,10 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
                 if(preview.file.type?.startsWith("audio") == true){
-                    val intent = Intent(binding.root.context, MediaActivity::class.java)
-                    intent.putExtra(MediaNavigationKeys.EXTRA_FILE, preview.file)
-                    context?.startActivity(intent)
+//                    val intent = Intent(binding.root.context, MediaActivity::class.java)
+//                    intent.putExtra(MediaNavigationKeys.EXTRA_FILE, preview.file)
+                    TODO()
+//                    context?.startActivity(intent)
                 }else{
                     context?.startActivity(
                         Intent().apply{

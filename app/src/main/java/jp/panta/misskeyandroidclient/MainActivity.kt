@@ -28,7 +28,7 @@ import com.google.firebase.analytics.ktx.logEvent
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
-import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
+import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import jp.panta.misskeyandroidclient.ui.main.*
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope

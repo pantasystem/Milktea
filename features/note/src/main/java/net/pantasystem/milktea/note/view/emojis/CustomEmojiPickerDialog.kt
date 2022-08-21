@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.emojis
+package net.pantasystem.milktea.note.view.emojis
 
 import android.app.Dialog
 import android.os.Bundle
@@ -9,16 +9,16 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.flexbox.*
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.DialogCustomEmojiPickerBinding
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelection
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.EmojiSelectionViewModel
-import jp.panta.misskeyandroidclient.ui.emojis.viewmodel.Emojis
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.DialogCustomEmojiPickerBinding
+import net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelection
+import net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelectionViewModel
+import net.pantasystem.milktea.note.view.emojis.viewmodel.Emojis
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.emojis.viewmodel
+package net.pantasystem.milktea.note.view.emojis.viewmodel
 
 import net.pantasystem.milktea.model.emoji.Emoji
 

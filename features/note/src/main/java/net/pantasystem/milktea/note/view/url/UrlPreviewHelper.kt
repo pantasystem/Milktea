@@ -6,7 +6,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.Preview
+import net.pantasystem.milktea.note.viewmodel.Preview
 
 object UrlPreviewHelper {
 
