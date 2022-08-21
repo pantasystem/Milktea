@@ -397,6 +397,7 @@
     <string name="search_custom_emojis">搜索表情符号</string>
     <string name="notification_group_invited_message">您已被邀请加入一个群组: %s</string>
 
+    <string name="groups">组列表</string>
 
 
     <!--    <string name="n_people">%d位用户</string>-->

@@ -391,4 +391,6 @@
     <string name="search_custom_emojis">Search Custom Emojis…</string>
     <string name="notification_group_invited_message">You\'ve been invited to a group: %s</string>
 
+    <string name="groups">Groups</string>
+
 </resources>
