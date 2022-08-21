@@ -1,5 +1,6 @@
-package jp.panta.misskeyandroidclient.mfm
+package net.pantasystem.milktea.common_android.mfm
 
+import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.net.URLDecoder
 import java.util.regex.Matcher
