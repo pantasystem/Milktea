@@ -1,11 +1,10 @@
-package net.pantasystem.milktea.common_android.ui
+package net.pantasystem.milktea.common_android_ui
 
 import android.util.TypedValue
 import androidx.cardview.widget.CardView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.ColorUtil
-import net.pantasystem.milktea.common_android.BindingProvider
 import net.pantasystem.milktea.common_android.R
 
 object ViewBackgroundColorHelper {

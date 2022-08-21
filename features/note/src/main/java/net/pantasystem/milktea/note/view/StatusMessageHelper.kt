@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
-import net.pantasystem.milktea.common_android.BindingProvider
+import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.note.R

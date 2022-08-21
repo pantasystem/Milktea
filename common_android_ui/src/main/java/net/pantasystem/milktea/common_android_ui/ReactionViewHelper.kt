@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common_android.BindingProvider
+import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 
 object ReactionViewHelper {

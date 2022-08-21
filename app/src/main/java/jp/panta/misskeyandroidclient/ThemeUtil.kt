@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_android.BindingProvider
+import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.isNightTheme
 

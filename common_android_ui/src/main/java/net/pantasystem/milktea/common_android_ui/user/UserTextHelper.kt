@@ -1,10 +1,9 @@
-package net.pantasystem.milktea.common_android.ui
+package net.pantasystem.milktea.common_android_ui.user
 
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
-import net.pantasystem.milktea.common_android.BindingProvider
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.model.user.User
 
@@ -17,7 +16,7 @@ object UserTextHelper {
         user ?: return
         val isUserNameDefault = EntryPointAccessors.fromApplication(
             this.context.applicationContext,
-            BindingProvider::class.java
+            net.pantasystem.milktea.common_android_ui.BindingProvider::class.java
         )
             .settingStore()
             .isUserNameDefault
