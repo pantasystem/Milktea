@@ -95,6 +95,7 @@ dependencies {
     implementation project(path: ':api_streaming')
     implementation project(path: ':features:group')
     implementation project(path: ':features:note')
+    implementation project(path: ':common_android_ui')
 
     testImplementation project(path: ':api_streaming')
     implementation project(path: ':common_android')

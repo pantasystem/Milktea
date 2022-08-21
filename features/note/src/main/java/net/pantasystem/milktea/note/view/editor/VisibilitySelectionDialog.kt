@@ -8,11 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.DialogVisibilitySelectionBinding
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel
+import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.DialogVisibilitySelectionBinding
 import net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel
 
 @AndroidEntryPoint

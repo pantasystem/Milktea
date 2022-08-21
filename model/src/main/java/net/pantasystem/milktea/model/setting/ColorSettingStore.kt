@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.settings
+package net.pantasystem.milktea.model.setting
 
 import android.content.SharedPreferences
 

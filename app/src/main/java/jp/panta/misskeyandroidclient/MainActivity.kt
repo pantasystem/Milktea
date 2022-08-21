@@ -29,28 +29,29 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.account.AccountSwitchingDialog
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.main.*
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
-import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
+import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.putActivity
+import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.SuitableType
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.suitableType
-import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.gallery.GalleryPostsActivity
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
@@ -60,6 +61,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.note.view.NoteEditorActivity
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 
@@ -101,7 +103,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by viewModels()
 
-    private val reportViewModel: net.pantasystem.milktea.common_android_ui.report.ReportViewModel by viewModels()
+    private val reportViewModel: ReportViewModel by viewModels()
 
     private lateinit var toggleNavigationDrawerDelegate: ToggleNavigationDrawerDelegate
 

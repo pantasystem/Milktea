@@ -7,7 +7,7 @@
         <import type="net.pantasystem.milktea.model.notes.Visibility"/>
         <variable
                 name="noteEditorViewModel"
-                type="jp.panta.misskeyandroidclient.ui.notes.viewmodel.editor.NoteEditorViewModel" />
+                type="net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel" />
 
     </data>
     <Switch

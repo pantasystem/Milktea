@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.util
+package net.pantasystem.milktea.common_android.ui
 
 import android.graphics.Outline
 import android.view.View
@@ -11,7 +11,7 @@ class CircleOutlineProvider(val rect: Float) : ViewOutlineProvider(){
 
         private val rectMap = ConcurrentHashMap<Float, CircleOutlineProvider>()
 
-        fun getInstance(rect: Float): CircleOutlineProvider{
+        fun getInstance(rect: Float): CircleOutlineProvider {
             var provider = rectMap[rect]
             if(provider == null){
                 provider = CircleOutlineProvider(rect)

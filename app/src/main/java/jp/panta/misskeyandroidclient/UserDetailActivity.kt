@@ -19,15 +19,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.PinNoteFragment
-import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import jp.panta.misskeyandroidclient.ui.users.nickname.EditNicknameDialog
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
@@ -36,16 +31,23 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android.ui.getParentActivity
+import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.view.NoteEditorActivity
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(
@@ -370,7 +372,7 @@ class UserDetailActivity : AppCompatActivity() {
             }
             R.id.report_user -> {
                 mUserId?.let {
-                    net.pantasystem.milktea.common_android_ui.report.ReportDialog.newInstance(it).show(supportFragmentManager, "")
+                    ReportDialog.newInstance(it).show(supportFragmentManager, "")
                 }
             }
             R.id.share -> {

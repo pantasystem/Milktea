@@ -1,11 +1,12 @@
-package jp.panta.misskeyandroidclient.ui
+package net.pantasystem.milktea.common_android.ui
 
 import android.util.TypedValue
 import androidx.cardview.widget.CardView
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.MiApplication
-import jp.panta.misskeyandroidclient.R
+import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.ColorUtil
+import net.pantasystem.milktea.common_android.BindingProvider
+import net.pantasystem.milktea.common_android.R
 
 object ViewBackgroundColorHelper {
 
@@ -16,8 +17,8 @@ object ViewBackgroundColorHelper {
             this.setCardBackgroundColor(setCardViewSurfaceColor)
         }
         val cardView = this
-        val miApp = cardView.context.applicationContext as MiApplication
-        val store = miApp.colorSettingStore
+        val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, BindingProvider::class.java)
+        val store = entryPoint.colorSettingStore()
         val typedValue = TypedValue()
         cardView.context.theme.resolveAttribute(R.attr.colorSurface, typedValue, true)
         cardView.setCardBackgroundColor(ColorUtil.matchOpaqueAndColor(store.surfaceColorOpaque, typedValue.data))

@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.url
+package net.pantasystem.milktea.note.view.url
 
 import android.view.View
 import android.widget.ImageView

@@ -1,8 +1,7 @@
-package jp.panta.misskeyandroidclient.ui
+package net.pantasystem.milktea.common_android.ui
 
 import android.view.ViewGroup
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.util.CircleOutlineProvider
 
 object CircleOutlineHelper {
     @JvmStatic

@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.getPreferences
+import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.settings.LocalConfigRepositoryImpl
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.NoteExpandedHeightSize
@@ -34,5 +35,11 @@ object SettingModule {
     @Provides
     fun  provideNoteExpandedHeightSize(settingStore: SettingStore): NoteExpandedHeightSize {
         return settingStore
+    }
+
+    @Singleton
+    @Provides
+    fun provideColorSettingStore(@ApplicationContext context: Context): ColorSettingStore {
+        return ColorSettingStore(context.getPreferences())
     }
 }

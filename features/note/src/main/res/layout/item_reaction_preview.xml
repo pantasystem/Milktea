@@ -12,7 +12,7 @@
             android:orientation="horizontal" android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            reactionImageVixew="@{reactionImagePreview}"
+            reactionImageView="@{reactionImagePreview}"
             reactionStringView="@{reactionStringPreview}"
             reaction="@{reaction}"
             android:background="?attr/colorSurface"

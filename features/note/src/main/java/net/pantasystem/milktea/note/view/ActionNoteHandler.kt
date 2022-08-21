@@ -4,12 +4,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
+import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ConfirmEvent
 import net.pantasystem.milktea.model.confirm.ResultType
-import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.draft.DraftNote
@@ -30,7 +31,7 @@ class ActionNoteHandler(
 
     private val shareTargetObserver = Observer<PlaneNoteViewData> {
         Log.d("MainActivity", "share clicked :$it")
-        net.pantasystem.milktea.note.view.ShareBottomSheetDialog()
+        ShareBottomSheetDialog()
             .show(activity.supportFragmentManager, "MainActivity")
     }
 

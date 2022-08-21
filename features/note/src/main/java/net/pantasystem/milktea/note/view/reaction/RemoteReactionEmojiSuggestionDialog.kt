@@ -11,13 +11,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.DialogRemoteReactionEmojiSuggestionBinding
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.reaction.RemoteReactionEmojiSuggestionViewModel
-import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
+import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.databinding.DialogRemoteReactionEmojiSuggestionBinding
+import net.pantasystem.milktea.note.viewmodel.reaction.RemoteReactionEmojiSuggestionViewModel
 
 private const val EXTRA_REACTION = "EXTRA_REACTION"
 private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"

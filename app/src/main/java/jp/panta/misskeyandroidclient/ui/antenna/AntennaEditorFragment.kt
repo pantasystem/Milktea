@@ -13,9 +13,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
-import net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter
-import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
+import net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.antenna.AntennaSource
 
@@ -162,8 +162,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         }
 
 
-        val userChipAdapter =
-            net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter(viewLifecycleOwner)
+        val userChipAdapter = UserChipListAdapter(viewLifecycleOwner)
         binding.specifiedUserListView.adapter = userChipAdapter
         binding.specifiedUserListView.applyFlexBoxLayout(requireContext())
 

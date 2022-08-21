@@ -14,14 +14,15 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
-import net.pantasystem.milktea.common.ui.ScrollableTop
-import jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionHandler
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
-import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.ui.ScrollableTop
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.note.view.NoteCardActionHandler
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 
@@ -39,6 +40,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
     @Inject
     internal lateinit var settingStore: SettingStore
 
+    @Inject
+    lateinit var userDetailNavigation: UserDetailNavigation
+
     private val mBinding: FragmentNotificationBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,7 +58,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
                 notesViewModel,
-                settingStore
+                settingStore,
+                userDetailNavigation
             ).onAction(it)
         }
 

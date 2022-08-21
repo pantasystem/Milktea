@@ -1,17 +1,15 @@
 package net.pantasystem.milktea.note.view.reaction
 
 import android.content.Context
-import android.util.Log
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
-import net.pantasystem.milktea.note.BindingProvider
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 object NoteReactionViewHelper {
