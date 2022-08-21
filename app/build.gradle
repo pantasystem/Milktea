@@ -93,8 +93,11 @@ dependencies {
     implementation project(path: ':features:gallery')
     implementation project(path: ':api_streaming')
     implementation project(path: ':features:group')
+    implementation project(path: ':features:note')
+
     testImplementation project(path: ':api_streaming')
     implementation project(path: ':common_android')
+
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
