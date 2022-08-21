@@ -25,8 +25,8 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.model.account.page.Page
 import javax.inject.Inject
 
@@ -44,6 +44,9 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var pageableFragmentFactory: PageableFragmentFactory
 
     private val mTabViewModel by viewModels<TabViewModel>()
 
@@ -63,7 +66,11 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mPagerAdapter = TimelinePagerAdapter(this.childFragmentManager, mPages ?: emptyList())
+        mPagerAdapter = TimelinePagerAdapter(
+            this.childFragmentManager,
+            pageableFragmentFactory,
+            mPages ?: emptyList()
+        )
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }
@@ -121,7 +128,8 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
     class TimelinePagerAdapter(
         fragmentManager: FragmentManager,
-        list: List<Page>
+        val pageableFragmentFactory: PageableFragmentFactory,
+        list: List<Page>,
     ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         private var requestBaseList: List<Page> = list
         private var oldRequestBaseSetting = requestBaseList
@@ -136,7 +144,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
         override fun getItem(position: Int): Fragment {
             val item = requestBaseList[position]
-            val fragment = PageableFragmentFactory.create(item)
+            val fragment = pageableFragmentFactory.create(item)
 
             if (fragment is ScrollableTop) {
                 scrollableTopFragments.add(fragment)

@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
 import jp.panta.misskeyandroidclient.ui.PageableFragmentFactory
-import net.pantasystem.milktea.common.ui.ToolbarSetter
 import jp.panta.misskeyandroidclient.ui.settings.page.PageTypeNameMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
@@ -33,6 +33,9 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
     private val mBinding: FragmentNotificationMentionBinding by dataBinding()
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var pageableFragmentFactory: PageableFragmentFactory
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -77,7 +80,7 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
         FragmentStatePagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         private fun createFragment(position: Int): Fragment {
-            return PageableFragmentFactory.create(pages[position].pageable)
+            return pageableFragmentFactory.create(pages[position].pageable)
         }
 
         override fun getPageTitle(position: Int): CharSequence {
