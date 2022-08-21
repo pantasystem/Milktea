@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient.ui.notes.view
+package jp.panta.misskeyandroidclient.ui.tab
 
 import android.os.Bundle
 import android.view.LayoutInflater
