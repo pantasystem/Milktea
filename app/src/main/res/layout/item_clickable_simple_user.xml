@@ -6,7 +6,7 @@
 
         <variable
                 name="user"
-                type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData" />
+                type="net.pantasystem.milktea.common_viewmodel.UserViewData" />
 
 
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />

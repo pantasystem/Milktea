@@ -9,7 +9,7 @@ import jp.panta.misskeyandroidclient.*
 import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.messaging.MessagingListActivity
 
 internal class MainActivityMenuProvider(

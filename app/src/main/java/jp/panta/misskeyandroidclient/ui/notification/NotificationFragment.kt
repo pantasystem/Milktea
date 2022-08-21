@@ -20,7 +20,7 @@ import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 

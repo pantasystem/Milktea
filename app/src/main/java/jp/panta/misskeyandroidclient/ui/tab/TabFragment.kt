@@ -19,15 +19,15 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
-import net.pantasystem.milktea.common.ui.ScrollableTop
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.TabViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common.ui.ToolbarSetter
+import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.note.viewmodel.TabViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint

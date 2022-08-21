@@ -4,7 +4,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.navigation.NavigationView
 import jp.panta.misskeyandroidclient.databinding.NavHeaderMainBinding
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 
 internal class SetUpNavHeader(
     private val navView: NavigationView,

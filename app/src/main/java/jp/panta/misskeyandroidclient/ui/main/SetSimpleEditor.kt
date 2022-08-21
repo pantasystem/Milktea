@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.notes.view.editor.SimpleEditorFragment
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 
 
 internal class SetSimpleEditor(

@@ -10,7 +10,7 @@
                 type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData" />
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
+                type="net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel" />
 
 
 

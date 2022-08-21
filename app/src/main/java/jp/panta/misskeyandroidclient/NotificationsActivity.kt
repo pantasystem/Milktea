@@ -9,14 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityNotificationsBinding
-import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ui.ToolbarSetter
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -35,7 +34,7 @@ class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
         setTheme()
         setContentView(R.layout.activity_notifications)
 
-        ActionNoteHandler(
+        net.pantasystem.milktea.note.view.ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],

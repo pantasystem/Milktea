@@ -20,7 +20,7 @@ import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 

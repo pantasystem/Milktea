@@ -18,7 +18,7 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.page.*

@@ -1,9 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.url
 
+import net.pantasystem.milktea.model.url.UrlPreview
+import net.pantasystem.milktea.model.url.UrlPreviewStore
 import org.jsoup.Jsoup
 import java.util.regex.Pattern
 
-class JSoupUrlPreviewStore : UrlPreviewStore{
+class JSoupUrlPreviewStore : UrlPreviewStore {
     private val ogPattern = Pattern.compile("""og:(.*)""")
     private val urlPattern = Pattern.compile("""(https)(://)([-_.!~*'()\[\]a-zA-Z0-9;?:@&=+${'$'},%#]+)(/[-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)?""")
     //private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")

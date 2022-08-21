@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ItemAccountBinding
 import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewData
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 

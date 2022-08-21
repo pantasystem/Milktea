@@ -6,8 +6,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.notes.view.reaction.ReactionViewHelper
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
+import net.pantasystem.milktea.common_android_ui.ReactionViewHelper
 
 object NotificationStatusIconHelper {
 
@@ -18,7 +18,7 @@ object NotificationStatusIconHelper {
             "reaction" -> {
                 //context: Context, reactionTextTypeView: TextView, reactionImageTypeView: ImageView,reaction: String, note: PlaneNoteViewData)
                 if(notificationReaction != null && notification.noteViewData != null) {
-                    ReactionViewHelper.setReactionCount(this.context, notificationReactionStringView, notificationReactionImageView,  notificationReaction, notification.noteViewData)
+                    net.pantasystem.milktea.common_android_ui.ReactionViewHelper.setReactionCount(this.context, notificationReactionStringView, notificationReactionImageView,  notificationReaction, notification.noteViewData)
                 }
                 notificationStatusView.visibility = View.GONE
 

@@ -6,7 +6,7 @@
         <variable
                 name="viewModel"
                 type="jp.panta.misskeyandroidclient.ui.settings.viewmodel.url.UrlPreviewSourceSettingViewModel" />
-        <import type="net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting" />
+        <import type="net.pantasystem.milktea.app_store.setting.UrlPreviewSourceSetting" />
         <import type="android.view.View" />
     </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout

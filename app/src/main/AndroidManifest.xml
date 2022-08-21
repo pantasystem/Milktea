@@ -146,7 +146,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".NoteDetailActivity"
+                android:name="net.pantasystem.milktea.note.view.detail.NoteDetailActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -165,7 +165,7 @@
                 android:windowSoftInputMode="adjustResize" />
         <activity android:name="net.pantasystem.milktea.drive.DriveActivity" />
         <activity
-                android:name=".NoteEditorActivity"
+                android:name="net.pantasystem.milktea.note.view.NoteEditorActivity"
                 android:exported="true"
                 android:windowSoftInputMode="adjustResize">
             <intent-filter>

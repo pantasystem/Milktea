@@ -3,6 +3,7 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
+import net.pantasystem.milktea.app_store.setting.UrlPreviewSourceSetting
 import net.pantasystem.milktea.model.setting.*
 
 fun RememberVisibility.Keys.str(): String {

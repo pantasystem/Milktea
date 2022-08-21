@@ -1,9 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
-import net.pantasystem.milktea.model.setting.Config
-import net.pantasystem.milktea.model.setting.DefaultConfig
-import net.pantasystem.milktea.model.setting.Theme
-import net.pantasystem.milktea.model.setting.UrlPreviewConfig
+import net.pantasystem.milktea.model.setting.*
 import org.junit.Assert
 import org.junit.Test
 

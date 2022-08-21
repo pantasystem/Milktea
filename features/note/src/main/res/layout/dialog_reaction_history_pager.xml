@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="?attr/colorSurface"
+            >
+
+
+        <com.google.android.material.tabs.TabLayout
+                android:id="@+id/reaction_history_tab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabMode="scrollable"
+                app:tabTextColor="?attr/normalIconTint"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+
+                >
+
+
+        </com.google.android.material.tabs.TabLayout>
+
+
+        <net.pantasystem.milktea.common_android.ui.BottomSheetViewPager
+                android:id="@+id/reaction_history_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/reaction_history_tab"/>
+
+    </RelativeLayout>
+</layout>

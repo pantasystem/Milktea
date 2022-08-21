@@ -86,6 +86,7 @@ dependencies {
     implementation project(path: ':features:drive')
     implementation project(path: ':features:media')
     implementation project(path: ':common_compose')
+    implementation project(path: ':common_resource')
     implementation project(path: ':common_compose')
     implementation project(path: ':features:messaging')
     implementation project(path: ':common_navigation')

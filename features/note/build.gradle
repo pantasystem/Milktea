@@ -30,6 +30,14 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    buildFeatures {
+        compose true
+        dataBinding true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = compose_version
+    }
 }
 
 dependencies {
@@ -37,6 +45,9 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.appcompat.appcompat
     implementation libs.android.material.material
+    implementation project(path: ':common')
+    implementation project(path: ':api')
+    implementation project(path: ':common_android_ui')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -48,6 +59,8 @@ dependencies {
     implementation project(path: ':model')
     implementation project(path: ':data')
     implementation project(path: ':app_store')
+    implementation project(path: ':common_resource')
+
     implementation libs.lifecycle.extenstions
     implementation libs.lifecycle.viewmodel
 
@@ -87,5 +100,7 @@ dependencies {
     implementation libs.wada811.databinding
     implementation libs.activity.ktx
 
-
+    implementation libs.glide.glide
+    kapt libs.glide.compiler
+    implementation libs.accompanist.glide
 }

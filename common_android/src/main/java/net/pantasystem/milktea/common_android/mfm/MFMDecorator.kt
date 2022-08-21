@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.mfm
+package net.pantasystem.milktea.common_android.mfm
 
 import android.app.SearchManager
 import android.content.Intent
@@ -11,11 +11,12 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.ui.text.DrawableEmojiSpan
-import jp.panta.misskeyandroidclient.ui.text.EmojiAdapter
-import jp.panta.misskeyandroidclient.ui.text.EmojiSpan
+import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.R
+import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
+import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
+import net.pantasystem.milktea.common_android.ui.text.EmojiSpan
 import java.lang.ref.WeakReference
 
 object MFMDecorator {
@@ -75,7 +76,7 @@ object MFMDecorator {
             return when(element){
                 is Leaf ->
                     when(element){
-                        is Text-> decorateText(element)
+                        is Text -> decorateText(element)
                         is EmojiElement -> decorateEmoji(element)
                         is Search -> decorateSearch(element)
                         is Mention -> decorateMention(element)
@@ -132,9 +133,12 @@ object MFMDecorator {
 
         private fun decorateMention(mention: Mention): Spanned{
             return textView.get()?.let{ textView ->
-                val intent = UserDetailActivity.newInstance(textView.context, userName = mention.text)
-                intent.putActivity(Activities.ACTIVITY_IN_APP)
 
+                // TODO: 修正する
+//                val intent = UserDetailActivity.newInstance(textView.context, userName = mention.text)
+//                intent.putActivity(Activities.ACTIVITY_IN_APP)
+
+                val intent = Intent()
 
                 makeClickableSpan(mention.text, intent)
             }?: closeErrorElement(mention)
@@ -148,8 +152,11 @@ object MFMDecorator {
 
         private fun decorateHashTag(hashTag: HashTag): Spanned{
             return textView.get()?.let{ textView ->
-                val intent = Intent(textView.context, SearchResultActivity::class.java)
-                intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)
+                // TODO: 修正する
+                val intent = Intent()
+//
+//                val intent = Intent(textView.context, SearchResultActivity::class.java)
+//                intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)
                 makeClickableSpan(hashTag.text, intent)
             }?: closeErrorElement(hashTag)
 

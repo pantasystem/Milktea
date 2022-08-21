@@ -9,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreview
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.app_store.setting.UrlPreviewSourceSetting
+import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO

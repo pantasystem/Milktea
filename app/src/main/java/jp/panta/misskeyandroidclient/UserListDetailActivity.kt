@@ -17,22 +17,21 @@ import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
-import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
 import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
 import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
-import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.ChangedDiffResult
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -94,7 +93,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         mListId = listId
 
 
-        ActionNoteHandler(
+        net.pantasystem.milktea.note.view.ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],

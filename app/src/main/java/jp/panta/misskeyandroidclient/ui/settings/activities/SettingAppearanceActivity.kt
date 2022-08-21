@@ -37,7 +37,7 @@ import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.drive.DriveFileRepository

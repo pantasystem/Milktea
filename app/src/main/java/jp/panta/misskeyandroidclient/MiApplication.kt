@@ -21,9 +21,9 @@ import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
-import net.pantasystem.milktea.data.infrastructure.settings.Keys
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.data.infrastructure.settings.str
+import net.pantasystem.milktea.model.setting.Keys
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.model.setting.str
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration

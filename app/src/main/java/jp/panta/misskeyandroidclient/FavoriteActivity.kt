@@ -9,10 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.common_android.ui.PageableFragmentFactory
-import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
 import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
@@ -39,7 +38,7 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
 
-        ActionNoteHandler(
+        net.pantasystem.milktea.note.view.ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],

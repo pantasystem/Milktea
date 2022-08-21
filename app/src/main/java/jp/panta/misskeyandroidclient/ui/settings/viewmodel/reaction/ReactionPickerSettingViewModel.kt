@@ -9,7 +9,7 @@ import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
