@@ -3,7 +3,7 @@ package jp.panta.misskeyandroidclient.ui.main
 import android.app.Activity
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
-import net.pantasystem.milktea.note.view.detail.NoteDetailActivity
+import net.pantasystem.milktea.note.NoteDetailActivity
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState

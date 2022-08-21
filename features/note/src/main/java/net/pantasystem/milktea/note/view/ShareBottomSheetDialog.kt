@@ -16,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentShareBottomSheetBinding
-import net.pantasystem.milktea.note.view.detail.NoteDetailActivity
+import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 @AndroidEntryPoint

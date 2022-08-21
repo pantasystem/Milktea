@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view.detail
+package net.pantasystem.milktea.note
 
 import android.content.Context
 import android.content.Intent
@@ -24,7 +24,6 @@ import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ActivityNoteDetailBinding
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject

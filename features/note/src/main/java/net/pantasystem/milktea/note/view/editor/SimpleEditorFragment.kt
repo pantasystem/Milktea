@@ -39,9 +39,9 @@ import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSimpleEditorBinding
-import net.pantasystem.milktea.note.view.NoteEditorActivity
 import net.pantasystem.milktea.note.view.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelectionViewModel
 import net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel

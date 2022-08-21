@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note
 
 import android.content.Context
 import android.content.Intent
@@ -10,7 +10,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ActivityNoteEditorBinding
 import net.pantasystem.milktea.note.view.editor.NoteEditorFragment
 import net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel

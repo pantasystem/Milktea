@@ -6,7 +6,8 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.setting.ReactionPickerType
-import net.pantasystem.milktea.note.view.detail.NoteDetailActivity
+import net.pantasystem.milktea.note.NoteEditorActivity
+import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.view.reaction.ReactionSelectionDialog
 import net.pantasystem.milktea.note.view.reaction.RemoteReactionEmojiSuggestionDialog
 import net.pantasystem.milktea.note.view.reaction.history.ReactionHistoryPagerDialog

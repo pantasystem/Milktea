@@ -60,7 +60,7 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.ReportState
-import net.pantasystem.milktea.note.view.NoteEditorActivity
+import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 

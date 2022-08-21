@@ -14,7 +14,7 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.toFile
-import net.pantasystem.milktea.note.view.NoteEditorActivity
+import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.viewmodel.draft.DraftNotesViewModel
 import javax.inject.Inject
 

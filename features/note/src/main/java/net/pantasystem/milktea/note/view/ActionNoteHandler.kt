@@ -15,6 +15,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.user.report.Report
+import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData

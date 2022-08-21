@@ -46,7 +46,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.note.view.NoteEditorActivity
+import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
