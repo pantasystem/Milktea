@@ -14,9 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.internal.managers.FragmentComponentManager
+import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.file.File
-import net.pantasystem.milktea.note.ActivityBindingProvider
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.media.MediaViewData
 import net.pantasystem.milktea.note.viewmodel.media.PreviewAbleFile
@@ -37,7 +38,8 @@ object MediaPreviewHelper {
             return
         }
         val listener = View.OnClickListener {
-            val intent = EntryPointAccessors.fromView(this, ActivityBindingProvider::class.java)
+            val activity = FragmentComponentManager.findActivity(it.context) as Activity
+            val intent = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
                 .mediaNavigation().newIntent(MediaNavigationArgs.Files(
                     files = previewAbleFileList.map { fvd ->
                         fvd.file

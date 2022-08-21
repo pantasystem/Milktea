@@ -1,5 +1,6 @@
-package net.pantasystem.milktea.common_android.mfm
+package net.pantasystem.milktea.common_android_ui
 
+import android.app.Activity
 import android.app.SearchManager
 import android.content.Intent
 import android.graphics.Color
@@ -11,12 +12,17 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.R
+import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
 import net.pantasystem.milktea.common_android.ui.text.EmojiSpan
+import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import java.lang.ref.WeakReference
 
 object MFMDecorator {
@@ -134,11 +140,12 @@ object MFMDecorator {
         private fun decorateMention(mention: Mention): Spanned{
             return textView.get()?.let{ textView ->
 
-                // TODO: 修正する
-//                val intent = UserDetailActivity.newInstance(textView.context, userName = mention.text)
-//                intent.putActivity(Activities.ACTIVITY_IN_APP)
+                val activity = FragmentComponentManager.findActivity(textView.context) as Activity
+                val intent = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
+                    .userDetailNavigation()
+                    .newIntent(UserDetailNavigationArgs.UserName(userName = mention.text))
+                intent.putActivity(Activities.ACTIVITY_IN_APP)
 
-                val intent = Intent()
 
                 makeClickableSpan(mention.text, intent)
             }?: closeErrorElement(mention)

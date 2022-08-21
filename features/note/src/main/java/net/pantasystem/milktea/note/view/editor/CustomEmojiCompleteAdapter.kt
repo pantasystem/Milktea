@@ -8,9 +8,9 @@ import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.databinding.DataBindingUtil
+import net.pantasystem.milktea.common_android_ui.databinding.ItemReactionPreviewBinding
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.note.R
-import net.pantasystem.milktea.note.databinding.ItemReactionPreviewBinding
 
 class CustomEmojiCompleteAdapter(
     private val emojis: List<Emoji>,

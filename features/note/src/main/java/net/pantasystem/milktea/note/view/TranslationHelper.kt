@@ -4,7 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.common_android.mfm.MFMDecorator
+import net.pantasystem.milktea.common_android_ui.MFMDecorator
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_android.mfm.MFMParser

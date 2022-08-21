@@ -115,11 +115,7 @@ class NoteDetailAdapter(
                 note.conversation.observe(viewLifecycleOwner) {
                     adapter.submitList(it)
                 }
-                // FIXME なぜ今まで動いていたのか何故エラーが出るようになったのかわからない
-                /*if(note.poll != null){
-                     holder.binding.conversationView.poll.adapter = PollListAdapter(note.poll, notesViewModel, viewLifecycleOwner)
-                     holder.binding.conversationView.poll.layoutManager = LinearLayoutManager(holder.binding.root.context)
-                }*/
+
                 holder.binding.lifecycleOwner = viewLifecycleOwner
 
                 holder.binding.executePendingBindings()

@@ -1,13 +1,13 @@
-package net.pantasystem.milktea.common_android.ui.text
+package net.pantasystem.milktea.common_android_ui
 
 import android.net.Uri
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.common_android.mfm.MFMDecorator
 import jp.panta.misskeyandroidclient.mfm.Root
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.regex.Pattern
 
