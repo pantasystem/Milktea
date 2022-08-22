@@ -13,9 +13,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
-import jp.panta.misskeyandroidclient.ui.users.UserChipListAdapter
-import jp.panta.misskeyandroidclient.util.listview.applyFlexBoxLayout
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
+import net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.antenna.AntennaSource
 

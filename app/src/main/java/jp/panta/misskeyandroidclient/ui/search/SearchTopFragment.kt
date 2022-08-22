@@ -21,13 +21,14 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.setMenuTint
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.ui.explore.ExploreType
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.model.account.page.Pageable
+import javax.inject.Inject
 
 
 @FlowPreview
@@ -37,11 +38,14 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
 
     private val mBinding: FragmentSearchTopBinding by dataBinding()
 
+    @Inject
+    internal lateinit var pageableFragmentFactory: PageableFragmentFactory
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mBinding.searchViewPager.adapter =
-            SearchPagerAdapter(this.childFragmentManager, requireContext())
+            SearchPagerAdapter(this.childFragmentManager, requireContext(), pageableFragmentFactory)
         mBinding.searchTabLayout.setupWithViewPager(mBinding.searchViewPager)
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -79,9 +83,12 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
     }
 
 
-    class SearchPagerAdapter(supportFragmentManager: FragmentManager, context: Context) :
-        FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        val tabList =
+    class SearchPagerAdapter(
+        supportFragmentManager: FragmentManager,
+        context: Context,
+        private val pageableFragmentFactory: PageableFragmentFactory,
+    ) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        private val tabList =
             listOf(
                 context.getString(R.string.title_featured),
                 context.getString(R.string.explore),
@@ -94,7 +101,7 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
 
         override fun getItem(position: Int): Fragment {
             return when (position) {
-                0 -> TimelineFragment.newInstance(Pageable.Featured(null))
+                0 -> pageableFragmentFactory.create(Pageable.Featured(null))
                 1 -> ExploreFragment.newInstance(ExploreType.Local)
                 2 -> ExploreFragment.newInstance(ExploreType.Fediverse)
                 else -> throw IllegalArgumentException("range 0..1, list:$tabList")

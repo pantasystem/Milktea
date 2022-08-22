@@ -8,12 +8,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
-import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 
@@ -27,6 +26,9 @@ class FavoriteActivity : AppCompatActivity() {
     @Inject
     lateinit var settingStore: SettingStore
 
+    @Inject
+    lateinit var pageableFragmentFactory: PageableFragmentFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -36,13 +38,13 @@ class FavoriteActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.favorite)
 
 
-        ActionNoteHandler(
+        net.pantasystem.milktea.note.view.ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],
             settingStore
         ).initViewModelListener()
-        val fragment = TimelineFragment.newInstance(
+        val fragment = pageableFragmentFactory.create(
             Pageable.Favorite
         )
 

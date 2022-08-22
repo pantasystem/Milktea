@@ -6,8 +6,9 @@ import android.util.TypedValue
 import android.view.Menu
 import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.EntryPointAccessors
-import jp.panta.misskeyandroidclient.ui.BindingProvider
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.setting.isNightTheme
 
@@ -49,3 +50,8 @@ class ApplyThemeImpl(
     }
 }
 
+class ApplyMenuTintImpl : ApplyMenuTint {
+    override fun invoke(context: Context, menu: Menu) {
+        context.setMenuTint(menu)
+    }
+}

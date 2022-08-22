@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.url
 
+import net.pantasystem.milktea.model.url.UrlPreview
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

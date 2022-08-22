@@ -14,7 +14,7 @@
                 type="jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel" />
         <variable
                 name="noteCardActionListener"
-                type="jp.panta.misskeyandroidclient.ui.notes.view.NoteCardActionListenerAdapter" />
+                type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />
     </data>
 
     <androidx.cardview.widget.CardView

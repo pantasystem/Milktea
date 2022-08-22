@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.PlaneNoteViewData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -21,6 +20,7 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class UserDetailViewModel @AssistedInject constructor(
     private val translationStore: NoteTranslationStore,

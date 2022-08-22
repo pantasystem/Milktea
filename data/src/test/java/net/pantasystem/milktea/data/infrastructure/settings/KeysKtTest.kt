@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
+import net.pantasystem.milktea.model.setting.Keys
+import net.pantasystem.milktea.model.setting.allKeys
+import net.pantasystem.milktea.model.setting.str
 import org.junit.Assert
 import org.junit.Test
 

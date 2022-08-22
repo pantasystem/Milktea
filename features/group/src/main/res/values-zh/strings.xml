@@ -5,5 +5,4 @@
     <string name="group_name">团队名字</string>
     <string name="create_group">创建组</string>
     <string name="edit_group">编辑组</string>
-    <string name="groups">组列表</string>
 </resources>

@@ -17,13 +17,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityReactionSettingBinding
 import jp.panta.misskeyandroidclient.setTheme
-import jp.panta.misskeyandroidclient.ui.reaction.ReactionAutoCompleteArrayAdapter
-import jp.panta.misskeyandroidclient.ui.reaction.ReactionChoicesAdapter
 import jp.panta.misskeyandroidclient.ui.settings.viewmodel.reaction.ReactionPickerSettingViewModel
-import jp.panta.misskeyandroidclient.ui.text.CustomEmojiDecorator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
+import net.pantasystem.milktea.common_android_ui.reaction.ReactionAutoCompleteArrayAdapter
+import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import javax.inject.Inject
@@ -61,7 +61,9 @@ class ReactionSettingActivity : AppCompatActivity() {
         touchHelper.attachToRecyclerView(binding.reactionSettingListView)
         binding.reactionSettingListView.addItemDecoration(touchHelper)
         binding.reactionPickerSettingViewModel = mReactionPickerSettingViewModel
-        val reactionsAdapter = ReactionChoicesAdapter(mReactionPickerSettingViewModel)
+        val reactionsAdapter = ReactionChoicesAdapter(
+                mReactionPickerSettingViewModel
+            )
         binding.reactionSettingListView.adapter = reactionsAdapter
         mReactionPickerSettingViewModel.reactionSettingsList.observe(this) { list ->
             reactionsAdapter.submitList(list.map { rus ->
@@ -81,7 +83,10 @@ class ReactionSettingActivity : AppCompatActivity() {
         }.distinctUntilChanged().mapNotNull {
             it?.emojis
         }.onEach { emojis ->
-            val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(emojis, this)
+            val reactionAutoCompleteArrayAdapter = ReactionAutoCompleteArrayAdapter(
+                    emojis,
+                    this
+                )
             binding.reactionSettingField.setAdapter(reactionAutoCompleteArrayAdapter)
             binding.reactionSettingField.setOnItemClickListener { _, _, position, _ ->
                 val emoji = reactionAutoCompleteArrayAdapter.suggestions[position]

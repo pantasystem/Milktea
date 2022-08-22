@@ -11,10 +11,7 @@ import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
-import net.pantasystem.milktea.model.setting.Config
-import net.pantasystem.milktea.model.setting.DefaultConfig
-import net.pantasystem.milktea.model.setting.LocalConfigRepository
-import net.pantasystem.milktea.model.setting.RememberVisibility
+import net.pantasystem.milktea.model.setting.*
 
 
 class LocalConfigRepositoryImpl(

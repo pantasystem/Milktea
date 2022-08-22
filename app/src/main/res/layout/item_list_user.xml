@@ -5,7 +5,7 @@
     <data>
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
         <variable name="userViewData"
-                  type="jp.panta.misskeyandroidclient.ui.users.viewmodel.UserViewData"/>
+                  type="net.pantasystem.milktea.common_viewmodel.UserViewData"/>
 
         <variable
                 name="userListDetailViewModel"

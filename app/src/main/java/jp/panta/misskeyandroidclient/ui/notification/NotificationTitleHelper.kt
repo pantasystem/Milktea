@@ -4,7 +4,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.BindingProvider
+import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.notification.PollEndedNotification
 

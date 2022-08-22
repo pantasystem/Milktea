@@ -19,16 +19,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityUserDetailBinding
-import jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.notes.view.ActionNoteHandler
-import jp.panta.misskeyandroidclient.ui.notes.view.TimelineFragment
-import jp.panta.misskeyandroidclient.ui.notes.viewmodel.NotesViewModel
 import jp.panta.misskeyandroidclient.ui.users.PinNoteFragment
-import jp.panta.misskeyandroidclient.ui.users.ReportDialog
 import jp.panta.misskeyandroidclient.ui.users.nickname.EditNicknameDialog
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.UserDetailViewModel
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.provideFactory
-import jp.panta.misskeyandroidclient.viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
@@ -36,16 +30,24 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android.ui.Activities
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android.ui.getParentActivity
+import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.NoteEditorActivity
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(
@@ -98,6 +100,9 @@ class UserDetailActivity : AppCompatActivity() {
 
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var pageableFragmentFactory: PageableFragmentFactory
 
     private val accountViewModel: AccountViewModel by viewModels()
 
@@ -171,7 +176,7 @@ class UserDetailActivity : AppCompatActivity() {
         Log.d("UserDetailActivity", "userName:$userName")
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        ActionNoteHandler(
+        net.pantasystem.milktea.note.view.ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],
@@ -275,9 +280,9 @@ class UserDetailActivity : AppCompatActivity() {
         @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> TimelineFragment.newInstance(requestTimeline)
+                0 -> pageableFragmentFactory.create(requestTimeline)
                 1 -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
-                2 -> TimelineFragment.newInstance(requestMedia)
+                2 -> pageableFragmentFactory.create(requestMedia)
                 3 -> GalleryPostsFragment.newInstance(
                     Pageable.Gallery.User(userId),
                     account.accountId

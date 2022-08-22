@@ -15,15 +15,13 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
-import net.pantasystem.milktea.data.infrastructure.settings.ColorSettingStore
-import net.pantasystem.milktea.data.infrastructure.settings.Keys
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
-import net.pantasystem.milktea.data.infrastructure.settings.str
+import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -34,6 +32,8 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaCache
+import net.pantasystem.milktea.model.setting.Keys
+import net.pantasystem.milktea.model.setting.str
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -63,8 +63,8 @@ class MiApplication : Application() {
     @Inject
     internal lateinit var urlPreviewProvider: UrlPreviewStoreProvider
 
+    @Inject
     internal lateinit var colorSettingStore: ColorSettingStore
-        private set
 
     @Inject
     internal lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
@@ -117,7 +117,6 @@ class MiApplication : Application() {
 
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
-        colorSettingStore = ColorSettingStore(sharedPreferences)
 
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)

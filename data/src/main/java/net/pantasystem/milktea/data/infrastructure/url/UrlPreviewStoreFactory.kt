@@ -4,9 +4,10 @@ package net.pantasystem.milktea.data.infrastructure.url
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.data.infrastructure.settings.UrlPreviewSourceSetting
+import net.pantasystem.milktea.app_store.setting.UrlPreviewSourceSetting
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.url.UrlPreviewStore
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.setTheme
 import net.pantasystem.milktea.common_compose.SwitchTile
-import net.pantasystem.milktea.data.infrastructure.settings.SettingStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
