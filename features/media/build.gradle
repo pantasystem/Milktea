@@ -49,7 +49,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     //ExoPlayer
-    implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
 
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
