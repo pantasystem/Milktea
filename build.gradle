@@ -25,7 +25,7 @@ buildscript {
         compose_version = '1.2.0'
         coroutines_version = '1.6.2'
         retrofit = '2.9.0'
-        room_version = "2.4.2"
+        room_version = "2.4.3"
         nav_version = "2.5.1"
     }
 }
