@@ -31,17 +31,10 @@ import net.pantasystem.milktea.model.notes.NoteRelation
 fun ItemRenoteUser(
     note: NoteRelation,
     onClick: ()->Unit,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     isUserNameDefault: Boolean = false
 ) {
 
     val createdAt = getSimpleElapsedTime(time = note.note.createdAt)
-
-    LaunchedEffect(key1 = true){
-        withContext(Dispatchers.IO) {
-            noteCaptureAPIAdapter?.capture(note.note.id)?.launchIn(this)
-        }
-    }
 
     Card(
         shape = RoundedCornerShape(0.dp),

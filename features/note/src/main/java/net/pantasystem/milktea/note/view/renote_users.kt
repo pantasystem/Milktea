@@ -33,7 +33,6 @@ fun RenoteUsersScreen(
     renotesViewModel: RenotesViewModel,
     onSelected: (NoteRelation) -> Unit,
     onScrollState: (Boolean) -> Unit,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter
 ) {
 
     val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData()
@@ -55,7 +54,6 @@ fun RenoteUsersScreen(
             onBottomReached = {
                 renotesViewModel.next()
             },
-            noteCaptureAPIAdapter = noteCaptureAPIAdapter,
             modifier = Modifier.fillMaxSize(),
             onScrollState = onScrollState,
         )
@@ -89,7 +87,6 @@ fun RenoteUserList(
     onSelected: (NoteRelation) -> Unit,
     onBottomReached: () -> Unit,
     onScrollState: (Boolean) -> Unit,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter?,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberLazyListState()
@@ -127,7 +124,6 @@ fun RenoteUserList(
                 onClick = {
                     onSelected.invoke(notes[pos])
                 },
-                noteCaptureAPIAdapter = noteCaptureAPIAdapter
             )
         }
     }
