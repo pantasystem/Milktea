@@ -6,31 +6,33 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.user.User
 
 @ExperimentalCoroutinesApi
 @Composable
 @Stable
 fun ItemRenoteUser(
     note: NoteRelation,
-    onClick: ()->Unit,
+    myId: User.Id?,
+    onAction: (ItemRenoteAction) -> Unit,
     isUserNameDefault: Boolean = false
 ) {
 
@@ -41,7 +43,7 @@ fun ItemRenoteUser(
         modifier = Modifier
             .padding(0.5.dp)
             .clickable {
-                onClick.invoke()
+                onAction(ItemRenoteAction.OnClick(note))
             }
     ) {
         Row(
@@ -68,23 +70,43 @@ fun ItemRenoteUser(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     if(isUserNameDefault){
-                        CustomEmojiText(text = note.user.displayUserName, emojis = note.user.emojis)
+                        Text(text = note.user.displayUserName, fontSize = 16.sp)
                     }else{
-                        CustomEmojiText(text = note.user.displayName, emojis = note.user.emojis)
+                        CustomEmojiText(
+                            text = note.user.displayName,
+                            emojis = note.user.emojis,
+                            fontSize = 16.sp
+                        )
                     }
                     if(isUserNameDefault){
-                        Text(text = note.user.displayName)
+                        CustomEmojiText(
+                            text = note.user.displayName,
+                            emojis = note.user.emojis,
+                        )
                     }else{
                         Text(text = note.user.displayUserName)
                     }
                 }
-
+            }
+            Column {
+                Text(createdAt)
+                if (note.user.id == myId) {
+                    IconButton(onClick = {
+                        onAction(ItemRenoteAction.OnDeleteButtonClicked(note))
+                    }) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                    }
+                }
 
             }
-            Text(createdAt)
 
         }
     }
 }
 
+
+sealed interface ItemRenoteAction {
+    data class OnClick(val note: NoteRelation) : ItemRenoteAction
+    data class OnDeleteButtonClicked(val note: NoteRelation): ItemRenoteAction
+}
 
