@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.note.view.RenoteUsersScreen
 import net.pantasystem.milktea.note.viewmodel.renote.RenotesViewModel
+import net.pantasystem.milktea.note.viewmodel.renote.provideViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -43,13 +45,15 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
     @Inject
     lateinit var renotesViewModelAssistedFactory: RenotesViewModel.ViewModelAssistedFactory
 
-    private val viewModel by lazy {
+
+
+    private val viewModel by viewModels<RenotesViewModel> {
         val noteId = arguments?.let {
             val aId = it.getLong(EXTRA_ACCOUNT_ID)
             val nId = it.getString(EXTRA_NOTE_ID)!!
             Note.Id(aId, nId)
         }!!
-        renotesViewModelAssistedFactory.create(noteId)
+        RenotesViewModel.provideViewModel(renotesViewModelAssistedFactory, noteId)
     }
 
 
@@ -78,7 +82,6 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
                             ))
                             startActivity(intent)
                         },
-                        noteCaptureAPIAdapter = noteCaptureAPIAdapter,
                         onScrollState = { state ->
                             bottomSheetDialogBehavior?.isDraggable = state
                         }
