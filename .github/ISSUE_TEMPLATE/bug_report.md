@@ -7,26 +7,18 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## 不具合の概要
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## 再現方法
+**不具合の再現方法を箇条書きで記述してください**
+## 期待する動作
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Screenshots
+**不具合が発生した時のスクリーンショットやキャプチャー**
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Smartphone (please complete the following information):**
+## 不具合が発生した時の端末
  - Device:
  - OS Version:
  - App Version:
 
-**Additional context**
-Add any other context about the problem here.
+## 備考　
