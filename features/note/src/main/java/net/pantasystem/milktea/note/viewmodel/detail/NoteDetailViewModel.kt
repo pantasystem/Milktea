@@ -9,7 +9,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
@@ -21,8 +20,8 @@ import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
@@ -34,7 +33,7 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 class NoteDetailViewModel @AssistedInject constructor(
     private val encryption: Encryption,
     private val noteDataSourceAdder: NoteDataSourceAdder,
-    private val accountRepository: AccountRepository,
+    accountRepository: AccountRepository,
     private val noteCaptureAdapter: NoteCaptureAPIAdapter,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
@@ -50,16 +49,17 @@ class NoteDetailViewModel @AssistedInject constructor(
         fun create(show: Pageable.Show, accountId: Long?): NoteDetailViewModel
     }
 
-    companion object
+    companion object;
+
+    private val currentAccountWatcher: CurrentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
 
     val notes = MutableLiveData<List<PlaneNoteViewData>>()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun loadDetail() {
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val account = getAccount()
+                val account = currentAccountWatcher.getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
                     .getOrThrow()
 
@@ -67,7 +67,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
                 val detail = NoteDetailViewData(
                     noteDetail,
-                    getAccount(),
+                    currentAccountWatcher.getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore,
                 )
@@ -113,7 +113,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     suspend fun getUrl(): String {
-        val account = getAccount()
+        val account = currentAccountWatcher.getAccount()
         return "${account.instanceDomain}/notes/${show.noteId}"
     }
 
@@ -129,17 +129,17 @@ class NoteDetailViewModel @AssistedInject constructor(
             noteConversationViewData
         } else {
             conversation.add(next)
-            val children = misskeyAPIProvider.get(getAccount()).children(
+            val children = misskeyAPIProvider.get(currentAccountWatcher.getAccount()).children(
                 NoteRequest(
-                    getAccount().getI(encryption),
+                    currentAccountWatcher.getAccount().getI(encryption),
                     limit = 100,
                     noteId = next.toShowNote.note.id.noteId
                 )
             ).body()?.map {
-                val n = noteDataSourceAdder.addNoteDtoToDataSource(getAccount(), it)
+                val n = noteDataSourceAdder.addNoteDtoToDataSource(currentAccountWatcher.getAccount(), it)
                 PlaneNoteViewData(
                     noteRelationGetter.get(n).getOrThrow(),
-                    getAccount(),
+                    currentAccountWatcher.getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore
                 ).apply {
@@ -153,18 +153,18 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun loadConversation(): List<PlaneNoteViewData>? {
-        return misskeyAPIProvider.get(getAccount()).conversation(makeRequest()).body()
+        return misskeyAPIProvider.get(currentAccountWatcher.getAccount()).conversation(makeRequest()).body()
             ?.map {
                 noteRelationGetter.get(
                     noteDataSourceAdder.addNoteDtoToDataSource(
-                        getAccount(),
+                        currentAccountWatcher.getAccount(),
                         it
                     )
                 )
             }?.map {
                 PlaneNoteViewData(
                     it.getOrThrow(),
-                    getAccount(),
+                    currentAccountWatcher.getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore,
                 ).apply {
@@ -179,14 +179,14 @@ class NoteDetailViewModel @AssistedInject constructor(
         }?.map {
             noteRelationGetter.get(
                 noteDataSourceAdder.addNoteDtoToDataSource(
-                    getAccount(),
+                    currentAccountWatcher.getAccount(),
                     it
                 )
             )
         }?.map {
             val planeNoteViewData = PlaneNoteViewData(
                 it.getOrThrow(),
-                getAccount(),
+                currentAccountWatcher.getAccount(),
                 noteCaptureAdapter,
                 noteTranslationStore,
             )
@@ -195,11 +195,11 @@ class NoteDetailViewModel @AssistedInject constructor(
                 PlaneNoteViewData(
                     noteRelationGetter.get(
                         noteDataSourceAdder.addNoteDtoToDataSource(
-                            getAccount(),
+                            currentAccountWatcher.getAccount(),
                             n
                         )
                     ).getOrThrow(),
-                    getAccount(),
+                    currentAccountWatcher.getAccount(),
                     noteCaptureAdapter,
                     noteTranslationStore,
                 ).apply {
@@ -209,7 +209,7 @@ class NoteDetailViewModel @AssistedInject constructor(
             NoteConversationViewData(
                 it.getOrThrow(),
                 childInChild,
-                getAccount(),
+                currentAccountWatcher.getAccount(),
                 noteCaptureAdapter,
                 noteTranslationStore,
             ).apply {
@@ -220,14 +220,14 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     private suspend fun loadChildren(id: String): List<NoteDTO>? {
-        return misskeyAPIProvider.get(getAccount())
-            .children(NoteRequest(i = getAccount().getI(encryption), limit = 100, noteId = id))
+        return misskeyAPIProvider.get(currentAccountWatcher.getAccount())
+            .children(NoteRequest(i = currentAccountWatcher.getAccount().getI(encryption), limit = 100, noteId = id))
             .body()
     }
 
     private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData) {
         UrlPreviewLoadTask(
-            urlPreviewStoreProvider.getUrlPreviewStore(getAccount()),
+            urlPreviewStoreProvider.getUrlPreviewStore(currentAccountWatcher.getAccount()),
             planeNoteViewData.urls,
             viewModelScope
         ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
@@ -247,23 +247,9 @@ class NoteDetailViewModel @AssistedInject constructor(
         }
     }
 
-    private var mAc: Account? = null
-    private suspend fun getAccount(): Account {
-        if (mAc != null) {
-            return mAc!!
-        }
-
-        if (accountId != null) {
-            mAc = accountRepository.get(accountId).getOrThrow()
-            return mAc!!
-        }
-
-        mAc = accountRepository.getCurrentAccount().getOrThrow()
-        return mAc!!
-    }
 
     private suspend fun makeRequest(): NoteRequest {
-        return show.toParams().toNoteRequest(i = getAccount().getI(encryption))
+        return show.toParams().toNoteRequest(i = currentAccountWatcher.getAccount().getI(encryption))
     }
 }
 
