@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -120,6 +118,20 @@ class InMemoryNoteDataSource @Inject constructor(
         result.mapNotNull {
             remove(it.id).getOrNull()
         }.count ()
+    }
+
+    override fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>> {
+        return _state.map { state ->
+            noteIds.mapNotNull {
+                state.getOrNull(it)
+            }
+        }
+    }
+
+    override fun observeOne(noteId: Note.Id): Flow<Note?> {
+        return _state.map {
+            it.getOrNull(noteId)
+        }
     }
 
     private suspend fun createOrUpdate(note: Note): AddResult {

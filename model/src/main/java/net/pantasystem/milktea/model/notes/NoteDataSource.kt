@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
@@ -70,5 +71,9 @@ interface NoteDataSource {
      * @return 削除されたNote数
      */
     suspend fun removeByUserId(userId: User.Id) : Result<Int>
+
+    fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>>
+
+    fun observeOne(noteId: Note.Id): Flow<Note?>
 
 }

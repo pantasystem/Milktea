@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -102,8 +104,6 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        noteDetailViewModel.loadDetail()
         val adapter = NoteDetailAdapter(
             noteDetailViewModel = noteDetailViewModel,
             viewLifecycleOwner = viewLifecycleOwner
@@ -115,9 +115,14 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
                 userDetailNavigation
             ).onAction(it)
         }
-        noteDetailViewModel.notes.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                noteDetailViewModel.notes.collect {
+                    adapter.submitList(it)
+                }
+            }
         }
+
 
 
         binding.notesView.adapter = adapter

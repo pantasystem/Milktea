@@ -1,45 +1,32 @@
 package net.pantasystem.milktea.note.viewmodel.detail
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.notes.toNoteRequest
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
+import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
-@Suppress("BlockingMethodInNonBlockingContext")
 class NoteDetailViewModel @AssistedInject constructor(
-    private val encryption: Encryption,
-    private val noteDataSourceAdder: NoteDataSourceAdder,
     accountRepository: AccountRepository,
     private val noteCaptureAdapter: NoteCaptureAPIAdapter,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
     private val noteTranslationStore: NoteTranslationStore,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
+    private val noteDataSource: NoteDataSource,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -53,63 +40,144 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     private val currentAccountWatcher: CurrentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
 
-    val notes = MutableLiveData<List<PlaneNoteViewData>>()
+    private val cache = PlaneNoteViewDataCache(
+        currentAccountWatcher::getAccount,
+        noteCaptureAdapter,
+        noteTranslationStore,
+        { account -> urlPreviewStoreProvider.getUrlPreviewStore(account) },
+        viewModelScope
+    )
 
-    fun loadDetail() {
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private val note = suspend {
+        currentAccountWatcher.getAccount()
+    }.asFlow().flatMapLatest {
+        noteDataSource.observeOne(Note.Id(it.accountId, show.noteId))
+    }.onStart {
+        emit(null)
+    }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val conversationNotes = note.filterNotNull().flatMapLatest { note ->
+        noteDataSource.state.map { state ->
+            state.conversation(note.id)
+        }
+    }.onStart {
+        emit(emptyList())
+    }
+
+    private val repliesMap = noteDataSource.state.map { state ->
+        state.repliesMap()
+    }.onStart {
+        emit(emptyMap())
+    }
+
+    val notes = combine(note, conversationNotes, repliesMap) { note, conversation, repliesMap ->
+        val relatedConversation = noteRelationGetter.getIn(conversation.map { it.id }).map {
+            NoteType.Conversation(it)
+        }
+        val relatedChildren = noteRelationGetter.getIn((repliesMap[note?.id]?: emptyList()).map {
+            it.id
+        }).map { childNote ->
+            NoteType.Children(childNote, noteRelationGetter.getIn(repliesMap[childNote.note.id]?.map { it.id }?: emptyList()))
+        }
+        val relatedNote = noteRelationGetter.getIn(if (note == null) emptyList() else listOf(note.id)).map {
+            NoteType.Detail(it)
+        }
+        relatedConversation + relatedNote + relatedChildren
+    }.map { notes ->
+        notes.map { note ->
+            when(note) {
+                is NoteType.Children -> {
+                    val children = note.nextChildren.map {
+                        cache.get(it)
+                    }
+                    NoteConversationViewData(
+                        note.note, children,
+                        currentAccountWatcher.getAccount(),
+                        noteCaptureAdapter,
+                        noteTranslationStore,
+                    ).also {
+                        it.capture()
+                        cache.put(it)
+                    }.apply {
+                        this.hasConversation.postValue(false)
+                        this.conversation.postValue(note.getReplies().map {
+                            cache.get(it)
+                        })
+                    }
+                }
+                is NoteType.Conversation -> {
+                    cache.get(note.note)
+                }
+                is NoteType.Detail -> {
+                    NoteDetailViewData(
+                        note.note,
+                        currentAccountWatcher.getAccount(),
+                        noteCaptureAdapter,
+                        noteTranslationStore,
+                    ).also {
+                        cache.put(it)
+                    }
+                }
+            }
+        }
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private fun NoteDataSourceState.repliesMap(): Map<Note.Id, List<Note>> {
+        return this.map.values.filterNot {
+            it.replyId == null
+        }.groupBy {
+            it.replyId!!
+        }
+    }
+
+    private fun NoteDataSourceState.conversation(noteId: Note.Id, notes: List<Note> = emptyList()): List<Note> {
+        val note = getOrNull(noteId)
+            ?: return notes.sortedBy {
+                it.id.noteId
+            }
+        if (note.replyId != null) {
+            val reply = getOrNull(note.replyId!!)?.let {
+                listOf(it)
+            }?: emptyList()
+
+            return conversation(note.replyId!!, notes + reply)
+        }
+
+        return (notes).sortedBy {
+            it.id.noteId
+        }
+    }
+
+    init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = currentAccountWatcher.getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
                     .getOrThrow()
 
-                val noteDetail = noteRelationGetter.get(note).getOrThrow()
-
-                val detail = NoteDetailViewData(
-                    noteDetail,
-                    currentAccountWatcher.getAccount(),
-                    noteCaptureAdapter,
-                    noteTranslationStore,
-                )
-                loadUrlPreview(detail)
-                var list: List<PlaneNoteViewData> = listOf(detail)
-                notes.postValue(list)
-
-                val conversation = loadConversation()?.asReversed()
-                if (conversation != null) {
-                    list = ArrayList<PlaneNoteViewData>(conversation).apply {
-                        addAll(list)
-                    }
-                    list.captureAll()
-                    notes.postValue(list)
-                }
-                val children = loadChildren()
-                if (children != null) {
-                    list = ArrayList<PlaneNoteViewData>(list).apply {
-                        addAll(children)
-                    }
-                    list.captureAll()
-                    notes.postValue(list)
-                }
-
+                noteRepository.syncConversation(note.id)
+                recursiveSync(note.id).getOrThrow()
             } catch (e: Exception) {
                 Log.w("NoteDetailViewModel", "loadDetail失敗", e)
             }
         }
-
     }
 
 
-    fun loadNewConversation(noteConversationViewData: NoteConversationViewData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val conversation = noteConversationViewData.conversation.value
-                    ?: emptyList()
-                getChildrenToIterate(noteConversationViewData, ArrayList(conversation))
-            } catch (e: Exception) {
-                Log.e("NoteDetailViewModel", "loadNewConversation中にエラー発生", e)
+    private suspend fun recursiveSync(noteId: Note.Id): Result<Unit> = runCatching {
+        coroutineScope {
+            noteRepository.syncChildren(noteId).also {
+                noteDataSource.state.value.repliesMap()[noteId]?.map {
+                    async {
+                        recursiveSync(it.id).getOrNull()
+                    }
+                }?.awaitAll()
             }
         }
+
+
     }
 
     suspend fun getUrl(): String {
@@ -117,121 +185,8 @@ class NoteDetailViewModel @AssistedInject constructor(
         return "${account.instanceDomain}/notes/${show.noteId}"
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun getChildrenToIterate(
-        noteConversationViewData: NoteConversationViewData,
-        conversation: ArrayList<PlaneNoteViewData>
-    ): NoteConversationViewData {
-        val next = noteConversationViewData.getNextNoteForConversation()
-        return if (next == null) {
-            noteConversationViewData.conversation.postValue(conversation)
-            noteConversationViewData.hasConversation.postValue(false)
-            noteConversationViewData
-        } else {
-            conversation.add(next)
-            val children = misskeyAPIProvider.get(currentAccountWatcher.getAccount()).children(
-                NoteRequest(
-                    currentAccountWatcher.getAccount().getI(encryption),
-                    limit = 100,
-                    noteId = next.toShowNote.note.id.noteId
-                )
-            ).body()?.map {
-                val n = noteDataSourceAdder.addNoteDtoToDataSource(currentAccountWatcher.getAccount(), it)
-                PlaneNoteViewData(
-                    noteRelationGetter.get(n).getOrThrow(),
-                    currentAccountWatcher.getAccount(),
-                    noteCaptureAdapter,
-                    noteTranslationStore
-                ).apply {
-                    loadUrlPreview(this)
-                }
-            }
-            noteConversationViewData.nextChildren = children
-            getChildrenToIterate(noteConversationViewData, conversation)
-        }
-    }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun loadConversation(): List<PlaneNoteViewData>? {
-        return misskeyAPIProvider.get(currentAccountWatcher.getAccount()).conversation(makeRequest()).body()
-            ?.map {
-                noteRelationGetter.get(
-                    noteDataSourceAdder.addNoteDtoToDataSource(
-                        currentAccountWatcher.getAccount(),
-                        it
-                    )
-                )
-            }?.map {
-                PlaneNoteViewData(
-                    it.getOrThrow(),
-                    currentAccountWatcher.getAccount(),
-                    noteCaptureAdapter,
-                    noteTranslationStore,
-                ).apply {
-                    loadUrlPreview(this)
-                }
-            }
-    }
 
-    private suspend fun loadChildren(): List<NoteConversationViewData>? {
-        return loadChildren(id = show.noteId)?.filter {
-            it.reNote?.id != show.noteId
-        }?.map {
-            noteRelationGetter.get(
-                noteDataSourceAdder.addNoteDtoToDataSource(
-                    currentAccountWatcher.getAccount(),
-                    it
-                )
-            )
-        }?.map {
-            val planeNoteViewData = PlaneNoteViewData(
-                it.getOrThrow(),
-                currentAccountWatcher.getAccount(),
-                noteCaptureAdapter,
-                noteTranslationStore,
-            )
-            val childInChild = loadChildren(planeNoteViewData.toShowNote.note.id.noteId)?.map { n ->
-
-                PlaneNoteViewData(
-                    noteRelationGetter.get(
-                        noteDataSourceAdder.addNoteDtoToDataSource(
-                            currentAccountWatcher.getAccount(),
-                            n
-                        )
-                    ).getOrThrow(),
-                    currentAccountWatcher.getAccount(),
-                    noteCaptureAdapter,
-                    noteTranslationStore,
-                ).apply {
-                    loadUrlPreview(this)
-                }
-            }
-            NoteConversationViewData(
-                it.getOrThrow(),
-                childInChild,
-                currentAccountWatcher.getAccount(),
-                noteCaptureAdapter,
-                noteTranslationStore,
-            ).apply {
-                this.hasConversation.postValue(this.getNextNoteForConversation() != null)
-            }
-        }
-
-    }
-
-    private suspend fun loadChildren(id: String): List<NoteDTO>? {
-        return misskeyAPIProvider.get(currentAccountWatcher.getAccount())
-            .children(NoteRequest(i = currentAccountWatcher.getAccount().getI(encryption), limit = 100, noteId = id))
-            .body()
-    }
-
-    private suspend fun loadUrlPreview(planeNoteViewData: PlaneNoteViewData) {
-        UrlPreviewLoadTask(
-            urlPreviewStoreProvider.getUrlPreviewStore(currentAccountWatcher.getAccount()),
-            planeNoteViewData.urls,
-            viewModelScope
-        ).load(planeNoteViewData.urlPreviewLoadTaskCallback)
-    }
 
     private fun <T : PlaneNoteViewData> T.capture(): T {
         val self = this
@@ -241,16 +196,6 @@ class NoteDetailViewModel @AssistedInject constructor(
         return this
     }
 
-    private fun <T : PlaneNoteViewData> List<T>.captureAll() {
-        this.forEach {
-            it.capture()
-        }
-    }
-
-
-    private suspend fun makeRequest(): NoteRequest {
-        return show.toParams().toNoteRequest(i = currentAccountWatcher.getAccount().getI(encryption))
-    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -261,5 +206,20 @@ fun NoteDetailViewModel.Companion.provideFactory(
 ) = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return factory.create(show, accountId) as T
+    }
+}
+
+sealed interface NoteType {
+    data class Detail(val note: NoteRelation) : NoteType
+    data class Conversation(val note: NoteRelation) : NoteType
+    data class Children(val note: NoteRelation, val nextChildren: List<NoteRelation>) : NoteType {
+
+
+        fun getReplies(): List<NoteRelation> {
+            return nextChildren.filter {
+                it.note.replyId == note.note.id
+            }
+        }
+
     }
 }
