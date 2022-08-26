@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.gallery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
@@ -14,7 +15,6 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
@@ -79,7 +79,7 @@ class GalleryPostsStoreImpl(
         FuturePagingController(entityAdder, this, galleryPostState, loader)
 
     override suspend fun loadPrevious() {
-        return previousPagingController.loadPrevious()
+        previousPagingController.loadPrevious()
     }
 
     override suspend fun loadFuture() {
@@ -121,7 +121,7 @@ class LikedGalleryPostStoreImpl(
         FuturePagingController(entityAdder, this, galleryPostState, loader)
 
     override suspend fun loadPrevious() {
-        return previousPagingController.loadPrevious()
+        previousPagingController.loadPrevious()
     }
 
     override suspend fun loadFuture() {

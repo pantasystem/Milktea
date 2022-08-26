@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -82,7 +83,9 @@ class TimelineStoreImpl(
                 )
             }
             else -> TimelinePagingStoreImpl(
-                pageableTimeline, noteAdder, getAccount, encryption, misskeyAPIProvider
+                pageableTimeline, noteAdder, getAccount, {
+                    initialUntilDate
+                },encryption, misskeyAPIProvider
             )
         }
     }
@@ -90,6 +93,8 @@ class TimelineStoreImpl(
         get() = pageableStore.state.distinctUntilChanged()
 
     var latestReceiveId: Note.Id? = null
+
+    var initialUntilDate: Instant? = null
 
     init {
         coroutineScope.launch(Dispatchers.IO) {
@@ -112,7 +117,7 @@ class TimelineStoreImpl(
 
     override suspend fun loadFuture(): Result<Unit> {
         return runCatching {
-            when (val store = pageableStore) {
+            val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     FuturePagingController(
                         store,
@@ -129,6 +134,9 @@ class TimelineStoreImpl(
                         store,
                     ).loadFuture()
                 }
+            }
+            if (addedCount.getOrElse { Int.MAX_VALUE } < 20) {
+                initialUntilDate = null
             }
             latestReceiveId = null
         }
@@ -159,8 +167,9 @@ class TimelineStoreImpl(
 
     }
 
-    override suspend fun clear() {
+    override suspend fun clear(initialUntilDate: Instant?) {
         pageableStore.mutex.withLock {
+            this.initialUntilDate = initialUntilDate
             pageableStore.setState(PageableState.Loading.Init())
         }
     }
@@ -177,6 +186,9 @@ class TimelineStoreImpl(
         val store = pageableStore
         if (store is TimelinePagingStoreImpl) {
             store.mutex.withLock {
+                if (initialUntilDate != null) {
+                    return@withLock
+                }
                 val content = store.getState().content
 
                 var added = false
@@ -215,11 +227,12 @@ class TimelineStoreImpl(
 sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
 
 class TimelinePagingStoreImpl(
-    val pageableTimeline: Pageable,
-    val noteAdder: NoteDataSourceAdder,
-    val getAccount: suspend () -> Account,
-    val encryption: Encryption,
-    val misskeyAPIProvider: MisskeyAPIProvider,
+    private val pageableTimeline: Pageable,
+    private val noteAdder: NoteDataSourceAdder,
+    private val getAccount: suspend () -> Account,
+    private val getInitialUntilDate: () -> Instant?,
+    private val encryption: Encryption,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
     IdGetter<Note.Id>, TimelinePagingBase {
 
@@ -248,7 +261,12 @@ class TimelinePagingStoreImpl(
                 i = getAccount.invoke().getI(encryption),
                 pageable = pageableTimeline
             )
-            val req = builder.build(NoteRequest.Conditions(untilId = getUntilId()?.noteId))
+            val untilId = getUntilId()?.noteId
+            val untilDate = getInitialUntilDate.invoke()
+            val req = builder.build(NoteRequest.Conditions(
+                untilId = untilId,
+                untilDate = if (untilId == null) untilDate?.toEpochMilliseconds() else null,
+            ))
             getStore()!!.invoke(req).throwIfHasError().body()!!
         }
     }

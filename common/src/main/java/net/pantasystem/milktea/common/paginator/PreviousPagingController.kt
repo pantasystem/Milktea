@@ -10,11 +10,11 @@ class PreviousPagingController<DTO, E>(
     private val state: PaginationState<E>,
     private val previousLoader: PreviousLoader<DTO>
 ) : PreviousPaginator {
-    override suspend fun loadPrevious() {
+    override suspend fun loadPrevious(): Result<Int> {
         if (locker.mutex.isLocked) {
-            return
+            return Result.failure(IllegalStateException())
         }
-        locker.mutex.withLock {
+        val result = locker.mutex.withLock {
 
             val loading = PageableState.Loading.Previous(
                 content = state.getState().content
@@ -51,6 +51,9 @@ class PreviousPagingController<DTO, E>(
                     }
                 }
             }
+        }
+        return result.map {
+            it.size
         }
     }
 }

@@ -1,5 +1,5 @@
 package net.pantasystem.milktea.common.paginator
 
 interface PreviousPaginator {
-    suspend fun loadPrevious()
+    suspend fun loadPrevious(): Result<Int>
 }
