@@ -23,6 +23,8 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.SincePaginate
+import net.pantasystem.milktea.model.account.page.UntilPaginate
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
@@ -259,12 +261,15 @@ class TimelinePagingStoreImpl(
 
     override suspend fun loadPrevious(): Result<List<NoteDTO>> {
         return runCatching {
+            val untilId = getUntilId()?.noteId
+            if (pageableTimeline !is UntilPaginate && untilId != null) {
+                return@runCatching emptyList()
+            }
             val builder = NoteRequest.Builder(
                 i = getAccount.invoke().getI(encryption),
                 pageable = pageableTimeline,
                 limit = LIMIT
             )
-            val untilId = getUntilId()?.noteId
             val untilDate = getInitialUntilDate.invoke()
             val req = builder.build(NoteRequest.Conditions(
                 untilId = untilId,
@@ -276,6 +281,10 @@ class TimelinePagingStoreImpl(
 
     override suspend fun loadFuture(): Result<List<NoteDTO>> {
         return runCatching {
+            if (pageableTimeline !is SincePaginate) {
+                return@runCatching emptyList()
+            }
+
             val builder = NoteRequest.Builder(
                 i = getAccount.invoke().getI(encryption),
                 pageable = pageableTimeline,
