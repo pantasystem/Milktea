@@ -30,15 +30,17 @@ import retrofit2.Response
 import javax.inject.Inject
 
 
+const val LIMIT = 10
+
 class TimelineStoreImpl(
-    val pageableTimeline: Pageable,
-    val noteAdder: NoteDataSourceAdder,
-    val noteDataSource: NoteDataSource,
-    val getAccount: suspend () -> Account,
-    val encryption: Encryption,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val coroutineScope: CoroutineScope,
-    val noteRelationGetter: NoteRelationGetter,
+    private val pageableTimeline: Pageable,
+    private val noteAdder: NoteDataSourceAdder,
+    noteDataSource: NoteDataSource,
+    private val getAccount: suspend () -> Account,
+    private val encryption: Encryption,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    coroutineScope: CoroutineScope,
+    private val noteRelationGetter: NoteRelationGetter,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -135,7 +137,7 @@ class TimelineStoreImpl(
                     ).loadFuture()
                 }
             }
-            if (addedCount.getOrElse { Int.MAX_VALUE } < 20) {
+            if (addedCount.getOrElse { Int.MAX_VALUE } < LIMIT) {
                 initialUntilDate = null
             }
             latestReceiveId = null
@@ -259,7 +261,8 @@ class TimelinePagingStoreImpl(
         return runCatching {
             val builder = NoteRequest.Builder(
                 i = getAccount.invoke().getI(encryption),
-                pageable = pageableTimeline
+                pageable = pageableTimeline,
+                limit = LIMIT
             )
             val untilId = getUntilId()?.noteId
             val untilDate = getInitialUntilDate.invoke()
@@ -275,7 +278,8 @@ class TimelinePagingStoreImpl(
         return runCatching {
             val builder = NoteRequest.Builder(
                 i = getAccount.invoke().getI(encryption),
-                pageable = pageableTimeline
+                pageable = pageableTimeline,
+                limit = LIMIT
             )
             val req = builder.build(NoteRequest.Conditions(sinceId = getSinceId()?.noteId))
             getStore()!!.invoke(req).throwIfHasError().body()!!
@@ -384,7 +388,7 @@ class FavoriteNoteTimelinePagingStoreImpl(
         val ac = getAccount.invoke()
         return runCatching {
             misskeyAPIProvider.get(getAccount.invoke()).favorites(
-                NoteRequest.Builder(pageableTimeline, ac.getI(encryption))
+                NoteRequest.Builder(pageableTimeline, ac.getI(encryption), limit = LIMIT)
                     .build(NoteRequest.Conditions(sinceId = getSinceId()))
             ).throwIfHasError().body()!!
         }
@@ -394,7 +398,7 @@ class FavoriteNoteTimelinePagingStoreImpl(
         return runCatching {
             val ac = getAccount.invoke()
             misskeyAPIProvider.get(getAccount.invoke()).favorites(
-                NoteRequest.Builder(pageableTimeline, ac.getI(encryption))
+                NoteRequest.Builder(pageableTimeline, ac.getI(encryption), limit = LIMIT)
                     .build(NoteRequest.Conditions(untilId = getUntilId()))
             ).throwIfHasError().body()!!
         }
