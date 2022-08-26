@@ -133,6 +133,7 @@ class TimelineViewModel @AssistedInject constructor(
             cache.clear()
             timelineStore.clear()
             timelineStore.loadPrevious()
+            timelineStore.loadFuture()
         }
     }
 
