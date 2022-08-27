@@ -49,11 +49,13 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
+        private const val EXTRA_INITIAL_UNTIL_DATE = " EXTRA_INITIAL_UNTIL_DATE"
 
         fun newInstance(page: Page, initialUntilDate: Instant? = null): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGE, page)
+                    putLong(EXTRA_INITIAL_UNTIL_DATE, initialUntilDate?.toEpochMilliseconds() ?: -1)
                 }
             }
         }
@@ -62,6 +64,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGEABLE, pageable)
+                    putLong(EXTRA_INITIAL_UNTIL_DATE, initialUntilDate?.toEpochMilliseconds() ?: -1)
                 }
             }
         }
@@ -122,6 +125,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (savedInstanceState == null) {
+            loadInit()
+        }
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner) {
@@ -258,6 +264,12 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         ): Boolean {
             return oldItem.id == newItem.id
         }
+    }
+
+    private fun loadInit() {
+        val epoc = arguments?.getLong(EXTRA_INITIAL_UNTIL_DATE, - 1)?: -1
+        val untilDate = if (epoc >= 0) Instant.fromEpochMilliseconds(epoc) else null
+        mViewModel.loadInit(untilDate)
     }
 
     @ExperimentalCoroutinesApi

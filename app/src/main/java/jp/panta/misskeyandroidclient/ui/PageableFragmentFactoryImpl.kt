@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.ui
 
 import androidx.fragment.app.Fragment
 import jp.panta.misskeyandroidclient.ui.notification.NotificationFragment
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Page
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory {
 
-    override fun create(page: Page): Fragment {
+    override fun create(page: Page, initialStartAt: Instant?): Fragment {
         return when(val pageable = page.pageable()){
             is Pageable.Show ->{
                 NoteDetailFragment.newInstance(page)
@@ -25,13 +26,13 @@ class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory
                 return GalleryPostsFragment.newInstance(pageable, page.accountId)
             }
             else ->{
-                TimelineFragment.newInstance(page)
+                TimelineFragment.newInstance(page, initialStartAt)
             }
         }
 
     }
 
-    override fun create(pageable: Pageable): Fragment {
+    override fun create(pageable: Pageable, initialStartAt: Instant?): Fragment {
         return when(pageable){
             is Pageable.Show ->{
                 NoteDetailFragment.newInstance(pageable.noteId)
@@ -43,7 +44,7 @@ class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory
                 return GalleryPostsFragment.newInstance(pageable, null)
             }
             else ->{
-                TimelineFragment.newInstance(pageable)
+                TimelineFragment.newInstance(pageable, initialStartAt)
             }
         }
     }
