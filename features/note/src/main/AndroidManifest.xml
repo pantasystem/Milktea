@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="net.pantasystem.milktea.note">
+
+    <application>
+        <activity
+                android:name=".TimeMachineTimelineActivity"
+                android:exported="false" />
+    </application>
 
 </manifest>
