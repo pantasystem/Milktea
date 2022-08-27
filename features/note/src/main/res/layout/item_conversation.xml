@@ -6,10 +6,10 @@
         <import type="android.view.View"/>
         <variable
                 name="childrenViewData"
-                type="net.pantasystem.milktea.note.viewmodel.detail.NoteConversationViewData" />
+                type="net.pantasystem.milktea.note.detail.viewmodel.NoteConversationViewData" />
         <variable
                 name="noteDetailViewModel"
-                type="net.pantasystem.milktea.note.viewmodel.detail.NoteDetailViewModel" />
+                type="net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel" />
         <variable
                 name="noteCardActionListener"
                 type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />

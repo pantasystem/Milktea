@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
-import net.pantasystem.milktea.note.view.reaction.NoteReactionViewHelper
+import net.pantasystem.milktea.note.reaction.NoteReactionViewHelper
 
 object NotificationStatusIconHelper {
 

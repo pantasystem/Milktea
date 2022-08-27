@@ -3,7 +3,7 @@ package net.pantasystem.milktea.note.view
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.note.view.reaction.ReactionCountAction
+import net.pantasystem.milktea.note.reaction.ReactionCountAction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class NoteCardActionListenerAdapter(

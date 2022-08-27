@@ -7,7 +7,7 @@
 
         <variable
                 name="noteEditorViewModel"
-                type="net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel" />
+                type="net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel" />
 
         <import type="android.view.View" />
 
@@ -17,7 +17,7 @@
 
         <variable
                 name="simpleEditor"
-                type="net.pantasystem.milktea.note.view.editor.SimpleEditor" />
+                type="net.pantasystem.milktea.note.editor.SimpleEditor" />
 
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>

@@ -10,7 +10,7 @@
                 type="net.pantasystem.milktea.app_store.notes.PollEditingState" />
         <variable
                 name="noteEditorViewModel"
-                type="net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel" />
+                type="net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel" />
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
         <import type="android.view.View" />
     </data>

@@ -7,7 +7,7 @@
 
         <variable
                 name="note"
-                type="net.pantasystem.milktea.note.viewmodel.detail.NoteDetailViewData" />
+                type="net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewData" />
 
         <import type="android.view.View" />
 

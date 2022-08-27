@@ -7,10 +7,10 @@
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
         <variable
                 name="previewAbleFile"
-                type="net.pantasystem.milktea.note.viewmodel.media.PreviewAbleFile" />
+                type="net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile" />
         <variable
                 name="mediaViewData"
-                type="net.pantasystem.milktea.note.viewmodel.media.MediaViewData" />
+                type="net.pantasystem.milktea.note.media.viewmodel.MediaViewData" />
     </data>
     <FrameLayout android:id="@+id/baseFrame"
             android:layout_width="match_parent"

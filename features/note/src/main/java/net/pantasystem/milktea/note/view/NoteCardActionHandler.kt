@@ -8,11 +8,11 @@ import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
-import net.pantasystem.milktea.note.view.reaction.ReactionSelectionDialog
-import net.pantasystem.milktea.note.view.reaction.RemoteReactionEmojiSuggestionDialog
-import net.pantasystem.milktea.note.view.reaction.history.ReactionHistoryPagerDialog
-import net.pantasystem.milktea.note.view.reaction.picker.ReactionPickerDialog
-import net.pantasystem.milktea.note.view.renote.RenotesBottomSheetDialog
+import net.pantasystem.milktea.note.reaction.ReactionSelectionDialog
+import net.pantasystem.milktea.note.reaction.RemoteReactionEmojiSuggestionDialog
+import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
+import net.pantasystem.milktea.note.reaction.picker.ReactionPickerDialog
+import net.pantasystem.milktea.note.renote.RenotesBottomSheetDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 class NoteCardActionHandler(
