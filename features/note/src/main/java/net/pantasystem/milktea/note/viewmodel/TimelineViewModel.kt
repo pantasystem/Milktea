@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
@@ -128,10 +129,10 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
-    fun loadInit() {
+    fun loadInit(initialUntilDate: Instant? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             cache.clear()
-            timelineStore.clear()
+            timelineStore.clear(initialUntilDate)
             timelineStore.loadPrevious()
             timelineStore.loadFuture()
         }
