@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.viewmodel
+package net.pantasystem.milktea.note.timeline.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +26,7 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteStreaming
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TimelineViewModel @AssistedInject constructor(

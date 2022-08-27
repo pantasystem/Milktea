@@ -6,7 +6,7 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.note.view.TimelineFragment
+import net.pantasystem.milktea.note.timeline.TimelineFragment
 import net.pantasystem.milktea.note.detail.NoteDetailFragment
 import javax.inject.Inject
 

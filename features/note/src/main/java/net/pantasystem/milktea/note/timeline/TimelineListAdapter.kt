@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note.timeline
 
 
 import android.view.LayoutInflater
@@ -23,6 +23,8 @@ import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.poll.PollListAdapter
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.view.NoteCardAction
+import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note.timeline
 
 import android.os.Bundle
 import android.util.Log
@@ -34,10 +34,11 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
+import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
+import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
-import net.pantasystem.milktea.note.viewmodel.TimelineViewModel
-import net.pantasystem.milktea.note.viewmodel.provideViewModel
 import javax.inject.Inject
 import kotlin.math.abs
 

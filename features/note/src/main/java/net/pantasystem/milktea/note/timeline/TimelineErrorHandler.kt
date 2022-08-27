@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note.timeline
 
 import android.content.Context
 import android.util.Log
