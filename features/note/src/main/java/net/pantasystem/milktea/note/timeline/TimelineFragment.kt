@@ -19,7 +19,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
@@ -49,22 +48,19 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
-        private const val EXTRA_INITIAL_UNTIL_DATE = " EXTRA_INITIAL_UNTIL_DATE"
 
-        fun newInstance(page: Page, initialUntilDate: Instant? = null): TimelineFragment {
+        fun newInstance(page: Page): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGE, page)
-                    putLong(EXTRA_INITIAL_UNTIL_DATE, initialUntilDate?.toEpochMilliseconds() ?: -1)
                 }
             }
         }
 
-        fun newInstance(pageable: Pageable, initialUntilDate: Instant? = null): TimelineFragment {
+        fun newInstance(pageable: Pageable): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGEABLE, pageable)
-                    putLong(EXTRA_INITIAL_UNTIL_DATE, initialUntilDate?.toEpochMilliseconds() ?: -1)
                 }
             }
         }
@@ -115,8 +111,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private var mFirstVisibleItemPosition: Int? = null
 
 
-//    val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
-
     val notesViewModel by activityViewModels<NotesViewModel>()
 
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
@@ -125,10 +119,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        if (savedInstanceState == null) {
-            loadInit()
-        }
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
         val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner) {
@@ -279,11 +269,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         }
     }
 
-    private fun loadInit() {
-        val epoc = arguments?.getLong(EXTRA_INITIAL_UNTIL_DATE, - 1)?: -1
-        val untilDate = if (epoc >= 0) Instant.fromEpochMilliseconds(epoc) else null
-        mViewModel.loadInit(untilDate)
-    }
 
     @ExperimentalCoroutinesApi
     private val mScrollListener = object : RecyclerView.OnScrollListener() {
