@@ -9,4 +9,11 @@
             android:title="@string/refresh"
             app:showAsAction="ifRoom"
             />
+    <item
+            android:id="@+id/set_time_machine"
+            android:icon="@drawable/ic_baseline_timeline_24"
+            android:title="@string/time_machine"
+            app:showAsAction="ifRoom"
+
+            />
 </menu>

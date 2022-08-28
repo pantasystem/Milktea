@@ -228,6 +228,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                         mViewModel.loadInit()
                         return true
                     }
+                    R.id.set_time_machine -> {
+                        TimeMachineDialog().show(childFragmentManager, "")
+                        return true
+                    }
                 }
                 return false
             }
