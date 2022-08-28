@@ -11,9 +11,7 @@ import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +32,7 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
+import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
 import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
@@ -86,6 +85,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         )
     }
 
+    private val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
     @Inject
     lateinit var settingStore: SettingStore
 
@@ -150,11 +150,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             mViewModel.loadNew()
         }
 
-        mViewModel.isLoading.observe(viewLifecycleOwner) {
+        mViewModel.isLoading.observe(viewLifecycleOwner, Observer {
             if (it != null && !it) {
                 mBinding.refresh.isRefreshing = false
             }
-        }
+        })
 
 
         mBinding.listView.adapter = adapter
@@ -236,6 +236,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 return false
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        lifecycleScope.launch {
+            whenResumed {
+                timeMachineEventViewModel.loadEvents.collect {
+                    mViewModel.loadInit(it)
+                }
+            }
+        }
     }
 
 

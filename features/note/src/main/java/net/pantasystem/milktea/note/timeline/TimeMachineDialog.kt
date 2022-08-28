@@ -16,11 +16,13 @@ import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogTimeMachineBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineDialogViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
 
 @AndroidEntryPoint
 class TimeMachineDialog : AppCompatDialogFragment() {
 
     val viewModel by activityViewModels<TimeMachineDialogViewModel>()
+    val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = View.inflate(this.context, R.layout.dialog_time_machine, null)
@@ -40,7 +42,7 @@ class TimeMachineDialog : AppCompatDialogFragment() {
             .setTitle(R.string.time_machine)
             .setMessage(R.string.dialog_timemachine_message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-
+                timeMachineEventViewModel.setDateTime(viewModel.currentDateTime.value)
             }.setNegativeButton(android.R.string.cancel) { _, _ ->
 
             }.setView(view)
