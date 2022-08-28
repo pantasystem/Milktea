@@ -33,6 +33,7 @@ class TimeMachineDialogViewModel @Inject constructor(): ViewModel() {
     fun setTime(hourOfDay: Int, minutes: Int) {
         _currentDateTime.update {
             val calendar = Calendar.getInstance()
+            calendar.time = Date(it.toEpochMilliseconds())
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
             calendar.set(Calendar.MINUTE, minutes)
             Instant.fromEpochMilliseconds(calendar.time.time)
