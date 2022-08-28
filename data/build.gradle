@@ -86,7 +86,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
 
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
     implementation 'org.jsoup:jsoup:1.14.3'
 
     implementation "androidx.datastore:datastore-preferences:1.0.0"
