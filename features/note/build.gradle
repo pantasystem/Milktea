@@ -49,7 +49,7 @@ dependencies {
     implementation project(path: ':api')
     implementation project(path: ':common_android_ui')
 
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation libs.androidx.constraintlayout
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -70,9 +70,9 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
-    implementation "androidx.viewpager2:viewpager2:1.1.0-beta01"
+    implementation libs.flexbox
+    implementation libs.androidx.swiperefreshlayout
+    implementation libs.androidx.viewpager2
     implementation libs.kotlin.datetime
     implementation libs.lifecycle.livedata
 
@@ -88,7 +88,7 @@ dependencies {
     implementation libs.accompanist.pager
     implementation libs.accompanist.pager.indicators
     implementation libs.coil.compose
-    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    implementation libs.compose.constraintlayout
 
     // hilt
     implementation libs.hilt.android
