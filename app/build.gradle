@@ -151,7 +151,8 @@ dependencies {
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    implementation libs.okhttp3.logging.inspector
+
 
 
     //glide
