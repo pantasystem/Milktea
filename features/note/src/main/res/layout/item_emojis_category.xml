@@ -6,7 +6,7 @@
 
         <variable
                 name="emojiCategory"
-                type="net.pantasystem.milktea.note.view.emojis.viewmodel.Emojis.EmojiCategory" />
+                type="net.pantasystem.milktea.note.emojis.viewmodel.Emojis.EmojiCategory" />
     </data>
     <FrameLayout
             android:orientation="vertical"

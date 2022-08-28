@@ -7,7 +7,7 @@
 
         <variable
                 name="customEmojiSelection"
-                type="net.pantasystem.milktea.note.view.emojis.viewmodel.EmojiSelection" />
+                type="net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection" />
 
         <variable
                 name="emoji"

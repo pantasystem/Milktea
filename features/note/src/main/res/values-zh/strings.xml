@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="time_machine">回到未来</string>
+    <string name="dialog_timemachine_message">请指定您要显示的时间线的时间</string>
+</resources>

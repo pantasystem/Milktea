@@ -24,7 +24,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
-import net.pantasystem.milktea.note.view.TimelineListAdapter
+import net.pantasystem.milktea.note.timeline.TimelineListAdapter
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import javax.inject.Inject

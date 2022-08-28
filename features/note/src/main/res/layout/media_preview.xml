@@ -8,7 +8,7 @@
         <import type="android.view.View" />
         <variable
                 name="media"
-                type="net.pantasystem.milktea.note.viewmodel.media.MediaViewData" />
+                type="net.pantasystem.milktea.note.media.viewmodel.MediaViewData" />
 
 
     </data>

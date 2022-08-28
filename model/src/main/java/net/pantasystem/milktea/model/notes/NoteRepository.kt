@@ -19,4 +19,8 @@ interface NoteRepository {
 
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit>
 
+    suspend fun syncConversation(noteId: Note.Id): Result<Unit>
+
+    suspend fun syncChildren(noteId: Note.Id): Result<Unit>
+
 }

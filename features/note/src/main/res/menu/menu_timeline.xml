@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+            android:id="@+id/refresh_timeline"
+            android:icon="@drawable/ic_refresh_black_24dp"
+            android:title="@string/refresh"
+            app:showAsAction="ifRoom"
+            />
+    <item
+            android:id="@+id/set_time_machine"
+            android:icon="@drawable/ic_baseline_timeline_24"
+            android:title="@string/time_machine"
+            app:showAsAction="ifRoom"
+
+            />
+</menu>

@@ -17,7 +17,7 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.note.viewmodel.media.MediaViewData
+import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 
 open class PlaneNoteViewData(
     val note: NoteRelation,

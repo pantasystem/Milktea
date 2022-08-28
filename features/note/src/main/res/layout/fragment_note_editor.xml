@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="net.pantasystem.milktea.note.viewmodel.editor.NoteEditorViewModel" />
+                type="net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel" />
         <variable
                 name="accountViewModel"
                 type="net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel" />

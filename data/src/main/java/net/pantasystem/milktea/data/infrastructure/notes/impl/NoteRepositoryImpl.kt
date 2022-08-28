@@ -222,4 +222,33 @@ class NoteRepositoryImpl @Inject constructor(
             }.awaitAll().filterNotNull()
         }
     }
+
+    override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCatching {
+        val account = getAccount.get(noteId.accountId)
+        val dtoList = misskeyAPIProvider.get(account).children(
+            NoteRequest(
+                i = account.getI(encryption),
+                noteId = noteId.noteId,
+                limit = 100,
+            )
+        ).throwIfHasError().body()!!
+        dtoList.map {
+            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+        }
+    }
+
+    override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCatching {
+        val account = getAccount.get(noteId.accountId)
+        val dtoList = misskeyAPIProvider.get(account).conversation(
+            NoteRequest(
+                i = account.getI(encryption),
+                noteId = noteId.noteId,
+
+            )
+        ).throwIfHasError().body()!!
+        dtoList.map {
+            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+        }
+
+    }
 }

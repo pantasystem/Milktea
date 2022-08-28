@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="reactionSelectionViewModel"
-                type="net.pantasystem.milktea.note.viewmodel.reaction.ReactionSelectionDialogViewModel" />
+                type="net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel" />
         <import type="android.view.View" />
     </data>
     <RelativeLayout

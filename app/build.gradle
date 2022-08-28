@@ -6,7 +6,7 @@ plugins {
     id('com.google.gms.google-services')
     id('com.google.android.gms.oss-licenses-plugin')
     id('dagger.hilt.android.plugin')
-    id('com.github.triplet.play')
+    id('com.github.triplet.play') version("3.7.0")
     id('com.google.firebase.crashlytics')
 }
 
@@ -112,7 +112,7 @@ dependencies {
 
     // NOTE: リアクションピッカーなどでリフレクションを行っているのでバージョンを変更しないこと
     implementation libs.android.material.material
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation libs.androidx.constraintlayout
 
     implementation 'androidx.preference:preference-ktx:1.2.0'
     //noinspection GradleDynamicVersion
@@ -151,7 +151,8 @@ dependencies {
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+    implementation libs.okhttp3.logging.inspector
+
 
 
     //glide
@@ -171,15 +172,16 @@ dependencies {
     implementation 'com.caverock:androidsvg-aar:1.4'
 
 
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation libs.flexbox
 
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 
     // Swipe refresh
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
+    implementation libs.androidx.swiperefreshlayout
+
 
     // ViewPager2
-    implementation "androidx.viewpager2:viewpager2:1.1.0-beta01"
+    implementation libs.androidx.viewpager2
 
     implementation 'org.jsoup:jsoup:1.14.3'
 
@@ -214,7 +216,7 @@ dependencies {
     implementation libs.accompanist.pager
     implementation libs.accompanist.pager.indicators
     implementation libs.coil.compose
-    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    implementation libs.compose.constraintlayout
 
     // hilt
     implementation libs.hilt.android

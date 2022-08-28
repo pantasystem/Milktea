@@ -17,7 +17,7 @@ import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewM
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
-import net.pantasystem.milktea.note.view.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 
@@ -33,7 +33,6 @@ class NotificationListAdapter constructor(
 
     override fun onBindViewHolder(holder: NotificationHolder, position: Int) {
         holder.binding.notification = getItem(position)
-        holder.binding.simpleNote
         holder.binding.notificationViewModel = notificationViewModel
         holder.binding.noteCardActionListener = noteCardActionListenerAdapter
 
