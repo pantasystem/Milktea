@@ -71,7 +71,7 @@ dependencies {
     kaptTest libs.hilt.compiler
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
 
 
 }
