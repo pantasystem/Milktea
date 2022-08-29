@@ -67,7 +67,7 @@ dependencyResolutionManagement {
             alias("androidx-viewpager2").to("androidx.viewpager2:viewpager2:1.1.0-beta01")
             alias("androidx-swiperefreshlayout").to("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
             alias("flexbox").to("com.google.android.flexbox:flexbox:3.0.0")
-            alias("okhttp3-logging-inspector").to('com.squareup.okhttp3:logging-interceptor:4.9.3')
+            alias("okhttp3-logging-inspector").to('com.squareup.okhttp3:logging-interceptor:4.10.0')
 
         }
     }
