@@ -34,7 +34,7 @@ class ReactionSelectionDialogViewModel @Inject constructor(
             word.replace(":", "")
         }.map { word ->
             emojis.filter { emoji ->
-                emoji.name.startsWith(word)
+                emoji.name.contains(word)
                         || emoji.aliases?.any { alias ->
                     alias.startsWith(word)
                 } ?: false
