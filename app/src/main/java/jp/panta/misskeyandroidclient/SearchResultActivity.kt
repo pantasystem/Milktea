@@ -2,6 +2,7 @@
 
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -25,6 +26,8 @@ import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_navigation.SearchNavArgs
+import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.Account
@@ -242,4 +245,14 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
 
+}
+
+class SearchNavigationImpl  @Inject constructor(
+    val activity: Activity
+): SearchNavigation {
+    override fun newIntent(args: SearchNavArgs): Intent {
+        val intent = Intent(activity, SearchResultActivity::class.java)
+        intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, args.searchWord)
+        return intent
+    }
 }
