@@ -22,6 +22,7 @@ import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
 import net.pantasystem.milktea.common_android.ui.text.EmojiSpan
+import net.pantasystem.milktea.common_navigation.SearchNavArgs
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import java.lang.ref.WeakReference
 
@@ -159,11 +160,12 @@ object MFMDecorator {
 
         private fun decorateHashTag(hashTag: HashTag): Spanned{
             return textView.get()?.let{ textView ->
-                // TODO: 修正する
-                val intent = Intent()
+                val activity = FragmentComponentManager.findActivity(textView.context) as Activity
+
+                val navigation = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
+                val intent = navigation.searchNavigation()
+                    .newIntent(SearchNavArgs(hashTag.text))
 //
-//                val intent = Intent(textView.context, SearchResultActivity::class.java)
-//                intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, hashTag.text)
                 makeClickableSpan(hashTag.text, intent)
             }?: closeErrorElement(hashTag)
 
