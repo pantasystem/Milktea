@@ -49,7 +49,8 @@ class NoteEditorViewModel @Inject constructor(
     private val draftNoteRepository: DraftNoteRepository,
     private val noteReservationPostExecutor: NoteReservationPostExecutor,
     private val userViewDataFactory: UserViewData.Factory,
-    private val settingStore: SettingStore
+    private val settingStore: SettingStore,
+    private val noteRepository: NoteRepository
 ) : ViewModel() {
 
 
@@ -191,6 +192,14 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
+
+            // NOTE: リプライ先のcwの状態をフォームに反映するようにする
+            noteRepository.find(noteId).onSuccess { note ->
+                _state.update { state ->
+                    state.changeCw(note.cw)
+                }
+            }
+
             getAllMentionUsersUseCase(noteId).onSuccess { users ->
                 _state.update { state ->
                     state.addMentionUserNames(users.map { it.displayUserName }, 0).state
