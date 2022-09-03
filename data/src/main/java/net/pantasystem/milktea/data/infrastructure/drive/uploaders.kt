@@ -16,11 +16,15 @@ interface FileUploader {
     suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO
 }
 
-class FileUploadFailedException(val file: AppFile.Local, val throwable: Throwable?, val statusCode: Int?) : IllegalStateException()
+class FileUploadFailedException(
+    val file: AppFile.Local,
+    val throwable: Throwable?,
+    statusCode: Int?
+) : IllegalStateException("ファイルアップロードに失敗: file:$file, statusCode:$statusCode", throwable)
 
 interface FileUploaderProvider {
     fun create(account: Account): FileUploader
-    fun get(account: Account) : FileUploader
+    fun get(account: Account): FileUploader
 }
 
 class OkHttpFileUploaderProvider(
@@ -38,13 +42,14 @@ class OkHttpFileUploaderProvider(
                 val map = instances.toMutableMap()
                 map[account.accountId] = OkHttpDriveFileUploader(context, account, json, encryption)
                 instances = map
-                instances[account.accountId]?: throw IllegalStateException("生成したはずのインスタンスが消滅しました！！")
+                instances[account.accountId]
+                    ?: throw IllegalStateException("生成したはずのインスタンスが消滅しました！！")
             }
         }
     }
 
     override fun get(account: Account): FileUploader {
-        return instances[account.accountId]?: create(account)
+        return instances[account.accountId] ?: create(account)
     }
 
 }
