@@ -53,7 +53,7 @@ dependencyResolutionManagement {
             alias('appcompat-appcompat').to('androidx.appcompat:appcompat:1.6.0-alpha05')
             alias('android-material-material').to('com.google.android.material:material:1.6.1')
             alias('androidx-core-ktx').to('androidx.core:core-ktx:1.7.0')
-            alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.5.1')
+            alias('fragment-ktx').to('androidx.fragment:fragment-ktx:1.5.2')
             alias('activity-ktx').to('androidx.activity:activity-ktx:1.5.0')
 
             def emoji2_version = "1.2.0"
