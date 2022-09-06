@@ -2,6 +2,7 @@ package jp.panta.misskeyandroidclient.ui.main
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
@@ -130,6 +131,9 @@ internal class MainActivityEventCollector (
     }
 
     private fun collectLatestNotifications() {
+        val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val ringtone = RingtoneManager.getRingtone(activity, uri)
+
         // NOTE: 最新の通知をSnackBar等に表示する
         lifecycleScope.launch {
             lifecycleOwner.whenCreated {
@@ -138,6 +142,12 @@ internal class MainActivityEventCollector (
                         notificationMessageScope {
                             notificationRelation.showSnackBarMessage(binding.appBarMain.simpleNotification)
                         }
+
+                        // NOTE: 通知音を再生する
+                        if (ringtone.isPlaying) {
+                            ringtone.stop()
+                        }
+                        ringtone.play()
                     }
                 }
             }
