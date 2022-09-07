@@ -14,7 +14,6 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
-
     <application
             android:name=".MiApplication"
             android:allowBackup="true"
@@ -45,6 +44,9 @@
         <meta-data
                 android:name="firebase_analytics_collection_enabled"
                 android:value="false" />
+
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+
 
         <service
                 android:name=".FCMService"
