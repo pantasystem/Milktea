@@ -99,16 +99,14 @@ class GroupListViewModel @Inject constructor(
         sync()
         combine(joinedGroups, ownedGroups) { joined, owned ->
             (joined.map {
-                it.members
+                it.group.userIds
             }.flatten() + owned.map {
-                it.members
-            }.flatten()).map { member ->
-                member.userId
-            }.distinct()
+                it.group.userIds
+            }.flatten()).distinct()
         }.distinctUntilChanged().map {
-            userRepository.syncIn(it)
-        }.catch {
-            logger.error("ユーザーの同期エラー", it)
+            userRepository.syncIn(it).onFailure { e ->
+                logger.error("ユーザーの同期エラー", e)
+            }
         }.launchIn(viewModelScope)
     }
 
