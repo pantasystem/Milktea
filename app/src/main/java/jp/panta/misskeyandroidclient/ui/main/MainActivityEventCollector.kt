@@ -6,10 +6,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.whenCreated
+import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
@@ -142,14 +139,17 @@ internal class MainActivityEventCollector (
                         notificationMessageScope {
                             notificationRelation.showSnackBarMessage(binding.appBarMain.simpleNotification)
                         }
-
-                        // NOTE: 通知音を再生する
-                        if (ringtone.isPlaying) {
-                            ringtone.stop()
-                        }
-                        ringtone.play()
                     }
                 }
+            }
+        }
+        lifecycleScope.launch {
+            lifecycleOwner.whenResumed {
+                // NOTE: 通知音を再生する
+                if (ringtone.isPlaying) {
+                    ringtone.stop()
+                }
+                ringtone.play()
             }
         }
     }
