@@ -110,6 +110,31 @@ data class UserEmojiRecord(
 }
 
 @Entity(
+    tableName = "user_instance_info",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            entity = UserRecord::class,
+            childColumns = ["userId"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index("userId")
+    ]
+)
+data class UserInstanceInfoRecord(
+    val faviconUrl: String?,
+    val iconUrl: String?,
+    val name: String?,
+    val softwareName: String?,
+    val softwareVersion: String?,
+    val themeColor: String?,
+    @PrimaryKey(autoGenerate = false) val userId: Long
+)
+
+@Entity(
     tableName = "pinned_note_id",
     foreignKeys = [
         ForeignKey(
@@ -165,7 +190,13 @@ data class UserRelated(
         parentColumn = "id",
         entityColumn = "userId"
     )
-    val pinnedNoteIds: List<PinnedNoteIdRecord>
+    val pinnedNoteIds: List<PinnedNoteIdRecord>,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val instance: UserInstanceInfoRecord?
 ) {
     fun toModel(): User {
         if (detail == null) {

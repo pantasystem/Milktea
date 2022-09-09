@@ -11,7 +11,6 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
-import javax.annotation.concurrent.Immutable
 import java.io.Serializable as JSerializable
 
 data class Note(
@@ -49,7 +48,6 @@ data class Note(
         val accountId: Long,
         val noteId: String
     ) : EntityId
-
 
 
     /**
