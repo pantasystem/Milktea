@@ -93,6 +93,7 @@ fun PreviewItemSimpleUser() {
         isBot = true,
         isCat = true,
         nickname = null,
-        isSameHost = true
+        isSameHost = true,
+        instance = null,
     ), onSelected = {})
 }

@@ -63,6 +63,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
         UserDetailedStateRecord::class,
         UserEmojiRecord::class,
         PinnedNoteIdRecord::class,
+        UserInstanceInfoRecord::class,
 
     ],
     version = 21,
@@ -87,7 +88,6 @@ import net.pantasystem.milktea.model.url.UrlPreview
     TimelinePageTypeConverter::class,
     AccountInstanceTypeConverter::class,
     InstantConverter::class,
-    UserInstanceInfoRecord::class
 )
 abstract class DataBase : RoomDatabase() {
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
