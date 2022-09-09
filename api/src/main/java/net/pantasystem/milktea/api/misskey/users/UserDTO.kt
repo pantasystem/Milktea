@@ -49,12 +49,12 @@ data class UserDTO(
 
     @kotlinx.serialization.Serializable
     data class InstanceInfo(
-        val faviconUrl: String?,
-        val iconUrl: String?,
-        val name: String?,
-        val softwareName: String?,
-        val softwareVersion: String?,
-        val themeColor: String?,
+        val faviconUrl: String? = null,
+        val iconUrl: String? = null,
+        val name: String? = null,
+        val softwareName: String? = null,
+        val softwareVersion: String? = null,
+        val themeColor: String? = null,
     )
 
     val displayUserName: String

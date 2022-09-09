@@ -36,6 +36,7 @@ class DeleteNicknameUseCaseTest {
             host = "misskey.io",
             nickname = null,
             isSameHost = true,
+            instance = null,
         )
         deleteNicknameUseCase = DeleteNicknameUseCase(
             userDataSource = userDataSource,

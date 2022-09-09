@@ -33,7 +33,8 @@ class UpdateNicknameUseCaseTest {
                 null,
                 host = "misskey.io",
                 nickname = null,
-                isSameHost = true
+                isSameHost = true,
+                instance = null,
             )
             userDataSource.add(user)
 
