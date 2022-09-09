@@ -30,7 +30,6 @@
                 android:contentDescription="@string/thumbnail"
                 android:scaleType="centerCrop"
                 tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-                android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.GONE : View.VISIBLE }"
                 thumbnailView="@{previewAbleFile}"
                 />
         <ImageButton
