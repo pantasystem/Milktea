@@ -143,6 +143,22 @@ class MediatorUserDataSource @Inject constructor(
 
                         }
                     }
+                    when (val instance = user.instance) {
+                        null -> Unit
+                        else -> {
+                            userDao.insertUserInstanceInfo(
+                                UserInstanceInfoRecord(
+                                    faviconUrl = instance.faviconUrl,
+                                    iconUrl = instance.iconUrl,
+                                    name = instance.name,
+                                    softwareVersion = instance.softwareVersion,
+                                    softwareName = instance.softwareName,
+                                    themeColor = instance.themeColor,
+                                    userId = dbId
+                                )
+                            )
+                        }
+                    }
                 }
 
             }

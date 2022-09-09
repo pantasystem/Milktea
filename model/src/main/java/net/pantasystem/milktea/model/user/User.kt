@@ -23,6 +23,7 @@ sealed interface User : Entity {
     val host: String
     val nickname: UserNickname?
     val isSameHost: Boolean
+    val instance: InstanceInfo?
 
 
     data class Id(
@@ -40,7 +41,8 @@ sealed interface User : Entity {
         override val isBot: Boolean?,
         override val host: String,
         override val nickname: UserNickname?,
-        override val isSameHost: Boolean
+        override val isSameHost: Boolean,
+        override val instance: InstanceInfo?
     ) : User {
         companion object
     }
@@ -70,7 +72,8 @@ sealed interface User : Entity {
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
-        override val isSameHost: Boolean
+        override val isSameHost: Boolean,
+        override val instance: InstanceInfo?
     ) : User {
         companion object
         val followState: FollowState
@@ -91,6 +94,14 @@ sealed interface User : Entity {
             }
     }
 
+    data class InstanceInfo(
+        val faviconUrl: String?,
+        val iconUrl: String?,
+        val name: String?,
+        val softwareName: String?,
+        val softwareVersion: String?,
+        val themeColor: String?,
+    )
 
     val displayUserName: String
         get() = "@" + this.userName + if (isSameHost) {
@@ -126,6 +137,7 @@ fun User.Simple.Companion.make(
     host: String? = null,
     nickname: UserNickname? = null,
     isSameHost: Boolean? = null,
+    instance: User.InstanceInfo? = null,
 ): User.Simple {
     return User.Simple(
         id,
@@ -138,6 +150,7 @@ fun User.Simple.Companion.make(
         host = host ?: "",
         nickname = nickname,
         isSameHost = isSameHost ?: false,
+        instance = instance
     )
 }
 
@@ -168,6 +181,7 @@ fun User.Detail.Companion.make(
     hasPendingFollowRequestToYou: Boolean = false,
     isLocked: Boolean = false,
     isSameHost: Boolean = false,
+    instance: User.InstanceInfo? = null,
 ): User.Detail {
     return User.Detail(
         id,
@@ -195,5 +209,6 @@ fun User.Detail.Companion.make(
         hasPendingFollowRequestToYou,
         isLocked,
         isSameHost,
+        instance
     )
 }

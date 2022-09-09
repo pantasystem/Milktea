@@ -43,8 +43,20 @@ data class UserDTO(
     val url: String? = null,
     val hasPendingFollowRequestFromYou: Boolean? = null,
     val hasPendingFollowRequestToYou: Boolean? = null,
-    val isLocked: Boolean? = null
+    val isLocked: Boolean? = null,
+    val instance: InstanceInfo? = null,
 ) : Serializable {
+
+    @kotlinx.serialization.Serializable
+    data class InstanceInfo(
+        val faviconUrl: String?,
+        val iconUrl: String?,
+        val name: String?,
+        val softwareName: String?,
+        val softwareVersion: String?,
+        val themeColor: String?,
+    )
+
     val displayUserName: String
         get() = "@" + this.userName + if (this.host == null) {
             ""

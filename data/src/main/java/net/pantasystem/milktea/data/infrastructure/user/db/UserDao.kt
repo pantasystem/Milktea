@@ -24,6 +24,8 @@ abstract class UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertEmojis(emojis: List<UserEmojiRecord>): List<Long>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertUserInstanceInfo(info: UserInstanceInfoRecord): Long
 
     @Query("delete from pinned_note_id where userId = :userId")
     abstract suspend fun detachAllPinnedNoteIds(userId: Long)

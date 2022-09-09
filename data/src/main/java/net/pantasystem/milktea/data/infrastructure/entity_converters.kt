@@ -325,6 +325,16 @@ fun NotificationDTO.toNotification(account: Account): Notification {
 }
 
 fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
+    val instanceInfo = instance?.let {
+        User.InstanceInfo(
+            name = it.name,
+            faviconUrl = it.faviconUrl,
+            iconUrl = it.iconUrl,
+            softwareName = it.softwareName,
+            softwareVersion = it.softwareVersion,
+            themeColor = it.themeColor
+        )
+    }
     if (isDetail) {
 
         return User.Detail(
@@ -355,6 +365,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             isLocked = isLocked ?: false,
             nickname = null,
             isSameHost = host == null,
+            instance = instanceInfo
         )
     } else {
         return User.Simple(
@@ -368,6 +379,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             host = this.host ?: account.getHost(),
             nickname = null,
             isSameHost = host == null,
+            instance = instanceInfo
         )
     }
 

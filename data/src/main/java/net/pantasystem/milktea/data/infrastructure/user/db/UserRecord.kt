@@ -199,6 +199,16 @@ data class UserRelated(
     val instance: UserInstanceInfoRecord?
 ) {
     fun toModel(): User {
+        val instanceInfo = instance?.let {
+            User.InstanceInfo(
+                faviconUrl = it.faviconUrl,
+                iconUrl = it.iconUrl,
+                name = it.name,
+                softwareName = it.softwareName,
+                softwareVersion = it.softwareVersion,
+                themeColor = it.themeColor
+            )
+        }
         if (detail == null) {
             return User.Simple(
                 id = User.Id(
@@ -220,7 +230,8 @@ data class UserRelated(
                         id = UserNickname.Id(user.userName, user.host),
                         name = user.nickname
                     )
-                }
+                },
+                instance = instanceInfo
             )
         } else {
             return User.Detail(
@@ -261,6 +272,7 @@ data class UserRelated(
                     Note.Id(user.accountId, it.noteId)
                 },
                 url = detail.url,
+                instance = instanceInfo
             )
         }
     }
