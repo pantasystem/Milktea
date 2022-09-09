@@ -12,9 +12,11 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
+import jp.wasabeef.glide.transformations.BlurTransformation
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.file.File
@@ -79,6 +81,13 @@ object MediaPreviewHelper {
             true
         }
         thumbnailView.setOnLongClickListener(holdListener)
+
+        // NOTE: 実装の仕様上、サムネイル非表示時には親レイアウトにクリックイベントを伝播する必要がある
+        if (previewAbleFile?.isHiding == true) {
+            thumbnailView.setOnClickListener {
+                this.performClick()
+            }
+        }
     }
 
 
@@ -103,10 +112,18 @@ object MediaPreviewHelper {
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
         file ?: return
-        Glide.with(this)
-            .load(file.file.thumbnailUrl)
-            .centerCrop()
-            .into(this)
+        if (file.isHiding) {
+            Glide.with(this)
+                .load(file.file.thumbnailUrl)
+                .transform(BlurTransformation(32, 4), CenterCrop())
+                .into(this)
+        } else {
+            Glide.with(this)
+                .load(file.file.thumbnailUrl)
+                .centerCrop()
+                .into(this)
+        }
+
     }
 
     private fun setPreview(

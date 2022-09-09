@@ -18,23 +18,24 @@ class PreviewAbleFileListAdapter(
         }
 
         override fun areItemsTheSame(oldItem: PreviewAbleFile, newItem: PreviewAbleFile): Boolean {
-            return oldItem.file.localFileId == newItem.file.localFileId
-                    && oldItem.file.remoteFileId == oldItem.file.remoteFileId
+            return oldItem == newItem
         }
     }
 ) {
 
     class ViewHolder(val binding: ItemMediaPreviewBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(fileViewData: PreviewAbleFile, media: MediaViewData) {
+        fun bind(index: Int, fileViewData: PreviewAbleFile, media: MediaViewData) {
+            binding.previewAbleFileIndex = index
             binding.previewAbleFile = fileViewData
             binding.mediaViewData = media
             binding.executePendingBindings()
+
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position), media)
+        holder.bind(position, getItem(position), media)
 
     }
 
