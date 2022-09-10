@@ -25,7 +25,7 @@ object InstanceInfoHelper {
             Glide.with(this)
                 .load(info!!.iconUrl)
                 .into(iconDrawable.target)
-            text =  SpannableStringBuilder(":${info.iconUrl}:info.name").apply {
+            text =  SpannableStringBuilder(":${info.iconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.iconUrl}:".length, 0)
             }
             when(val color = info.themeColor) {
