@@ -22,7 +22,6 @@ import net.pantasystem.milktea.data.infrastructure.instance.db.*
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
@@ -32,6 +31,7 @@ import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.url.UrlPreview
 
 @Database(
     entities = [
@@ -63,9 +63,10 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         UserDetailedStateRecord::class,
         UserEmojiRecord::class,
         PinnedNoteIdRecord::class,
+        UserInstanceInfoRecord::class,
 
     ],
-    version = 20,
+    version = 21,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -77,6 +78,7 @@ import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetti
         AutoMigration(from = 17, to = 18),
         AutoMigration(from = 18, to = 19),
         AutoMigration(from = 19, to = 20),
+        AutoMigration(from = 20, to = 21)
     ],
     views = [UserView::class, GroupMemberView::class,]
 )

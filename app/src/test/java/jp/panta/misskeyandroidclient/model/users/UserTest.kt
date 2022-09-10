@@ -19,6 +19,7 @@ class UserTest : TestCase() {
             userName = "Panta",
             nickname = null,
             isSameHost = true,
+            instance = null,
         )
 
         val profileUrl = user.getProfileUrl(
@@ -28,7 +29,8 @@ class UserTest : TestCase() {
                 remoteId = "",
                 userName = "",
                 instanceType = Account.InstanceType.MISSKEY
-            ))
+            )
+        )
         assertEquals("https://example.com/@Panta", profileUrl)
     }
 
@@ -45,15 +47,18 @@ class UserTest : TestCase() {
             userName = "Panta",
             nickname = null,
             isSameHost = false,
+            instance = null,
         )
 
-        val profileUrl = user.getProfileUrl(Account(
-            instanceDomain = "https://example.com",
-            encryptedToken = "",
-            remoteId = "",
-            userName = "",
-            instanceType = Account.InstanceType.MISSKEY
-        ))
+        val profileUrl = user.getProfileUrl(
+            Account(
+                instanceDomain = "https://example.com",
+                encryptedToken = "",
+                remoteId = "",
+                userName = "",
+                instanceType = Account.InstanceType.MISSKEY
+            )
+        )
         assertEquals("https://example.com/@Panta@misskey.io", profileUrl)
     }
 }

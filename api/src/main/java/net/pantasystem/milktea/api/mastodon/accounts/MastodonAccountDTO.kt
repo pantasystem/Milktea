@@ -65,7 +65,8 @@ data class MastodonAccountDTO (
             isCat = false,
             nickname = null,
             isSameHost = acct.split("@").getOrNull(1) == null
-                    || acct.split("@").getOrNull(1) == account.getHost()
+                    || acct.split("@").getOrNull(1) == account.getHost(),
+            instance = null,
         )
     }
 }
