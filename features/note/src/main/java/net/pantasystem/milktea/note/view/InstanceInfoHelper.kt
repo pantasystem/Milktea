@@ -33,7 +33,7 @@ object InstanceInfoHelper {
 
                 }
                 else -> {
-                    val parsedColor = Color.parseColor(color)
+                    val parsedColor = ColorUtils.setAlphaComponent(Color.parseColor(color), (255 * 0.5).toInt())
                     setBackgroundColor(parsedColor)
                     val isDark = ColorUtils.calculateLuminance(parsedColor) < 0.5
                     if (isDark) {
