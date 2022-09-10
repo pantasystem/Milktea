@@ -138,6 +138,19 @@
                     >
 
                 <TextView
+                        android:id="@+id/instanceInfoLabel"
+                        tools:text="Misskey.io"
+                        android:textSize="12sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:background="#8BC34A"
+                        rectViewById="@{4}"
+                        android:gravity="center_vertical"
+                        android:padding="2dp"
+                        instanceInfo="@{note.toShowNote.user.instance}"
+                        android:singleLine="true"
+                    />
+                <TextView
                         android:id="@+id/cw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
