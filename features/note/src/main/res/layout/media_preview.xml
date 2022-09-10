@@ -117,7 +117,7 @@
                         android:contentDescription="@string/play_media"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_play_circle_outline_black_24dp"
-                        android:visibility="@{SafeUnbox.unbox(media.fileThree.isHiding) ? View.GONE : View.VISIBLE }"
+                        android:visibility="@{ media.fileThree.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
 
                         app:tint="?attr/colorAccent" />
 
