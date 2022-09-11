@@ -403,5 +403,6 @@
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->
     <string name="groups">グループ一覧</string>
+    <string name="is_enable_instance_ticker">Instance Tickerを使う</string>
 
 </resources>

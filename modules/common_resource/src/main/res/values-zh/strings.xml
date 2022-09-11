@@ -399,6 +399,7 @@
 
     <string name="groups">组列表</string>
 
+    <string name="is_enable_instance_ticker">使用实例代码</string>
 
     <!--    <string name="n_people">%d位用户</string>-->
 <!--    <string name="n_posts">%d篇帖文</string>-->

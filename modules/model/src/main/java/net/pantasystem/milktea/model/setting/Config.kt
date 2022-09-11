@@ -54,6 +54,7 @@ data class IsAnalyticsCollectionEnabled(
  * @param isCrashlyticsCollectionEnabled クラシュリティクスの許可状態
  * @param isAnalyticsCollectionEnabled アナリティクスの許可状態
  * @param isConfirmedPostNotification プッシュ通知の顕現許可の状態
+ * @param isEnableInstanceTicker Instance Tickerの有無
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -73,6 +74,7 @@ data class Config(
     val isCrashlyticsCollectionEnabled: IsCrashlyticsCollectionEnabled,
     val isAnalyticsCollectionEnabled: IsAnalyticsCollectionEnabled,
     val isConfirmedPostNotification: Boolean,
+    val isEnableInstanceTicker: Boolean,
 ) {
     companion object
 
@@ -120,6 +122,7 @@ object DefaultConfig {
             isEnabled = false,
         ),
         isConfirmedPostNotification = false,
+        isEnableInstanceTicker = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

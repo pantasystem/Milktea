@@ -393,4 +393,6 @@
 
     <string name="groups">Groups</string>
 
+    <string name="is_enable_instance_ticker">Use Instance Ticker</string>
+
 </resources>

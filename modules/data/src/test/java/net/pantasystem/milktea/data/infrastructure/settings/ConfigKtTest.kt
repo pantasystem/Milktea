@@ -106,6 +106,10 @@ class ConfigKtTest {
                     config.isConfirmedPostNotification,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsEnableInstanceTicker -> Assert.assertEquals(
+                    config.isEnableInstanceTicker,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
