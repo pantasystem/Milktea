@@ -98,7 +98,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         ),
         isConfirmedPostNotification = map.getValue<PrefType.BoolPref>(
             Keys.IsConfirmedPostNotification
-        )?.value ?: false
+        )?.value ?: false,
+        isEnableInstanceTicker = map.getValue<PrefType.BoolPref>(
+            Keys.IsEnableInstanceTicker
+        )?.value ?: DefaultConfig.config.isEnableInstanceTicker
     )
 }
 
@@ -177,6 +180,9 @@ fun Config.pref(key: Keys): PrefType? {
         }
         Keys.IsConfirmedPostNotification -> {
             PrefType.BoolPref(isConfirmedPostNotification)
+        }
+        Keys.IsEnableInstanceTicker -> {
+            PrefType.BoolPref(isEnableInstanceTicker)
         }
     }
 }

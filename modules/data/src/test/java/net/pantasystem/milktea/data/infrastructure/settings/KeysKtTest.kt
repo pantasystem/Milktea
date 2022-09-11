@@ -62,6 +62,7 @@ class KeysKtTest {
                 Keys.IsAnalyticsCollectionEnabled -> Assert.assertEquals("IsAnalyticsCollectionEnabled", key.str())
                 Keys.IsConfirmedAnalyticsCollection -> Assert.assertEquals("IsConfirmedAnalyticsCollection", key.str())
                 Keys.IsConfirmedPostNotification -> Assert.assertEquals("IsConfirmedPostNotification", key.str())
+                Keys.IsEnableInstanceTicker -> Assert.assertEquals("IsEnableInstanceTicker", key.str())
             }
         }
     }
@@ -69,8 +70,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(20, Keys.allKeys.size)
-        Assert.assertEquals(20, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(21, Keys.allKeys.size)
+        Assert.assertEquals(21, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

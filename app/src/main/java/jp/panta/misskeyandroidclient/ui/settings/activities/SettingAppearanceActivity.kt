@@ -32,14 +32,14 @@ import jp.panta.misskeyandroidclient.setTheme
 import jp.panta.misskeyandroidclient.ui.settings.compose.SettingTitleTile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_compose.RadioTile
 import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.common_navigation.EXTRA_INT_SELECTABLE_FILE_MAX_SIZE
 import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
-import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.drive.DriveActivity
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -141,16 +141,19 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
                         item {
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isClassicUI, onChanged = {
                                 currentConfigState = currentConfigState.copy(isClassicUI = it)
                             }) {
                                 Text(stringResource(R.string.hide_bottom_navigation))
                             }
-                        }
-                        item {
+
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isSimpleEditorEnabled,
                                 onChanged = {
                                     currentConfigState =
@@ -159,20 +162,21 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             ) {
                                 Text(stringResource(R.string.use_simple_editor))
                             }
-                        }
 
-                        item {
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isUserNameDefault, onChanged = {
-                                currentConfigState = currentConfigState.copy(isUserNameDefault = it)
-                            }) {
+                                    currentConfigState = currentConfigState.copy(isUserNameDefault = it)
+                                }) {
                                 Text(stringResource(id = R.string.user_name_as_default_display_name))
                             }
-                        }
-                        item {
+
                             SwitchTile(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
                                 checked = currentConfigState.isPostButtonAtTheBottom,
                                 onChanged = {
                                     currentConfigState =
@@ -181,14 +185,22 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             ) {
                                 Text(stringResource(id = R.string.post_button_at_the_bottom))
                             }
-                        }
+                            
+                            SwitchTile(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                checked = currentConfigState.isEnableInstanceTicker,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(isEnableInstanceTicker = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.is_enable_instance_ticker))
+                            }
 
-                        item {
                             SettingTitleTile(text = stringResource(id = R.string.background_image))
-                        }
-
-                        if (configState.backgroundImagePath != null) {
-                            item {
+                            
+                            if (configState.backgroundImagePath != null) {
                                 Image(
                                     rememberAsyncImagePainter(configState.backgroundImagePath),
                                     contentDescription = null,
@@ -197,9 +209,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                         .aspectRatio(16f / 9)
                                 )
                             }
-                        }
 
-                        item {
                             Row(
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             ) {
@@ -215,10 +225,6 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 }
                             }
 
-                        }
-
-
-                        item {
                             SettingTitleTile(text = stringResource(id = R.string.note_opacity))
                             Slider(
                                 value = currentConfigState.surfaceColorOpacity.toFloat() / 0xff,
@@ -228,9 +234,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 },
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
-                        }
 
-                        item {
                             SettingTitleTile(text = stringResource(id = R.string.animation))
                             SwitchTile(
                                 checked = currentConfigState.isEnableTimelineScrollAnimation,
