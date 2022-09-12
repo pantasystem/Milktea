@@ -88,7 +88,6 @@ dependencies {
 
     implementation libs.okhttp3.logging.inspector
 
-    implementation 'org.jsoup:jsoup:1.14.3'
 
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"

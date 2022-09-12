@@ -59,16 +59,8 @@ class ConfigKtTest {
                     config.reactionPickerType.ordinal,
                     (u as PrefType.IntPref).value
                 )
-                Keys.SummalyServerUrl -> Assert.assertEquals(
-                    (config.urlPreviewConfig.type as UrlPreviewConfig.Type.SummalyServer?)?.url,
-                    (u as PrefType.StrPref).value
-                )
                 Keys.ThemeType -> Assert.assertEquals(
                     (config.theme.toInt()), (u as PrefType.IntPref).value
-                )
-                Keys.UrlPreviewSourceType -> Assert.assertEquals(
-                    config.urlPreviewConfig.type.toInt(),
-                    (u as PrefType.IntPref).value
                 )
                 Keys.IsIncludeLocalRenotes -> Assert.assertEquals(
                     config.isIncludeLocalRenotes, (u as PrefType.BoolPref).value
