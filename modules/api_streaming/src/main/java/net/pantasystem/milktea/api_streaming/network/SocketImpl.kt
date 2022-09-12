@@ -2,7 +2,6 @@ package net.pantasystem.milktea.api_streaming.network
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.*
 import net.pantasystem.milktea.common.Logger
@@ -14,7 +13,7 @@ import kotlin.coroutines.suspendCoroutine
 class SocketImpl(
     val url: String,
     loggerFactory: Logger.Factory,
-    okHttpClientProvider: OkHttpClientProvider = DefaultOkHttpClientProvider()
+    okHttpClientProvider: OkHttpClientProvider
     ) : Socket {
     val logger = loggerFactory.create("SocketImpl")
 

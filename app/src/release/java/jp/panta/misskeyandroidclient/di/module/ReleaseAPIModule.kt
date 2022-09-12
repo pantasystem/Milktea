@@ -1,20 +1,18 @@
 package jp.panta.misskeyandroidclient.di.module
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
+import jp.panta.misskeyandroidclient.impl.OkHttpClientProviderImpl
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
-import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object ReleaseAPIModule {
+abstract class ReleaseAPIModule {
 
-    @Singleton
-    @Provides
-    fun provideOkHttpClientProvider(): OkHttpClientProvider {
-        return DefaultOkHttpClientProvider()
-    }
+    @Binds
+    abstract fun bindOkHttpClientProvider(
+        impl: OkHttpClientProviderImpl
+    ): OkHttpClientProvider
 }

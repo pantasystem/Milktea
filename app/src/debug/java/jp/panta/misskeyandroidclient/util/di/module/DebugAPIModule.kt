@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import jp.panta.misskeyandroidclient.impl.OkHttpClientProviderImpl
 import jp.panta.misskeyandroidclient.util.FlipperSetupManagerImpl
-import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
@@ -17,9 +17,10 @@ object DebugAPIModule {
     @Singleton
     @Provides
     fun provideOkHttpClientProvider(
-        flipperSetupManager: FlipperSetupManagerImpl
+        flipperSetupManager: FlipperSetupManagerImpl,
+        okHttpClientProvider: OkHttpClientProviderImpl,
     ): OkHttpClientProvider {
-        val builder = DefaultOkHttpClientProvider().client.newBuilder()
+        val builder = okHttpClientProvider.get().newBuilder()
 
         flipperSetupManager.applyNetworkFlipperPlugin(builder)
         val client = builder.build()

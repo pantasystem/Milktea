@@ -8,7 +8,6 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
-import okhttp3.OkHttpClient
 import javax.inject.Inject
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider as ISocketWithAccountProvider
 
