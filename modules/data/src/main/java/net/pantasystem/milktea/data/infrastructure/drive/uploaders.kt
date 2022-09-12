@@ -5,11 +5,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.file.AppFile
-import okhttp3.OkHttpClient
 
 interface FileUploader {
     @Throws(FileUploadFailedException::class)
@@ -28,10 +28,10 @@ interface FileUploaderProvider {
 }
 
 class OkHttpFileUploaderProvider(
-    val okHttpClient: OkHttpClient,
+    val okHttpClientProvider: OkHttpClientProvider,
     val context: Context,
     val json: Json,
-    val encryption: Encryption
+    val encryption: Encryption,
 ) : FileUploaderProvider {
     private val lock = Mutex()
     private var instances = mapOf<Long, FileUploader>()
@@ -40,7 +40,7 @@ class OkHttpFileUploaderProvider(
         return runBlocking {
             lock.withLock {
                 val map = instances.toMutableMap()
-                map[account.accountId] = OkHttpDriveFileUploader(context, account, json, encryption)
+                map[account.accountId] = OkHttpDriveFileUploader(context, account, json, encryption, okHttpClientProvider)
                 instances = map
                 instances[account.accountId]
                     ?: throw IllegalStateException("生成したはずのインスタンスが消滅しました！！")

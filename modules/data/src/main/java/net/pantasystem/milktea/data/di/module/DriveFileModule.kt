@@ -8,12 +8,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.infrastructure.drive.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 @Module
@@ -37,9 +37,9 @@ abstract class DriveFileBindModule {
 object DriveFileModule {
     @Provides
     @Singleton
-    fun uploader(@ApplicationContext context: Context, encryption: Encryption) : FileUploaderProvider {
+    fun uploader(@ApplicationContext context: Context, encryption: Encryption, okHttpClientProvider: OkHttpClientProvider) : FileUploaderProvider {
         return OkHttpFileUploaderProvider(
-            OkHttpClient(),
+            okHttpClientProvider,
             context,
             json = Json {
                 ignoreUnknownKeys = true

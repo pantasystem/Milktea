@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.streaming.impl
 
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.common.Encryption
@@ -18,8 +19,8 @@ class SocketWithAccountProviderImpl @Inject constructor(
     val encryption: Encryption,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
+    val okHttpClientProvider: OkHttpClientProvider
 ) : ISocketWithAccountProvider{
-    val okHttpClient: OkHttpClient = OkHttpClient()
 
     private val logger = loggerFactory.create("SocketProvider")
 
@@ -55,8 +56,8 @@ class SocketWithAccountProviderImpl @Inject constructor(
 
             socket = SocketImpl(
                 url = uri,
-                okHttpClient,
-                loggerFactory,
+                okHttpClientProvider = okHttpClientProvider,
+                loggerFactory = loggerFactory,
             )
             accountIdWithSocket[account.accountId] = socket
 

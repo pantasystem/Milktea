@@ -2,6 +2,8 @@ package net.pantasystem.milktea.api_streaming.network
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.*
 import net.pantasystem.milktea.common.Logger
 import okhttp3.*
@@ -11,15 +13,18 @@ import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
-    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+    loggerFactory: Logger.Factory,
+    okHttpClientProvider: OkHttpClientProvider = DefaultOkHttpClientProvider()
+    ) : Socket {
+    val logger = loggerFactory.create("SocketImpl")
+
+    private val okHttpClient: OkHttpClient = okHttpClientProvider
+        .get()
+        .newBuilder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(1, TimeUnit.HOURS)
         .readTimeout(1, TimeUnit.HOURS)
-        .build(),
-    loggerFactory: Logger.Factory,
-) : Socket {
-    val logger = loggerFactory.create("SocketImpl")
-
+        .build()
 
     private var pollingJob: PollingJob = PollingJob(this)
 
