@@ -8,12 +8,11 @@ import android.util.Log
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
-import com.facebook.soloader.SoLoader
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
-import jp.panta.misskeyandroidclient.util.FlipperSetupManager
+import jp.panta.misskeyandroidclient.util.DebuggerSetupManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -96,9 +95,13 @@ class MiApplication : Application() {
     @Inject
     internal lateinit var clientIdRepository: ClientIdRepository
 
+    @Inject
+    internal lateinit var debuggerSetupManager: DebuggerSetupManager
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
+        debuggerSetupManager.setup(this)
 
         val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         val mainThreadId = Looper.getMainLooper().thread.id
@@ -117,8 +120,6 @@ class MiApplication : Application() {
         )
         EmojiCompat.get().load()
 
-        SoLoader.init(this, false)
-        FlipperSetupManager.setup(this)
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
 
