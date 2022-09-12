@@ -8,6 +8,14 @@ import android.util.Log
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
+import com.facebook.flipper.android.AndroidFlipperClient
+import com.facebook.flipper.android.utils.FlipperUtils
+import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
+import com.facebook.flipper.plugins.inspector.DescriptorMapping
+import com.facebook.flipper.plugins.inspector.InspectorFlipperPlugin
+import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
+import com.facebook.flipper.plugins.sharedpreferences.SharedPreferencesFlipperPlugin
+import com.facebook.soloader.SoLoader
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
@@ -21,7 +29,6 @@ import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
-import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -32,6 +39,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaCache
+import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.model.setting.Keys
 import net.pantasystem.milktea.model.setting.str
 import javax.inject.Inject
@@ -115,6 +123,15 @@ class MiApplication : Application() {
         )
         EmojiCompat.get().load()
 
+        SoLoader.init(this, false)
+        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
+            AndroidFlipperClient.getInstance(this).apply {
+                addPlugin(InspectorFlipperPlugin(this@MiApplication, DescriptorMapping.withDefaults()))
+                addPlugin(DatabasesFlipperPlugin(this@MiApplication))
+                addPlugin(SharedPreferencesFlipperPlugin(this@MiApplication))
+                addPlugin(NetworkFlipperPlugin())
+            }.start()
+        }
 
         sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
 
