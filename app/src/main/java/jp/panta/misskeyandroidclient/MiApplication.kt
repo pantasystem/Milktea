@@ -33,8 +33,6 @@ import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaCache
 import net.pantasystem.milktea.model.setting.ColorSettingStore
-import net.pantasystem.milktea.model.setting.Keys
-import net.pantasystem.milktea.model.setting.str
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -153,8 +151,6 @@ class MiApplication : Application() {
             }
         }
 
-        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferencesChangedListener)
-
         activeNetworkFlow().distinctUntilChanged().onEach {
             logger.debug("接続状態が変化:${if (it) "接続" else "未接続"}")
             mSocketWithAccountProvider.all().forEach { socket ->
@@ -239,16 +235,5 @@ class MiApplication : Application() {
     }
 
 
-
-    private val sharedPreferencesChangedListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            when (key) {
-                Keys.UrlPreviewSourceType.str() -> {
-                    mAccountStore.state.value.accounts.forEach {
-                        urlPreviewProvider.getUrlPreviewStore(it, true)
-                    }
-                }
-            }
-        }
 
 }

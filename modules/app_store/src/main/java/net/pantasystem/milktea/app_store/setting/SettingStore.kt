@@ -66,7 +66,6 @@ class SettingStore(
         }
 
 
-    val urlPreviewSetting = UrlPreviewSourceSetting(sharedPreferences)
 
     override fun getNoteExpandedHeightSize(): Int {
         return configState.value.noteExpandedHeightSize

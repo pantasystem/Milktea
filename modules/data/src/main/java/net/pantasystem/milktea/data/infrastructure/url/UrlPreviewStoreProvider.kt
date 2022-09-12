@@ -30,18 +30,17 @@ class UrlPreviewStoreProvider @Inject constructor(
         isReplace: Boolean
     ): UrlPreviewStore {
         return account.instanceDomain.let { accountUrl ->
-            val url = settingStore.urlPreviewSetting.getSummalyUrl() ?: accountUrl
 
-            var store = mUrlPreviewStoreInstanceBaseUrlMap[url]
+            var store = mUrlPreviewStoreInstanceBaseUrlMap[accountUrl]
             if (store == null || isReplace) {
                 store = UrlPreviewStoreFactory(
-                    urlPreviewDAO, settingStore.urlPreviewSetting.getSourceType(),
-                    settingStore.urlPreviewSetting.getSummalyUrl(),
+                    urlPreviewDAO,
+                    accountUrl,
                     accountStore.state.value.currentAccount,
                     misskeyAPIServiceBuilder
                 ).create()
             }
-            mUrlPreviewStoreInstanceBaseUrlMap[url] = store
+            mUrlPreviewStoreInstanceBaseUrlMap[accountUrl] = store
             store
         }
     }

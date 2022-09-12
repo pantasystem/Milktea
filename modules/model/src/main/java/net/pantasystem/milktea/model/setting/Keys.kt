@@ -9,8 +9,6 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsUserNameDefault,
         Keys.IsPostButtonToBottom,
         Keys.NoteLimitHeight,
-        Keys.UrlPreviewSourceType,
-        Keys.SummalyServerUrl,
         Keys.IsIncludeLocalRenotes,
         Keys.IsIncludeRenotedMyNotes,
         Keys.IsIncludeMyRenotes,
@@ -28,7 +26,6 @@ val Keys.Companion.allKeys by lazy {
 
 sealed interface Keys {
 
-    object SummalyServerUrl : Keys
 
     object IsSimpleEditorEnabled : Keys
 
@@ -43,7 +40,6 @@ sealed interface Keys {
 
     object NoteLimitHeight : Keys
 
-    object UrlPreviewSourceType : Keys
 
     object ThemeType : Keys
 
@@ -74,8 +70,6 @@ fun Keys.str(): String {
         is Keys.IsUserNameDefault -> "IS_USER_NAME_DEFAULT"
         is Keys.NoteLimitHeight -> "HEIGHT"
         is Keys.ReactionPickerType -> "ReactionPickerType"
-        is Keys.SummalyServerUrl -> "jp.panta.misskeyandroidclient.model.settings.SUMMALY_SERVER_URL_KEY"
-        is Keys.UrlPreviewSourceType -> "jp.panta.misskeyandroidclient.model.settings.URL_PREVIEW_SOURCE_TYPE"
         is Keys.ThemeType -> "THEME"
         is Keys.IsIncludeMyRenotes -> "INCLUDE_MY_RENOTES"
         is Keys.IsIncludeLocalRenotes -> "INCLUDE_LOCAL_RENOTES"

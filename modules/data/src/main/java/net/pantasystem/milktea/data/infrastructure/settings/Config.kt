@@ -3,7 +3,6 @@
 package net.pantasystem.milktea.data.infrastructure.settings
 
 import android.content.SharedPreferences
-import net.pantasystem.milktea.app_store.setting.UrlPreviewSourceSetting
 import net.pantasystem.milktea.model.setting.*
 
 fun RememberVisibility.Keys.str(): String {
@@ -64,13 +63,6 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
             ?: DefaultConfig.config.isUserNameDefault,
         isPostButtonAtTheBottom = map.getValue<PrefType.BoolPref>(Keys.IsPostButtonToBottom)?.value
             ?: DefaultConfig.config.isPostButtonAtTheBottom,
-        urlPreviewConfig = UrlPreviewConfig(
-            type = UrlPreviewConfig.Type.from(
-                map.getValue<PrefType.IntPref>(Keys.UrlPreviewSourceType)?.value
-                    ?: UrlPreviewSourceSetting.MISSKEY,
-                url = map.getValue<PrefType.StrPref>(Keys.SummalyServerUrl)?.value
-            ),
-        ),
         noteExpandedHeightSize = map.getValue<PrefType.IntPref>(Keys.NoteLimitHeight)?.value
             ?: DefaultConfig.config.noteExpandedHeightSize,
         theme = Theme.from(map.getValue<PrefType.IntPref>(Keys.ThemeType)?.value ?: 0),
@@ -137,17 +129,7 @@ fun Config.pref(key: Keys): PrefType? {
                 }
             )
         }
-        Keys.SummalyServerUrl -> {
-            val type = urlPreviewConfig.type
-            if (type is UrlPreviewConfig.Type.SummalyServer && urlPattern.matches(type.url)) {
-                PrefType.StrPref(type.url)
-            } else {
-                null
-            }
-        }
-        Keys.UrlPreviewSourceType -> {
-            PrefType.IntPref(urlPreviewConfig.type.toInt())
-        }
+
         Keys.ThemeType -> {
             PrefType.IntPref(theme.toInt())
         }

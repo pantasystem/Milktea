@@ -77,14 +77,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
-        val urlPreviewSource = MoveSettingActivityPanel(
-            R.string.url_preview,
-            UrlPreviewSourceSettingActivity::class.java,
-            this
-        )
-        urlPreviewSource.startActivityEventBus.observe(this) {
-            startActivity(Intent(this, it))
-        }
+
 
 
         val licenseActivitySetting = MoveSettingActivityPanel(
@@ -105,7 +98,6 @@ class SettingsActivity : AppCompatActivity() {
                 movementSetting,
                 tabSetting,
                 appearanceSetting,
-                urlPreviewSource,
                 securitySetting,
                 reactionSetting,
                 licenseActivitySetting

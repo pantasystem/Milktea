@@ -34,15 +34,8 @@ class KeysKtTest {
                     key.str()
                 )
                 Keys.ReactionPickerType -> Assert.assertEquals("ReactionPickerType", key.str())
-                Keys.SummalyServerUrl -> Assert.assertEquals(
-                    "jp.panta.misskeyandroidclient.model.settings.SUMMALY_SERVER_URL_KEY",
-                    key.str()
-                )
                 Keys.ThemeType -> Assert.assertEquals("THEME", key.str())
-                Keys.UrlPreviewSourceType -> Assert.assertEquals(
-                    "jp.panta.misskeyandroidclient.model.settings.URL_PREVIEW_SOURCE_TYPE",
-                    key.str()
-                )
+
                 Keys.IsIncludeLocalRenotes -> Assert.assertEquals(
                     "INCLUDE_LOCAL_RENOTES",
                     key.str()
@@ -70,8 +63,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(21, Keys.allKeys.size)
-        Assert.assertEquals(21, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(19, Keys.allKeys.size)
+        Assert.assertEquals(19, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

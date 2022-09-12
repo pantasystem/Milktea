@@ -7,7 +7,6 @@ import net.pantasystem.milktea.common.getPreferences
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
-import net.pantasystem.milktea.model.setting.UrlPreviewConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -42,7 +41,6 @@ class LocalConfigRepositoryImplTest {
             isPostButtonAtTheBottom = false,
             isClassicUI = true,
             noteExpandedHeightSize = 100,
-            urlPreviewConfig = UrlPreviewConfig(type = UrlPreviewConfig.Type.InApp),
             theme = Theme.Black
         )
         runBlocking {

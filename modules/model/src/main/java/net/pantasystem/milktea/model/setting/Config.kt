@@ -2,19 +2,7 @@ package net.pantasystem.milktea.model.setting
 
 import net.pantasystem.milktea.model.notes.Visibility
 
-val urlPattern = Regex("""(https)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
-data class UrlPreviewConfig(
-    val type: Type = Type.Misskey
-) {
-    sealed interface Type {
-        object Misskey : Type
-        object InApp : Type
-        data class SummalyServer(val url: String) : Type
-
-        companion object
-    }
-}
 
 
 sealed interface RememberVisibility {
@@ -48,7 +36,6 @@ data class IsAnalyticsCollectionEnabled(
  * @param isClassicUI BottomNavを使用しないタイプのUI
  * @param isUserNameDefault User@usernameを主体とする表示
  * @param isPostButtonAtTheBottom ノート編集画面の投稿ボタンを下に持ってくる
- * @param urlPreviewConfig OGPの設定
  * @param noteExpandedHeightSize ノートを強制的に折り畳むサイズ
  * @param theme テーマカラー
  * @param isCrashlyticsCollectionEnabled クラシュリティクスの許可状態
@@ -63,7 +50,6 @@ data class Config(
     val isClassicUI: Boolean,
     val isUserNameDefault: Boolean,
     val isPostButtonAtTheBottom: Boolean,
-    val urlPreviewConfig: UrlPreviewConfig,
     val noteExpandedHeightSize: Int,
     val theme: Theme,
     val isIncludeMyRenotes: Boolean,
@@ -105,7 +91,6 @@ object DefaultConfig {
         isClassicUI = false,
         isUserNameDefault = true,
         isPostButtonAtTheBottom = true,
-        urlPreviewConfig = UrlPreviewConfig(UrlPreviewConfig.Type.Misskey),
         noteExpandedHeightSize = 300,
         theme = Theme.White,
         isIncludeLocalRenotes = true,
