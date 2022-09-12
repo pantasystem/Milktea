@@ -76,7 +76,6 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.settings.activities.UrlPreviewSourceSettingActivity" />
         <activity android:name=".DraftNotesActivity" />
         <activity android:name=".SortedUsersActivity" />
         <activity android:name=".AntennaEditorActivity" />
