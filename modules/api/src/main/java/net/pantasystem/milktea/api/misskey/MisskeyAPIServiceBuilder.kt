@@ -16,12 +16,17 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
+
+private const val READ_TIMEOUT_S = 30L
+private const val WRITE_TIMEOUT_S = 30L
+private const val CONNECTION_TIMEOUT_S = 30L
 
 @OptIn(ExperimentalSerializationApi::class)
-object MisskeyAPIServiceBuilder {
-    private const val READ_TIMEOUT_S = 30L
-    private const val WRITE_TIMEOUT_S = 30L
-    private const val CONNECTION_TIMEOUT_S = 30L
+@Singleton
+class MisskeyAPIServiceBuilder @Inject constructor(){
+
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(CONNECTION_TIMEOUT_S, TimeUnit.SECONDS)
         .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)

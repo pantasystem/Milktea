@@ -1,17 +1,17 @@
 package jp.panta.misskeyandroidclient.api
 
-import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.api.misskey.notes.CreateNote
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.api.misskey.I
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.notes.CreateNote
+import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.throwIfHasError
 import org.junit.Assert.*
 import org.junit.Test
 
 class APIErrorTest {
 
-    private val misskeyAPI = MisskeyAPIServiceBuilder.build("https://misskey.io")
+    private val misskeyAPI = MisskeyAPIServiceBuilder().build("https://misskey.io")
 
 
     @Test(expected = APIError.ForbiddenException::class)

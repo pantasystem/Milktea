@@ -12,7 +12,9 @@ import javax.inject.Singleton
  * MisskeyAPIとBaseURLとVersionをいい感じに管理する
  */
 @Singleton
-class MisskeyAPIProvider @Inject constructor(){
+class MisskeyAPIProvider @Inject constructor(
+    val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder
+){
 
 
     private val baseURLAndMisskeyAPI = mutableMapOf<String, MisskeyAPI>()
@@ -24,12 +26,12 @@ class MisskeyAPIProvider @Inject constructor(){
 
             // NOTE BaseURLに対応するインスタンスが生成されていない＆＆鯖のバージョンに対応するインスタンスが生成されていなければ生成する
             if(api == null) {
-                api = if(version == null) MisskeyAPIServiceBuilder.build(baseURL) else MisskeyAPIServiceBuilder.build(
+                api = if(version == null) misskeyAPIServiceBuilder.build(baseURL) else misskeyAPIServiceBuilder.build(
                     baseURL,
                     version
                 )
             }else if((baseURLAndVersion[baseURL] == null || baseURLAndVersion[baseURL] != version) && version != null) {
-                api = MisskeyAPIServiceBuilder.build(baseURL, version)
+                api = misskeyAPIServiceBuilder.build(baseURL, version)
             }
             baseURLAndMisskeyAPI[baseURL] = api
             return api
