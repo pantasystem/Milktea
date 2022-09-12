@@ -54,6 +54,7 @@ class AppAuthViewModel @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val metaStore: FetchMeta,
+    private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
     loggerFactory: Logger.Factory,
     accountRepository: AccountRepository,
 ) : ViewModel() {
@@ -218,7 +219,7 @@ class AppAuthViewModel @Inject constructor(
                     }
                     is AppType.Misskey -> {
                         val secret = app.secret
-                        val authApi = MisskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
+                        val authApi = misskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
                         val session = authApi.generateSession(
                             AppSecret(
                                 secret!!

@@ -16,17 +16,36 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
+const val READ_TIMEOUT_S = 30L
+const val CONNECTION_TIMEOUT_S = 30L
+const val WRITE_TIMEOUT_S = 30L
+
+interface OkHttpClientProvider {
+    fun get(): OkHttpClient
+}
+
+class DefaultOkHttpClientProvider : OkHttpClientProvider {
+    val client = OkHttpClient.Builder()
+    .connectTimeout(CONNECTION_TIMEOUT_S, TimeUnit.SECONDS)
+    .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
+    .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS)
+    .build()
+    override fun get(): OkHttpClient {
+        return client
+    }
+}
 @OptIn(ExperimentalSerializationApi::class)
-object MisskeyAPIServiceBuilder {
-    private const val READ_TIMEOUT_S = 30L
-    private const val WRITE_TIMEOUT_S = 30L
-    private const val CONNECTION_TIMEOUT_S = 30L
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(CONNECTION_TIMEOUT_S, TimeUnit.SECONDS)
-        .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
-        .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS)
-        .build()
+@Singleton
+class MisskeyAPIServiceBuilder @Inject constructor(
+    private val okHttpClientProvider: OkHttpClientProvider
+){
+
+    private val okHttpClient by lazy {
+        okHttpClientProvider.get()
+    }
 
     val json = Json {
         ignoreUnknownKeys = true
@@ -52,6 +71,7 @@ object MisskeyAPIServiceBuilder {
     fun build(baseUrl: String, version: Version): MisskeyAPI {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
+            .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
         return when{

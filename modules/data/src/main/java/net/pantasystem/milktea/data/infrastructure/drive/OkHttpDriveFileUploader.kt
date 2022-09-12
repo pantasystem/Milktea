@@ -6,16 +6,20 @@ import android.provider.MediaStore
 import android.util.Log
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.common.Encryption
-import okhttp3.*
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.file.AppFile
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.Request
+import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.source
 import java.net.URL
 import java.util.concurrent.TimeUnit
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.file.AppFile
 
 
 
@@ -25,13 +29,14 @@ class OkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
     val json: Json,
-    val encryption: Encryption
+    val encryption: Encryption,
+    private val okHttpClientProvider: OkHttpClientProvider,
 ) : FileUploader {
     override suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try{
 
-            val client = OkHttpClient.Builder()
+            val client = okHttpClientProvider.get().newBuilder()
                 .connectTimeout(20, TimeUnit.SECONDS)
                 .writeTimeout(114514, TimeUnit.SECONDS)
                 .readTimeout(20, TimeUnit.SECONDS)

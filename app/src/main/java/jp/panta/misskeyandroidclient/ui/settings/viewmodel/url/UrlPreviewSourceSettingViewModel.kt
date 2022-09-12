@@ -9,13 +9,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.app_store.setting.UrlPreviewSourceSetting
-import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreFactory
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
-import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.model.url.UrlPreview
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +25,7 @@ class UrlPreviewSourceSettingViewModel @Inject constructor(
     val settingStore: SettingStore,
     private val urlPreviewDAO: UrlPreviewDAO,
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
+    private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
 
     ) :
     ViewModel() {
@@ -57,7 +59,8 @@ class UrlPreviewSourceSettingViewModel @Inject constructor(
                 urlPreviewDAO,
                 it,
                 url,
-                accountStore.currentAccount
+                accountStore.currentAccount,
+                misskeyAPIServiceBuilder
             ).create()
         }
 

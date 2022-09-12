@@ -6,11 +6,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
-import okhttp3.OkHttpClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -24,9 +24,8 @@ class ChannelAPITest {
     fun connect(): Unit = runBlocking {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
         val socket =
-            SocketImpl(wssURL, okHttpClient, logger)
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         socket.blockingConnect()
 
         var count = 0
@@ -50,9 +49,8 @@ class ChannelAPITest {
     fun testDisconnect() {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
         val socket =
-            SocketImpl(wssURL, okHttpClient, logger)
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 

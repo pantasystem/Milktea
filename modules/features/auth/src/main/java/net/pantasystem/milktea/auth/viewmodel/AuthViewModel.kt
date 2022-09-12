@@ -3,28 +3,22 @@ package net.pantasystem.milktea.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.api.misskey.auth.createObtainToken
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.map
-import net.pantasystem.milktea.api.misskey.auth.createObtainToken
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
-import java.lang.IllegalStateException
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -35,6 +29,7 @@ class AuthViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     private val accountRepository: AccountRepository,
     val encryption: Encryption,
+    val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
 
     loggerFactory: Logger.Factory
 ) : ViewModel() {
@@ -51,7 +46,7 @@ class AuthViewModel @Inject constructor(
                 delay(4000)
                 if (a is Authorization.Waiting4UserAuthorization.Misskey) {
                     try {
-                        val token = MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
+                        val token = misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL)
                             .getAccessToken(
                                 UserKey(
                                     appSecret = a.appSecret,
@@ -93,7 +88,7 @@ class AuthViewModel @Inject constructor(
                 when (a) {
                     is Authorization.Waiting4UserAuthorization.Misskey -> {
                         val accessToken =
-                            MisskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                            misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
                                 UserKey(
                                     appSecret = a.appSecret,
                                     a.session.token

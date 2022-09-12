@@ -12,6 +12,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
+import jp.panta.misskeyandroidclient.util.DebuggerSetupManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -21,7 +22,6 @@ import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
-import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
@@ -32,6 +32,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaCache
+import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.model.setting.Keys
 import net.pantasystem.milktea.model.setting.str
 import javax.inject.Inject
@@ -94,9 +95,13 @@ class MiApplication : Application() {
     @Inject
     internal lateinit var clientIdRepository: ClientIdRepository
 
+    @Inject
+    internal lateinit var debuggerSetupManager: DebuggerSetupManager
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
+        debuggerSetupManager.setup(this)
 
         val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         val mainThreadId = Looper.getMainLooper().thread.id

@@ -16,7 +16,8 @@ class UrlPreviewStoreFactory(
     private val urlPreviewDAO: UrlPreviewDAO,
     sourceType: Int? = null,
     private var summalyUrl: String? = null,
-    var account: Account? = null
+    var account: Account? = null,
+    private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder
 ) {
 
     private var sourceType = sourceType ?: UrlPreviewSourceSetting.MISSKEY
@@ -44,7 +45,7 @@ class UrlPreviewStoreFactory(
                     MisskeyUrlPreviewStore(
                         Retrofit.Builder()
                             .baseUrl(url!!)
-                            .addConverterFactory(MisskeyAPIServiceBuilder.json.asConverterFactory("application/json".toMediaType()))
+                            .addConverterFactory(misskeyAPIServiceBuilder.json.asConverterFactory("application/json".toMediaType()))
                             .client(OkHttpClient.Builder().build())
                             .build()
                             .create(RetrofitMisskeyUrlPreview::class.java)
