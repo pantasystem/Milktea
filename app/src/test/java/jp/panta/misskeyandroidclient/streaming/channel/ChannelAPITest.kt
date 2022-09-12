@@ -6,6 +6,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
@@ -24,7 +25,7 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val socket =
-            SocketImpl(wssURL, logger)
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         socket.blockingConnect()
 
         var count = 0
@@ -49,7 +50,7 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val socket =
-            SocketImpl(wssURL, logger)
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 
