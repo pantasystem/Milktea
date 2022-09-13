@@ -10,9 +10,7 @@ class AndroidDefaultLogger(
 ) : Logger {
 
     override fun debug(msg: String, tag: String, e: Throwable?) {
-        if (BuildConfig.DEBUG) {
-            Log.d(tag, msg, e)
-        }
+        Log.d(tag, msg, e)
     }
 
     override fun error(msg: String, e: Throwable?, tag: String) {
