@@ -26,14 +26,12 @@ class SubscriptionRegistrationWorker(
     }
 
     override suspend fun doWork(): Result {
-        val token = inputData.getString(TOKEN)
-            ?: return Result.failure()
         val entryPoint = EntryPointAccessors.fromApplication(
             applicationContext,
             SubscriptionRegistrationWorkerProvider::class.java
         )
         return withContext(Dispatchers.IO) {
-            entryPoint.subscriptionRegistration().registerAll(token)
+            entryPoint.subscriptionRegistration().registerAll()
             Result.success()
         }
     }

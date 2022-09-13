@@ -10,7 +10,6 @@ import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
 import jp.panta.misskeyandroidclient.util.DebuggerSetupManager
 import kotlinx.coroutines.*
@@ -164,23 +163,12 @@ class MiApplication : Application() {
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
-        runCatching {
-            FirebaseMessaging.getInstance()
-        }.getOrNull()?.token?.addOnCompleteListener {
-            if (!it.isSuccessful) {
-                return@addOnCompleteListener
+        applicationScope.launch(Dispatchers.IO) {
+            runCatching {
+                mSubscriptionRegistration.registerAll()
+            }.onFailure { e ->
+                logger.error("register error", e)
             }
-            it.result?.also { token ->
-                applicationScope.launch(Dispatchers.IO) {
-                    runCatching {
-                        mSubscriptionRegistration.registerAll(token)
-                    }.onFailure { e ->
-                        logger.error("register error", e)
-                    }
-                }
-            }
-        }?.addOnFailureListener {
-            logger.debug("fcm token取得失敗", e = it)
         }
 
         mAccountStore.state.distinctUntilChangedBy { state ->
