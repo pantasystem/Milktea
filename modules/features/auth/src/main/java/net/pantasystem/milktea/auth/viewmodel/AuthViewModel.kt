@@ -15,6 +15,7 @@ import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
+import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
@@ -30,6 +31,7 @@ class AuthViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     val encryption: Encryption,
     val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
+    val subscriptionRegistration: SubscriptionRegistration,
 
     loggerFactory: Logger.Factory
 ) : ViewModel() {
@@ -164,6 +166,7 @@ class AuthViewModel @Inject constructor(
                 }
                 userDataSource.add(user)
                 accountStore.addAccount(account)
+                subscriptionRegistration.register(account.accountId)
 
                 account to user
             }.onSuccess {

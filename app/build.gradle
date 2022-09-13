@@ -34,7 +34,7 @@ android {
 
         // プッシュ通知関連のデータをlocal.propertiesからBuildConfigへ書き込んでいます。
         def properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        properties.load(project.rootProject.file('secret.properties').newDataInputStream())
         def PUSH_TO_FCM_SERVER_BASE_URL = properties.getProperty('push_to_fcm.server_base_url')
         def PUSH_TO_FCM_PUBLIC_KEY = properties.getProperty('push_to_fcm.public_key')
         def PUSH_TO_FCM_AUTH = properties.getProperty('push_to_fcm.auth')

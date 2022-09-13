@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.sw.register
 
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -18,20 +19,21 @@ class SubscriptionRegistration(
     val lang: String,
     loggerFactory: Logger.Factory,
     val auth: String,
-    private val publicKey: String,
-    private val endpointBase: String,
+    val publicKey: String,
+    val endpointBase: String,
 ) {
     val logger = loggerFactory.create("sw/register")
 
     /**
      * 特定のアカウントをsw/registerに登録します。
      */
-    private suspend fun register(deviceToken: String, accountId: Long) : SubscriptionState?{
-
+    suspend fun register(accountId: Long) : Result<SubscriptionState?> = runCatching {
+        val token = FirebaseMessaging.getInstance().token.asSuspend()
         logger.debug("call register(accountId:$accountId)")
+        logger.debug("auth:$auth, publicKey:$publicKey")
         val account = accountRepository.get(accountId).getOrThrow()
         val endpoint = EndpointBuilder(
-            deviceToken = deviceToken,
+            deviceToken = token,
             accountId = accountId,
             lang = lang,
             auth = auth,
@@ -51,25 +53,30 @@ class SubscriptionRegistration(
         )
         res.throwIfHasError()
         logger.debug("res code:${res.code()}, body:${res.body()}")
-        return res.body()
+        res.body()
     }
 
     /**
      * 全てのアカウントをsw/registerに登録します。
      * @return 成功件数
      */
-    suspend fun registerAll(deviceToken: String) : Int{
+    suspend fun registerAll() : Int {
         val accounts = accountRepository.findAll().getOrThrow()
         return coroutineScope {
             accounts.map {
                 async {
-                    val result: SubscriptionState? = runCatching {
-                        register(deviceToken, it.accountId)
-                    }.onFailure {
+                    register(it.accountId).onFailure {
                         logger.error("sw/registerに失敗しました", it)
-                    }.getOrNull()
-                    logger.debug("subscription result:${result}")
-                    if(result == null) 0 else 1
+                    }.onSuccess { result ->
+                        logger.debug("subscription result:${result}")
+                    }.fold(
+                        onSuccess = {
+                            1
+                        },
+                        onFailure = {
+                            0
+                        }
+                    )
                 }
             }.awaitAll().sumOf { it }
         }

@@ -91,11 +91,11 @@ app nameはインスタンスのバージョンによってはvia名として公
 ## ビルドするには
 
 プロジェクトをgit cloneします。<br>
-local.propertiesを作成します。<br>
+secret.propertiesを作成します。<br>
 ```
-touch local.properties
+touch secret.properties
 ```
-local.propertiesには<br>
+secret.propertiesには<br>
 以下のような属性を追加してプッシュ通知の中継鯖についての設定をします。<br>
 プッシュ通知中継サーバについて<br>
 https://github.com/pantasystem/MisskeyAndroidClient/blob/develop/PushToFCM/README.md<br>
