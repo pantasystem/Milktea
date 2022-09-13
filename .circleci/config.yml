@@ -38,7 +38,7 @@ jobs:
       - checkout
 
       - run:
-          name: generate local.properties
+          name: generate secret.properties
           command:
             echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./secret.properties
             echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
