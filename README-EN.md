@@ -82,11 +82,11 @@ If successful, you will be redirected to Milktea and press "CONTINUE" to complet
 
 ## Build
 
-`git clone` this repo and create a file `local.properties`.<br>
+`git clone` this repo and create a file `secret.properties`.<br>
 ```
-touch local.properties
+touch secret.properties
 ```
-Add the following attributes to local.properties to configure the settings about the relay server for push notifications.<br>
+Add the following attributes to secret.properties to configure the settings about the relay server for push notifications.<br>
 To read more about the relay server for push notifications, please check below link.<br>
 https://github.com/pantasystem/MisskeyAndroidClient/blob/develop/PushToFCM/README.md<br>
 
