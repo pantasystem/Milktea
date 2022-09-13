@@ -12,11 +12,11 @@ jobs:
       - checkout
 
       - run:
-          name: generate local.properties
+          name: generate secret.properties
           command:
-              echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./local.properties
-              echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties
-              echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
+              echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./secret.properties
+              echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+              echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
 
       - android/run-tests:
           test-command: ./gradlew lint testDebug --continue
@@ -40,9 +40,9 @@ jobs:
       - run:
           name: generate local.properties
           command:
-            echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./local.properties
-            echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties
-            echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
+            echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./secret.properties
+            echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+            echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
       - run:
           name: export KEYSTORE path
           command:
