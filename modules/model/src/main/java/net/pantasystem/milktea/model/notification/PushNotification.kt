@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.model.notification
 
+import android.os.Bundle
+
 
 data class PushNotification(
     val notificationId: String,
@@ -9,9 +11,25 @@ data class PushNotification(
     val accountId: Long,
     val noteId: String?,
     val userId: String?,
-)
+) {
+    fun isNearUserNotification(): Boolean {
+        return userId != null
+                && (type == "follow"
+                || type == "receiveFollowRequest"
+                || type == "followRequestAccepted")
+    }
 
-fun Map<String, String>.toPushNotification(): PushNotification {
+    fun isNearNoteNotification(): Boolean {
+        return noteId != null
+                && (type == "mention"
+                || type == "reply"
+                || type == "renote"
+                || type == "quote"
+                || type == "reaction")
+    }
+}
+
+fun Map<String, String?>.toPushNotification(): PushNotification {
     val title = this["title"]
     val body = this["body"]
     val notificationId = this["notificationId"]
@@ -33,4 +51,16 @@ fun Map<String, String>.toPushNotification(): PushNotification {
         noteId = noteId,
         userId = userId
     )
+}
+
+fun Bundle.toPushNotification(): Result<PushNotification> = runCatching {
+    listOf(
+        "title" to getString("title"),
+        "body" to getString("body"),
+        "notificationId" to getString("notificationId"),
+        "type" to getString("type"),
+        "accountId" to getString("accountId"),
+        "userId" to  getString("userId"),
+        "noteId" to getString("noteId"),
+    ).toMap().toPushNotification()
 }
