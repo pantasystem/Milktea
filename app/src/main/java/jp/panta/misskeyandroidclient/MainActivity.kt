@@ -32,6 +32,7 @@ import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
+import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
@@ -65,6 +66,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     @Inject
     lateinit var setTheme: ApplyTheme
 
+    @Inject
+    lateinit var userDetailNavigation: UserDetailNavigation
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -124,6 +127,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView),
         ).setup()
 
+        if (savedInstanceState == null) {
+            handleIntent()
+        }
 
     }
 
@@ -168,6 +174,15 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
                 param(FirebaseAnalytics.Param.SCREEN_CLASS, destination.label.toString())
             }
         }
+    }
+
+    private fun handleIntent() {
+        MainActivityInitialIntentHandler(
+            binding.appBarMain.bottomNavigation,
+            this,
+            userDetailNavigation,
+            accountStore.accountRepository
+        ).invoke(intent)
     }
 
     private fun setupOnBackPressedDispatcherCallBack() {
