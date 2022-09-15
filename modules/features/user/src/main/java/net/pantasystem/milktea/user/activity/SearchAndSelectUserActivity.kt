@@ -18,8 +18,8 @@ import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationAr
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.user.search.SearchAndSelectUserScreen
 import net.pantasystem.milktea.user.search.SearchUserViewModel
-import net.pantasystem.milktea.user.selectable.SelectedUserViewModel
-import net.pantasystem.milktea.user.selectable.provideViewModel
+import net.pantasystem.milktea.user.viewmodel.SelectedUserViewModel
+import net.pantasystem.milktea.user.viewmodel.provideViewModel
 import java.io.Serializable
 import javax.inject.Inject
 

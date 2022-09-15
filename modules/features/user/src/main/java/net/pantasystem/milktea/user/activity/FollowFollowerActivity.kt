@@ -22,6 +22,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.user.*
 import net.pantasystem.milktea.user.databinding.ActivityFollowFollowerBinding
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject

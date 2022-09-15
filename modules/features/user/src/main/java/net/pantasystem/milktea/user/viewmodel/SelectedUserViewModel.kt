@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user.selectable
+package net.pantasystem.milktea.user.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

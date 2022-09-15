@@ -18,6 +18,7 @@ import net.pantasystem.milktea.model.user.query.from
 import net.pantasystem.milktea.user.compose.UserDetailCardList
 import net.pantasystem.milktea.user.compose.UserDetailCardListAction
 import net.pantasystem.milktea.user.viewmodel.SortedUsersViewModel
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.viewmodel.providerViewModel
 import javax.inject.Inject
 

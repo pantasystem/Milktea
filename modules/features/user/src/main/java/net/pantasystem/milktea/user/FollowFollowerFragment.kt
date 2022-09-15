@@ -22,6 +22,7 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.user.compose.UserDetailCardPageableList
 import net.pantasystem.milktea.user.compose.UserDetailCardPageableListAction
 import net.pantasystem.milktea.user.viewmodel.FollowFollowerViewModel
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
 

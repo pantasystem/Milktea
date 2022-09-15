@@ -3,6 +3,7 @@ package net.pantasystem.milktea.user
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowErrorUiState
 
 class ToggleFollowErrorHandler(
     val view: View,

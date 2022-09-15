@@ -7,6 +7,7 @@ import net.pantasystem.milktea.user.activity.FollowFollowerActivity
 import net.pantasystem.milktea.user.activity.UserDetailActivity
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
 import net.pantasystem.milktea.user.compose.UserDetailCardListAction
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 
 class UserCardListActionHandler(
     activity: Activity,

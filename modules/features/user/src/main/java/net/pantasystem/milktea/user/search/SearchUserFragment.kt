@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.user.ToggleFollowViewModel
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.UserCardListActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCardList
 import net.pantasystem.milktea.user.compose.UserDetailCardListAction
