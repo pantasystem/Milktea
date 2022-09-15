@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient.ui.list
+package net.pantasystem.milktea.userlist
 
 import android.util.Log
 import android.widget.ImageButton
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.list.UserList
 
 

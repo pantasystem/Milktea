@@ -8,7 +8,7 @@
                 type="net.pantasystem.milktea.model.list.UserList" />
         <variable
                 name="pullPushViewModel"
-                type="jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel" />
+                type="net.pantasystem.milktea.userlist.viewmodel.UserListPullPushUserViewModel" />
         <variable
                 name="addUserId"
                 type="net.pantasystem.milktea.model.user.User.Id" />

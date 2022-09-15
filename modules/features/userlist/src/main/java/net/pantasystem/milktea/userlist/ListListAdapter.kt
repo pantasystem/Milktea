@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.list
+package net.pantasystem.milktea.userlist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,15 +8,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.ItemListAddUserBinding
-import jp.panta.misskeyandroidclient.databinding.ItemListBinding
-
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
-import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
-import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.userlist.databinding.ItemListAddUserBinding
+import net.pantasystem.milktea.userlist.databinding.ItemListBinding
+import net.pantasystem.milktea.userlist.viewmodel.ListListViewModel
+import net.pantasystem.milktea.userlist.viewmodel.UserListPullPushUserViewModel
 
 class ListListAdapter @ExperimentalCoroutinesApi constructor(
     private val listListViewModel: ListListViewModel,

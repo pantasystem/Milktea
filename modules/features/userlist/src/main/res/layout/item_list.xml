@@ -12,11 +12,11 @@
 
         <variable
                 name="listListViewModel"
-                type="jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel" />
+                type="net.pantasystem.milktea.userlist.viewmodel.ListListViewModel" />
 
         <variable
                 name="tryToEditCallback"
-                type="jp.panta.misskeyandroidclient.ui.list.ListListAdapter.OnTryToEditCallback" />
+                type="net.pantasystem.milktea.userlist.ListListAdapter.OnTryToEditCallback" />
     </data>
 
     <androidx.cardview.widget.CardView

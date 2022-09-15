@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.list.viewmodel
+package net.pantasystem.milktea.userlist.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData

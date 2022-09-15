@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.list.viewmodel
+package net.pantasystem.milktea.userlist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,16 +7,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import net.pantasystem.milktea.common_viewmodel.UserViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.app_store.userlist.UserListStore
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_viewmodel.UserViewData
+import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 
 @FlowPreview
