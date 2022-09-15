@@ -25,15 +25,15 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.ui.users.UserCardActionHandler
-import jp.panta.misskeyandroidclient.ui.users.UserDetailCard
-import jp.panta.misskeyandroidclient.ui.users.UserDetailCardAction
-import jp.panta.misskeyandroidclient.ui.users.viewmodel.ToggleFollowViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.user.query.*
+import net.pantasystem.milktea.user.ToggleFollowViewModel
+import net.pantasystem.milktea.user.UserCardActionHandler
+import net.pantasystem.milktea.user.UserDetailCard
+import net.pantasystem.milktea.user.UserDetailCardAction
 
 @FlowPreview
 @ExperimentalCoroutinesApi

@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
-import jp.panta.misskeyandroidclient.FollowFollowerActivity
-import jp.panta.misskeyandroidclient.UserDetailActivity
+import net.pantasystem.milktea.user.FollowFollowerActivity
+import net.pantasystem.milktea.user.UserDetailActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_android.ui.Activities

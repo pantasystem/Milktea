@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.UserListArgs
 import net.pantasystem.milktea.common_navigation.UserListNavigation
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
@@ -150,7 +151,7 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 class UserListNavigationImpl @Inject constructor(
     val activity: Activity
 ) : UserListNavigation {
-    override fun newIntent(args: Unit): Intent {
-        return Intent(activity, ListListActivity::class.java)
+    override fun newIntent(args: UserListArgs): Intent {
+        return ListListActivity.newInstance(activity, args.userId)
     }
 }

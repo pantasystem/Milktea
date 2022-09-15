@@ -45,6 +45,8 @@ dependencies {
     implementation libs.appcompat.appcompat
     implementation libs.android.material.material
     implementation project(path: ':modules:common_android')
+    implementation project(path: ':modules:features:note')
+    implementation project(path: ':modules:features:gallery')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -89,6 +91,8 @@ dependencies {
     implementation libs.accompanist.pager
     implementation libs.accompanist.pager.indicators
     implementation libs.coil.compose
+    implementation libs.compose.constraintlayout
+
 
 
     implementation libs.kotlin.datetime
@@ -101,5 +105,9 @@ dependencies {
     implementation libs.flexbox
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
+
+    implementation libs.glide.glide
+    kapt libs.glide.compiler
+    implementation libs.accompanist.glide
 
 }
