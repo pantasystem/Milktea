@@ -5,7 +5,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".AntennaEditorActivity">
+            tools:context="net.pantasystem.milktea.antenna.AntennaEditorActivity">
         <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/antennaEditorAppBar"
                 android:layout_width="match_parent"

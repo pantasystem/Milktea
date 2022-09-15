@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.antenna
+package net.pantasystem.milktea.antenna
 
 import android.os.Bundle
 import android.util.Log
@@ -10,10 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentAntennaEditorBinding
-import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
 import kotlinx.coroutines.*
+import net.pantasystem.milktea.antenna.databinding.FragmentAntennaEditorBinding
+import net.pantasystem.milktea.antenna.viewmodel.AntennaEditorViewModel
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android_ui.user.UserChipListAdapter
 import net.pantasystem.milktea.model.antenna.Antenna
@@ -25,8 +24,8 @@ import net.pantasystem.milktea.model.antenna.AntennaSource
 class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     companion object {
-        const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment.EXTRA_ANTENNA_ID"
-        fun newInstance(antennaId: Antenna.Id?): AntennaEditorFragment{
+        const val EXTRA_ANTENNA_ID = "net.pantasystem.milktea.antenna.AntennaEditorFragment.EXTRA_ANTENNA_ID"
+        fun newInstance(antennaId: Antenna.Id?): AntennaEditorFragment {
             return AntennaEditorFragment().apply{
                 arguments = Bundle().apply{
                     antennaId?.let {

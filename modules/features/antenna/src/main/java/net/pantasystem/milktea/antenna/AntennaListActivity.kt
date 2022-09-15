@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.antenna
 
 import android.app.Activity
 import android.content.Intent
@@ -10,10 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
-import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.antenna.databinding.ActivityAntennaListBinding
+import net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.AntennaNavigation
 import net.pantasystem.milktea.model.antenna.Antenna
 import javax.inject.Inject
@@ -26,10 +27,14 @@ class AntennaListActivity : AppCompatActivity() {
 
     private lateinit var mBinding: ActivityAntennaListBinding
 
+    @Inject
+    lateinit var applyTheme: ApplyTheme
+
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
+
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_antenna_list)
         setSupportActionBar(mBinding.antennaListToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

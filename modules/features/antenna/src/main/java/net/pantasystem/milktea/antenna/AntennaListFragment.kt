@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.antenna
+package net.pantasystem.milktea.antenna
 
 import android.os.Bundle
 import android.view.View
@@ -7,11 +7,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentAntennaListBinding
-import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.antenna.databinding.FragmentAntennaListBinding
+import net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel
 
 @FlowPreview
 @ExperimentalCoroutinesApi
