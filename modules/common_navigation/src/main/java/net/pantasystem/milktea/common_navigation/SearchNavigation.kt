@@ -1,7 +1,10 @@
 package net.pantasystem.milktea.common_navigation
 
-interface SearchNavigation : ActivityNavigation<SearchNavArgs>
+interface SearchNavigation : ActivityNavigation<SearchNavType>
 
-data class SearchNavArgs(
-    val searchWord: String,
-)
+sealed interface SearchNavType {
+    val searchWord: String?
+    data class ResultScreen(override val searchWord: String) : SearchNavType
+    data class SearchScreen(override val searchWord: String? = null) : SearchNavType
+
+}

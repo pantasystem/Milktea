@@ -26,7 +26,7 @@
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
-                android:name=".ui.settings.activities.SecuritySettingActivity"
+                android:name="net.pantasystem.milktea.setting.activities.SecuritySettingActivity"
                 android:exported="false" />
         <activity
                 android:name="net.pantasystem.milktea.channel.ChannelActivity"
@@ -81,10 +81,10 @@
         <activity android:name=".SortedUsersActivity" />
         <activity android:name=".AntennaEditorActivity" />
         <activity android:name=".AntennaListActivity" />
-        <activity android:name=".ui.settings.activities.PageSettingActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.PageSettingActivity" />
         <activity android:name="net.pantasystem.milktea.messaging.MessagingListActivity" />
         <activity android:name=".NotificationsActivity" />
-        <activity android:name=".ui.settings.activities.ReactionSettingActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.ReactionSettingActivity" />
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
                 android:theme="@style/LicensePageTheme" />
@@ -119,10 +119,10 @@
                 android:exported="false" />
 
         <activity android:name="net.pantasystem.milktea.media.MediaActivity" />
-        <activity android:name=".ui.settings.activities.SettingAppearanceActivity" />
-        <activity android:name=".ui.settings.activities.SettingMovementActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.SettingAppearanceActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.SettingMovementActivity" />
         <activity
-                android:name=".SettingsActivity"
+                android:name="net.pantasystem.milktea.setting.activities.SettingsActivity"
                 android:label="@string/title_activity_settings" />
         <activity
                 android:name=".UserDetailActivity"

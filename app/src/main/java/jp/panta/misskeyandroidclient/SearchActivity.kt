@@ -19,12 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
 import jp.panta.misskeyandroidclient.ui.users.SimpleUserListView
 import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.model.user.User
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
@@ -36,8 +32,6 @@ class SearchActivity : AppCompatActivity() {
 
     private var mSearchWord: String? = null
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     private val mSearchUserViewModel: SearchUserViewModel by viewModels()
 
     private val binding: ActivitySearchBinding by dataBinding()
@@ -92,8 +86,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     private val queryTextListener = object : SearchView.OnQueryTextListener{
         override fun onQueryTextChange(newText: String?): Boolean {
             mSearchUserViewModel.setUserName(newText?: "")
@@ -110,7 +102,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     fun showSearchResult(searchWord: String){
         val intent = Intent(this, SearchResultActivity::class.java)
         intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)

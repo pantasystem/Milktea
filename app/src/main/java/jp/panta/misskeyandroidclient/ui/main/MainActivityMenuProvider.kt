@@ -6,11 +6,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.core.view.MenuProvider
 import jp.panta.misskeyandroidclient.*
-import jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.messaging.MessagingListActivity
+import net.pantasystem.milktea.setting.activities.PageSettingActivity
+import net.pantasystem.milktea.setting.activities.SettingsActivity
 
 internal class MainActivityMenuProvider(
     val activity: MainActivity,
