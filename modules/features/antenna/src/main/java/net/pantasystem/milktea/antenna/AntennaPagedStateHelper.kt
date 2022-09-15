@@ -1,8 +1,7 @@
-package jp.panta.misskeyandroidclient.ui.antenna
+package net.pantasystem.milktea.antenna
 
 import android.widget.ImageButton
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.antenna.Antenna
 
 object AntennaPagedStateHelper{

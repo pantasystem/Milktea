@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.antenna
 
 import android.app.Activity
 import android.content.Context
@@ -12,21 +12,25 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivityAntennaEditorBinding
-import jp.panta.misskeyandroidclient.ui.antenna.AntennaEditorFragment
-import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaEditorViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.antenna.databinding.ActivityAntennaEditorBinding
+import net.pantasystem.milktea.antenna.viewmodel.AntennaEditorViewModel
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.ChangedDiffResult
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.user.User
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @FlowPreview
 @AndroidEntryPoint
 class AntennaEditorActivity : AppCompatActivity() {
     companion object{
-        const val EXTRA_ANTENNA_ID = "jp.panta.misskeyandroidclient.AntennaEditorActivity.EXTRA_ANTENNA_ID"
+        const val EXTRA_ANTENNA_ID = "net.pantasystem.milktea.antenna.AntennaEditorActivity.EXTRA_ANTENNA_ID"
 
         fun newIntent(context: Context, antennaId: Antenna.Id?) : Intent{
             return Intent(context, AntennaEditorActivity::class.java).apply {
@@ -42,9 +46,15 @@ class AntennaEditorActivity : AppCompatActivity() {
 
     val viewModel: AntennaEditorViewModel by viewModels()
 
+    @Inject
+    lateinit var applyTheme: ApplyTheme
+
+    @Inject
+    lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
         setContentView(R.layout.activity_antenna_editor)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_antenna_editor)
         setSupportActionBar(mBinding.antennaEditorToolbar)
@@ -89,7 +99,7 @@ class AntennaEditorActivity : AppCompatActivity() {
 
     @FlowPreview
     private fun showSearchAndSelectUserActivity(userIds: List<User.Id>){
-        val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = userIds)
+        val intent = searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs(selectedUserIds = userIds))
         requestSearchAndUserResult.launch(intent)
     }
 
@@ -110,7 +120,7 @@ class AntennaEditorActivity : AppCompatActivity() {
         val data = result.data
         val resultCode = result.resultCode
         if(resultCode == Activity.RESULT_OK && data != null){
-            (data.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult)?.let {
+            (data.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult)?.let {
                 val userNames = it.selectedUserNames
                 mViewModel?.setUserNames(userNames)
             }

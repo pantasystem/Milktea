@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.antenna.viewmodel
+package net.pantasystem.milktea.antenna.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*

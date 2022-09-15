@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.antenna
+package net.pantasystem.milktea.antenna
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,10 +7,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.ItemAntennaBinding
+import net.pantasystem.milktea.antenna.databinding.ItemAntennaBinding
+import net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel
 import net.pantasystem.milktea.model.antenna.Antenna
-import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 
 class AntennaListAdapter(
     private val antennaListViewModel: AntennaListViewModel,

@@ -18,7 +18,7 @@ internal class StartActivityFromNavDrawerItems(
             R.id.nav_drive -> DriveActivity::class.java
             R.id.nav_favorite -> FavoriteActivity::class.java
             R.id.nav_list -> net.pantasystem.milktea.userlist.ListListActivity::class.java
-            R.id.nav_antenna -> AntennaListActivity::class.java
+            R.id.nav_antenna -> net.pantasystem.milktea.antenna.AntennaListActivity::class.java
             R.id.nav_draft -> DraftNotesActivity::class.java
             R.id.nav_gallery -> GalleryPostsActivity::class.java
             R.id.nav_channel -> ChannelActivity::class.java
