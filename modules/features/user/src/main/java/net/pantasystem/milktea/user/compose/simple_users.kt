@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*

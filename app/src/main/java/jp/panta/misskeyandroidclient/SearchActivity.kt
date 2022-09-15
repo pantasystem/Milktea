@@ -18,8 +18,8 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.SimpleUserListView
-import net.pantasystem.milktea.user.UserDetailActivity
+import net.pantasystem.milktea.user.compose.SimpleUserListView
+import net.pantasystem.milktea.user.activity.UserDetailActivity
 import net.pantasystem.milktea.user.search.SearchUserViewModel
 
 @AndroidEntryPoint

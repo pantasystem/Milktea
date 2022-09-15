@@ -3,6 +3,10 @@ package net.pantasystem.milktea.user
 import android.app.Activity
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
+import net.pantasystem.milktea.user.activity.FollowFollowerActivity
+import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.compose.UserDetailCardAction
+import net.pantasystem.milktea.user.compose.UserDetailCardListAction
 
 class UserCardListActionHandler(
     activity: Activity,

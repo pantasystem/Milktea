@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.helper
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter

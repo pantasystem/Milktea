@@ -1,5 +1,5 @@
 @file:Suppress("DEPRECATION")
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.activity
 
 import android.content.Context
 import android.content.Intent
@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.user.*
 import net.pantasystem.milktea.user.databinding.ActivityFollowFollowerBinding
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
@@ -29,8 +30,8 @@ import javax.inject.Inject
 class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
 
     companion object{
-        private const val EXTRA_USER_ID = "net.pantasystem.milktea.user.FollowFollowerActivity.EXTRA_USER_ID"
-        private const val EXTRA_VIEW_CURRENT = "net.pantasystem.milktea.user.FollowFollowerActivity.EXTRA_VIEW_CURRENT"
+        private const val EXTRA_USER_ID = "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_USER_ID"
+        private const val EXTRA_VIEW_CURRENT = "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_VIEW_CURRENT"
         private const val FOLLOWING_VIEW_MODE = 0
         private const val FOLLOWER_VIEW_MODE = 1
 

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.user.R
-import net.pantasystem.milktea.user.SimpleUserListView
+import net.pantasystem.milktea.user.compose.SimpleUserListView
 import net.pantasystem.milktea.user.selectable.SelectedUserViewModel
 
 @Composable

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -10,6 +10,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 import net.pantasystem.milktea.model.user.query.from
+import net.pantasystem.milktea.user.R
+import net.pantasystem.milktea.user.SortedUsersFragment
 import net.pantasystem.milktea.user.databinding.ActivitySortedUsesBinding
 import javax.inject.Inject
 

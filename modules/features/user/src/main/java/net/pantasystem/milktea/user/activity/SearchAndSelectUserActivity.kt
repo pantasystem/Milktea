@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.activity
 
 import android.app.Activity
 import android.content.Context

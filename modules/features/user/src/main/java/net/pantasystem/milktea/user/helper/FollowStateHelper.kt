@@ -1,8 +1,9 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.helper
 
 import android.widget.Button
 import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.model.user.FollowState
+import net.pantasystem.milktea.user.R
 
 object FollowStateHelper {
 

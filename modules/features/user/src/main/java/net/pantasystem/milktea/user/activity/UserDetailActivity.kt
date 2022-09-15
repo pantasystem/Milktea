@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.activity
 
 import android.app.Activity
 import android.content.Context
@@ -44,6 +44,8 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.user.PinNoteFragment
+import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
@@ -72,9 +74,9 @@ class UserDetailNavigationImpl @Inject constructor(
 class UserDetailActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_USER_ID =
-            "net.pantasystem.milktea.user.UserDetailActivity.EXTRA_USER_ID"
+            "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_ID"
         private const val EXTRA_USER_NAME =
-            "net.pantasystem.milktea.user.UserDetailActivity.EXTRA_USER_NAME"
+            "net.pantasystem.milktea.user.activity.UserDetailActivity.EXTRA_USER_NAME"
         private const val EXTRA_ACCOUNT_ID =
             "jp.panta.misskeyandroiclient.UserDetailActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"

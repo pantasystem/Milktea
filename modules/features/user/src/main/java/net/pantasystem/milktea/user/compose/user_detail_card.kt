@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.user
+package net.pantasystem.milktea.user.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +24,7 @@ import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.model.user.FollowState
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.make
+import net.pantasystem.milktea.user.R
 
 sealed interface UserDetailCardAction {
     val userId: User.Id

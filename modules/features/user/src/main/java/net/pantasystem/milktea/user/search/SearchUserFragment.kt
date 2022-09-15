@@ -20,8 +20,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.user.ToggleFollowViewModel
 import net.pantasystem.milktea.user.UserCardListActionHandler
-import net.pantasystem.milktea.user.UserDetailCardList
-import net.pantasystem.milktea.user.UserDetailCardListAction
+import net.pantasystem.milktea.user.compose.UserDetailCardList
+import net.pantasystem.milktea.user.compose.UserDetailCardListAction
 
 @FlowPreview
 @ExperimentalCoroutinesApi
