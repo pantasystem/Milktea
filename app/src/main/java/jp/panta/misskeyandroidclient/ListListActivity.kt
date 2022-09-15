@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_navigation.UserListNavigation
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -144,4 +146,12 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
 
 
+}
+
+class UserListNavigationImpl @Inject constructor(
+    val activity: Activity
+) : UserListNavigation {
+    override fun newIntent(args: Unit): Intent {
+        return Intent(activity, ListListActivity::class.java)
+    }
 }

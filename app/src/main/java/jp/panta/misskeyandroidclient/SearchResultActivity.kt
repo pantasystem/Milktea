@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
-import net.pantasystem.milktea.common_navigation.SearchNavArgs
+import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
@@ -250,9 +250,21 @@ class SearchResultActivity : AppCompatActivity() {
 class SearchNavigationImpl  @Inject constructor(
     val activity: Activity
 ): SearchNavigation {
-    override fun newIntent(args: SearchNavArgs): Intent {
-        val intent = Intent(activity, SearchResultActivity::class.java)
-        intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, args.searchWord)
-        return intent
+    override fun newIntent(args: SearchNavType): Intent {
+        return when(args) {
+            is SearchNavType.ResultScreen -> {
+                val intent = Intent(activity, SearchResultActivity::class.java)
+                intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, args.searchWord)
+                intent
+            }
+            is SearchNavType.SearchScreen -> {
+                val intent = Intent(activity, SearchActivity::class.java)
+                if (args.searchWord != null) {
+                    intent.putExtra(SearchActivity.EXTRA_SEARCH_WORD, args.searchWord)
+                }
+                intent
+            }
+        }
+
     }
 }

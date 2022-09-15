@@ -22,7 +22,7 @@ import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
 import net.pantasystem.milktea.common_android.ui.text.EmojiSpan
-import net.pantasystem.milktea.common_navigation.SearchNavArgs
+import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import java.lang.ref.WeakReference
 
@@ -164,7 +164,7 @@ object MFMDecorator {
 
                 val navigation = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
                 val intent = navigation.searchNavigation()
-                    .newIntent(SearchNavArgs(hashTag.text))
+                    .newIntent(SearchNavType.ResultScreen(hashTag.text))
 //
                 makeClickableSpan(hashTag.text, intent)
             }?: closeErrorElement(hashTag)

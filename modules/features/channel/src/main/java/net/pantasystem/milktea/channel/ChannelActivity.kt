@@ -1,13 +1,16 @@
 package net.pantasystem.milktea.channel
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.ChannelNavigation
 import javax.inject.Inject
 
 
@@ -36,5 +39,12 @@ class ChannelActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+}
+
+
+class ChannelNavigationImpl @Inject constructor(val activity: Activity): ChannelNavigation {
+    override fun newIntent(args: Unit): Intent {
+        return Intent(activity, ChannelActivity::class.java)
     }
 }

@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -13,7 +14,9 @@ import jp.panta.misskeyandroidclient.databinding.ActivityAntennaListBinding
 import jp.panta.misskeyandroidclient.ui.antenna.viewmodel.AntennaListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common_navigation.AntennaNavigation
 import net.pantasystem.milktea.model.antenna.Antenna
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AntennaListActivity : AppCompatActivity() {
@@ -72,4 +75,12 @@ class AntennaListActivity : AppCompatActivity() {
     }
 
 
+}
+
+class AntennaNavigationImpl @Inject constructor(
+    val activity: Activity
+): AntennaNavigation {
+    override fun newIntent(args: Unit): Intent {
+        return Intent(activity, AntennaListActivity::class.java)
+    }
 }
