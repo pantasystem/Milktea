@@ -17,10 +17,9 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
+import jp.panta.misskeyandroidclient.ui.users.SimpleUserListView
+import jp.panta.misskeyandroidclient.ui.users.viewmodel.search.SearchUserViewModel
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.compose.SimpleUserListView
-import net.pantasystem.milktea.user.activity.UserDetailActivity
-import net.pantasystem.milktea.user.search.SearchUserViewModel
 
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {

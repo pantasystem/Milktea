@@ -12,6 +12,7 @@ import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
+import jp.panta.misskeyandroidclient.ui.users.ReportStateHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
@@ -25,7 +26,6 @@ import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.ReportState
-import net.pantasystem.milktea.user.ReportStateHandler
 
 internal class MainActivityEventCollector (
     val activity: MainActivity,

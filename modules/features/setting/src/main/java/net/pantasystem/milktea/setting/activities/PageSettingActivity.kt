@@ -100,7 +100,7 @@ class PageSettingActivity : AppCompatActivity() {
                         searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
                     startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
                 }
-                PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
+                PageType.USER_LIST -> startActivity(userListNavigation.newIntent(Unit))
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
                 PageType.USERS_GALLERY_POSTS -> {

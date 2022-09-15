@@ -24,7 +24,6 @@ import net.pantasystem.milktea.model.notification.PushNotification
 import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
-import net.pantasystem.milktea.user.activity.UserDetailActivity
 import javax.inject.Inject
 
 const val NOTIFICATION_CHANNEL_ID =

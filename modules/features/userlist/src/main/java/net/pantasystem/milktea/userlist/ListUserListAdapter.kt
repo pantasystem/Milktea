@@ -13,11 +13,14 @@ import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.userlist.databinding.ItemListUserBinding
 import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class ListUserListAdapter(
     private val userListDetailViewModel: UserListDetailViewModel,
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<UserViewData, ListUserListAdapter.VH>(ItemCallback()){
     class VH(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)
+    @FlowPreview
     class ItemCallback : DiffUtil.ItemCallback<UserViewData>(){
 
         override fun areContentsTheSame(
