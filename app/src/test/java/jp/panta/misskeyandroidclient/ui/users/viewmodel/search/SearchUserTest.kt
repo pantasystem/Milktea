@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
+import net.pantasystem.milktea.user.search.SearchUser
 import org.junit.Assert
 import org.junit.Test
 

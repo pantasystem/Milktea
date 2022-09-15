@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.account.viewmodel
+package net.pantasystem.milktea.common_viewmodel.viewmodel
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
