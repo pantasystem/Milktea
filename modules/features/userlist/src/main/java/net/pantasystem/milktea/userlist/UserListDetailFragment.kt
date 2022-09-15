@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.list
+package net.pantasystem.milktea.userlist
 
 import android.os.Bundle
 import android.view.View
@@ -6,11 +6,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentListUserListBinding
-import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.userlist.databinding.FragmentListUserListBinding
+import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
 
 @FlowPreview
 @ExperimentalCoroutinesApi

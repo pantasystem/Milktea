@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.userlist
 
 import android.content.Context
 import android.content.Intent
@@ -16,22 +16,25 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivityUserListDetailBinding
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
-import jp.panta.misskeyandroidclient.ui.list.UserListDetailFragment
-import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
-import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel
-import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.ChangedDiffResult
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
+import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
+import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.userlist.databinding.ActivityUserListDetailBinding
+import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -67,6 +70,9 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    @Inject
+    lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
+
 
     @FlowPreview
     @ExperimentalCoroutinesApi
@@ -79,10 +85,15 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     private val binding: ActivityUserListDetailBinding by dataBinding()
     val notesViewModel by viewModels<NotesViewModel>()
 
+    @Inject
+    lateinit var applyTheme: ApplyTheme
+
+    @Inject
+    lateinit var applyMenuTint: ApplyMenuTint
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
         setContentView(R.layout.activity_user_list_detail)
 
         setSupportActionBar(binding.userListToolbar)
@@ -137,7 +148,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         } else {
             addToTabItem?.setIcon(R.drawable.ic_remove_to_tab_24px)
         }
-        setMenuTint(menu)
+        applyMenuTint(this, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -156,7 +167,11 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                 val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
                     it.userId
                 } ?: return false
-                val intent = SearchAndSelectUserActivity.newIntent(this, selectedUserIds = selected)
+                val intent = searchAndSelectUserNavigation.newIntent(
+                    SearchAndSelectUserNavigationArgs(
+                        selectedUserIds = selected
+                    )
+                )
                 requestSelectUserResult.launch(intent)
             }
         }
@@ -172,7 +187,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             val data = result.data
             if (resultCode == RESULT_OK) {
                 val changedDiff =
-                    data?.getSerializableExtra(SearchAndSelectUserActivity.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
+                    data?.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
                 val added = changedDiff?.added
                 val removed = changedDiff?.removed
                 Log.d(TAG, "新たに追加:${added?.toList()}, 削除:${removed?.toList()}")

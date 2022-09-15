@@ -33,8 +33,8 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android.ui.Activities
-import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android.ui.getParentActivity
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
@@ -48,6 +48,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.userlist.ListListActivity
 import javax.inject.Inject
 
 class UserDetailNavigationImpl @Inject constructor(

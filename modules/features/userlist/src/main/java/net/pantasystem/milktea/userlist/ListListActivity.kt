@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.userlist
 
 import android.app.Activity
 import android.content.Context
@@ -13,21 +13,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivityListListBinding
-import jp.panta.misskeyandroidclient.ui.list.ListListAdapter
-import jp.panta.misskeyandroidclient.ui.list.UserListEditorDialog
-import jp.panta.misskeyandroidclient.ui.list.viewmodel.ListListViewModel
-import jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListPullPushUserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.UserListNavigation
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.userlist.databinding.ActivityListListBinding
+import net.pantasystem.milktea.userlist.viewmodel.ListListViewModel
+import net.pantasystem.milktea.userlist.viewmodel.UserListPullPushUserViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,6 +52,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     @Inject
     lateinit var accountStore: AccountStore
 
+    @Inject
+    lateinit var applyTheme: ApplyTheme
 
 
     private lateinit var mBinding: ActivityListListBinding
@@ -61,7 +61,8 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
+
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_list_list)
 
         val addUserId = intent.getSerializableExtra(EXTRA_ADD_USER_ID) as? User.Id
@@ -120,7 +121,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
     }
 
-    @OptIn(FlowPreview::class)
     @ExperimentalCoroutinesApi
     private val showUserListDetail = Observer<UserList>{ ul ->
         val intent = UserListDetailActivity.newIntent(this, ul.id)
@@ -129,7 +129,6 @@ class ListListActivity : AppCompatActivity(), ListListAdapter.OnTryToEditCallbac
 
 
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     override fun onEdit(userList: UserList?) {
         userList?: return
 

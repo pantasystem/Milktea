@@ -100,6 +100,7 @@ dependencies {
     testImplementation project(path: ':modules:api_streaming')
     implementation project(path: ':modules:common_android')
     implementation project(path: ':modules:features:setting')
+    implementation project(path: ':modules:features:userlist')
 
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'

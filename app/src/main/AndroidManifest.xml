@@ -94,8 +94,8 @@
         <activity
                 android:name=".SearchAndSelectUserActivity"
                 android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".UserListDetailActivity" />
-        <activity android:name=".ListListActivity" />
+        <activity android:name="net.pantasystem.milktea.userlist.UserListDetailActivity" />
+        <activity android:name="net.pantasystem.milktea.userlist.ListListActivity" />
         <activity android:name=".FavoriteActivity" />
         <activity android:name=".FollowFollowerActivity" />
         <activity android:name=".SearchActivity" />

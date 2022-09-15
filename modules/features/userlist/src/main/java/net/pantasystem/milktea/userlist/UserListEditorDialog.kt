@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.list
+package net.pantasystem.milktea.userlist
 
 import android.app.Dialog
 import android.os.Bundle
@@ -7,8 +7,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.DialogUserListEditorBinding
+import net.pantasystem.milktea.userlist.databinding.DialogUserListEditorBinding
 
 class UserListEditorDialog : AppCompatDialogFragment(){
 

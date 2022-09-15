@@ -9,7 +9,7 @@
 
         <variable
                 name="userListDetailViewModel"
-                type="jp.panta.misskeyandroidclient.ui.list.viewmodel.UserListDetailViewModel" />
+                type="net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel" />
 
 
     </data>
