@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.notification
+package net.pantasystem.milktea.notification
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +10,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.ItemNotificationBinding
-import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
-import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
-import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.notification.databinding.ItemNotificationBinding
+import net.pantasystem.milktea.notification.viewmodel.NotificationViewData
+import net.pantasystem.milktea.notification.viewmodel.NotificationViewModel
 
 
 class NotificationListAdapter constructor(

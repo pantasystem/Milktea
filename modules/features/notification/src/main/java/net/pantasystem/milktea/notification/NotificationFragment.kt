@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.notification
+package net.pantasystem.milktea.notification
 
 import android.os.Bundle
 import android.util.Log
@@ -12,10 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentNotificationBinding
-import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewData
-import jp.panta.misskeyandroidclient.ui.notification.viewmodel.NotificationViewModel
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
@@ -23,6 +19,9 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.notification.databinding.FragmentNotificationBinding
+import net.pantasystem.milktea.notification.viewmodel.NotificationViewData
+import net.pantasystem.milktea.notification.viewmodel.NotificationViewModel
 import javax.inject.Inject
 
 

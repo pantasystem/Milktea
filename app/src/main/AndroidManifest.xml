@@ -83,7 +83,7 @@
         <activity android:name="net.pantasystem.milktea.antenna.AntennaListActivity" />
         <activity android:name="net.pantasystem.milktea.setting.activities.PageSettingActivity" />
         <activity android:name="net.pantasystem.milktea.messaging.MessagingListActivity" />
-        <activity android:name=".NotificationsActivity" />
+        <activity android:name="net.pantasystem.milktea.notification.NotificationsActivity" />
         <activity android:name="net.pantasystem.milktea.setting.activities.ReactionSettingActivity" />
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"

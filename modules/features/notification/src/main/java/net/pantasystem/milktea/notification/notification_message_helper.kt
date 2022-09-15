@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient.ui.notification
+package net.pantasystem.milktea.notification
 
 import android.content.Context
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.notification.*
 
 

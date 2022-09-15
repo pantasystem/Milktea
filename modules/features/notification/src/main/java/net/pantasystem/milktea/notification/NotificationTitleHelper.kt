@@ -1,9 +1,8 @@
-package jp.panta.misskeyandroidclient.ui.notification
+package net.pantasystem.milktea.notification
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import net.pantasystem.milktea.model.notification.PollEndedNotification

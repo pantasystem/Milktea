@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.notification.viewmodel
+package net.pantasystem.milktea.notification.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

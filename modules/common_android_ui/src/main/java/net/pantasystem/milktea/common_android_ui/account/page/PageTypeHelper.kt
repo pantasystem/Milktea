@@ -1,8 +1,9 @@
-package net.pantasystem.milktea.setting
+package net.pantasystem.milktea.common_android_ui.account.page
 
 import android.content.Context
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.PageType.*
 
