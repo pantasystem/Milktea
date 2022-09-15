@@ -98,6 +98,8 @@ dependencies {
     implementation project(path: ':modules:common_android_ui')
     implementation project(path: ':modules:features:antenna')
     implementation project(path: ':modules:features:user')
+    implementation project(path: ':modules:features:notification')
+
 
     testImplementation project(path: ':modules:api_streaming')
     implementation project(path: ':modules:common_android')
