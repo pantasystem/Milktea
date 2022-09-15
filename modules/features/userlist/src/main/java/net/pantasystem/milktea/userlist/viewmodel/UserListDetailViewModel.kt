@@ -19,8 +19,6 @@ import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class UserListDetailViewModel @AssistedInject constructor(
     private val userListStore: UserListStore,
     private val userViewDataFactory: UserViewData.Factory,

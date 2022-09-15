@@ -16,8 +16,6 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -37,8 +35,6 @@ import net.pantasystem.milktea.userlist.databinding.ActivityUserListDetailBindin
 import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 @AndroidEntryPoint
 class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmittedListener {
 
@@ -74,9 +70,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
 
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
+    private val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
         UserListDetailViewModel.provideFactory(assistedFactory, listId)
     }
@@ -179,9 +173,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
-    val requestSelectUserResult =
+    private val requestSelectUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val resultCode = result.resultCode
             val data = result.data

@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
-import jp.panta.misskeyandroidclient.ui.users.SearchUserFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
@@ -34,6 +33,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.user.search.SearchUserFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
