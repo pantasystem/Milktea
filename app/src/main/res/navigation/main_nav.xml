@@ -11,7 +11,7 @@
             android:label="@string/menu_home" />
     <fragment
             android:id="@+id/navigation_notification"
-            android:name="jp.panta.misskeyandroidclient.ui.notification.NotificationMentionFragment"
+            android:name="net.pantasystem.milktea.notification.NotificationMentionFragment"
             android:label="@string/notification" />
     <fragment
             android:id="@+id/navigation_search"

@@ -1,8 +1,7 @@
-package jp.panta.misskeyandroidclient.ui.notification
+package net.pantasystem.milktea.notification
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.UnknownNotification
 

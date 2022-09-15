@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient.ui.notification
+package net.pantasystem.milktea.notification
 
 import android.os.Bundle
 import android.view.View
@@ -9,8 +9,6 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentNotificationMentionBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
@@ -19,10 +17,11 @@ import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.account.page.PageTypeHelper
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
-import net.pantasystem.milktea.setting.PageTypeNameMap
+import net.pantasystem.milktea.notification.databinding.FragmentNotificationMentionBinding
 import javax.inject.Inject
 
 @FlowPreview
@@ -40,18 +39,17 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val pageableTypeNameMap = PageTypeNameMap(view.context)
 
         val pagerItems = listOf(
             TitleWithPageable(
-                pageableTypeNameMap.get(PageType.NOTIFICATION),
+                PageTypeHelper.nameByPageType(requireContext(), PageType.NOTIFICATION),
                 PageableTemplate(null)
-                    .notification(pageableTypeNameMap.get(PageType.NOTIFICATION)).pageable(),
+                    .notification(PageTypeHelper.nameByPageType(requireContext(), PageType.NOTIFICATION)).pageable(),
             ),
             TitleWithPageable(
-                pageableTypeNameMap.get(PageType.MENTION),
+                PageTypeHelper.nameByPageType(requireContext(), PageType.MENTION),
                 PageableTemplate(null)
-                    .mention(pageableTypeNameMap.get(PageType.MENTION)).pageable(),
+                    .mention(PageTypeHelper.nameByPageType(requireContext(), PageType.MENTION)).pageable(),
             )
         )
 

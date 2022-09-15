@@ -10,7 +10,7 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
-import jp.panta.misskeyandroidclient.ui.notification.notificationMessageScope
+import net.pantasystem.milktea.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChangedBy

@@ -1,6 +1,5 @@
-package jp.panta.misskeyandroidclient.ui.notification.viewmodel
+package net.pantasystem.milktea.notification.viewmodel
 
-import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
@@ -8,6 +7,7 @@ import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.notification.R
 
 class NotificationViewData(
     val notification: NotificationRelation,
