@@ -11,8 +11,8 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.user.User
@@ -47,6 +47,7 @@ class UserDetailViewModel @AssistedInject constructor(
 
     private val logger = loggerFactory.create("UserDetailViewModel")
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val accountWatcher = CurrentAccountWatcher(userId?.accountId, accountRepository)
 
 
     val userState = when {
@@ -86,7 +87,7 @@ class UserDetailViewModel @AssistedInject constructor(
             }.map { note ->
                 PlaneNoteViewData(
                     note,
-                    getAccount(),
+                    accountWatcher.getAccount(),
                     noteCaptureAPIAdapter,
                     translationStore
                 )
@@ -114,20 +115,22 @@ class UserDetailViewModel @AssistedInject constructor(
         require(userId != null || fqdnUserName != null) {
             "userIdかfqdnUserNameのいずれかが指定されている必要があります。"
         }
-        load()
+        sync()
     }
 
-    fun load() {
-        viewModelScope.launch(dispatcher) {
+
+    fun sync() {
+        viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                findUser()
+                getUserId()
+            }.mapCatching { userId ->
+                userRepository.sync(userId).getOrThrow()
             }.onFailure {
-                logger.error("読み込みエラー", e = it)
-            }.onSuccess { u ->
-                logger.debug("user:$u")
+                logger.error("user sync error", it)
             }
         }
     }
+
 
     fun changeFollow() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -238,44 +241,28 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     private suspend fun findUser(): User {
-        val u = userId?.let {
-            runCatching {
-                userRepository.find(userId!!, true)
-            }.onSuccess {
-                logger.debug("ユーザー取得成功:$it")
-            }.onFailure {
-                logger.error("ユーザー取得失敗", e = it)
-            }.getOrNull()
-        } ?: fqdnUserName?.let {
-            val account = getAccount()
-            val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
-            val userName = userNameAndHost[0]
-            val host = userNameAndHost.getOrNull(1)
-            runCatching {
-                userRepository.findByUserName(account.accountId, userName, host, true)
-            }.onFailure {
-                logger.error("ユーザー取得失敗", e = it)
-            }.onSuccess {
-                logger.debug("ユーザー取得成功: $it")
-            }.getOrNull()
-        }
-        return u!!
+        return userRepository.find(getUserId())
     }
 
-    private var mAc: Account? = null
-    private suspend fun getAccount(): Account {
-        if (mAc != null) {
-            return mAc!!
-        }
+    private fun splitUserNameAndHost(acct: String): Pair<String, String?> {
+        val userNameAndHost = acct.split("@").filter { it.isNotBlank() }
+        val userName = userNameAndHost[0]
+        val host = userNameAndHost.getOrNull(1)
+        return userName to host
+    }
+
+    private suspend fun getUserId(): User.Id {
         if (userId != null) {
-            mAc = accountRepository.get(userId.accountId).getOrThrow()
-            return mAc!!
+            return userId
         }
 
-        mAc = accountRepository.getCurrentAccount().getOrThrow()
-        return mAc!!
+        val account = accountWatcher.getAccount()
+        if (fqdnUserName != null) {
+            val (userName, host) = splitUserNameAndHost(fqdnUserName)
+            return userRepository.findByUserName(account.accountId, userName, host).id
+        }
+        throw IllegalStateException()
     }
-
 }
 
 @Suppress("UNCHECKED_CAST")

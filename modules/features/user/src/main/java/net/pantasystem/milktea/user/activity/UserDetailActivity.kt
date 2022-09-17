@@ -43,9 +43,11 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
+import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.user.PinNoteFragment
 import net.pantasystem.milktea.user.R
+import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
@@ -189,7 +191,7 @@ class UserDetailActivity : AppCompatActivity() {
         Log.d("UserDetailActivity", "userName:$userName")
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        net.pantasystem.milktea.note.view.ActionNoteHandler(
+        ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],
@@ -203,7 +205,7 @@ class UserDetailActivity : AppCompatActivity() {
 
             val isEnableGallery =
                 misskeyAPIProvider.get(ar.instanceDomain) is MisskeyAPIV1275
-            mViewModel.load()
+            mViewModel.sync()
             mViewModel.user.observe(this) { detail ->
                 if (detail != null) {
                     val adapter = UserTimelinePagerAdapterV2(ar, detail.id.id, isEnableGallery)
@@ -315,42 +317,8 @@ class UserDetailActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_user_menu, menu)
 
-        val state = mViewModel.userState.value
-        Log.d("UserDetailActivity", "onCreateOptionsMenu: state:$state")
-
-        val block = menu.findItem(R.id.block)
-        val mute = menu.findItem(R.id.mute)
-        val unblock = menu.findItem(R.id.unblock)
-        val unmute = menu.findItem(R.id.unmute)
-        val report = menu.findItem(R.id.report_user)
-        mute?.isVisible = !(state?.isMuting ?: false)
-        block?.isVisible = !(state?.isBlocking ?: false)
-        unblock?.isVisible = (state?.isBlocking ?: false)
-        unmute?.isVisible = (state?.isMuting ?: false)
-        if (mViewModel.isMine.value) {
-            block?.isVisible = false
-            mute?.isVisible = false
-            unblock?.isVisible = false
-            unmute?.isVisible = false
-            report?.isVisible = false
-        }
-
-        val tab = menu.findItem(R.id.nav_add_to_tab)
-        val page = accountStore.currentAccount?.pages?.firstOrNull {
-            val pageable = it.pageable()
-            if (pageable is Pageable.UserTimeline) {
-                pageable.userId == mUserId?.id
-            } else {
-                false
-            }
-        }
-        if (page == null) {
-            tab?.setIcon(R.drawable.ic_add_to_tab_24px)
-        } else {
-            tab?.setIcon(R.drawable.ic_remove_to_tab_24px)
-        }
-
-        applyMenuTint(this, menu)
+        UserDetailActivityMenuBinder(this, mViewModel, applyMenuTint, accountStore)
+            .bind(menu)
 
         return super.onCreateOptionsMenu(menu)
     }
