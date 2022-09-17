@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.search
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,18 +16,24 @@ import androidx.compose.ui.platform.ComposeView
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivitySearchBinding
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.compose.SimpleUserListView
+import net.pantasystem.milktea.search.databinding.ActivitySearchBinding
 import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.user.compose.SimpleUserListView
 import net.pantasystem.milktea.user.search.SearchUserViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
     companion object{
-        const val EXTRA_SEARCH_WORD = "jp.panta.misskeyandroidclient.SearchActivity.EXTRA_SEARCH_WORD"
+        const val EXTRA_SEARCH_WORD = "net.pantasystem.milktea.search.SearchActivity.EXTRA_SEARCH_WORD"
     }
+
+    @Inject
+    internal lateinit var applyTheme: ApplyTheme
+
 
     private var mSearchView: SearchView? = null
 
@@ -40,7 +46,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
 
         setContentView(R.layout.activity_search)
         setSupportActionBar(binding.searchToolbar)

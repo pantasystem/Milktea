@@ -77,7 +77,7 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name=".DraftNotesActivity" />
+        <activity android:name="net.pantasystem.milktea.note.DraftNotesActivity" />
         <activity android:name="net.pantasystem.milktea.user.activity.SortedUsersActivity" />
         <activity android:name="net.pantasystem.milktea.antenna.AntennaEditorActivity" />
         <activity android:name="net.pantasystem.milktea.antenna.AntennaListActivity" />
@@ -96,11 +96,11 @@
                 android:windowSoftInputMode="adjustResize" />
         <activity android:name="net.pantasystem.milktea.userlist.UserListDetailActivity" />
         <activity android:name="net.pantasystem.milktea.userlist.ListListActivity" />
-        <activity android:name=".FavoriteActivity" />
+        <activity android:name="net.pantasystem.milktea.favorite.FavoriteActivity" />
         <activity android:name="net.pantasystem.milktea.user.activity.FollowFollowerActivity" />
-        <activity android:name=".SearchActivity" />
+        <activity android:name="net.pantasystem.milktea.search.SearchActivity" />
         <activity
-                android:name=".SearchResultActivity"
+                android:name="net.pantasystem.milktea.search.SearchResultActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

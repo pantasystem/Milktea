@@ -1,9 +1,8 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id('kotlin-kapt')
-    id('dagger.hilt.android.plugin')
-
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -32,17 +31,12 @@ android {
     }
 
     buildFeatures {
-        compose true
         dataBinding true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = compose_version
-    }
-
 }
 
 dependencies {
+
     implementation libs.androidx.core.ktx
     implementation libs.appcompat.appcompat
     implementation libs.android.material.material
@@ -54,22 +48,13 @@ dependencies {
     implementation project(path: ':modules:data')
     implementation project(path: ':modules:common')
     implementation project(path: ':modules:model')
-    implementation project(path: ':modules:api')
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_resource')
     implementation project(path: ':modules:common_compose')
     implementation project(path: ':modules:common_viewmodel')
     implementation project(path: ':modules:common_android_ui')
     implementation project(path: ':modules:common_navigation')
-
-
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-
-    implementation libs.lifecycle.extenstions
-    implementation libs.lifecycle.viewmodel
-    implementation libs.lifecycle.livedata
-    implementation libs.activity.ktx
+    implementation project(path: ':modules:features:note')
 
     // hilt
     implementation libs.hilt.android
@@ -79,30 +64,14 @@ dependencies {
     testImplementation libs.hilt.android.testing
     kaptTest libs.hilt.compiler
 
-    // compose
-    implementation libs.bundles.compose.ui
-    implementation libs.bundles.compose.foundation
-    implementation libs.bundles.compose.material
-    androidTestImplementation libs.compose.ui.ui.test.junit4
-    implementation libs.compose.runtime.runtime.livedata
-    implementation libs.android.material.compose.theme.adapter
-    implementation libs.accompanist.swiperefresh
-    implementation libs.activity.compose
-    implementation libs.accompanist.pager
-    implementation libs.accompanist.pager.indicators
-    implementation libs.coil.compose
-
-
     implementation libs.kotlin.datetime
 
     implementation libs.wada811.databinding
     implementation libs.fragment.ktx
 
-    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
-
-    implementation libs.flexbox
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation "com.squareup.retrofit2:retrofit:$retrofit"
-
+    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.viewmodel
+    implementation libs.lifecycle.livedata
+    implementation libs.activity.ktx
 
 }

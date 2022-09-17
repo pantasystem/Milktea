@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.ui.explore
+package net.pantasystem.milktea.search.explore
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,9 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.user.query.*
@@ -34,9 +31,8 @@ import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCard
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
+import net.pantasystem.milktea.search.R
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class ExploreFragment : Fragment() {
 
@@ -121,6 +117,7 @@ class ExploreFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
 
         val queries = when (ExploreType.values()[requireArguments().getInt("type")]) {

@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.search
 
 import android.app.Activity
 import android.content.Context
@@ -17,13 +17,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivitySearchResultBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.SearchNavigation
@@ -33,6 +34,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.search.databinding.ActivitySearchResultBinding
 import net.pantasystem.milktea.user.search.SearchUserFragment
 import javax.inject.Inject
 
@@ -40,7 +42,7 @@ import javax.inject.Inject
 class SearchResultActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_SEARCH_WORLD =
-            "jp.panta.misskeyandroidclient.SearchResultActivity.EXTRA_SEARCH_WORLD"
+            "net.pantasystem.milktea.search.SearchResultActivity.EXTRA_SEARCH_WORLD"
 
         private const val SEARCH_NOTES = 0
         private const val SEARCH_USERS = 1
@@ -64,10 +66,15 @@ class SearchResultActivity : AppCompatActivity() {
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    @Inject
+    internal lateinit var applyTheme: ApplyTheme
+
+    @Inject
+    internal lateinit var applyMenuTint: ApplyMenuTint
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
         setContentView(R.layout.activity_search_result)
         setSupportActionBar(binding.searchResultToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -113,7 +120,7 @@ class SearchResultActivity : AppCompatActivity() {
         } else {
             item.setIcon(R.drawable.ic_add_to_tab_24px)
         }
-        setMenuTint(menu)
+        applyMenuTint(this, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
