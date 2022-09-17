@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import jp.panta.misskeyandroidclient.MainNavigationImpl
 import net.pantasystem.milktea.user.activity.SearchAndSelectUserNavigationImpl
-import jp.panta.misskeyandroidclient.SearchNavigationImpl
+import net.pantasystem.milktea.search.SearchNavigationImpl
 import net.pantasystem.milktea.user.activity.UserDetailNavigationImpl
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation

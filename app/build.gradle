@@ -99,6 +99,7 @@ dependencies {
     implementation project(path: ':modules:features:antenna')
     implementation project(path: ':modules:features:user')
     implementation project(path: ':modules:features:notification')
+    implementation project(path: ':modules:features:search')
 
 
     testImplementation project(path: ':modules:api_streaming')

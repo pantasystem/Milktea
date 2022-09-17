@@ -98,9 +98,9 @@
         <activity android:name="net.pantasystem.milktea.userlist.ListListActivity" />
         <activity android:name=".FavoriteActivity" />
         <activity android:name="net.pantasystem.milktea.user.activity.FollowFollowerActivity" />
-        <activity android:name=".SearchActivity" />
+        <activity android:name="net.pantasystem.milktea.search.SearchActivity" />
         <activity
-                android:name=".SearchResultActivity"
+                android:name="net.pantasystem.milktea.search.SearchResultActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

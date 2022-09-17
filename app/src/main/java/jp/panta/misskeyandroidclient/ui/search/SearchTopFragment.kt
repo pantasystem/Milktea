@@ -18,16 +18,16 @@ import androidx.lifecycle.Lifecycle
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.SearchActivity
 import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
 import jp.panta.misskeyandroidclient.setMenuTint
-import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
 import jp.panta.misskeyandroidclient.ui.explore.ExploreType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ui.ToolbarSetter
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.search.SearchActivity
 import javax.inject.Inject
 
 
