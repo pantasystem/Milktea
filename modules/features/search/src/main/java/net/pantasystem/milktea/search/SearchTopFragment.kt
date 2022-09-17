@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package jp.panta.misskeyandroidclient.ui.search
+package net.pantasystem.milktea.search
 
 import android.content.Context
 import android.content.Intent
@@ -17,17 +17,15 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Lifecycle
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.R
-import jp.panta.misskeyandroidclient.databinding.FragmentSearchTopBinding
-import jp.panta.misskeyandroidclient.setMenuTint
-import jp.panta.misskeyandroidclient.ui.explore.ExploreFragment
-import jp.panta.misskeyandroidclient.ui.explore.ExploreType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.search.SearchActivity
+import net.pantasystem.milktea.search.databinding.FragmentSearchTopBinding
+import net.pantasystem.milktea.search.explore.ExploreFragment
+import net.pantasystem.milktea.search.explore.ExploreType
 import javax.inject.Inject
 
 
@@ -37,6 +35,9 @@ import javax.inject.Inject
 class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
 
     private val mBinding: FragmentSearchTopBinding by dataBinding()
+
+    @Inject
+    internal lateinit var applyMenuTint: ApplyMenuTint
 
     @Inject
     internal lateinit var pageableFragmentFactory: PageableFragmentFactory
@@ -50,7 +51,7 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.search_top_menu, menu)
-                requireActivity().setMenuTint(menu)
+                applyMenuTint(requireActivity(), menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {

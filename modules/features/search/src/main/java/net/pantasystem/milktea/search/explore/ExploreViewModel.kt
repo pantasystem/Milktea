@@ -1,12 +1,12 @@
-package jp.panta.misskeyandroidclient.ui.explore
+package net.pantasystem.milktea.search.explore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
@@ -22,8 +22,11 @@ import javax.inject.Inject
 class ExploreViewModel @Inject constructor(
     val accountStore: AccountStore,
     val userDataSource: UserDataSource,
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
+    val logger = loggerFactory.create("ExploreViewModel")
+
     private val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
 
     private val rawLoadingStates =
@@ -87,7 +90,7 @@ class ExploreViewModel @Inject constructor(
             ExploreUiState(it)
         }
     }.catch { e ->
-        FirebaseCrashlytics.getInstance().recordException(e)
+        logger.error("get explores error", e)
     }.distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
 

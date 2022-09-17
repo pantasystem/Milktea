@@ -15,7 +15,7 @@
             android:label="@string/notification" />
     <fragment
             android:id="@+id/navigation_search"
-            android:name="jp.panta.misskeyandroidclient.ui.search.SearchTopFragment"
+            android:name="net.pantasystem.milktea.search.SearchTopFragment"
             android:label="@string/search" />
     <fragment
             android:id="@+id/navigation_message_list"
