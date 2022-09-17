@@ -43,6 +43,7 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
+import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.user.PinNoteFragment
 import net.pantasystem.milktea.user.R
@@ -189,7 +190,7 @@ class UserDetailActivity : AppCompatActivity() {
         Log.d("UserDetailActivity", "userName:$userName")
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        net.pantasystem.milktea.note.view.ActionNoteHandler(
+        ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],
@@ -203,7 +204,7 @@ class UserDetailActivity : AppCompatActivity() {
 
             val isEnableGallery =
                 misskeyAPIProvider.get(ar.instanceDomain) is MisskeyAPIV1275
-            mViewModel.load()
+            mViewModel.sync()
             mViewModel.user.observe(this) { detail ->
                 if (detail != null) {
                     val adapter = UserTimelinePagerAdapterV2(ar, detail.id.id, isEnableGallery)
