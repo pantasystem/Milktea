@@ -77,7 +77,7 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name=".DraftNotesActivity" />
+        <activity android:name="net.pantasystem.milktea.note.DraftNotesActivity" />
         <activity android:name="net.pantasystem.milktea.user.activity.SortedUsersActivity" />
         <activity android:name="net.pantasystem.milktea.antenna.AntennaEditorActivity" />
         <activity android:name="net.pantasystem.milktea.antenna.AntennaListActivity" />

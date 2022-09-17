@@ -7,6 +7,7 @@ import net.pantasystem.milktea.channel.ChannelActivity
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.gallery.GalleryPostsActivity
 import net.pantasystem.milktea.group.GroupActivity
+import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.setting.activities.SettingsActivity
 
 internal class StartActivityFromNavDrawerItems(

@@ -6,7 +6,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".DraftNotesActivity">
+            tools:context="net.pantasystem.milktea.note.DraftNotesActivity">
 
 
         <androidx.fragment.app.FragmentContainerView
@@ -14,7 +14,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:name="net.pantasystem.milktea.note.draft.DraftNotesFragment"
-                tools:layout="@layout/fragment_draft_notes"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 />
 
