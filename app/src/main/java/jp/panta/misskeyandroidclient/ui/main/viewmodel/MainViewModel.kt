@@ -11,15 +11,15 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
+import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.Getters
-import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
     unreadMessages: UnReadMessages,
     loggerFactory: Logger.Factory,
     private val notificationRepository: NotificationRepository,
-    private val getters: Getters,
+    private val notificationRelationGetter: NotificationRelationGetter,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val socketProvider: SocketWithAccountProvider,
     private val configRepository: LocalConfigRepository,
@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor(
             ac to it
         }
     }.map {
-        getters.notificationRelationGetter.get(it.first, it.second.body)
+        notificationRelationGetter.get(it.first, it.second.body)
     }.flowOn(Dispatchers.IO).catch { e ->
         logger.error("通知取得エラー", e = e)
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())

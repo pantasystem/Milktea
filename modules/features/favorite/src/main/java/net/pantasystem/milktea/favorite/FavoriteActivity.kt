@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient
+package net.pantasystem.milktea.favorite
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -7,10 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
+import net.pantasystem.milktea.favorite.databinding.ActivityFavoriteBinding
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -29,9 +30,12 @@ class FavoriteActivity : AppCompatActivity() {
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    @Inject
+    internal lateinit var applyTheme: ApplyTheme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme()
+        applyTheme()
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_favorite)
         setSupportActionBar(mBinding.favoriteToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
