@@ -178,6 +178,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.unmute(it.id)
+                    userRepository.sync(it.id)
                 }.onSuccess {
 
                 }.onFailure {
@@ -192,6 +193,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.block(it.id)
+                    userRepository.sync(it.id)
                 }.onSuccess {
 
                 }
