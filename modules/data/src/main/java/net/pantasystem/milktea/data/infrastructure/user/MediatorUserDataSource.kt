@@ -188,13 +188,22 @@ class MediatorUserDataSource @Inject constructor(
 
 
     override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
-        return userDao.observeInServerIds(accountId, serverIds).map { list ->
-            list.map { user ->
-                user.toModel()
+        return serverIds.chunked(50).map {
+            userDao.observeInServerIds(accountId, serverIds).onStart {
+                emit(emptyList())
+            }.distinctUntilChanged().map { list ->
+                list.map {
+                    it.toModel()
+                }
+            }.distinctUntilChanged()
+        }.merge().map { list ->
+            val hash = list.associateBy {
+                it.id.id
             }
-        }.flowOn(Dispatchers.IO).onEach {
-            inMem.addAll(it)
-        }.distinctUntilChanged().catch {
+            serverIds.mapNotNull {
+                hash[it]
+            }
+        }.distinctUntilChanged().flowOn(Dispatchers.IO).catch {
             logger.error("observeIn error", it)
             throw it
         }
