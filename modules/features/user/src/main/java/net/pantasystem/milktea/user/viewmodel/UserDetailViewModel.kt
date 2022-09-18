@@ -164,8 +164,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.mute(it.id)
-                }.onSuccess {
-
+                    userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
                 }
@@ -178,9 +177,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.unmute(it.id)
-                    userRepository.sync(it.id)
-                }.onSuccess {
-
+                    userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
                 }
@@ -194,8 +191,8 @@ class UserDetailViewModel @AssistedInject constructor(
                 runCatching {
                     userRepository.block(it.id)
                     userRepository.sync(it.id)
-                }.onSuccess {
-
+                }.onFailure {
+                    logger.error("block failed", it)
                 }
             }
         }
