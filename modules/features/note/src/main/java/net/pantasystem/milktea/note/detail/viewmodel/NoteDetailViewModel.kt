@@ -45,7 +45,8 @@ class NoteDetailViewModel @AssistedInject constructor(
         noteCaptureAdapter,
         noteTranslationStore,
         { account -> urlPreviewStoreProvider.getUrlPreviewStore(account) },
-        viewModelScope
+        viewModelScope,
+        noteRelationGetter
     )
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)

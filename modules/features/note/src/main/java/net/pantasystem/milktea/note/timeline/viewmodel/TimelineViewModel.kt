@@ -33,7 +33,7 @@ class TimelineViewModel @AssistedInject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     noteStreaming: NoteStreaming,
     accountRepository: AccountRepository,
-    private val noteRelationGetter: NoteRelationGetter,
+    noteRelationGetter: NoteRelationGetter,
     loggerFactory: Logger.Factory,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
@@ -69,10 +69,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
-            val relations = list.mapNotNull {
-                noteRelationGetter.get(it).getOrNull()
-            }
-            cache.getIn(relations)
+            cache.getByIds(list)
         }
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, PageableState.Loading.Init())
 
@@ -92,7 +89,8 @@ class TimelineViewModel @AssistedInject constructor(
         noteCaptureAPIAdapter,
         noteTranslationStore,
         { account -> urlPreviewStoreProvider.getUrlPreviewStore(account) },
-        viewModelScope
+        viewModelScope,
+        noteRelationGetter,
     )
 
     init {

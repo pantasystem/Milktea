@@ -8,6 +8,7 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
@@ -23,6 +24,7 @@ class PlaneNoteViewDataCache(
     private val translationStore: NoteTranslationStore,
     private val GetUrlPreviewStore: suspend (Account) -> UrlPreviewStore?,
     private val coroutineScope: CoroutineScope,
+    private val noteRelationGetter: NoteRelationGetter,
 ) {
 
     private val lock = Mutex()
@@ -39,6 +41,27 @@ class PlaneNoteViewDataCache(
             relations.map {
                 getUnThreadSafe(it)
             }
+        }
+    }
+
+    suspend fun getByIds(ids: List<Note.Id>): List<PlaneNoteViewData> {
+        val notExistsIds = lock.withLock {
+            ids.filter {
+                cache[it] == null
+            }
+        }
+        val exists = lock.withLock {
+            ids.mapNotNull {
+                cache[it]
+            }
+        }
+        val relations = noteRelationGetter.getIn(notExistsIds)
+        val newList = getIn(relations)
+        val map = (exists + newList).associateBy {
+            it.id
+        }
+        return ids.mapNotNull {
+            map[it]
         }
     }
 
