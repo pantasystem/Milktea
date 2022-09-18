@@ -41,13 +41,22 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>> = runCatching {
-
+    override suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean): Result<List<User>> = runCatching {
         withContext(Dispatchers.IO) {
-            userDao.getInServerIds(accountId, serverIds).map {
-                it.toModel()
-            }.also {
+            val list = serverIds.distinct().chunked(100).map {
+                userDao.getInServerIds(accountId, serverIds).map {
+                    it.toModel()
+                }
+            }.flatten().also {
                 inMem.addAll(it).getOrThrow()
+            }
+            if (!keepInOrder) {
+                list
+            } else {
+                val hash = list.associateBy { it.id.id }
+                serverIds.mapNotNull {
+                    hash[it]
+                }
             }
         }
     }
@@ -188,13 +197,20 @@ class MediatorUserDataSource @Inject constructor(
 
 
     override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
-        return userDao.observeInServerIds(accountId, serverIds).map { list ->
-            list.map { user ->
-                user.toModel()
+        return serverIds.distinct().chunked(50).map {
+            userDao.observeInServerIds(accountId, serverIds).distinctUntilChanged().map { list ->
+                list.map {
+                    it.toModel()
+                }
+            }.distinctUntilChanged()
+        }.merge().map { list ->
+            val hash = list.associateBy {
+                it.id.id
             }
-        }.flowOn(Dispatchers.IO).onEach {
-            inMem.addAll(it)
-        }.distinctUntilChanged().catch {
+            serverIds.mapNotNull {
+                hash[it]
+            }
+        }.distinctUntilChanged().flowOn(Dispatchers.IO).catch {
             logger.error("observeIn error", it)
             throw it
         }

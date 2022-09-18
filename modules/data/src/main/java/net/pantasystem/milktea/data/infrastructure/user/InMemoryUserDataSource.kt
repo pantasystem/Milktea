@@ -45,7 +45,7 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         } ?: throw UserNotFoundException(userId)
     }
 
-    override suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>> {
+    override suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean): Result<List<User>> {
         val userIds = serverIds.map {
             User.Id(accountId, it)
         }

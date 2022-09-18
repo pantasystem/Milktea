@@ -142,11 +142,9 @@ class UserDetailViewModel @AssistedInject constructor(
                     } else {
                         userRepository.follow(user.id)
                     }
-                    userRepository.find(user.id) as User.Detail
-                }.onSuccess {
-
+                    userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
-                    logger.error("unmute", e = it)
+                    logger.error("unmute failed", e = it)
                 }
             }
 
@@ -166,8 +164,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.mute(it.id)
-                }.onSuccess {
-
+                    userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
                 }
@@ -180,8 +177,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.unmute(it.id)
-                }.onSuccess {
-
+                    userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
                 }
@@ -194,8 +190,9 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.block(it.id)
-                }.onSuccess {
-
+                    userRepository.sync(it.id)
+                }.onFailure {
+                    logger.error("block failed", it)
                 }
             }
         }
@@ -206,9 +203,9 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCatching {
                     userRepository.unblock(it.id)
-                    (userRepository.find(it.id, true) as User.Detail)
-                }.onSuccess {
-
+                    userRepository.sync(it.id).getOrThrow()
+                }.onFailure {
+                    logger.info("unblock failed", e = it)
                 }
             }
         }
