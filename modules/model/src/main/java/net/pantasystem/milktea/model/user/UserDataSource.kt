@@ -32,7 +32,10 @@ interface UserDataSource {
 
     suspend fun get(userId: User.Id): Result<User>
 
-    suspend fun getIn(accountId: Long, serverIds: List<String>): Result<List<User>>
+    /**
+     * @param keepInOrder 指定したserverIdsの順番と同じように揃える場合はtrueを指定します。
+     */
+    suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean  = false): Result<List<User>>
 
     suspend fun get(accountId: Long, userName: String, host: String?): Result<User>
 
