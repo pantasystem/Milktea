@@ -198,9 +198,7 @@ class MediatorUserDataSource @Inject constructor(
 
     override fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>> {
         return serverIds.distinct().chunked(50).map {
-            userDao.observeInServerIds(accountId, serverIds).onStart {
-                emit(emptyList())
-            }.distinctUntilChanged().map { list ->
+            userDao.observeInServerIds(accountId, serverIds).distinctUntilChanged().map { list ->
                 list.map {
                     it.toModel()
                 }
