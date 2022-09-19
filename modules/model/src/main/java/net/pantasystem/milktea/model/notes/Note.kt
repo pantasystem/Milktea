@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
@@ -49,6 +50,7 @@ data class Note(
         val noteId: String
     ) : EntityId
 
+    companion object;
 
     /**
      * 引用リノートであるか
@@ -121,4 +123,54 @@ sealed class NoteRelation : JSerializable {
         override val files: List<FileProperty>?,
         val promotionId: String
     ) : NoteRelation()
+}
+
+fun Note.Companion.make(
+    id: Note.Id,
+    userId: User.Id,
+    createdAt: Instant = Clock.System.now(),
+    text: String? = null,
+    cw: String? = null,
+    replyId: Note.Id? = null,
+    renoteId: Note.Id? = null,
+    viaMobile: Boolean? = null,
+    visibility: Visibility = Visibility.Public(false),
+    localOnly: Boolean? = false,
+    visibleUserIds: List<User.Id>? = null,
+    url: String? = null,
+    uri: String? = null,
+    renoteCount: Int = 0,
+    reactionCounts: List<ReactionCount> = emptyList(),
+    emojis: List<Emoji>? = null,
+    repliesCount: Int = 0,
+    fileIds: List<FileProperty.Id>? = null,
+    poll: Poll? = null,
+    myReaction: String? = null,
+    app: AppType.Misskey? = null,
+    channelId: Channel.Id? = null,
+): Note {
+    return Note(
+        id = id,
+        userId = userId,
+        createdAt = createdAt,
+        text = text,
+        cw = cw,
+        replyId = replyId,
+        renoteId = renoteId,
+        viaMobile = viaMobile,
+        visibility = visibility,
+        localOnly = localOnly,
+        visibleUserIds = visibleUserIds,
+        url = url,
+        uri = uri,
+        renoteCount = renoteCount,
+        reactionCounts = reactionCounts,
+        emojis = emojis,
+        repliesCount = repliesCount,
+        fileIds = fileIds,
+        poll = poll,
+        myReaction = myReaction,
+        app = app,
+        channelId = channelId,
+    )
 }

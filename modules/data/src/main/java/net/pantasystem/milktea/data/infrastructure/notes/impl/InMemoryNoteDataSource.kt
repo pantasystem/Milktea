@@ -4,17 +4,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
-class InMemoryNoteDataSource @Inject constructor(
-    loggerFactory: Logger.Factory
-): NoteDataSource {
+class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
 
-    val logger = loggerFactory.create("InMemoryNoteRepository")
 
     private var notes = mapOf<Note.Id, Note>()
 

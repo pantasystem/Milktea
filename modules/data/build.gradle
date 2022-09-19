@@ -94,6 +94,7 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:30.4.0')
     implementation 'com.google.firebase:firebase-messaging'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
 
 }
 
