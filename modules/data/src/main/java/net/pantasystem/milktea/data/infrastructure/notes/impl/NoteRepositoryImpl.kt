@@ -118,7 +118,16 @@ class NoteRepositoryImpl @Inject constructor(
             return notes
         }
 
-        fetchIn(notExistsIds)
+        val notExistsAndNoteDeletedNoteIds = notExistsIds.filterNot { noteId ->
+            noteDataSource.get(noteId).fold(
+                onSuccess = { true },
+                onFailure = {
+                    it is NoteDeletedException
+                }
+            )
+        }
+
+        fetchIn(notExistsAndNoteDeletedNoteIds)
         return noteDataSource.getIn(noteIds).getOrThrow()
     }
 
@@ -207,7 +216,8 @@ class NoteRepositoryImpl @Inject constructor(
                         val account = accountMap.getValue(noteId.accountId)
                         misskeyAPIProvider.get(account).showNote(
                             NoteRequest(
-                                i = account.getI(encryption)
+                                i = account.getI(encryption),
+                                noteId = noteId.noteId,
                             )
                         ).throwIfHasError().body()?.let {
                             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
