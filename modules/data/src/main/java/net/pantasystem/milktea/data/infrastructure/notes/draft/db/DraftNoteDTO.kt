@@ -5,6 +5,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import java.util.*
 
 @Entity(
     tableName = "draft_note_table", foreignKeys = [
@@ -31,6 +32,7 @@ data class DraftNoteDTO(
     val replyId: String? = null,
     val renoteId: String? = null,
     val channelId: String? = null,
+    val scheduleWillPostAt: Date? = null,
     @Embedded val poll: DraftPollDTO?,
     @ColumnInfo(name = "draft_note_id")
     @PrimaryKey(autoGenerate = true)
@@ -55,8 +57,10 @@ data class DraftNoteDTO(
                 draftNote.replyId,
                 draftNote.renoteId,
                 draftNote.channelId?.channelId,
+                draftNote.reservationPostingAt,
                 DraftPollDTO.make(draftNote.draftPoll),
-                draftNoteId = if(draftNote.draftNoteId == 0L) null else draftNote.draftNoteId
+                draftNoteId = if(draftNote.draftNoteId == 0L) null else draftNote.draftNoteId,
+
             )
         }
     }
@@ -88,7 +92,8 @@ data class DraftNoteDTO(
             channelId = channelId?.let {
                 Channel.Id(accountId, it)
             },
-            draftNoteId = draftNoteId ?: 0L
+            draftNoteId = draftNoteId ?: 0L,
+            reservationPostingAt = scheduleWillPostAt
         )
     }
 
