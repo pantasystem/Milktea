@@ -35,7 +35,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun testAdd() {
-        val noteDataSource = InMemoryNoteDataSource(loggerFactory)
+        val noteDataSource = InMemoryNoteDataSource()
 
         val dto = NoteDTO(
             "",
@@ -66,7 +66,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun testUpdateNote(): Unit = runBlocking {
-        val noteDataSource = InMemoryNoteDataSource(loggerFactory)
+        val noteDataSource = InMemoryNoteDataSource()
 
         val dto = NoteDTO(
             "note-1",
