@@ -31,7 +31,7 @@ class NoteCaptureAPIAdapterTest {
     fun setUp() {
         loggerFactory = TestLogger.Factory()
         accountRepository = TestAccountRepository()
-        noteDataSource = InMemoryNoteDataSource(loggerFactory)
+        noteDataSource = InMemoryNoteDataSource()
     }
 
     @ExperimentalCoroutinesApi

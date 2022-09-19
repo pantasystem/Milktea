@@ -66,7 +66,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
         UserInstanceInfoRecord::class,
 
     ],
-    version = 21,
+    version = 22,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -78,7 +78,8 @@ import net.pantasystem.milktea.model.url.UrlPreview
         AutoMigration(from = 17, to = 18),
         AutoMigration(from = 18, to = 19),
         AutoMigration(from = 19, to = 20),
-        AutoMigration(from = 20, to = 21)
+        AutoMigration(from = 20, to = 21),
+        AutoMigration(from = 21, to = 22),
     ],
     views = [UserView::class, GroupMemberView::class,]
 )

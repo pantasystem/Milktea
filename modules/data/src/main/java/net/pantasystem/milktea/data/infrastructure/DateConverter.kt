@@ -14,12 +14,14 @@ class DateConverter{
     }
 
     @TypeConverter
-    fun toDate(formattedDate: String): Date{
-        return smf.parse(formattedDate)!!
+    fun toDate(formattedDate: String?): Date? {
+        formattedDate ?: return null
+        return smf.parse(formattedDate)
     }
 
     @TypeConverter
-    fun fromDate(date: Date): String{
+    fun fromDate(date: Date?): String? {
+        date?: return null
         return smf.format(date)
     }
 }
