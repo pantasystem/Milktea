@@ -8,11 +8,14 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.user.User
@@ -26,9 +29,10 @@ class UserDetailViewModel @AssistedInject constructor(
     private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
-    accountStore: AccountStore,
+    private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
     private val noteDataSource: NoteDataSource,
+    private val settingStore: SettingStore,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val noteRelationGetter: NoteRelationGetter,
@@ -233,6 +237,28 @@ class UserDetailViewModel @AssistedInject constructor(
                 logger.debug("ニックネーム削除処理成功")
             }.onFailure {
                 logger.error("ニックネーム削除失敗", e = it)
+            }
+        }
+    }
+
+    fun toggleUserTimelineTab() {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val userId = getUserId()
+                val account = accountRepository.get(userId.accountId).getOrThrow()
+                val page = account.pages.firstOrNull {
+                    val pageable = it.pageable()
+                    pageable is Pageable.UserTimeline && pageable.userId == userId.id
+                }
+                if (page == null) {
+                    accountStore.addPage(
+                        PageableTemplate(account).user(findUser(), settingStore.isUserNameDefault)
+                    )
+                } else {
+                    accountStore.removePage(page)
+                }
+            }.onFailure {
+                logger.error("toggle user timeline tab failed", it)
             }
         }
     }
