@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.setting.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -28,10 +28,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PageSettingActivity : AppCompatActivity() {
 
-    companion object{
-        const val SEARCH_AND_SELECT_USER_RESULT_CODE = 30
-        const val SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE = 31
-    }
 
     @Inject
     lateinit var applyTheme: ApplyTheme
@@ -98,7 +94,7 @@ class PageSettingActivity : AppCompatActivity() {
                 PageType.USER -> {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
-                    startActivityForResult(intent, SEARCH_AND_SELECT_USER_RESULT_CODE)
+                    launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
                 PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
@@ -106,7 +102,7 @@ class PageSettingActivity : AppCompatActivity() {
                 PageType.USERS_GALLERY_POSTS -> {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
-                    startActivityForResult(intent, SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE)
+                    launchSearchAndSelectUserForAddGalleryTab.launch(intent)
                 }
                 PageType.CHANNEL_TIMELINE -> {
                     val intent = channelNavigation.newIntent(Unit)
@@ -151,21 +147,20 @@ class PageSettingActivity : AppCompatActivity() {
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE || requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE){
-            if(resultCode == RESULT_OK && data != null){
-                val changeDiff = data.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
-                val userId = changeDiff.selected.firstOrNull()?.id
-                if(userId != null) {
-                    if(resultCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
-                        mPageSettingViewModel.addUsersGalleryById(userId)
-                    }else{
-                        mPageSettingViewModel.addUserPageById(userId)
-                    }
-                }
-            }
+
+    private val launchSearchAndSelectUserForAddGalleryTab = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK && it.data != null) {
+            val changeDiff = it.data!!.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
+            mPageSettingViewModel.addUsersGalleryByIds(changeDiff.selected)
         }
     }
+
+    private val launchSearchAndSelectUserForAddUserTimelineTab = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK && it.data != null) {
+            val changeDiff = it.data!!.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
+            mPageSettingViewModel.addUserPageByIds(changeDiff.selected)
+        }
+    }
+
 
 }

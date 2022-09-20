@@ -6,20 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import net.pantasystem.milktea.api.misskey.users.RequestUser
-import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.eventbus.EventBus
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -32,17 +26,11 @@ class PageSettingViewModel @Inject constructor(
     private val pageTypeNameMap: PageTypeNameMap,
     private val userRepository: UserRepository,
     private val accountStore: AccountStore,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val encryption: Encryption
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
-
 
     val selectedPages = MediatorLiveData<List<Page>>()
 
-    var account: Account? = null
-        get() = accountStore.currentAccount
-        private set
-
+    val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val pageAddedEvent = EventBus<PageType>()
 
@@ -51,16 +39,11 @@ class PageSettingViewModel @Inject constructor(
     val pageOnUpdateEvent = EventBus<Page>()
 
     init {
-
-        accountStore.observeCurrentAccount.filterNotNull().onEach {
-            account = it
-            selectedPages.postValue(
-                it.pages.sortedBy { p ->
-                    p.weight
-                }
-            )
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
+        viewModelScope.launch {
+            account.collect {
+                selectedPages.value = it?.pages ?: emptyList()
+            }
+        }
     }
 
     fun setList(pages: List<Page>) {
@@ -112,14 +95,16 @@ class PageSettingViewModel @Inject constructor(
         setList(list)
     }
 
-    fun addUserPageById(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun addUserPageByIds(userIds: List<User.Id>) {
+        viewModelScope.launch {
             runCatching {
-                misskeyAPIProvider.get(account!!).showUser(
-                    RequestUser(userId = userId, i = account?.getI(encryption))
-                ).throwIfHasError().body() ?: throw IllegalStateException()
-            }.onSuccess {
-                addUserPage(it)
+                userIds.map {
+                    async {
+                        userRepository.find(it)
+                    }
+                }.awaitAll()
+            }.onSuccess { list ->
+                list.map(::addUserPage)
             }.onFailure { t ->
                 Log.e("PageSettingVM", "ユーザーの取得に失敗した", t)
             }
@@ -127,27 +112,29 @@ class PageSettingViewModel @Inject constructor(
         }
     }
 
-    private fun addUserPage(user: UserDTO) {
+    private fun addUserPage(user: User) {
         val page = if (settingStore.isUserNameDefault) {
-            PageableTemplate(account!!)
-                .user(user.id, title = user.shortDisplayName)
+            PageableTemplate(account.value!!)
+                .user(user.id.id, title = user.shortDisplayName)
         } else {
-            PageableTemplate(account!!)
-                .user(user.id, title = user.displayName)
+            PageableTemplate(account.value!!)
+                .user(user.id.id, title = user.displayName)
         }
         addPage(page)
     }
 
-    fun addUsersGalleryById(userId: String) {
-        val pageable = Pageable.Gallery.User(userId = userId)
-        viewModelScope.launch(Dispatchers.IO) {
+    fun addUsersGalleryByIds(userIds: List<User.Id>) {
+        viewModelScope.launch  {
             runCatching {
-                val user = userRepository
-                    .find(User.Id(accountId = account!!.accountId, id = userId))
-                val name =
-                    if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName
-                val page = account!!.newPage(pageable, name = name)
-                addPage(page)
+                userIds.map {
+                    async {
+                        userRepository.find(it)
+                    }
+                }.awaitAll().map { user ->
+                    val name =
+                        if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName
+                    account.value!!.newPage(Pageable.Gallery.User(userId = user.id.id), name = name)
+                }.forEach(::addPage)
             }
         }
     }
@@ -164,51 +151,51 @@ class PageSettingViewModel @Inject constructor(
         val name = pageTypeNameMap.get(type)
         when (type) {
             PageType.GLOBAL -> {
-                addPage(PageableTemplate(account!!).globalTimeline(name))
+                addPage(PageableTemplate(account.value!!).globalTimeline(name))
             }
             PageType.SOCIAL -> {
-                addPage(PageableTemplate(account!!).hybridTimeline(name))
+                addPage(PageableTemplate(account.value!!).hybridTimeline(name))
             }
             PageType.LOCAL -> {
-                addPage(PageableTemplate(account!!).localTimeline(name))
+                addPage(PageableTemplate(account.value!!).localTimeline(name))
             }
             PageType.HOME -> {
-                addPage(PageableTemplate(account!!).homeTimeline(name))
+                addPage(PageableTemplate(account.value!!).homeTimeline(name))
             }
             PageType.NOTIFICATION -> {
-                addPage(PageableTemplate(account!!).notification(name))
+                addPage(PageableTemplate(account.value!!).notification(name))
             }
             PageType.FAVORITE -> {
-                addPage(PageableTemplate(account!!).favorite(name))
+                addPage(PageableTemplate(account.value!!).favorite(name))
             }
             PageType.FEATURED -> {
-                addPage(PageableTemplate(account!!).featured(name))
+                addPage(PageableTemplate(account.value!!).featured(name))
             }
             PageType.MENTION -> {
-                addPage(PageableTemplate(account!!).mention(name))
+                addPage(PageableTemplate(account.value!!).mention(name))
             }
             PageType.GALLERY_FEATURED -> addPage(
-                account!!.newPage(
+                account.value!!.newPage(
                     Pageable.Gallery.Featured, name
                 )
             )
             PageType.GALLERY_POPULAR -> addPage(
-                account!!.newPage(
+                account.value!!.newPage(
                     Pageable.Gallery.Popular, name
                 )
             )
             PageType.GALLERY_POSTS -> addPage(
-                account!!.newPage(
+                account.value!!.newPage(
                     Pageable.Gallery.Posts, name
                 )
             )
             PageType.MY_GALLERY_POSTS -> addPage(
-                account!!.newPage(
+                account.value!!.newPage(
                     Pageable.Gallery.MyPosts, name
                 )
             )
             PageType.I_LIKED_GALLERY_POSTS -> addPage(
-                account!!.newPage(
+                account.value!!.newPage(
                     Pageable.Gallery.ILikedPosts,
                     name
                 )

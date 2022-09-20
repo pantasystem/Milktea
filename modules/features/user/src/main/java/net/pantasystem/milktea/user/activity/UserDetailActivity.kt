@@ -35,11 +35,9 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
@@ -107,8 +105,6 @@ class UserDetailActivity : AppCompatActivity() {
 
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
-
-    private val accountViewModel: AccountViewModel by viewModels()
 
 
     @ExperimentalCoroutinesApi
@@ -398,34 +394,6 @@ class UserDetailActivity : AppCompatActivity() {
 
     @ExperimentalCoroutinesApi
     private fun addPageToTab() {
-        val user = mViewModel.user.value
-        user ?: return
-
-        val page = accountStore.currentAccount?.pages?.firstOrNull {
-            val pageable = it.pageable()
-            if (pageable is Pageable.UserTimeline) {
-                pageable.userId == mUserId?.id && mUserId != null
-            } else {
-                false
-            }
-        }
-        val isAdded = page != null
-        if (isAdded) {
-            accountViewModel.removePage(page!!)
-        } else {
-            accountViewModel.addPage(
-                Page(
-                    accountStore.currentAccountId ?: -1,
-                    title = user.displayUserName,
-                    weight = -1,
-                    pageable = Pageable.UserTimeline(
-                        userId = user.id.id
-                    )
-                )
-            )
-
-
-        }
-
+        mViewModel.toggleUserTimelineTab()
     }
 }
