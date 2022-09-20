@@ -198,7 +198,7 @@ dependencies {
     implementation libs.wada811.databinding
 
     implementation libs.fragment.ktx
-    implementation platform('com.google.firebase:firebase-bom:30.4.0')
+    implementation platform('com.google.firebase:firebase-bom:30.5.0')
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics-ktx'
