@@ -251,7 +251,7 @@ sealed class Pageable : Serializable{
 
         data class User(val userId: String) : Gallery(), UntilPaginate, SincePaginate {
             override fun toParams(): PageParams {
-                return PageParams(type = PageType.USERS_GALLERY_POSTS)
+                return PageParams(type = PageType.USERS_GALLERY_POSTS, userId = userId)
             }
         }
 
