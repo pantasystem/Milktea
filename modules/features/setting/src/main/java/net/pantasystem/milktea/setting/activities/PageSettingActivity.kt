@@ -156,13 +156,10 @@ class PageSettingActivity : AppCompatActivity() {
         if(requestCode == SEARCH_AND_SELECT_USER_RESULT_CODE || requestCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE){
             if(resultCode == RESULT_OK && data != null){
                 val changeDiff = data.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
-                val userId = changeDiff.selected.firstOrNull()?.id
-                if(userId != null) {
-                    if(resultCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
-                        mPageSettingViewModel.addUsersGalleryById(userId)
-                    }else{
-                        mPageSettingViewModel.addUserPageById(userId)
-                    }
+                if(resultCode == SEARCH_AND_SELECT_USER_FOR_GALLERY_CODE) {
+                    mPageSettingViewModel.addUsersGalleryByIds(changeDiff.selected)
+                }else{
+                    mPageSettingViewModel.addUserPageByIds(changeDiff.selected)
                 }
             }
         }
