@@ -10,7 +10,6 @@ import androidx.lifecycle.*
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
-import net.pantasystem.milktea.notification.notificationMessageScope
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -25,6 +24,7 @@ import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.ReportState
+import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
 
 internal class MainActivityEventCollector (
@@ -146,10 +146,12 @@ internal class MainActivityEventCollector (
         lifecycleScope.launch {
             lifecycleOwner.whenResumed {
                 // NOTE: 通知音を再生する
-                if (ringtone.isPlaying) {
-                    ringtone.stop()
+                mainViewModel.newNotifications.collect {
+                    if (ringtone.isPlaying) {
+                        ringtone.stop()
+                    }
+                    ringtone.play()
                 }
-                ringtone.play()
             }
         }
     }
