@@ -9,6 +9,8 @@ import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.app_store.notes.PollExpiresAt
 import net.pantasystem.milktea.app_store.notes.expiresAt
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
@@ -23,12 +25,9 @@ class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateS
 
         val viewModel = mViewModel
         val date = viewModel.poll.value?.expiresAt?.expiresAt()?: Clock.System.now()
+        val local = date.toLocalDateTime(TimeZone.currentSystemDefault())
 
-
-        val calendar = Calendar.getInstance()
-        calendar.time = Date(date.toEpochMilliseconds())
-
-        return DatePickerDialog(requireActivity(), this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+        return DatePickerDialog(requireActivity(), this, local.year, local.monthNumber - 1, local.dayOfMonth)
 
     }
 

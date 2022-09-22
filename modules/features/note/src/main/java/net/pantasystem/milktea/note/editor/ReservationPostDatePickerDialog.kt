@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.widget.DatePicker
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import java.util.*
 
@@ -17,13 +20,10 @@ class ReservationPostDatePickerDialog : AppCompatDialogFragment(), DatePickerDia
 
         val viewModel  = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
         mViewModel = viewModel
-        val date = viewModel.reservationPostingAt.value
+        val date = viewModel.state.value.reservationPostingAt ?: Clock.System.now()
+        val local = date.toLocalDateTime(TimeZone.currentSystemDefault())
 
-        val calendar = Calendar.getInstance()
-        calendar.time = date ?: Date()
-
-        return DatePickerDialog(requireActivity(), this, calendar.get(Calendar.YEAR), calendar.get(
-            Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+        return DatePickerDialog(requireActivity(), this, local.year, local.monthNumber - 1, local.dayOfMonth)
 
     }
 
