@@ -30,6 +30,7 @@ object InstanceInfoHelper {
             val iconDrawable = DrawableEmojiSpan(emojiAdapter)
             Glide.with(this)
                 .load(info!!.iconUrl)
+                .override(this.textSize.toInt())
                 .into(iconDrawable.target)
             text =  SpannableStringBuilder(":${info.iconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.iconUrl}:".length, 0)
