@@ -35,12 +35,12 @@ object InstanceInfoHelper {
             text =  SpannableStringBuilder(":${info.iconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.iconUrl}:".length, 0)
             }
-            when(val color = info.themeColor) {
+            when(val color = info.themeColorNumber.getOrNull()) {
                 null -> {
 
                 }
                 else -> {
-                    val parsedColor = ColorUtils.setAlphaComponent(Color.parseColor(color), (255 * 0.42).toInt())
+                    val parsedColor = ColorUtils.setAlphaComponent(color, (255 * 0.42).toInt())
                     setBackgroundColor(parsedColor)
                     val isDark = ColorUtils.calculateLuminance(parsedColor) < 0.5
                     if (isDark) {
