@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.user
 
+import android.graphics.Color
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
@@ -101,7 +102,17 @@ sealed interface User : Entity {
         val softwareName: String?,
         val softwareVersion: String?,
         val themeColor: String?,
-    )
+    ) {
+
+        val themeColorNumber: Result<Int?> by lazy {
+            runCatching {
+                themeColor?.let {
+                    Color.parseColor(it)
+                }
+            }
+
+        }
+    }
 
     val displayUserName: String
         get() = "@" + this.userName + if (isSameHost) {
