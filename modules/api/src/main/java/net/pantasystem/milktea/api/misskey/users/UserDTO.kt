@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.api.misskey.users
 
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.serializers.LocalDateComponentSerializer
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -45,6 +48,13 @@ data class UserDTO(
     val hasPendingFollowRequestToYou: Boolean? = null,
     val isLocked: Boolean? = null,
     val instance: InstanceInfo? = null,
+    val fields: List<FieldDTO>? = null,
+
+    @kotlinx.serialization.Serializable(with = LocalDateComponentSerializer::class)
+    val birthday: LocalDate? = null,
+
+    val createdAt: Instant? = null,
+    val updatedAt: Instant? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
@@ -56,6 +66,9 @@ data class UserDTO(
         val softwareVersion: String? = null,
         val themeColor: String? = null,
     )
+
+    @kotlinx.serialization.Serializable
+    data class FieldDTO(val name: String, val value: String)
 
     val displayUserName: String
         get() = "@" + this.userName + if (this.host == null) {
