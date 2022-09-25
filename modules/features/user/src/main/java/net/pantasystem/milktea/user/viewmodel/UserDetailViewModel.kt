@@ -6,11 +6,14 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
@@ -24,6 +27,7 @@ import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import net.pantasystem.milktea.user.R
 
 class UserDetailViewModel @AssistedInject constructor(
     private val translationStore: NoteTranslationStore,
@@ -110,6 +114,18 @@ class UserDetailViewModel @AssistedInject constructor(
     val isMine = combine(userState, accountStore.state) { userState, accountState ->
         userState?.id?.id == accountState.currentAccount?.remoteId
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    val birthday = userState.map {
+        it?.birthday
+    }.filterNotNull().map {
+        StringSource(R.string.birthday, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val registrationDate = userState.map {
+        it?.createdAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
+    }.filterNotNull().map {
+        StringSource(R.string.registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
     val showFollowers = EventBus<User?>()

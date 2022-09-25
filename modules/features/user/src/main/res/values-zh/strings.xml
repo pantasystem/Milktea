@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="birthday">生日: %s</string>
+    <string name="registration_date">注册于 %s</string>
+</resources>
