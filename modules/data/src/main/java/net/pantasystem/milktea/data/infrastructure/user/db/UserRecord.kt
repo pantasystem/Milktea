@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.user.db
 
 import androidx.room.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
@@ -72,6 +75,9 @@ data class UserDetailedStateRecord(
     val hasPendingFollowRequestFromYou: Boolean,
     val hasPendingFollowRequestToYou: Boolean,
     val isLocked: Boolean,
+    val birthday: LocalDate?,
+    val createdAt: Instant?,
+    val updatedAt: Instant?,
     @PrimaryKey(autoGenerate = false) val userId: Long
 )
 
@@ -156,6 +162,28 @@ data class PinnedNoteIdRecord(
     @PrimaryKey(autoGenerate = true) val id: Long
 )
 
+@Entity(
+    tableName = "user_profile_field",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [
+        Index("userId")
+    ]
+)
+data class UserProfileFieldRecord(
+    val name: String,
+    val value: String,
+    val userId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L
+)
+
 @DatabaseView(
     "select user.*, nicknames.nickname from user left join nicknames on user.userName = nicknames.username and user.host = nicknames.host",
     viewName = "user_view"
@@ -196,7 +224,14 @@ data class UserRelated(
         parentColumn = "id",
         entityColumn = "userId"
     )
-    val instance: UserInstanceInfoRecord?
+    val instance: UserInstanceInfoRecord?,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId",
+    )
+    val fields: List<UserProfileFieldRecord>?
+
 ) {
     fun toModel(): User {
         val instanceInfo = instance?.let {
@@ -234,6 +269,7 @@ data class UserRelated(
                 instance = instanceInfo
             )
         } else {
+            val now = Clock.System.now()
             return User.Detail(
                 id = User.Id(
                     user.accountId,
@@ -272,7 +308,13 @@ data class UserRelated(
                     Note.Id(user.accountId, it.noteId)
                 },
                 url = detail.url,
-                instance = instanceInfo
+                instance = instanceInfo,
+                birthday = detail.birthday,
+                createdAt = detail.createdAt ?: now,
+                updatedAt = detail.updatedAt ?: now,
+                fields = fields?.map {
+                    User.Field(it.name, it.value)
+                } ?: emptyList()
             )
         }
     }

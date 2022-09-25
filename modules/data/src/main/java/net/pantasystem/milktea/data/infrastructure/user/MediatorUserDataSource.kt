@@ -133,7 +133,10 @@ class MediatorUserDataSource @Inject constructor(
                                 hostLower = user.hostLower,
                                 notesCount = user.notesCount,
                                 url = user.url,
-                                userId = dbId
+                                userId = dbId,
+                                birthday = user.birthday,
+                                createdAt = user.createdAt,
+                                updatedAt = user.updatedAt,
                             )
                         )
 
@@ -150,6 +153,16 @@ class MediatorUserDataSource @Inject constructor(
                                 })
                             }
 
+                        }
+                        if ((record?.toModel() as? User.Detail?)?.fields?.toSet() != user.fields.toSet()) {
+                            if (record != null) {
+                                userDao.detachUserFields(dbId)
+                            }
+                            if (user.fields.isNotEmpty()) {
+                                userDao.insertUserProfileFields(user.fields.map {
+                                    UserProfileFieldRecord(it.name, it.value, dbId)
+                                })
+                            }
                         }
                     }
                     when (val instance = user.instance) {

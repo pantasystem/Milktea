@@ -27,11 +27,17 @@ abstract class UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertUserInstanceInfo(info: UserInstanceInfoRecord): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertUserProfileFields(fields: List<UserProfileFieldRecord>): List<Long>
+
     @Query("delete from pinned_note_id where userId = :userId")
     abstract suspend fun detachAllPinnedNoteIds(userId: Long)
 
     @Query("delete from user_emoji where userId = :userId")
     abstract suspend fun detachAllUserEmojis(userId: Long)
+
+    @Query("delete from user_profile_field where userId = :userId")
+    abstract suspend fun detachUserFields(userId: Long)
 
     @Update
     abstract suspend fun update(user: UserRecord)
