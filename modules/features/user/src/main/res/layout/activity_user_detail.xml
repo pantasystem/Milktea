@@ -188,7 +188,8 @@
                             android:gravity="center_vertical"
                             app:drawableLeftCompat="@drawable/ic_baseline_cake_24"
                             stringSource="@{userViewModel.birthday}"
-                            />
+
+                            app:drawableTint="?attr/normalIconTint" />
                     <TextView
                             android:id="@+id/userCreatedAtText"
                             android:layout_width="0dp"
@@ -203,7 +204,7 @@
                             app:drawableLeftCompat="@drawable/ic_baseline_calendar_month_24"
                             android:visibility="@{ userViewModel.user.createdAt == null ? View.GONE : View.VISIBLE }"
                             stringSource="@{userViewModel.registrationDate}"
-                            />
+                            app:drawableTint="?attr/normalIconTint" />
 
                     <LinearLayout
                             android:layout_width="0dp"
