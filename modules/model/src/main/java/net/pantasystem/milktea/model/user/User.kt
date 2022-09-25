@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.model.user
 
 import android.graphics.Color
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
@@ -74,7 +77,11 @@ sealed interface User : Entity {
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
         override val isSameHost: Boolean,
-        override val instance: InstanceInfo?
+        override val instance: InstanceInfo?,
+        val birthday: LocalDate?,
+        val fields: List<Field>,
+        val createdAt: Instant,
+        val updatedAt: Instant,
     ) : User {
         companion object
         val followState: FollowState
@@ -113,6 +120,11 @@ sealed interface User : Entity {
 
         }
     }
+
+    data class Field(
+        val name: String,
+        val value: String,
+    )
 
     val displayUserName: String
         get() = "@" + this.userName + if (isSameHost) {
@@ -193,6 +205,10 @@ fun User.Detail.Companion.make(
     isLocked: Boolean = false,
     isSameHost: Boolean = false,
     instance: User.InstanceInfo? = null,
+    birthday: LocalDate? = null,
+    fields: List<User.Field>? = null,
+    createdAt: Instant? = null,
+    updatedAt: Instant? = null,
 ): User.Detail {
     return User.Detail(
         id,
@@ -220,6 +236,10 @@ fun User.Detail.Companion.make(
         hasPendingFollowRequestToYou,
         isLocked,
         isSameHost,
-        instance
+        instance,
+        birthday,
+        fields ?: emptyList(),
+        createdAt ?: Clock.System.now(),
+        updatedAt ?: Clock.System.now(),
     )
 }
