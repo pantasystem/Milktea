@@ -22,7 +22,7 @@
             <com.google.android.material.appbar.CollapsingToolbarLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
                     >
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -173,16 +173,63 @@
 
 
                             />
+
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            tools:text="Birthday: 2001/06/23"
+                            app:layout_constraintTop_toBottomOf="@id/profileText"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginHorizontal="16dp"
+                            android:id="@+id/birthdayText"
+                            android:visibility="@{ userViewModel.birthday == null ? View.GONE : View.VISIBLE }"
+                            android:gravity="center_vertical"
+                            app:drawableLeftCompat="@drawable/ic_baseline_cake_24"
+                            stringSource="@{userViewModel.birthday}"
+
+                            app:drawableTint="?attr/normalIconTint" />
+                    <TextView
+                            android:id="@+id/userCreatedAtText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            tools:text="Registration date: 2020/02/06"
+                            app:layout_constraintTop_toBottomOf="@id/birthdayText"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginHorizontal="16dp"
+
+                            app:drawableLeftCompat="@drawable/ic_baseline_calendar_month_24"
+                            android:visibility="@{ userViewModel.user.createdAt == null ? View.GONE : View.VISIBLE }"
+                            stringSource="@{userViewModel.registrationDate}"
+                            app:drawableTint="?attr/normalIconTint" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/userFields"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/userCreatedAtText"
+                            android:layout_marginHorizontal="16dp"
+                            tools:listitem="@layout/item_user_profile_field"
+                            tools:itemCount="4"
+                            android:visibility="@{userViewModel.userState.fields.empty ? View.GONE : View.VISIBLE }"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        />
                     <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_alignStart="@id/avatarIcon"
                             android:layout_marginEnd="16dp"
-                            app:layout_constraintTop_toBottomOf="@id/profileText"
+                            app:layout_constraintTop_toBottomOf="@id/userFields"
                             android:layout_marginStart="16dp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
+                            android:id="@+id/countersLayout"
 
                             >
                         <TextView
@@ -227,6 +274,7 @@
                                 android:onClick="@{()-> userViewModel.showFollowers()}"
                                 android:text="@string/follower"/>
                     </LinearLayout>
+
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
                 <androidx.appcompat.widget.Toolbar

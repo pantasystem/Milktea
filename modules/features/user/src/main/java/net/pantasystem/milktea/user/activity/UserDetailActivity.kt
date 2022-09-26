@@ -13,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +24,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
@@ -48,6 +51,7 @@ import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
+import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
@@ -269,6 +273,19 @@ class UserDetailActivity : AppCompatActivity() {
 
         binding.editNicknameButton.setOnClickListener {
             EditNicknameDialog().show(supportFragmentManager, "editNicknameDialog")
+        }
+
+
+        val userFieldsAdapter = UserProfileFieldListAdapter()
+        binding.userFields.adapter = userFieldsAdapter
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mViewModel.userState.mapNotNull {
+                    it?.fields
+                }.collect {
+                    userFieldsAdapter.submitList(it)
+                }
+            }
         }
 
 

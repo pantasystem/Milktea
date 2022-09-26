@@ -64,9 +64,9 @@ import net.pantasystem.milktea.model.url.UrlPreview
         UserEmojiRecord::class,
         PinnedNoteIdRecord::class,
         UserInstanceInfoRecord::class,
-
+        UserProfileFieldRecord::class,
     ],
-    version = 22,
+    version = 23,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -80,6 +80,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
         AutoMigration(from = 19, to = 20),
         AutoMigration(from = 20, to = 21),
         AutoMigration(from = 21, to = 22),
+        AutoMigration(from = 22, to = 23),
     ],
     views = [UserView::class, GroupMemberView::class,]
 )
@@ -89,6 +90,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
     TimelinePageTypeConverter::class,
     AccountInstanceTypeConverter::class,
     InstantConverter::class,
+    LocalDateConverter::class,
 )
 abstract class DataBase : RoomDatabase() {
     //abstract fun connectionInstanceDao(): ConnectionInstanceDao
