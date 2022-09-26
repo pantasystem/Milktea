@@ -10,7 +10,7 @@ interface WordFilterConfigDao {
     suspend fun insertAll(conditions: List<WordFilterConditionRecord>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRegexList(regexList: List<WordFilterConditionRegexRecord>)
+    suspend fun insertRegex(regex: WordFilterConditionRegexRecord)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWords(words: List<WordFilterConditionWordRecord>): List<Long>
