@@ -2,4 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="net.pantasystem.milktea.setting">
 
+    <application>
+        <activity
+                android:name="net.pantasystem.milktea.setting.activities.ClientWordFilterSettingActivity"
+                android:exported="false" />
+    </application>
+
 </manifest>

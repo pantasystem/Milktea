@@ -12,6 +12,7 @@ import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
@@ -86,4 +87,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideUserDao(db: DataBase): UserDao = db.userDao()
+
+    @Provides
+    @Singleton
+    fun provideWordFilterDao(db: DataBase): WordFilterConfigDao = db.wordFilterConfigDao()
 }

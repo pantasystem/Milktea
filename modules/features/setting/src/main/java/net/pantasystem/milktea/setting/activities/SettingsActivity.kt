@@ -80,6 +80,15 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        val clientMuteWordSetting = MoveSettingActivityPanel(
+            titleStringRes = R.string.client_word_mute,
+            activity = ClientWordFilterSettingActivity::class.java,
+            context = this
+        ).apply {
+            startActivityEventBus.observe(this@SettingsActivity) {
+                startActivity(Intent(this@SettingsActivity, it))
+            }
+        }
 
         val licenseActivitySetting =
             MoveSettingActivityPanel(
@@ -102,6 +111,7 @@ class SettingsActivity : AppCompatActivity() {
                 appearanceSetting,
                 securitySetting,
                 reactionSetting,
+                clientMuteWordSetting,
                 licenseActivitySetting
             )
         )
