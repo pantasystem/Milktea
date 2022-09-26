@@ -42,4 +42,20 @@ class UserDTOTest {
         Assert.assertEquals("ぢすこ", harunon.fields?.get(1)?.name)
 
     }
+
+    @Test
+    fun convertFromJson_GiveV10Harunon() {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        val file = File(javaClass.classLoader!!.getResource("v10_user_dto_give_harunon_case1.json").file)
+        val testData = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
+            it.readLines().reduce { acc, s -> acc + s }.trimIndent()
+        }
+        val harunon = json.decodeFromString<UserDTO>(testData)
+        Assert.assertEquals("keybase", harunon.fields?.get(0)?.name)
+        Assert.assertEquals("https://keybase.io/harunon", harunon.fields?.get(0)?.value)
+        Assert.assertEquals("ぢすこ", harunon.fields?.get(1)?.name)
+
+    }
 }
