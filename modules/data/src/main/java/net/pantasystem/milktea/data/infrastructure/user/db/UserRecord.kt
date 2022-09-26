@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.user.db
 
 import androidx.room.*
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.model.account.Account
@@ -269,7 +268,6 @@ data class UserRelated(
                 instance = instanceInfo
             )
         } else {
-            val now = Clock.System.now()
             return User.Detail(
                 id = User.Id(
                     user.accountId,
@@ -310,8 +308,8 @@ data class UserRelated(
                 url = detail.url,
                 instance = instanceInfo,
                 birthday = detail.birthday,
-                createdAt = detail.createdAt ?: now,
-                updatedAt = detail.updatedAt ?: now,
+                createdAt = detail.createdAt,
+                updatedAt = detail.updatedAt,
                 fields = fields?.map {
                     User.Field(it.name, it.value)
                 } ?: emptyList()
