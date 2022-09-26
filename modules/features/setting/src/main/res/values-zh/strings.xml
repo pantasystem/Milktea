@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="client_word_mute">Client Word mute</string>
+    <string name="client_word_mute">应用程序字静音</string>
 </resources>
