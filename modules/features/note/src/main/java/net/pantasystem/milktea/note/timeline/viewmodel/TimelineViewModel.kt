@@ -73,6 +73,17 @@ class TimelineViewModel @AssistedInject constructor(
         pageableState.suspendConvert { list ->
             cache.getByIds(list)
         }
+    }.flatMapLatest { state ->
+        wordFilterConfigRepository.observe().distinctUntilChanged().map { config ->
+            state.suspendConvert { notes ->
+                notes.filterNot {
+                    config.checkMatchText(it.text)
+                            || config.checkMatchText(it.cw)
+                            || config.checkMatchText(it.subNote?.note?.text)
+                            || config.checkMatchText(it.subNote?.note?.cw)
+                }
+            }
+        }
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, PageableState.Loading.Init())
 
 
