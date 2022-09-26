@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.user.profile
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -22,6 +25,10 @@ class UserProfileFieldListAdapter : ListAdapter<User.Field, UserProfileFieldList
     class VH(val binding: ItemUserProfileFieldBinding) : RecyclerView.ViewHolder(binding.root) {
         fun onBind(field: User.Field) {
             binding.field = field
+            binding.copyValueButton.setOnClickListener {
+                val clipboardManager = binding.root.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboardManager.setPrimaryClip(ClipData.newPlainText(field.name, field.value))
+            }
         }
 
     }
