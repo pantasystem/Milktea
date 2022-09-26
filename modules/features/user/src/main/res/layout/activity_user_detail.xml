@@ -22,7 +22,7 @@
             <com.google.android.material.appbar.CollapsingToolbarLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"
                     >
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -206,13 +206,26 @@
                             stringSource="@{userViewModel.registrationDate}"
                             app:drawableTint="?attr/normalIconTint" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/userFields"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/userCreatedAtText"
+                            android:layout_marginHorizontal="16dp"
+                            tools:listitem="@layout/item_user_profile_field"
+                            tools:itemCount="4"
+                            android:visibility="@{userViewModel.userState.fields.empty ? View.GONE : View.VISIBLE }"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        />
                     <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:layout_alignStart="@id/avatarIcon"
                             android:layout_marginEnd="16dp"
-                            app:layout_constraintTop_toBottomOf="@id/userCreatedAtText"
+                            app:layout_constraintTop_toBottomOf="@id/userFields"
                             android:layout_marginStart="16dp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
