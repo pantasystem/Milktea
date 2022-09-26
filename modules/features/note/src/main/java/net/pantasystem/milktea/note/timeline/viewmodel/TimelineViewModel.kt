@@ -26,6 +26,7 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteStreaming
+import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -39,6 +40,7 @@ class TimelineViewModel @AssistedInject constructor(
     noteTranslationStore: NoteTranslationStore,
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     private val accountStore: AccountStore,
+    private val wordFilterConfigRepository: WordFilterConfigRepository,
     @Assisted val account: Account?,
     @Assisted val accountId: Long? = account?.accountId,
     @Assisted val pageable: Pageable,
