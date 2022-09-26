@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="field"
+                type="net.pantasystem.milktea.model.user.User.Field" />
+    </data>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            >
+        <TextView android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                tools:text="namenamenamename"
+                android:layout_weight="1"
+                android:paddingEnd="4dp"
+                android:text="@{field.name}"
+                 />
+        <TextView android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                tools:text="namenamenamename"
+                android:layout_weight="4"
+                android:text="@{field.value}"
+                />
+    </LinearLayout>
+</layout>
