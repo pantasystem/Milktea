@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.user
 
 import android.graphics.Color
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import net.pantasystem.milktea.model.Entity
@@ -80,8 +79,8 @@ sealed interface User : Entity {
         override val instance: InstanceInfo?,
         val birthday: LocalDate?,
         val fields: List<Field>,
-        val createdAt: Instant,
-        val updatedAt: Instant,
+        val createdAt: Instant?,
+        val updatedAt: Instant?,
     ) : User {
         companion object
         val followState: FollowState
@@ -239,7 +238,7 @@ fun User.Detail.Companion.make(
         instance,
         birthday,
         fields ?: emptyList(),
-        createdAt ?: Clock.System.now(),
-        updatedAt ?: Clock.System.now(),
+        createdAt,
+        updatedAt,
     )
 }

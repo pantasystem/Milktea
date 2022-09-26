@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure
 
-import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
@@ -368,8 +367,8 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             isSameHost = host == null,
             instance = instanceInfo,
             birthday = birthday,
-            createdAt = createdAt ?: Clock.System.now(),
-            updatedAt = updatedAt ?: Clock.System.now(),
+            createdAt = createdAt,
+            updatedAt = updatedAt,
             fields = fields?.map {
                 User.Field(it.name, it.value)
             }?: emptyList()
