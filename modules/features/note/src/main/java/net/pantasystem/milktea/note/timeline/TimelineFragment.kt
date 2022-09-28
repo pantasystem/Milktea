@@ -28,7 +28,6 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
 import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
@@ -147,9 +146,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
 
         mBinding.listView.adapter = adapter
-        if (savedInstanceState == null) {
-            adapter.submitList(listOf(TimelineListItem.Loading))
-        }
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -178,12 +174,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         })
 
-        mViewModel.position.let {
-            try {
-                mLinearLayoutManager.scrollToPosition(it)
-            } catch (_: Exception) {
-            }
-        }
 
 
 
@@ -223,6 +213,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         isShowing = true
         currentPageableTimelineViewModel.setCurrentPageable(mPageable)
+        try {
+            mLinearLayoutManager.scrollToPosition(mViewModel.position)
+        } catch (_: Exception) {
+        }
 
     }
 
@@ -267,7 +261,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val itemCount = mLinearLayoutManager.itemCount
 
             if (endVisibleItemPosition == (itemCount - 1)) {
-                Log.d("", "後ろ")
                 mViewModel.loadOld()
             }
 
