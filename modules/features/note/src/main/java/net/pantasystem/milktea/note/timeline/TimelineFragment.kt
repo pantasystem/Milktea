@@ -6,7 +6,6 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
-import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,8 +19,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.PageableView
 import net.pantasystem.milktea.common.ui.ScrollableTop
@@ -32,11 +29,11 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
 import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -82,6 +79,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
     private val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
+
     @Inject
     lateinit var settingStore: SettingStore
 
@@ -121,7 +119,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onViewCreated(view, savedInstanceState)
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner) {
+        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, {
+            mViewModel.loadInit()
+        }) {
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
                 notesViewModel,
@@ -151,34 +151,20 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            mViewModel.timelineState.collect { state ->
-                val notes = (state.content as? StateContent.Exist)?.rawContent ?: emptyList()
-                adapter.submitList(notes)
-
-                mBinding.timelineProgressBar.isVisible =
-                    state is PageableState.Loading && state.content is StateContent.NotExist
-
-                mBinding.refresh.isVisible = state.content is StateContent.Exist
-                when (state.content) {
-                    is StateContent.Exist -> {
-                        mBinding.timelineEmptyView.visibility = View.GONE
-                    }
-                    is StateContent.NotExist -> {
-                        mBinding.timelineEmptyView.isVisible = state is PageableState.Error
-                    }
+                mViewModel.timelineListState.collect { state ->
+                    adapter.submitList(state)
                 }
             }
-            }
 
         }
+//
+//        mBinding.retryLoadButton.setOnClickListener {
+//            Log.d("TimelineFragment", "リトライボタンを押しました")
+//            mViewModel.loadInit()
+//        }
 
-        mBinding.retryLoadButton.setOnClickListener {
-            Log.d("TimelineFragment", "リトライボタンを押しました")
-            mViewModel.loadInit()
-        }
 
-
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mViewModel.errorEvent.collect { error ->
                     TimelineErrorHandler(requireContext())(error)
@@ -253,19 +239,25 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
 
-    private val diffUtilCallBack = object : DiffUtil.ItemCallback<PlaneNoteViewData>() {
+    private val diffUtilCallBack = object : DiffUtil.ItemCallback<TimelineListItem>() {
         override fun areContentsTheSame(
-            oldItem: PlaneNoteViewData,
-            newItem: PlaneNoteViewData
+            oldItem: TimelineListItem,
+            newItem: TimelineListItem,
         ): Boolean {
-            return oldItem.id == newItem.id
+            if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
+                return oldItem.note.id == newItem.note.id
+            }
+            return oldItem == newItem
         }
 
         override fun areItemsTheSame(
-            oldItem: PlaneNoteViewData,
-            newItem: PlaneNoteViewData
+            oldItem: TimelineListItem,
+            newItem: TimelineListItem,
         ): Boolean {
-            return oldItem.id == newItem.id
+            if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
+                return oldItem.note.id == newItem.note.id
+            }
+            return oldItem == newItem
         }
     }
 
