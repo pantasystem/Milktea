@@ -21,22 +21,27 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
+import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyOrErrorBinding
 import net.pantasystem.milktea.note.poll.PollListAdapter
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class TimelineListAdapter(
-    diffUtilCallBack: DiffUtil.ItemCallback<PlaneNoteViewData>,
+    diffUtilCallBack: DiffUtil.ItemCallback<TimelineListItem>,
     private val lifecycleOwner: LifecycleOwner,
+    val onRefreshAction: () -> Unit,
     val onAction: (NoteCardAction) -> Unit,
-) : ListAdapter<PlaneNoteViewData, TimelineListAdapter.NoteViewHolderBase<ViewDataBinding>>(diffUtilCallBack){
+) : ListAdapter<TimelineListItem, TimelineListAdapter.TimelineListItemViewHolderBase>(diffUtilCallBack){
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
-    abstract class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : RecyclerView.ViewHolder(view){
+    sealed class TimelineListItemViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
+
+    sealed class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : TimelineListItemViewHolderBase(view){
         abstract val binding: T
         private var mNoteIdAndPollListAdapter: Pair<Note.Id, PollListAdapter>? = null
         abstract val lifecycleOwner: LifecycleOwner
@@ -128,9 +133,14 @@ class TimelineListAdapter(
         }
     }
 
-    companion object{
-        private const val NORMAL_NOTE = 0
-        private const val HAS_REPLY_TO_NOTE = 1
+    class LoadingViewHolder(view: View) : TimelineListItemViewHolderBase(view)
+
+    class ErrorViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root)
+
+    class EmptyViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root)
+
+    enum class ViewHolderType {
+        NormalNote, HasReplyToNote, Loading, Empty, Error
     }
 
     inner class NoteViewHolder(override val binding: ItemNoteBinding): NoteViewHolderBase<ItemNoteBinding>(binding.root){
@@ -181,32 +191,72 @@ class TimelineListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
-        return if(item is HasReplyToNoteViewData){
-            HAS_REPLY_TO_NOTE
-        }else{
-            NORMAL_NOTE
-        }
+        return when (item) {
+            TimelineListItem.Empty -> ViewHolderType.Empty
+            is TimelineListItem.Error -> ViewHolderType.Error
+            TimelineListItem.Loading -> ViewHolderType.Loading
+            is TimelineListItem.Note -> {
+                if(item.note is HasReplyToNoteViewData){
+                    ViewHolderType.HasReplyToNote
+                }else{
+                    ViewHolderType.NormalNote
+                }
+            }
+        }.ordinal
+
     }
 
-    override fun onBindViewHolder(p0: NoteViewHolderBase<ViewDataBinding>, position: Int) {
+    override fun onBindViewHolder(p0: TimelineListItemViewHolderBase, position: Int) {
 
         val item = getItem(position)
-        p0.bind(item)
+
+        when(p0) {
+
+            is LoadingViewHolder -> {
+                // 何もしない
+            }
+            is HasReplyToNoteViewHolder -> {
+                p0.bind((item as TimelineListItem.Note).note)
+            }
+            is NoteViewHolder -> {
+                p0.bind((item as TimelineListItem.Note).note)
+            }
+            is EmptyViewHolder -> {
+                p0.binding.retryLoadButton.setOnClickListener {
+                    onRefreshAction()
+                }
+            }
+            is ErrorViewHolder -> {
+                p0.binding.retryLoadButton.setOnClickListener {
+                    onRefreshAction()
+
+                }
+            }
+        }
 
     }
 
-    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): NoteViewHolderBase<ViewDataBinding> {
-        return when(p1){
-            HAS_REPLY_TO_NOTE ->{
-                val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
-                HasReplyToNoteViewHolder(binding)
-            }
-            NORMAL_NOTE ->{
+    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): TimelineListItemViewHolderBase {
+        return when(ViewHolderType.values()[p1]) {
+            ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
                 NoteViewHolder(binding)
             }
-            else -> throw IllegalArgumentException("I don't know this type")
+            ViewHolderType.HasReplyToNote -> {
+                val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
+                HasReplyToNoteViewHolder(binding)
+            }
+            ViewHolderType.Loading -> {
+                LoadingViewHolder(LayoutInflater.from(p0.context).inflate(R.layout.item_timeline_loading, p0, false))
+            }
+            ViewHolderType.Empty -> {
+                EmptyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_empty_or_error, p0, false))
+            }
+            ViewHolderType.Error -> {
+                ErrorViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_empty_or_error, p0, false))
+            }
         }
+
 
     }
 
