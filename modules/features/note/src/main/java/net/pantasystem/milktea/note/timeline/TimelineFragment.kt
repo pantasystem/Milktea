@@ -155,12 +155,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
 
         }
-//
-//        mBinding.retryLoadButton.setOnClickListener {
-//            Log.d("TimelineFragment", "リトライボタンを押しました")
-//            mViewModel.loadInit()
-//        }
-
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -180,13 +174,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         })
 
-        mViewModel.position.let {
-            try {
-                mLinearLayoutManager.scrollToPosition(it)
-            } catch (e: Exception) {
-
-            }
-        }
 
 
 
@@ -226,6 +213,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         isShowing = true
         currentPageableTimelineViewModel.setCurrentPageable(mPageable)
+        try {
+            mLinearLayoutManager.scrollToPosition(mViewModel.position)
+        } catch (_: Exception) {
+        }
 
     }
 
@@ -270,7 +261,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             val itemCount = mLinearLayoutManager.itemCount
 
             if (endVisibleItemPosition == (itemCount - 1)) {
-                Log.d("", "後ろ")
                 mViewModel.loadOld()
             }
 

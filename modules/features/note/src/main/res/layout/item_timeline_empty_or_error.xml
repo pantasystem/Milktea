@@ -18,5 +18,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/retry"/>
+
+        <TextView
+                android:id="@+id/showErrorMessageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_error"
+                />
+        <TextView
+                android:id="@+id/errorView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
     </LinearLayout>
 </layout>

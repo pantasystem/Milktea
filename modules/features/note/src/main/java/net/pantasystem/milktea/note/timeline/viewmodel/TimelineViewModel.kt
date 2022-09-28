@@ -86,17 +86,13 @@ class TimelineViewModel @AssistedInject constructor(
                 }
             }
         }
-    }.stateIn(
-        viewModelScope + Dispatchers.IO,
-        SharingStarted.WhileSubscribed(5_000),
-        PageableState.Loading.Init()
-    )
+    }
 
     val timelineListState: StateFlow<List<TimelineListItem>> = timelineState.map { state ->
         state.toList()
     }.stateIn(
         viewModelScope + Dispatchers.IO,
-        SharingStarted.WhileSubscribed(5_000),
+        SharingStarted.Lazily,
         listOf(TimelineListItem.Loading)
     )
 
