@@ -31,11 +31,30 @@ import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class TimelineListAdapter(
-    diffUtilCallBack: DiffUtil.ItemCallback<TimelineListItem>,
     private val lifecycleOwner: LifecycleOwner,
     val onRefreshAction: () -> Unit,
     val onAction: (NoteCardAction) -> Unit,
-) : ListAdapter<TimelineListItem, TimelineListAdapter.TimelineListItemViewHolderBase>(diffUtilCallBack){
+) : ListAdapter<TimelineListItem, TimelineListAdapter.TimelineListItemViewHolderBase>(object : DiffUtil.ItemCallback<TimelineListItem>() {
+    override fun areContentsTheSame(
+        oldItem: TimelineListItem,
+        newItem: TimelineListItem,
+    ): Boolean {
+        if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
+            return oldItem.note.id == newItem.note.id
+        }
+        return oldItem == newItem
+    }
+
+    override fun areItemsTheSame(
+        oldItem: TimelineListItem,
+        newItem: TimelineListItem,
+    ): Boolean {
+        if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
+            return oldItem.note.id == newItem.note.id
+        }
+        return oldItem == newItem
+    }
+}){
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 

@@ -119,7 +119,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onViewCreated(view, savedInstanceState)
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
-        val adapter = TimelineListAdapter(diffUtilCallBack, viewLifecycleOwner, {
+        val adapter = TimelineListAdapter(viewLifecycleOwner, {
             mViewModel.loadInit()
         }) {
             NoteCardActionHandler(
@@ -239,27 +239,6 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
 
-    private val diffUtilCallBack = object : DiffUtil.ItemCallback<TimelineListItem>() {
-        override fun areContentsTheSame(
-            oldItem: TimelineListItem,
-            newItem: TimelineListItem,
-        ): Boolean {
-            if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
-                return oldItem.note.id == newItem.note.id
-            }
-            return oldItem == newItem
-        }
-
-        override fun areItemsTheSame(
-            oldItem: TimelineListItem,
-            newItem: TimelineListItem,
-        ): Boolean {
-            if (oldItem is TimelineListItem.Note && newItem is TimelineListItem.Note) {
-                return oldItem.note.id == newItem.note.id
-            }
-            return oldItem == newItem
-        }
-    }
 
 
     @ExperimentalCoroutinesApi

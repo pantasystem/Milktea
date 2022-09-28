@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,9 +15,9 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.timeline.TimelineListAdapter
+import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.user.databinding.FragmentPinNoteBinding
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
@@ -81,21 +80,9 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
 
 
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
-        val adapter = TimelineListAdapter(object : DiffUtil.ItemCallback<PlaneNoteViewData>() {
-            override fun areContentsTheSame(
-                oldItem: PlaneNoteViewData,
-                newItem: PlaneNoteViewData
-            ): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areItemsTheSame(
-                oldItem: PlaneNoteViewData,
-                newItem: PlaneNoteViewData
-            ): Boolean {
-                return oldItem.id == newItem.id
-            }
-        }, viewLifecycleOwner) {
+        val adapter = TimelineListAdapter(viewLifecycleOwner, {
+            userViewModel.sync()
+        }) {
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
                 notesViewModel,
@@ -109,8 +96,10 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
         binding.pinNotesView.adapter = adapter
         binding.pinNotesView.layoutManager = LinearLayoutManager(this.context)
 
-        userViewModel.pinNotes.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+        userViewModel.pinNotes.observe(viewLifecycleOwner) { list ->
+            adapter.submitList(list.map {
+                TimelineListItem.Note(it)
+            })
         }
     }
 
