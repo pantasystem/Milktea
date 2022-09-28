@@ -18,6 +18,7 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.Account
@@ -27,6 +28,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,7 +71,7 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineStore: TimelineStore =
         timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount)
 
-    val timelineState = timelineStore.timelineState.map { pageableState ->
+    private val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
             cache.getByIds(list)
         }
@@ -84,7 +86,19 @@ class TimelineViewModel @AssistedInject constructor(
                 }
             }
         }
-    }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, PageableState.Loading.Init())
+    }.stateIn(
+        viewModelScope + Dispatchers.IO,
+        SharingStarted.WhileSubscribed(5_000),
+        PageableState.Loading.Init()
+    )
+
+    val timelineListState: StateFlow<List<TimelineListItem>> = timelineState.map { state ->
+        state.toList()
+    }.stateIn(
+        viewModelScope + Dispatchers.IO,
+        SharingStarted.WhileSubscribed(5_000),
+        listOf(TimelineListItem.Loading)
+    )
 
 
     val errorEvent = timelineStore.timelineState.map {
@@ -109,7 +123,7 @@ class TimelineViewModel @AssistedInject constructor(
     init {
 
         viewModelScope.launch(Dispatchers.IO) {
-            accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().map { 
+            accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().map {
                 currentAccountWatcher.getAccount()
             }.distinctUntilChanged().catch {
                 logger.error("observe account error", it)
@@ -163,5 +177,39 @@ fun TimelineViewModel.Companion.provideViewModel(
     ) = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return assistedFactory.create(account, accountId, pageable) as T
+    }
+}
+
+sealed interface TimelineListItem {
+    object Loading : TimelineListItem
+    data class Note(val note: PlaneNoteViewData) : TimelineListItem
+    data class Error(val throwable: Throwable) : TimelineListItem
+    object Empty : TimelineListItem
+}
+
+fun PageableState<List<PlaneNoteViewData>>.toList(): List<TimelineListItem> {
+    return when (val content = this.content) {
+        is StateContent.Exist -> {
+            content.rawContent.map {
+                TimelineListItem.Note(it)
+            } + if (this is PageableState.Loading.Previous) {
+                listOf(TimelineListItem.Loading)
+            } else {
+                emptyList()
+            }
+        }
+        is StateContent.NotExist -> {
+            listOf(
+                when (this) {
+                    is PageableState.Error -> {
+                        TimelineListItem.Error(this.throwable)
+                    }
+                    is PageableState.Fixed -> {
+                        TimelineListItem.Empty
+                    }
+                    is PageableState.Loading -> TimelineListItem.Loading
+                }
+            )
+        }
     }
 }
