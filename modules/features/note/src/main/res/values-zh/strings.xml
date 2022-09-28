@@ -2,4 +2,5 @@
 <resources>
     <string name="time_machine">回到未来</string>
     <string name="dialog_timemachine_message">请指定您要显示的时间线的时间</string>
+    <string name="show_error">Show Error</string>
 </resources>

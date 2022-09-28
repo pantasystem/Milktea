@@ -1,4 +1,5 @@
 <resources>
     <string name="time_machine">Back to the future</string>
     <string name="dialog_timemachine_message">Please specify the time of the timeline you want to display</string>
+    <string name="show_error">Show Error</string>
 </resources>

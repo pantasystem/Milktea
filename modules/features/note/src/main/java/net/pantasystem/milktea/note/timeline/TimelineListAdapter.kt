@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -154,9 +155,23 @@ class TimelineListAdapter(
 
     class LoadingViewHolder(view: View) : TimelineListItemViewHolderBase(view)
 
-    class ErrorViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root)
+    class ErrorViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root) {
+        fun bind(throwable: Throwable) {
+            binding.errorView.isVisible = false
+            binding.showErrorMessageButton.isVisible = true
+            binding.errorView.text = throwable.toString()
+            binding.showErrorMessageButton.setOnClickListener {
+                binding.errorView.isVisible = true
+            }
+        }
+    }
 
-    class EmptyViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root)
+    class EmptyViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root) {
+        fun bind() {
+            binding.errorView.isVisible = false
+            binding.showErrorMessageButton.isVisible = false
+        }
+    }
 
     enum class ViewHolderType {
         NormalNote, HasReplyToNote, Loading, Empty, Error
@@ -244,12 +259,13 @@ class TimelineListAdapter(
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
                 }
+                p0.bind()
             }
             is ErrorViewHolder -> {
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
-
                 }
+                p0.bind((item as TimelineListItem.Error).throwable)
             }
         }
 
