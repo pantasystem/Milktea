@@ -18,6 +18,7 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.Account
@@ -27,6 +28,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,7 +71,7 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineStore: TimelineStore =
         timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount)
 
-    val timelineState = timelineStore.timelineState.map { pageableState ->
+    private val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
             cache.getByIds(list)
         }
@@ -85,6 +87,31 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, PageableState.Loading.Init())
+
+    val timelineListState: StateFlow<List<TimelineListItem>> = timelineState.map { state ->
+        when(val content = state.content) {
+            is StateContent.Exist -> {
+                content.rawContent.map {
+                    TimelineListItem.Note(it)
+                } + if (state is PageableState.Loading.Previous) {
+                    listOf(TimelineListItem.Loading)
+                } else {
+                    emptyList()
+                }
+            }
+            is StateContent.NotExist -> {
+                listOf(when(state) {
+                    is PageableState.Error -> {
+                        TimelineListItem.Error(state.throwable)
+                    }
+                    is PageableState.Fixed -> {
+                        TimelineListItem.Empty
+                    }
+                    is PageableState.Loading -> TimelineListItem.Loading
+                })
+            }
+        }
+    }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, listOf(TimelineListItem.Loading))
 
 
     val errorEvent = timelineStore.timelineState.map {
@@ -164,4 +191,11 @@ fun TimelineViewModel.Companion.provideViewModel(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return assistedFactory.create(account, accountId, pageable) as T
     }
+}
+
+sealed interface TimelineListItem {
+    object Loading : TimelineListItem
+    data class Note(val note: PlaneNoteViewData) : TimelineListItem
+    data class Error(val throwable: Throwable) : TimelineListItem
+    object Empty : TimelineListItem
 }
