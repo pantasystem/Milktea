@@ -86,32 +86,19 @@ class TimelineViewModel @AssistedInject constructor(
                 }
             }
         }
-    }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, PageableState.Loading.Init())
+    }.stateIn(
+        viewModelScope + Dispatchers.IO,
+        SharingStarted.WhileSubscribed(5_000),
+        PageableState.Loading.Init()
+    )
 
     val timelineListState: StateFlow<List<TimelineListItem>> = timelineState.map { state ->
-        when(val content = state.content) {
-            is StateContent.Exist -> {
-                content.rawContent.map {
-                    TimelineListItem.Note(it)
-                } + if (state is PageableState.Loading.Previous) {
-                    listOf(TimelineListItem.Loading)
-                } else {
-                    emptyList()
-                }
-            }
-            is StateContent.NotExist -> {
-                listOf(when(state) {
-                    is PageableState.Error -> {
-                        TimelineListItem.Error(state.throwable)
-                    }
-                    is PageableState.Fixed -> {
-                        TimelineListItem.Empty
-                    }
-                    is PageableState.Loading -> TimelineListItem.Loading
-                })
-            }
-        }
-    }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, listOf(TimelineListItem.Loading))
+        state.toList()
+    }.stateIn(
+        viewModelScope + Dispatchers.IO,
+        SharingStarted.WhileSubscribed(5_000),
+        listOf(TimelineListItem.Loading)
+    )
 
 
     val errorEvent = timelineStore.timelineState.map {
@@ -136,7 +123,7 @@ class TimelineViewModel @AssistedInject constructor(
     init {
 
         viewModelScope.launch(Dispatchers.IO) {
-            accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().map { 
+            accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().map {
                 currentAccountWatcher.getAccount()
             }.distinctUntilChanged().catch {
                 logger.error("observe account error", it)
@@ -198,4 +185,31 @@ sealed interface TimelineListItem {
     data class Note(val note: PlaneNoteViewData) : TimelineListItem
     data class Error(val throwable: Throwable) : TimelineListItem
     object Empty : TimelineListItem
+}
+
+fun PageableState<List<PlaneNoteViewData>>.toList(): List<TimelineListItem> {
+    return when (val content = this.content) {
+        is StateContent.Exist -> {
+            content.rawContent.map {
+                TimelineListItem.Note(it)
+            } + if (this is PageableState.Loading.Previous) {
+                listOf(TimelineListItem.Loading)
+            } else {
+                emptyList()
+            }
+        }
+        is StateContent.NotExist -> {
+            listOf(
+                when (this) {
+                    is PageableState.Error -> {
+                        TimelineListItem.Error(this.throwable)
+                    }
+                    is PageableState.Fixed -> {
+                        TimelineListItem.Empty
+                    }
+                    is PageableState.Loading -> TimelineListItem.Loading
+                }
+            )
+        }
+    }
 }

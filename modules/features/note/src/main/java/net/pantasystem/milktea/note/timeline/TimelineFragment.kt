@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
@@ -29,7 +28,6 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
 import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
