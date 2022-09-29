@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -58,14 +60,23 @@ class ClientWordFilterSettingActivity : AppCompatActivity() {
                 ) {
                     LazyColumn(Modifier.padding(it)) {
                         item {
+                            Spacer(modifier = Modifier.height(16.dp))
                             OutlinedTextField(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
+                                    .padding(horizontal = 16.dp),
                                 value = viewModel.muteWordsFieldState,
                                 onValueChange = {
-                                viewModel.updateText(it)
-                            })
+                                    viewModel.updateText(it)
+                                }
+                            )
+                            Text(
+                                stringResource(R.string.client_word_mute_format_description),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }

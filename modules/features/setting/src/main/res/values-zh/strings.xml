@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="client_word_mute">应用程序字静音</string>
+    <string name="client_word_mute_format_description">用空格分隔会产生 AND 规范，用换行符分隔会产生 OR 规范。 \n关键字周围的斜线使其成为正则表达式。</string>
+
 </resources>
