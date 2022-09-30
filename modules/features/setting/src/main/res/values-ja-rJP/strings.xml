@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="client_word_mute">クライアントワードミュート</string>
+    <string name="client_word_mute_format_description">b</string>
 
 </resources>
