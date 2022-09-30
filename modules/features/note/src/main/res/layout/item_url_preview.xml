@@ -18,8 +18,8 @@
 
         <ImageView
                 android:id="@+id/siteThumbnailView"
-                android:layout_width="62dp"
-                android:layout_height="62dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +29,7 @@
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/ic_selectable_file"
                 app:urlPreviewThumbnailUrl="@{urlPreview.thumbnail}"
-                android:layout_marginStart="1dp"
+                app:layout_constraintDimensionRatio="1:1"
                 />
 
         <TextView
@@ -81,7 +81,6 @@
                 app:layout_constraintTop_toBottomOf="@id/siteDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="8dp"
-                tools:src="@mipmap/ic_launcher"
                 tools:ignore="ContentDescription"
                 app:siteIconUrl="@{urlPreview.icon}"
                 />
