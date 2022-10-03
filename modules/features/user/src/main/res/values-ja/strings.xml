@@ -3,4 +3,6 @@
 
     <string name="birthday">誕生日: %s</string>
     <string name="registration_date">%sに登録をしました</string>
+    <string name="confirm_user_block_title">確認</string>
+    <string name="confirm_user_block_description">本当に%sさんをブロックしますか？</string>
 </resources>

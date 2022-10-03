@@ -3,4 +3,6 @@
 
     <string name="birthday">生日: %s</string>
     <string name="registration_date">注册于 %s</string>
+    <string name="confirm_user_block_title">确认</string>
+    <string name="confirm_user_block_description">您确定要阻止%s吗？</string>
 </resources>
