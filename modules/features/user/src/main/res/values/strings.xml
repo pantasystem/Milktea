@@ -2,4 +2,6 @@
 <resources>
     <string name="birthday">Birthday: %s</string>
     <string name="registration_date">Registered on the %s</string>
+    <string name="confirm_user_block_title">Confirmation</string>
+    <string name="confirm_user_block_description">Are you sure you want to block %s?</string>
 </resources>
