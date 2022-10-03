@@ -51,6 +51,7 @@ import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
+import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
 import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
@@ -346,7 +347,7 @@ class UserDetailActivity : AppCompatActivity() {
                 return true
             }
             R.id.block -> {
-                mViewModel.block()
+                ConfirmUserBlockDialog().show(supportFragmentManager, "ConfirmUserBlockDialog")
             }
             R.id.mute -> {
                 mViewModel.mute()
