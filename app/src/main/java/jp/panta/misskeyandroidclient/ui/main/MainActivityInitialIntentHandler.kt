@@ -15,6 +15,7 @@ import net.pantasystem.milktea.model.notification.PushNotification
 import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
+import net.pantasystem.milktea.note.NoteEditorActivity
 
 /**
  * MainActivity起動時にIntentを処理するクラス
@@ -43,6 +44,28 @@ class MainActivityInitialIntentHandler(
             }
             return
         }
+
+        val shortcutType = runCatching {
+            intent.getStringExtra("SHORTCUT_TYPE")
+                ?.let { AppShortcutType.valueOf(it) }
+        }.getOrNull()
+
+        when (
+            shortcutType
+        ) {
+            AppShortcutType.TYPE_OPEN_MESSAGING -> {
+                bottomNavigationView.selectedItemId = R.id.navigation_message_list
+            }
+            AppShortcutType.TYPE_OPEN_NOTIFICATION -> {
+                bottomNavigationView.selectedItemId = R.id.navigation_notification
+            }
+            AppShortcutType.TYPE_EDIT_NOTE -> {
+                activity.startActivity(NoteEditorActivity.newBundle(activity))
+            }
+            null -> {
+
+            }
+        }
     }
 
     private fun navigateBy(pushNotification: PushNotification) {
@@ -56,17 +79,24 @@ class MainActivityInitialIntentHandler(
                                 pushNotification.accountId,
                                 pushNotification.userId!!
                             )
-                        ))
+                        )
+                    )
                 )
             }
             pushNotification.isNearNoteNotification() -> {
                 activity.startActivity(
-                    NoteDetailActivity.newIntent(activity, Note.Id(
-                        pushNotification.accountId,
-                        pushNotification.noteId!!,
-                    ))
+                    NoteDetailActivity.newIntent(
+                        activity, Note.Id(
+                            pushNotification.accountId,
+                            pushNotification.noteId!!,
+                        )
+                    )
                 )
             }
         }
     }
+}
+
+enum class AppShortcutType {
+    TYPE_OPEN_MESSAGING, TYPE_OPEN_NOTIFICATION, TYPE_EDIT_NOTE
 }
