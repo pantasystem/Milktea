@@ -3,11 +3,11 @@ package net.pantasystem.milktea.antenna.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import net.pantasystem.milktea.common_viewmodel.UserViewData
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.antenna.*
@@ -107,7 +107,7 @@ class AntennaEditorViewModel @Inject constructor(
     private val mUsers = userNames.map { list ->
         list.map { userName: String ->
             val userNameAndHost = userName.split("@").filterNot { it == "" }
-            userViewDataFactory.create(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().accountId, viewModelScope, Dispatchers.IO)
+            userViewDataFactory.create(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().getOrThrow().accountId, viewModelScope, Dispatchers.IO)
 
         }
     }
@@ -123,7 +123,7 @@ class AntennaEditorViewModel @Inject constructor(
     val userListList = MediatorLiveData<List<UserList>>().apply{
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = getAccount()
+                val account = getAccount().getOrThrow()
                 userListRepository.findByAccountId(account.accountId)
             }.onSuccess {
                 postValue(it)
@@ -203,7 +203,7 @@ class AntennaEditorViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val account = getAccount()
+                val account = getAccount().getOrThrow()
                 val antenna = mAntenna.value
                 val params = SaveAntennaParam(
                     name.value ?: antenna?.name ?: "",
@@ -299,14 +299,9 @@ class AntennaEditorViewModel @Inject constructor(
         }
     }
 
-    private var mAccount: Account? = null
-    private suspend fun getAccount(): Account {
-        if(mAccount == null) {
-            mAccount = _antennaId.value?.let{
-                accountRepository.get(it.accountId).getOrThrow()
-            }?: accountRepository.getCurrentAccount().getOrThrow()
-        }
-        require(mAccount != null)
-        return mAccount!!
+    private suspend fun getAccount(): Result<Account> = runCatching {
+        _antennaId.value?.let {
+            accountRepository.get(it.accountId).getOrThrow()
+        } ?: accountRepository.getCurrentAccount().getOrThrow()
     }
 }

@@ -22,18 +22,18 @@ import net.pantasystem.milktea.model.antenna.str
 @Serializable
 data class AntennaToAdd(
     val i: String,
-    val antennaId: String?,
+    val antennaId: String? = null,
     val name: String,
     val src: String,
-    val userListId: String?,
-    val userGroupId: String?,
+    val userListId: String? = null,
+    val userGroupId: String? = null,
     val keywords: List<List<String>>,
     val excludeKeywords: List<List<String>>,
-    val users: List<String> = emptyList(),
-    val caseSensitive: Boolean = true,
-    val withFile: Boolean = false,
-    val withReplies: Boolean = false,
-    val notify: Boolean = false,
+    val users: List<String>,
+    val caseSensitive: Boolean,
+    val withFile: Boolean,
+    val withReplies: Boolean,
+    val notify: Boolean,
     val hasUnreadNote: Boolean = false
 
 ) {
