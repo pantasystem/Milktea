@@ -349,7 +349,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         noteEditorViewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner) {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
-            val dialog = VisibilitySelectionDialog()
+            val dialog = VisibilitySelectionDialogV2()
             dialog.show(childFragmentManager, "NoteEditor")
         }
 

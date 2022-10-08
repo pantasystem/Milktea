@@ -13,12 +13,16 @@ import net.pantasystem.milktea.app_store.notes.NoteEditingState
 import net.pantasystem.milktea.app_store.notes.toCreateNote
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -50,7 +54,8 @@ class NoteEditorViewModel @Inject constructor(
     private val noteReservationPostExecutor: NoteReservationPostExecutor,
     private val userViewDataFactory: UserViewData.Factory,
     private val settingStore: SettingStore,
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val channelRepository: ChannelRepository,
 ) : ViewModel() {
 
 
@@ -109,6 +114,17 @@ class NoteEditorViewModel @Inject constructor(
             4
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val channels = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        suspend {
+            channelRepository.findFollowedChannels(it.accountId).onFailure {
+                logger.error("load channel error", it)
+            }.getOrThrow()
+        }.asLoadingStateFlow().onEach {
+            logger.debug("Channel state:${it}")
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = ResultState.Loading(StateContent.NotExist()))
 
 
     val files = _state.map {
@@ -367,7 +383,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setVisibility(visibility: Visibility) {
         logger.debug("公開範囲がセットされた:$visibility")
-        _state.value = _state.value.setVisibility(visibility)
+        _state.value = _state.value.setChannelId(null).setVisibility(visibility)
         this.visibilitySelectedEvent.event = Unit
     }
 
