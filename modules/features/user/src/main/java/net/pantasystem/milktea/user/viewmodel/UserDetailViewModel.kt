@@ -59,12 +59,15 @@ class UserDetailViewModel @AssistedInject constructor(
     private val accountWatcher = CurrentAccountWatcher(userId?.accountId, accountRepository)
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val userState = when {
         userId != null -> {
             userDataSource.observe(userId)
         }
         fqdnUserName != null -> {
-            userDataSource.observe(fqdnUserName)
+            accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+                userDataSource.observe(it.accountId, fqdnUserName)
+            }
         }
         else -> {
             throw IllegalArgumentException()

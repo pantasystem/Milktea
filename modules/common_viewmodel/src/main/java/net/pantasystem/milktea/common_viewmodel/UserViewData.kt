@@ -19,7 +19,7 @@ open class UserViewData(
     val userId: User.Id?,
     val userName: String? = null,
     val host: String? = null,
-    val accountId: Long? = null,
+    val accountId: Long,
     val userDataSource: UserDataSource,
     val userRepository: UserRepository,
     val logger: Logger,
@@ -143,7 +143,7 @@ open class UserViewData(
         logger: Logger,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO
-    ) : this(userId, null, null, null, userDataSource, userRepository, logger, coroutineScope, dispatcher)
+    ) : this(userId, null, null, userId.accountId, userDataSource, userRepository, logger, coroutineScope, dispatcher)
 
     init {
 
@@ -160,7 +160,6 @@ open class UserViewData(
         if (user.value == null) {
             runCatching {
                 if (userId == null) {
-                    require(accountId != null)
                     require(userName != null)
                     userRepository.findByUserName(accountId, userName, host)
                 } else {

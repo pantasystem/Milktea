@@ -19,11 +19,11 @@ data class UsersState (
         }
     }
 
-    fun get(fqdnUserName: String): User? {
+    fun get(accountId: Long, fqdnUserName: String): User? {
         val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
         val userName = userNameAndHost[0]
         val host = userNameAndHost.getOrNull(1)
-        return get(userName, host)
+        return get(userName, host, accountId)
     }
 }
 
@@ -48,9 +48,9 @@ interface UserDataSource {
 
     fun observeIn(accountId: Long, serverIds: List<String>): Flow<List<User>>
     fun observe(userId: User.Id): Flow<User>
-    fun observe(acct: String): Flow<User>
+    fun observe(accountId: Long, acct: String): Flow<User>
 
-    fun observe(userName: String, host: String? = null, accountId: Long? = null): Flow<User?>
+    fun observe(userName: String, host: String? = null, accountId: Long): Flow<User?>
 
     suspend fun searchByName(accountId: Long, name: String): List<User>
 }

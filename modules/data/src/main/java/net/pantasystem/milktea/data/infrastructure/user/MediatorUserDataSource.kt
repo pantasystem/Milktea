@@ -241,15 +241,15 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override fun observe(acct: String): Flow<User> {
+    override fun observe(accountId: Long, acct: String): Flow<User> {
         val (userName, host) = Acct(acct).let {
             it.userName to it.host
         }
         return userDao.let {
             if(host == null) {
-                it.observeByUserName(userName).filterNotNull()
+                it.observeByUserName(accountId, userName).filterNotNull()
             } else {
-                it.observeByUserName(userName, host).filterNotNull()
+                it.observeByUserName(accountId, userName, host).filterNotNull()
             }
         }.map {
             it.toModel()
@@ -261,7 +261,7 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
+    override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
         return inMem.observe(userName, host, accountId).distinctUntilChanged().catch {
             logger.error("observe error", it)
             throw it

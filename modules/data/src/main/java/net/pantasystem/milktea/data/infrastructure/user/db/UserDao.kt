@@ -9,17 +9,14 @@ abstract class UserDao {
     @Insert
     abstract suspend fun insert(user: UserRecord): Long
 
-    @Insert
-    abstract suspend fun insertUsers(users: List<UserRecord>): List<Long>
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertPinnedNoteIds(ids: List<PinnedNoteIdRecord>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(detail: UserDetailedStateRecord): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertDetails(users: List<UserDetailedStateRecord>): List<Long>
+    
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertEmojis(emojis: List<UserEmojiRecord>): List<Long>
@@ -109,17 +106,6 @@ abstract class UserDao {
     @Transaction
     abstract fun observeByUserName(accountId: Long, userName: String): Flow<UserRelated?>
 
-    @Query("""
-        select * from user_view where userName = :userName
-    """)
-    @Transaction
-    abstract fun observeByUserName(userName: String): Flow<UserRelated?>
-
-    @Query("""
-        select * from user_view where userName = :userName and host = :host
-    """)
-    @Transaction
-    abstract fun observeByUserName(userName: String, host: String): Flow<UserRelated?>
 
     @Query("""
         select * from user_view where accountId = :accountId and serverId in (:serverIds)
