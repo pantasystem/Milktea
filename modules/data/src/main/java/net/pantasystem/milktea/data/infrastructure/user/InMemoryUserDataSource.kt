@@ -142,9 +142,9 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
-    override fun observe(acct: String): Flow<User> {
+    override fun observe(accountId: Long, acct: String): Flow<User> {
         return _state.mapNotNull {
-            it.get(acct)
+            it.get(accountId, acct)
         }
     }
 
@@ -156,10 +156,10 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
-    override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
+    override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
         return state.map { state ->
             state.usersMap.values.filter { user ->
-                accountId == null || accountId == user.id.accountId
+                accountId == user.id.accountId
             }.firstOrNull {
                 it.userName == userName && it.host == host
             }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
@@ -240,15 +241,15 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override fun observe(acct: String): Flow<User> {
-        val userNameAndHost = acct.split("@").filter { it.isNotBlank() }
-        val userName = userNameAndHost[0]
-        val host = userNameAndHost.getOrNull(1)
+    override fun observe(accountId: Long, acct: String): Flow<User> {
+        val (userName, host) = Acct(acct).let {
+            it.userName to it.host
+        }
         return userDao.let {
             if(host == null) {
-                it.observeByUserName(userName).filterNotNull()
+                it.observeByUserName(accountId, userName).filterNotNull()
             } else {
-                it.observeByUserName(userName, host).filterNotNull()
+                it.observeByUserName(accountId, userName, host).filterNotNull()
             }
         }.map {
             it.toModel()
@@ -260,7 +261,7 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override fun observe(userName: String, host: String?, accountId: Long?): Flow<User?> {
+    override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
         return inMem.observe(userName, host, accountId).distinctUntilChanged().catch {
             logger.error("observe error", it)
             throw it
