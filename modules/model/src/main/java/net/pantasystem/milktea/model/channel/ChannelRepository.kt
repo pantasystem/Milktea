@@ -14,4 +14,10 @@ interface ChannelRepository {
 
     suspend fun update(model: UpdateChannel): Result<Channel>
 
+    suspend fun findFollowedChannels(
+        accountId: Long,
+        sinceId: Channel.Id? = null,
+        untilId: Channel.Id? = null,
+        limit: Int = 99,
+    ): Result<List<Channel>>
 }

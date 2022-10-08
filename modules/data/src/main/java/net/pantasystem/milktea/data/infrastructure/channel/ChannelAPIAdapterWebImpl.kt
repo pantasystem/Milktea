@@ -84,6 +84,23 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
         }
     }
 
+    override suspend fun findFollowedChannels(
+        accountId: Long,
+        sinceId: Channel.Id?,
+        untilId: Channel.Id?,
+        limit: Int
+    ): Result<List<ChannelDTO>> {
+        return runCatching {
+            val account = accountRepository.get(accountId).getOrThrow()
+            val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
+            api.followedChannels(FindPageable(
+                i = account.getI(encryption),
+                sinceId = sinceId?.channelId,
+                untilId = untilId?.channelId,
+                limit = limit,
+            )).throwIfHasError().body()!!
+        }
+    }
     private suspend fun Channel.Id.getAPI(): MisskeyAPIV12 {
         val account = accountRepository.get(accountId).getOrThrow()
         return misskeyAPIProvider.get(account) as MisskeyAPIV12

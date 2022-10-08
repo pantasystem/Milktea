@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.channel
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.*
 
@@ -53,6 +55,26 @@ class ChannelRepositoryImpl(
             val channel = channelAPIAdapter.update(model).getOrThrow()
             val account = accountRepository.get(model.id.accountId).getOrThrow()
             channelStateModel.add(channel.toModel(account))
+        }
+    }
+
+    override suspend fun findFollowedChannels(
+        accountId: Long,
+        sinceId: Channel.Id?,
+        untilId: Channel.Id?,
+        limit: Int
+    ): Result<List<Channel>> = runCatching {
+        withContext(Dispatchers.IO) {
+            channelAPIAdapter.findFollowedChannels(accountId, sinceId, untilId, 99).mapCatching { list ->
+                val account = accountRepository.get(accountId).getOrThrow()
+                list.map {
+                    it.toModel(account)
+                }
+            }.mapCatching {
+                channelStateModel.addAll(it)
+                it
+            }.getOrThrow()
+
         }
     }
 }
