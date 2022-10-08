@@ -15,6 +15,7 @@ fun SwitchTile(
     modifier: Modifier = Modifier,
     checked: Boolean,
     onChanged: (Boolean) -> Unit,
+    enabled: Boolean = true,
     label: @Composable RowScope.() -> Unit
 ) {
     Row(
@@ -28,6 +29,6 @@ fun SwitchTile(
             label.invoke(this@Row)
         }
 
-        Switch(checked = checked, onCheckedChange = onChanged)
+        Switch(checked = checked, onCheckedChange = onChanged, enabled = enabled)
     }
 }

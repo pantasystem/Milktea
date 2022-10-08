@@ -16,4 +16,11 @@ interface ChannelAPIAdapter {
     suspend fun unFollow(id: Channel.Id): Result<Unit>
 
     suspend fun update(model: UpdateChannel): Result<ChannelDTO>
+
+    suspend fun findFollowedChannels(
+        accountId: Long,
+        sinceId: Channel.Id? = null,
+        untilId: Channel.Id? = null,
+        limit: Int = 20,
+    ): Result<List<ChannelDTO>>
 }
