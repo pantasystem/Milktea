@@ -80,8 +80,8 @@ data class UnFollowChannelDTO(
 @Serializable
 data class FindPageable(
     val i: String?,
-    val sinceId: String?,
-    val untilId: String?,
+    val sinceId: String? = null,
+    val untilId: String? = null,
     val limit: Int = 5
 )
 
