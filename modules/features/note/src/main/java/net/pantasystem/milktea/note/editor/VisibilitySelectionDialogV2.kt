@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.activityViewModels
 import coil.compose.rememberAsyncImagePainter
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,17 +49,20 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
-            setContentView(ComposeView(requireContext()).apply {
+            val view = ComposeView(requireContext()).apply {
                 setContent {
-
                     MdcTheme {
                         VisibilitySelectionDialogContent(viewModel = viewModel)
                     }
-
                 }
-            })
+            }
+            setContentView(view)
+            val behavior = (this as BottomSheetDialog).behavior
+            behavior.peekHeight = (resources.displayMetrics.density * 350).toInt()
         }
     }
+
+
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
