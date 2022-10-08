@@ -60,19 +60,18 @@ class CustomEmojiCompleteAdapter(
     private val mFilter = object : Filter(){
         override fun performFiltering(constraint: CharSequence?): FilterResults {
             this@CustomEmojiCompleteAdapter.constraint = constraint
-            suggestions = listOf()
-
-            suggestions = listOf()
 
             val text = constraint?.toString()
-            if(text != null){
-                suggestions = emojis.filter{
+            val suggestions = if(text != null){
+                emojis.filter{
                     it.name.startsWith(text.replace(":", "")) || it.aliases?.any { alias ->
                         alias.startsWith(text.replace(":", ""))
                     }?: false
                 }.map {
                     ":${it.name}:"
                 }
+            } else {
+                emptyList()
             }
 
             val results = FilterResults()
@@ -84,6 +83,9 @@ class CustomEmojiCompleteAdapter(
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
             val resultCount = results?.count?: 0
             if(resultCount > 0){
+                suggestions = (results?.values as? List<*>?)?.mapNotNull {
+                    it as? String?
+                } ?: emptyList()
                 notifyDataSetChanged()
             }else{
                 notifyDataSetInvalidated()
