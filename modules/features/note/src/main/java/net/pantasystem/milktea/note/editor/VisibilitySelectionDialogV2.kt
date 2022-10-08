@@ -46,101 +46,107 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
 
     val viewModel by activityViewModels<NoteEditorViewModel>()
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
             setContentView(ComposeView(requireContext()).apply {
                 setContent {
-                    val visibility by viewModel.visibility.collectAsState()
-                    val channelsState by viewModel.channels.collectAsState()
-                    val channels =
-                        (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
-                    val state by viewModel.state.collectAsState()
-                    val channelId = state.channelId
+
                     MdcTheme {
-                        Surface(
-                            Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                                .nestedScroll(rememberNestedScrollInteropConnection())
-                        ) {
-                            Column(
-                                Modifier.padding(top = 4.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                Box(
-                                    Modifier
-                                        .width(32.dp)
-                                        .height(8.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(Color.Gray),
-                                    content = {}
-                                )
-                                Spacer(Modifier.height(4.dp))
-
-                                LazyColumn(
-                                    Modifier.fillMaxWidth()
-                                ) {
-                                    item {
-                                        VisibilitySelectionTile(
-                                            item = Visibility.Public(visibility.isLocalOnly()),
-                                            isSelected = visibility is Visibility.Public && channelId == null,
-                                            onClick = viewModel::setVisibility
-                                        )
-
-                                        VisibilitySelectionTile(
-                                            item = Visibility.Home(visibility.isLocalOnly()),
-                                            isSelected = visibility is Visibility.Home && channelId == null,
-                                            onClick = viewModel::setVisibility
-                                        )
-                                        VisibilitySelectionTile(
-                                            item = Visibility.Followers(
-                                                visibility.isLocalOnly()
-                                            ),
-                                            isSelected = visibility is Visibility.Followers && channelId == null,
-                                            onClick = viewModel::setVisibility
-                                        )
-                                        VisibilitySelectionTile(
-                                            item = Visibility.Specified(
-                                                emptyList()
-                                            ),
-                                            isSelected = visibility is Visibility.Specified && channelId == null,
-                                            onClick = viewModel::setVisibility
-                                        )
-
-                                        VisibilityLocalOnlySwitch(
-                                            checked = visibility.isLocalOnly(),
-                                            enabled = visibility is CanLocalOnly && channelId == null,
-                                            onChanged = { result ->
-                                                (visibility as? CanLocalOnly)?.changeLocalOnly(
-                                                    result
-                                                )?.also {
-                                                    viewModel.setVisibility(it as Visibility)
-                                                }
-                                            },
-                                        )
-
-                                        VisibilityChannelTitle()
-                                    }
-
-                                    items(channels) { channel ->
-                                        VisibilityChannelSelection(
-                                            item = channel,
-                                            isSelected = channel.id == channelId,
-                                            onClick = {
-                                                viewModel.setChannelId(it.id)
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-
-                        }
+                        VisibilitySelectionDialogContent(viewModel = viewModel)
                     }
 
                 }
             })
         }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
+    val visibility by viewModel.visibility.collectAsState()
+    val channelsState by viewModel.channels.collectAsState()
+    val channels =
+        (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
+    val state by viewModel.state.collectAsState()
+    val channelId = state.channelId
+    Surface(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .nestedScroll(rememberNestedScrollInteropConnection())
+    ) {
+        Column(
+            Modifier.padding(top = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(
+                Modifier
+                    .width(32.dp)
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.Gray),
+                content = {}
+            )
+            Spacer(Modifier.height(4.dp))
+
+            LazyColumn(
+                Modifier.fillMaxWidth()
+            ) {
+                item {
+                    VisibilitySelectionTile(
+                        item = Visibility.Public(visibility.isLocalOnly()),
+                        isSelected = visibility is Visibility.Public && channelId == null,
+                        onClick = viewModel::setVisibility
+                    )
+
+                    VisibilitySelectionTile(
+                        item = Visibility.Home(visibility.isLocalOnly()),
+                        isSelected = visibility is Visibility.Home && channelId == null,
+                        onClick = viewModel::setVisibility
+                    )
+                    VisibilitySelectionTile(
+                        item = Visibility.Followers(
+                            visibility.isLocalOnly()
+                        ),
+                        isSelected = visibility is Visibility.Followers && channelId == null,
+                        onClick = viewModel::setVisibility
+                    )
+                    VisibilitySelectionTile(
+                        item = Visibility.Specified(
+                            emptyList()
+                        ),
+                        isSelected = visibility is Visibility.Specified && channelId == null,
+                        onClick = viewModel::setVisibility
+                    )
+
+                    VisibilityLocalOnlySwitch(
+                        checked = visibility.isLocalOnly(),
+                        enabled = visibility is CanLocalOnly && channelId == null,
+                        onChanged = { result ->
+                            (visibility as? CanLocalOnly)?.changeLocalOnly(
+                                result
+                            )?.also {
+                                viewModel.setVisibility(it as Visibility)
+                            }
+                        },
+                    )
+
+                    VisibilityChannelTitle()
+                }
+
+                items(channels) { channel ->
+                    VisibilityChannelSelection(
+                        item = channel,
+                        isSelected = channel.id == channelId,
+                        onClick = {
+                            viewModel.setChannelId(it.id)
+                        }
+                    )
+                }
+            }
+        }
+
     }
 }
 
