@@ -21,6 +21,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -283,12 +284,7 @@ class UserDetailViewModel @AssistedInject constructor(
         return userRepository.find(getUserId())
     }
 
-    private fun splitUserNameAndHost(acct: String): Pair<String, String?> {
-        val userNameAndHost = acct.split("@").filter { it.isNotBlank() }
-        val userName = userNameAndHost[0]
-        val host = userNameAndHost.getOrNull(1)
-        return userName to host
-    }
+
 
     private suspend fun getUserId(): User.Id {
         if (userId != null) {
@@ -297,7 +293,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
         val account = accountWatcher.getAccount()
         if (fqdnUserName != null) {
-            val (userName, host) = splitUserNameAndHost(fqdnUserName)
+            val (userName, host) = Acct(fqdnUserName).let {
+                it.userName to it.host
+            }
             return userRepository.findByUserName(account.accountId, userName, host).id
         }
         throw IllegalStateException()

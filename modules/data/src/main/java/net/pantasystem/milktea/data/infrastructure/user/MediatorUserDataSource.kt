@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
@@ -241,9 +242,9 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override fun observe(acct: String): Flow<User> {
-        val userNameAndHost = acct.split("@").filter { it.isNotBlank() }
-        val userName = userNameAndHost[0]
-        val host = userNameAndHost.getOrNull(1)
+        val (userName, host) = Acct(acct).let {
+            it.userName to it.host
+        }
         return userDao.let {
             if(host == null) {
                 it.observeByUserName(userName).filterNotNull()
