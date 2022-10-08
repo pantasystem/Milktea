@@ -2,6 +2,7 @@ package net.pantasystem.milktea.note.editor
 
 import android.app.Dialog
 import android.os.Bundle
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,21 +13,28 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.activityViewModels
+import coil.compose.rememberAsyncImagePainter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
@@ -38,19 +46,23 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
 
     val viewModel by activityViewModels<NoteEditorViewModel>()
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return super.onCreateDialog(savedInstanceState).apply {
             setContentView(ComposeView(requireContext()).apply {
                 setContent {
                     val visibility by viewModel.visibility.collectAsState()
                     val channelsState by viewModel.channels.collectAsState()
-                    val channels = (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
-
+                    val channels =
+                        (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
+                    val state by viewModel.state.collectAsState()
+                    val channelId = state.channelId
                     MdcTheme {
                         Surface(
                             Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                                .nestedScroll(rememberNestedScrollInteropConnection())
                         ) {
                             Column(
                                 Modifier.padding(top = 4.dp),
@@ -72,31 +84,33 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
                                     item {
                                         VisibilitySelectionTile(
                                             item = Visibility.Public(visibility.isLocalOnly()),
-                                            isSelected = visibility is Visibility.Public,
+                                            isSelected = visibility is Visibility.Public && channelId == null,
                                             onClick = viewModel::setVisibility
                                         )
 
                                         VisibilitySelectionTile(
                                             item = Visibility.Home(visibility.isLocalOnly()),
-                                            isSelected = visibility is Visibility.Home,
+                                            isSelected = visibility is Visibility.Home && channelId == null,
                                             onClick = viewModel::setVisibility
                                         )
                                         VisibilitySelectionTile(
                                             item = Visibility.Followers(
                                                 visibility.isLocalOnly()
-                                            ), isSelected = visibility is Visibility.Followers,
+                                            ),
+                                            isSelected = visibility is Visibility.Followers && channelId == null,
                                             onClick = viewModel::setVisibility
                                         )
                                         VisibilitySelectionTile(
                                             item = Visibility.Specified(
                                                 emptyList()
-                                            ), isSelected = visibility is Visibility.Specified,
+                                            ),
+                                            isSelected = visibility is Visibility.Specified && channelId == null,
                                             onClick = viewModel::setVisibility
                                         )
 
                                         VisibilityLocalOnlySwitch(
                                             checked = visibility.isLocalOnly(),
-                                            enabled = visibility is CanLocalOnly,
+                                            enabled = visibility is CanLocalOnly && channelId == null,
                                             onChanged = { result ->
                                                 (visibility as? CanLocalOnly)?.changeLocalOnly(
                                                     result
@@ -110,7 +124,13 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
                                     }
 
                                     items(channels) { channel ->
-                                        Text(channel.name)
+                                        VisibilityChannelSelection(
+                                            item = channel,
+                                            isSelected = channel.id == channelId,
+                                            onClick = {
+                                                viewModel.setChannelId(it.id)
+                                            }
+                                        )
                                     }
                                 }
                             }
@@ -198,3 +218,43 @@ fun VisibilityChannelTitle() {
     )
 }
 
+
+@Composable
+fun VisibilityChannelSelection(
+    item: Channel,
+    isSelected: Boolean,
+    onClick: (Channel) -> Unit,
+) {
+    val color = remember {
+        item.rgpFromName
+    }
+    Surface(
+        Modifier.clickable {
+            onClick(item)
+        },
+        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                rememberAsyncImagePainter(item.bannerUrl),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(red = color.first, green = color.second, blue = color.third))
+            )
+            Spacer(Modifier.width(4.dp))
+
+            Column {
+                Text(item.name, fontWeight = FontWeight.Bold)
+                Text(item.description ?: "", maxLines = 2)
+            }
+        }
+    }
+}
