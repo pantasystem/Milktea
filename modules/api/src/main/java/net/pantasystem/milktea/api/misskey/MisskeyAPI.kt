@@ -222,7 +222,7 @@ interface MisskeyAPI {
     suspend fun readMessage(@Body messageAction: MessageAction): Response<Unit>
 
     @POST("api/mute/create")
-    suspend fun muteUser(@Body requestUser: RequestUser): Response<Unit>
+    suspend fun muteUser(@Body createMuteRequest: CreateMuteUserRequest): Response<Unit>
 
     @POST("api/mute/delete")
     suspend fun unmuteUser(@Body requestUser: RequestUser): Response<Unit>

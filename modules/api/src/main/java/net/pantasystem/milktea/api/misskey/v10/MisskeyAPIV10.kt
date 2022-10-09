@@ -98,7 +98,7 @@ open class MisskeyAPIV10(val misskey: MisskeyAPI, private val diff: MisskeyAPIV1
 
     override suspend fun localTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskey.localTimeline(noteRequest)
 
-    override suspend fun muteUser(requestUser: RequestUser): Response<Unit> = misskey.muteUser(requestUser)
+    override suspend fun muteUser(createMuteRequest: CreateMuteUserRequest): Response<Unit> = misskey.muteUser(createMuteRequest)
 
     override suspend fun myApps(i: I): Response<List<App>> = misskey.myApps(i)
 
