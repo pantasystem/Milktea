@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -187,7 +188,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    userRepository.mute(it.id)
+                    userRepository.mute(CreateMute(it.id))
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
