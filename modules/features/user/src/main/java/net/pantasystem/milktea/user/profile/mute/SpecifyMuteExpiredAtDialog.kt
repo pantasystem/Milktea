@@ -54,17 +54,19 @@ class SpecifyMuteExpiredAtDialog : AppCompatDialogFragment() {
                 }
             })
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                when(viewModel.state) {
+                val expiredAt = when(val state = viewModel.state) {
                     SpecifyUserMuteUiState.IndefinitePeriod -> {
-
+                        null
                     }
                     is SpecifyUserMuteUiState.Specified -> {
-
+                        state.dateTime
                     }
                 }
+                userDetailViewModel.mute(expiredAt)
                 viewModel.onConfirmed()
             }
             .setNegativeButton(android.R.string.cancel) { _, _ ->
+                viewModel.onCanceled()
             }
             .create()
     }

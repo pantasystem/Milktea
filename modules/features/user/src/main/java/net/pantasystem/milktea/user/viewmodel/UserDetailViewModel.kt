@@ -6,6 +6,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -184,11 +185,11 @@ class UserDetailViewModel @AssistedInject constructor(
         showFollowers.event = user.value
     }
 
-    fun mute() {
+    fun mute(expiredAt: Instant?) {
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    userRepository.mute(CreateMute(it.id))
+                    userRepository.mute(CreateMute(it.id, expiredAt))
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
