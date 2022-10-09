@@ -17,6 +17,11 @@ import kotlin.time.Duration
 class MuteUserViewModel @Inject constructor(): ViewModel() {
     var state by mutableStateOf<SpecifyUserMuteUiState>(SpecifyUserMuteUiState.IndefinitePeriod)
         private set
+    val expiredAt: Instant
+        get() {
+            return (state as? SpecifyUserMuteUiState.Specified)?.dateTime
+                ?: Clock.System.now()
+        }
 
     fun setDate(year: Int, month: Int, dayOfMonth: Int) {
         val dateTime = (state as? SpecifyUserMuteUiState.Specified)?.dateTime ?: Clock.System.now()
@@ -38,6 +43,10 @@ class MuteUserViewModel @Inject constructor(): ViewModel() {
     }
 
     fun onConfirmed() {
+        state = SpecifyUserMuteUiState.IndefinitePeriod
+    }
+
+    fun onCanceled() {
         state = SpecifyUserMuteUiState.IndefinitePeriod
     }
 
