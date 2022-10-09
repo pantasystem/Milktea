@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.user.profile.mute
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Switch
@@ -28,7 +29,18 @@ fun SpecifyMuteExpiredAtDialogContent(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .clickable {
+                    onAction(
+                        SpecifyMuteUserAction.OnChangeState(
+                            if (state is SpecifyUserMuteUiState.Specified) {
+                                SpecifyUserMuteUiState.IndefinitePeriod
+                            } else {
+                                SpecifyUserMuteUiState.Specified(Clock.System.now() + 15.minutes)
+                            }
+                        )
+                    )
+                },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
