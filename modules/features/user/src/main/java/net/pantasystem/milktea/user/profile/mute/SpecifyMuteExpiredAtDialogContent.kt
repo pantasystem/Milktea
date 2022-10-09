@@ -32,7 +32,7 @@ fun SpecifyMuteExpiredAtDialogContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("無期限")
+            Text(stringResource(R.string.user_mute_specify_time_indefinite_period))
             Switch(
                 checked = state is SpecifyUserMuteUiState.IndefinitePeriod,
                 onCheckedChange = {
