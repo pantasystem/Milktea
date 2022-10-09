@@ -6,6 +6,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -25,6 +26,7 @@ import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -183,11 +185,11 @@ class UserDetailViewModel @AssistedInject constructor(
         showFollowers.event = user.value
     }
 
-    fun mute() {
+    fun mute(expiredAt: Instant?) {
         viewModelScope.launch(Dispatchers.IO) {
             userState.value?.let {
                 runCatching {
-                    userRepository.mute(it.id)
+                    userRepository.mute(CreateMute(it.id, expiredAt))
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)

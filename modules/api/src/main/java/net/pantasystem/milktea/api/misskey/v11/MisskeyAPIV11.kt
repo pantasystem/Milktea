@@ -1,30 +1,27 @@
 package net.pantasystem.milktea.api.misskey.v11
 
 import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.groups.*
-import net.pantasystem.milktea.api.misskey.list.*
-import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
+import net.pantasystem.milktea.api.misskey.groups.*
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
-
-import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
+import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
 import net.pantasystem.milktea.api.misskey.notes.*
 import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
 import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
-import net.pantasystem.milktea.model.messaging.RequestMessageHistory
-import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.api.misskey.notes.reaction.ReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.translation.Translate
 import net.pantasystem.milktea.api.misskey.notes.translation.TranslationResult
+import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.SubscriptionState
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
@@ -34,6 +31,8 @@ import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
+import net.pantasystem.milktea.model.messaging.RequestMessageHistory
+import net.pantasystem.milktea.model.notes.poll.Vote
 import retrofit2.Response
 
 open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff: MisskeyAPIV11Diff): MisskeyAPI by misskeyAPI{
@@ -68,7 +67,7 @@ open class MisskeyAPIV11(private val misskeyAPI: MisskeyAPI, private val apiDiff
     override suspend fun i(i: I): Response<UserDTO> = misskeyAPI.i(i)
     override suspend fun localTimeline(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.localTimeline(noteRequest)
     override suspend fun mentions(noteRequest: NoteRequest): Response<List<NoteDTO>?> = misskeyAPI.mentions(noteRequest)
-    override suspend fun muteUser(requestUser: RequestUser): Response<Unit> = misskeyAPI.muteUser(requestUser)
+    override suspend fun muteUser(createMuteRequest: CreateMuteUserRequest): Response<Unit> = misskeyAPI.muteUser(createMuteRequest)
     override suspend fun followUser(requestUser: RequestUser): Response<UserDTO> = misskeyAPI.followUser(requestUser)
     override suspend fun myApps(i: I): Response<List<App>> = misskeyAPI.myApps(i)
     override suspend fun noteState(noteRequest: NoteRequest): Response<NoteState> = misskeyAPI.noteState(noteRequest)

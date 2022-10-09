@@ -53,6 +53,7 @@ import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
 import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
 import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
+import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
@@ -350,7 +351,8 @@ class UserDetailActivity : AppCompatActivity() {
                 ConfirmUserBlockDialog().show(supportFragmentManager, "ConfirmUserBlockDialog")
             }
             R.id.mute -> {
-                mViewModel.mute()
+                SpecifyMuteExpiredAtDialog()
+                    .show(supportFragmentManager, "SpecifyMuteExpiredAtDialog")
             }
             R.id.unblock -> {
                 mViewModel.unblock()

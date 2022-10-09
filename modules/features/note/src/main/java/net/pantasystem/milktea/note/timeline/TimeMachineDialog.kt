@@ -22,7 +22,7 @@ import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
 class TimeMachineDialog : AppCompatDialogFragment() {
 
     val viewModel by activityViewModels<TimeMachineDialogViewModel>()
-    val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
+    private val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = View.inflate(this.context, R.layout.dialog_time_machine, null)

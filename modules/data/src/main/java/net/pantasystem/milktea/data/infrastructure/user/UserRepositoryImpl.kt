@@ -19,6 +19,7 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 import net.pantasystem.milktea.model.user.report.Report
 import retrofit2.Response
@@ -157,10 +158,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun mute(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
-        action(userId.getMisskeyAPI()::muteUser, userId) { user ->
-            user.copy(isMuting = true)
-        }
+    override suspend fun mute(createMute: CreateMute): Boolean = withContext(Dispatchers.IO) {
+        val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
+        val res = misskeyAPIProvider.get(account).muteUser(CreateMuteUserRequest(
+            i = account.getI(encryption),
+            userId = createMute.userId.id,
+            expiresAt = createMute.expiresAt?.toEpochMilliseconds()
+        )).throwIfHasError()
+        userDataSource.add(userDataSource.get(createMute.userId).getOrThrow()).getOrThrow()
+        res.isSuccessful
     }
 
     override suspend fun unmute(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
