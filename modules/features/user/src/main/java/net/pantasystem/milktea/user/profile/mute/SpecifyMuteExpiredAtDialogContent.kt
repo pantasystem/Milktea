@@ -8,8 +8,10 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.viewmodel.SpecifyUserMuteUiState
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -48,69 +50,69 @@ fun SpecifyMuteExpiredAtDialogContent(
 
         }
 
-        when (val s = state) {
+        when (state) {
             is SpecifyUserMuteUiState.Specified -> {
-                val localDateTime = s.localDateTime
+                val localDateTime = state.localDateTime
 
                 TextButton(
                     onClick = {
                         onAction(
                             SpecifyMuteUserAction.OnChangeState(
-                                s.applyDuration(15.minutes)
+                                state.applyDuration(15.minutes)
                             )
                         )
                     },
                     Modifier.fillMaxWidth()
                 ) {
-                    Text("15分後")
+                    Text(stringResource(R.string.user_mute_specify_time_15_minutes_later))
                 }
                 TextButton(
                     onClick = {
                         onAction(
                             SpecifyMuteUserAction.OnChangeState(
-                                s.applyDuration(30.minutes)
+                                state.applyDuration(30.minutes)
                             )
                         )
                     },
                     Modifier.fillMaxWidth()
                 ) {
-                    Text("30分後")
+                    Text(stringResource(R.string.user_mute_specify_time_30_minutes_later))
                 }
                 TextButton(
                     onClick = {
                         onAction(
                             SpecifyMuteUserAction.OnChangeState(
-                                s.applyDuration(1.hours)
+                                state.applyDuration(1.hours)
                             )
                         )
                     },
                     Modifier.fillMaxWidth()
                 ) {
-                    Text("1時間後")
+                    Text(stringResource(R.string.user_mute_specify_time_1_hours_later))
                 }
                 TextButton(
                     onClick = {
                         onAction(
                             SpecifyMuteUserAction.OnChangeState(
-                                s.applyDuration(7.days)
+                                state.applyDuration(7.days)
                             )
                         )
                     },
                     Modifier.fillMaxWidth()
                 ) {
-                    Text("1週間後")
+                    Text(stringResource(R.string.user_mute_specify_time_1_week_later))
                 }
                 TextButton(
                     onClick = {
                         onAction(
                             SpecifyMuteUserAction.OnChangeState(
-                                s.applyDuration(30.days)
+                                state.applyDuration(30.days)
                             )
                         )
                     },
                     Modifier.fillMaxWidth()
                 ) {
-                    Text("1ヶ月後")
+                    Text(stringResource(R.string.user_mute_specify_time_1_month_later))
                 }
 
                 Row(
@@ -120,7 +122,7 @@ fun SpecifyMuteExpiredAtDialogContent(
                 ) {
                     Button(
                         onClick = {
-
+                            onAction(SpecifyMuteUserAction.OnDateChangeButtonClicked)
                         },
                         Modifier.weight(1f),
                     ) {
@@ -128,7 +130,9 @@ fun SpecifyMuteExpiredAtDialogContent(
                     }
                     Spacer(Modifier.width(4.dp))
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            onAction(SpecifyMuteUserAction.OnTimeChangeButtonClicked)
+                        },
                         Modifier.weight(1f),
                     ) {
                         Text("${localDateTime.hour}:${localDateTime.minute}")
