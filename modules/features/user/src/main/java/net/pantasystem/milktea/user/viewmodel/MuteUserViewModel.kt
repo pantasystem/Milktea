@@ -9,6 +9,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.util.*
 import javax.inject.Inject
 import kotlin.time.Duration
 
@@ -17,12 +18,23 @@ class MuteUserViewModel @Inject constructor(): ViewModel() {
     var state by mutableStateOf<SpecifyUserMuteUiState>(SpecifyUserMuteUiState.IndefinitePeriod)
         private set
 
-    fun setDate(year: Int, month: Int, monthOfDay: Int) {
-
+    fun setDate(year: Int, month: Int, dayOfMonth: Int) {
+        val dateTime = (state as? SpecifyUserMuteUiState.Specified)?.dateTime ?: Clock.System.now()
+        val calendar = Calendar.getInstance()
+        calendar.time = Date(dateTime.toEpochMilliseconds())
+        calendar.set(Calendar.YEAR, year)
+        calendar.set(Calendar.MONTH, month)
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        state = SpecifyUserMuteUiState.Specified(Instant.fromEpochMilliseconds(calendar.time.time))
     }
 
-    fun setTime(time: Int, hour: Int) {
-
+    fun setTime(hour: Int, minutes: Int) {
+        val dateTime = (state as? SpecifyUserMuteUiState.Specified)?.dateTime ?: Clock.System.now()
+        val calendar = Calendar.getInstance()
+        calendar.time = Date(dateTime.toEpochMilliseconds())
+        calendar.set(Calendar.HOUR_OF_DAY, hour)
+        calendar.set(Calendar.MINUTE, minutes)
+        state = SpecifyUserMuteUiState.Specified(Instant.fromEpochMilliseconds(calendar.time.time))
     }
 
     fun onConfirmed() {
