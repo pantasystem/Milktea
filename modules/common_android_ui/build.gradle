@@ -69,5 +69,7 @@ dependencies {
     implementation libs.lifecycle.viewmodel
     implementation libs.fragment.ktx
     implementation libs.activity.ktx
+    implementation libs.animation.apng
+
 
 }
