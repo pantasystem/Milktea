@@ -12,4 +12,5 @@ type InstanceRepository interface {
 	FindById(uuid.UUID) (*domain.Instance, error)
 	Create(domain.Instance) (*domain.Instance, error)
 	FindByHost(host string) (*domain.Instance, error)
+	FindAll() ([]*domain.Instance, error)
 }

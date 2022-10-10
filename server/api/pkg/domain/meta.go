@@ -1,7 +1,7 @@
 package domain
 
 type Meta struct {
-	Host        string  `json:"instanceId" gorm:"primaryKey"`
+	Host        string  `json:"host" gorm:"primaryKey"`
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
 	ThemeColor  *string `json:"themeColor"`

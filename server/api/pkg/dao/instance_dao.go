@@ -50,8 +50,8 @@ func (r InstanceDao) FindByPublishedInstances() ([]domain.InstanceInfo, error) {
 	if result := r.db.
 		Table("instances").
 		Select("instances.host", "meta.name", "meta.description").
-		// Where("publishedAt is not null").
-		// Where("instances.deletedAt is null").
+		Where("instances.published_at is not null").
+		Where("instances.deleted_at is null").
 		Joins("LEFT JOIN meta ON instances.host = meta.host").
 		Find(&list); result.Error != nil {
 		return nil, result.Error
@@ -82,6 +82,14 @@ func (r InstanceDao) FindByHost(host string) (*domain.Instance, error) {
 		return nil, result.Error
 	}
 	return &instance, nil
+}
+
+func (r InstanceDao) FindAll() ([]*domain.Instance, error) {
+	var instances []*domain.Instance
+	if result := r.db.Find(&instances); result.Error != nil {
+		return nil, result.Error
+	}
+	return instances, nil
 }
 
 func NewInstanceRepository(db gorm.DB) repository.InstanceRepository {
