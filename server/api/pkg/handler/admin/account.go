@@ -64,7 +64,7 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 	})
 
 	engine.GET("/api/admin/instances", m.CheckToken(), func(c *gin.Context) {
-		instances, err := instanceRepository.FindByPublishedInstances()
+		instances, err := instanceRepository.FindAll()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 			return

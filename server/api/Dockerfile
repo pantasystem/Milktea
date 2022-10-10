@@ -1,10 +1,10 @@
-FROM golang:1.18.7-alpine3.16
+FROM golang:1.18.7-bullseye
 
 ENV GOPATH /go
 ENV GO111MODULE on
 
-RUN apk update && \
-    apk --no-cache add git
+RUN apt update && \
+    apt install git
 
 RUN mkdir /go/src/app
 WORKDIR /go/src/app
