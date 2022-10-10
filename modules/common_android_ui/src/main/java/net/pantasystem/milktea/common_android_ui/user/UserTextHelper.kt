@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
+import net.pantasystem.milktea.common_android_ui.DecorateTextHelper
 import net.pantasystem.milktea.model.user.User
 
 
@@ -30,6 +31,7 @@ object UserTextHelper {
             userName = subNameView
         }
         name?.let {
+            DecorateTextHelper.stopDrawableAnimations(it)
             name.text = CustomEmojiDecorator().decorate(user.emojis, user.displayName, name)
         }
         userName?.let {

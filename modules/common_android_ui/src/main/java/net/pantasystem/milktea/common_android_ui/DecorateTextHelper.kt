@@ -1,13 +1,18 @@
 package net.pantasystem.milktea.common_android_ui
 
 import android.net.Uri
+import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.widget.TextView
+import androidx.core.text.getSpans
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.github.penfeizhou.animation.apng.APNGDrawable
 import jp.panta.misskeyandroidclient.mfm.Root
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
+import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.regex.Pattern
 
@@ -28,6 +33,7 @@ object DecorateTextHelper {
         text?: return
         val span = CustomEmojiDecorator()
             .decorate(emojis, text, this)
+        stopDrawableAnimations(this)
         this.text = span
         if(clickableLink == true){
             decorateLink(this)
@@ -61,7 +67,25 @@ object DecorateTextHelper {
     fun TextView.decorate(node: Root?){
         node?: return
         this.movementMethod = LinkMovementMethod.getInstance()
+        stopDrawableAnimations(this)
         this.text = MFMDecorator.decorate(this, node)
+    }
+
+    fun stopDrawableAnimations(textView: TextView) {
+        val beforeText = textView.text
+        if (beforeText is Spannable) {
+            val drawableEmojiSpans = beforeText.getSpans<DrawableEmojiSpan>()
+            drawableEmojiSpans.forEach {
+                when(val imageDrawable = it.imageDrawable) {
+                    is GifDrawable -> {
+                        imageDrawable.stop()
+                    }
+                    is APNGDrawable -> {
+                        imageDrawable.stop()
+                    }
+                }
+            }
+        }
     }
 
     @BindingAdapter("sourceText", "emojis")
