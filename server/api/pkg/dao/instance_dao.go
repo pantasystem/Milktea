@@ -49,9 +49,10 @@ func (r InstanceDao) FindByPublishedInstances() ([]domain.InstanceInfo, error) {
 	var list []domain.InstanceInfo
 	if result := r.db.
 		Table("instances").
-		Where("publishedAt is not null").
-		Where("deletedAt is null").
-		Joins("LEFT JOIN metas ON instances.id = metas.instanceId").
+		Select("instances.host", "meta.name", "meta.description").
+		// Where("publishedAt is not null").
+		// Where("instances.deletedAt is null").
+		Joins("LEFT JOIN meta ON instances.host = meta.host").
 		Find(&list); result.Error != nil {
 		return nil, result.Error
 	}
