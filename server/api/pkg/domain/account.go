@@ -39,3 +39,12 @@ func (r *AdAccount) SetPassword(password string) bool {
 func (r *AdAccount) CheckPassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(r.EncryptedPassword), []byte(password))
 }
+
+func (r *AdAccount) GetToken(token string) *Token {
+	for _, t := range r.Tokens {
+		if t.Token == token {
+			return t
+		}
+	}
+	return nil
+}
