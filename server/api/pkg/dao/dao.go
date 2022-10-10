@@ -18,7 +18,7 @@ func Init() Dao {
 	if err != nil {
 		panic("db connection error")
 	}
-	if err := db.AutoMigrate(&domain.Instance{}, &domain.Meta{}); err != nil {
+	if err := db.AutoMigrate(&domain.Instance{}, &domain.Meta{}, &domain.AdAccount{}, &domain.Token{}); err != nil {
 		panic(err)
 	}
 	return Dao{
@@ -32,4 +32,8 @@ func (r *Dao) NewInstanceRepository() repository.InstanceRepository {
 
 func (r *Dao) NewMetaRepository() repository.MetaRepository {
 	return NewMetaDao(*r.db)
+}
+
+func (r *Dao) NewAdAccountRepository() repository.AdAccountRepository {
+	return NewAccountDAO(*r.db)
 }

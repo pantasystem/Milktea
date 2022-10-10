@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"systems.panta.milktea/pkg/dao"
 	"systems.panta.milktea/pkg/handler"
+	"systems.panta.milktea/pkg/handler/admin"
 )
 
 func main() {
@@ -22,6 +23,11 @@ func main() {
 		Dao: d,
 	}
 
+	adminAccountHandler := admin.AccountHandler{
+		Dao: d,
+	}
 	instanceHnadler.Setup(engine)
+	adminAccountHandler.Setup(engine)
+
 	engine.Run(":8080")
 }

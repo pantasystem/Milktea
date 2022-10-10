@@ -8,12 +8,12 @@ import (
 	"systems.panta.milktea/pkg/repository"
 )
 
-type AccountDAO struct {
+type AdAccountDAO struct {
 	db gorm.DB
 }
 
-func (r AccountDAO) FindByEmail(email string) (*domain.Account, error) {
-	var account *domain.Account
+func (r AdAccountDAO) FindByEmail(email string) (*domain.AdAccount, error) {
+	var account *domain.AdAccount
 	if result := r.db.Where("email = ?", email).First(&account); result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -23,40 +23,40 @@ func (r AccountDAO) FindByEmail(email string) (*domain.Account, error) {
 	return account, nil
 }
 
-func (r AccountDAO) Create(account *domain.Account) (*domain.Account, error) {
+func (r AdAccountDAO) Create(account *domain.AdAccount) (*domain.AdAccount, error) {
 	if result := r.db.Create(account); result.Error != nil {
 		return nil, result.Error
 	}
 	return r.FindOne(account.Id)
 }
 
-func (r AccountDAO) Delete(id uuid.UUID) error {
-	if result := r.db.Delete(&domain.Account{}, id); result.Error != nil {
+func (r AdAccountDAO) Delete(id uuid.UUID) error {
+	if result := r.db.Delete(&domain.AdAccount{}, id); result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 
-func (r AccountDAO) FindOne(id uuid.UUID) (*domain.Account, error) {
-	var account domain.Account
+func (r AdAccountDAO) FindOne(id uuid.UUID) (*domain.AdAccount, error) {
+	var account domain.AdAccount
 	if result := r.db.Preload(clause.Associations).First(&account, id); result.Error != nil {
 		return nil, result.Error
 	}
 	return &account, nil
 }
 
-func (r AccountDAO) FindByToken(token string) (*domain.Account, error) {
+func (r AdAccountDAO) FindByToken(token string) (*domain.AdAccount, error) {
 	var tokenModel domain.Token
 	if result := r.db.Where("token = ?", token).First(&tokenModel); result.Error != nil {
 		return nil, result.Error
 	}
-	return r.FindOne(tokenModel.AccountId)
+	return r.FindOne(tokenModel.AdAccountId)
 }
 
-func (r AccountDAO) CreateToken(accountId uuid.UUID, ipAddress string) (*domain.Token, error) {
+func (r AdAccountDAO) CreateToken(accountId uuid.UUID, ipAddress string) (*domain.Token, error) {
 	token := domain.Token{
-		AccountId: accountId,
-		IpAddress: ipAddress,
+		AdAccountId: accountId,
+		IpAddress:   ipAddress,
 	}
 	if result := r.db.Create(&token); result.Error != nil {
 		return nil, result.Error
@@ -64,11 +64,11 @@ func (r AccountDAO) CreateToken(accountId uuid.UUID, ipAddress string) (*domain.
 	return &token, nil
 }
 
-func (r AccountDAO) RemoveToken(token domain.Token) error {
+func (r AdAccountDAO) RemoveToken(token domain.Token) error {
 	result := r.db.Delete(&domain.Token{}, token.ID)
 	return result.Error
 }
 
-func NewAccountDAO(db gorm.DB) repository.AccountRepository {
-	return AccountDAO{db: db}
+func NewAccountDAO(db gorm.DB) repository.AdAccountRepository {
+	return AdAccountDAO{db: db}
 }

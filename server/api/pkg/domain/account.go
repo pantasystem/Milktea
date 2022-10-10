@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Account struct {
+type AdAccount struct {
 	Id                uuid.UUID `json:"id" gorm:"primaryKey"`
 	CreatedAt         time.Time `json:"createdAt"`
 	UpdatedAt         time.Time `json:"updatedAt"`
@@ -17,7 +17,7 @@ type Account struct {
 	Tokens            []*Token  `json:"-"`
 }
 
-func (r *Account) BeforeCreate(tx *gorm.DB) (err error) {
+func (r *AdAccount) BeforeCreate(tx *gorm.DB) (err error) {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil
@@ -27,7 +27,7 @@ func (r *Account) BeforeCreate(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func (r *Account) SetPassword(password string) bool {
+func (r *AdAccount) SetPassword(password string) bool {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return false
@@ -36,6 +36,6 @@ func (r *Account) SetPassword(password string) bool {
 	return true
 }
 
-func (r *Account) CheckPassword(password string) error {
+func (r *AdAccount) CheckPassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(r.EncryptedPassword), []byte(password))
 }

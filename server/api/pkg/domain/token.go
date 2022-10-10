@@ -8,13 +8,13 @@ import (
 )
 
 type Token struct {
-	ID        uuid.UUID `json:"id" gorm:"primaryKey"`
-	Token     string    `json:"token" gorm:"unique"`
-	AccountId uuid.UUID `json:"accountId" gorm:"foreignKey"`
-	Account   Account   `json:"-"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	IpAddress string    `json:"ipAddress"`
+	ID          uuid.UUID `json:"id" gorm:"primaryKey"`
+	Token       string    `json:"token" gorm:"unique"`
+	AdAccountId uuid.UUID `json:"accountId" gorm:"foreignKey"`
+	AdAccount   AdAccount `json:"-"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	IpAddress   string    `json:"ipAddress"`
 }
 
 func (t *Token) BeforeCreate(tx *gorm.DB) (err error) {
