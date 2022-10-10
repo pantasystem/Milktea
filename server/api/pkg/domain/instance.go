@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Instance struct {
@@ -18,4 +19,10 @@ type Instance struct {
 func (r *Instance) Approve() {
 	now := time.Now()
 	r.PublishedAt = &now
+}
+
+func (r *Instance) BeforeCreate(tx *gorm.DB) (err error) {
+	uuid, err := uuid.NewRandom()
+	r.Id = uuid
+	return err
 }
