@@ -5,15 +5,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"systems.panta.milktea/pkg/dao"
+	"systems.panta.milktea/pkg/handler"
 )
 
 func main() {
 	fmt.Printf("Test")
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
+	d := dao.Init()
+	engine := gin.Default()
+	engine.GET("/api/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pongggg",
 		})
 	})
-	r.Run(":8080")
+	instanceHnadler := handler.InstanceHandler{
+		Dao: d,
+	}
+
+	instanceHnadler.Setup(engine)
+	engine.Run(":8080")
 }

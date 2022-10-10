@@ -1,6 +1,8 @@
 package dao
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"systems.panta.milktea/pkg/domain"
@@ -33,6 +35,7 @@ func (r InstanceDao) Request(instance domain.Instance) (*domain.Instance, error)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
+	fmt.Printf("第一段階突破")
 	if i == nil || err == gorm.ErrRecordNotFound {
 		instance.PublishedAt = nil
 		return r.Create(instance)
@@ -73,11 +76,11 @@ func (r InstanceDao) Create(instance domain.Instance) (*domain.Instance, error) 
 }
 
 func (r InstanceDao) FindByHost(host string) (*domain.Instance, error) {
-	var instance *domain.Instance
-	if result := r.db.Where("host = ?", host).First(instance); result.Error != nil {
+	var instance domain.Instance
+	if result := r.db.Where("host = ?", host).First(&instance); result.Error != nil {
 		return nil, result.Error
 	}
-	return instance, nil
+	return &instance, nil
 }
 
 func NewInstanceRepository(db gorm.DB) repository.InstanceRepository {
