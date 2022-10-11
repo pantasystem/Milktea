@@ -136,8 +136,12 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 	// }
 	// hoge := string(plaintext)
 	// return &hoge, nil
-	hoge := string(plaintext)
-	return &hoge, nil
+	text := string(plaintext)
+	for text[(len(text)-1):] != "}" {
+		text = text[0:(len(text) - 1)]
+		fmt.Printf("json length:%d\n", len(text))
+	}
+	return &text, nil
 
 }
 
