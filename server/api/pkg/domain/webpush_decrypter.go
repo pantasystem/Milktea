@@ -8,6 +8,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
+	"strconv"
 
 	"github.com/aead/ecdh"
 )
@@ -25,13 +27,27 @@ func Sha256(key []byte, data []byte) []byte {
 }
 
 func DecodeBase64(src string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(src)
+	result, err := base64.URLEncoding.DecodeString(src)
+	if err == nil {
+		return result, err
+	}
+	result, err = base64.RawURLEncoding.DecodeString(src)
+	if err == nil {
+		return result, err
+	}
+
+	result, err = base64.StdEncoding.DecodeString(src)
+	if err == nil {
+		return result, err
+	}
+	return base64.RawStdEncoding.DecodeString(src)
 }
 
 func NewDecrypter(authSecret string, receiverPublic string, receiverPrivate string) (*Decrypter, error) {
 
 	asb, err := DecodeBase64(authSecret)
 	if err != nil {
+		fmt.Printf("decode failed:%s", err.Error())
 		return nil, err
 	}
 	rcpb, err := DecodeBase64(receiverPublic)
@@ -40,6 +56,9 @@ func NewDecrypter(authSecret string, receiverPublic string, receiverPrivate stri
 	}
 
 	rpb, err := DecodeBase64(receiverPrivate)
+	if err != nil {
+		return nil, err
+	}
 	decrypter := Decrypter{
 		authSecret:      asb,
 		receiverPublic:  rcpb,
@@ -48,31 +67,36 @@ func NewDecrypter(authSecret string, receiverPublic string, receiverPrivate stri
 	return &decrypter, nil
 }
 
-func (r Decrypter) Decrypt(base64Body string, receiverKey string) (*string, error) {
+func (r Decrypter) Decrypt(base64Body string) (*string, error) {
+
 	enc, err := DecodeBase64(base64Body)
 	if err != nil {
+		fmt.Printf("bodyをdecode base64するのに失敗:%s\n", err.Error())
 		return nil, err
 	}
-	body := string(enc)
+	body := enc
 
 	salt := body[0:16]
 	// rs := body[16:(16 + 4)]
 	idlenHex := hex.EncodeToString(enc[(16 + 4):(16 + 4 + 1)])
-	idlen := len(idlenHex)
-	keyId := body[(16 + 4 + 1):(16 + 4 + 1 + idlen)]
-	content := body[(16 + 4 + 1 + idlen):]
-
-	senderPublic, err := base64.StdEncoding.DecodeString(keyId)
+	idlen, err := strconv.ParseInt(idlenHex, 16, 64)
 	if err != nil {
 		return nil, err
 	}
+	keyId := body[(16 + 4 + 1):(16 + 4 + 1 + idlen)]
+	content := body[(16 + 4 + 1 + idlen):]
+
+	senderPublic := base64.StdEncoding.EncodeToString(keyId)
+	fmt.Printf("senderPublic:%s\n", senderPublic)
 
 	// fmt.Printf("salt: %s, rs:%s, idlenHex:%s, idlen:%s, keyId:%s, content:%s, senderPublic:%s", salt, rs, idlenHex, idlen, keyId, content, &senderPublic)
 
 	p256 := elliptic.P256()
 
 	generic := ecdh.Generic(p256)
-	sharedSecret := generic.ComputeSecret(r.receiverPrivate, keyId)
+	fmt.Printf("keyid:%s\n", keyId)
+
+	sharedSecret := generic.ComputeSecret(string(r.receiverPrivate), keyId)
 
 	prkKey := Sha256([]byte(r.authSecret), sharedSecret)
 	keyInfo := "WebPush: info\000" + string(r.receiverPublic) + string(senderPublic) + "\001"
