@@ -78,12 +78,11 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 
 	salt := body[0:16]
 	// rs := body[16:(16 + 4)]
-	idlenHex := hex.EncodeToString(enc[(16 + 4):(16 + 4 + 1)])
-	idlen, err := strconv.ParseInt(idlenHex, 16, 64)
+	idlen, err := r.GetIdlen(body)
 	if err != nil {
 		return nil, err
 	}
-	keyId := body[(16 + 4 + 1):(16 + 4 + 1 + idlen)]
+	keyId := r.GetKeyId(body, idlen)
 	content := body[(16 + 4 + 1 + idlen):]
 
 	senderPublic := base64.StdEncoding.EncodeToString(keyId)
@@ -91,13 +90,15 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 
 	// fmt.Printf("salt: %s, rs:%s, idlenHex:%s, idlen:%s, keyId:%s, content:%s, senderPublic:%s", salt, rs, idlenHex, idlen, keyId, content, &senderPublic)
 
-	p256 := elliptic.P256()
-
-	generic := ecdh.Generic(p256)
 	fmt.Printf("keyid:%s\n", keyId)
 
-	x, y := elliptic.Unmarshal(p256, keyId)
-	sharedSecret := generic.ComputeSecret(r.receiverPrivate, ecdh.Point{X: x, Y: y})
+	sharedSecret, err := r.GenerateSharedKey(keyId)
+	if err != nil {
+		fmt.Printf("Get SharedSecret failed\n")
+		return nil, err
+	}
+	fmt.Printf("sharedSecret:%s\n", sharedSecret)
+	fmt.Printf("salt:%s, content:%s\n", salt, content)
 
 	prkKey := Sha256([]byte(r.authSecret), sharedSecret)
 	keyInfo := "WebPush: info\000" + string(r.receiverPublic) + string(senderPublic) + "\001"
@@ -109,9 +110,11 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 
 	nonceInfo := "Content-Encoding: nonce\000\001"
 	nonce := Sha256(prk, []byte(nonceInfo))[0:12]
+	fmt.Printf("cek:%s, nonce:%s\n", cek, nonce)
 	iv := nonce
 	block, err := aes.NewCipher([]byte(cek))
 	if err != nil {
+		fmt.Printf("aes.NewCipherに失敗")
 		return nil, err
 	}
 	aesgcm, err := cipher.NewGCM(block)
@@ -120,6 +123,8 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 	}
 	plaintext, err := aesgcm.Open(nil, []byte(iv), []byte(content), nil)
 	if err != nil {
+		fmt.Printf("aesgcm.Openに失敗:%s", err.Error())
+
 		return nil, err
 	}
 
@@ -129,4 +134,26 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 	hoge := string(plaintext)
 	return &hoge, nil
 
+}
+
+func (r Decrypter) GetKeyId(body []byte, idlen int64) []byte {
+	return body[(16 + 4 + 1):(16 + 4 + 1 + idlen)]
+}
+
+func (r Decrypter) GetIdlen(body []byte) (int64, error) {
+	idlenHex := hex.EncodeToString(body[(16 + 4):(16 + 4 + 1)])
+	return strconv.ParseInt(idlenHex, 16, 64)
+}
+func (r Decrypter) GenerateSharedKey(keyId []byte) ([]byte, error) {
+
+	p256 := elliptic.P256()
+
+	generic := ecdh.Generic(p256)
+
+	x, y := elliptic.Unmarshal(p256, keyId)
+	if x == nil || y == nil {
+		return nil, fmt.Errorf("Invalid keyId")
+	}
+	fmt.Printf("x:%s, y:%s\n", x, y)
+	return generic.ComputeSecret(r.receiverPrivate, ecdh.Point{X: x, Y: y}), nil
 }
