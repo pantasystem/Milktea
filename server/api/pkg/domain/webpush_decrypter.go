@@ -85,7 +85,10 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 	keyId := r.GetKeyId(body, idlen)
 	content := body[(16 + 4 + 1 + idlen):]
 
-	senderPublic := base64.StdEncoding.EncodeToString(keyId)
+	senderPublic, err := DecodeBase64(base64.StdEncoding.EncodeToString(keyId))
+	if err != nil {
+		return nil, err
+	}
 	fmt.Printf("senderPublic:%s\n", senderPublic)
 
 	// fmt.Printf("salt: %s, rs:%s, idlenHex:%s, idlen:%s, keyId:%s, content:%s, senderPublic:%s", salt, rs, idlenHex, idlen, keyId, content, &senderPublic)
@@ -98,19 +101,19 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 		return nil, err
 	}
 	fmt.Printf("sharedSecret:%s\n", sharedSecret)
-	fmt.Printf("salt:%s, content:%s\n", salt, content)
+	fmt.Printf("salt:%s, content:%s\n", base64.URLEncoding.EncodeToString(salt), content)
 
-	prkKey := Sha256([]byte(r.authSecret), sharedSecret)
-	keyInfo := "WebPush: info\000" + string(r.receiverPublic) + string(senderPublic) + "\001"
-	ikm := Sha256(prkKey, []byte(keyInfo))
-	prk := Sha256([]byte(salt), ikm)
+	prkKey := Sha256(r.authSecret, sharedSecret)
+	keyInfo := append(append(append([]byte("WebPush: info\000"), r.receiverPublic...), senderPublic...), []byte("\001")...)
+	ikm := Sha256(prkKey, keyInfo)
+	prk := Sha256(salt, ikm)
 
 	cekInfo := "Content-Encoding: aes128gcm\000\001"
 	cek := Sha256(prk, []byte(cekInfo))[0:16]
 
 	nonceInfo := "Content-Encoding: nonce\000\001"
 	nonce := Sha256(prk, []byte(nonceInfo))[0:12]
-	fmt.Printf("cek:%s, nonce:%s\n", cek, nonce)
+	fmt.Printf("cek:%s, nonce:%s\n", base64.URLEncoding.EncodeToString(cek), base64.URLEncoding.EncodeToString(nonce))
 	iv := nonce
 	block, err := aes.NewCipher([]byte(cek))
 	if err != nil {
@@ -128,9 +131,11 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 		return nil, err
 	}
 
-	for string(plaintext[(len(plaintext)-1):]) != "}" {
-		plaintext = plaintext[(len(plaintext) - 1):]
-	}
+	// for plaintext[(len(plaintext)-1):] != []byte("}") {
+	// 	plaintext = plaintext[(len(plaintext) - 1):]
+	// }
+	// hoge := string(plaintext)
+	// return &hoge, nil
 	hoge := string(plaintext)
 	return &hoge, nil
 

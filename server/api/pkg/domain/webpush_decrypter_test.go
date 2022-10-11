@@ -73,7 +73,6 @@ func TestDecrypt(t *testing.T) {
 	assert.NotEmpty(t, sharedKey)
 	fmt.Printf("sharedKey:%s\n", sharedKey)
 	result, err := decrypter.Decrypt(body)
-	fmt.Printf("error:%s", err.Error())
 	assert.Nil(t, err)
 	fmt.Printf("result:%s\n", *result)
 
@@ -147,4 +146,11 @@ func TestGetKeyId(t *testing.T) {
 	expect, _ := domain.DecodeBase64(expectKeyId)
 	assert.Equal(t, expect, keyId)
 
+}
+
+func TestByteConvert(t *testing.T) {
+	expect := []byte{0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x2d, 0x45, 0x6e, 0x63, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x61, 0x65, 0x73, 0x31, 0x32, 0x38, 0x67, 0x63, 0x6d, 0x00, 0x01}
+	cekInfo := "Content-Encoding: aes128gcm\000\001"
+	assert.Equal(t, expect, []byte(cekInfo))
+	//43 6f 6e 74 65 6e 74 2d 45 6e 63 6f 64 69 6e 67 3a 20 61 65 73 31 32 38 67 63 6d 00 01
 }
