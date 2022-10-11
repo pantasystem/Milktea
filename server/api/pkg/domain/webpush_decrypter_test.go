@@ -1,21 +1,28 @@
 package domain_test
 
 import (
+	"crypto/elliptic"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"strconv"
 	"testing"
 
+	"github.com/aead/ecdh"
 	"github.com/stretchr/testify/assert"
 	"systems.panta.milktea/pkg/domain"
 )
 
 // var (
 // 	publicKey  = "BJgVD2cj1pNKNR2Ss3U_8e7P9AyoL5kWaxVio5aO16Cvnx-P1r7HH8SRb-h5tuxaydZ1ky3oO0V40s6t_uN1SdA"
-// 	privateKey = "ciQ800G-6jyKWf6KKG94g5rCSU_l_rgbHbyHny_UsIM"
+
 // 	authSecret = "43w_wOVYeF9XzyRyZL3O8g"
 // )
+var (
+	sharedSecret      = "oP7t4W/jHURAO+M+DQjqjljNu8D2p7+3uf48Hd2Z91c="
+	nonce             = "OxF/eyKT/8Pt3iN8"
+	recurvePrivateKey = "ciQ800G-6jyKWf6KKG94g5rCSU_l_rgbHbyHny_UsIM"
+)
 
 func TestSha256(t *testing.T) {
 	expect := "yb1GUyy4+k/dcGubgS2+QRWvBW0VgTpw3H9JLVx2Iss="
@@ -67,6 +74,19 @@ func TestDecrypt(t *testing.T) {
 }
 
 func TestGenerateSharedSecret(t *testing.T) {
+	p256 := elliptic.P256()
+
+	keyId := "BE8bArSb8EH1d8PH0J4Wrf/p2CY2rLUx55TgRayuyH0B3ZjJ2JiMDJH+c2FsA526yd08GVf7QjwqGWnNo4+LwpI="
+	generic := ecdh.Generic(p256)
+	fmt.Printf("keyid:%s\n", keyId)
+	pk, err := domain.DecodeBase64(keyId)
+
+	assert.Nil(t, err)
+
+	x, y := elliptic.Unmarshal(p256, pk)
+	fmt.Printf("x:%d, y:%d\n", x, y)
+	secret := generic.ComputeSecret(pk, ecdh.Point{X: x, Y: y})
+	fmt.Printf("secret:%s\n", secret)
 
 }
 

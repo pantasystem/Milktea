@@ -96,7 +96,8 @@ func (r Decrypter) Decrypt(base64Body string) (*string, error) {
 	generic := ecdh.Generic(p256)
 	fmt.Printf("keyid:%s\n", keyId)
 
-	sharedSecret := generic.ComputeSecret(string(r.receiverPrivate), keyId)
+	x, y := elliptic.Unmarshal(p256, keyId)
+	sharedSecret := generic.ComputeSecret(r.receiverPrivate, ecdh.Point{X: x, Y: y})
 
 	prkKey := Sha256([]byte(r.authSecret), sharedSecret)
 	keyInfo := "WebPush: info\000" + string(r.receiverPublic) + string(senderPublic) + "\001"
