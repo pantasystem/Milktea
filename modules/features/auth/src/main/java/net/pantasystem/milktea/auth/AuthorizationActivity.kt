@@ -13,6 +13,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
+import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
@@ -21,12 +24,22 @@ import net.pantasystem.milktea.data.infrastructure.auth.from
 import javax.inject.Inject
 
 
+const val EXTRA_HOST = "EXTRA_HOST"
+const val EXTRA_USERNAME = "EXTRA_USERNAME"
 class AuthorizationNavigationImpl @Inject constructor(
     val activity: Activity
 ) : AuthorizationNavigation {
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    override fun newIntent(args: Unit): Intent {
-        return Intent(activity, AuthorizationActivity::class.java)
+    override fun newIntent(args: AuthorizationArgs): Intent {
+        val intent = Intent(activity, AuthorizationActivity::class.java)
+        when(args) {
+            is AuthorizationArgs.New -> {}
+            is AuthorizationArgs.ReAuth -> {
+                intent.putExtra(EXTRA_HOST, args.account?.getHost())
+                intent.putExtra(EXTRA_USERNAME, args.account?.userName)
+            }
+        }
+        return intent
     }
 }
 @FlowPreview
@@ -35,12 +48,17 @@ class AuthorizationNavigationImpl @Inject constructor(
 class AuthorizationActivity : AppCompatActivity() {
 
     private val mViewModel: AuthViewModel by viewModels()
+    private val appAuthViewModel: AppAuthViewModel by viewModels()
 
     @Inject
     lateinit var mainNavigation: MainNavigation
 
+    @Inject
+    lateinit var applyTheme: ApplyTheme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyTheme()
         setContentView(R.layout.activity_authorization)
 
         lifecycleScope.launch {
@@ -56,6 +74,12 @@ class AuthorizationActivity : AppCompatActivity() {
             }
 
 
+        }
+
+//        val username = intent.getStringExtra(EXTRA_USERNAME)
+        val host = intent.getStringExtra(EXTRA_HOST)
+        if (host != null) {
+            appAuthViewModel.instanceDomain.value = host
         }
     }
 

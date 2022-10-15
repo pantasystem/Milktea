@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
+import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.TaskState
@@ -162,7 +163,7 @@ internal class MainActivityEventCollector (
                 accountStore.state.collect {
                     if (it.isUnauthorized) {
                         activity.startActivity(
-                            authorizationNavigation.newIntent(Unit)
+                            authorizationNavigation.newIntent(AuthorizationArgs.New)
                         )
                         activity.finish()
                     }

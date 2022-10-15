@@ -413,7 +413,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     if (it.isUnauthorized) {
                         requireActivity().finish()
                         startActivity(
-                            authorizationNavigation.newIntent(Unit)
+                            authorizationNavigation.newIntent(AuthorizationArgs.New)
                         )
                     }
                 }

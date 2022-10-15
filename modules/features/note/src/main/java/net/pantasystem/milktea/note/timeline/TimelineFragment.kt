@@ -21,6 +21,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.PageableView
 import net.pantasystem.milktea.common.ui.ScrollableTop
+import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -127,7 +128,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 mViewModel.loadInit()
             },
             onReauthenticateAction = {
-                startActivity(authorizationNavigation.newIntent(Unit))
+                startActivity(authorizationNavigation.newIntent(AuthorizationArgs.New))
             },
         ) {
             NoteCardActionHandler(

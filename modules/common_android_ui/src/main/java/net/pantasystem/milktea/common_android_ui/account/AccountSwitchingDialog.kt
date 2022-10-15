@@ -10,11 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common_android_ui.R
+import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewData
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import javax.inject.Inject
 
@@ -38,7 +39,7 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
         }
 
         view.findViewById<Button>(R.id.add_account).setOnClickListener {
-            startActivity(authorizationNavigation.newIntent(Unit))
+            startActivity(authorizationNavigation.newIntent(AuthorizationArgs.New))
             dismiss()
         }
         val accountsView = view.findViewById<RecyclerView>(R.id.accounts_view)
