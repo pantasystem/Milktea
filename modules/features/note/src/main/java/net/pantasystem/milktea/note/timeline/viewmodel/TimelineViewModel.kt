@@ -214,6 +214,11 @@ sealed interface TimelineListItem {
                 }
             }
         }
+
+        fun isUnauthorizedError(): Boolean {
+            return throwable is APIError.AuthenticationException
+                    || throwable is UnauthorizedException
+        }
     }
     object Empty : TimelineListItem
 }

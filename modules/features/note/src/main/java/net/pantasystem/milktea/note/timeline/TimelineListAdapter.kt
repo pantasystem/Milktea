@@ -35,6 +35,7 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 class TimelineListAdapter(
     private val lifecycleOwner: LifecycleOwner,
     val onRefreshAction: () -> Unit,
+    val onReauthenticateAction: () -> Unit,
     val onAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<TimelineListItem, TimelineListAdapter.TimelineListItemViewHolderBase>(object : DiffUtil.ItemCallback<TimelineListItem>() {
     override fun areContentsTheSame(
@@ -260,6 +261,9 @@ class TimelineListAdapter(
             is ErrorViewHolder -> {
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
+                }
+                p0.binding.reauthenticateButton.setOnClickListener {
+                    onReauthenticateAction()
                 }
                 p0.bind((item as TimelineListItem.Error))
             }

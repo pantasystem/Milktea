@@ -21,6 +21,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.PageableView
 import net.pantasystem.milktea.common.ui.ScrollableTop
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Page
@@ -87,6 +88,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     @Inject
     lateinit var setMenuTint: ApplyMenuTint
 
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
+
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
@@ -117,9 +121,15 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onViewCreated(view, savedInstanceState)
 
         mLinearLayoutManager = LinearLayoutManager(this.requireContext())
-        val adapter = TimelineListAdapter(viewLifecycleOwner, {
-            mViewModel.loadInit()
-        }) {
+        val adapter = TimelineListAdapter(
+            viewLifecycleOwner,
+            onRefreshAction = {
+                mViewModel.loadInit()
+            },
+            onReauthenticateAction = {
+                startActivity(authorizationNavigation.newIntent(Unit))
+            },
+        ) {
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
                 notesViewModel,

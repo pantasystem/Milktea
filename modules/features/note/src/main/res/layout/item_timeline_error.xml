@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
+        <import type="android.view.View" />
         <variable
                 name="errorItem"
                 type="net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem.Error" />
@@ -25,11 +26,21 @@
                 android:layout_height="wrap_content"
                 android:text="@string/retry"/>
 
-        <TextView
+        <Button
+                android:id="@+id/reauthenticateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reauthenticate"
+                android:visibility="@{errorItem.unauthorizedError ? View.VISIBLE : View.GONE }"
+                />
+
+        <Button
                 android:id="@+id/showErrorMessageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/show_error"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+
                 />
         <TextView
                 android:id="@+id/errorView"

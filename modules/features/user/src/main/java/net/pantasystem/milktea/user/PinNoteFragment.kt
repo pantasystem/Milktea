@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.timeline.TimelineListAdapter
@@ -60,6 +61,9 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
+
     @ExperimentalCoroutinesApi
     val userViewModel: UserDetailViewModel by activityViewModels {
 
@@ -82,6 +86,8 @@ class PinNoteFragment : Fragment(R.layout.fragment_pin_note) {
         val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
         val adapter = TimelineListAdapter(viewLifecycleOwner, {
             userViewModel.sync()
+        }, {
+            authorizationNavigation.newIntent(Unit)
         }) {
             NoteCardActionHandler(
                 requireActivity() as AppCompatActivity,
