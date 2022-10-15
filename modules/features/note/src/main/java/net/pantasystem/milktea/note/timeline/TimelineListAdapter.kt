@@ -22,7 +22,8 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
-import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyOrErrorBinding
+import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding
+import net.pantasystem.milktea.note.databinding.ItemTimelineErrorBinding
 import net.pantasystem.milktea.note.poll.PollListAdapter
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
@@ -155,23 +156,19 @@ class TimelineListAdapter(
 
     class LoadingViewHolder(view: View) : TimelineListItemViewHolderBase(view)
 
-    class ErrorViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root) {
-        fun bind(throwable: Throwable) {
+    class ErrorViewHolder(val binding: ItemTimelineErrorBinding) : TimelineListItemViewHolderBase(binding.root) {
+        fun bind(item: TimelineListItem.Error) {
+            binding.errorItem = item
             binding.errorView.isVisible = false
             binding.showErrorMessageButton.isVisible = true
-            binding.errorView.text = throwable.toString()
+            binding.errorView.text = item.throwable.toString()
             binding.showErrorMessageButton.setOnClickListener {
                 binding.errorView.isVisible = true
             }
         }
     }
 
-    class EmptyViewHolder(val binding: ItemTimelineEmptyOrErrorBinding) : TimelineListItemViewHolderBase(binding.root) {
-        fun bind() {
-            binding.errorView.isVisible = false
-            binding.showErrorMessageButton.isVisible = false
-        }
-    }
+    class EmptyViewHolder(val binding: ItemTimelineEmptyBinding) : TimelineListItemViewHolderBase(binding.root)
 
     enum class ViewHolderType {
         NormalNote, HasReplyToNote, Loading, Empty, Error
@@ -259,13 +256,12 @@ class TimelineListAdapter(
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
                 }
-                p0.bind()
             }
             is ErrorViewHolder -> {
                 p0.binding.retryLoadButton.setOnClickListener {
                     onRefreshAction()
                 }
-                p0.bind((item as TimelineListItem.Error).throwable)
+                p0.bind((item as TimelineListItem.Error))
             }
         }
 
@@ -285,10 +281,10 @@ class TimelineListAdapter(
                 LoadingViewHolder(LayoutInflater.from(p0.context).inflate(R.layout.item_timeline_loading, p0, false))
             }
             ViewHolderType.Empty -> {
-                EmptyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_empty_or_error, p0, false))
+                EmptyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_empty, p0, false))
             }
             ViewHolderType.Error -> {
-                ErrorViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_empty_or_error, p0, false))
+                ErrorViewHolder(DataBindingUtil.inflate(LayoutInflater.from(p0.context), R.layout.item_timeline_error, p0, false))
             }
         }
 
