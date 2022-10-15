@@ -71,6 +71,8 @@ class AppAuthViewModel @Inject constructor(
 
     val isOpenInWebView = MutableStateFlow(false)
 
+    val username = MutableStateFlow("")
+
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
     }.flowOn(Dispatchers.IO).stateIn(

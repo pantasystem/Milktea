@@ -57,6 +57,7 @@ class AuthFragment : Fragment() {
                             WebViewAuthActivity::class.java
                         ).also { intent ->
                             intent.putExtra(EXTRA_AUTH_URL, it.generateAuthUrl())
+                            intent.putExtra(EXTRA_USERNAME, appAuthViewModel.username.value)
                         })
                 } else {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))

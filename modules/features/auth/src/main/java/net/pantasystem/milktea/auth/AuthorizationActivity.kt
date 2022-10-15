@@ -76,11 +76,15 @@ class AuthorizationActivity : AppCompatActivity() {
 
         }
 
-//        val username = intent.getStringExtra(EXTRA_USERNAME)
+        val username = intent.getStringExtra(EXTRA_USERNAME)
         val host = intent.getStringExtra(EXTRA_HOST)
         if (host != null) {
             appAuthViewModel.instanceDomain.value = host
         }
+        if (username != null) {
+            appAuthViewModel.username.value = username
+        }
+
     }
 
     /**
