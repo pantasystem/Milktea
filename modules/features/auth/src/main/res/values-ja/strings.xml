@@ -18,5 +18,6 @@
     </string>
     <string name="welcome">ようこそ</string>
     <string name="san">さん</string>
+    <string name="open_in_webview">アプリブラウザで開く</string>
 
 </resources>

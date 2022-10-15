@@ -50,7 +50,19 @@ class AuthFragment : Fragment() {
         binding.appAuthViewModel = appAuthViewModel
         appAuthViewModel.waiting4UserAuthorization.observe(viewLifecycleOwner) {
             it?.let {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))
+                if (appAuthViewModel.isOpenInWebView.value) {
+                    startActivity(
+                        Intent(
+                            requireContext(),
+                            WebViewAuthActivity::class.java
+                        ).also { intent ->
+                            intent.putExtra(EXTRA_AUTH_URL, it.generateAuthUrl())
+                            intent.putExtra(EXTRA_USERNAME, appAuthViewModel.username.value)
+                        })
+                } else {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))
+
+                }
                 authViewModel.setState(it)
                 appAuthViewModel.waiting4UserAuthorization.postValue(null)
             }

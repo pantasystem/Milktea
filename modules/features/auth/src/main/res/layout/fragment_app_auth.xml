@@ -83,6 +83,12 @@
                             android:hint="@string/custom_app_name"
                             android:text="@={appAuthViewModel.appName}"/>
                 </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/useWebViewSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/open_in_webview"
+                        android:checked="@={appAuthViewModel.isOpenInWebView }"/>
                 <ProgressBar
                         android:layout_marginTop="16dp"
                         android:layout_width="match_parent"
