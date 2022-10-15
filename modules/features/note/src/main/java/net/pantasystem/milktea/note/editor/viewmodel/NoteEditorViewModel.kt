@@ -213,6 +213,7 @@ class NoteEditorViewModel @Inject constructor(
             noteRepository.find(noteId).onSuccess { note ->
                 _state.update { state ->
                     state.changeCw(note.cw)
+                        .setVisibility(note.visibility)
                 }
             }
 
@@ -245,7 +246,6 @@ class NoteEditorViewModel @Inject constructor(
         accountStore.observeCurrentAccount.filterNotNull().onEach {
             val v = settingStore.getNoteVisibility(it.accountId)
             _state.value = _state.value.setVisibility(v)
-
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
