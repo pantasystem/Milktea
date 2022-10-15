@@ -17,5 +17,6 @@
     <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">将身份验证目标的 URL 复制到剪贴板。</string>
     <string name="welcome">欢迎</string>
     <string name="san">先生 / 女士</string>
+    <string name="open_in_webview">Open in WebView</string>
 
 </resources>

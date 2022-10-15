@@ -19,6 +19,7 @@
     </string>
     <string name="welcome">Welcome</string>
     <string name="san">-san</string>
+    <string name="open_in_webview">Open in WebView</string>
 
 
 </resources>

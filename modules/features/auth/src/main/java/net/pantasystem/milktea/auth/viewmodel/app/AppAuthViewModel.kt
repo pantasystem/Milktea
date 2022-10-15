@@ -68,6 +68,9 @@ class AppAuthViewModel @Inject constructor(
         Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
     val instanceDomain = MutableStateFlow("")
+
+    val isOpenInWebView = MutableStateFlow(false)
+
     private val metaState = instanceDomain.flatMapLatest {
         getMeta(it)
     }.flowOn(Dispatchers.IO).stateIn(
