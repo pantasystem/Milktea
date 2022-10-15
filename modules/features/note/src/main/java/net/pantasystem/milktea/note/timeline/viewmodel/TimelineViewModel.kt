@@ -16,20 +16,26 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
+import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TimelineViewModel @AssistedInject constructor(
@@ -179,7 +185,41 @@ fun TimelineViewModel.Companion.provideViewModel(
 sealed interface TimelineListItem {
     object Loading : TimelineListItem
     data class Note(val note: PlaneNoteViewData) : TimelineListItem
-    data class Error(val throwable: Throwable) : TimelineListItem
+    data class Error(val throwable: Throwable) : TimelineListItem {
+        fun getErrorMessage(): StringSource {
+            return when(throwable) {
+                is SocketTimeoutException -> {
+                    StringSource(R.string.timeout_error)
+                }
+                is IOException -> {
+                    StringSource(R.string.timeout_error)
+                }
+                is APIError.AuthenticationException -> {
+                    StringSource(R.string.auth_error)
+                }
+                is APIError.IAmAIException -> {
+                    StringSource(R.string.bot_error)
+                }
+                is APIError.InternalServerException -> {
+                    StringSource(R.string.server_error)
+                }
+                is APIError.ClientException -> {
+                    StringSource(R.string.parameter_error)
+                }
+                is UnauthorizedException -> {
+                    StringSource(R.string.timeline_unauthorized_error)
+                }
+                else -> {
+                    StringSource("error:$throwable")
+                }
+            }
+        }
+
+        fun isUnauthorizedError(): Boolean {
+            return throwable is APIError.AuthenticationException
+                    || throwable is UnauthorizedException
+        }
+    }
     object Empty : TimelineListItem
 }
 

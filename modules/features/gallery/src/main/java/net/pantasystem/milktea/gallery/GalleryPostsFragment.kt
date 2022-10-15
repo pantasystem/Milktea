@@ -127,7 +127,7 @@ class GalleryPostsFragment : Fragment() {
                     if (it is APIError.ClientException && it.error?.error?.code == "PERMISSION_DENIED") {
                         Toast.makeText(requireContext(), "再認証が必要です。", Toast.LENGTH_LONG).show()
                         // 再認証をする
-                        startActivity(authorizationNavigation.newIntent(Unit))
+                        startActivity(authorizationNavigation.newIntent(AuthorizationArgs.New))
                     }
                 }
             }
