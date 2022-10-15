@@ -3,4 +3,11 @@
     <string name="time_machine">タイムマシーン</string>
     <string name="dialog_timemachine_message">表示したいタイムラインの時間を指定してください</string>
     <string name="show_error">Show Error</string>
+
+    <string name="timeout_error">タイムアウト</string>
+    <string name="server_error">サーバーエラー</string>
+    <string name="bot_error">ボットですか？</string>
+    <string name="auth_error">認証エラー</string>
+    <string name="parameter_error">パラメーターエラー</string>
+    <string name="timeline_unauthorized_error">未認証エラー</string>
 </resources>

@@ -299,11 +299,7 @@
     <string name="retry">Retry</string>
     <string name="failed_to_get_the_note">Failed to get note</string>
 
-    <string name="timeout_error">Timeout</string>
-    <string name="server_error">Server error</string>
-    <string name="bot_error">Are you human?</string>
-    <string name="auth_error">Authentication error</string>
-    <string name="parameter_error">Parameter error</string>
+
     <string name="refresh">Refresh</string>
 
     <string name="long_text">Collapsed automatically because it is too long(size:%d)</string>
