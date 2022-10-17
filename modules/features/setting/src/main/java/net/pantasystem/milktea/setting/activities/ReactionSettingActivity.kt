@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.setting.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -128,6 +129,14 @@ class ReactionSettingActivity : AppCompatActivity() {
             override fun onNothingSelected(p0: AdapterView<*>?) {
 
             }
+        }
+
+
+        binding.importReactionFromWebButton.setOnClickListener {
+            val intent = Intent(this, ImportReactionFromWebViewActivity::class.java)
+            intent.putExtra(EXTRA_ACCOUNT_HOST, accountStore.currentAccount?.getHost())
+            startActivity(intent)
+            finish()
         }
 
 
