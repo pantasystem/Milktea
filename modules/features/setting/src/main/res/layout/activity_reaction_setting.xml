@@ -83,6 +83,12 @@
                         android:layout_height="wrap_content"
                         android:text="@string/set_the_reaction_displayed_in_the_reaction_picker"/>
 
+                <Button
+                        android:id="@+id/importReactionFromWebButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/import_reactions_from_the_web"/>
+
 
             </LinearLayout>
         </ScrollView>
