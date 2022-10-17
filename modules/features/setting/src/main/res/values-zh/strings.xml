@@ -2,8 +2,8 @@
 <resources>
     <string name="client_word_mute">应用程序字静音</string>
     <string name="client_word_mute_format_description">用空格分隔会产生 AND 规范，用换行符分隔会产生 OR 规范。 \n关键字周围的斜线使其成为正则表达式。</string>
-    <string name="import_reactions_from_the_web">Import reactions from the web</string>
-    <string name="import_reactions">Import reactions</string>
-    <string name="overwrite_save">Overwrite save</string>
+    <string name="import_reactions_from_the_web">从网络导入反应</string>
+    <string name="import_reactions">进口反应</string>
+    <string name="overwrite_save">覆盖保存</string>
 
 </resources>
