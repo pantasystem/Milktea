@@ -15,7 +15,6 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.whenResumed
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,6 +65,7 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
 
         setupWebView()
         setSupportActionBar(binding.topToolbar)
+        supportActionBar?.setTitle(R.string.import_reactions_from_the_web)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         addMenuProvider(object : MenuProvider {
@@ -107,7 +107,7 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            whenResumed {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 (0..Int.MAX_VALUE).asFlow().map {
                     delay(500)
                 }.flatMapLatest {
