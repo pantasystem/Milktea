@@ -134,9 +134,9 @@ class ReactionSettingActivity : AppCompatActivity() {
 
         binding.importReactionFromWebButton.setOnClickListener {
             val intent = Intent(this, ImportReactionFromWebViewActivity::class.java)
-
+            intent.putExtra(EXTRA_ACCOUNT_HOST, accountStore.currentAccount?.getHost())
             startActivity(intent)
-
+            finish()
         }
 
 
