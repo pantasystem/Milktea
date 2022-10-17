@@ -124,9 +124,7 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.domStorageEnabled = true
         binding.webView.addJavascriptInterface(
-            LocalStorageResultJSInterface(
-                importReactionFromWebViewViewModel
-            ), jsInterfaceName
+            jsInterface, jsInterfaceName
         )
 
         val current = accountStore.currentAccount
@@ -155,6 +153,15 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
         ) {
             Log.d("ImportReactionFrom", "result:$it")
         }
+    }
+
+    private val jsInterface: LocalStorageResultJSInterface by lazy {
+        LocalStorageResultJSInterface(importReactionFromWebViewViewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.webView.removeJavascriptInterface(jsInterfaceName)
     }
 }
 
