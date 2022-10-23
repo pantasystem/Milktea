@@ -263,6 +263,19 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
 
+            binding.showRemoteUserInRemotePage.setOnClickListener {
+                val account = accountStore.currentAccount
+                if (account != null) {
+
+                    mViewModel.user.value?.getRemoteProfileUrl(account)?.let {
+                        val uri = Uri.parse(it)
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW, uri)
+                        )
+                    }
+                }
+            }
+
             binding.createMention.setOnClickListener {
                 mViewModel.user.value?.displayUserName?.let {
                     val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
@@ -374,8 +387,11 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
             R.id.share -> {
-                val url = mViewModel.profileUrl.value
-                    ?: return false
+                val account = accountStore.currentAccount
+                val url = account?.let {
+                    mViewModel.user.value?.getRemoteProfileUrl(it)
+                } ?: return false
+
 
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
