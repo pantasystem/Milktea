@@ -387,8 +387,11 @@ class UserDetailActivity : AppCompatActivity() {
                 }
             }
             R.id.share -> {
-                val url = mViewModel.profileUrl.value
-                    ?: return false
+                val account = accountStore.currentAccount
+                val url = account?.let {
+                    mViewModel.user.value?.getRemoteProfileUrl(it)
+                } ?: return false
+
 
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
