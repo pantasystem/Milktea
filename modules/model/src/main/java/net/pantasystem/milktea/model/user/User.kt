@@ -83,6 +83,9 @@ sealed interface User : Entity {
         val updatedAt: Instant?,
     ) : User {
         companion object
+
+        val isRemoteUser: Boolean = !isSameHost
+
         val followState: FollowState
             get() {
                 if (isFollowing) {
@@ -99,6 +102,9 @@ sealed interface User : Entity {
 
                 return FollowState.UNFOLLOWING
             }
+        fun getRemoteProfileUrl(account: Account): String {
+            return url ?: getProfileUrl(account)
+        }
     }
 
     data class InstanceInfo(
