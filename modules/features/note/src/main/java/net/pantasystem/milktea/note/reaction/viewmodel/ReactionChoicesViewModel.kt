@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -24,11 +23,9 @@ class ReactionChoicesViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
     private val reactionHistoryDao: ReactionHistoryDao,
     private val reactionUserSettingDao: ReactionUserSettingDao,
-    loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
 
-    private val logger = loggerFactory.create("ReactionChoicesVM")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val meta = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
@@ -55,7 +52,7 @@ class ReactionChoicesViewModel @Inject constructor(
             )
         }.stateIn(
             viewModelScope,
-            SharingStarted.Lazily,
+            SharingStarted.Eagerly,
             ReactionSelectionUiState(null, null, emptyList(), emptyList())
         )
 
