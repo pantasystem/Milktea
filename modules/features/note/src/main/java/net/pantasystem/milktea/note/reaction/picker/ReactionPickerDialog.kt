@@ -3,14 +3,14 @@ package net.pantasystem.milktea.note.reaction.picker
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,6 @@ import net.pantasystem.milktea.common_android_ui.reaction.ReactionAutoCompleteAr
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogReactionPickerBinding
@@ -53,6 +52,8 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
     @Inject
     lateinit var metaRepository: MetaRepository
 
+    private val reactionPickerDialogViewModel by activityViewModels<ReactionPickerDialogViewModel>()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -60,7 +61,6 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         dialog.setContentView(view)
         val binding = DialogReactionPickerBinding.bind(view)
 
-        val ac = accountStore.currentAccount
 
         val noteId = Note.Id(
             requireArguments().getLong("ACCOUNT_ID"),
@@ -77,23 +77,13 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
 
         binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
-        //adapter.submitList(ReactionResourceMap.defaultReaction)
 
+        reactionPickerDialogViewModel.setCurrentAccountById(noteId.accountId)
         lifecycleScope.launch(Dispatchers.IO){
-            var reactionSettings = reactionUserSettingDao.findByInstanceDomain(
-                ac?.instanceDomain!!
-            )?.sortedBy {
-                it.weight
-            }?.map{
-                it.reaction
-            }?: LegacyReaction.defaultReaction
-            if(reactionSettings.isEmpty()){
-                reactionSettings = LegacyReaction.defaultReaction
-            }
-
-            Handler(Looper.getMainLooper()).post{
-                adapter.submitList(reactionSettings)
-
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                reactionPickerDialogViewModel.userConfigReactions.collect { reactions ->
+                    adapter.submitList(reactions)
+                }
             }
 
         }
