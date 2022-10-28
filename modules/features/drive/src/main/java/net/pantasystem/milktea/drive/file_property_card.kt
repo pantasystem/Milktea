@@ -25,14 +25,11 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun FilePropertySimpleCard(
     file: FileViewData,
     isSelectMode: Boolean = false,
-    onCheckedChanged: (Boolean) -> Unit,
     onDeleteMenuItemClicked: () -> Unit,
-    onToggleNsfwMenuItemClicked: () -> Unit,
     onEditFileCaption: (id: FileProperty.Id, newCaption: String) -> Unit,
+    onAction: (FilePropertyCardAction) -> Unit,
 ) {
-    var actionMenuExpandedState by remember {
-        mutableStateOf(false)
-    }
+
 
     var confirmDeleteTargetId by remember {
         mutableStateOf<FileProperty.Id?>(null)
@@ -53,9 +50,9 @@ fun FilePropertySimpleCard(
         },
         onClick = {
             if (isSelectMode) {
-                onCheckedChanged.invoke(!file.isSelected)
+                onAction(FilePropertyCardAction.OnToggleSelectItem(file.fileProperty.id, !file.isSelected))
             } else {
-                actionMenuExpandedState = true
+                onAction(FilePropertyCardAction.OnOpenDropdownMenu(file.fileProperty.id))
             }
 
         }
@@ -118,21 +115,22 @@ fun FilePropertySimpleCard(
             ) {
                 FileActionDropdownMenu(
 
-                    expanded = actionMenuExpandedState,
-                    onDismissRequest = {
-                        actionMenuExpandedState = false
-                    },
-                    onNsfwMenuItemClicked = {
-                        actionMenuExpandedState = false
-                        onToggleNsfwMenuItemClicked()
-                    },
-                    onDeleteMenuItemClicked = {
-                        actionMenuExpandedState = false
-                        confirmDeleteTargetId = file.fileProperty.id
-                    },
-                    onEditFileCaption = {
-                        actionMenuExpandedState = false
-                        editCaptionTargetFile = file.fileProperty
+                    expanded = file.isDropdownMenuExpanded,
+                    onAction = { e ->
+                        onAction(FilePropertyCardAction.OnCloseDropdownMenu(file.fileProperty.id))
+                        when(e) {
+                            FileCardDropdownMenuAction.OnDeleteMenuItemClicked -> {
+                                confirmDeleteTargetId = file.fileProperty.id
+                            }
+                            FileCardDropdownMenuAction.OnDismissRequest -> {
+                            }
+                            FileCardDropdownMenuAction.OnEditFileCaption -> {
+                                editCaptionTargetFile = file.fileProperty
+                            }
+                            FileCardDropdownMenuAction.OnNsfwMenuItemClicked -> {
+                                onAction(FilePropertyCardAction.OnToggleNsfw(file.fileProperty.id))
+                            }
+                        }
                     },
                     property = file.fileProperty
                 )
@@ -172,3 +170,10 @@ fun FilePropertySimpleCard(
 
 }
 
+sealed interface FilePropertyCardAction {
+    data class OnOpenDropdownMenu(val fileId: FileProperty.Id) : FilePropertyCardAction
+    data class OnCloseDropdownMenu(val fileId: FileProperty.Id) : FilePropertyCardAction
+    data class OnToggleSelectItem(val fileId: FileProperty.Id, val newValue: Boolean) : FilePropertyCardAction
+    data class OnToggleNsfw(val fileId: FileProperty.Id) : FilePropertyCardAction
+//    data class OnDropDownAction(val fileId: FileProperty.Id, val type: FileCardDropdownMenuAction) : FilePropertyCardAction
+}

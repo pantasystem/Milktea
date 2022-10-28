@@ -19,20 +19,20 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun FileActionDropdownMenu(
     property: FileProperty,
     expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    onNsfwMenuItemClicked: () -> Unit,
-    onDeleteMenuItemClicked: () -> Unit,
-    onEditFileCaption: () -> Unit,
+    onAction: (FileCardDropdownMenuAction) -> Unit
 ) {
-
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = {
+            onAction(FileCardDropdownMenuAction.OnDismissRequest)
+        },
         modifier = Modifier.wrapContentWidth(),
     ) {
         DropdownMenuItem(
-            onClick = onNsfwMenuItemClicked
+            onClick = {
+                onAction(FileCardDropdownMenuAction.OnNsfwMenuItemClicked)
+            }
         ) {
             if (property.isSensitive) {
                 Icon(
@@ -54,7 +54,9 @@ fun FileActionDropdownMenu(
 
         Divider()
         DropdownMenuItem(
-            onClick = onDeleteMenuItemClicked,
+            onClick = {
+                onAction(FileCardDropdownMenuAction.OnDeleteMenuItemClicked)
+            },
         ) {
             Icon(
                 Icons.Default.Delete,
@@ -64,7 +66,9 @@ fun FileActionDropdownMenu(
             Text(text = stringResource(R.string.delete))
         }
         Divider()
-        DropdownMenuItem(onClick = onEditFileCaption) {
+        DropdownMenuItem(onClick = {
+            onAction(FileCardDropdownMenuAction.OnEditFileCaption)
+        }) {
             Icon(
                 Icons.Default.Edit,
                 modifier = Modifier.size(24.dp),
@@ -154,4 +158,11 @@ fun EditCaptionDialog(
             }
         }
     }
+}
+
+sealed interface FileCardDropdownMenuAction {
+    object OnDismissRequest : FileCardDropdownMenuAction
+    object OnNsfwMenuItemClicked : FileCardDropdownMenuAction
+    object OnDeleteMenuItemClicked : FileCardDropdownMenuAction
+    object OnEditFileCaption : FileCardDropdownMenuAction
 }
