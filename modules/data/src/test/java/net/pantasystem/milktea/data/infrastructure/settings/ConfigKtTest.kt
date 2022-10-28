@@ -102,6 +102,10 @@ class ConfigKtTest {
                     config.isEnableInstanceTicker,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsDriveUsingGridView -> Assert.assertEquals(
+                    config.isDriveUsingGridView,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
