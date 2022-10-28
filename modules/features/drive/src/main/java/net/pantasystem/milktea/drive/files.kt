@@ -1,15 +1,26 @@
 package net.pantasystem.milktea.drive
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +38,11 @@ import net.pantasystem.milktea.model.drive.FileProperty
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
 @Composable
-fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveViewModel) {
+fun FilePropertyListScreen(
+    fileViewModel: FileViewModel,
+    driveViewModel: DriveViewModel,
+    isGridMode: Boolean,
+) {
     val filesState: PageableState<List<FileViewData>> by fileViewModel.state.collectAsState()
 
     val swipeRefreshState = rememberSwipeRefreshState(
@@ -36,21 +51,12 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
     val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
         .observeAsState(initial = false)
     val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
-    val listViewState = rememberLazyListState()
 
     var confirmDeleteTarget: FileProperty? by remember {
         mutableStateOf(null)
     }
 
-    LaunchedEffect(null) {
-        snapshotFlow {
-            listViewState.isScrolledToTheEnd() && listViewState.layoutInfo.totalItemsCount != listViewState.layoutInfo.visibleItemsInfo.size && listViewState.isScrollInProgress
-        }.distinctUntilChanged().onEach {
-            if (it) {
-                fileViewModel.loadNext()
-            }
-        }.launchIn(this)
-    }
+
 
     var editCaptionTargetFile: FileProperty? by remember {
         mutableStateOf(null)
@@ -79,8 +85,8 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         }
     )
 
-    val actionHandler: (FilePropertyCardAction) -> Unit =  { cardAction ->
-        when(cardAction) {
+    val actionHandler: (FilePropertyCardAction) -> Unit = { cardAction ->
+        when (cardAction) {
             is FilePropertyCardAction.OnCloseDropdownMenu -> {
                 fileViewModel.closeFileCardDropDownMenu()
             }
@@ -108,12 +114,24 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             fileViewModel.loadInit()
         }
     ) {
-        FileViewDataListView(
-            files,
-            isSelectMode,
-            state = listViewState,
-            onAction = actionHandler
-        )
+        if (isGridMode) {
+            DriveFilesGridView(
+                files = files,
+                onLoadNext = {
+                    fileViewModel.loadNext()
+                }
+            )
+        } else {
+            FileViewDataListView(
+                files,
+                isSelectMode,
+                onAction = actionHandler,
+                onLoadNext = {
+                    fileViewModel.loadNext()
+                }
+            )
+        }
+
     }
 }
 
@@ -122,10 +140,20 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
-    state: LazyListState = rememberLazyListState(),
+    onLoadNext: () -> Unit,
     onAction: (FilePropertyCardAction) -> Unit,
 ) {
+    val state: LazyListState = rememberLazyListState()
 
+    LaunchedEffect(null) {
+        snapshotFlow {
+            state.isScrolledToTheEnd() && state.layoutInfo.totalItemsCount != state.layoutInfo.visibleItemsInfo.size && state.isScrollInProgress
+        }.distinctUntilChanged().onEach {
+            if (it) {
+                onLoadNext()
+            }
+        }.launchIn(this)
+    }
     LazyColumn(
         state = state,
         modifier = Modifier.fillMaxSize()
@@ -141,6 +169,44 @@ fun FileViewDataListView(
                 isSelectMode = isSelectMode,
                 onAction = onAction,
             )
+        }
+    }
+}
+
+
+@Composable
+fun DriveFilesGridView(files: List<FileViewData>, onLoadNext: () -> Unit) {
+    val state = rememberLazyGridState()
+    LaunchedEffect(null) {
+        snapshotFlow {
+            state.isScrolledToTheEnd() && state.layoutInfo.totalItemsCount != state.layoutInfo.visibleItemsInfo.size && state.isScrollInProgress
+        }.distinctUntilChanged().onEach {
+            if (it) {
+                onLoadNext()
+            }
+        }.launchIn(this)
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        modifier = Modifier.fillMaxSize(),
+        state = state
+    ) {
+        items(files.size) { index ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(1.dp)
+                    .aspectRatio(1f),
+            ) {
+                Image(
+                    rememberAsyncImagePainter(
+                        files[index].fileProperty.thumbnailUrl),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
         }
     }
 }
