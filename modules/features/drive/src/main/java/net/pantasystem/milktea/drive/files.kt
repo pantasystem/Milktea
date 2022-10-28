@@ -79,6 +79,29 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         }
     )
 
+    val actionHandler: (FilePropertyCardAction) -> Unit =  { cardAction ->
+        when(cardAction) {
+            is FilePropertyCardAction.OnCloseDropdownMenu -> {
+                fileViewModel.closeFileCardDropDownMenu()
+            }
+            is FilePropertyCardAction.OnOpenDropdownMenu -> {
+                fileViewModel.openFileCardDropDownMenu(cardAction.fileId)
+            }
+            is FilePropertyCardAction.OnToggleSelectItem -> {
+                driveViewModel.driveStore.toggleSelect(cardAction.fileId)
+            }
+            is FilePropertyCardAction.OnToggleNsfw -> {
+                fileViewModel.toggleNsfw(cardAction.fileId)
+            }
+            is FilePropertyCardAction.OnSelectDeletionMenuItem -> {
+                confirmDeleteTarget = cardAction.file
+            }
+            is FilePropertyCardAction.OnSelectEditCaptionMenuItem -> {
+                editCaptionTargetFile = cardAction.file
+            }
+        }
+    }
+
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
@@ -89,28 +112,7 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             files,
             isSelectMode,
             state = listViewState,
-            onAction = { cardAction ->
-                when(cardAction) {
-                    is FilePropertyCardAction.OnCloseDropdownMenu -> {
-                        fileViewModel.closeFileCardDropDownMenu()
-                    }
-                    is FilePropertyCardAction.OnOpenDropdownMenu -> {
-                        fileViewModel.openFileCardDropDownMenu(cardAction.fileId)
-                    }
-                    is FilePropertyCardAction.OnToggleSelectItem -> {
-                        driveViewModel.driveStore.toggleSelect(cardAction.fileId)
-                    }
-                    is FilePropertyCardAction.OnToggleNsfw -> {
-                        fileViewModel.toggleNsfw(cardAction.fileId)
-                    }
-                    is FilePropertyCardAction.OnSelectDeletionMenuItem -> {
-                        confirmDeleteTarget = cardAction.file
-                    }
-                    is FilePropertyCardAction.OnSelectEditCaptionMenuItem -> {
-                        editCaptionTargetFile = cardAction.file
-                    }
-                }
-            }
+            onAction = actionHandler
         )
     }
 }
