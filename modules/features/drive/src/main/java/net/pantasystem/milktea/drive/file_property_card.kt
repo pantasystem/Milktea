@@ -51,7 +51,7 @@ fun FilePropertySimpleCard(
                 .padding(8.dp),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Box(
                     contentAlignment = Alignment.TopEnd,
@@ -76,7 +76,8 @@ fun FilePropertySimpleCard(
                     }
                 }
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
 
                     Text(
