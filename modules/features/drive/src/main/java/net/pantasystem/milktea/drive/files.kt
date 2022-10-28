@@ -6,11 +6,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -31,10 +28,8 @@ import net.pantasystem.milktea.model.drive.FileProperty
 @ExperimentalMaterialApi
 @Composable
 fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveViewModel) {
-    val filesState: PageableState<List<FileViewData>> by fileViewModel.state.asLiveData()
-        .observeAsState(
-            initial = PageableState.Fixed(StateContent.NotExist())
-        )
+    val filesState: PageableState<List<FileViewData>> by fileViewModel.state.collectAsState()
+
     val swipeRefreshState = rememberSwipeRefreshState(
         isRefreshing = filesState is PageableState.Loading.Init || filesState is PageableState.Loading.Future
     )
@@ -60,18 +55,28 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         FileViewDataListView(
             files,
             isSelectMode,
-            onCheckedChanged = { id, _ ->
-                driveViewModel.driveStore.toggleSelect(id)
-            },
             state = listViewState,
-            onToggleNsfwMenuItemClicked = {
-                fileViewModel.toggleNsfw(it)
-            },
             onDeleteMenuItemClicked = {
                 fileViewModel.deleteFile(it)
             },
             onEditFileCaption = { id, newCaption ->
                 fileViewModel.updateCaption(id, newCaption)
+            },
+            onAction = { cardAction ->
+                when(cardAction) {
+                    is FilePropertyCardAction.OnCloseDropdownMenu -> {
+                        fileViewModel.closeFileCardDropDownMenu()
+                    }
+                    is FilePropertyCardAction.OnOpenDropdownMenu -> {
+                        fileViewModel.openFileCardDropDownMenu(cardAction.fileId)
+                    }
+                    is FilePropertyCardAction.OnToggleSelectItem -> {
+                        driveViewModel.driveStore.toggleSelect(cardAction.fileId)
+                    }
+                    is FilePropertyCardAction.OnToggleNsfw -> {
+                        fileViewModel.toggleNsfw(cardAction.fileId)
+                    }
+                }
             }
         )
     }
@@ -82,11 +87,10 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
-    onCheckedChanged: (FileProperty.Id, Boolean) -> Unit,
     onDeleteMenuItemClicked: (FileProperty.Id) -> Unit,
-    onToggleNsfwMenuItemClicked: (FileProperty.Id) -> Unit,
     onEditFileCaption: (FileProperty.Id, String) -> Unit,
     state: LazyListState = rememberLazyListState(),
+    onAction: (FilePropertyCardAction) -> Unit,
 ) {
     LazyColumn(
         state = state,
@@ -101,12 +105,9 @@ fun FileViewDataListView(
             FilePropertySimpleCard(
                 file = item,
                 isSelectMode = isSelectMode,
-                onCheckedChanged = {
-                    onCheckedChanged.invoke(item.fileProperty.id, it)
-                },
                 onDeleteMenuItemClicked = { onDeleteMenuItemClicked(item.fileProperty.id) },
-                onToggleNsfwMenuItemClicked = { onToggleNsfwMenuItemClicked(item.fileProperty.id) },
-                onEditFileCaption = onEditFileCaption
+                onEditFileCaption = onEditFileCaption,
+                onAction = onAction,
             )
         }
     }

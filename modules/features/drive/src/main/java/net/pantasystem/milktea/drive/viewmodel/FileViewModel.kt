@@ -11,14 +11,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.drive.DriveStore
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.model.drive.*
+import net.pantasystem.milktea.model.drive.DriveFileRepository
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 
 /**
@@ -63,9 +66,11 @@ class FileViewModel @AssistedInject constructor(
     private val account =
         currentAccountWatcher.account.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
+    private val _fileCardDropDowned = MutableStateFlow<FileProperty.Id?>(null)
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val state = filePropertyPagingStore.state.flatMapLatest { pageableState->
-        val ids = when(val content = pageableState.content) {
+    private val filesState = filePropertyPagingStore.state.flatMapLatest { pageableState ->
+        val ids = when (val content = pageableState.content) {
             is StateContent.Exist -> content.rawContent
             is StateContent.NotExist -> emptyList()
         }
@@ -74,18 +79,28 @@ class FileViewModel @AssistedInject constructor(
                 list
             }
         }
-    }.combine(driveStore.state) { p, driveState ->
+    }
+
+    val state = combine(
+        filesState,
+        driveStore.state,
+        _fileCardDropDowned
+    ) { p, driveState, dropDownedFileId ->
         p.convert {
             it.map { property ->
                 FileViewData(
                     property,
                     driveState.selectedFilePropertyIds?.exists(property.id) == true,
-                    driveState.isSelectMode && (driveState.selectedFilePropertyIds?.exists(property.id) == true || driveState.selectedFilePropertyIds?.isAddable == true)
+                    driveState.isSelectMode && (driveState.selectedFilePropertyIds?.exists(property.id) == true || driveState.selectedFilePropertyIds?.isAddable == true),
+                    isDropdownMenuExpanded = dropDownedFileId == property.id
                 )
             }
         }
-    }.flowOn(Dispatchers.IO)
-
+    }.flowOn(Dispatchers.IO).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        PageableState.Loading.Init(),
+    )
 
     init {
 
@@ -100,7 +115,6 @@ class FileViewModel @AssistedInject constructor(
             filePropertyPagingStore.setCurrentDirectory(it.path.lastOrNull())
             filePropertyPagingStore.loadPrevious()
         }.launchIn(viewModelScope + Dispatchers.IO)
-
 
 
         /**
@@ -193,6 +207,13 @@ class FileViewModel @AssistedInject constructor(
         }
     }
 
+    fun openFileCardDropDownMenu(fileId: FileProperty.Id) {
+        _fileCardDropDowned.value = fileId
+    }
+
+    fun closeFileCardDropDownMenu() {
+        _fileCardDropDowned.value = null
+    }
 
 }
 
