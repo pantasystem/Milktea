@@ -46,6 +46,22 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             }
         }.launchIn(this)
     }
+    var confirmDeleteTarget: FileProperty? by remember {
+        mutableStateOf(null)
+    }
+
+    if (confirmDeleteTarget != null) {
+        ConfirmDeleteFilePropertyDialog(
+            filename = confirmDeleteTarget!!.name,
+            onDismissRequest = {
+                confirmDeleteTarget = null
+            },
+            onConfirmed = {
+                fileViewModel.deleteFile(confirmDeleteTarget!!.id)
+                confirmDeleteTarget = null
+            }
+        )
+    }
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
@@ -56,9 +72,6 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             files,
             isSelectMode,
             state = listViewState,
-            onDeleteMenuItemClicked = {
-                fileViewModel.deleteFile(it)
-            },
             onEditFileCaption = { id, newCaption ->
                 fileViewModel.updateCaption(id, newCaption)
             },
@@ -76,6 +89,9 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
                     is FilePropertyCardAction.OnToggleNsfw -> {
                         fileViewModel.toggleNsfw(cardAction.fileId)
                     }
+                    is FilePropertyCardAction.OnSelectDeletionMenuItem -> {
+                        confirmDeleteTarget = cardAction.file
+                    }
                 }
             }
         )
@@ -87,11 +103,11 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
-    onDeleteMenuItemClicked: (FileProperty.Id) -> Unit,
     onEditFileCaption: (FileProperty.Id, String) -> Unit,
     state: LazyListState = rememberLazyListState(),
     onAction: (FilePropertyCardAction) -> Unit,
 ) {
+
     LazyColumn(
         state = state,
         modifier = Modifier.fillMaxSize()
@@ -105,7 +121,6 @@ fun FileViewDataListView(
             FilePropertySimpleCard(
                 file = item,
                 isSelectMode = isSelectMode,
-                onDeleteMenuItemClicked = { onDeleteMenuItemClicked(item.fileProperty.id) },
                 onEditFileCaption = onEditFileCaption,
                 onAction = onAction,
             )

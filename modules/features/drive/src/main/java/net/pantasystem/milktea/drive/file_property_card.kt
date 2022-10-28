@@ -25,15 +25,10 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun FilePropertySimpleCard(
     file: FileViewData,
     isSelectMode: Boolean = false,
-    onDeleteMenuItemClicked: () -> Unit,
     onEditFileCaption: (id: FileProperty.Id, newCaption: String) -> Unit,
     onAction: (FilePropertyCardAction) -> Unit,
 ) {
 
-
-    var confirmDeleteTargetId by remember {
-        mutableStateOf<FileProperty.Id?>(null)
-    }
 
     var editCaptionTargetFile by remember {
         mutableStateOf<FileProperty?>(null)
@@ -120,7 +115,7 @@ fun FilePropertySimpleCard(
                         onAction(FilePropertyCardAction.OnCloseDropdownMenu(file.fileProperty.id))
                         when(e) {
                             FileCardDropdownMenuAction.OnDeleteMenuItemClicked -> {
-                                confirmDeleteTargetId = file.fileProperty.id
+                                onAction(FilePropertyCardAction.OnSelectDeletionMenuItem(file.fileProperty))
                             }
                             FileCardDropdownMenuAction.OnDismissRequest -> {
                             }
@@ -140,18 +135,7 @@ fun FilePropertySimpleCard(
 
 
     }
-    if (confirmDeleteTargetId != null) {
-        ConfirmDeleteFilePropertyDialog(
-            filename = file.fileProperty.name,
-            onDismissRequest = {
-                confirmDeleteTargetId = null
-            },
-            onConfirmed = {
-                confirmDeleteTargetId = null
-                onDeleteMenuItemClicked()
-            }
-        )
-    }
+
 
     if (editCaptionTargetFile != null) {
         EditCaptionDialog(
@@ -175,5 +159,5 @@ sealed interface FilePropertyCardAction {
     data class OnCloseDropdownMenu(val fileId: FileProperty.Id) : FilePropertyCardAction
     data class OnToggleSelectItem(val fileId: FileProperty.Id, val newValue: Boolean) : FilePropertyCardAction
     data class OnToggleNsfw(val fileId: FileProperty.Id) : FilePropertyCardAction
-//    data class OnDropDownAction(val fileId: FileProperty.Id, val type: FileCardDropdownMenuAction) : FilePropertyCardAction
+    data class OnSelectDeletionMenuItem(val file: FileProperty) : FilePropertyCardAction
 }
