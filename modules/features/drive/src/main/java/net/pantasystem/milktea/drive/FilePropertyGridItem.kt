@@ -102,7 +102,7 @@ private fun CircleCheckbox(modifier: Modifier = Modifier, selected: Boolean, ena
 
     val color = MaterialTheme.colors
     val imageVector = if (selected) Icons.Filled.CheckCircle else Icons.Outlined.Circle
-    val tint = if (selected) color.primary.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.8f)
+    val tint = color.primary
     val background = if (selected) Color.White else Color.Transparent
 
     IconButton(
