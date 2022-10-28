@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.drive
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -93,14 +92,18 @@ fun DriveScreen(
                             }
                         }
                     },
-                    elevation = 0.dp
+                    elevation = 0.dp,
+                    backgroundColor = MaterialTheme.colors.surface
 
                 )
                 PathHorizontalView(path = path) { dir ->
                     driveViewModel.popUntil(dir.folder)
                 }
 
-                TabRow(selectedTabIndex = pagerState.currentPage) {
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    backgroundColor = MaterialTheme.colors.surface
+                ) {
                     tabTitles.forEachIndexed { index, s ->
                         Tab(
                             text = { Text(text = s) },
@@ -151,26 +154,28 @@ fun DriveScreen(
 
 @Composable
 fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData) -> Unit) {
-    LazyRow(
-        Modifier
-            .background(MaterialTheme.colors.primarySurface)
-            .fillMaxWidth(),
-
+    Surface(
+        color = MaterialTheme.colors.surface
+    ) {
+        LazyRow(
+            Modifier
+                .fillMaxWidth(),
         ) {
-        this.items(path, key = {
-            it.id to it.name
-        }) { dir ->
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clickable {
-                        onSelected.invoke(dir)
-                    }
+            this.items(path, key = {
+                it.id to it.name
+            }) { dir ->
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable {
+                            onSelected.invoke(dir)
+                        }
 
-            ) {
-                Text(text = dir.name)
-                Icon(imageVector = Icons.Filled.ArrowRight, contentDescription = null)
+                ) {
+                    Text(text = dir.name)
+                    Icon(imageVector = Icons.Filled.ArrowRight, contentDescription = null)
 
+                }
             }
         }
     }
