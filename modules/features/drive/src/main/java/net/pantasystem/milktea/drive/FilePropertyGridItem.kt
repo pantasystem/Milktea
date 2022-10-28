@@ -2,16 +2,14 @@ package net.pantasystem.milktea.drive
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.SensitiveIcon
 import net.pantasystem.milktea.drive.viewmodel.FileViewData
 
 @Composable
@@ -39,14 +37,21 @@ fun FilePropertyGridItem(
             }
     ) {
 
-        Image(
-            rememberAsyncImagePainter(
-                fileViewData.fileProperty.thumbnailUrl
-            ),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        Box {
+            Image(
+                rememberAsyncImagePainter(
+                    fileViewData.fileProperty.thumbnailUrl
+                ),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            if (fileViewData.fileProperty.isSensitive) {
+                SensitiveIcon()
+            }
+
+        }
+
 
         FileActionDropdownMenu(
             expanded = fileViewData.isDropdownMenuExpanded,
