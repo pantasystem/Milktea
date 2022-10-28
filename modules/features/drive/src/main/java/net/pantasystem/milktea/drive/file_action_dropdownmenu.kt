@@ -122,7 +122,7 @@ fun EditCaptionDialog(
     onSave: (FileProperty.Id, newCaption: String) -> Unit
 ) {
 
-    var captionText: String by remember {
+    var captionText: String by remember(fileProperty) {
         mutableStateOf(fileProperty?.comment ?: "")
     }
     if (fileProperty != null) {
