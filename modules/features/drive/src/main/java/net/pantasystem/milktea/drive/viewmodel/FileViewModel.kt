@@ -79,7 +79,11 @@ class FileViewModel @AssistedInject constructor(
                 list
             }
         }
-    }
+    }.distinctUntilChanged().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        PageableState.Loading.Init(),
+    )
 
     val state = combine(
         filesState,
@@ -91,7 +95,9 @@ class FileViewModel @AssistedInject constructor(
                 FileViewData(
                     property,
                     driveState.selectedFilePropertyIds?.exists(property.id) == true,
-                    driveState.isSelectMode && (driveState.selectedFilePropertyIds?.exists(property.id) == true || driveState.selectedFilePropertyIds?.isAddable == true),
+                    driveState.isSelectMode
+                            && (driveState.selectedFilePropertyIds?.exists(property.id) == true
+                                || driveState.selectedFilePropertyIds?.isAddable == true),
                     isDropdownMenuExpanded = dropDownedFileId == property.id
                 )
             }
