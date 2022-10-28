@@ -1,10 +1,6 @@
 package net.pantasystem.milktea.drive
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,14 +9,11 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
-import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -119,7 +112,9 @@ fun FilePropertyListScreen(
                 files = files,
                 onLoadNext = {
                     fileViewModel.loadNext()
-                }
+                },
+                isSelectMode = isSelectMode,
+                onAction = actionHandler
             )
         } else {
             FileViewDataListView(
@@ -175,7 +170,12 @@ fun FileViewDataListView(
 
 
 @Composable
-fun DriveFilesGridView(files: List<FileViewData>, onLoadNext: () -> Unit) {
+fun DriveFilesGridView(
+    files: List<FileViewData>,
+    isSelectMode: Boolean = false,
+    onLoadNext: () -> Unit,
+    onAction: (FilePropertyCardAction) -> Unit,
+) {
     val state = rememberLazyGridState()
     LaunchedEffect(null) {
         snapshotFlow {
@@ -192,21 +192,7 @@ fun DriveFilesGridView(files: List<FileViewData>, onLoadNext: () -> Unit) {
         state = state
     ) {
         items(files.size) { index ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(1.dp)
-                    .aspectRatio(1f),
-            ) {
-                Image(
-                    rememberAsyncImagePainter(
-                        files[index].fileProperty.thumbnailUrl),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
+            FilePropertyGridItem(fileViewData = files[index], onAction = onAction, isSelectMode = isSelectMode)
         }
     }
 }
