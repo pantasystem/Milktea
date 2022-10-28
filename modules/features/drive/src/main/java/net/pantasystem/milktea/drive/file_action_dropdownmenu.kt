@@ -16,6 +16,7 @@ import androidx.compose.ui.window.Dialog
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
+@Stable
 fun FileActionDropdownMenu(
     property: FileProperty,
     expanded: Boolean,

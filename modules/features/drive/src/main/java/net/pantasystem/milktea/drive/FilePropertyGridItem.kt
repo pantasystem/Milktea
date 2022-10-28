@@ -5,14 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +21,7 @@ import net.pantasystem.milktea.common_compose.SensitiveIcon
 import net.pantasystem.milktea.drive.viewmodel.FileViewData
 
 @Composable
+@Stable
 fun FilePropertyGridItem(
     fileViewData: FileViewData,
     isSelectMode: Boolean = false,
@@ -47,15 +46,27 @@ fun FilePropertyGridItem(
             }
     ) {
 
-        Box {
-            Image(
-                rememberAsyncImagePainter(
-                    fileViewData.fileProperty.thumbnailUrl
-                ),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (
+                fileViewData.fileProperty.thumbnailUrl == null
+                || (!fileViewData.fileProperty.type.startsWith("image")
+                && !fileViewData.fileProperty.type.startsWith("video"))
+            ) {
+                Text(fileViewData.fileProperty.name)
+            } else {
+                Image(
+                    rememberAsyncImagePainter(
+                        fileViewData.fileProperty.thumbnailUrl
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             if (fileViewData.fileProperty.isSensitive) {
                 SensitiveIcon()
             }
@@ -98,6 +109,7 @@ fun FilePropertyGridItem(
 }
 
 @Composable
+@Stable
 private fun CircleCheckbox(modifier: Modifier = Modifier, selected: Boolean, enabled: Boolean = true, onChecked: () -> Unit) {
 
     val color = MaterialTheme.colors
