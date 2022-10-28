@@ -50,6 +50,10 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         mutableStateOf(null)
     }
 
+    var editCaptionTargetFile: FileProperty? by remember {
+        mutableStateOf(null)
+    }
+
     if (confirmDeleteTarget != null) {
         ConfirmDeleteFilePropertyDialog(
             filename = confirmDeleteTarget!!.name,
@@ -62,6 +66,21 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             }
         )
     }
+
+    if (editCaptionTargetFile != null) {
+        EditCaptionDialog(
+            fileProperty = editCaptionTargetFile!!,
+            onDismiss = {
+                editCaptionTargetFile = null
+            },
+            onSave = { id, newCaption ->
+                editCaptionTargetFile = null
+                fileViewModel.updateCaption(id, newCaption)
+            }
+        )
+
+
+    }
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
@@ -72,9 +91,6 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             files,
             isSelectMode,
             state = listViewState,
-            onEditFileCaption = { id, newCaption ->
-                fileViewModel.updateCaption(id, newCaption)
-            },
             onAction = { cardAction ->
                 when(cardAction) {
                     is FilePropertyCardAction.OnCloseDropdownMenu -> {
@@ -92,6 +108,9 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
                     is FilePropertyCardAction.OnSelectDeletionMenuItem -> {
                         confirmDeleteTarget = cardAction.file
                     }
+                    is FilePropertyCardAction.OnSelectEditCaptionMenuItem -> {
+
+                    }
                 }
             }
         )
@@ -103,7 +122,6 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
 fun FileViewDataListView(
     list: List<FileViewData>,
     isSelectMode: Boolean = false,
-    onEditFileCaption: (FileProperty.Id, String) -> Unit,
     state: LazyListState = rememberLazyListState(),
     onAction: (FilePropertyCardAction) -> Unit,
 ) {
@@ -121,7 +139,6 @@ fun FileViewDataListView(
             FilePropertySimpleCard(
                 file = item,
                 isSelectMode = isSelectMode,
-                onEditFileCaption = onEditFileCaption,
                 onAction = onAction,
             )
         }

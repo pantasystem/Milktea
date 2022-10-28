@@ -7,7 +7,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,15 +25,8 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun FilePropertySimpleCard(
     file: FileViewData,
     isSelectMode: Boolean = false,
-    onEditFileCaption: (id: FileProperty.Id, newCaption: String) -> Unit,
     onAction: (FilePropertyCardAction) -> Unit,
 ) {
-
-
-    var editCaptionTargetFile by remember {
-        mutableStateOf<FileProperty?>(null)
-    }
-
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -120,7 +113,7 @@ fun FilePropertySimpleCard(
                             FileCardDropdownMenuAction.OnDismissRequest -> {
                             }
                             FileCardDropdownMenuAction.OnEditFileCaption -> {
-                                editCaptionTargetFile = file.fileProperty
+                                onAction(FilePropertyCardAction.OnSelectEditCaptionMenuItem(file.fileProperty))
                             }
                             FileCardDropdownMenuAction.OnNsfwMenuItemClicked -> {
                                 onAction(FilePropertyCardAction.OnToggleNsfw(file.fileProperty.id))
@@ -137,20 +130,7 @@ fun FilePropertySimpleCard(
     }
 
 
-    if (editCaptionTargetFile != null) {
-        EditCaptionDialog(
-            fileProperty = file.fileProperty,
-            onDismiss = {
-                editCaptionTargetFile = null
-            },
-            onSave = { id, newCaption ->
-                editCaptionTargetFile = null
-                onEditFileCaption.invoke(id, newCaption)
-            }
-        )
 
-
-    }
 
 }
 
@@ -160,4 +140,5 @@ sealed interface FilePropertyCardAction {
     data class OnToggleSelectItem(val fileId: FileProperty.Id, val newValue: Boolean) : FilePropertyCardAction
     data class OnToggleNsfw(val fileId: FileProperty.Id) : FilePropertyCardAction
     data class OnSelectDeletionMenuItem(val file: FileProperty) : FilePropertyCardAction
+    data class OnSelectEditCaptionMenuItem(val file: FileProperty) : FilePropertyCardAction
 }
