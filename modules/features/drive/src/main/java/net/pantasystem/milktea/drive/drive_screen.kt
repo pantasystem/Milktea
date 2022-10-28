@@ -8,8 +8,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,9 +50,7 @@ fun DriveScreen(
 ) {
     require(tabTitles.size == 2)
 
-    var isGridMode: Boolean by remember {
-        mutableStateOf(false)
-    }
+    val isGridMode: Boolean by driveViewModel.isUsingGridView.collectAsState()
 
     val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
         .observeAsState(initial = false)
@@ -103,7 +104,7 @@ fun DriveScreen(
                         driveViewModel.popUntil(dir.folder)
                     }
                     ToggleViewMode(isGridMode = isGridMode) {
-                        isGridMode = !isGridMode
+                        driveViewModel.setUsingGridView(!isGridMode)
                     }
                 }
 
@@ -202,9 +203,12 @@ private fun ToggleViewMode(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier.padding(4.dp).clickable {
-            onClick()
-        }.clip(RoundedCornerShape(4.dp))
+        modifier = modifier
+            .padding(4.dp)
+            .clickable {
+                onClick()
+            }
+            .clip(RoundedCornerShape(4.dp))
     ) {
         if (isGridMode) {
             Icon(Icons.Default.Grid3x3, contentDescription = null, modifier = Modifier.size(24.dp))
