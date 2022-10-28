@@ -44,10 +44,10 @@ class NotificationRelationGetter @Inject constructor(
 
     suspend fun get(notificationId: Notification.Id): NotificationRelation {
         val notification = notificationDataSource.get(notificationId)
-        val user = (notification as? HasUser)?.userId?.let {
+        val user = (notification.getOrThrow() as? HasUser)?.userId?.let {
             userDataSource.get(it)
         }
-        val noteRelation = (notification as? HasNote)?.let{
+        val noteRelation = (notification.getOrThrow() as? HasNote)?.let{
             noteRelationGetter.get(it.noteId)
         }
         return NotificationRelation(notification.getOrThrow(), user?.getOrNull(), noteRelation?.getOrNull())
