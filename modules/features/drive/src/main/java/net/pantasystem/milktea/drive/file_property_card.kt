@@ -7,7 +7,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,23 +25,8 @@ import net.pantasystem.milktea.model.drive.FileProperty
 fun FilePropertySimpleCard(
     file: FileViewData,
     isSelectMode: Boolean = false,
-    onCheckedChanged: (Boolean) -> Unit,
-    onDeleteMenuItemClicked: () -> Unit,
-    onToggleNsfwMenuItemClicked: () -> Unit,
-    onEditFileCaption: (id: FileProperty.Id, newCaption: String) -> Unit,
+    onAction: (FilePropertyCardAction) -> Unit,
 ) {
-    var actionMenuExpandedState by remember {
-        mutableStateOf(false)
-    }
-
-    var confirmDeleteTargetId by remember {
-        mutableStateOf<FileProperty.Id?>(null)
-    }
-
-    var editCaptionTargetFile by remember {
-        mutableStateOf<FileProperty?>(null)
-    }
-
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -53,9 +38,9 @@ fun FilePropertySimpleCard(
         },
         onClick = {
             if (isSelectMode) {
-                onCheckedChanged.invoke(!file.isSelected)
+                onAction(FilePropertyCardAction.OnToggleSelectItem(file.fileProperty.id, !file.isSelected))
             } else {
-                actionMenuExpandedState = true
+                onAction(FilePropertyCardAction.OnOpenDropdownMenu(file.fileProperty.id))
             }
 
         }
@@ -66,7 +51,7 @@ fun FilePropertySimpleCard(
                 .padding(8.dp),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Box(
                     contentAlignment = Alignment.TopEnd,
@@ -91,7 +76,8 @@ fun FilePropertySimpleCard(
                     }
                 }
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
 
                     Text(
@@ -118,21 +104,22 @@ fun FilePropertySimpleCard(
             ) {
                 FileActionDropdownMenu(
 
-                    expanded = actionMenuExpandedState,
-                    onDismissRequest = {
-                        actionMenuExpandedState = false
-                    },
-                    onNsfwMenuItemClicked = {
-                        actionMenuExpandedState = false
-                        onToggleNsfwMenuItemClicked()
-                    },
-                    onDeleteMenuItemClicked = {
-                        actionMenuExpandedState = false
-                        confirmDeleteTargetId = file.fileProperty.id
-                    },
-                    onEditFileCaption = {
-                        actionMenuExpandedState = false
-                        editCaptionTargetFile = file.fileProperty
+                    expanded = file.isDropdownMenuExpanded,
+                    onAction = { e ->
+                        onAction(FilePropertyCardAction.OnCloseDropdownMenu(file.fileProperty.id))
+                        when(e) {
+                            FileCardDropdownMenuAction.OnDeleteMenuItemClicked -> {
+                                onAction(FilePropertyCardAction.OnSelectDeletionMenuItem(file.fileProperty))
+                            }
+                            FileCardDropdownMenuAction.OnDismissRequest -> {
+                            }
+                            FileCardDropdownMenuAction.OnEditFileCaption -> {
+                                onAction(FilePropertyCardAction.OnSelectEditCaptionMenuItem(file.fileProperty))
+                            }
+                            FileCardDropdownMenuAction.OnNsfwMenuItemClicked -> {
+                                onAction(FilePropertyCardAction.OnToggleNsfw(file.fileProperty.id))
+                            }
+                        }
                     },
                     property = file.fileProperty
                 )
@@ -142,33 +129,17 @@ fun FilePropertySimpleCard(
 
 
     }
-    if (confirmDeleteTargetId != null) {
-        ConfirmDeleteFilePropertyDialog(
-            filename = file.fileProperty.name,
-            onDismissRequest = {
-                confirmDeleteTargetId = null
-            },
-            onConfirmed = {
-                confirmDeleteTargetId = null
-                onDeleteMenuItemClicked()
-            }
-        )
-    }
-
-    if (editCaptionTargetFile != null) {
-        EditCaptionDialog(
-            fileProperty = file.fileProperty,
-            onDismiss = {
-                editCaptionTargetFile = null
-            },
-            onSave = { id, newCaption ->
-                editCaptionTargetFile = null
-                onEditFileCaption.invoke(id, newCaption)
-            }
-        )
 
 
-    }
+
 
 }
 
+sealed interface FilePropertyCardAction {
+    data class OnOpenDropdownMenu(val fileId: FileProperty.Id) : FilePropertyCardAction
+    data class OnCloseDropdownMenu(val fileId: FileProperty.Id) : FilePropertyCardAction
+    data class OnToggleSelectItem(val fileId: FileProperty.Id, val newValue: Boolean) : FilePropertyCardAction
+    data class OnToggleNsfw(val fileId: FileProperty.Id) : FilePropertyCardAction
+    data class OnSelectDeletionMenuItem(val file: FileProperty) : FilePropertyCardAction
+    data class OnSelectEditCaptionMenuItem(val file: FileProperty) : FilePropertyCardAction
+}

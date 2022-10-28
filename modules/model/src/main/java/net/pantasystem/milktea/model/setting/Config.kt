@@ -42,6 +42,7 @@ data class IsAnalyticsCollectionEnabled(
  * @param isAnalyticsCollectionEnabled アナリティクスの許可状態
  * @param isConfirmedPostNotification プッシュ通知の顕現許可の状態
  * @param isEnableInstanceTicker Instance Tickerの有無
+ * @param isDriveUsingGridView 一覧表示時にグリッド表示を行うのか
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -61,6 +62,7 @@ data class Config(
     val isAnalyticsCollectionEnabled: IsAnalyticsCollectionEnabled,
     val isConfirmedPostNotification: Boolean,
     val isEnableInstanceTicker: Boolean,
+    val isDriveUsingGridView: Boolean,
 ) {
     companion object
 
@@ -108,6 +110,7 @@ object DefaultConfig {
         ),
         isConfirmedPostNotification = false,
         isEnableInstanceTicker = true,
+        isDriveUsingGridView = false,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

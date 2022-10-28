@@ -1,21 +1,21 @@
 package net.pantasystem.milktea.drive
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
@@ -49,6 +49,8 @@ fun DriveScreen(
     )
 ) {
     require(tabTitles.size == 2)
+
+    val isGridMode: Boolean by driveViewModel.isUsingGridView.collectAsState()
 
     val isSelectMode: Boolean by driveViewModel.isSelectMode.asLiveData()
         .observeAsState(initial = false)
@@ -93,14 +95,23 @@ fun DriveScreen(
                             }
                         }
                     },
-                    elevation = 0.dp
+                    elevation = 0.dp,
+                    backgroundColor = MaterialTheme.colors.surface
 
                 )
-                PathHorizontalView(path = path) { dir ->
-                    driveViewModel.popUntil(dir.folder)
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    PathHorizontalView(path = path, modifier = Modifier.weight(1f)) { dir ->
+                        driveViewModel.popUntil(dir.folder)
+                    }
+                    ToggleViewMode(isGridMode = isGridMode) {
+                        driveViewModel.setUsingGridView(!isGridMode)
+                    }
                 }
 
-                TabRow(selectedTabIndex = pagerState.currentPage) {
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    backgroundColor = MaterialTheme.colors.surface
+                ) {
                     tabTitles.forEachIndexed { index, s ->
                         Tab(
                             text = { Text(text = s) },
@@ -139,7 +150,8 @@ fun DriveScreen(
             if (page == 0) {
                 FilePropertyListScreen(
                     fileViewModel = fileViewModel,
-                    driveViewModel = driveViewModel
+                    driveViewModel = driveViewModel,
+                    isGridMode = isGridMode
                 )
             } else {
                 DirectoryListScreen(viewModel = directoryViewModel, driveViewModel = driveViewModel)
@@ -150,29 +162,58 @@ fun DriveScreen(
 
 
 @Composable
-fun PathHorizontalView(path: List<PathViewData>, onSelected: (PathViewData) -> Unit) {
-    LazyRow(
-        Modifier
-            .background(MaterialTheme.colors.primarySurface)
-            .fillMaxWidth(),
-
+fun PathHorizontalView(
+    modifier: Modifier = Modifier,
+    path: List<PathViewData>,
+    onSelected: (PathViewData) -> Unit
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colors.surface,
+    ) {
+        LazyRow(
+            Modifier
+                .fillMaxWidth(),
         ) {
-        this.items(path, key = {
-            it.id to it.name
-        }) { dir ->
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clickable {
-                        onSelected.invoke(dir)
-                    }
+            this.items(path, key = {
+                it.id to it.name
+            }) { dir ->
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable {
+                            onSelected.invoke(dir)
+                        }
 
-            ) {
-                Text(text = dir.name)
-                Icon(imageVector = Icons.Filled.ArrowRight, contentDescription = null)
+                ) {
+                    Text(text = dir.name)
+                    Icon(imageVector = Icons.Filled.ArrowRight, contentDescription = null)
 
+                }
             }
         }
     }
 
+}
+
+@Composable
+private fun ToggleViewMode(
+    modifier: Modifier = Modifier,
+    isGridMode: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .padding(4.dp)
+            .clickable {
+                onClick()
+            }
+            .clip(RoundedCornerShape(4.dp))
+    ) {
+        if (isGridMode) {
+            Icon(Icons.Default.Grid3x3, contentDescription = null, modifier = Modifier.size(24.dp))
+        } else {
+            Icon(Icons.Default.List, contentDescription = null, modifier = Modifier.size(24.dp))
+        }
+    }
 }

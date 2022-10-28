@@ -20,7 +20,8 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsConfirmedAnalyticsCollection,
         Keys.IsAnalyticsCollectionEnabled,
         Keys.IsConfirmedPostNotification,
-        Keys.IsEnableInstanceTicker
+        Keys.IsEnableInstanceTicker,
+        Keys.IsDriveUsingGridView,
     )
 }
 
@@ -58,6 +59,8 @@ sealed interface Keys {
 
     object IsEnableInstanceTicker : Keys
 
+    object IsDriveUsingGridView : Keys
+
     companion object
 }
 
@@ -82,5 +85,6 @@ fun Keys.str(): String {
         is Keys.IsAnalyticsCollectionEnabled -> "IsAnalyticsCollectionEnabled"
         is Keys.IsConfirmedPostNotification -> "IsConfirmedPostNotification"
         is Keys.IsEnableInstanceTicker -> "IsEnableInstanceTicker"
+        is Keys.IsDriveUsingGridView -> "IsDriveUsingGridView"
     }
 }

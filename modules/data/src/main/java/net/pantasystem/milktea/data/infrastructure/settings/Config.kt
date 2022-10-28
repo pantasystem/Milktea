@@ -93,7 +93,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: false,
         isEnableInstanceTicker = map.getValue<PrefType.BoolPref>(
             Keys.IsEnableInstanceTicker
-        )?.value ?: DefaultConfig.config.isEnableInstanceTicker
+        )?.value ?: DefaultConfig.config.isEnableInstanceTicker,
+        isDriveUsingGridView = map.getValue<PrefType.BoolPref>(
+            Keys.IsDriveUsingGridView
+        )?.value ?: DefaultConfig.config.isDriveUsingGridView
     )
 }
 
@@ -101,7 +104,7 @@ private fun <T : PrefType?> Map<Keys, PrefType?>.getValue(key: Keys): T? {
     return this[key] as? T
 }
 
-fun Config.pref(key: Keys): PrefType? {
+fun Config.pref(key: Keys): PrefType {
     return when (key) {
         Keys.BackgroundImage -> {
             PrefType.StrPref(backgroundImagePath)
@@ -166,13 +169,16 @@ fun Config.pref(key: Keys): PrefType? {
         Keys.IsEnableInstanceTicker -> {
             PrefType.BoolPref(isEnableInstanceTicker)
         }
+        Keys.IsDriveUsingGridView -> {
+            PrefType.BoolPref(isDriveUsingGridView)
+        }
     }
 }
 
 fun Config.prefs(): Map<Keys, PrefType> {
     val map = mutableMapOf<Keys, PrefType>()
     Keys.allKeys.forEach { key ->
-        pref(key)?.let {
+        pref(key).let {
             map[key] = it
         }
     }

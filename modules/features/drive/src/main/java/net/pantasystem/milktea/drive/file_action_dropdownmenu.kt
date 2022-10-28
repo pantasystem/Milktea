@@ -16,23 +16,24 @@ import androidx.compose.ui.window.Dialog
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
+@Stable
 fun FileActionDropdownMenu(
     property: FileProperty,
     expanded: Boolean,
-    onDismissRequest: () -> Unit,
-    onNsfwMenuItemClicked: () -> Unit,
-    onDeleteMenuItemClicked: () -> Unit,
-    onEditFileCaption: () -> Unit,
+    onAction: (FileCardDropdownMenuAction) -> Unit
 ) {
-
 
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = {
+            onAction(FileCardDropdownMenuAction.OnDismissRequest)
+        },
         modifier = Modifier.wrapContentWidth(),
     ) {
         DropdownMenuItem(
-            onClick = onNsfwMenuItemClicked
+            onClick = {
+                onAction(FileCardDropdownMenuAction.OnNsfwMenuItemClicked)
+            }
         ) {
             if (property.isSensitive) {
                 Icon(
@@ -54,7 +55,9 @@ fun FileActionDropdownMenu(
 
         Divider()
         DropdownMenuItem(
-            onClick = onDeleteMenuItemClicked,
+            onClick = {
+                onAction(FileCardDropdownMenuAction.OnDeleteMenuItemClicked)
+            },
         ) {
             Icon(
                 Icons.Default.Delete,
@@ -64,7 +67,9 @@ fun FileActionDropdownMenu(
             Text(text = stringResource(R.string.delete))
         }
         Divider()
-        DropdownMenuItem(onClick = onEditFileCaption) {
+        DropdownMenuItem(onClick = {
+            onAction(FileCardDropdownMenuAction.OnEditFileCaption)
+        }) {
             Icon(
                 Icons.Default.Edit,
                 modifier = Modifier.size(24.dp),
@@ -79,79 +84,93 @@ fun FileActionDropdownMenu(
 
 @Composable
 fun ConfirmDeleteFilePropertyDialog(
+    isShow: Boolean,
     filename: String,
     onDismissRequest: () -> Unit,
     onConfirmed: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
+    if (isShow) {
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
 
-        title = {
-            Text(stringResource(R.string.file_deletion_confirmation))
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirmed) {
-                Text(stringResource(R.string.delete))
+            title = {
+                Text(stringResource(R.string.file_deletion_confirmation))
+            },
+            confirmButton = {
+                TextButton(onClick = onConfirmed) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            text = {
+                Text(stringResource(R.string.do_u_want_2_delete_s, filename))
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissRequest) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
-        },
-        text = {
-            Text(stringResource(R.string.do_u_want_2_delete_s, filename))
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
+        )
+    }
+
 }
 
 
 @Composable
 fun EditCaptionDialog(
-    fileProperty: FileProperty,
+    fileProperty: FileProperty?,
     onDismiss: () -> Unit,
     onSave: (FileProperty.Id, newCaption: String) -> Unit
 ) {
 
-    var captionText: String by remember {
-        mutableStateOf(fileProperty.comment ?: "")
+    var captionText: String by remember(fileProperty) {
+        mutableStateOf(fileProperty?.comment ?: "")
     }
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colors.surface,
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+    if (fileProperty != null) {
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colors.surface,
             ) {
-                Text(
-                    stringResource(R.string.edit_caption),
-                    fontSize = 24.sp,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = captionText,
-                    placeholder = {
-                        Text(stringResource(R.string.input_caption))
-                    },
-                    onValueChange = { text ->
-                    captionText = text
-                    }
-                )
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                    TextButton(onClick = {
-                        onSave.invoke(fileProperty.id, captionText)
-                    }) {
-                        Text(stringResource(R.string.save))
+                    Text(
+                        stringResource(R.string.edit_caption),
+                        fontSize = 24.sp,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = captionText,
+                        placeholder = {
+                            Text(stringResource(R.string.input_caption))
+                        },
+                        onValueChange = { text ->
+                            captionText = text
+                        }
+                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onDismiss) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                        TextButton(onClick = {
+                            onSave.invoke(fileProperty.id, captionText)
+                        }) {
+                            Text(stringResource(R.string.save))
+                        }
                     }
                 }
             }
         }
     }
+
+}
+
+sealed interface FileCardDropdownMenuAction {
+    object OnDismissRequest : FileCardDropdownMenuAction
+    object OnNsfwMenuItemClicked : FileCardDropdownMenuAction
+    object OnDeleteMenuItemClicked : FileCardDropdownMenuAction
+    object OnEditFileCaption : FileCardDropdownMenuAction
 }
