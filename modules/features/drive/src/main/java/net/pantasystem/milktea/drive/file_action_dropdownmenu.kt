@@ -83,81 +83,88 @@ fun FileActionDropdownMenu(
 
 @Composable
 fun ConfirmDeleteFilePropertyDialog(
+    isShow: Boolean,
     filename: String,
     onDismissRequest: () -> Unit,
     onConfirmed: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
+    if (isShow) {
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
 
-        title = {
-            Text(stringResource(R.string.file_deletion_confirmation))
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirmed) {
-                Text(stringResource(R.string.delete))
+            title = {
+                Text(stringResource(R.string.file_deletion_confirmation))
+            },
+            confirmButton = {
+                TextButton(onClick = onConfirmed) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            text = {
+                Text(stringResource(R.string.do_u_want_2_delete_s, filename))
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissRequest) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
-        },
-        text = {
-            Text(stringResource(R.string.do_u_want_2_delete_s, filename))
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
+        )
+    }
+
 }
 
 
 @Composable
 fun EditCaptionDialog(
-    fileProperty: FileProperty,
+    fileProperty: FileProperty?,
     onDismiss: () -> Unit,
     onSave: (FileProperty.Id, newCaption: String) -> Unit
 ) {
 
     var captionText: String by remember {
-        mutableStateOf(fileProperty.comment ?: "")
+        mutableStateOf(fileProperty?.comment ?: "")
     }
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colors.surface,
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+    if (fileProperty != null) {
+        Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colors.surface,
             ) {
-                Text(
-                    stringResource(R.string.edit_caption),
-                    fontSize = 24.sp,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = captionText,
-                    placeholder = {
-                        Text(stringResource(R.string.input_caption))
-                    },
-                    onValueChange = { text ->
-                    captionText = text
-                    }
-                )
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                    TextButton(onClick = {
-                        onSave.invoke(fileProperty.id, captionText)
-                    }) {
-                        Text(stringResource(R.string.save))
+                    Text(
+                        stringResource(R.string.edit_caption),
+                        fontSize = 24.sp,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = captionText,
+                        placeholder = {
+                            Text(stringResource(R.string.input_caption))
+                        },
+                        onValueChange = { text ->
+                            captionText = text
+                        }
+                    )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onDismiss) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                        TextButton(onClick = {
+                            onSave.invoke(fileProperty.id, captionText)
+                        }) {
+                            Text(stringResource(R.string.save))
+                        }
                     }
                 }
             }
         }
     }
+
 }
 
 sealed interface FileCardDropdownMenuAction {

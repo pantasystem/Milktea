@@ -37,6 +37,11 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
         .observeAsState(initial = false)
     val files = (filesState.content as? StateContent.Exist)?.rawContent ?: emptyList()
     val listViewState = rememberLazyListState()
+
+    var confirmDeleteTarget: FileProperty? by remember {
+        mutableStateOf(null)
+    }
+
     LaunchedEffect(null) {
         snapshotFlow {
             listViewState.isScrolledToTheEnd() && listViewState.layoutInfo.totalItemsCount != listViewState.layoutInfo.visibleItemsInfo.size && listViewState.isScrollInProgress
@@ -46,41 +51,34 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
             }
         }.launchIn(this)
     }
-    var confirmDeleteTarget: FileProperty? by remember {
-        mutableStateOf(null)
-    }
 
     var editCaptionTargetFile: FileProperty? by remember {
         mutableStateOf(null)
     }
 
-    if (confirmDeleteTarget != null) {
-        ConfirmDeleteFilePropertyDialog(
-            filename = confirmDeleteTarget!!.name,
-            onDismissRequest = {
-                confirmDeleteTarget = null
-            },
-            onConfirmed = {
-                fileViewModel.deleteFile(confirmDeleteTarget!!.id)
-                confirmDeleteTarget = null
-            }
-        )
-    }
+    ConfirmDeleteFilePropertyDialog(
+        isShow = confirmDeleteTarget != null,
+        filename = confirmDeleteTarget?.name ?: "",
+        onDismissRequest = {
+            confirmDeleteTarget = null
+        },
+        onConfirmed = {
+            fileViewModel.deleteFile(confirmDeleteTarget!!.id)
+            confirmDeleteTarget = null
+        }
+    )
 
-    if (editCaptionTargetFile != null) {
-        EditCaptionDialog(
-            fileProperty = editCaptionTargetFile!!,
-            onDismiss = {
-                editCaptionTargetFile = null
-            },
-            onSave = { id, newCaption ->
-                editCaptionTargetFile = null
-                fileViewModel.updateCaption(id, newCaption)
-            }
-        )
+    EditCaptionDialog(
+        fileProperty = editCaptionTargetFile,
+        onDismiss = {
+            editCaptionTargetFile = null
+        },
+        onSave = { id, newCaption ->
+            editCaptionTargetFile = null
+            fileViewModel.updateCaption(id, newCaption)
+        }
+    )
 
-
-    }
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
@@ -109,7 +107,7 @@ fun FilePropertyListScreen(fileViewModel: FileViewModel, driveViewModel: DriveVi
                         confirmDeleteTarget = cardAction.file
                     }
                     is FilePropertyCardAction.OnSelectEditCaptionMenuItem -> {
-
+                        editCaptionTargetFile = cardAction.file
                     }
                 }
             }
