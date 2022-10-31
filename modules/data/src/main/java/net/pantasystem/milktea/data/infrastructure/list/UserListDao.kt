@@ -24,6 +24,18 @@ interface UserListDao {
 
     @Query(
         """
+            select * from user_list where accountId = :accountId
+                and serverId in (:serverIds)
+        """
+    )
+    @Transaction
+    suspend fun findUserListWhereIn(
+        accountId: Long,
+        serverIds: List<String>
+    ): List<UserListRecord>
+
+    @Query(
+        """
             select * from user_list 
                 where accountId = :accountId
                 and serverId = :serverId
@@ -43,13 +55,19 @@ interface UserListDao {
             """
     )
     @Transaction
-    suspend fun observeByServerId(
+    fun observeByServerId(
         accountId: Long,
         serverId: String,
     ): Flow<UserListRelatedRecord?>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(userList: UserListRecord): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(userList: List<UserListRecord>): List<Long>
+
+    @Update
+    suspend fun update(userListRecord: UserListRecord)
 
     @Query(
         """
