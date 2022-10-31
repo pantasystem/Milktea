@@ -1,7 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.list
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.list.CreateList
 import net.pantasystem.milktea.api.misskey.list.ListId
@@ -170,13 +174,17 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun syncOne(userListId: UserList.Id): Result<Unit> = runCatching {
-        val source = findOne(userListId)
+        withContext(Dispatchers.IO) {
+            val source = findOne(userListId)
 
-        upsert(source)
+            upsert(source)
+        }
+
     }
 
     override fun observeOne(userListId: UserList.Id): Flow<UserListWithMembers?> {
         return userListDao.observeByServerId(userListId.accountId, userListId.userListId)
+            .distinctUntilChanged()
             .map { relatedRecord ->
                 relatedRecord?.let {
                     UserListWithMembers(
@@ -189,7 +197,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
                         }
                     )
                 }
-            }
+            }.flowOn(Dispatchers.IO)
     }
 
     private suspend fun upsert(source: UserList) {
