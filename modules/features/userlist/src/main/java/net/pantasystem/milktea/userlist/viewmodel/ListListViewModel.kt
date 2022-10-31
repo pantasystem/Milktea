@@ -10,14 +10,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Encryption
-import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListRepository
+import net.pantasystem.milktea.model.list.UserListWithMembers
+import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -32,6 +33,51 @@ class ListListViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+
+    private val userListsFlow =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+            userListRepository.observeByAccountId(account.accountId)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val userListsSyncState =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+            suspend {
+                userListRepository.syncByAccountId(it.accountId).getOrThrow()
+            }.asLoadingStateFlow()
+        }.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultState.Loading(
+                StateContent.NotExist()
+            )
+        )
+
+    private val addTargetUserId = MutableStateFlow<User.Id?>(null)
+
+    val uiState = combine(
+        accountStore.observeCurrentAccount,
+        userListsFlow,
+        userListsSyncState,
+        addTargetUserId
+    ) { ac, userLists, syncState, addUser ->
+        UserListsUiState(
+            userLists.map { userList ->
+                UserListBindingModel(
+                    userList,
+                    ac?.pages?.any {
+                        it.pageParams.listId == userList.userList.id.userListId
+                    } ?: false,
+                    isTargetUserAdded = userList.userList.userIds.any { id ->
+                        id == addUser
+                    },
+                )
+            },
+            syncState = syncState,
+            addTargetUserId = addUser,
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        UserListsUiState(emptyList(), userListsSyncState.value)
+    )
 
     val userListList = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
         userListRepository.observeByAccountId(account.accountId).map { list ->
@@ -53,6 +99,7 @@ class ListListViewModel @Inject constructor(
                 }.toSet()
             }
         }.asLiveData()
+
 
     val showUserDetailEvent = EventBus<UserList>()
 
@@ -90,6 +137,21 @@ class ListListViewModel @Inject constructor(
     fun showUserListDetail(userList: UserList?) {
         userList?.let { ul ->
             showUserDetailEvent.event = ul
+        }
+    }
+
+    fun toggle(userList: UserList, userId: User.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                if (userList.userIds.contains(userId)) {
+                    userListRepository.removeUser(userList.id, userId)
+                } else {
+                    userListRepository.appendUser(userList.id, userId)
+                }
+                userListRepository.syncOne(userList.id)
+            }.onFailure {
+                logger.error("toggle user failed", it)
+            }
         }
     }
 
@@ -151,6 +213,10 @@ class ListListViewModel @Inject constructor(
 
     }
 
+    fun setAddTargetUserId(userId: User.Id?) {
+        addTargetUserId.value = userId
+    }
+
     private suspend fun syncUsers(accountId: Long) {
         val userIds = userListRepository.findByAccountId(accountId).map {
             it.userIds
@@ -159,3 +225,15 @@ class ListListViewModel @Inject constructor(
     }
 
 }
+
+data class UserListBindingModel(
+    val userList: UserListWithMembers,
+    val isAddedTab: Boolean,
+    val isTargetUserAdded: Boolean,
+)
+
+data class UserListsUiState(
+    val userLists: List<UserListBindingModel>,
+    val syncState: ResultState<Unit>,
+    val addTargetUserId: User.Id? = null,
+)

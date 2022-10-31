@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.userlist.viewmodel.UserListsUiState
 
 @Composable
@@ -30,7 +31,8 @@ fun UserListCardPage(
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
-                }
+                },
+                backgroundColor = MaterialTheme.colors.surface
             )
         }
     ) {
@@ -45,12 +47,23 @@ fun UserListCardPage(
                     onAction = { action ->
                         when (action) {
                             is UserListCardAction.OnClick -> {
-                                onAction(
-                                    UserListCardPageAction
-                                        .OnUserListCardClicked(
-                                            uiState.userLists[index].userList.userList
-                                        )
-                                )
+                                if (uiState.addTargetUserId == null) {
+                                    onAction(
+                                        UserListCardPageAction
+                                            .OnUserListCardClicked(
+                                                uiState.userLists[index].userList.userList
+                                            )
+                                    )
+                                } else {
+                                    onAction(
+                                        UserListCardPageAction
+                                            .OnToggleAddUser(
+                                                uiState.userLists[index].userList.userList,
+                                                uiState.addTargetUserId
+                                            )
+                                    )
+                                }
+
                             }
                             is UserListCardAction.OnClickToggleTab -> {
                                 onAction(
@@ -72,4 +85,5 @@ sealed interface UserListCardPageAction {
     data class OnUserListAddToTabToggled(val userList: UserList) : UserListCardPageAction
     object OnNavigateUp : UserListCardPageAction
 
+    data class OnToggleAddUser(val userList: UserList, val userId: User.Id): UserListCardPageAction
 }

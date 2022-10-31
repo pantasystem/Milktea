@@ -36,6 +36,7 @@ fun UserListCard(userList: UserListBindingModel, onAction: (UserListCardAction) 
         Modifier
             .fillMaxWidth()
             .padding(0.5.dp),
+        backgroundColor = if (userList.isTargetUserAdded) MaterialTheme.colors.primary else MaterialTheme.colors.surface
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -45,7 +46,9 @@ fun UserListCard(userList: UserListBindingModel, onAction: (UserListCardAction) 
                 .padding(8.dp)
         ) {
             Column(
-                Modifier.weight(1f).fillMaxWidth()
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
                 Text(userList.userList.userList.name, fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(2.dp))
@@ -91,7 +94,8 @@ fun Preview_GroupCard() {
                     UserListMember(User.Id(0L, "id"), ""),
                 )
             ),
-            isAddedTab = true
+            isAddedTab = true,
+            isTargetUserAdded = false,
         ),
         onAction = {}
     )
