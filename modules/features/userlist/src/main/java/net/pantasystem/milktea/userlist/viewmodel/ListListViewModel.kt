@@ -1,17 +1,14 @@
 package net.pantasystem.milktea.userlist.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -25,7 +22,6 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class ListListViewModel @Inject constructor(
-    val encryption: Encryption,
     val accountStore: AccountStore,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
@@ -80,56 +76,16 @@ class ListListViewModel @Inject constructor(
     )
 
 
-    val pagedUserList =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
-            userListRepository.observeByAccountId(account.accountId).map { lists ->
-                lists.filter { list ->
-                    account.pages.any { page ->
-                        list.userList.id.userListId == page.pageParams.listId
-                    }
-                }.map {
-                    it.userList
-                }.toSet()
-            }
-        }.asLiveData()
-
-
-    val showUserDetailEvent = EventBus<UserList>()
 
     private val logger = loggerFactory.create("ListListViewModel")
 
     init {
-        accountStore.observeCurrentAccount.onEach {
-            fetch()
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
         viewModelScope.launch {
             accountStore.observeCurrentAccount.distinctUntilChanged().filterNotNull().map {
                 syncUsers(it.accountId)
             }.catch {
                 logger.error("sync users error", it)
             }.collect()
-        }
-    }
-
-
-    fun fetch() {
-        viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.getCurrentAccount().mapCatching { account ->
-                userListRepository.syncByAccountId(account.accountId).getOrThrow()
-            }.onSuccess {
-                logger.debug("success fetch")
-            }.onFailure {
-                logger.error("fetch error", e = it)
-            }
-
-        }
-    }
-
-
-    fun showUserListDetail(userList: UserList?) {
-        userList?.let { ul ->
-            showUserDetailEvent.event = ul
         }
     }
 
