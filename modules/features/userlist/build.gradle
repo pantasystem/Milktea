@@ -31,6 +31,11 @@ android {
     }
     buildFeatures {
         dataBinding true
+        compose true
+
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = compose_version
     }
 }
 
@@ -75,5 +80,20 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation libs.androidx.constraintlayout
+
+    // compose
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
+    implementation libs.kotlin.datetime
+
 
 }
