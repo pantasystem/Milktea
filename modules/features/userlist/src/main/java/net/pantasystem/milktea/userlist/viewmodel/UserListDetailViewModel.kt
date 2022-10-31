@@ -78,6 +78,7 @@ class UserListDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 userListRepository.update(listId, name)
+                userListRepository.syncOne(listId).getOrThrow()
             }.onSuccess {
                 load()
             }.onFailure { t ->
@@ -92,6 +93,7 @@ class UserListDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 userListRepository.appendUser(listId, userId)
+                userListRepository.syncOne(listId).getOrThrow()
             }.onSuccess {
                 logger.info("ユーザーの追加に成功")
             }.onFailure {
@@ -107,6 +109,7 @@ class UserListDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 userListRepository.removeUser(listId, userId)
+                userListRepository.syncOne(listId).getOrThrow()
             }.onFailure { t ->
                 logger.warning("ユーザーの除去に失敗", e = t)
             }.onSuccess {
