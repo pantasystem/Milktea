@@ -18,7 +18,7 @@ data class UserList(
     ) : EntityId
 }
 
-data class UserListWithMember(
+data class UserListWithMembers(
     val userList: UserList,
     val members: List<UserListMember>,
 )
