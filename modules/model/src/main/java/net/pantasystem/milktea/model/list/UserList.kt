@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.model.list
 
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
-import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.user.User
 
 data class UserList(
@@ -17,3 +17,13 @@ data class UserList(
         val userListId: String
     ) : EntityId
 }
+
+data class UserListWithMember(
+    val userList: UserList,
+    val members: List<UserListMember>,
+)
+
+data class UserListMember(
+    val userId: User.Id,
+    val avatarUrl: String?,
+)
