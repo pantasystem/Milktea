@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.userlist.UserListStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
@@ -18,37 +17,41 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListRepository
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class ListListViewModel @Inject constructor(
     val encryption: Encryption,
-    private val userListStore: UserListStore,
     val accountStore: AccountStore,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
+    private val userListRepository: UserListRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
 
     val userListList = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
-        userListStore.state.map {
-            it.getUserLists(account.accountId)
+        userListRepository.observeByAccountId(account.accountId).map { list ->
+            list.map {
+                it.userList
+            }
         }
     }.asLiveData()
 
     val pagedUserList =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
-            userListStore.state.map {
-                it.getUserLists(account.accountId)
-            }.map { lists ->
+            userListRepository.observeByAccountId(account.accountId).map { lists ->
                 lists.filter { list ->
                     account.pages.any { page ->
-                        list.id.userListId == page.pageParams.listId
+                        list.userList.id.userListId == page.pageParams.listId
                     }
+                }.map {
+                    it.userList
                 }.toSet()
             }
-
         }.asLiveData()
 
     val showUserDetailEvent = EventBus<UserList>()
@@ -59,13 +62,21 @@ class ListListViewModel @Inject constructor(
         accountStore.observeCurrentAccount.onEach {
             fetch()
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+        viewModelScope.launch {
+            accountStore.observeCurrentAccount.distinctUntilChanged().filterNotNull().map {
+                syncUsers(it.accountId)
+            }.catch {
+                logger.error("sync users error", it)
+            }.collect()
+        }
     }
 
 
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {
             accountRepository.getCurrentAccount().mapCatching { account ->
-                userListStore.findByAccount(account.accountId)
+                userListRepository.syncByAccountId(account.accountId).getOrThrow()
             }.onSuccess {
                 logger.debug("success fetch")
             }.onFailure {
@@ -119,7 +130,7 @@ class ListListViewModel @Inject constructor(
         userList ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                userListStore.delete(userList.id)
+                userListRepository.delete(userList.id)
             }.onSuccess {
                 logger.debug("削除成功")
             }
@@ -131,7 +142,8 @@ class ListListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = accountRepository.getCurrentAccount().getOrThrow()
-                userListStore.create(account.accountId, name)
+                val result = userListRepository.create(account.accountId, name)
+                userListRepository.syncOne(result.id).getOrThrow()
             }.onSuccess {
                 logger.debug("作成成功")
             }
@@ -139,5 +151,11 @@ class ListListViewModel @Inject constructor(
 
     }
 
+    private suspend fun syncUsers(accountId: Long) {
+        val userIds = userListRepository.findByAccountId(accountId).map {
+            it.userIds
+        }.flatten().distinct()
+        userRepository.syncIn(userIds)
+    }
 
 }
