@@ -81,7 +81,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
         UserListRecord::class,
         UserListMemberIdRecord::class,
     ],
-    version = 24,
+    version = 25,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
