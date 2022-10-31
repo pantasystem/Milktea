@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.userlist.UserListStore
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
@@ -25,7 +24,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ListListViewModel @Inject constructor(
     val encryption: Encryption,
-    private val userListStore: UserListStore,
     val accountStore: AccountStore,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
@@ -43,16 +41,15 @@ class ListListViewModel @Inject constructor(
 
     val pagedUserList =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
-            userListStore.state.map {
-                it.getUserLists(account.accountId)
-            }.map { lists ->
+            userListRepository.observeByAccountId(account.accountId).map { lists ->
                 lists.filter { list ->
                     account.pages.any { page ->
-                        list.id.userListId == page.pageParams.listId
+                        list.userList.id.userListId == page.pageParams.listId
                     }
+                }.map {
+                    it.userList
                 }.toSet()
             }
-
         }.asLiveData()
 
     val showUserDetailEvent = EventBus<UserList>()
@@ -123,7 +120,7 @@ class ListListViewModel @Inject constructor(
         userList ?: return
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                userListStore.delete(userList.id)
+                userListRepository.delete(userList.id)
             }.onSuccess {
                 logger.debug("削除成功")
             }
@@ -135,7 +132,8 @@ class ListListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = accountRepository.getCurrentAccount().getOrThrow()
-                userListStore.create(account.accountId, name)
+                val result = userListRepository.create(account.accountId, name)
+                userListRepository.syncOne(result.id).getOrThrow()
             }.onSuccess {
                 logger.debug("作成成功")
             }

@@ -8,20 +8,18 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.app_store.userlist.UserListStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.list.UserListRepository
 import net.pantasystem.milktea.model.user.User
 
 class UserListDetailViewModel @AssistedInject constructor(
-    private val userListStore: UserListStore,
     private val userViewDataFactory: UserViewData.Factory,
+    private val userListRepository: UserListRepository,
     loggerFactory: Logger.Factory,
     @Assisted val listId: UserList.Id,
 ) : ViewModel() {
@@ -44,15 +42,14 @@ class UserListDetailViewModel @AssistedInject constructor(
     }
 
 
-    val userList = userListStore.state.map {
-        it.get(listId)
-    }.filterNotNull().asLiveData()
+
+    val userList = userListRepository.observeOne(listId).filterNotNull().map {
+        it.userList
+    }.asLiveData()
 
 
-    val listUsers = userListStore.state.map {
-        it.get(listId)
-    }.filterNotNull().map {
-        it.userIds.map { id ->
+    val listUsers = userListRepository.observeOne(listId).filterNotNull().map {
+        it.userList.userIds.map { id ->
             userViewDataFactory.create(id, viewModelScope)
         }
     }.asLiveData()
@@ -66,7 +63,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     fun load() {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                userListStore.findOne(listId)
+                userListRepository.syncOne(listId)
             }.onSuccess {
                 logger.info("load list success")
             }.onFailure {
@@ -80,7 +77,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     fun updateName(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                userListStore.update(listId, name)
+                userListRepository.update(listId, name)
             }.onSuccess {
                 load()
             }.onFailure { t ->
@@ -94,7 +91,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                userListStore.appendUser(listId, userId)
+                userListRepository.appendUser(listId, userId)
             }.onSuccess {
                 logger.info("ユーザーの追加に成功")
             }.onFailure {
@@ -109,7 +106,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                userListStore.removeUser(listId, userId)
+                userListRepository.removeUser(listId, userId)
             }.onFailure { t ->
                 logger.warning("ユーザーの除去に失敗", e = t)
             }.onSuccess {
