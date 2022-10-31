@@ -19,6 +19,10 @@ import net.pantasystem.milktea.data.infrastructure.group.GroupMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberView
 import net.pantasystem.milktea.data.infrastructure.group.GroupRecord
 import net.pantasystem.milktea.data.infrastructure.instance.db.*
+import net.pantasystem.milktea.data.infrastructure.list.UserListDao
+import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
+import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
+import net.pantasystem.milktea.data.infrastructure.list.UserListRecord
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRegexRecord
@@ -73,6 +77,9 @@ import net.pantasystem.milktea.model.url.UrlPreview
         WordFilterConditionRecord::class,
         WordFilterConditionRegexRecord::class,
         WordFilterConditionWordRecord::class,
+
+        UserListRecord::class,
+        UserListMemberIdRecord::class,
     ],
     version = 24,
     exportSchema = true,
@@ -89,9 +96,10 @@ import net.pantasystem.milktea.model.url.UrlPreview
         AutoMigration(from = 20, to = 21),
         AutoMigration(from = 21, to = 22),
         AutoMigration(from = 22, to = 23),
-        AutoMigration(from = 23, to = 24)
+        AutoMigration(from = 23, to = 24),
+        AutoMigration(from = 24, to = 25),
     ],
-    views = [UserView::class, GroupMemberView::class,]
+    views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
 @TypeConverters(
     PageTypeConverter::class,
@@ -136,4 +144,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
     abstract fun wordFilterConfigDao(): WordFilterConfigDao
+
+    abstract fun userListDao(): UserListDao
 }
