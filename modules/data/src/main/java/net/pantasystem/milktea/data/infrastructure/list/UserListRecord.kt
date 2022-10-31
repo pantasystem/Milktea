@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.list
 
 import androidx.room.*
 import kotlinx.datetime.Instant
-import net.pantasystem.milktea.data.infrastructure.group.GroupRecord
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
@@ -29,7 +28,7 @@ data class UserListRecord(
     val accountId: Long,
     val createdAt: Instant,
     val name: String,
-    @PrimaryKey(autoGenerate = true) val id: Long
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L
 )
 
 @Entity(
@@ -38,7 +37,7 @@ data class UserListRecord(
         ForeignKey(
             parentColumns = ["id"],
             childColumns = ["userListId"],
-            entity = GroupRecord::class,
+            entity = UserListRecord::class,
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         ),
@@ -51,7 +50,7 @@ data class UserListRecord(
 data class UserListMemberIdRecord(
     val userListId: Long,
     val userId: String,
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 )
 
 @DatabaseView(
@@ -77,7 +76,7 @@ data class UserListRelatedRecord(
     @Embedded val userList: UserListRecord,
     @Relation(
         parentColumn = "id",
-        entityColumn = "groupId",
+        entityColumn = "userListId",
         entity = UserListMemberIdRecord::class
     )
     val userIds: List<UserListMemberIdRecord>,
