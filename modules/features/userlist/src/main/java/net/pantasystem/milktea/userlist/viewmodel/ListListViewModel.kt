@@ -79,13 +79,6 @@ class ListListViewModel @Inject constructor(
         UserListsUiState(emptyList(), userListsSyncState.value)
     )
 
-    val userListList = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
-        userListRepository.observeByAccountId(account.accountId).map { list ->
-            list.map {
-                it.userList
-            }
-        }
-    }.asLiveData()
 
     val pagedUserList =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
@@ -188,18 +181,6 @@ class ListListViewModel @Inject constructor(
         }
     }
 
-    fun delete(userList: UserList?) {
-        userList ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                userListRepository.delete(userList.id)
-            }.onSuccess {
-                logger.debug("削除成功")
-            }
-        }
-
-    }
-
     fun createUserList(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
@@ -208,6 +189,8 @@ class ListListViewModel @Inject constructor(
                 userListRepository.syncOne(result.id).getOrThrow()
             }.onSuccess {
                 logger.debug("作成成功")
+            }.onFailure {
+                logger.error("作成失敗", it)
             }
         }
 
