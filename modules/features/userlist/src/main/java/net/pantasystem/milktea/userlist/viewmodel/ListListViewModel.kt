@@ -18,6 +18,7 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListRepository
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -28,6 +29,7 @@ class ListListViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
     private val userListRepository: UserListRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
 
@@ -60,6 +62,14 @@ class ListListViewModel @Inject constructor(
         accountStore.observeCurrentAccount.onEach {
             fetch()
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+        viewModelScope.launch {
+            accountStore.observeCurrentAccount.distinctUntilChanged().filterNotNull().map {
+                syncUsers(it.accountId)
+            }.catch {
+                logger.error("sync users error", it)
+            }.collect()
+        }
     }
 
 
@@ -141,5 +151,11 @@ class ListListViewModel @Inject constructor(
 
     }
 
+    private suspend fun syncUsers(accountId: Long) {
+        val userIds = userListRepository.findByAccountId(accountId).map {
+            it.userIds
+        }.flatten().distinct()
+        userRepository.syncIn(userIds)
+    }
 
 }
