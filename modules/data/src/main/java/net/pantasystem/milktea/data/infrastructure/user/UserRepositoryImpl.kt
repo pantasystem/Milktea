@@ -131,29 +131,30 @@ class UserRepositoryImpl @Inject constructor(
         userDataSource.searchByName(accountId, name)
     }
 
-    override suspend fun searchByUserName(
+    override suspend fun syncByUserName(
         accountId: Long,
         userName: String,
         host: String?
-    ): List<User> = withContext(Dispatchers.IO) {
-        val ac = accountRepository.get(accountId).getOrThrow()
-        val i = ac.getI(encryption)
-        val api = misskeyAPIProvider.get(ac)
+    ) = runCatching<Unit> {
+        withContext(Dispatchers.IO) {
+            val ac = accountRepository.get(accountId).getOrThrow()
+            val i = ac.getI(encryption)
+            val api = misskeyAPIProvider.get(ac)
 
-        val results = SearchByUserAndHost(api)
-            .search(
-                RequestUser(
-                    userName = userName,
-                    host = host,
-                    i = i
+            val results = SearchByUserAndHost(api)
+                .search(
+                    RequestUser(
+                        userName = userName,
+                        host = host,
+                        i = i
+                    )
                 )
-            )
-            .throwIfHasError()
+                .throwIfHasError()
 
-        results.body()!!.map {
-            it.toUser(ac, true).also { u ->
-                userDataSource.add(u)
-                userDataSource.get(u.id)
+            results.body()!!.forEach {
+                it.toUser(ac, true).also { u ->
+                    userDataSource.add(u)
+                }
             }
         }
     }

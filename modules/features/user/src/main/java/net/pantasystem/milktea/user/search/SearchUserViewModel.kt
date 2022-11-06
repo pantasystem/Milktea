@@ -44,23 +44,23 @@ class SearchUserViewModel @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val filteredByUserNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
+    val syncByUserNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.flatMapLatest {
                 suspend {
                     userRepository
-                        .searchByUserName(
+                        .syncByUserName(
                             accountId = account.accountId,
                             userName = it.word,
                             host = it.host
                         )
                 }.asLoadingStateFlow()
             }
-        }.map { state ->
-            state.convert { list ->
-                list.map { it.id }
-            }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            ResultState.Loading(StateContent.NotExist())
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val filteredByNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
@@ -74,22 +74,27 @@ class SearchUserViewModel @Inject constructor(
             state.convert { list ->
                 list.map { it.id }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            ResultState.Loading(StateContent.NotExist())
+        )
 
     val searchState =
-        combine(filteredByNameLoadingState, filteredByUserNameLoadingState) { users1, users2 ->
+        combine(
+            filteredByNameLoadingState,
+            syncByUserNameLoadingState
+        ) { users1, remoteSyncState ->
             val content1 = (users1.content as? StateContent.Exist?)?.rawContent
                 ?: emptyList()
-            val content2 = (users2.content as? StateContent.Exist?)?.rawContent
-                ?: emptyList()
-            val users = (content2 + content1).distinctBy { it.id }
+
             val isNotExists =
-                users1.content is StateContent.NotExist && users2.content is StateContent.NotExist
-            val isLoading = users1 is ResultState.Loading && users2 is ResultState.Loading
-            val isFailure = users1 is ResultState.Error && users2 is ResultState.Error
-            val content = if (isNotExists) StateContent.NotExist() else StateContent.Exist(users)
+                users1.content is StateContent.NotExist
+            val isLoading = users1 is ResultState.Loading && remoteSyncState is ResultState.Loading
+            val isFailure = users1 is ResultState.Error && remoteSyncState is ResultState.Error
+            val content = if (isNotExists) StateContent.NotExist() else StateContent.Exist(content1)
             val throwable = (users1 as? ResultState.Error?)?.throwable
-                ?: (users2 as? ResultState.Error?)?.throwable
+                ?: (remoteSyncState as? ResultState.Error?)?.throwable
             if (isLoading) {
                 ResultState.Loading(content)
             } else if (isFailure) {
@@ -100,7 +105,7 @@ class SearchUserViewModel @Inject constructor(
         }.catch { error ->
             logger.info("ユーザー検索処理に失敗しました", e = error)
         }.stateIn(
-            viewModelScope, SharingStarted.Lazily, ResultState.Fixed(
+            viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultState.Fixed(
                 StateContent.NotExist()
             )
         )
@@ -132,7 +137,7 @@ class SearchUserViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
-    val errors = filteredByUserNameLoadingState.map {
+    val errors = syncByUserNameLoadingState.map {
         it as? ResultState.Error?
     }.mapNotNull {
         it?.throwable

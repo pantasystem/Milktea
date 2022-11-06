@@ -12,7 +12,7 @@ interface UserRepository {
 
     suspend fun searchByName(accountId: Long, name: String): List<User>
 
-    suspend fun searchByUserName(accountId: Long, userName: String, host: String?): List<User>
+    suspend fun syncByUserName(accountId: Long, userName: String, host: String?): Result<Unit>
 
     suspend fun searchByNameOrAcct(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null): List<User>
 
