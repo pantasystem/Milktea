@@ -4,24 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
-import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.UserCardListActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCardList
 import net.pantasystem.milktea.user.compose.UserDetailCardListAction
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -77,13 +72,7 @@ class SearchUserFragment : Fragment() {
         if (username != null) {
             viewModel.setUserName(username!!)
         }
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.errors.collect {
-                    Toast.makeText(requireContext(), "Load error:$it", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+
     }
 
 

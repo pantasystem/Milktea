@@ -11,6 +11,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -18,16 +19,6 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 
 
-data class SearchUser(
-    val word: String,
-    val host: String?
-) {
-    val isUserName: Boolean
-        get() = Pattern.compile("""^[a-zA-Z_\-0-9]+$""")
-            .matcher(word)
-            .find()
-
-}
 
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
@@ -44,17 +35,27 @@ class SearchUserViewModel @Inject constructor(
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val syncByUserNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
+    private val syncByUserNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
         .flatMapLatest { account ->
-            searchUserRequests.flatMapLatest {
+            searchUserRequests.flatMapLatest { query ->
                 suspend {
-                    userRepository
-                        .syncByUserName(
-                            accountId = account.accountId,
-                            userName = it.word,
-                            host = it.host
-                        ).getOrThrow()
-                }.asLoadingStateFlow()
+                    userRepository.syncByUserName(account.accountId, query.word, query.host).getOrThrow()
+                }.asLoadingStateFlow().map {
+                    SyncRemoteResult.from(account, query, it)
+                }
+            }
+        }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val filteredByNameLoadingState =
+        syncByUserNameLoadingState.distinctUntilChanged().flatMapLatest {
+            suspend {
+                userRepository.searchByNameOrAcct(it.account.accountId, it.word)
+            }.asLoadingStateFlow()
+        }.map { state ->
+            state.convert { list ->
+                list.map { it.id }
             }
         }.flowOn(Dispatchers.IO).stateIn(
             viewModelScope,
@@ -62,56 +63,11 @@ class SearchUserViewModel @Inject constructor(
             ResultState.Loading(StateContent.NotExist())
         )
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val filteredByNameLoadingState = syncByUserNameLoadingState.flatMapLatest {
-        accountStore.observeCurrentAccount.filterNotNull()
-            .flatMapLatest { account ->
-                searchUserRequests.flatMapLatest {
-                    suspend {
-                        userRepository.searchByNameOrAcct(account.accountId, it.word)
-                    }.asLoadingStateFlow()
-                }
-            }
-    }.map { state ->
-        state.convert { list ->
-            list.map { it.id }
-        }
-    }.flowOn(Dispatchers.IO).stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
-    )
-
-    val searchState =
-        combine(
-            filteredByNameLoadingState,
-            syncByUserNameLoadingState
-        ) { users1, remoteSyncState ->
-            val content1 = (users1.content as? StateContent.Exist?)?.rawContent
-                ?: emptyList()
-
-            val isNotExists =
-                users1.content is StateContent.NotExist
-            val isLoading = users1 is ResultState.Loading && remoteSyncState is ResultState.Loading
-            val isFailure = users1 is ResultState.Error && remoteSyncState is ResultState.Error
-            val content = if (isNotExists) StateContent.NotExist() else StateContent.Exist(content1)
-            val throwable = (users1 as? ResultState.Error?)?.throwable
-                ?: (remoteSyncState as? ResultState.Error?)?.throwable
-            if (isLoading) {
-                ResultState.Loading(content)
-            } else if (isFailure) {
-                ResultState.Error(content, throwable = throwable!!)
-            } else {
-                ResultState.Fixed(content)
-            }
-        }.catch { error ->
-            logger.info("ユーザー検索処理に失敗しました", e = error)
-        }.stateIn(
-            viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultState.Fixed(
-                StateContent.NotExist()
-            )
+    val searchState = filteredByNameLoadingState.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultState.Fixed(
+            StateContent.NotExist()
         )
+    )
 
 
     val uiState = combine(searchState, searchUserRequests) { state, request ->
@@ -140,12 +96,6 @@ class SearchUserViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
-    val errors = syncByUserNameLoadingState.map {
-        it as? ResultState.Error?
-    }.mapNotNull {
-        it?.throwable
-    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.Lazily)
-
     fun setUserName(text: String) {
         searchUserRequests.update {
             it.copy(word = text)
@@ -167,7 +117,51 @@ class SearchUserViewModel @Inject constructor(
 
 }
 
+
+data class SearchUser(
+    val word: String,
+    val host: String?
+) {
+    val isUserName: Boolean
+        get() = Pattern.compile("""^[a-zA-Z_\-0-9]+$""")
+            .matcher(word)
+            .find()
+
+}
+
 data class SearchUserUiState(
     val query: SearchUser,
     val result: ResultState<List<User.Id>>,
 )
+
+data class SyncRemoteResult(
+    val word: String = "",
+    val isSuccess: Boolean = false,
+    val isInitial: Boolean = true,
+    val account: Account,
+) {
+    companion object {
+        fun from(account: Account, query: SearchUser, state: ResultState<Unit>): SyncRemoteResult {
+            return when (state) {
+                is ResultState.Error -> SyncRemoteResult(
+                    query.word,
+                    isSuccess = false,
+                    isInitial = false,
+                    account = account
+                )
+                is ResultState.Fixed -> SyncRemoteResult(
+                    query.word,
+                    isSuccess = true,
+                    isInitial = false,
+                    account = account
+                )
+                is ResultState.Loading -> SyncRemoteResult(
+                    query.word,
+                    isSuccess = false,
+                    isInitial = false,
+                    account = account
+                )
+            }
+        }
+    }
+}
