@@ -5,5 +5,7 @@
     <string name="import_reactions_from_the_web">从网络导入反应</string>
     <string name="import_reactions">进口反应</string>
     <string name="overwrite_save">覆盖保存</string>
+    <string name="notification_sound">通知音</string>
+    <string name="inapp_notification_sound">启用应用内通知声音</string>
 
 </resources>
