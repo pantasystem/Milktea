@@ -127,11 +127,21 @@ abstract class UserDao {
     @Query("""
        select * from user_view
             where accountId = :accountId
+            and serverId >= :nextId
             and (name like :word or userName like :word)
-            and id >= :nextId
-            order by id asc
+            order by serverId asc
             limit :limit
     """)
     @Transaction
-    abstract suspend fun searchByNameOrAcct(accountId: Long, word: String, limit: Int, nextId: Long): List<UserRelated>
+    abstract suspend fun searchByNameOrAcct(accountId: Long, word: String, limit: Int, nextId: String): List<UserRelated>
+
+    @Query("""
+       select * from user_view
+            where accountId = :accountId
+            and (name like :word or userName like :word)
+            order by serverId asc
+            limit :limit
+    """)
+    @Transaction
+    abstract suspend fun searchByNameOrAcct(accountId: Long, word: String, limit: Int): List<UserRelated>
 }

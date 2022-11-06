@@ -166,6 +166,22 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
+    override suspend fun searchByNameOrAcct(
+        accountId: Long,
+        keyword: String,
+        limit: Int,
+        nextId: String?
+    ): Result<List<User>> = runCatching {
+        all().filter {
+            it.id.accountId == accountId
+        }.filter {
+            it.name?.startsWith(keyword) == true
+                    || it.userName.startsWith(keyword)
+        }.filter {
+            it.id.id > (nextId ?: "")
+        }
+    }
+
     private fun publish() {
         _state.value = _state.value.copy(
             usersMap = userMap

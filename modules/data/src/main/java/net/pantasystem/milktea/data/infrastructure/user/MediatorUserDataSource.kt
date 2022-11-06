@@ -282,19 +282,28 @@ class MediatorUserDataSource @Inject constructor(
         accountId: Long,
         keyword: String,
         limit: Int,
-        nextId: Long?
+        nextId: String?
     ): Result<List<User>> = runCatching {
          withContext(Dispatchers.IO) {
-             userDao.searchByNameOrAcct(
-                 accountId = accountId,
-                 word = keyword,
-                 limit = limit,
-                 nextId = nextId ?: -1
-             ).map {
+             if (nextId == null) {
+                 userDao.searchByNameOrAcct(
+                     accountId = accountId,
+                     word = "$keyword%",
+                     limit = limit,
+                 )
+             } else {
+                 userDao.searchByNameOrAcct(
+                     accountId = accountId,
+                     word = "$keyword%",
+                     limit = limit,
+                     nextId = nextId
+                 )
+             }.map {
                  it.toModel()
              }.also {
                  inMem.addAll(it)
              }
+
          }
     }
 

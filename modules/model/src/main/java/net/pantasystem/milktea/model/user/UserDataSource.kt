@@ -54,5 +54,5 @@ interface UserDataSource {
 
     suspend fun searchByName(accountId: Long, name: String): List<User>
 
-    suspend fun searchByNameOrAcct(accountId: Long, keyword: String, limit: Int = 100, nextId: Long? = null): Result<List<User>>
+    suspend fun searchByNameOrAcct(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null): Result<List<User>>
 }

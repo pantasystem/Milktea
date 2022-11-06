@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.user.search
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +67,7 @@ class SearchUserViewModel @Inject constructor(
         .flatMapLatest { account ->
             searchUserRequests.flatMapLatest {
                 suspend {
-                    userRepository.searchByName(account.accountId, it.word)
+                    userRepository.searchByNameOrAcct(account.accountId, it.word)
                 }.asLoadingStateFlow()
             }
         }.map { state ->
@@ -117,9 +116,6 @@ class SearchUserViewModel @Inject constructor(
             ResultState.Loading(StateContent.NotExist())
         )
     )
-    val isLoading = searchState.map {
-        it is ResultState.Loading
-    }.asLiveData()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val users = searchState.map {

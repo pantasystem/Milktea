@@ -158,6 +158,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchByNameOrAcct(
+        accountId: Long,
+        keyword: String,
+        limit: Int,
+        nextId: String?
+    ): List<User> {
+        return userDataSource.searchByNameOrAcct(accountId, keyword, limit, nextId).getOrThrow()
+    }
+
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(Dispatchers.IO) {
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
         val res = misskeyAPIProvider.get(account).muteUser(CreateMuteUserRequest(
