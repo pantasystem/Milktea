@@ -5,5 +5,7 @@
     <string name="import_reactions_from_the_web">リアクションをWebから取り込み</string>
     <string name="import_reactions">取り込み</string>
     <string name="overwrite_save">上書き保存</string>
+    <string name="notification_sound">通知音</string>
+    <string name="inapp_notification_sound">アプリ内通知音を有効にする</string>
 
 </resources>

@@ -96,7 +96,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: DefaultConfig.config.isEnableInstanceTicker,
         isDriveUsingGridView = map.getValue<PrefType.BoolPref>(
             Keys.IsDriveUsingGridView
-        )?.value ?: DefaultConfig.config.isDriveUsingGridView
+        )?.value ?: DefaultConfig.config.isDriveUsingGridView,
+        isEnableNotificationSound = map.getValue<PrefType.BoolPref>(
+            Keys.IsEnableNotificationSound
+        )?.value ?: DefaultConfig.config.isEnableNotificationSound
     )
 }
 
@@ -171,6 +174,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsDriveUsingGridView -> {
             PrefType.BoolPref(isDriveUsingGridView)
+        }
+        Keys.IsEnableNotificationSound -> {
+            PrefType.BoolPref(isEnableNotificationSound)
         }
     }
 }

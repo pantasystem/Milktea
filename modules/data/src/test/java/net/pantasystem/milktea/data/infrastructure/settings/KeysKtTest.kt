@@ -57,6 +57,7 @@ class KeysKtTest {
                 Keys.IsConfirmedPostNotification -> Assert.assertEquals("IsConfirmedPostNotification", key.str())
                 Keys.IsEnableInstanceTicker -> Assert.assertEquals("IsEnableInstanceTicker", key.str())
                 Keys.IsDriveUsingGridView -> Assert.assertEquals("IsDriveUsingGridView", key.str())
+                Keys.IsEnableNotificationSound -> Assert.assertEquals("IsEnableNotificationSound", key.str())
             }
         }
     }
@@ -64,8 +65,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assert.assertEquals(20, Keys.allKeys.size)
-        Assert.assertEquals(20, Keys.allKeys.map { it.str() }.toSet().size)
+        Assert.assertEquals(21, Keys.allKeys.size)
+        Assert.assertEquals(21, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

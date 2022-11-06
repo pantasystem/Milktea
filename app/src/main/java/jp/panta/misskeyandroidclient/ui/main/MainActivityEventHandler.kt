@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
@@ -28,7 +29,7 @@ import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
 
-internal class MainActivityEventCollector (
+internal class MainActivityEventHandler (
     val activity: MainActivity,
     val binding: ActivityMainBinding,
     val lifecycleScope: CoroutineScope,
@@ -40,6 +41,7 @@ internal class MainActivityEventCollector (
     val authorizationNavigation: AuthorizationNavigation,
     val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
+    private val configStore: SettingStore,
 ){
 
     fun setup() {
@@ -151,7 +153,9 @@ internal class MainActivityEventCollector (
                     if (ringtone.isPlaying) {
                         ringtone.stop()
                     }
-                    ringtone.play()
+                    if (configStore.configState.value.isEnableNotificationSound) {
+                        ringtone.play()
+                    }
                 }
             }
         }

@@ -11,7 +11,7 @@ import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.util.DoubleBackPressedFinishDelegate
 
-class SetupOnBackPressedDispatcherCallback(
+class SetupOnBackPressedDispatcherHandler(
     private val activity: AppCompatActivity,
     private val binding: ActivityMainBinding,
     private val backPressedDelegate: DoubleBackPressedFinishDelegate = DoubleBackPressedFinishDelegate(),
