@@ -36,7 +36,6 @@ import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.setting.R
 import net.pantasystem.milktea.setting.SettingTitleTile
-import net.pantasystem.milktea.setting.databinding.ActivitySettingsBinding
 import javax.inject.Inject
 
 
@@ -44,7 +43,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingMovementActivity : AppCompatActivity() {
 
-    lateinit var mBinding: ActivitySettingsBinding
 
     @Inject
     lateinit var accountStore: AccountStore
@@ -170,7 +168,7 @@ class SettingMovementActivity : AppCompatActivity() {
 
                         if (currentAccount != null) {
                             item {
-                                SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
+                                SettingTitleTile(text = stringResource(id = R.string.learn_note_visibility))
                                 SwitchTile(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -191,6 +189,19 @@ class SettingMovementActivity : AppCompatActivity() {
                                         text = stringResource(id = R.string.learn_note_visibility)
                                     )
                                 }
+                            }
+                        }
+
+                        item {
+                            SettingTitleTile(text = stringResource(id = R.string.notification_sound))
+                            SwitchTile(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                checked = currentConfigState.isEnableNotificationSound, onChanged = {
+                                    currentConfigState = currentConfigState.copy(isEnableNotificationSound = it)
+                                }) {
+                                Text(stringResource(id = R.string.inapp_notification_sound))
                             }
                         }
                     }

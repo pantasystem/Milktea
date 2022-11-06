@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         addMenuProvider(MainActivityMenuProvider(this, settingStore))
 
-        MainActivityEventCollector(
+        MainActivityEventHandler(
             activity = this,
             accountStore = accountStore,
             authorizationNavigation = authorizationNavigation,
@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             reportViewModel = reportViewModel,
             requestPostNotificationsPermissionLauncher = requestPermissionLauncher,
             changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView),
+            configStore = settingStore
         ).setup()
 
         if (savedInstanceState == null) {
@@ -186,7 +187,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     }
 
     private fun setupOnBackPressedDispatcherCallBack() {
-        SetupOnBackPressedDispatcherCallback(
+        SetupOnBackPressedDispatcherHandler(
             this,
             binding
         ).setup()
