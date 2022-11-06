@@ -39,7 +39,7 @@ class SearchUserViewModel @Inject constructor(
         .flatMapLatest { account ->
             searchUserRequests.flatMapLatest { query ->
                 suspend {
-                    userRepository.syncByUserName(account.accountId, query.word, query.host).getOrThrow()
+                    userRepository.syncByUserName(account.accountId, query.word, host = query.host).getOrThrow()
                 }.asLoadingStateFlow().map {
                     SyncRemoteResult.from(account, query, it)
                 }
@@ -51,7 +51,7 @@ class SearchUserViewModel @Inject constructor(
     private val filteredByNameLoadingState =
         syncByUserNameLoadingState.distinctUntilChanged().flatMapLatest {
             suspend {
-                userRepository.searchByNameOrAcct(it.account.accountId, it.word)
+                userRepository.searchByNameOrUserName(it.account.accountId, it.word, host = it.host)
             }.asLoadingStateFlow()
         }.map { state ->
             state.convert { list ->
@@ -136,6 +136,7 @@ data class SearchUserUiState(
 
 data class SyncRemoteResult(
     val word: String = "",
+    val host: String? = null,
     val isSuccess: Boolean = false,
     val isInitial: Boolean = true,
     val account: Account,
@@ -145,18 +146,21 @@ data class SyncRemoteResult(
             return when (state) {
                 is ResultState.Error -> SyncRemoteResult(
                     query.word,
+                    query.host,
                     isSuccess = false,
                     isInitial = false,
                     account = account
                 )
                 is ResultState.Fixed -> SyncRemoteResult(
                     query.word,
+                    query.host,
                     isSuccess = true,
                     isInitial = false,
                     account = account
                 )
                 is ResultState.Loading -> SyncRemoteResult(
                     query.word,
+                    query.host,
                     isSuccess = false,
                     isInitial = false,
                     account = account

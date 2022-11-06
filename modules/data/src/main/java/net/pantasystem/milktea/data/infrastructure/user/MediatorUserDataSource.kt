@@ -268,36 +268,51 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun searchByName(accountId: Long, name: String): List<User> {
-        return withContext(Dispatchers.IO) {
-            userDao.searchByName(accountId, "$name%").map {
-                it.toModel()
-            }.also {
-                inMem.addAll(it)
-            }
-        }
-    }
 
-    override suspend fun searchByNameOrAcct(
+
+    override suspend fun searchByNameOrUserName(
         accountId: Long,
         keyword: String,
         limit: Int,
-        nextId: String?
+        nextId: String?,
+        host: String?,
     ): Result<List<User>> = runCatching {
          withContext(Dispatchers.IO) {
              if (nextId == null) {
-                 userDao.searchByNameOrAcct(
-                     accountId = accountId,
-                     word = "$keyword%",
-                     limit = limit,
-                 )
+                 if (host.isNullOrBlank()) {
+                     userDao.searchByNameOrUserName(
+                         accountId = accountId,
+                         word = "$keyword%",
+                         limit = limit,
+                     )
+                 } else {
+                     logger.debug("searchByNameOrUserName accountId:$accountId, keyword:$keyword, nextId:$nextId, host:$host")
+                     userDao.searchByNameOrUserNameWithHost(
+                         accountId = accountId,
+                         word = "$keyword%",
+                         limit = limit,
+                         host = "$host%"
+                     )
+                 }
+
              } else {
-                 userDao.searchByNameOrAcct(
-                     accountId = accountId,
-                     word = "$keyword%",
-                     limit = limit,
-                     nextId = nextId
-                 )
+                 if (host.isNullOrBlank()) {
+                     userDao.searchByNameOrUserName(
+                         accountId = accountId,
+                         word = "$keyword%",
+                         limit = limit,
+                         nextId = nextId
+                     )
+                 } else {
+                     userDao.searchByNameOrUserNameWithHost(
+                         accountId = accountId,
+                         word = "$keyword%",
+                         limit = limit,
+                         nextId = nextId,
+                         host = "$host%"
+                     )
+                 }
+
              }.map {
                  it.toModel()
              }.also {

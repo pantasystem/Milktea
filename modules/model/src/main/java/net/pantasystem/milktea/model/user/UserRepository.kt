@@ -10,11 +10,9 @@ interface UserRepository {
 
     suspend fun findByUserName(accountId: Long, userName: String, host: String?, detail: Boolean = true): User
 
-    suspend fun searchByName(accountId: Long, name: String): List<User>
-
     suspend fun syncByUserName(accountId: Long, userName: String, host: String?): Result<Unit>
 
-    suspend fun searchByNameOrAcct(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null): List<User>
+    suspend fun searchByNameOrUserName(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null, host: String? = null): List<User>
 
     suspend fun follow(userId: User.Id): Boolean
 

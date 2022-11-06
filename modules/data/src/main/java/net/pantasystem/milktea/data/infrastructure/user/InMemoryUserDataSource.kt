@@ -148,13 +148,6 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
-    override suspend fun searchByName(accountId: Long, name: String): List<User> {
-        return all().filter {
-            it.id.accountId == accountId
-        }.filter {
-            it.displayName.startsWith(name)
-        }
-    }
 
     override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
         return state.map { state ->
@@ -166,11 +159,12 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
-    override suspend fun searchByNameOrAcct(
+    override suspend fun searchByNameOrUserName(
         accountId: Long,
         keyword: String,
         limit: Int,
-        nextId: String?
+        nextId: String?,
+        host: String?
     ): Result<List<User>> = runCatching {
         all().filter {
             it.id.accountId == accountId
@@ -179,6 +173,8 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
                     || it.userName.startsWith(keyword)
         }.filter {
             it.id.id > (nextId ?: "")
+        }.filter {
+            host == null || it.host == host
         }
     }
 

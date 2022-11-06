@@ -3,7 +3,7 @@ package net.pantasystem.milktea.model.user
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.AddResult
 
-data class UsersState (
+data class UsersState(
     val usersMap: Map<User.Id, User> = emptyMap()
 ) {
 
@@ -35,7 +35,11 @@ interface UserDataSource {
     /**
      * @param keepInOrder 指定したserverIdsの順番と同じように揃える場合はtrueを指定します。
      */
-    suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean  = false): Result<List<User>>
+    suspend fun getIn(
+        accountId: Long,
+        serverIds: List<String>,
+        keepInOrder: Boolean = false
+    ): Result<List<User>>
 
     suspend fun get(accountId: Long, userName: String, host: String?): Result<User>
 
@@ -52,7 +56,11 @@ interface UserDataSource {
 
     fun observe(userName: String, host: String? = null, accountId: Long): Flow<User?>
 
-    suspend fun searchByName(accountId: Long, name: String): List<User>
-
-    suspend fun searchByNameOrAcct(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null): Result<List<User>>
+    suspend fun searchByNameOrUserName(
+        accountId: Long,
+        keyword: String,
+        limit: Int = 100,
+        nextId: String? = null,
+        host: String? = null
+    ): Result<List<User>>
 }

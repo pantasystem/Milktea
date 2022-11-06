@@ -117,12 +117,7 @@ abstract class UserDao {
         delete from user where accountId = :accountId and serverId = :serverId
     """)
     abstract suspend fun delete(accountId: Long, serverId: String)
-
-    @Query("""
-        select * from user_view where accountId = :accountId and (name like :word or userName like :word) 
-    """)
-    @Transaction
-    abstract suspend fun searchByName(accountId: Long, word: String): List<UserRelated>
+    
 
     @Query("""
        select * from user_view
@@ -133,7 +128,7 @@ abstract class UserDao {
             limit :limit
     """)
     @Transaction
-    abstract suspend fun searchByNameOrAcct(accountId: Long, word: String, limit: Int, nextId: String): List<UserRelated>
+    abstract suspend fun searchByNameOrUserName(accountId: Long, word: String, limit: Int, nextId: String): List<UserRelated>
 
     @Query("""
        select * from user_view
@@ -143,5 +138,28 @@ abstract class UserDao {
             limit :limit
     """)
     @Transaction
-    abstract suspend fun searchByNameOrAcct(accountId: Long, word: String, limit: Int): List<UserRelated>
+    abstract suspend fun searchByNameOrUserName(accountId: Long, word: String, limit: Int): List<UserRelated>
+
+    @Query("""
+       select * from user_view
+            where accountId = :accountId
+            and host like :host
+            and serverId >= :nextId
+            and (name like :word or userName like :word)
+            order by serverId asc
+            limit :limit
+    """)
+    @Transaction
+    abstract suspend fun searchByNameOrUserNameWithHost(accountId: Long, word: String, limit: Int, nextId: String, host: String): List<UserRelated>
+
+    @Query("""
+       select * from user_view
+            where accountId = :accountId
+            and host like :host
+            and (name like :word or userName like :word)
+            order by serverId asc
+            limit :limit
+    """)
+    @Transaction
+    abstract suspend fun searchByNameOrUserNameWithHost(accountId: Long, word: String, limit: Int, host: String): List<UserRelated>
 }
