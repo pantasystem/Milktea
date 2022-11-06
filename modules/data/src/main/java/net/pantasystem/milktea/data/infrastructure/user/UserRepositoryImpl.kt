@@ -41,50 +41,51 @@ class UserRepositoryImpl @Inject constructor(
     private val noteDataSourceAdder =
         NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
 
-    override suspend fun find(userId: User.Id, detail: Boolean): User = withContext(Dispatchers.IO) {
-        val localResult = runCatching {
-            userDataSource.get(userId).let {
-                if (detail) {
-                    it.getOrThrow() as? User.Detail
-                } else it.getOrThrow()
-            }
-        }.onFailure {
-            logger.debug("ローカルにユーザーは存在しませんでした。:$userId")
-        }
-        localResult.getOrNull()?.let {
-            return@withContext it
-        }
-
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        if (localResult.getOrNull() == null) {
-            val res = misskeyAPIProvider.get(account).showUser(
-                RequestUser(
-                    i = account.getI(encryption),
-                    userId = userId.id,
-                    detail = true
-                )
-            )
-            res.throwIfHasError()
-            res.body()?.let {
-                val user = it.toUser(account, true)
-                it.pinnedNotes?.forEach { dto ->
-                    noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
+    override suspend fun find(userId: User.Id, detail: Boolean): User =
+        withContext(Dispatchers.IO) {
+            val localResult = runCatching {
+                userDataSource.get(userId).let {
+                    if (detail) {
+                        it.getOrThrow() as? User.Detail
+                    } else it.getOrThrow()
                 }
-                val result = userDataSource.add(user)
-                logger.debug("add result: $result")
-                return@withContext userDataSource.get(userId).getOrThrow()
+            }.onFailure {
+                logger.debug("ローカルにユーザーは存在しませんでした。:$userId")
             }
-        }
+            localResult.getOrNull()?.let {
+                return@withContext it
+            }
 
-        throw UserNotFoundException(userId)
-    }
+            val account = accountRepository.get(userId.accountId).getOrThrow()
+            if (localResult.getOrNull() == null) {
+                val res = misskeyAPIProvider.get(account).showUser(
+                    RequestUser(
+                        i = account.getI(encryption),
+                        userId = userId.id,
+                        detail = true
+                    )
+                )
+                res.throwIfHasError()
+                res.body()?.let {
+                    val user = it.toUser(account, true)
+                    it.pinnedNotes?.forEach { dto ->
+                        noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
+                    }
+                    val result = userDataSource.add(user)
+                    logger.debug("add result: $result")
+                    return@withContext userDataSource.get(userId).getOrThrow()
+                }
+            }
+
+            throw UserNotFoundException(userId)
+        }
 
     override suspend fun findByUserName(
         accountId: Long,
         userName: String,
         host: String?,
         detail: Boolean
-    ): User =  withContext(Dispatchers.IO) {
+    ): User = withContext(Dispatchers.IO) {
         val local = runCatching {
             userDataSource.get(accountId, userName, host).let {
                 if (detail) {
@@ -127,44 +128,55 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun searchByName(accountId: Long, name: String): List<User> = withContext(Dispatchers.IO) {
-        userDataSource.searchByName(accountId, name)
-    }
 
-    override suspend fun searchByUserName(
+    override suspend fun syncByUserName(
         accountId: Long,
         userName: String,
         host: String?
-    ): List<User> = withContext(Dispatchers.IO) {
-        val ac = accountRepository.get(accountId).getOrThrow()
-        val i = ac.getI(encryption)
-        val api = misskeyAPIProvider.get(ac)
+    ) = runCatching<Unit> {
+        withContext(Dispatchers.IO) {
+            val ac = accountRepository.get(accountId).getOrThrow()
+            val i = ac.getI(encryption)
+            val api = misskeyAPIProvider.get(ac)
 
-        val results = SearchByUserAndHost(api)
-            .search(
-                RequestUser(
-                    userName = userName,
-                    host = host,
-                    i = i
+            val results = SearchByUserAndHost(api)
+                .search(
+                    RequestUser(
+                        userName = userName,
+                        host = host,
+                        i = i
+                    )
                 )
-            )
-            .throwIfHasError()
+                .throwIfHasError()
 
-        results.body()!!.map {
-            it.toUser(ac, true).also { u ->
-                userDataSource.add(u)
-                userDataSource.get(u.id)
+            results.body()!!.forEach {
+                it.toUser(ac, true).also { u ->
+                    userDataSource.add(u)
+                }
             }
         }
     }
 
+    override suspend fun searchByNameOrUserName(
+        accountId: Long,
+        keyword: String,
+        limit: Int,
+        nextId: String?,
+        host: String?
+    ): List<User> {
+        return userDataSource.searchByNameOrUserName(accountId, keyword, limit, nextId, host = host)
+            .getOrThrow()
+    }
+
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(Dispatchers.IO) {
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
-        val res = misskeyAPIProvider.get(account).muteUser(CreateMuteUserRequest(
-            i = account.getI(encryption),
-            userId = createMute.userId.id,
-            expiresAt = createMute.expiresAt?.toEpochMilliseconds()
-        )).throwIfHasError()
+        val res = misskeyAPIProvider.get(account).muteUser(
+            CreateMuteUserRequest(
+                i = account.getI(encryption),
+                userId = createMute.userId.id,
+                expiresAt = createMute.expiresAt?.toEpochMilliseconds()
+            )
+        ).throwIfHasError()
         userDataSource.add(userDataSource.get(createMute.userId).getOrThrow()).getOrThrow()
         res.isSuccessful
     }
@@ -227,45 +239,57 @@ class UserRepositoryImpl @Inject constructor(
         res.isSuccessful
     }
 
-    override suspend fun acceptFollowRequest(userId: User.Id): Boolean  = withContext(Dispatchers.IO) {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        val user = find(userId, true) as User.Detail
-        if (!user.hasPendingFollowRequestToYou) {
-            return@withContext false
+    override suspend fun acceptFollowRequest(userId: User.Id): Boolean =
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(userId.accountId).getOrThrow()
+            val user = find(userId, true) as User.Detail
+            if (!user.hasPendingFollowRequestToYou) {
+                return@withContext false
+            }
+            val res = misskeyAPIProvider.get(account)
+                .acceptFollowRequest(
+                    AcceptFollowRequest(
+                        i = account.getI(encryption),
+                        userId = userId.id
+                    )
+                )
+                .throwIfHasError()
+            if (res.isSuccessful) {
+                userDataSource.add(
+                    user.copy(
+                        hasPendingFollowRequestToYou = false,
+                        isFollower = true
+                    )
+                )
+            }
+            return@withContext res.isSuccessful
+
         }
-        val res = misskeyAPIProvider.get(account)
-            .acceptFollowRequest(
-                AcceptFollowRequest(
+
+    override suspend fun rejectFollowRequest(userId: User.Id): Boolean =
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(userId.accountId).getOrThrow()
+            val user = find(userId, true) as User.Detail
+            if (!user.hasPendingFollowRequestToYou) {
+                return@withContext false
+            }
+            val res = misskeyAPIProvider.get(account).rejectFollowRequest(
+                RejectFollowRequest(
                     i = account.getI(encryption),
                     userId = userId.id
                 )
             )
-            .throwIfHasError()
-        if (res.isSuccessful) {
-            userDataSource.add(user.copy(hasPendingFollowRequestToYou = false, isFollower = true))
+                .throwIfHasError()
+            if (res.isSuccessful) {
+                userDataSource.add(
+                    user.copy(
+                        hasPendingFollowRequestToYou = false,
+                        isFollower = false
+                    )
+                )
+            }
+            return@withContext res.isSuccessful
         }
-        return@withContext res.isSuccessful
-
-    }
-
-    override suspend fun rejectFollowRequest(userId: User.Id): Boolean = withContext(Dispatchers.IO){
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        val user = find(userId, true) as User.Detail
-        if (!user.hasPendingFollowRequestToYou) {
-            return@withContext false
-        }
-        val res = misskeyAPIProvider.get(account).rejectFollowRequest(
-            RejectFollowRequest(
-                i = account.getI(encryption),
-                userId = userId.id
-            )
-        )
-            .throwIfHasError()
-        if (res.isSuccessful) {
-            userDataSource.add(user.copy(hasPendingFollowRequestToYou = false, isFollower = false))
-        }
-        return@withContext res.isSuccessful
-    }
 
     private suspend fun action(
         requestAPI: suspend (RequestUser) -> Response<Unit>,
