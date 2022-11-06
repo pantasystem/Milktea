@@ -106,6 +106,10 @@ class ConfigKtTest {
                     config.isDriveUsingGridView,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsEnableNotificationSound -> Assert.assertEquals(
+                    config.isEnableNotificationSound,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
