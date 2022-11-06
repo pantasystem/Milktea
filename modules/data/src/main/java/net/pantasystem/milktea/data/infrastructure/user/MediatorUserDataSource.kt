@@ -278,5 +278,24 @@ class MediatorUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun searchByNameOrAcct(
+        accountId: Long,
+        keyword: String,
+        limit: Int,
+        nextId: Long?
+    ): Result<List<User>> = runCatching {
+         withContext(Dispatchers.IO) {
+             userDao.searchByNameOrAcct(
+                 accountId = accountId,
+                 word = keyword,
+                 limit = limit,
+                 nextId = nextId ?: -1
+             ).map {
+                 it.toModel()
+             }.also {
+                 inMem.addAll(it)
+             }
+         }
+    }
 
 }

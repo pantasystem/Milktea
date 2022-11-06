@@ -123,4 +123,15 @@ abstract class UserDao {
     """)
     @Transaction
     abstract suspend fun searchByName(accountId: Long, word: String): List<UserRelated>
+
+    @Query("""
+       select * from user_view
+            where accountId = :accountId
+            and (name like :word or userName like :word)
+            and id >= :nextId
+            order by id asc
+            limit :limit
+    """)
+    @Transaction
+    abstract suspend fun searchByNameOrAcct(accountId: Long, word: String, limit: Int, nextId: Long): List<UserRelated>
 }

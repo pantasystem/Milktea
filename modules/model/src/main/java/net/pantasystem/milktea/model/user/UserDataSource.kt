@@ -53,4 +53,6 @@ interface UserDataSource {
     fun observe(userName: String, host: String? = null, accountId: Long): Flow<User?>
 
     suspend fun searchByName(accountId: Long, name: String): List<User>
+
+    suspend fun searchByNameOrAcct(accountId: Long, keyword: String, limit: Int = 100, nextId: Long? = null): Result<List<User>>
 }
