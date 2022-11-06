@@ -53,7 +53,7 @@ class SearchUserViewModel @Inject constructor(
                             accountId = account.accountId,
                             userName = it.word,
                             host = it.host
-                        )
+                        ).getOrThrow()
                 }.asLoadingStateFlow()
             }
         }.flowOn(Dispatchers.IO).stateIn(
@@ -62,23 +62,26 @@ class SearchUserViewModel @Inject constructor(
             ResultState.Loading(StateContent.NotExist())
         )
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val filteredByNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
-        .flatMapLatest { account ->
-            searchUserRequests.flatMapLatest {
-                suspend {
-                    userRepository.searchByNameOrAcct(account.accountId, it.word)
-                }.asLoadingStateFlow()
+    private val filteredByNameLoadingState = syncByUserNameLoadingState.flatMapLatest {
+        accountStore.observeCurrentAccount.filterNotNull()
+            .flatMapLatest { account ->
+                searchUserRequests.flatMapLatest {
+                    suspend {
+                        userRepository.searchByNameOrAcct(account.accountId, it.word)
+                    }.asLoadingStateFlow()
+                }
             }
-        }.map { state ->
-            state.convert { list ->
-                list.map { it.id }
-            }
-        }.flowOn(Dispatchers.IO).stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            ResultState.Loading(StateContent.NotExist())
-        )
+    }.map { state ->
+        state.convert { list ->
+            list.map { it.id }
+        }
+    }.flowOn(Dispatchers.IO).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ResultState.Loading(StateContent.NotExist())
+    )
 
     val searchState =
         combine(
