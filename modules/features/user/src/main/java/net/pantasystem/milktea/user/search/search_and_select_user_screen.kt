@@ -123,7 +123,7 @@ fun SearchAndSelectUserScreen(
                     )
                     Text("@")
                     TextField(
-                        value = uiState.query.host ?: "",
+                        value = uiState.query.sourceHost ?: "",
                         modifier = Modifier.weight(1f),
                         placeholder = {
                             Text(stringResource(id = R.string.host))

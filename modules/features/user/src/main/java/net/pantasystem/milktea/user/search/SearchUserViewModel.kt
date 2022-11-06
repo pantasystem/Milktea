@@ -39,7 +39,7 @@ class SearchUserViewModel @Inject constructor(
         .flatMapLatest { account ->
             searchUserRequests.flatMapLatest { query ->
                 suspend {
-                    userRepository.syncByUserName(account.accountId, query.word, host = query.host).getOrThrow()
+                    userRepository.syncByUserName(account.accountId, query.getNameOrUserName(), host = query.getHost()).getOrThrow()
                 }.asLoadingStateFlow().map {
                     SyncRemoteResult.from(account, query, it)
                 }
@@ -104,7 +104,7 @@ class SearchUserViewModel @Inject constructor(
 
     fun setHost(text: String?) {
         searchUserRequests.update {
-            it.copy(host = text)
+            it.copy(sourceHost = text)
         }
     }
 
@@ -120,13 +120,26 @@ class SearchUserViewModel @Inject constructor(
 
 data class SearchUser(
     val word: String,
-    val host: String?
+    val sourceHost: String?
 ) {
     val isUserName: Boolean
         get() = Pattern.compile("""^[a-zA-Z_\-0-9]+$""")
             .matcher(word)
             .find()
 
+    fun getNameOrUserName(): String {
+        return word.split("@").filterNot {
+            it.isBlank()
+        }.firstOrNull() ?: word
+    }
+
+    fun getHost(): String? {
+        return word.split("@").filterNot {
+            it.isBlank()
+        }.getOrElse(1) {
+            sourceHost
+        }
+    }
 }
 
 data class SearchUserUiState(
@@ -145,22 +158,22 @@ data class SyncRemoteResult(
         fun from(account: Account, query: SearchUser, state: ResultState<Unit>): SyncRemoteResult {
             return when (state) {
                 is ResultState.Error -> SyncRemoteResult(
-                    query.word,
-                    query.host,
+                    query.getNameOrUserName(),
+                    query.getHost(),
                     isSuccess = false,
                     isInitial = false,
                     account = account
                 )
                 is ResultState.Fixed -> SyncRemoteResult(
-                    query.word,
-                    query.host,
+                    query.getNameOrUserName(),
+                    query.getHost(),
                     isSuccess = true,
                     isInitial = false,
                     account = account
                 )
                 is ResultState.Loading -> SyncRemoteResult(
-                    query.word,
-                    query.host,
+                    query.getNameOrUserName(),
+                    query.getHost(),
                     isSuccess = false,
                     isInitial = false,
                     account = account

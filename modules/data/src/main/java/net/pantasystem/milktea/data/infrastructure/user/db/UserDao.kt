@@ -117,7 +117,7 @@ abstract class UserDao {
         delete from user where accountId = :accountId and serverId = :serverId
     """)
     abstract suspend fun delete(accountId: Long, serverId: String)
-    
+
 
     @Query("""
        select * from user_view
