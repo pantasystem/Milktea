@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "488937418039-ohoqu72vcf056djpqlitem3jch0cdjgb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jp.panta.misskeyandroidclient",
+            "certificate_hash": "a0829916db5a5dd7f72264ea3a0550e6ae57b012"
+          }
+        },
+        {
           "client_id": "488937418039-qvdak1q6k7n67e0jvi4lc19gtkjvhbnh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
