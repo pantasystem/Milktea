@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="show">show</string>
-    <string name="undo_nsfw">Undo nsfw</string>
+    <string name="show">Show</string>
+    <string name="undo_nsfw">Undo NSFW</string>
     <string name="mark_as_nsfw">Mark as NSFW</string>
-    <string name="remove_attachment">Remote attachment</string>
+    <string name="remove_attachment">Remove attachment</string>
 
 
     <string name="future">Future</string>
