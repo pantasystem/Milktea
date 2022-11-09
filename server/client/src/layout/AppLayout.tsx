@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom"
+import { ReactNode } from "react"
 import SideMenuItemLayout from "./SideMenuItemLayout"
 
 type AppLayoutProps = {
-    children: React.ReactElement
+    children: React.ReactElement,
+    sideBar?: ReactNode,
+
 }
 
 const AppNavHead: React.FC = () => {
@@ -15,31 +17,20 @@ const AppNavHead: React.FC = () => {
 
 
 
-const AppLayout: React.FC<AppLayoutProps> = ({children}) => {
+const AppLayout: React.FC<AppLayoutProps> = ({children, sideBar}) => {
     return (
     <div className="flex h-screen w-screen">
-      <div className="w-64 bg-sky-900 pt-4">
-        <AppNavHead />
-        <div className="text-slate-200 pt-2">
-          <SideMenuItemLayout to="/admin/all-instances">
-          全インスタンス
-          </SideMenuItemLayout>
-          <SideMenuItemLayout to="/admin/approved-instances">
-          承認済み
-          </SideMenuItemLayout>
-          <SideMenuItemLayout to="/admin/unapproved-instances">
-          未承認
-          </SideMenuItemLayout>
-          <SideMenuItemLayout to="/admin/blacklist">
-          ブラックリスト
-          </SideMenuItemLayout>
-          <SideMenuItemLayout to="/admin/account">
-          アカウント
-          </SideMenuItemLayout>
-        </div>
-        
-      </div>
-      <div className="flex-auto p-4">
+      {
+        sideBar && (
+          <div className="w-64 bg-sky-900 pt-4">
+            <AppNavHead />
+            <div className="text-slate-200 pt-2">
+              {sideBar}
+            </div>
+          </div>
+        )
+      }
+      <div className="flex-auto">
         {children}
       </div>
     </div>

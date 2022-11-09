@@ -1,8 +1,15 @@
+import AppBarLayout from "../../layout/AppBarLayout";
+import BodyLayout from "../../layout/BodyLayout";
+
 const LoginPage: React.FC = () => {
     return (
-        <div>
-
-        </div>
+        <BodyLayout topAppBar={
+            <AppBarLayout>
+                Login
+            </AppBarLayout>
+        }>
+            
+        </BodyLayout>
     )
 }
 

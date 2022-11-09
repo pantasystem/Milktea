@@ -2,19 +2,11 @@ import React from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
-  Outlet,
 } from "react-router-dom";
-import AppLayout from './layout/AppLayout';
+import AdminRootPage from './pages/admin/AdminRootPage';
 import AllInstancesPage from './pages/admin/all-instances';
 import ApprovedInstancesPage from './pages/admin/approved-instances-page';
-const AdminRootPage: React.FC = () => {
-  return (
-    <AppLayout children={
-      <Outlet />
-    }/>
-  )
-}
+
 const router = createBrowserRouter([
   {
     path: "/",
