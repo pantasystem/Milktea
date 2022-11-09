@@ -5,7 +5,7 @@ services:
     build:  .
     tty: true
     ports:
-      - "8080:8080"
+      - "3001:8080"
     volumes:
       - "./:/go/src/app"
 
@@ -18,12 +18,12 @@ services:
       POSTGRES_USER: dbuser
       POSTGRES_DB: database
     ports:
-      - "5432:5432"
+      - "5433:5432"
   proxy:
     container_name: "proxy"
     image: nginx:latest
     ports:
-      - "8081:80"
+      - "3000:80"
     volumes:
       - ./docker/nginx/config/default.conf:/etc/nginx/conf.d/default.conf
   # client:

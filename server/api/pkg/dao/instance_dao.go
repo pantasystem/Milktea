@@ -49,7 +49,7 @@ func (r InstanceDao) FindByPublishedInstances() ([]domain.InstanceInfo, error) {
 	var list []domain.InstanceInfo
 	if result := r.db.
 		Table("instances").
-		Select("instances.host", "meta.name", "meta.description").
+		Select("instances.host", "meta.name", "meta.description", "instances.client_max_body_byte_size").
 		Where("instances.published_at is not null").
 		Where("instances.deleted_at is null").
 		Joins("LEFT JOIN meta ON instances.host = meta.host").
@@ -97,8 +97,8 @@ func (r InstanceDao) Update(instance domain.Instance) error {
 	if result := r.db.Model(&domain.Instance{}).
 		Where("id = ?", instance.Id).
 		Updates(map[string]interface{}{
-			"client_max_body_byte_size": instance.ClientMaxBodyByteSize,
-			"published_at":              instance.PublishedAt,
+			"ClientMaxBodyByteSize": instance.ClientMaxBodyByteSize,
+			"PublishedAt":           instance.PublishedAt,
 		}); result.Error != nil {
 		return result.Error
 	}
