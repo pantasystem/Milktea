@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import {
   createBrowserRouter,
@@ -6,6 +7,8 @@ import {
 import AdminRootPage from './pages/admin/AdminRootPage';
 import AllInstancesPage from './pages/admin/all-instances';
 import ApprovedInstancesPage from './pages/admin/approved-instances-page';
+
+export const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -48,7 +51,9 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   );
 }
 

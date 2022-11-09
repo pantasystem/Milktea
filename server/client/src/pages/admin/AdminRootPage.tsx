@@ -1,11 +1,13 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Outlet } from "react-router";
+import { useRecoilState } from "recoil";
 import AppLayout from "../../layout/AppLayout";
 import SideMenuItemLayout from "../../layout/SideMenuItemLayout";
 import { AccountSchema } from "../../models/account";
+import { authAtom, AuthState } from "../../state/auth";
 import LoginPage from "./login";
 
-type AuthState = "Loading" | "Unauthorized" | "Authorized";
+
 
 const AutohrizedSideMenu: React.FC = () => {
   return (
@@ -47,10 +49,14 @@ const AdminRootPageLayout: React.FC<AdminRootPageLayoutProps> = ({state}) => {
   }
 }
 const AdminRootPage: React.FC = () => {
-  const [authState, setAuthState] = useState<AuthState>("Loading");
+  const [authState, setAuthState] = useRecoilState(authAtom)
   useEffect(() => {
     const currentAccount = async() => {
-      const res = await fetch("/api/admin/accounts/current")
+      const res = await fetch("/api/admin/accounts/current", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("Token")}`
+        }
+      })
       const result = await AccountSchema.safeParseAsync(await res.json())
       if (result.success) {
         setAuthState("Authorized");
@@ -61,7 +67,7 @@ const AdminRootPage: React.FC = () => {
       }
     }
     currentAccount();
-  }, []);
+  }, [setAuthState]);
   
   return (
     <AdminRootPageLayout state={authState} />

@@ -12,6 +12,6 @@ const InstanceSchema = z.object({
 });
 
 type Instance = z.infer<typeof InstanceSchema>;
+export type {Instance}
 
-export default Instance;
 export {InstanceSchema};

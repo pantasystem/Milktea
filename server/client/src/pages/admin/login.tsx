@@ -3,6 +3,9 @@ import AppBarLayout from "../../layout/AppBarLayout";
 import BodyLayout from "../../layout/BodyLayout";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TokenSchema } from "../../models/token";
+import { useRecoilState } from "recoil";
+import { authAtom,  tokenAtom } from "../../state/auth";
+import { tokenRepository } from "../../repositories";
 
 type Inputs = {
   email: string;
@@ -20,6 +23,9 @@ const LoginForm: React.FC = () => {
   //   e.preventDefault();
   // };
 
+  const [authState, setAuthState] = useRecoilState(authAtom);
+  const [token, setTokenState] = useRecoilState(tokenAtom);
+
   const onSubmit: SubmitHandler<Inputs> = async (e) => {
     const res = await fetch("/api/admin/accounts/login", {
       method: "POST",
@@ -30,7 +36,9 @@ const LoginForm: React.FC = () => {
     });
     const result = await TokenSchema.safeParseAsync(await res.json());
     if (result.success) {
-      console.log("成功", e)
+      setAuthState("Authorized");
+      tokenRepository.setToken(result.data.token)
+      // setTokenState(result.data.token);
     } else {
       console.log("失敗 status", res.status, result.error)
     }
