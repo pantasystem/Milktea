@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"systems.panta.milktea/pkg/dao"
+	"systems.panta.milktea/pkg/domain"
 )
 
 type AccountHandler struct {
@@ -16,6 +17,10 @@ type AccountHandler struct {
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type UpdateClientMaxBodySizeRequest struct {
+	Size int64 `json:"size"`
 }
 
 func (r AccountHandler) Setup(engine *gin.Engine) {
@@ -97,4 +102,44 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 		c.JSON(http.StatusOK, instance)
 	})
 
+	engine.POST("/api/admin/instances/:instanceId/update-client-max-body-size", m.CheckToken(), func(c *gin.Context) {
+		var req UpdateClientMaxBodySizeRequest
+
+		err := c.ShouldBindJSON(&req)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		instanceId := c.Params.ByName("instanceId")
+		id, err := uuid.Parse(instanceId)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		instance, conti := r.GetInstance(c, id)
+		if !conti {
+			return
+		}
+		instance.ClientMaxBodyByteSize = &req.Size
+		instanceRepository.Update(*instance)
+		c.Status(http.StatusAccepted)
+		return
+	})
+
+}
+
+func (r AccountHandler) GetInstance(c *gin.Context, instanceId uuid.UUID) (*domain.Instance, bool) {
+	instance, err := r.Dao.NewInstanceRepository().FindById(instanceId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, err.Error())
+			return nil, false
+		} else {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return nil, false
+		}
+	}
+	return instance, true
 }
