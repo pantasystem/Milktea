@@ -9,7 +9,7 @@ RUN apt update && \
 RUN mkdir /go/src/app
 WORKDIR /go/src/app
 
-ADD . /go/src/app
+ADD ./api /go/src/app
 
 RUN go mod tidy && \
     go install github.com/cosmtrek/air@v1.27.3

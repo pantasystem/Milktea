@@ -50,6 +50,7 @@ func (r InstanceDao) FindByPublishedInstances() ([]domain.InstanceInfo, error) {
 	if result := r.db.
 		Table("instances").
 		Select(
+			"instances.id",
 			"instances.host",
 			"meta.name", "meta.description",
 			"instances.client_max_body_byte_size",
