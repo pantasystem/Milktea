@@ -2,12 +2,12 @@
 version: "3"
 services:
   api:
-    build:  .
+    build: .
     tty: true
     ports:
       - "3001:8080"
     volumes:
-      - "./:/go/src/app"
+      - "./api:/go/src/app"
 
   psql:
     container_name: "psql"
@@ -26,13 +26,13 @@ services:
       - "3000:80"
     volumes:
       - ./docker/nginx/config/default.conf:/etc/nginx/conf.d/default.conf
-  # client:
-  #   container_name: "client"
-  #   build: ./docker/client
-  #   tty: true
-  #   ports:
-  #     - "3001:3000"
-  #   volumes:
-  #     - type: bind
-  #       source: ./client
-  #       target: /usr/src/app
+  client:
+    container_name: "client"
+    build: ./docker/client
+    tty: true
+    ports:
+      - "3002:3000"
+    volumes:
+      - type: bind
+        source: ./client
+        target: /usr/src/app
