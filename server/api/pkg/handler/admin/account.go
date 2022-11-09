@@ -78,7 +78,7 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 
 	})
 
-	engine.GET("/api/admin/instances", m.CheckToken(), func(c *gin.Context) {
+	engine.GET("api/admin/instances", m.CheckToken(), func(c *gin.Context) {
 		instances, err := instanceRepository.FindAll()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
@@ -87,7 +87,7 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 		c.JSON(http.StatusOK, instances)
 	})
 
-	engine.POST("/api/admin/instances/:instanceId/approve", m.CheckToken(), func(c *gin.Context) {
+	engine.POST("api/admin/instances/:instanceId/approve", m.CheckToken(), func(c *gin.Context) {
 		instanceId := c.Params.ByName("instanceId")
 		id, err := uuid.Parse(instanceId)
 		if err != nil {
@@ -112,7 +112,7 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 		c.JSON(http.StatusOK, instance)
 	})
 
-	engine.POST("/api/admin/instances/:instanceId/update-client-max-body-size", m.CheckToken(), func(c *gin.Context) {
+	engine.POST("api/admin/instances/:instanceId/update-client-max-body-size", m.CheckToken(), func(c *gin.Context) {
 		var req UpdateClientMaxBodySizeRequest
 
 		err := c.ShouldBindJSON(&req)
