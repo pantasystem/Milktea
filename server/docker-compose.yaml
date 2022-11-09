@@ -26,6 +26,8 @@ services:
       - "3000:80"
     volumes:
       - ./docker/nginx/config/default.conf:/etc/nginx/conf.d/default.conf
+    tty: true
+    restart: always
   client:
     container_name: "client"
     build: ./docker/client

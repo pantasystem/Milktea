@@ -28,7 +28,17 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 	repository := r.Dao.NewAdAccountRepository()
 	instanceRepository := r.Dao.NewInstanceRepository()
 
-	engine.POST("/api/admin/accounts/login", func(c *gin.Context) {
+	engine.GET("api/admin/accounts/current", m.CheckToken(), func(c *gin.Context) {
+		user, err := GetCurrentUser(&r.Dao, c)
+		if user == nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+		c.JSON(http.StatusOK, user)
+		return
+	})
+
+	engine.POST("api/admin/accounts/login", func(c *gin.Context) {
 		var req LoginRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, err.Error())
