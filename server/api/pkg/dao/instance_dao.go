@@ -49,7 +49,13 @@ func (r InstanceDao) FindByPublishedInstances() ([]domain.InstanceInfo, error) {
 	var list []domain.InstanceInfo
 	if result := r.db.
 		Table("instances").
-		Select("instances.host", "meta.name", "meta.description", "instances.client_max_body_byte_size").
+		Select(
+			"instances.host",
+			"meta.name", "meta.description",
+			"instances.client_max_body_byte_size",
+			"meta.icon_url",
+			"meta.theme_color",
+		).
 		Where("instances.published_at is not null").
 		Where("instances.deleted_at is null").
 		Joins("LEFT JOIN meta ON instances.host = meta.host").
