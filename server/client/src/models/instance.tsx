@@ -1,13 +1,14 @@
 import { z } from "zod";
+import dateSchema from "./date-schema";
 
 const InstanceSchema = z.object({
   id: z.string(),
   host: z.string(),
-  publishedAt: z.date().nullable(),
+  publishedAt: dateSchema.nullable(),
   clientMaxBodyByteSize: z.number().nullable(),
-  deletedAt: z.date().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date()
+  deletedAt: dateSchema.nullable(),
+  createdAt: dateSchema,
+  updatedAt: dateSchema
 });
 
 type Instance = z.infer<typeof InstanceSchema>;
