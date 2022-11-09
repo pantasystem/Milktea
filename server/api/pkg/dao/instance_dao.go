@@ -92,6 +92,19 @@ func (r InstanceDao) FindAll() ([]*domain.Instance, error) {
 	return instances, nil
 }
 
+func (r InstanceDao) Update(instance domain.Instance) error {
+
+	if result := r.db.Model(&domain.Instance{}).
+		Where("id = ?", instance.Id).
+		Updates(map[string]interface{}{
+			"client_max_body_byte_size": instance.ClientMaxBodyByteSize,
+			"published_at":              instance.PublishedAt,
+		}); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func NewInstanceRepository(db gorm.DB) repository.InstanceRepository {
 	return InstanceDao{db: db}
 }

@@ -13,4 +13,5 @@ type InstanceRepository interface {
 	Create(domain.Instance) (*domain.Instance, error)
 	FindByHost(host string) (*domain.Instance, error)
 	FindAll() ([]*domain.Instance, error)
+	Update(domain.Instance) error
 }
