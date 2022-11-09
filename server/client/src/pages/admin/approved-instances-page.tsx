@@ -1,5 +1,5 @@
-import AppBarLayout from "../../layout/AppBarLayout";
-import BodyLayout from "../../layout/BodyLayout";
+import AppBarLayout from "../../layout/app-bar-layout";
+import BodyLayout from "../../layout/body-layout";
 import InstancesStatePage from "./components/instances-state-page";
 
 

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router";
 import { useRecoilState } from "recoil";
-import AppLayout from "../../layout/AppLayout";
-import SideMenuItemLayout from "../../layout/SideMenuItemLayout";
+import AppLayout from "../../layout/app-layout";
+import SideMenuItemLayout from "../../layout/side-menu-item-layout";
 import { AccountSchema } from "../../models/account";
 import { authAtom, AuthState } from "../../state/auth";
 import LoginPage from "./login";

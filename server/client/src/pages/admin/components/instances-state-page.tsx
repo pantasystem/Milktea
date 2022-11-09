@@ -32,13 +32,7 @@ const InstancesStatePage: React.FC<Props> = ({filterType}) => {
   const onPublishButtonClicked: OnPublishButtonClicked = (instance) => {
     approveMutation.mutate(instance.id)
   }
-  // return <BodyLayout topAppBar={
-  //   <AppBarLayout>
-  //     全てのインスタンス
-  //   </AppBarLayout>
-  // }>
-    
-  // </BodyLayout>
+
   return <div className="p-4">
   {
     query.isLoading

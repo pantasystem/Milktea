@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import AdminRootPage from './pages/admin/AdminRootPage';
+import AdminRootPage from './pages/admin/admin-root-page';
 import AllInstancesPage from './pages/admin/all-instances';
 import ApprovedInstancesPage from './pages/admin/approved-instances-page';
 import UnapprovedInstancesPage from './pages/admin/unapproved-instances-page';

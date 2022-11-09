@@ -16,6 +16,7 @@ const InstancesTable: React.FC<InstancesTableProps> = ({instances, onPublishButt
         <th className="px-4 py-2">公開承認日</th>
         <th className="px-4 py-2">作成日</th>
         <th className="px-4 py-2">更新日</th>
+        <th className="px-4 py-2">リクエストボディ許容サイズ(Byte)</th>
         <th className="px-4 py-2">アクション</th>
 
       </tr>
@@ -28,6 +29,7 @@ const InstancesTable: React.FC<InstancesTableProps> = ({instances, onPublishButt
             <td className="border px-4 py-2">{i.publishedAt == null ? "未配信" : dayjs(i.publishedAt).format("YYYY/M/DD")}</td>
             <td className="border px-4 py-2">{dayjs(i.createdAt).format("YYYY/M/DD")}</td>
             <td className="border px-4 py-2">{dayjs(i.updatedAt).format("YYYY/M/DD")}</td>
+            <td className="border px-4 py-2">{i.clientMaxBodyByteSize}</td>
             <td className="border px-4 py-2">
               <button className="bg-sky-600 p-1 rounded-md text-white hover:bg-sky-500" onClick={() => onPublishButtonClicked(i)}>
                 承認

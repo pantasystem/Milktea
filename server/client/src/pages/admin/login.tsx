@@ -1,5 +1,5 @@
-import AppBarLayout from "../../layout/AppBarLayout";
-import BodyLayout from "../../layout/BodyLayout";
+import AppBarLayout from "../../layout/app-bar-layout";
+import BodyLayout from "../../layout/body-layout";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TokenSchema } from "../../models/token";
 import { useRecoilState } from "recoil";
