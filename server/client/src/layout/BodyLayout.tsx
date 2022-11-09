@@ -6,13 +6,11 @@ type Props = {
 const BodyLayout: React.FC<Props> = (
   { children, topAppBar }
 ) => {
-  return <div>
+  return <div className="w-full h-full flex-col flex">
     <div>
       {topAppBar}
     </div>
-    <div>
-      {children && <></>}
-    </div>
+    {children}
   </div>
 }
 

@@ -7,7 +7,9 @@ const AllInstancesPage: React.FC = () => {
             全てのインスタンス
         </AppBarLayout>
     }>
-        
+        <div className="">
+        Body
+        </div>
     </BodyLayout>
 }
 export default AllInstancesPage;

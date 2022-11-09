@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-import SideMenuItemLayout from "./SideMenuItemLayout"
 
 type AppLayoutProps = {
     children: React.ReactElement,
@@ -31,7 +30,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({children, sideBar}) => {
         )
       }
       <div className="flex-auto">
-        {children}
+      {children}
       </div>
     </div>
     )
