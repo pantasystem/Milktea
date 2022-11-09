@@ -1,3 +1,5 @@
 runConfigurations.xml
 deploymentTargetDropDown.xml
 !.gitignore
+androidTestResultsUserPreferences.xml
+/inspectionProfiles
