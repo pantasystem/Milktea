@@ -7,6 +7,7 @@ import {
 import AdminRootPage from './pages/admin/AdminRootPage';
 import AllInstancesPage from './pages/admin/all-instances';
 import ApprovedInstancesPage from './pages/admin/approved-instances-page';
+import UnapprovedInstancesPage from './pages/admin/unapproved-instances-page';
 
 export const queryClient = new QueryClient();
 
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
       },
       {
         path: "unapproved-instances",
-        element: <div>Unapproved</div>
+        element: <UnapprovedInstancesPage />
       },
       {
         path: "blacklist",

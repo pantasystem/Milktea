@@ -15,16 +15,13 @@ const LoginForm: React.FC = () => {
 
   const {
     register,
-    watch,
     handleSubmit,
-    formState: {}
   } = useForm<Inputs>();
   // const handleSubmit: FormEventHandler<any> = (e) => {
   //   e.preventDefault();
   // };
 
-  const [authState, setAuthState] = useRecoilState(authAtom);
-  const [token, setTokenState] = useRecoilState(tokenAtom);
+  const [, setAuthState] = useRecoilState(authAtom);
 
   const onSubmit: SubmitHandler<Inputs> = async (e) => {
     const res = await fetch("/api/admin/accounts/login", {
@@ -38,7 +35,6 @@ const LoginForm: React.FC = () => {
     if (result.success) {
       setAuthState("Authorized");
       tokenRepository.setToken(result.data.token)
-      // setTokenState(result.data.token);
     } else {
       console.log("失敗 status", res.status, result.error)
     }

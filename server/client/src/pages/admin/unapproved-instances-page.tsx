@@ -3,13 +3,13 @@ import BodyLayout from "../../layout/BodyLayout";
 import InstancesStatePage from "./components/instances-state-page";
 
 
-const ApprovedInstancesPage: React.FC = () => {
+const UnapprovedInstancesPage: React.FC = () => {
     return <BodyLayout topAppBar={
         <AppBarLayout>
-          公開承認済みインスタンス
+          公開未承認済みインスタンス
         </AppBarLayout>
       }>
-        <InstancesStatePage filterType="approved" />
+        <InstancesStatePage filterType="unapproved" />
       </BodyLayout>
 }
-export default ApprovedInstancesPage
+export default UnapprovedInstancesPage;
