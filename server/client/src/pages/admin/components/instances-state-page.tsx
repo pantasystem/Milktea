@@ -1,7 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../../../App";
-import AppBarLayout from "../../../layout/AppBarLayout";
-import BodyLayout from "../../../layout/BodyLayout";
 import { instanceRepository } from "../../../repositories/instance-repository";
 import InstancesTable, { OnPublishButtonClicked } from "./instances-table";
 

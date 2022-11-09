@@ -1,10 +1,9 @@
-import { FormEventHandler } from "react";
 import AppBarLayout from "../../layout/AppBarLayout";
 import BodyLayout from "../../layout/BodyLayout";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TokenSchema } from "../../models/token";
 import { useRecoilState } from "recoil";
-import { authAtom,  tokenAtom } from "../../state/auth";
+import { authAtom } from "../../state/auth";
 import { tokenRepository } from "../../repositories";
 
 type Inputs = {
