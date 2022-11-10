@@ -13,4 +13,5 @@
     <string name="user_mute_specify_time_1_month_later">1 month later</string>
     <string name="user_mute_specify_time_indefinite_period">Indefinite perio</string>
     <string name="view_remotely">View remotely</string>
+    <string name="follows_you">Follows you</string>
 </resources>

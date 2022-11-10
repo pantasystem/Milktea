@@ -76,6 +76,20 @@
 
                             />
 
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/follows_you"
+                            app:layout_constraintTop_toTopOf="@id/headerView"
+                            app:layout_constraintStart_toStartOf="@id/headerView"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
+                            android:visibility="@{userViewModel.user.follower ? View.VISIBLE : View.GONE}"
+                            android:background="@drawable/shape_follower_state_background"
+                            android:padding="4dp"
+                            android:textColor="@android:color/white"
+                        />
+
                     <ImageView
                             android:id="@+id/avatarIcon"
                             android:layout_width="100dp"
