@@ -9,6 +9,28 @@ import { Instance } from "../../models/instance";
 type InstanceDetailContentProps = {
   instance: Instance
 }
+
+const InstanceDetailContentNormal : React.FC<InstanceDetailContentProps> = ({instance}) => {
+  return (
+    <div className="rounded-md drop-shadow-md bg-white p-4">
+      <div className="text-xl">
+        基本情報
+      </div>
+      <div>
+        Id: {instance.id}  
+      </div>
+      <div>
+        Host: {instance.host}  
+      </div>
+      <div>
+        作成日: {dayjs(instance.createdAt).format("YYYY/M/D")}
+      </div>
+      <div>
+        更新日: {dayjs(instance.updatedAt).format("YYYY/M/D")}
+      </div>
+    </div>
+  )
+}
 const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance}) => {
   return <div className="p-4">
     <div className="pb-4">
@@ -19,23 +41,7 @@ const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance})
       </div>
     </div>
     <div className="pb-4">
-      <div className="rounded-md drop-shadow-md bg-white p-4">
-        <div className="text-xl">
-          基本情報
-        </div>
-        <div>
-          Id: {instance.id}  
-        </div>
-        <div>
-          Host: {instance.host}  
-        </div>
-        <div>
-          作成日: {dayjs(instance.createdAt).format("YYYY/M/D")}
-        </div>
-        <div>
-          更新日: {dayjs(instance.updatedAt).format("YYYY/M/D")}
-        </div>
-      </div>
+      <InstanceDetailContentNormal instance={instance}/>
     </div>
     
     <div className="pb-4">
@@ -50,6 +56,16 @@ const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance})
             ? '削除済み'
             : '未承認'
           }
+        </div>
+      </div>
+    </div>
+    <div className="pb-4">
+      <div className="rounded-md drop-shadow-md bg-white p-4">
+        <div className="text-xl">
+          送信可能なボディのサイズ(バイト)
+        </div>
+        <div>
+          {instance.clientMaxBodyByteSize?.toString() || "未設定"}
         </div>
       </div>
     </div>

@@ -102,6 +102,22 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 		return
 	})
 
+	engine.GET("api/admin/instance-with-meta/:host", m.CheckToken(), func(c *gin.Context) {
+		host := c.Params.ByName("host")
+		instance, err := instanceRepository.FindInstanceInfoByHost(host, false)
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				c.Status(http.StatusNotFound)
+				return
+			} else {
+				c.Status(http.StatusInternalServerError)
+				return
+			}
+		}
+		c.JSON(http.StatusOK, instance)
+		return
+	})
+
 	engine.POST("api/admin/instances/:instanceId/approve", m.CheckToken(), func(c *gin.Context) {
 		instanceId := c.Params.ByName("instanceId")
 		id, err := uuid.Parse(instanceId)
