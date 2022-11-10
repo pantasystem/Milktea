@@ -26,6 +26,7 @@ import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.R
@@ -80,6 +81,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     }
 
     private val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
+
+    private val scrollToTopViewModel by activityViewModels<ScrollToTopViewModel>()
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -183,6 +186,16 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     TimelineErrorHandler(requireContext())(error)
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                scrollToTopViewModel.scrollToTopEvent
+                    .collect {
+                        mLinearLayoutManager.scrollToPosition(0)
+                    }
+            }
+
         }
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {

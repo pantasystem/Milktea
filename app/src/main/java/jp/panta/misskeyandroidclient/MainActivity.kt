@@ -34,6 +34,7 @@ import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     private val reportViewModel: ReportViewModel by viewModels()
 
+    private val scrollToTopViewModel: ScrollToTopViewModel by viewModels()
+
     private lateinit var toggleNavigationDrawerDelegate: ToggleNavigationDrawerDelegate
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -93,6 +96,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
         binding.appBarMain.fab.setOnClickListener {
             onFabClicked()
+        }
+
+        binding.appBarMain.bottomNavigation.setOnItemReselectedListener {
+            scrollToTopViewModel.scrollToTop()
         }
 
         AccountViewModelHandler(binding, this, mAccountViewModel).setup()
