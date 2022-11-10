@@ -192,7 +192,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 scrollToTopViewModel.scrollToTopEvent
                     .collect {
-                        mLinearLayoutManager.scrollToPosition(0)
+                        mBinding.listView.smoothScrollToPosition(0)
                     }
             }
 

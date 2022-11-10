@@ -89,7 +89,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 scrollToTopViewModel.scrollToTopEvent.collect {
-                    mLinearLayoutManager.scrollToPosition(0)
+                    mBinding.notificationListView.smoothScrollToPosition(0)
                 }
             }
         }
