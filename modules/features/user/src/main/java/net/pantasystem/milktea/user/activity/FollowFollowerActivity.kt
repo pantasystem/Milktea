@@ -1,50 +1,46 @@
 @file:Suppress("DEPRECATION")
+
 package net.pantasystem.milktea.user.activity
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
-import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.user.*
-import net.pantasystem.milktea.user.databinding.ActivityFollowFollowerBinding
+import net.pantasystem.milktea.user.UserCardActionHandler
+import net.pantasystem.milktea.user.compose.screen.FollowFollowerRoute
+import net.pantasystem.milktea.user.viewmodel.FollowFollowerViewModel
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
+class FollowFollowerActivity : AppCompatActivity() {
 
-    companion object{
-        private const val EXTRA_USER_ID = "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_USER_ID"
-        private const val EXTRA_VIEW_CURRENT = "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_VIEW_CURRENT"
+    companion object {
+        private const val EXTRA_USER_ID =
+            "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_USER_ID"
+        private const val EXTRA_VIEW_CURRENT =
+            "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_VIEW_CURRENT"
         private const val FOLLOWING_VIEW_MODE = 0
         private const val FOLLOWER_VIEW_MODE = 1
 
         fun newIntent(context: Context, userId: User.Id, isFollowing: Boolean): Intent {
             return Intent(context, FollowFollowerActivity::class.java).apply {
                 putExtra(EXTRA_USER_ID, userId)
-                putExtra(EXTRA_VIEW_CURRENT, if(isFollowing) FOLLOWING_VIEW_MODE else FOLLOWER_VIEW_MODE)
+                putExtra(
+                    EXTRA_VIEW_CURRENT,
+                    if (isFollowing) FOLLOWING_VIEW_MODE else FOLLOWER_VIEW_MODE
+                )
             }
         }
     }
-
-    lateinit var mBinding: ActivityFollowFollowerBinding
 
     @Inject
     lateinit var assistedFactory: UserDetailViewModel.ViewModelAssistedFactory
@@ -52,74 +48,33 @@ class FollowFollowerActivity : AppCompatActivity(), TitleSettable {
     @Inject
     lateinit var applyTheme: ApplyTheme
 
-    private val userDetailViewModel: UserDetailViewModel by viewModels {
-        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
-        UserDetailViewModel.provideFactory(assistedFactory, userId)
-    }
-
     private val toggleFollowFollowerViewModel: ToggleFollowViewModel by viewModels()
 
+    @Inject
+    lateinit var viewModelFactory: FollowFollowerViewModel.ViewModelAssistedFactory
+    private val followFollowerViewModel by viewModels<FollowFollowerViewModel> {
+        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
+        FollowFollowerViewModel.provideFactory(viewModelFactory, userId)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_follow_follower)
-        setSupportActionBar(mBinding.followFollowerToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-
-        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
-
-        userDetailViewModel.user.observe(this) {
-            title = it?.displayName
-        }
-
-        mBinding.followFollowerPager.adapter = FollowFollowerPagerAdapter(userId)
-        mBinding.followFollowerTab.setupWithViewPager(mBinding.followFollowerPager)
-        mBinding.followFollowerPager.currentItem = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
-
-        val errorHandler = ToggleFollowErrorHandler(mBinding.layoutBase) {
-            toggleFollowFollowerViewModel.toggleFollow(it)
-        }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                toggleFollowFollowerViewModel.errors.collect(errorHandler::invoke)
-            }
-        }
-
-    }
-
-    override fun setTitle(text: String) {
-        supportActionBar?.title = text
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    inner class FollowFollowerPagerAdapter(val userId: User.Id) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
-
-        private val titleList = arrayOf(getString(R.string.following), getString(R.string.follower))
-
-        override fun getCount(): Int {
-            return titleList.size
-        }
-
-        override fun getPageTitle(position: Int): CharSequence {
-            return titleList[position]
-        }
-
-        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-        override fun getItem(position: Int): Fragment {
-            return if(position == 0){
-                FollowFollowerFragment.newInstance(RequestType.Following(userId))
-            }else{
-                FollowFollowerFragment.newInstance(RequestType.Follower(userId))
+        setContent {
+            MdcTheme {
+                FollowFollowerRoute(
+                    followFollowerViewModel = followFollowerViewModel,
+                    toggleFollowViewModel = toggleFollowFollowerViewModel,
+                    onCardAction = {
+                        UserCardActionHandler(this, toggleFollowFollowerViewModel).onAction(it)
+                    },
+                    onNavigateUp = {
+                        finish()
+                    },
+                    initialTabIndex = intent.getIntExtra(EXTRA_VIEW_CURRENT, FOLLOWER_VIEW_MODE)
+                )
             }
         }
     }
-
 }

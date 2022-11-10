@@ -13,7 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
@@ -22,18 +25,39 @@ import net.pantasystem.milktea.user.compose.UserDetailCardPageableListAction
 import net.pantasystem.milktea.user.viewmodel.FollowFollowerUiState
 import net.pantasystem.milktea.user.viewmodel.FollowFollowerViewModel
 import net.pantasystem.milktea.user.viewmodel.LoadType
+import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 
 @Composable
 fun FollowFollowerRoute(
     initialTabIndex: Int,
     followFollowerViewModel: FollowFollowerViewModel,
+    toggleFollowViewModel: ToggleFollowViewModel,
     onCardAction: (UserDetailCardAction) -> Unit,
     onNavigateUp: () -> Unit
 ) {
     val uiState by followFollowerViewModel.uiState.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(null) {
         followFollowerViewModel.loadInit()
+    }
+
+    val errorMessage = stringResource(id = R.string.failure)
+    val retryMessage = stringResource(id = R.string.retry)
+
+    LaunchedEffect(null) {
+        toggleFollowViewModel.errors.filterNotNull().collect {
+            val result = snackBarHostState.showSnackbar(
+                message = errorMessage,
+                actionLabel = retryMessage
+            )
+            when(result) {
+                SnackbarResult.Dismissed -> {}
+                SnackbarResult.ActionPerformed -> {
+                    toggleFollowViewModel.toggleFollow(it.userId)
+                }
+            }
+        }
     }
 
     FollowFollowerScreen(
@@ -46,7 +70,8 @@ fun FollowFollowerRoute(
             followFollowerViewModel.loadOld(it)
         },
         onNavigateUp = onNavigateUp,
-        onCardAction = onCardAction
+        onCardAction = onCardAction,
+        snackBarHostState = snackBarHostState
     )
 }
 
@@ -59,6 +84,7 @@ fun FollowFollowerScreen(
     onLoadPrevious: (LoadType) -> Unit,
     onNavigateUp: () -> Unit,
     onCardAction: (UserDetailCardAction) -> Unit,
+    snackBarHostState: SnackbarHostState,
 ) {
     val pagerState = rememberPagerState(pageCount = 2, initialPage = initialTabIndex)
     val tabTitles = remember {
@@ -81,68 +107,106 @@ fun FollowFollowerScreen(
     }
 
     Scaffold(
+        scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState),
         topBar = {
-            Column(Modifier.fillMaxWidth()) {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = onNavigateUp) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = null)
-                        }
-                    },
-                    title = {
-                        Text(stringResource(id = if(pagerState.currentPage == 0) R.string.follow else R.string.follower))
-                    },
-                )
-                TabRow(
-                    selectedTabIndex = pagerState.currentPage,
-                    backgroundColor = MaterialTheme.colors.surface
-                ) {
-                    tabTitles.forEachIndexed { index, s ->
-                        Tab(
-                            text = { Text(text = stringResource(id = s.titleRes)) },
-                            selected = index == pagerState.currentPage,
-                            onClick = {
-
-                                scope.launch {
-                                    pagerState.animateScrollToPage(index)
-                                }
-                            }
-                        )
-                    }
-
-                }
-            }
+            FollowFollowerTopBar(
+                modifier = Modifier.fillMaxWidth(),
+                pagerState = pagerState,
+                tabTitles = tabTitles,
+                onNavigateUp = onNavigateUp,
+                scope = scope,
+            )
         },
 
     ) {
-        HorizontalPager(
+        Pager(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
-            state = pagerState
-        ) { pageIndex ->
-            val item = tabTitles[pageIndex]
-            when(item.type) {
-                LoadType.Follow -> {
-                    UserDetailCardPageableList(
-                        pageableState = uiState.followUsersState,
-                        users = uiState.followUsers,
-                        isUserNameMain = false,
-                        onAction = { action ->
-                            onAction(LoadType.Follow, action)
-                        }
-                    )
+            pagerState = pagerState,
+            tabTitles = tabTitles,
+            uiState = uiState,
+            onAction = ::onAction
+        )
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun Pager(
+    modifier: Modifier,
+    pagerState: PagerState,
+    tabTitles: List<FollowFollowerTabItem>,
+    uiState: FollowFollowerUiState,
+    onAction: (type: LoadType, it: UserDetailCardPageableListAction) -> Unit,
+) {
+    HorizontalPager(
+        modifier = modifier,
+        state = pagerState
+    ) { pageIndex ->
+        val item = tabTitles[pageIndex]
+        when (item.type) {
+            LoadType.Follow -> {
+                UserDetailCardPageableList(
+                    pageableState = uiState.followUsersState,
+                    users = uiState.followUsers,
+                    isUserNameMain = false,
+                    onAction = { action ->
+                        onAction(LoadType.Follow, action)
+                    }
+                )
+            }
+            LoadType.Follower -> {
+                UserDetailCardPageableList(
+                    pageableState = uiState.followerUsersState,
+                    users = uiState.followerUsers,
+                    isUserNameMain = false,
+                    onAction = { action ->
+                        onAction(LoadType.Follower, action)
+                    }
+                )
+            }
+        }
+
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun FollowFollowerTopBar(
+    modifier: Modifier,
+    pagerState: PagerState,
+    tabTitles: List<FollowFollowerTabItem>,
+    onNavigateUp: () -> Unit,
+    scope: CoroutineScope,
+) {
+    Column(modifier.fillMaxWidth()) {
+        TopAppBar(
+            backgroundColor = MaterialTheme.colors.surface,
+            navigationIcon = {
+                IconButton(onClick = onNavigateUp) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = null)
                 }
-                LoadType.Follower -> {
-                    UserDetailCardPageableList(
-                        pageableState = uiState.followerUsersState,
-                        users = uiState.followerUsers,
-                        isUserNameMain = false,
-                        onAction = { action ->
-                            onAction(LoadType.Follower, action)
+            },
+            title = {
+                Text(stringResource(id = if(pagerState.currentPage == 0) R.string.follow else R.string.follower))
+            },
+        )
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            backgroundColor = MaterialTheme.colors.surface
+        ) {
+            tabTitles.forEachIndexed { index, s ->
+                Tab(
+                    text = { Text(text = stringResource(id = s.titleRes)) },
+                    selected = index == pagerState.currentPage,
+                    onClick = {
+
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
                         }
-                    )
-                }
+                    }
+                )
             }
 
         }
