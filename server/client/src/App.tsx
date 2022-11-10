@@ -7,6 +7,7 @@ import {
 import AdminRootPage from './pages/admin/admin-root-page';
 import AllInstancesPage from './pages/admin/all-instances';
 import ApprovedInstancesPage from './pages/admin/approved-instances-page';
+import InstanceDetailPage from './pages/admin/instance-detail-page';
 import UnapprovedInstancesPage from './pages/admin/unapproved-instances-page';
 
 export const queryClient = new QueryClient();
@@ -44,6 +45,13 @@ const router = createBrowserRouter([
       {
         path: "account",
         element: <div>Account</div>
+      },
+      {
+        path: "instances/:instanceId",
+        element: <InstanceDetailPage />,
+        loader: async ({ params }) => {
+          
+        }
       }
     ]
   }

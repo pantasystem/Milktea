@@ -24,8 +24,24 @@ export class InstanceRepository {
               "Authorization": `Bearer ${tokenRepository.getToken()}`
             },
             method: "POST"
-        })
+        });
     }
+
+    get = async (instanceId: string) => {
+        const res = await fetch(`/api/admin/instances/${instanceId}`, {
+            headers: {
+                "Authorization": `Bearer ${tokenRepository.getToken()}`
+            },
+            method: "GET"
+        });
+        const result = await InstanceSchema.safeParseAsync(await res.json());
+        if (result.success) {
+            return result.data;
+        } else {
+            throw result.error;
+        }
+    }
+    
 }
 
 const instanceRepository = new InstanceRepository()

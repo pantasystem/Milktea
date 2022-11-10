@@ -1,3 +1,4 @@
+import React from "react";
 import AppBarLayout from "../../layout/app-bar-layout";
 import BodyLayout from "../../layout/body-layout";
 import InstancesStatePage from "./components/instances-state-page";

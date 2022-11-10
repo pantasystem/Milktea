@@ -87,6 +87,21 @@ func (r AccountHandler) Setup(engine *gin.Engine) {
 		c.JSON(http.StatusOK, instances)
 	})
 
+	engine.GET("api/admin/instances/:instanceId", m.CheckToken(), func(c *gin.Context) {
+		instanceId := c.Params.ByName("instanceId")
+		id, err := uuid.Parse(instanceId)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+		instance, conti := r.GetInstance(c, id)
+		if !conti {
+			return
+		}
+		c.JSON(http.StatusOK, instance)
+		return
+	})
+
 	engine.POST("api/admin/instances/:instanceId/approve", m.CheckToken(), func(c *gin.Context) {
 		instanceId := c.Params.ByName("instanceId")
 		id, err := uuid.Parse(instanceId)

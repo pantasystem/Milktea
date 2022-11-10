@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 import { Instance } from "../../../models/instance";
+import React from "react";
+import { Link } from "react-router-dom";
 
 type OnPublishButtonClicked = (instance: Instance) => void;
 type InstancesTableProps = {
@@ -25,7 +27,7 @@ const InstancesTable: React.FC<InstancesTableProps> = ({instances, onPublishButt
       {
         instances.map((i)=>{
           return <tr>
-            <td className="border px-4 py-2">{i.host}</td>
+            <td className="border px-4 py-2"><Link to={`/admin/instances/${i.id}`}>{i.host}</Link></td>
             <td className="border px-4 py-2">{i.publishedAt == null ? "未配信" : dayjs(i.publishedAt).format("YYYY/M/DD")}</td>
             <td className="border px-4 py-2">{dayjs(i.createdAt).format("YYYY/M/DD")}</td>
             <td className="border px-4 py-2">{dayjs(i.updatedAt).format("YYYY/M/DD")}</td>
