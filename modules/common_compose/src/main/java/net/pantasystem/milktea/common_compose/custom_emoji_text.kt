@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -69,7 +70,8 @@ fun CustomEmojiText(
     fontWeight: FontWeight? = null,
     fontFamily: FontFamily? = null,
     textAlign: TextAlign? = null,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
 ) {
 
     val matches = text.findCustomEmojiInText(emojis)
@@ -109,6 +111,7 @@ fun CustomEmojiText(
         fontFamily = fontFamily,
         maxLines = maxLines,
         modifier = modifier,
-        textAlign = textAlign
+        textAlign = textAlign,
+        overflow = overflow
     )
 }
