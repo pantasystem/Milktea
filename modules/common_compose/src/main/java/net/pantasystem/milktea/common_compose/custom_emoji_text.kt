@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -43,16 +44,18 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>): List<EmojiPos> {
     val matches = mutableListOf<EmojiPos>()
 
     while (matcher.find()) {
-        val emoji = emojis.first {
+        val emoji = emojis.firstOrNull {
             it.name == this.substring(matcher.start() + 1, matcher.end() - 1)
         }
-        matches.add(
-            EmojiPos(
-                emoji,
-                matcher.start(),
-                matcher.end()
+        if (emoji != null) {
+            matches.add(
+                EmojiPos(
+                    emoji,
+                    matcher.start(),
+                    matcher.end()
+                )
             )
-        )
+        }
     }
     return matches
 }
@@ -72,7 +75,9 @@ fun CustomEmojiText(
     maxLines: Int = Int.MAX_VALUE
 ) {
 
-    val matches = text.findCustomEmojiInText(emojis)
+    val matches = remember(text, emojis) {
+        text.findCustomEmojiInText(emojis)
+    }
 
     val annotatedText = buildAnnotatedString {
         var pos = 0
