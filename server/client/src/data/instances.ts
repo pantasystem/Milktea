@@ -21,3 +21,9 @@ export const useInstanceDetailQuery = ({instanceId}: {instanceId: string}) => {
   }});
 }
 
+export const useInstanceInfoQuery = ({host}: {host: string}) => {
+  return useQuery({queryKey: ['getInstanceInfo', host], queryFn: () => {
+    return instanceRepository.getInstanceInfo(host);
+  }});
+}
+

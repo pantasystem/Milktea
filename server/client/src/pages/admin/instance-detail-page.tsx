@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import React from "react";
 import { useParams } from "react-router";
-import { useInstanceDetailQuery } from "../../data/instances";
+import { useInstanceDetailQuery, useInstanceInfoQuery } from "../../data/instances";
 import AppBarLayout from "../../layout/app-bar-layout";
 import BodyLayout from "../../layout/body-layout";
 import { Instance } from "../../models/instance";
@@ -30,6 +30,29 @@ const InstanceDetailContentNormal : React.FC<InstanceDetailContentProps> = ({ins
       </div>
     </div>
   )
+}
+
+const InstanceMetaContent: React.FC<{host: string}> = ({host}) => {
+  const query = useInstanceInfoQuery({host: host});
+  if (query.isLoading) {
+    return <div>Loading</div>
+  } else if (query.isError) {
+    return <div>
+      取得失敗:{`${query.error}`}
+    </div>
+  } else if (query.data) {
+    return <div>
+      
+      <div className="flex">
+        {query.data.iconUrl && <img className="w-6 h-6 rounded-md" src={query.data.iconUrl} alt="" />}{query.data.host}
+      </div>
+      <div>
+        Description: {query.data.description}
+      </div>
+    </div>
+  } else {
+    return <></>
+  }
 }
 const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance}) => {
   return <div className="p-4">
@@ -74,6 +97,7 @@ const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance})
         <div className="text-xl">
           メタ情報
         </div>
+        <InstanceMetaContent host={instance.host} />
       </div>
     </div>
   </div>

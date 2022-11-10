@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { tokenRepository } from ".";
 import { InstanceSchema } from "../models/instance"
+import { InstanceInfoSchema } from "../models/instance-info";
 
 export class InstanceRepository {
 
@@ -39,6 +40,21 @@ export class InstanceRepository {
             return result.data;
         } else {
             throw result.error;
+        }
+    }
+
+    getInstanceInfo = async (host: string) => {
+        const res = await fetch(`/api/admin/instance-with-meta/${host}`, {
+            headers: {
+                "Authorization": `Bearer ${tokenRepository.getToken()}`
+            },
+            method: "GET"
+        });
+        const reuslt = await InstanceInfoSchema.safeParseAsync(await res.json());
+        if (reuslt.success) {
+            return reuslt.data;
+        } else {
+            throw reuslt.error;
         }
     }
     
