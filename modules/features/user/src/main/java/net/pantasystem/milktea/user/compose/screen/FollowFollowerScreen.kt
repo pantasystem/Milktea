@@ -11,6 +11,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -18,6 +21,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
 import net.pantasystem.milktea.user.compose.UserDetailCardPageableList
@@ -111,6 +115,7 @@ fun FollowFollowerScreen(
         topBar = {
             FollowFollowerTopBar(
                 modifier = Modifier.fillMaxWidth(),
+                uiState = uiState,
                 pagerState = pagerState,
                 tabTitles = tabTitles,
                 onNavigateUp = onNavigateUp,
@@ -175,6 +180,7 @@ private fun Pager(
 @Composable
 private fun FollowFollowerTopBar(
     modifier: Modifier,
+    uiState: FollowFollowerUiState,
     pagerState: PagerState,
     tabTitles: List<FollowFollowerTabItem>,
     onNavigateUp: () -> Unit,
@@ -182,6 +188,7 @@ private fun FollowFollowerTopBar(
 ) {
     Column(modifier.fillMaxWidth()) {
         TopAppBar(
+            elevation = 0.dp,
             backgroundColor = MaterialTheme.colors.surface,
             navigationIcon = {
                 IconButton(onClick = onNavigateUp) {
@@ -189,7 +196,20 @@ private fun FollowFollowerTopBar(
                 }
             },
             title = {
-                Text(stringResource(id = if(pagerState.currentPage == 0) R.string.follow else R.string.follower))
+                if (uiState.user == null) {
+                    Text(
+                        stringResource(id = if(pagerState.currentPage == 0) R.string.follow else R.string.follower)
+                    )
+                } else {
+                    CustomEmojiText(
+                        text = uiState.user.displayName,
+                        emojis = uiState.user.emojis,
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+
             },
         )
         TabRow(

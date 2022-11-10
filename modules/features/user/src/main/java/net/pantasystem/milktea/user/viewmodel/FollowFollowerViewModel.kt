@@ -7,17 +7,21 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.RequestType
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
+import net.pantasystem.milktea.model.user.UserRepository
 
 class FollowFollowerViewModel @AssistedInject constructor(
     followFollowerPagingStoreFactory: FollowFollowerPagingStore.Factory,
+    private val userRepository: UserRepository,
+    private val userDataSource: UserDataSource,
+    private val loggerFactory: Logger.Factory,
     @Assisted val userId: User.Id
 ) : ViewModel() {
 
@@ -28,10 +32,16 @@ class FollowFollowerViewModel @AssistedInject constructor(
         fun create(userId: User.Id): FollowFollowerViewModel
     }
 
+    val logger = loggerFactory.create("FollowFollowerVM")
+
     private val followingPagingStore =
         followFollowerPagingStoreFactory.create(RequestType.Following(userId))
     private val followerPagingStore =
         followFollowerPagingStoreFactory.create(RequestType.Follower(userId))
+
+    private val user = userDataSource.observe(userId).flowOn(Dispatchers.IO).catch {
+        logger.error("observeに失敗", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val followUsers = followingPagingStore.users.stateIn(
         viewModelScope,
@@ -54,12 +64,14 @@ class FollowFollowerViewModel @AssistedInject constructor(
         PageableState.Loading.Init()
     )
     val uiState = combine(
+        user,
         followUsers,
         followerUsers,
         followerUsersState,
         followUsersState
-    ) { follows, followers, followerState, followState ->
+    ) { u, follows, followers, followerState, followState ->
         FollowFollowerUiState(
+            user = u,
             followerUsers = followers,
             followUsers = follows,
             followerUsersState = followerState,
@@ -79,6 +91,9 @@ class FollowFollowerViewModel @AssistedInject constructor(
         launch {
             followingPagingStore.clear()
             followingPagingStore.loadPrevious()
+        }
+        launch {
+            userRepository.sync(userId)
         }
 
     }
@@ -102,6 +117,7 @@ enum class LoadType {
     Follow, Follower
 }
 data class FollowFollowerUiState(
+    val user: User? = null,
     val followUsers: List<User.Detail> = emptyList(),
     val followerUsers: List<User.Detail> = emptyList(),
     val followerUsersState: PageableState<List<User.Id>> = PageableState.Loading.Init(),
