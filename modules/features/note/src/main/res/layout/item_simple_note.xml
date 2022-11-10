@@ -164,7 +164,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="4dp"
                         tools:text="展開する"
                         android:textColor="?attr/colorAccent"
                         android:text="@string/auto_note_folding"
@@ -198,7 +198,9 @@
                             android:id="@+id/translationView"
                             layout="@layout/view_translation"
                             app:emojis="@{note.toShowNote.note.emojis}"
-                            app:translationState="@{note.translateState}" />
+                            app:translationState="@{note.translateState}"
+                            android:layout_marginBottom="4dp"
+                            android:layout_marginTop="4dp" />
 
                     <include
                             android:id="@+id/mediaPreview"
@@ -375,14 +377,14 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/avatarIcon"
                 android:layout_below="@id/autoExpanded"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 tools:visibility="visible"
                 tools:listitem="@layout/item_reaction"
                 tools:itemCount="1"
                 app:layout_constraintTop_toBottomOf="@id/autoExpanded"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 />
 
         <ImageButton
@@ -400,7 +402,8 @@
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 android:layout_marginStart="8dp"
-                app:layout_constraintEnd_toStartOf="@+id/textView3" />
+                app:layout_constraintEnd_toStartOf="@+id/textView3"
+                tools:ignore="TouchTargetSizeCheck" />
 
         <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
@@ -436,7 +439,8 @@
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 app:layout_constraintEnd_toStartOf="@+id/textView4"
                 app:layout_constraintStart_toEndOf="@id/textView3"
-                android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"/>
+                android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
+                tools:ignore="TouchTargetSizeCheck" />
 
         <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
@@ -474,7 +478,8 @@
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
 
                 app:layout_constraintEnd_toStartOf="@+id/textView5"
-                app:layout_constraintStart_toEndOf="@id/textView4" />
+                app:layout_constraintStart_toEndOf="@id/textView4"
+                tools:ignore="TouchTargetSizeCheck" />
 
 
         <TextView
@@ -509,7 +514,8 @@
                 android:contentDescription="@string/more"
                 app:tint="?attr/normalIconTint"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

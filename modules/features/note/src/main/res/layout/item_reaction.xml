@@ -25,8 +25,9 @@
             reactionTextTypeView="@{reactionText}"
             reaction="@{reaction.reaction}"
             note="@{note}"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
 
             myReaction="@{note.myReaction}"
