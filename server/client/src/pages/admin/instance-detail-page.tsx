@@ -58,9 +58,15 @@ const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance})
   return <div className="p-4">
     <div className="pb-4">
       <div className="rounded-md drop-shadow-md bg-white p-4">
-        <div className="text-2xl">
-          {instance.host}
+        <div className="flex items-center justify-between">
+          <div className="text-2xl">
+            {instance.host}
+          </div>
+          <div>
+            <a href={`https://${instance.host}`} target="blank" className="bg-sky-600 text-white p-2 rounded-md hover:bg-sky-500">表示</a>
+          </div>
         </div>
+        
       </div>
     </div>
     <div className="pb-4">
