@@ -7,15 +7,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
+import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
@@ -31,6 +36,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
     private val mViewModel: NotificationViewModel by viewModels()
+    private val scrollToTopViewModel: ScrollToTopViewModel by activityViewModels()
 
     val notesViewModel by activityViewModels<NotesViewModel>()
 
@@ -80,7 +86,13 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         }
         mBinding.notificationListView.addOnScrollListener(mScrollListener)
 
-
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                scrollToTopViewModel.scrollToTopEvent.collect {
+                    mBinding.notificationListView.smoothScrollToPosition(0)
+                }
+            }
+        }
     }
 
 
