@@ -1,4 +1,5 @@
-import { ReactNode } from "react"
+import { ReactNode} from "react";
+import React from "react";
 
 type AppLayoutProps = {
     children: React.ReactElement,
@@ -29,7 +30,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({children, sideBar}) => {
           </div>
         )
       }
-      <div className="flex-auto">
+      <div className="flex-1">
       {children}
       </div>
     </div>

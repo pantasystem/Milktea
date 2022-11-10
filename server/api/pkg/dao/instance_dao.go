@@ -13,6 +13,15 @@ type InstanceDao struct {
 	db gorm.DB
 }
 
+var columns = []string{
+	"instances.id",
+	"instances.host",
+	"meta.name", "meta.description",
+	"instances.client_max_body_byte_size",
+	"meta.icon_url",
+	"meta.theme_color",
+}
+
 func (r InstanceDao) Approve(instance domain.Instance) (*domain.Instance, error) {
 	i, err := r.FindById(instance.Id)
 	if err != nil {
@@ -50,12 +59,7 @@ func (r InstanceDao) FindByPublishedInstances() ([]domain.InstanceInfo, error) {
 	if result := r.db.
 		Table("instances").
 		Select(
-			"instances.id",
-			"instances.host",
-			"meta.name", "meta.description",
-			"instances.client_max_body_byte_size",
-			"meta.icon_url",
-			"meta.theme_color",
+			columns,
 		).
 		Where("instances.published_at is not null").
 		Where("instances.deleted_at is null").
@@ -110,6 +114,22 @@ func (r InstanceDao) Update(instance domain.Instance) error {
 		return result.Error
 	}
 	return nil
+}
+
+func (r InstanceDao) FindInstanceInfoByHost(host string, published bool) (*domain.InstanceInfo, error) {
+	var instanceInfo domain.InstanceInfo
+	query := r.db.Table("instances").
+		Select(columns).
+		Where("instances.deleted_at is null").
+		Where("instances.host = ?", host).
+		Joins("LEFT JOIN meta ON instances.host = meta.host")
+	if published {
+		query = query.Where("instances.published_at is not null")
+	}
+	if result := query.First(&instanceInfo); result.Error != nil {
+		return nil, result.Error
+	}
+	return &instanceInfo, nil
 }
 
 func NewInstanceRepository(db gorm.DB) repository.InstanceRepository {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { tokenRepository } from ".";
 import { InstanceSchema } from "../models/instance"
+import { InstanceInfoSchema } from "../models/instance-info";
 
 export class InstanceRepository {
 
@@ -24,8 +25,39 @@ export class InstanceRepository {
               "Authorization": `Bearer ${tokenRepository.getToken()}`
             },
             method: "POST"
-        })
+        });
     }
+
+    get = async (instanceId: string) => {
+        const res = await fetch(`/api/admin/instances/${instanceId}`, {
+            headers: {
+                "Authorization": `Bearer ${tokenRepository.getToken()}`
+            },
+            method: "GET"
+        });
+        const result = await InstanceSchema.safeParseAsync(await res.json());
+        if (result.success) {
+            return result.data;
+        } else {
+            throw result.error;
+        }
+    }
+
+    getInstanceInfo = async (host: string) => {
+        const res = await fetch(`/api/admin/instance-with-meta/${host}`, {
+            headers: {
+                "Authorization": `Bearer ${tokenRepository.getToken()}`
+            },
+            method: "GET"
+        });
+        const reuslt = await InstanceInfoSchema.safeParseAsync(await res.json());
+        if (reuslt.success) {
+            return reuslt.data;
+        } else {
+            throw reuslt.error;
+        }
+    }
+    
 }
 
 const instanceRepository = new InstanceRepository()
