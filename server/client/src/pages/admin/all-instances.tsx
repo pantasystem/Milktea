@@ -3,10 +3,15 @@ import BodyLayout from "../../layout/body-layout";
 import InstancesStatePage from "./components/instances-state-page";
 import React from "react";
 import ScrollLayout from "../../layout/scroll-layout";
+import { Link } from "react-router-dom";
 
 const AllInstancesPage: React.FC = () => {
   return <BodyLayout topAppBar={
-      <AppBarLayout>
+      <AppBarLayout actions={
+        <div>
+          <Link to={`/admin/instances/create`}><p className="bg-sky-500 p-1 rounded-lg text-white">追加</p></Link>
+        </div>
+      }>
         全てのインスタンス
       </AppBarLayout>
     }>
