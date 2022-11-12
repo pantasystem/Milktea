@@ -1,12 +1,8 @@
 package jp.panta.misskeyandroidclient
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -14,6 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_android.notification.NotificationUtil
 import net.pantasystem.milktea.common_android.ui.SafeUnbox
 import net.pantasystem.milktea.model.messaging.MessageObserver
 import net.pantasystem.milktea.model.messaging.MessageRelation
@@ -43,6 +40,9 @@ class NotificationService : Service() {
 
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var notificationUtil: NotificationUtil
 
     override fun onBind(intent: Intent): IBinder {
         return mBinder
@@ -90,28 +90,10 @@ class NotificationService : Service() {
             .setContentText(SafeUnbox.unbox(message.message.text))
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
-        with(makeNotificationManager(MESSAGE_CHANNEL_ID)) {
+        with( notificationUtil.makeNotificationManager(MESSAGE_CHANNEL_ID, getString(R.string.app_name), "Messages notification")) {
             notify(6, builder.build())
         }
     }
-
-    private fun makeNotificationManager(id: String): NotificationManager {
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val name = getString(R.string.app_name)
-        val description = "THE NOTIFICATION"
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (notificationManager.getNotificationChannel(id) == null) {
-                val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
-                channel.description = description
-                notificationManager.createNotificationChannel(channel)
-            }
-        }
-        return notificationManager
-
-    }
-
 
     inner class NotificationBinder : Binder()
 
