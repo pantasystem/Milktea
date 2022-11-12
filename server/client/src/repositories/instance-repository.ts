@@ -57,6 +57,22 @@ export class InstanceRepository {
             throw reuslt.error;
         }
     }
+
+    create = async (request: {host: string, isPublish: boolean}) => {
+        const res = await fetch(`/api/admin/instances`, {
+            headers: {
+                "Authorization": `Bearer ${tokenRepository.getToken()}`
+            },
+            body: JSON.stringify(request),
+            method: "POST"
+        })
+        const result = await InstanceSchema.safeParseAsync(await res.json());
+        if (result.success) {
+            return result.data;
+        } else {
+            throw result.error;
+        }
+    }
     
 }
 

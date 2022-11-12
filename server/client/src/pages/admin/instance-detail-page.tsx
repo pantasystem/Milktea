@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { useInstanceDetailQuery, useInstanceInfoQuery } from "../../data/instances";
 import AppBarLayout from "../../layout/app-bar-layout";
 import BodyLayout from "../../layout/body-layout";
+import ScrollLayout from "../../layout/scroll-layout";
 import { Instance } from "../../models/instance";
 
 type InstanceDetailContentProps = {
@@ -118,12 +119,14 @@ const InstanceDetailPage: React.FC = () => {
       インスタンス詳細
     </AppBarLayout>
   }>
+    <ScrollLayout>
     {
       query.isLoading ? 'Loading'
       : query.isError ? 'Error'
       : query.data ? <InstanceDetailContent instance={query.data}/>
       : null
     }
+    </ScrollLayout>
   </BodyLayout>
 }
 
