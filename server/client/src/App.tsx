@@ -8,6 +8,7 @@ import AdminRootPage from './pages/admin/admin-root-page';
 import AllInstancesPage from './pages/admin/all-instances';
 import ApprovedInstancesPage from './pages/admin/approved-instances-page';
 import InstanceDetailPage from './pages/admin/instance-detail-page';
+import { InstanceRegisterPage } from './pages/admin/instance-register-page';
 import UnapprovedInstancesPage from './pages/admin/unapproved-instances-page';
 
 export const queryClient = new QueryClient();
@@ -24,7 +25,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <div>Hoge</div>
+        element: <div>管理画面</div>
       },
       {
         path: "all-instances",
@@ -49,9 +50,11 @@ const router = createBrowserRouter([
       {
         path: "instances/:instanceId",
         element: <InstanceDetailPage />,
-        loader: async ({ params }) => {
-          
-        }
+      },
+      {
+        path: "instances/create",
+        element: <InstanceRegisterPage />
+
       }
     ]
   }

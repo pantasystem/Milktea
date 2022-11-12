@@ -12,9 +12,7 @@ const BodyLayout: React.FC<Props> = (
     <div>
       {topAppBar}
     </div>
-    <div className="overflow-y-scroll">
     {children}
-    </div>
   </div>
 }
 
