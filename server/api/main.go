@@ -36,6 +36,10 @@ func main() {
 		Dao: d,
 	}
 
+	adminInstanceHandler := admin.AdminInstanceHandler{
+		Dao: d,
+	}
+
 	decrypter, err := domain.NewDecrypter(config.WebPushAuthSecret, config.WebPushPublicKey, config.WebPushPrivateKey)
 	if err != nil {
 		panic(err)
@@ -45,9 +49,11 @@ func main() {
 		Decrypter: *decrypter,
 		Dao:       d,
 	}
+
 	instanceHnadler.Setup(engine)
 	adminAccountHandler.Setup(engine)
 	pushToFcmHandler.Setup(engine)
+	adminInstanceHandler.Setup(engine)
 
 	engine.Run(":8080")
 }

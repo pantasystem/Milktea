@@ -14,6 +14,11 @@ type AdminInstanceHandler struct {
 	Dao dao.Dao
 }
 
+type CreateInstanceRequest struct {
+	Host      string `json:"host"`
+	IsPublish bool   `json:"isPublish"`
+}
+
 func (r *AdminInstanceHandler) Setup(engine *gin.Engine) {
 	m := DefaultAuthMiddleware{Dao: r.Dao}
 	instanceRepository := r.Dao.NewInstanceRepository()
@@ -25,6 +30,38 @@ func (r *AdminInstanceHandler) Setup(engine *gin.Engine) {
 			return
 		}
 		c.JSON(http.StatusOK, instances)
+	})
+
+	engine.POST("api/admin/instances", m.CheckToken(), func(c *gin.Context) {
+		var req CreateInstanceRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.Status(400)
+			return
+		}
+
+		_, err := r.Dao.NewMetaRepository().Sync(req.Host)
+		if err != nil {
+			c.Status(400)
+			return
+		}
+
+		instance, err := instanceRepository.Request(domain.Instance{
+			Host: req.Host,
+		})
+		if err != nil {
+			c.Status(400)
+			return
+		}
+
+		if req.IsPublish {
+			instance, err = instanceRepository.Approve(*instance)
+		}
+
+		if err != nil {
+			c.Status(500)
+			return
+		}
+		c.JSON(http.StatusOK, instance)
 	})
 
 	engine.GET("api/admin/instances/:instanceId", m.CheckToken(), func(c *gin.Context) {
