@@ -107,8 +107,8 @@ internal class MainActivityEventHandler (
 
     private fun collectReportSendingState() {
         lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                reportViewModel.state.distinctUntilChangedBy {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                reportViewModel.successOrFailureEvent.distinctUntilChangedBy {
                     it is ReportState.Sending.Success
                             || it is ReportState.Sending.Failed
                 }.collect { state ->

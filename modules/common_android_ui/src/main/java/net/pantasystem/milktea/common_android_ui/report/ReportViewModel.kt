@@ -23,6 +23,11 @@ class ReportViewModel @Inject constructor(
     private val _state = MutableStateFlow<ReportState>(ReportState.None)
     val state: StateFlow<ReportState> = _state
 
+    val successOrFailureEvent = state.distinctUntilChangedBy {
+        it is ReportState.Sending.Success
+                || it is ReportState.Sending.Failed
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
+
     val comment = state.map {
         (it as? ReportState.Specify)?.comment
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
