@@ -55,7 +55,7 @@ class AlarmNotePostReceiver : BroadcastReceiver() {
         val notificationManager = notificationUtil.makeNotificationManager(
             id = NOTIFICATION_CHANNEL_ID,
             description = "Schedule post notification",
-            name = context.getString(R.string.app_name)
+            name = "Schedule Note"
         )
         coroutineScope.launch {
             runCatching {
