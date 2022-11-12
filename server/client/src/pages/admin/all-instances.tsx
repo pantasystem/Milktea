@@ -9,7 +9,7 @@ const AllInstancesPage: React.FC = () => {
   return <BodyLayout topAppBar={
       <AppBarLayout actions={
         <div>
-          <Link to={`/admin/instances/create`}><p className="bg-sky-500 p-1 rounded-lg text-white">追加</p></Link>
+          <Link to={`/admin/instances/create`}><p className="bg-sky-600 p-1 rounded-lg text-white hover:bg-sky-500">追加</p></Link>
         </div>
       }>
         全てのインスタンス
