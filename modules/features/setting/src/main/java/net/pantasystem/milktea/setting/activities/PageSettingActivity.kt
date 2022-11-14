@@ -16,16 +16,15 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
@@ -210,112 +209,25 @@ fun ReorderList(
     list: List<String>,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit
 ) {
-    val listState = rememberLazyListState()
-
-    var initiallyDraggedElement by remember { mutableStateOf<LazyListItemInfo?>(null) }
-
-    var currentIndexOfDraggedItem by remember { mutableStateOf<Int?>(null) }
-
-    var draggedDistance by remember {
-        mutableStateOf<Float>(0f)
-    }
-
-    var overscrollJob by remember { mutableStateOf<Job?>(null) }
-
 
     val scope = rememberCoroutineScope()
 
-
-    fun checkForOverScroll(): Float {
-        return initiallyDraggedElement?.let {
-            val startOffset = it.offset + draggedDistance
-            val endOffset = (it.offset + it.size) + draggedDistance
-            val viewPortStart = listState.layoutInfo.viewportStartOffset
-            val viewPortEnd = listState.layoutInfo.viewportEndOffset
-
-            when {
-                draggedDistance > 0 -> (endOffset - viewPortEnd).takeIf { diff -> diff > 0 }
-                draggedDistance < 0 -> (startOffset - viewPortStart).takeIf { diff -> diff < 0 }
-                else -> null
-            }
-        } ?: 0f
-    }
+    val dragDropState = rememberDragDropListState(onMove = onMove, scope = scope)
 
 
     LazyColumn(modifier = modifier.pointerInput(Unit) {
         detectDragGesturesAfterLongPress(
-            onDrag = { change, offset ->
-                change.consume()
-                draggedDistance += offset.y
-
-                val currentElementItemInfo = currentIndexOfDraggedItem?.let {
-                    listState.getVisibleItemInfoFor(it)
-                }
-
-
-                initiallyDraggedElement?.let {
-                    val startOffset = it.offset + draggedDistance
-                    val endOffset = it.offset + it.size + draggedDistance
-
-                    currentElementItemInfo?.let { hovered ->
-                        listState.layoutInfo.visibleItemsInfo.filterNot { item ->
-                            (item.offset + item.size) < startOffset || item.offset > endOffset
-                        }.firstOrNull { item ->
-                            val delta = startOffset - hovered.offset
-                            when {
-                                delta > 0 -> (endOffset > (item.offset + item.size))
-                                else -> (startOffset < item.offset)
-                            }
-                        }?.also { item ->
-                            currentIndexOfDraggedItem?.let { current ->
-                                onMove(current, item.index)
-                            }
-                            currentIndexOfDraggedItem = item.index
-                        }
-                    }
-                }
-                if (overscrollJob?.isActive == true) {
-                    return@detectDragGesturesAfterLongPress
-                }
-                checkForOverScroll().takeIf { o -> o != 0f }
-                    ?.let {
-                        overscrollJob = scope.launch {
-                            listState.scrollBy(it)
-                        }
-                    } ?: run { overscrollJob?.cancel() }
-            },
-            onDragStart = { offset ->
-                listState.layoutInfo.visibleItemsInfo
-                    .firstOrNull { item ->
-                        offset.y.toInt() in item.offset..(item.offset + item.size)
-                    }?.also {
-                        currentIndexOfDraggedItem = it.index
-                        initiallyDraggedElement = it
-                    }
-            },
-            onDragEnd = {
-                draggedDistance = 0f
-                currentIndexOfDraggedItem = null
-                initiallyDraggedElement = null
-                overscrollJob?.cancel()
-            },
-            onDragCancel = {
-                draggedDistance = 0f
-                currentIndexOfDraggedItem = null
-                initiallyDraggedElement = null
-                overscrollJob?.cancel()
-            }
+            onDrag = dragDropState::onDrag,
+            onDragStart = dragDropState::onDragStart,
+            onDragEnd = dragDropState::onDragEnd,
+            onDragCancel = dragDropState::onDragCancel
         )
-    }, state = listState) {
+    }, state = dragDropState.listState) {
         itemsIndexed(list) { index, item ->
             Box(modifier = Modifier.graphicsLayer {
-                translationY = currentIndexOfDraggedItem
-                    ?.let {
-                        listState.getVisibleItemInfoFor(it)
-                    }
-                    ?.let { item -> (initiallyDraggedElement?.offset ?: 0f).toFloat() + draggedDistance - item.offset }
+                translationY = dragDropState.targetElementTranslateY
                     .takeIf {
-                        index == currentIndexOfDraggedItem
+                        index == dragDropState.currentIndexOfDraggedItem
                     }?: 0f
             }) {
                 Text(item)
@@ -329,4 +241,117 @@ fun LazyListState.getVisibleItemInfoFor(absoluteIndex: Int): LazyListItemInfo? {
         .layoutInfo
         .visibleItemsInfo
         .getOrNull(absoluteIndex - this.layoutInfo.visibleItemsInfo.first().index)
+}
+
+@Composable
+fun rememberDragDropListState(
+    lazyListState: LazyListState = rememberLazyListState(),
+    scope: CoroutineScope,
+    onMove: (Int, Int) -> Unit
+): DragAndDropState {
+    return remember { DragAndDropState(listState = lazyListState, scope = scope, onMove = onMove) }
+}
+
+
+class DragAndDropState(
+    val listState: LazyListState,
+    val scope: CoroutineScope,
+    val onMove: (fromIndex: Int, toIndex: Int) -> Unit,
+) {
+    private var initiallyDraggedElement by mutableStateOf<LazyListItemInfo?>(null)
+    var currentIndexOfDraggedItem by mutableStateOf<Int?>(null)
+        private set
+    private var draggedDistance by mutableStateOf<Float>(0f)
+
+    private var overscrollJob: Job? = null
+
+    val targetElementTranslateY
+        get() = currentIndexOfDraggedItem
+            ?.let {
+                listState.getVisibleItemInfoFor(it)
+            }
+            ?.let { item -> (initiallyDraggedElement?.offset ?: 0f).toFloat() + draggedDistance - item.offset }
+
+
+    private val currentElementItemInfo
+        get() = currentIndexOfDraggedItem?.let {
+            listState.getVisibleItemInfoFor(it)
+        }
+
+
+    fun onDrag(change: PointerInputChange, offset: Offset) {
+        change.consume()
+        draggedDistance += offset.y
+
+
+        initiallyDraggedElement?.let {
+            val startOffset = it.offset + draggedDistance
+            val endOffset = it.offset + it.size + draggedDistance
+
+            currentElementItemInfo?.let { hovered ->
+                listState.layoutInfo.visibleItemsInfo.filterNot { item ->
+                    (item.offset + item.size) < startOffset || item.offset > endOffset
+                }.firstOrNull { item ->
+                    val delta = startOffset - hovered.offset
+                    when {
+                        delta > 0 -> (endOffset > (item.offset + item.size))
+                        else -> (startOffset < item.offset)
+                    }
+                }?.also { item ->
+                    currentIndexOfDraggedItem?.let { current ->
+                        onMove(current, item.index)
+                    }
+                    currentIndexOfDraggedItem = item.index
+                }
+            }
+        }
+        if (overscrollJob?.isActive == true) {
+            return
+        }
+        checkForOverScroll().takeIf { o -> o != 0f }
+            ?.let {
+                overscrollJob = scope.launch {
+                    listState.scrollBy(it)
+                }
+            } ?: run { overscrollJob?.cancel() }
+    }
+
+    fun onDragStart(offset: Offset) {
+        listState.layoutInfo.visibleItemsInfo
+            .firstOrNull { item ->
+                offset.y.toInt() in item.offset..(item.offset + item.size)
+            }?.also {
+                currentIndexOfDraggedItem = it.index
+                initiallyDraggedElement = it
+            }
+    }
+
+    fun onDragEnd() {
+        draggedDistance = 0f
+        currentIndexOfDraggedItem = null
+        initiallyDraggedElement = null
+        overscrollJob?.cancel()
+    }
+
+    fun onDragCancel() {
+        draggedDistance = 0f
+        currentIndexOfDraggedItem = null
+        initiallyDraggedElement = null
+        overscrollJob?.cancel()
+    }
+
+    private fun checkForOverScroll(): Float {
+        return initiallyDraggedElement?.let {
+            val startOffset = it.offset + draggedDistance
+            val endOffset = (it.offset + it.size) + draggedDistance
+            val viewPortStart = listState.layoutInfo.viewportStartOffset
+            val viewPortEnd = listState.layoutInfo.viewportEndOffset
+
+            when {
+                draggedDistance > 0 -> (endOffset - viewPortEnd).takeIf { diff -> diff > 0 }
+                draggedDistance < 0 -> (startOffset - viewPortStart).takeIf { diff -> diff < 0 }
+                else -> null
+            }
+        } ?: 0f
+    }
 }
