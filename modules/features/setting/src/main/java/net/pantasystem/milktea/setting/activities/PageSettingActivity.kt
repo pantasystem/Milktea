@@ -72,7 +72,6 @@ class PageSettingActivity : AppCompatActivity() {
 
     private val mPageSettingViewModel: PageSettingViewModel by viewModels()
 
-    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
