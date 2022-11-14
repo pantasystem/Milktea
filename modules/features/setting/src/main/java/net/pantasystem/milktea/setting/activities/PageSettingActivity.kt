@@ -25,7 +25,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -33,6 +35,7 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_android_ui.account.page.PageTypeHelper
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.account.page.Page
@@ -40,7 +43,6 @@ import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.setting.EditTabNameDialog
 import net.pantasystem.milktea.setting.PageSettingActionDialog
 import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.SelectPageToAddDialog
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
 
@@ -70,6 +72,7 @@ class PageSettingActivity : AppCompatActivity() {
 
     private val mPageSettingViewModel: PageSettingViewModel by viewModels()
 
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
@@ -121,57 +124,31 @@ class PageSettingActivity : AppCompatActivity() {
 
         setContent {
             MdcTheme {
+                val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
                 val list by mPageSettingViewModel.selectedPages.collectAsState()
+                val scope = rememberCoroutineScope()
+                val dragAndDropState = rememberDragDropListState(scope = scope, onMove = { from, to ->
+                    val tmp = list[to]
+                    val mutable = list.toMutableList()
+                    mutable[to] = mutable[from]
+                    mutable[from] = tmp
+                    mPageSettingViewModel.setList(mutable)
+                })
 
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = {
-                                Text(stringResource(R.string.add_to_tab))
-                            },
-                            backgroundColor = MaterialTheme.colors.surface,
-                            navigationIcon = {
-                                IconButton(
-                                    onClick = {
-                                        finish()
-                                    }
-                                ) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = null)
-                                }
-                            }
-                        )
+                TabItemsListScreen(
+                    pageTypes = pageTypes,
+                    list = list,
+                    onSelectPage = {
+                        mPageSettingViewModel.add(it)
                     },
-                    floatingActionButton = {
-                        ExtendedFloatingActionButton(
-                            text = {
-                                Text(stringResource(R.string.add_tab))
-                            },
-                            icon = {
-                                Icon(Icons.Default.BookmarkAdd, contentDescription = null)
-                            },
-                            onClick = {
-                                SelectPageToAddDialog().show(supportFragmentManager, "Activity")
-                            }
-                        )
+                    onOptionButtonClicked = {
+                        mPageSettingViewModel.pageOnActionEvent.event = it
                     },
-                    floatingActionButtonPosition = FabPosition.Center
-                ) {
-                    TabItemsList(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it),
-                        list = list,
-                        onMove = { from, to ->
-                            val tmp = list[to]
-                            val mutable = list.toMutableList()
-                            mutable[to] = mutable[from]
-                            mutable[from] = tmp
-                            mPageSettingViewModel.setList(mutable)
-                        },
-                        onOptionButtonClicked = { page ->
-                            mPageSettingViewModel.pageOnActionEvent.event = page
-                        }
-                    )
-                }
+                    onNavigateUp = {
+                        finish()
+                    },
+                    dragDropState = dragAndDropState,
+                )
             }
         }
 
@@ -211,19 +188,106 @@ class PageSettingActivity : AppCompatActivity() {
 
 }
 
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun TabItemsListScreen(
+    dragDropState: DragAndDropState,
+    pageTypes: List<PageType>,
+    list: List<Page>,
+    onSelectPage: (PageType) -> Unit,
+    onOptionButtonClicked: (Page) -> Unit,
+    onNavigateUp: () -> Unit,
+
+) {
+    val scaffoldState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val scope = rememberCoroutineScope()
+//    val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
+
+
+    ModalBottomSheetLayout(
+        sheetState = scaffoldState,
+        sheetContent = {
+            TabItemSelectionDialog(
+                modifier = Modifier.fillMaxSize(),
+                items = pageTypes,
+                onClick = {
+                    scope.launch {
+                        scaffoldState.hide()
+                    }
+                    onSelectPage(it)
+                }
+            )
+        },
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(stringResource(R.string.add_to_tab))
+                    },
+                    backgroundColor = MaterialTheme.colors.surface,
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                onNavigateUp()
+                            }
+                        ) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = null)
+                        }
+                    }
+                )
+            },
+            floatingActionButton = {
+                ExtendedFloatingActionButton(
+                    text = {
+                        Text(stringResource(R.string.add_tab))
+                    },
+                    icon = {
+                        Icon(Icons.Default.BookmarkAdd, contentDescription = null)
+                    },
+                    onClick = {
+                        scope.launch {
+                            if (scaffoldState.isVisible) {
+                                scaffoldState.hide()
+                            } else {
+                                scaffoldState.show()
+                            }
+                        }
+                    }
+                )
+            },
+            floatingActionButtonPosition = FabPosition.Center,
+        ) {
+            TabItemsList(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it),
+                list = list,
+                onOptionButtonClicked = { page ->
+                    onOptionButtonClicked(page)
+                },
+                dragDropState = dragDropState
+            )
+        }
+
+    }
+}
+
 
 @Composable
 fun TabItemsList(
+    dragDropState: DragAndDropState,
     modifier: Modifier,
     list: List<Page>,
-    onMove: (fromIndex: Int, toIndex: Int) -> Unit,
+//    onMove: (fromIndex: Int, toIndex: Int) -> Unit,
     onOptionButtonClicked: (Page) -> Unit,
 
-    ) {
+) {
 
-    val scope = rememberCoroutineScope()
+//    val scope = rememberCoroutineScope()
 
-    val dragDropState = rememberDragDropListState(onMove = onMove, scope = scope)
+//    val dragDropState = rememberDragDropListState(onMove = onMove, scope = scope)
 
 
     LazyColumn(modifier = modifier.pointerInput(Unit) {
@@ -256,6 +320,39 @@ fun TabItemsList(
                     onOptionButtonClicked = onOptionButtonClicked
                 )
                 Divider(modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun TabItemSelectionDialog(
+    modifier: Modifier = Modifier,
+    items: List<PageType>,
+    onClick: (PageType) -> Unit,
+) {
+    LazyColumn(
+        modifier
+    ) {
+        items(items) { pageType ->
+            Surface(
+                onClick = {
+                    onClick(pageType)
+                },
+            ) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier
+                        .padding(horizontal = 32.dp, vertical = 16.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Text(
+                        PageTypeHelper.nameByPageType(LocalContext.current, pageType),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }
