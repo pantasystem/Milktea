@@ -6,20 +6,27 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -28,6 +35,8 @@ import kotlinx.coroutines.*
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
+import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.setting.R
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
 
@@ -125,11 +134,18 @@ class PageSettingActivity : AppCompatActivity() {
 
         setContent {
             MdcTheme {
-                var list by remember {
-                    mutableStateOf((0 until 100).map { it.toString() })
-                }
-                Scaffold() {
-                    ReorderList(modifier = Modifier
+                val list by mPageSettingViewModel.selectedPages.collectAsState()
+
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(stringResource(R.string.add_to_tab))
+                            }
+                        )
+                    }
+                ) {
+                    TabItemsList(modifier = Modifier
                         .fillMaxSize()
                         .padding(it),
                         list = list,
@@ -138,7 +154,7 @@ class PageSettingActivity : AppCompatActivity() {
                             val mutable = list.toMutableList()
                             mutable[to] = mutable[from]
                             mutable[from] = tmp
-                            list = mutable
+                            mPageSettingViewModel.setList(mutable)
                         }
                     )
                 }
@@ -204,9 +220,9 @@ class PageSettingActivity : AppCompatActivity() {
 
 
 @Composable
-fun ReorderList(
+fun TabItemsList(
     modifier: Modifier,
-    list: List<String>,
+    list: List<Page>,
     onMove: (fromIndex: Int, toIndex: Int) -> Unit
 ) {
 
@@ -223,18 +239,67 @@ fun ReorderList(
             onDragCancel = dragDropState::onDragCancel
         )
     }, state = dragDropState.listState) {
+
+
         itemsIndexed(list) { index, item ->
-            Box(modifier = Modifier.graphicsLayer {
-                translationY = dragDropState.targetElementTranslateY
-                    .takeIf {
-                        index == dragDropState.currentIndexOfDraggedItem
-                    }?: 0f
-            }) {
-                Text(item)
+            Column(
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationY = dragDropState.targetElementTranslateY
+                            .takeIf {
+                                index == dragDropState.currentIndexOfDraggedItem
+                            } ?: 0f
+                    }
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colors.surface)
+                    .zIndex(if (index == dragDropState.currentIndexOfDraggedItem) 1f else 0f)
+            ) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row {
+                        Icon(
+                            Icons.Default.Menu,
+                            contentDescription = null,
+                            modifier = Modifier.pointerInput(Unit) {
+
+                                detectDragGestures(
+                                    onDrag = dragDropState::onDrag,
+                                    onDragStart = {
+                                        dragDropState.listState.getVisibleItemInfoFor(index)?.run {
+                                            dragDropState.startDrag(index, this)
+                                        }
+                                    },
+                                    onDragEnd = dragDropState::onDragEnd,
+                                    onDragCancel = dragDropState::onDragCancel
+                                )
+                            },
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            item.title,
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
+                        )
+                    }
+
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                    }
+
+
+                }
+
+                Divider(modifier = Modifier.fillMaxWidth())
             }
         }
     }
 }
+
 
 fun LazyListState.getVisibleItemInfoFor(absoluteIndex: Int): LazyListItemInfo? {
     return this
@@ -270,7 +335,9 @@ class DragAndDropState(
             ?.let {
                 listState.getVisibleItemInfoFor(it)
             }
-            ?.let { item -> (initiallyDraggedElement?.offset ?: 0f).toFloat() + draggedDistance - item.offset }
+            ?.let { item ->
+                (initiallyDraggedElement?.offset ?: 0f).toFloat() + draggedDistance - item.offset
+            }
 
 
     private val currentElementItemInfo
@@ -324,6 +391,11 @@ class DragAndDropState(
                 currentIndexOfDraggedItem = it.index
                 initiallyDraggedElement = it
             }
+    }
+
+    fun startDrag(currentIndexOfDraggedItem: Int, initiallyDraggedElement: LazyListItemInfo) {
+        this.currentIndexOfDraggedItem = currentIndexOfDraggedItem
+        this.initiallyDraggedElement = initiallyDraggedElement
     }
 
     fun onDragEnd() {
