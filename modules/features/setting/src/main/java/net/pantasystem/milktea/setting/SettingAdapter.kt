@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.setting
 
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +11,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.setting.databinding.*
-import net.pantasystem.milktea.setting.viewmodel.*
+import net.pantasystem.milktea.setting.databinding.ItemMoveSettingActivityPanelBinding
+import net.pantasystem.milktea.setting.databinding.ItemSettingGroupBinding
+import net.pantasystem.milktea.setting.viewmodel.Group
+import net.pantasystem.milktea.setting.viewmodel.MoveSettingActivityPanel
+import net.pantasystem.milktea.setting.viewmodel.Shared
+import net.pantasystem.milktea.setting.viewmodel.SharedItem
 
 
 class SettingAdapter(
@@ -42,51 +45,25 @@ class SettingAdapter(
     }
 
     abstract class SharedHolder(view: View) : RecyclerView.ViewHolder(view)
-    class ItemSharedCheckboxHolder(val binding: ItemSharedCheckboxBinding) : SharedHolder(binding.root)
-    class ItemSharedSwitchHolder(val binding: ItemSharedSwitchBinding) : SharedHolder(binding.root)
     class ItemMoveSettingActivityPanelHolder(val binding: ItemMoveSettingActivityPanelBinding) : SharedHolder(
         binding.root
     )
     class ItemSettingGroupHolder(val binding: ItemSettingGroupBinding) : SharedHolder(binding.root)
-    class ItemSettingSelectionHolder(val binding: ItemSharedSelectionBinding) : SharedHolder(binding.root)
-    class ItemSharedTextHolder(val binding: ItemSharedTextBinding) : SharedHolder(binding.root)
 
     companion object{
         const val GROUP = 0
-        const val CHECK = 1
-        const val SWITCH = 2
         const val MOVE = 3
-        const val SELECTION = 4
-        const val TEXT = 5
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when(val item = getItem(position)){
+        return when(getItem(position)){
             is Group -> GROUP
-            is BooleanSharedItem -> {
-                when (item.choiceType) {
-                    BooleanSharedItem.ChoiceType.CHECK_BOX -> CHECK
-                    BooleanSharedItem.ChoiceType.SWITCH -> SWITCH
-                }
-            }
             is MoveSettingActivityPanel<*> -> MOVE
-            is SelectionSharedItem -> SELECTION
-            is TextSharedItem -> TEXT
             else -> throw IllegalArgumentException("not found")
         }
     }
     override fun onBindViewHolder(holder: SharedHolder, position: Int) {
         when(holder){
-            is ItemSharedSwitchHolder -> {
-                holder.binding.item = getItem(position) as BooleanSharedItem
-                holder.binding.lifecycleOwner = viewLifecycleOwner
-                holder.binding.executePendingBindings()
-            }
-            is ItemSharedCheckboxHolder -> {
-                holder.binding.item = getItem(position) as BooleanSharedItem
-                holder.binding.lifecycleOwner = viewLifecycleOwner
-                holder.binding.executePendingBindings()
-            }
             is ItemSettingGroupHolder -> {
                 holder.binding.item = getItem(position) as Group
                 val a = SettingAdapter(viewLifecycleOwner)
@@ -104,49 +81,12 @@ class SettingAdapter(
                 holder.binding.lifecycleOwner = viewLifecycleOwner
                 holder.binding.executePendingBindings()
             }
-            is ItemSettingSelectionHolder -> {
-                val item = getItem(position) as SelectionSharedItem
-                holder.binding.selection = item
-                holder.binding.selectionList.layoutManager =
-                    LinearLayoutManager(holder.itemView.context)
-                val adapter = SelectionListAdapter(viewLifecycleOwner, item)
-                holder.binding.selectionList.adapter = adapter
-                adapter.submitList(item.choices)
-                holder.binding.lifecycleOwner = viewLifecycleOwner
-                holder.binding.executePendingBindings()
-
-            }
-            is ItemSharedTextHolder -> {
-                val item = getItem(position) as TextSharedItem
-                holder.binding.item = item
-                if (item.type == TextSharedItem.InputType.NUMBER) {
-                    holder.binding.settingEditText.inputType =
-                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_NORMAL
-                } else {
-                    holder.binding.settingEditText.inputType = InputType.TYPE_CLASS_TEXT
-                }
-                holder.binding.lifecycleOwner = viewLifecycleOwner
-                holder.binding.executePendingBindings()
-            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SharedHolder {
         return when(viewType){
-            CHECK -> {
-                val binding = makeBinding<ItemSharedCheckboxBinding>(
-                    parent,
-                    R.layout.item_shared_checkbox
-                )
-                ItemSharedCheckboxHolder(binding)
-            }
-            SWITCH -> {
-                val binding = makeBinding<ItemSharedSwitchBinding>(
-                    parent,
-                    R.layout.item_shared_switch
-                )
-                ItemSharedSwitchHolder(binding)
-            }
+
             GROUP -> {
                 val binding = makeBinding<ItemSettingGroupBinding>(
                     parent,
@@ -161,17 +101,7 @@ class SettingAdapter(
                 )
                 ItemMoveSettingActivityPanelHolder(binding)
             }
-            SELECTION -> {
-                val binding = makeBinding<ItemSharedSelectionBinding>(
-                    parent,
-                    R.layout.item_shared_selection
-                )
-                ItemSettingSelectionHolder(binding)
-            }
-            TEXT -> {
-                val binding = makeBinding<ItemSharedTextBinding>(parent, R.layout.item_shared_text)
-                ItemSharedTextHolder(binding)
-            }
+
             else -> throw IllegalArgumentException("not found")
 
         }
