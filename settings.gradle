@@ -27,7 +27,7 @@ dependencyResolutionManagement {
             library("accompanist-swiperefresh", "com.google.accompanist:accompanist-swiperefresh:0.25.1")
             library("activity-compose", "androidx.activity:activity-compose:1.4.0")
 
-            library("accompanist-pager", "com.google.accompanist:accompanist-pager:0.14.0")
+            library("accompanist-pager", "com.google.accompanist:accompanist-pager:0.27.0")
             library("accompanist-pager-indicators", "com.google.accompanist:accompanist-pager-indicators:0.14.0")
             library("coil-compose", "io.coil-kt:coil-compose:2.2.2")
             library("compose-constraintlayout", "androidx.constraintlayout:constraintlayout-compose:1.0.1")
