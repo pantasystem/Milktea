@@ -89,7 +89,11 @@ class PageSettingActivity : AppCompatActivity() {
                 )
                 PageType.USER -> {
                     val intent =
-                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
+                        searchAndSelectUserNavigation.newIntent(
+                            SearchAndSelectUserNavigationArgs(
+                                selectableMaximumSize = 1
+                            )
+                        )
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
                 PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
@@ -97,7 +101,11 @@ class PageSettingActivity : AppCompatActivity() {
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
                 PageType.USERS_GALLERY_POSTS -> {
                     val intent =
-                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
+                        searchAndSelectUserNavigation.newIntent(
+                            SearchAndSelectUserNavigationArgs(
+                                selectableMaximumSize = 1
+                            )
+                        )
                     launchSearchAndSelectUserForAddGalleryTab.launch(intent)
                 }
                 PageType.CHANNEL_TIMELINE -> {
@@ -211,7 +219,7 @@ fun TabItemsList(
     onMove: (fromIndex: Int, toIndex: Int) -> Unit,
     onOptionButtonClicked: (Page) -> Unit,
 
-) {
+    ) {
 
     val scope = rememberCoroutineScope()
 
@@ -241,53 +249,66 @@ fun TabItemsList(
                     .background(MaterialTheme.colors.surface)
                     .zIndex(if (index == dragDropState.currentIndexOfDraggedItem) 1f else 0f)
             ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = null,
-                            modifier = Modifier.pointerInput(Unit) {
-
-                                detectDragGestures(
-                                    onDrag = dragDropState::onDrag,
-                                    onDragStart = {
-                                        dragDropState.listState.getVisibleItemInfoFor(index)?.run {
-                                            dragDropState.startDrag(index, this)
-                                        }
-                                    },
-                                    onDragEnd = dragDropState::onDragEnd,
-                                    onDragCancel = dragDropState::onDragCancel
-                                )
-                            },
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            item.title,
-                            fontSize = 18.sp,
-                            color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
-                        )
-                    }
-
-                    IconButton(onClick = {
-                        onOptionButtonClicked(item)
-                    }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
-
-                }
-
+                TabItem(
+                    dragDropState = dragDropState,
+                    index = index,
+                    item = item,
+                    onOptionButtonClicked = onOptionButtonClicked
+                )
                 Divider(modifier = Modifier.fillMaxWidth())
             }
         }
     }
 }
 
+@Composable
+private fun TabItem(
+    dragDropState: DragAndDropState,
+    index: Int,
+    item: Page,
+    onOptionButtonClicked: (Page) -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row {
+            Icon(
+                Icons.Default.Menu,
+                contentDescription = null,
+                modifier = Modifier.pointerInput(Unit) {
+
+                    detectDragGestures(
+                        onDrag = dragDropState::onDrag,
+                        onDragStart = {
+                            dragDropState.listState.getVisibleItemInfoFor(index)?.run {
+                                dragDropState.startDrag(index, this)
+                            }
+                        },
+                        onDragEnd = dragDropState::onDragEnd,
+                        onDragCancel = dragDropState::onDragCancel
+                    )
+                },
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                item.title,
+                fontSize = 18.sp,
+                color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.surface)
+            )
+        }
+
+        IconButton(onClick = {
+            onOptionButtonClicked(item)
+        }) {
+            Icon(Icons.Default.MoreVert, contentDescription = null)
+        }
+
+    }
+}
 
 fun LazyListState.getVisibleItemInfoFor(absoluteIndex: Int): LazyListItemInfo? {
     return this
