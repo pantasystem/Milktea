@@ -1,13 +1,13 @@
 package net.pantasystem.milktea.setting.viewmodel.page
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class PageSettingViewModel @Inject constructor(
     private val accountStore: AccountStore,
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
-    val selectedPages = MediatorLiveData<List<Page>>()
+    val selectedPages = MutableStateFlow<List<Page>>(emptyList())
 
     val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
@@ -55,7 +55,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun save() {
-        val list = selectedPages.value ?: emptyList()
+        val list = selectedPages.value
         list.forEachIndexed { index, page ->
             page.weight = index + 1
         }
@@ -68,9 +68,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun updatePage(page: Page) {
-        val pages = selectedPages.value?.let {
-            ArrayList(it)
-        } ?: return
+        val pages = ArrayList(selectedPages.value)
 
         var pageIndex = pages.indexOfFirst {
             it.pageId == page.pageId && it.pageId > 0

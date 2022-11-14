@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
@@ -27,8 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -36,7 +36,11 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.setting.EditTabNameDialog
+import net.pantasystem.milktea.setting.PageSettingActionDialog
 import net.pantasystem.milktea.setting.R
+import net.pantasystem.milktea.setting.SelectPageToAddDialog
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
 
@@ -69,67 +73,42 @@ class PageSettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
-//        val binding = DataBindingUtil.setContentView<ActivityPageSettingBinding>(this,
-//            R.layout.activity_page_setting
-//        )
-//        binding.lifecycleOwner = this
-//        setSupportActionBar(binding.pageSettingToolbar)
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        mPageSettingViewModel.pageOnActionEvent.observe(this) {
+            PageSettingActionDialog().show(supportFragmentManager, "PSA")
+        }
+
+        mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
+            EditTabNameDialog().show(supportFragmentManager, "ETD")
+        }
 //
-//
-//
-//        val touchHelper = ItemTouchHelper(ItemTouchCallback())
-//        touchHelper.attachToRecyclerView(binding.pagesView)
-//        binding.pagesView.addItemDecoration(touchHelper)
-//
-//        val pagesAdapter = PagesAdapter(mPageSettingViewModel)
-//        binding.pagesView.adapter = pagesAdapter
-//        binding.pagesView.layoutManager = LinearLayoutManager(this)
-//
-//        mPageSettingViewModel.selectedPages.observe(this) {
-//            Log.d("PageSettingActivity", "選択済みページが更新された")
-//            pagesAdapter.submitList(it)
-//        }
-//
-//        binding.addPageButton.setOnClickListener {
-//            SelectPageToAddDialog().show(supportFragmentManager, "Activity")
-//        }
-//
-//        mPageSettingViewModel.pageOnActionEvent.observe(this) {
-//            PageSettingActionDialog().show(supportFragmentManager, "PSA")
-//        }
-//
-//        mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
-//            EditTabNameDialog().show(supportFragmentManager, "ETD")
-//        }
-//
-//        mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
-//            when (pt) {
-//                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
-//                    searchNavigation.newIntent(SearchNavType.SearchScreen())
-//                )
-//                PageType.USER -> {
-//                    val intent =
-//                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
-//                    launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
-//                }
-//                PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
-//                PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
-//                PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
-//                PageType.USERS_GALLERY_POSTS -> {
-//                    val intent =
-//                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
-//                    launchSearchAndSelectUserForAddGalleryTab.launch(intent)
-//                }
-//                PageType.CHANNEL_TIMELINE -> {
-//                    val intent = channelNavigation.newIntent(Unit)
-//                    startActivity(intent)
-//                }
-//                else -> {
-//                    // auto add
-//                }
-//            }
-//        }
+        mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
+            when (pt) {
+                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
+                    searchNavigation.newIntent(SearchNavType.SearchScreen())
+                )
+                PageType.USER -> {
+                    val intent =
+                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
+                    launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
+                }
+                PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
+                PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
+                PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
+                PageType.USERS_GALLERY_POSTS -> {
+                    val intent =
+                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
+                    launchSearchAndSelectUserForAddGalleryTab.launch(intent)
+                }
+                PageType.CHANNEL_TIMELINE -> {
+                    val intent = channelNavigation.newIntent(Unit)
+                    startActivity(intent)
+                }
+                else -> {
+                    // auto add
+                }
+            }
+        }
 
 
         setContent {
@@ -141,9 +120,33 @@ class PageSettingActivity : AppCompatActivity() {
                         TopAppBar(
                             title = {
                                 Text(stringResource(R.string.add_to_tab))
+                            },
+                            backgroundColor = MaterialTheme.colors.surface,
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        finish()
+                                    }
+                                ) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                }
                             }
                         )
-                    }
+                    },
+                    floatingActionButton = {
+                        ExtendedFloatingActionButton(
+                            text = {
+                                Text(stringResource(R.string.add_tab))
+                            },
+                            icon = {
+                                Icon(Icons.Default.BookmarkAdd, contentDescription = null)
+                            },
+                            onClick = {
+                                SelectPageToAddDialog().show(supportFragmentManager, "Activity")
+                            }
+                        )
+                    },
+                    floatingActionButtonPosition = FabPosition.Center
                 ) {
                     TabItemsList(modifier = Modifier
                         .fillMaxSize()
@@ -155,6 +158,9 @@ class PageSettingActivity : AppCompatActivity() {
                             mutable[to] = mutable[from]
                             mutable[from] = tmp
                             mPageSettingViewModel.setList(mutable)
+                        },
+                        onOptionButtonClicked = { page ->
+                            mPageSettingViewModel.pageOnActionEvent.event = page
                         }
                     )
                 }
@@ -173,27 +179,6 @@ class PageSettingActivity : AppCompatActivity() {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    inner class ItemTouchCallback : ItemTouchHelper.SimpleCallback(
-        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-        ItemTouchHelper.ACTION_STATE_IDLE
-    ) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            val from = viewHolder.absoluteAdapterPosition
-            val to = target.absoluteAdapterPosition
-            val exList = ArrayList(mPageSettingViewModel.selectedPages.value ?: emptyList())
-            val d = exList.removeAt(from)
-            exList.add(to, d)
-            mPageSettingViewModel.setList(exList)
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
     }
 
 
@@ -223,7 +208,9 @@ class PageSettingActivity : AppCompatActivity() {
 fun TabItemsList(
     modifier: Modifier,
     list: List<Page>,
-    onMove: (fromIndex: Int, toIndex: Int) -> Unit
+    onMove: (fromIndex: Int, toIndex: Int) -> Unit,
+    onOptionButtonClicked: (Page) -> Unit,
+
 ) {
 
     val scope = rememberCoroutineScope()
@@ -257,7 +244,7 @@ fun TabItemsList(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -287,10 +274,11 @@ fun TabItemsList(
                         )
                     }
 
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        onOptionButtonClicked(item)
+                    }) {
                         Icon(Icons.Default.MoreVert, contentDescription = null)
                     }
-
 
                 }
 
