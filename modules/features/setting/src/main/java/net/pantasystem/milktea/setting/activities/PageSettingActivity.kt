@@ -1,15 +1,15 @@
 package net.pantasystem.milktea.setting.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -17,9 +17,10 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.account.page.PageType
-import net.pantasystem.milktea.setting.*
-import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.databinding.ActivityPageSettingBinding
+import net.pantasystem.milktea.setting.EditTabNameDialog
+import net.pantasystem.milktea.setting.PageSettingActionDialog
+import net.pantasystem.milktea.setting.compose.tab.TabItemsListScreen
+import net.pantasystem.milktea.setting.compose.tab.rememberDragDropListState
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 import javax.inject.Inject
 
@@ -52,31 +53,6 @@ class PageSettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
-        val binding = DataBindingUtil.setContentView<ActivityPageSettingBinding>(this,
-            R.layout.activity_page_setting
-        )
-        binding.lifecycleOwner = this
-        setSupportActionBar(binding.pageSettingToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-
-
-        val touchHelper = ItemTouchHelper(ItemTouchCallback())
-        touchHelper.attachToRecyclerView(binding.pagesView)
-        binding.pagesView.addItemDecoration(touchHelper)
-
-        val pagesAdapter = PagesAdapter(mPageSettingViewModel)
-        binding.pagesView.adapter = pagesAdapter
-        binding.pagesView.layoutManager = LinearLayoutManager(this)
-
-        mPageSettingViewModel.selectedPages.observe(this) {
-            Log.d("PageSettingActivity", "選択済みページが更新された")
-            pagesAdapter.submitList(it)
-        }
-
-        binding.addPageButton.setOnClickListener {
-            SelectPageToAddDialog().show(supportFragmentManager, "Activity")
-        }
 
         mPageSettingViewModel.pageOnActionEvent.observe(this) {
             PageSettingActionDialog().show(supportFragmentManager, "PSA")
@@ -85,7 +61,7 @@ class PageSettingActivity : AppCompatActivity() {
         mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
             EditTabNameDialog().show(supportFragmentManager, "ETD")
         }
-
+//
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
             when (pt) {
                 PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
@@ -93,7 +69,11 @@ class PageSettingActivity : AppCompatActivity() {
                 )
                 PageType.USER -> {
                     val intent =
-                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
+                        searchAndSelectUserNavigation.newIntent(
+                            SearchAndSelectUserNavigationArgs(
+                                selectableMaximumSize = 1
+                            )
+                        )
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
                 PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
@@ -101,7 +81,11 @@ class PageSettingActivity : AppCompatActivity() {
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
                 PageType.USERS_GALLERY_POSTS -> {
                     val intent =
-                        searchAndSelectUserNavigation.newIntent(SearchAndSelectUserNavigationArgs( selectableMaximumSize = 1))
+                        searchAndSelectUserNavigation.newIntent(
+                            SearchAndSelectUserNavigationArgs(
+                                selectableMaximumSize = 1
+                            )
+                        )
                     launchSearchAndSelectUserForAddGalleryTab.launch(intent)
                 }
                 PageType.CHANNEL_TIMELINE -> {
@@ -114,6 +98,37 @@ class PageSettingActivity : AppCompatActivity() {
             }
         }
 
+
+        setContent {
+            MdcTheme {
+                val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
+                val list by mPageSettingViewModel.selectedPages.collectAsState()
+                val scope = rememberCoroutineScope()
+                val dragAndDropState = rememberDragDropListState(scope = scope, onMove = { from, to ->
+                    val tmp = list[to]
+                    val mutable = list.toMutableList()
+                    mutable[to] = mutable[from]
+                    mutable[from] = tmp
+                    mPageSettingViewModel.setList(mutable)
+                })
+
+                TabItemsListScreen(
+                    pageTypes = pageTypes,
+                    list = list,
+                    onSelectPage = {
+                        mPageSettingViewModel.add(it)
+                    },
+                    onOptionButtonClicked = {
+                        mPageSettingViewModel.pageOnActionEvent.event = it
+                    },
+                    onNavigateUp = {
+                        finish()
+                    },
+                    dragDropState = dragAndDropState,
+                )
+            }
+        }
+
     }
 
     override fun onPause() {
@@ -122,45 +137,30 @@ class PageSettingActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    inner class ItemTouchCallback : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.ACTION_STATE_IDLE){
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            val from = viewHolder.absoluteAdapterPosition
-            val to = target.absoluteAdapterPosition
-            val exList = ArrayList(mPageSettingViewModel.selectedPages.value?: emptyList())
-            val d = exList.removeAt(from)
-            exList.add(to, d)
-            mPageSettingViewModel.setList(exList)
-            return true
+
+    private val launchSearchAndSelectUserForAddGalleryTab =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK && it.data != null) {
+                val changeDiff =
+                    it.data!!.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
+                mPageSettingViewModel.addUsersGalleryByIds(changeDiff.selected)
+            }
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
-    }
-
-
-
-    private val launchSearchAndSelectUserForAddGalleryTab = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK && it.data != null) {
-            val changeDiff = it.data!!.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
-            mPageSettingViewModel.addUsersGalleryByIds(changeDiff.selected)
+    private val launchSearchAndSelectUserForAddUserTimelineTab =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK && it.data != null) {
+                val changeDiff =
+                    it.data!!.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
+                mPageSettingViewModel.addUserPageByIds(changeDiff.selected)
+            }
         }
-    }
-
-    private val launchSearchAndSelectUserForAddUserTimelineTab = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK && it.data != null) {
-            val changeDiff = it.data!!.getSerializableExtra(EXTRA_SELECTED_USER_CHANGED_DIFF) as ChangedDiffResult
-            mPageSettingViewModel.addUserPageByIds(changeDiff.selected)
-        }
-    }
 
 
 }

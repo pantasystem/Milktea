@@ -1,19 +1,20 @@
 package net.pantasystem.milktea.setting.viewmodel.page
 
 import android.util.Log
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.page.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -26,9 +27,10 @@ class PageSettingViewModel @Inject constructor(
     private val pageTypeNameMap: PageTypeNameMap,
     private val userRepository: UserRepository,
     private val accountStore: AccountStore,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
-    val selectedPages = MediatorLiveData<List<Page>>()
+    val selectedPages = MutableStateFlow<List<Page>>(emptyList())
 
     val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
@@ -37,6 +39,20 @@ class PageSettingViewModel @Inject constructor(
     val pageOnActionEvent = EventBus<Page>()
 
     val pageOnUpdateEvent = EventBus<Page>()
+
+    val pageTypes = account.filterNotNull().map {
+        var pageTypeList = PageType.values().toList().toMutableList()
+        val api = misskeyAPIProvider.get(accountStore.state.value.currentAccount!!)
+        if(api !is MisskeyAPIV12){
+            pageTypeList.remove(PageType.ANTENNA)
+        }
+        if(api !is MisskeyAPIV1275) {
+            pageTypeList = pageTypeList.filterNot {
+                galleryTypes.contains(it)
+            }.toMutableList()
+        }
+        pageTypeList
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
         viewModelScope.launch {
@@ -55,7 +71,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun save() {
-        val list = selectedPages.value ?: emptyList()
+        val list = selectedPages.value
         list.forEachIndexed { index, page ->
             page.weight = index + 1
         }
@@ -68,9 +84,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun updatePage(page: Page) {
-        val pages = selectedPages.value?.let {
-            ArrayList(it)
-        } ?: return
+        val pages = ArrayList(selectedPages.value)
 
         var pageIndex = pages.indexOfFirst {
             it.pageId == page.pageId && it.pageId > 0
