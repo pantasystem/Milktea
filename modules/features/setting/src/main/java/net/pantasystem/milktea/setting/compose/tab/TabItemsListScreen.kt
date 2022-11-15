@@ -6,9 +6,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.setting.R
@@ -28,28 +30,8 @@ internal fun TabItemsListScreen(
     val scaffoldState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 
-    var bottomSheetType: BottomSheetType by remember {
-        mutableStateOf(BottomSheetType.None)
-    }
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(bottomSheetType) {
-        snapshotFlow {
-            bottomSheetType
-        }.collect { action ->
-
-            when(action) {
-                is BottomSheetType.None -> {
-                    scaffoldState.hide()
-                }
-                is BottomSheetType.AddTab -> {
-                    scaffoldState.show()
-                }
-                is BottomSheetType.TabOptionDialog -> {
-                    scaffoldState.show()
-                }
-            }
-        }
-    }
 
     ModalBottomSheetLayout(
         sheetState = scaffoldState,
@@ -58,7 +40,9 @@ internal fun TabItemsListScreen(
                 modifier = Modifier.fillMaxSize(),
                 items = pageTypes,
                 onClick = {
-                    bottomSheetType = BottomSheetType.None
+                    scope.launch {
+                        scaffoldState.hide()
+                    }
                     onSelectPage(it)
                 }
             )
@@ -91,10 +75,12 @@ internal fun TabItemsListScreen(
                         Icon(Icons.Default.BookmarkAdd, contentDescription = null)
                     },
                     onClick = {
-                        bottomSheetType = if (scaffoldState.isVisible) {
-                            BottomSheetType.None
-                        } else {
-                            BottomSheetType.AddTab
+                        scope.launch {
+                            if (scaffoldState.isVisible) {
+                                scaffoldState.hide()
+                            } else {
+                                scaffoldState.show()
+                            }
                         }
                     }
                 )
@@ -116,9 +102,4 @@ internal fun TabItemsListScreen(
     }
 }
 
-sealed interface BottomSheetType {
-    object AddTab : BottomSheetType
-    data class TabOptionDialog(val page: Page) : BottomSheetType
-    object None : BottomSheetType
-}
 
