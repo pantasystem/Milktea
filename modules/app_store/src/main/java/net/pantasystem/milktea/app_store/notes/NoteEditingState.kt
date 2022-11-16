@@ -160,13 +160,19 @@ data class NoteEditingState(
         if (files.any { it is AppFile.Remote }) {
             throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
         }
-        if (!(replyId == null || author.instanceDomain == account.instanceDomain)) {
-            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(replyId)。")
+
+        if (replyId != null) {
+            if (replyId.accountId != account.accountId && author.instanceDomain != account.instanceDomain) {
+                throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(replyId)。")
+            }
         }
 
-        if (!(renoteId == null || author.instanceDomain == account.instanceDomain)) {
-            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(renoteId)。")
+        if (renoteId != null) {
+            if (renoteId.accountId != account.accountId && author.instanceDomain != account.instanceDomain) {
+                throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(renoteId)。")
+            }
         }
+
 
         if (visibility is Visibility.Specified
             && (visibility.visibleUserIds.isNotEmpty()
