@@ -178,7 +178,9 @@ data class NoteEditingState(
             && (visibility.visibleUserIds.isNotEmpty()
                     || author.instanceDomain == account.instanceDomain)
         ) {
-            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(visibility)。")
+            if (!visibility.visibleUserIds.all { it.accountId == account.accountId }) {
+                throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(visibility)。")
+            }
         }
 
         return this.copy(
