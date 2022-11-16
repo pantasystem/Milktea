@@ -157,9 +157,6 @@ data class NoteEditingState(
         if (account == null) {
             throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
-        if (files.any { it is AppFile.Remote }) {
-            throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
-        }
 
         if (replyId != null) {
             if (replyId.accountId != account.accountId && author.instanceDomain != account.instanceDomain) {
@@ -399,15 +396,7 @@ fun PollEditingState.toCreatePoll(): CreatePoll {
     )
 }
 
-fun PollEditingState.toDraftPoll(): DraftPoll {
-    return DraftPoll(
-        choices = this.choices.map {
-            it.text
-        },
-        multiple = multiple,
-        expiresAt = expiresAt.expiresAt()?.toEpochMilliseconds()
-    )
-}
+
 
 fun NoteEditingState.toCreateNote(account: Account): CreateNote {
     return CreateNote(
