@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.editor.viewmodel
 
-import android.util.Log
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
