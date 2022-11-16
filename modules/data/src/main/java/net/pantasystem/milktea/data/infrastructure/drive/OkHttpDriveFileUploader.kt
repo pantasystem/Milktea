@@ -20,6 +20,13 @@ import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
+object OkHttpDriveFileUploaderConstants {
+    const val i = "i"
+    const val force = "force"
+    const val file = "file"
+    const val folderId = "folderId"
+    const val isSensitive = "isSensitive"
+}
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class OkHttpDriveFileUploader(
@@ -43,17 +50,20 @@ class OkHttpDriveFileUploader(
 
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("i", account.getI(encryption))
-                .addFormDataPart("force", isForce.toString())
+                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.getI(encryption))
+                .addFormDataPart(OkHttpDriveFileUploaderConstants.force, isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart(
-                    "file",
+                    OkHttpDriveFileUploaderConstants.file,
                     fileProperty.name,
                     createRequestBody(fileProperty.type, res.execute().body!!.byteStream())
                 )
 
             if (fileProperty.folderId != null) {
-                requestBodyBuilder.addFormDataPart("folderId", fileProperty.folderId!!)
+                requestBodyBuilder.addFormDataPart(
+                    OkHttpDriveFileUploaderConstants.folderId,
+                    fileProperty.folderId!!
+                )
             }
 
             val requestBody = requestBodyBuilder.build()
@@ -90,16 +100,26 @@ class OkHttpDriveFileUploader(
             val client = getOkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("i", account.getI(encryption))
-                .addFormDataPart("force", isForce.toString())
+                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.getI(encryption))
+                .addFormDataPart(OkHttpDriveFileUploaderConstants.force, isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
-                .addFormDataPart("file", file.name, createRequestBody(Uri.parse(file.path)))
+                .addFormDataPart(
+                    OkHttpDriveFileUploaderConstants.file,
+                    file.name,
+                    createRequestBody(Uri.parse(file.path))
+                )
 
             val isSensitive = file.isSensitive
-            requestBodyBuilder.addFormDataPart("isSensitive", isSensitive.toString())
+            requestBodyBuilder.addFormDataPart(
+                OkHttpDriveFileUploaderConstants.isSensitive,
+                isSensitive.toString()
+            )
 
             val folderId = file.folderId
-            if (folderId != null) requestBodyBuilder.addFormDataPart("folderId", folderId)
+            if (folderId != null) requestBodyBuilder.addFormDataPart(
+                OkHttpDriveFileUploaderConstants.folderId,
+                folderId
+            )
 
             val requestBody = requestBodyBuilder.build()
 
@@ -126,48 +146,11 @@ class OkHttpDriveFileUploader(
 
 
     private fun createRequestBody(type: String, inputStream: InputStream): RequestBody {
-        return object : RequestBody() {
-            override fun contentType(): MediaType {
-                return type.toMediaType()
-            }
-
-            override fun writeTo(sink: BufferedSink) {
-                inputStream.source().use {
-                    sink.writeAll(it)
-                }
-            }
-        }
+        return InputStreamRequestBody(type = type, inputStream = inputStream)
     }
 
     private fun createRequestBody(uri: Uri): RequestBody {
-        return object : RequestBody() {
-            override fun contentType(): MediaType? {
-                val type = context.contentResolver.getType(uri)
-                return type?.toMediaType()
-            }
-
-            override fun contentLength(): Long {
-                return context.contentResolver.query(
-                    uri,
-                    arrayOf(MediaStore.MediaColumns.SIZE),
-                    null,
-                    null,
-                    null
-                )?.use {
-                    return@use if (it.moveToFirst()) {
-                        it.getLong(0)
-                    } else {
-                        null
-                    }
-                } ?: throw IllegalArgumentException("ファイルサイズの取得に失敗しました")
-            }
-
-            override fun writeTo(sink: BufferedSink) {
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    sink.writeAll(inputStream.source())
-                }
-            }
-        }
+        return UriRequestBody(uri, context)
     }
 
     private fun getOkHttpClient(): OkHttpClient {
@@ -177,5 +160,55 @@ class OkHttpDriveFileUploader(
             .readTimeout(20, TimeUnit.SECONDS)
             .build()
 
+    }
+
+
+
+}
+
+private class UriRequestBody(
+    val uri: Uri,
+    val context: Context,
+) : RequestBody() {
+    override fun contentType(): MediaType? {
+        val type = context.contentResolver.getType(uri)
+        return type?.toMediaType()
+    }
+
+    override fun contentLength(): Long {
+        return context.contentResolver.query(
+            uri,
+            arrayOf(MediaStore.MediaColumns.SIZE),
+            null,
+            null,
+            null
+        )?.use {
+            return@use if (it.moveToFirst()) {
+                it.getLong(0)
+            } else {
+                null
+            }
+        } ?: throw IllegalArgumentException("ファイルサイズの取得に失敗しました")
+    }
+
+    override fun writeTo(sink: BufferedSink) {
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            sink.writeAll(inputStream.source())
+        }
+    }
+}
+
+private class InputStreamRequestBody(
+    val type: String,
+    val inputStream: InputStream,
+) : RequestBody() {
+    override fun contentType(): MediaType {
+        return type.toMediaType()
+    }
+
+    override fun writeTo(sink: BufferedSink) {
+        inputStream.source().use {
+            sink.writeAll(it)
+        }
     }
 }
