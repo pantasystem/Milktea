@@ -9,15 +9,24 @@ import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.AppFile
 
 interface FileUploader {
     @Throws(FileUploadFailedException::class)
-    suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO
+    suspend fun upload(file: UploadSource, isForce: Boolean): FilePropertyDTO
+}
+
+sealed interface UploadSource {
+    data class OtherAccountFile(
+        val fileProperty: FileProperty
+    ) : UploadSource
+
+    data class LocalFile(val file: AppFile.Local) : UploadSource
 }
 
 class FileUploadFailedException(
-    val file: AppFile.Local,
+    val file: AppFile,
     val throwable: Throwable?,
     statusCode: Int?
 ) : IllegalStateException("ファイルアップロードに失敗: file:$file, statusCode:$statusCode", throwable)

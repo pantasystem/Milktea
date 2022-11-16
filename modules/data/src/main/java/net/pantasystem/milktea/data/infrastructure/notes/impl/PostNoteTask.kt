@@ -7,6 +7,7 @@ import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploader
+import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -69,9 +70,19 @@ class PostNoteTask(
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
                         when(it) {
-                            is AppFile.Remote -> it.id.fileId
+                            is AppFile.Remote -> {
+                                if (account.accountId == it.id.accountId) {
+                                    it.id.fileId
+                                } else {
+                                    val result = fileUploader.upload(UploadSource.OtherAccountFile(
+                                        filePropertyDataSource.find(it.id).getOrThrow()
+                                    ), true)
+                                    filePropertyDataSource.add(result.toFileProperty(account))
+                                    result.id
+                                }
+                            }
                             is AppFile.Local -> {
-                                val result = fileUploader.upload(it, true)
+                                val result = fileUploader.upload(UploadSource.LocalFile(it), true)
                                 filePropertyDataSource.add(result.toFileProperty(account))
                                 result.id
                             }

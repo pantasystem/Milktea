@@ -10,18 +10,15 @@ import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.AppFile
-import okhttp3.MediaType
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.Request
-import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.source
+import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
-
-
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -32,16 +29,65 @@ class OkHttpDriveFileUploader(
     val encryption: Encryption,
     private val okHttpClientProvider: OkHttpClientProvider,
 ) : FileUploader {
-    override suspend fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO {
+    override suspend fun upload(file: UploadSource, isForce: Boolean): FilePropertyDTO {
+        return when (file) {
+            is UploadSource.LocalFile -> upload(file.file, isForce)
+            is UploadSource.OtherAccountFile -> transferUpload(file.fileProperty, isForce)
+        }
+    }
+
+    private fun transferUpload(fileProperty: FileProperty, isForce: Boolean): FilePropertyDTO {
+        return try {
+            val client = getOkHttpClient()
+            val res = client.newCall(Request.Builder().url(fileProperty.url).build())
+
+            val requestBodyBuilder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("i", account.getI(encryption))
+                .addFormDataPart("force", isForce.toString())
+                //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
+                .addFormDataPart(
+                    "file",
+                    fileProperty.name,
+                    createRequestBody(fileProperty.type, res.execute().body!!.byteStream())
+                )
+
+            if (fileProperty.folderId != null) {
+                requestBodyBuilder.addFormDataPart("folderId", fileProperty.folderId!!)
+            }
+
+            val requestBody = requestBodyBuilder.build()
+
+            val request =
+                Request.Builder().url(URL("${account.instanceDomain}/api/drive/files/create"))
+                    .post(requestBody).build()
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                json.decodeFromString<FilePropertyDTO>(response.body!!.string())
+            } else {
+                throw FileUploadFailedException(
+                    AppFile.Remote(fileProperty.id),
+                    null,
+                    response.code
+                )
+            }
+        } catch (e: Throwable) {
+            throw FileUploadFailedException(
+                AppFile.Remote(fileProperty.id),
+                e,
+                null
+            )
+        }
+
+
+    }
+
+    private fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
-        return try{
+        return try {
 
-            val client = okHttpClientProvider.get().newBuilder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(114514, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build()
 
+            val client = getOkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("i", account.getI(encryption))
@@ -53,16 +99,18 @@ class OkHttpDriveFileUploader(
             requestBodyBuilder.addFormDataPart("isSensitive", isSensitive.toString())
 
             val folderId = file.folderId
-            if( folderId != null ) requestBodyBuilder.addFormDataPart("folderId", folderId)
+            if (folderId != null) requestBodyBuilder.addFormDataPart("folderId", folderId)
 
             val requestBody = requestBodyBuilder.build()
 
-            val request = Request.Builder().url(URL("${account.instanceDomain}/api/drive/files/create")).post(requestBody).build()
+            val request =
+                Request.Builder().url(URL("${account.instanceDomain}/api/drive/files/create"))
+                    .post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code
-            if(code in 200 until 300){
+            if (code in 200 until 300) {
                 json.decodeFromString<FilePropertyDTO>(response.body!!.string())
-            }else{
+            } else {
                 Log.d("OkHttpConnection", "code: $code, error${response.body?.string()}")
                 throw FileUploadFailedException(
                     file,
@@ -70,38 +118,64 @@ class OkHttpDriveFileUploader(
                     code
                 )
             }
-        }catch(e: Exception){
+        } catch (e: Exception) {
             Log.w("OkHttpConnection", "post file error", e)
             throw FileUploadFailedException(file, e, null)
         }
     }
 
 
-    private fun createRequestBody(uri: Uri): RequestBody{
-        return object : RequestBody(){
+    private fun createRequestBody(type: String, inputStream: InputStream): RequestBody {
+        return object : RequestBody() {
+            override fun contentType(): MediaType {
+                return type.toMediaType()
+            }
+
+            override fun writeTo(sink: BufferedSink) {
+                inputStream.source().use {
+                    sink.writeAll(it)
+                }
+            }
+        }
+    }
+
+    private fun createRequestBody(uri: Uri): RequestBody {
+        return object : RequestBody() {
             override fun contentType(): MediaType? {
                 val type = context.contentResolver.getType(uri)
                 return type?.toMediaType()
             }
 
             override fun contentLength(): Long {
-                return context.contentResolver.query(uri, arrayOf(MediaStore.MediaColumns.SIZE), null, null, null)?.use{
-                    return@use if(it.moveToFirst()){
+                return context.contentResolver.query(
+                    uri,
+                    arrayOf(MediaStore.MediaColumns.SIZE),
+                    null,
+                    null,
+                    null
+                )?.use {
+                    return@use if (it.moveToFirst()) {
                         it.getLong(0)
-                    }else{
+                    } else {
                         null
                     }
-                }?: throw IllegalArgumentException("ファイルサイズの取得に失敗しました")
+                } ?: throw IllegalArgumentException("ファイルサイズの取得に失敗しました")
             }
 
             override fun writeTo(sink: BufferedSink) {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                inputStream?.source()
-                    ?.use{
-                        sink.writeAll(it)
-                    }
-
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    sink.writeAll(inputStream.source())
+                }
             }
         }
+    }
+
+    private fun getOkHttpClient(): OkHttpClient {
+        return okHttpClientProvider.get().newBuilder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(114514, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .build()
+
     }
 }
