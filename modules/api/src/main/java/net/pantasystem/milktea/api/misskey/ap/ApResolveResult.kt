@@ -6,14 +6,14 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 
 @kotlinx.serialization.Serializable
 sealed class ApResolveResult {
-    @SerialName("user")
+    @SerialName("User")
     @kotlinx.serialization.Serializable
     data class TypeUser(
         @SerialName("object") val user: UserDTO
     ) : ApResolveResult()
 
     @kotlinx.serialization.Serializable
-    @SerialName("note")
+    @SerialName("Note")
     data class TypeNote(
         @SerialName("object") val note: NoteDTO
     ) : ApResolveResult()
