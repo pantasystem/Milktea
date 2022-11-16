@@ -1,13 +1,13 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import junit.framework.TestCase
+import net.pantasystem.milktea.app_store.notes.AddMentionResult
+import net.pantasystem.milktea.app_store.notes.NoteEditingState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.app_store.notes.AddMentionResult
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.app_store.notes.NoteEditingState
 import net.pantasystem.milktea.model.notes.Visibility
 
 class NoteEditingStateTest : TestCase() {
@@ -35,12 +35,6 @@ class NoteEditingStateTest : TestCase() {
         assertTrue(state.checkValidate())
     }
 
-    fun testCheckValidationWhenOverFileCountsOfFailure() {
-        val state = NoteEditingState(files = listOf("a", "b", "c", "d", "e").map {
-            AppFile.Remote(FileProperty.Id(0L, it))
-        })
-        assertFalse(state.checkValidate())
-    }
 
     fun testCheckValidationWhenJustFileCountsOfSuccess() {
         val state = NoteEditingState(files = listOf("a", "b", "c", "d").map {

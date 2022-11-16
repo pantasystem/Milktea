@@ -59,7 +59,7 @@ class DriveFileRepositoryImpl @Inject constructor(
     override suspend fun create(accountId: Long, file: AppFile.Local): Result<FileProperty> {
         return runCatching {
             val property = driveFileUploaderProvider.get(getAccount.get(accountId))
-                .upload(file, true)
+                .upload(UploadSource.LocalFile(file), true)
                 .toFileProperty(getAccount.get(accountId))
             driveFileDataSource.add(property).getOrThrow()
             driveFileDataSource.find(property.id).getOrThrow()

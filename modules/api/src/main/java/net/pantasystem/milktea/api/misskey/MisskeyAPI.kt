@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.api.misskey
 
+import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
+import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
 import net.pantasystem.milktea.api.misskey.app.CreateApp
 import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.api.misskey.auth.App
@@ -247,4 +249,7 @@ interface MisskeyAPI {
 
     @POST("api/users/report-abuse")
     suspend fun report(@Body req: ReportDTO) : Response<Unit>
+
+    @POST("api/ap/show")
+    suspend fun resolve(@Body req: ApResolveRequest) : Response<ApResolveResult>
 }

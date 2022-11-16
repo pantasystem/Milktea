@@ -56,6 +56,7 @@ class NoteEditorViewModel @Inject constructor(
     private val settingStore: SettingStore,
     private val noteRepository: NoteRepository,
     private val channelRepository: ChannelRepository,
+    private val noteEditorSwitchAccountExecutor: NoteEditorSwitchAccountExecutor,
 ) : ViewModel() {
 
 
@@ -237,7 +238,9 @@ class NoteEditorViewModel @Inject constructor(
     init {
         accountStore.observeCurrentAccount.filterNotNull().onEach {
             _state.value = runCatching {
-                _state.value.setAccount(it)
+                noteEditorSwitchAccountExecutor(_state.value, it).getOrThrow()
+            }.onFailure {
+                logger.info("アカウント切り替え時にエラー発生", e = it)
             }.getOrElse {
                 NoteEditingState()
             }

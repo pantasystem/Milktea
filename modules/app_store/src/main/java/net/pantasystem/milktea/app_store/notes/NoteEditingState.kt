@@ -157,22 +157,27 @@ data class NoteEditingState(
         if (account == null) {
             throw IllegalArgumentException("現在の状態に未指定のAccountを指定することはできません")
         }
-        if (files.any { it is AppFile.Remote }) {
-            throw IllegalArgumentException("リモートファイル指定時にアカウントを変更することはできません(files)。")
-        }
-        if (!(replyId == null || author.instanceDomain == account.instanceDomain)) {
-            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(replyId)。")
+
+        if (replyId != null) {
+            if (replyId.accountId != account.accountId && author.instanceDomain != account.instanceDomain) {
+                throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(replyId)。")
+            }
         }
 
-        if (!(renoteId == null || author.instanceDomain == account.instanceDomain)) {
-            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(renoteId)。")
+        if (renoteId != null) {
+            if (renoteId.accountId != account.accountId && author.instanceDomain != account.instanceDomain) {
+                throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(renoteId)。")
+            }
         }
+
 
         if (visibility is Visibility.Specified
             && (visibility.visibleUserIds.isNotEmpty()
                     || author.instanceDomain == account.instanceDomain)
         ) {
-            throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(visibility)。")
+            if (!visibility.visibleUserIds.all { it.accountId == account.accountId }) {
+                throw IllegalArgumentException("異なるインスタンスドメインのアカウントを切り替えることはできません(visibility)。")
+            }
         }
 
         return this.copy(
@@ -391,15 +396,7 @@ fun PollEditingState.toCreatePoll(): CreatePoll {
     )
 }
 
-fun PollEditingState.toDraftPoll(): DraftPoll {
-    return DraftPoll(
-        choices = this.choices.map {
-            it.text
-        },
-        multiple = multiple,
-        expiresAt = expiresAt.expiresAt()?.toEpochMilliseconds()
-    )
-}
+
 
 fun NoteEditingState.toCreateNote(account: Account): CreateNote {
     return CreateNote(
