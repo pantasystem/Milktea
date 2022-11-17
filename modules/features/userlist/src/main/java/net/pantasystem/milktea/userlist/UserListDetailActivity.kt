@@ -6,32 +6,51 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.FrameLayout
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
-import com.wada811.databinding.dataBinding
+import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
-import net.pantasystem.milktea.common_navigation.ChangedDiffResult
-import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
+import net.pantasystem.milktea.common_compose.CustomEmojiText
+import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
-import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigationArgs
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
+import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.userlist.databinding.ActivityUserListDetailBinding
 import net.pantasystem.milktea.userlist.viewmodel.UserListDetailViewModel
 import javax.inject.Inject
 
@@ -54,14 +73,13 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
         }
     }
 
-    private var account: Account? = null
     private var mListId: UserList.Id? = null
 
     @Inject
     lateinit var assistedFactory: UserListDetailViewModel.ViewModelAssistedFactory
-    private val accountViewModel: AccountViewModel by viewModels()
 
-    @Inject lateinit var settingStore: SettingStore
+    @Inject
+    lateinit var settingStore: SettingStore
 
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
@@ -69,6 +87,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     @Inject
     lateinit var searchAndSelectUserNavigation: SearchAndSelectUserNavigation
 
+    @Inject
+    lateinit var userDetailPageNavigation: UserDetailNavigation
 
     private val mUserListDetailViewModel: UserListDetailViewModel by viewModels {
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
@@ -76,7 +96,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
     private var mUserListName: String = ""
-    private val binding: ActivityUserListDetailBinding by dataBinding()
+
+    //    private val binding: ActivityUserListDetailBinding by dataBinding()
     val notesViewModel by viewModels<NotesViewModel>()
 
     @Inject
@@ -85,15 +106,13 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     @Inject
     lateinit var applyMenuTint: ApplyMenuTint
 
+    @OptIn(ExperimentalPagerApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
         setContentView(R.layout.activity_user_list_detail)
 
-        setSupportActionBar(binding.userListToolbar)
-
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
-
 
         mListId = listId
 
@@ -105,71 +124,138 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
             settingStore
         ).initViewModelListener()
 
-        binding.userListDetailViewPager.adapter = PagerAdapter(listId)
-        binding.userListDetailTab.setupWithViewPager(binding.userListDetailViewPager)
+        setContent {
+            MdcTheme {
+                val userList by mUserListDetailViewModel.userList.collectAsState()
+                val titles = listOf(stringResource(R.string.timeline), stringResource(R.string.user_list))
+                val pagerState = rememberPagerState(pageCount = titles.size)
+                val users by mUserListDetailViewModel.users.collectAsState()
+                val isAddedTab by mUserListDetailViewModel.isAddedToTab.collectAsState()
 
-        mUserListDetailViewModel.userList.observe(this) { ul ->
-            supportActionBar?.title = ul.name
-            mUserListName = ul.name
+                val scope = rememberCoroutineScope()
+                Scaffold(
+                    topBar = {
+                        Column {
+                            TopAppBar(
+                                navigationIcon = {
+                                    IconButton(onClick = { finish() }) {
+                                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                    }
+                                },
+                                title = {
+                                    Text(userList?.name ?: "")
+                                },
+                                actions = {
+                                    IconButton(onClick = {
+                                        val selected =
+                                            mUserListDetailViewModel.users.value.map {
+                                                it.id
+                                            }
+                                        val intent = searchAndSelectUserNavigation.newIntent(
+                                            SearchAndSelectUserNavigationArgs(
+                                                selectedUserIds = selected
+                                            )
+                                        )
+                                        requestSelectUserResult.launch(intent)
+                                    }) {
+                                        Icon(Icons.Default.PersonAdd, contentDescription = null)
+                                    }
 
+                                    IconButton(onClick = {
+                                        showEditUserListDialog()
+                                    }) {
+                                        Icon(Icons.Default.Edit, contentDescription = null)
+                                    }
+                                    IconButton(onClick = {
+                                        mUserListDetailViewModel.toggleAddToTab()
+                                    }) {
+                                        if(isAddedTab) {
+                                            Icon(Icons.Default.BookmarkRemove, contentDescription = null)
+                                        } else {
+                                            Icon(Icons.Default.BookmarkAdd, contentDescription = null)
+                                        }
+                                    }
 
+                                }
 
-            if (intent.action == ACTION_EDIT_NAME) {
-                intent.action = ACTION_SHOW
-                showEditUserListDialog()
+                            )
+                            TabRow(selectedTabIndex = pagerState.currentPage) {
+                                titles.forEachIndexed { index, s ->
+                                    Tab(
+                                        text = { Text(text = s) },
+                                        selected = index == pagerState.currentPage,
+                                        onClick = {
+                                            scope.launch {
+                                                pagerState.animateScrollToPage(index)
+                                            }
+                                        }
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+                ) {
+                    HorizontalPager(
+                        modifier = Modifier
+                            .padding(it)
+                            .fillMaxSize(),
+                        state = pagerState,
+                    ) {
+                        when (pagerState.currentPage) {
+                            0 -> {
+                                AndroidView(
+                                    modifier = Modifier.fillMaxSize(),
+                                    factory = { context ->
+                                        FrameLayout(context).apply {
+                                            id = R.id.container
+                                        }
+                                    },
+                                    update = { frameLayout ->
+                                        val fragment = pageableFragmentFactory.create(
+                                            Pageable.UserListTimeline(listId = listId.userListId)
+                                        )
+                                        val transaction = supportFragmentManager.beginTransaction()
+                                        transaction.replace(frameLayout.id, fragment)
+                                        transaction.commit()
+                                    }
+                                )
+                            }
+                            1 -> {
+                                LazyColumn(Modifier.fillMaxSize()) {
+                                    items(users) { user ->
+                                        ItemSimpleUserCard(
+                                            user = user,
+                                            onSelected = { u ->
+                                                startActivity(userDetailPageNavigation.newIntent(
+                                                    UserDetailNavigationArgs.UserId(u.id)
+                                                ))
+                                            },
+                                            onDeleteButtonClicked = { u ->
+                                                mUserListDetailViewModel.pullUser(u.id)
+                                            }
+                                        )
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        mUserListDetailViewModel.userList.observe(this) {
-            invalidateOptionsMenu()
-        }
 
+
+        if (intent.action == ACTION_EDIT_NAME) {
+            intent.action = ACTION_SHOW
+            showEditUserListDialog()
+        }
 
     }
 
     override fun onSubmit(name: String) {
         mUserListDetailViewModel.updateName(name)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_user_list_detail, menu)
-        val addToTabItem = menu.findItem(R.id.action_add_to_tab)
-        val page = account?.pages?.firstOrNull {
-            (it.pageable() as? Pageable.UserListTimeline)?.listId == mListId?.userListId && mListId != null
-        }
-        if (page == null) {
-            addToTabItem?.setIcon(R.drawable.ic_add_to_tab_24px)
-        } else {
-            addToTabItem?.setIcon(R.drawable.ic_remove_to_tab_24px)
-        }
-        applyMenuTint(this, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_add_to_tab -> {
-                toggleAddToTab()
-            }
-            R.id.action_update_list_user -> {
-                showEditUserListDialog()
-            }
-            android.R.id.home -> {
-                finish()
-            }
-            R.id.action_add_user -> {
-                val selected = mUserListDetailViewModel.listUsers.value?.mapNotNull {
-                    it.userId
-                } ?: return false
-                val intent = searchAndSelectUserNavigation.newIntent(
-                    SearchAndSelectUserNavigationArgs(
-                        selectedUserIds = selected
-                    )
-                )
-                requestSelectUserResult.launch(intent)
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 
@@ -199,57 +285,63 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     }
 
 
-    private fun toggleAddToTab() {
-        val page = account?.pages?.firstOrNull {
-            val pageable = it.pageable()
-            if (pageable is Pageable.UserListTimeline) {
-                pageable.listId == mListId?.userListId && mListId != null
-            } else {
-                false
-            }
-        }
-        if (page == null) {
-            accountViewModel.addPage(
-                Page(
-                    account?.accountId ?: -1,
-                    mUserListName,
-                    weight = -1,
-                    pageable = Pageable.UserListTimeline(
-                        mListId?.userListId!!
-                    )
+}
+
+
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ItemSimpleUserCard(
+    user: User,
+    onSelected: (User) -> Unit,
+    onDeleteButtonClicked: (User) -> Unit,
+) {
+
+    Card(
+        onClick = {
+            onSelected.invoke(user)
+        },
+        shape = RoundedCornerShape(0.dp),
+        modifier = Modifier.padding(0.5.dp),
+        backgroundColor = MaterialTheme.colors.surface
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .weight(1f),
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(user.avatarUrl),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
-            )
-        } else {
-            accountViewModel.removePage(page)
-        }
-    }
-
-
-    inner class PagerAdapter(val listId: UserList.Id) :
-        FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        private val titles = listOf(getString(R.string.timeline), getString(R.string.user_list))
-        override fun getCount(): Int {
-            return titles.size
-        }
-
-        override fun getItem(position: Int): Fragment {
-            return when (position) {
-                0 -> {
-                    pageableFragmentFactory.create(
-                        Pageable.UserListTimeline(listId = listId.userListId)
-                    )
+                Spacer(modifier = Modifier.width(4.dp))
+                Column {
+                    CustomEmojiText(text = user.displayName, emojis = user.emojis)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = user.displayUserName)
                 }
-                1 -> {
-                    UserListDetailFragment()
-                }
-                else -> throw IllegalArgumentException("max 2 page")
+            }
+            IconButton(
+                onClick = {
+                    onDeleteButtonClicked(user)
+                },
+
+            ) {
+
+                Icon(Icons.Default.Delete ,contentDescription = null)
             }
         }
 
-        override fun getPageTitle(position: Int): CharSequence {
-            return titles[position]
-        }
     }
-
-
 }
