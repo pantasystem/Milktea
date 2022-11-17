@@ -110,7 +110,6 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
-        setContentView(R.layout.activity_user_list_detail)
 
         val listId = intent.getSerializableExtra(EXTRA_LIST_ID) as UserList.Id
 
