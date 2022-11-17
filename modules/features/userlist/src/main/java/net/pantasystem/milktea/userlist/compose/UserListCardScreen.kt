@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.userlist
+package net.pantasystem.milktea.userlist.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.userlist.R
 import net.pantasystem.milktea.userlist.viewmodel.UserListsUiState
 
 @Composable
