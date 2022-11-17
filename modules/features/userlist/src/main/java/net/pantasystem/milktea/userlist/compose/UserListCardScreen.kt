@@ -8,6 +8,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,27 +31,25 @@ fun UserListCardScreen(
         mutableStateOf(false)
     }
 
+    val connection = remember {
+        LazyInitialNestedScrollConnection()
+    }
+
     CreateUserListDialog(isShow = isShowCreateUserListDialog, onDismiss = {
         isShowCreateUserListDialog = false
     }, onSave = {
         isShowCreateUserListDialog = false
         onAction(UserListCardScreenAction.OnSaveNewUserList(it))
     })
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.user_list))
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onAction(UserListCardScreenAction.OnNavigateUp)
-                    }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null)
-                    }
-                },
-                backgroundColor = MaterialTheme.colors.surface
+            CollapsingTopAppBar(
+                modifier = Modifier,
+                onNavigateUp = { onAction(UserListCardScreenAction.OnNavigateUp) },
+                scrollConnection = connection
             )
         },
         floatingActionButton = {
@@ -57,46 +60,109 @@ fun UserListCardScreen(
             }
         }
     ) {
-        LazyColumn(
+        UserListList(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize()
-        ) {
-            items(uiState.userLists.size) { index ->
-                UserListCard(
-                    userList = uiState.userLists[index],
-                    onAction = { action ->
-                        when (action) {
-                            is UserListCardAction.OnClick -> {
-                                if (uiState.addTargetUserId == null) {
-                                    onAction(
-                                        UserListCardScreenAction
-                                            .OnUserListCardClicked(
-                                                uiState.userLists[index].userList.userList
-                                            )
-                                    )
-                                } else {
-                                    onAction(
-                                        UserListCardScreenAction
-                                            .OnToggleAddUser(
-                                                uiState.userLists[index].userList.userList,
-                                                uiState.addTargetUserId
-                                            )
-                                    )
-                                }
+                .nestedScroll(connection),
+            uiState = uiState, onAction = onAction
+        )
+    }
+}
 
-                            }
-                            is UserListCardAction.OnClickToggleTab -> {
+@Composable
+private fun CollapsingTopAppBar(
+    modifier: Modifier,
+    onNavigateUp: () -> Unit,
+    scrollConnection: LazyInitialNestedScrollConnection,
+) {
+
+    var toolbarHeight by remember {
+        mutableStateOf(56.dp)
+    }
+
+
+    val density = LocalDensity.current
+
+    val defaultFontSize = MaterialTheme.typography.h6.fontSize
+
+    var fontSize by remember {
+        mutableStateOf(defaultFontSize)
+    }
+
+    LaunchedEffect(null) {
+        scrollConnection.preScroll = { available, _ ->
+            val delta = available.y
+            toolbarHeight = with(density) {
+                (toolbarHeight.toPx() + delta).coerceIn(0.dp.toPx(), 56.dp.toPx()).toDp()
+            }
+            fontSize = (defaultFontSize.value * (toolbarHeight / 56.dp)).sp
+
+            Offset.Zero
+        }
+    }
+
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.user_list),
+                style = MaterialTheme.typography.h6.copy(fontSize = fontSize)
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onNavigateUp) {
+                Icon(Icons.Default.ArrowBack, contentDescription = null)
+            }
+        },
+        backgroundColor = MaterialTheme.colors.surface,
+        modifier = modifier.height(toolbarHeight)
+    )
+}
+
+@Composable
+@Stable
+fun UserListList(
+    modifier: Modifier,
+    uiState: UserListsUiState,
+    onAction: (UserListCardScreenAction) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier,
+    ) {
+        items(uiState.userLists.size) { index ->
+            UserListCard(
+                userList = uiState.userLists[index],
+                onAction = { action ->
+                    when (action) {
+                        is UserListCardAction.OnClick -> {
+                            if (uiState.addTargetUserId == null) {
                                 onAction(
-                                    UserListCardScreenAction.OnUserListAddToTabToggled(
-                                        uiState.userLists[index].userList.userList
-                                    )
+                                    UserListCardScreenAction
+                                        .OnUserListCardClicked(
+                                            uiState.userLists[index].userList.userList
+                                        )
+                                )
+                            } else {
+                                onAction(
+                                    UserListCardScreenAction
+                                        .OnToggleAddUser(
+                                            uiState.userLists[index].userList.userList,
+                                            uiState.addTargetUserId
+                                        )
                                 )
                             }
+
+                        }
+                        is UserListCardAction.OnClickToggleTab -> {
+                            onAction(
+                                UserListCardScreenAction.OnUserListAddToTabToggled(
+                                    uiState.userLists[index].userList.userList
+                                )
+                            )
                         }
                     }
-                )
-            }
+                }
+            )
         }
     }
 }
@@ -154,6 +220,14 @@ fun CreateUserListDialog(
         }
     }
 
+}
+
+private class LazyInitialNestedScrollConnection(
+    var preScroll: (available: Offset, source: NestedScrollSource) -> Offset = { _, _ -> Offset.Zero }
+) : NestedScrollConnection {
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        return preScroll(available, source)
+    }
 }
 
 sealed interface UserListCardScreenAction {
