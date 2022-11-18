@@ -4,24 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FormatQuote
-import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -74,49 +65,20 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
             setContent {
                 MdcTheme {
                     val uiState by viewModel.uiState.collectAsState()
-                    Surface(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        ) {
-                            RenoteTargetAccountRowList(accounts = uiState.accounts, onClick = {
-                                viewModel.toggleAddAccount(it)
-                            })
-                            RenoteButtonLayout(
-                                onClick = {
-                                    viewModel.renote()
-                                    dismiss()
-                                },
-                                icon = Icons.Default.Repeat,
-                                text = stringResource(id = R.string.renote)
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-                            if (isRenotedByMe) {
-                                RenoteButtonLayout(
-                                    onClick = {
-                                        viewModel.unRenote()
-                                        dismiss()
-                                    },
-                                    icon = Icons.Default.FormatQuote,
-                                    text = stringResource(id = R.string.unrenote)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                            }
-
-                            RenoteButtonLayout(
-                                onClick = {
-                                    notesViewModel.showQuoteNoteEditor(noteId)
-                                    dismiss()
-                                },
-                                icon = Icons.Default.FormatQuote,
-                                text = stringResource(id = R.string.quote_renote)
-                            )
-                        }
+                    RenoteDialogContent(
+                        uiState = uiState,
+                        isRenotedByMe = isRenotedByMe,
+                        onToggleAddAccount = {
+                            viewModel.toggleAddAccount(it)
+                        },
+                        onRenoteButtonClicked = {
+                            viewModel.renote()
+                            dismiss()
+                        },
+                        onQuoteRenoteButtonClicked = {
+                            notesViewModel.showQuoteNoteEditor(noteId)
+                            dismiss()
+                        }) {
                     }
                 }
             }
