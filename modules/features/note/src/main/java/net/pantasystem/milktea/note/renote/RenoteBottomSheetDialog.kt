@@ -125,7 +125,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
                             })
                             RenoteButtonLayout(
                                 onClick = {
-                                    notesViewModel.renote(noteId)
+                                    viewModel.renote()
                                     dismiss()
                                 },
                                 icon = Icons.Default.Repeat,

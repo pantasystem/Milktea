@@ -13,10 +13,11 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
+import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.renote.CreateRenoteMultipleAccountUseCase
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -29,7 +30,8 @@ class RenoteViewModel @Inject constructor(
     val userRepository: UserRepository,
     val accountStore: AccountStore,
     val userDataSource: UserDataSource,
-    val renoteUseCase: CreateRenoteUseCase,
+    val renoteUseCase: CreateRenoteMultipleAccountUseCase,
+    val noteRelationGetter: NoteRelationGetter,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
 
@@ -48,7 +50,9 @@ class RenoteViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val note = _targetNoteId.filterNotNull().flatMapLatest {
-        noteRepository.observeOne(it)
+        noteRepository.observeOne(it).filterNotNull().map { note ->
+            noteRelationGetter.get(note).getOrNull()
+        }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
@@ -82,13 +86,15 @@ class RenoteViewModel @Inject constructor(
 
     private val accountWithUsers = combine(
         accountWithUser,
-        _selectedAccountIds
-    ) { accountWithUser, selectedIds ->
+        _selectedAccountIds,
+        note,
+    ) { accountWithUser, selectedIds, note ->
         accountWithUser.map { (account, user) ->
             AccountWithUser(
                 accountId = account.accountId,
                 user = user,
-                isSelected = selectedIds.any { id -> id == account.accountId }
+                isSelected = selectedIds.any { id -> id == account.accountId },
+                isEnable = note?.canRenote(account, user) == true,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -106,7 +112,7 @@ class RenoteViewModel @Inject constructor(
 
     private val _noteState = combine(note, _syncState) { n, s ->
         RenoteDialogViewModelTargetNoteState(
-            note = n,
+            note = n?.note,
             syncState = s
         )
     }.stateIn(
@@ -114,7 +120,7 @@ class RenoteViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         RenoteDialogViewModelTargetNoteState(
             _syncState.value,
-            note.value,
+            note.value?.note,
         )
     )
 
@@ -157,31 +163,43 @@ class RenoteViewModel @Inject constructor(
         }
     }
 
-    fun renote(noteId: Note.Id) {
+    fun renote() {
+        val noteId = _targetNoteId.value
+            ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            renoteUseCase(noteId).onSuccess {
-                _resultEvents.tryEmit(RenoteActionResultEvent.Success(
-                    it.id, RenoteActionResultEvent.Type.Renote
-                ))
+            renoteUseCase(noteId, _selectedAccountIds.value).onSuccess {
+                _resultEvents.tryEmit(
+                    RenoteActionResultEvent.Success(
+                        noteId, RenoteActionResultEvent.Type.Renote
+                    )
+                )
             }.onFailure {
-                _resultEvents.tryEmit(RenoteActionResultEvent.Failed(
-                    noteId, RenoteActionResultEvent.Type.Renote
-                ))
+                _resultEvents.tryEmit(
+                    RenoteActionResultEvent.Failed(
+                        noteId, RenoteActionResultEvent.Type.Renote
+                    )
+                )
             }
         }
     }
 
 
-    fun unRenote(noteId: Note.Id) {
+    fun unRenote() {
+        val noteId = _targetNoteId.value
+            ?: return
         viewModelScope.launch(Dispatchers.IO) {
             noteRepository.delete(noteId).onSuccess {
-                _resultEvents.tryEmit(RenoteActionResultEvent.Success(
-                    noteId, RenoteActionResultEvent.Type.UnRenote
-                ))
+                _resultEvents.tryEmit(
+                    RenoteActionResultEvent.Success(
+                        noteId, RenoteActionResultEvent.Type.UnRenote
+                    )
+                )
             }.onFailure { t ->
-                _resultEvents.tryEmit(RenoteActionResultEvent.Failed(
-                    noteId, RenoteActionResultEvent.Type.UnRenote
-                ))
+                _resultEvents.tryEmit(
+                    RenoteActionResultEvent.Failed(
+                        noteId, RenoteActionResultEvent.Type.UnRenote
+                    )
+                )
             }
         }
     }
@@ -204,6 +222,7 @@ data class AccountWithUser(
     val accountId: Long,
     val user: User,
     val isSelected: Boolean,
+    val isEnable: Boolean,
 )
 
 sealed interface RenoteActionResultEvent {
@@ -223,4 +242,29 @@ sealed interface RenoteActionResultEvent {
     enum class Type {
         Renote, UnRenote
     }
+}
+
+private fun NoteRelation.canRenote(account: Account, user: User): Boolean {
+    if (note.canRenote(user.id)) {
+        return true
+    }
+
+
+    // NOTE: 公開範囲がpublicなら可能
+    if (note.visibility is Visibility.Public && !note.visibility.isLocalOnly()) {
+        return true
+    }
+
+    // NOTE: 公開範囲がフォロワー、DMの場合は無理
+    if (note.visibility is Visibility.Followers || note.visibility is Visibility.Specified) {
+        return false
+    }
+
+    // NOTE: 同一ホストなら可能
+    if (note.visibility.isLocalOnly() && this.user.host == account.getHost()) {
+        return true
+    }
+
+    return false
+
 }

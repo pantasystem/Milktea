@@ -42,6 +42,7 @@ fun RenoteTargetAccountRowList(
                 },
                 username = it.user.displayName,
                 emojis = it.user.emojis,
+                isEnable = it.isEnable
             )
         }
     }
@@ -51,6 +52,7 @@ fun RenoteTargetAccountRowList(
 fun SelectableAvatarOnlyAccount(
     modifier: Modifier = Modifier,
     isSelected: Boolean,
+    isEnable: Boolean,
     username: String,
     avatarUrl: String,
     emojis: List<Emoji>,
@@ -80,23 +82,26 @@ fun SelectableAvatarOnlyAccount(
             val tint = MaterialTheme.colors.primary
             val background = if (isSelected) Color.White else Color.Transparent
 
-            if (isSelected) {
-                Icon(
-                    Icons.Filled.CheckCircle,
-                    contentDescription = null,
-                    tint = tint,
-                    modifier = Modifier.background(background, CircleShape)
+            if (isEnable) {
+                if (isSelected) {
+                    Icon(
+                        Icons.Filled.CheckCircle,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.background(background, CircleShape)
 
-                )
-            } else {
-                Icon(
-                    Icons.Outlined.Circle,
-                    contentDescription = null,
-                    tint = tint,
-                    modifier = Modifier.background(background, CircleShape)
-                )
+                    )
+                } else {
+                    Icon(
+                        Icons.Outlined.Circle,
+                        contentDescription = null,
+                        tint = tint,
+                        modifier = Modifier.background(background, CircleShape)
+                    )
 
+                }
             }
+
 
         }
         CustomEmojiText(text = username, emojis = emojis, maxLines = 1, fontSize = 8.sp)
@@ -112,6 +117,7 @@ fun PreviewSelectableAvatarOnlyAccount() {
         onClick = {},
         isSelected = true,
         username = "@harunon",
-        emojis = emptyList()
+        emojis = emptyList(),
+        isEnable = true,
     )
 }
