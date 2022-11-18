@@ -111,14 +111,14 @@ class RenoteViewModel @Inject constructor(
     )
 
     private val _noteState = combine(note, _syncState) { n, s ->
-        RenoteDialogViewModelTargetNoteState(
+        RenoteViewModelTargetNoteState(
             note = n?.note,
             syncState = s
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        RenoteDialogViewModelTargetNoteState(
+        RenoteViewModelTargetNoteState(
             _syncState.value,
             note.value?.note,
         )
@@ -129,7 +129,7 @@ class RenoteViewModel @Inject constructor(
         _noteState,
         accountWithUsers
     ) { noteId, syncState, accounts ->
-        RenoteDialogViewModelUiState(
+        RenoteViewModelUiState(
             targetNoteId = noteId,
             noteState = syncState,
             accounts = accounts,
@@ -137,7 +137,7 @@ class RenoteViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        RenoteDialogViewModelUiState(
+        RenoteViewModelUiState(
             _targetNoteId.value,
             _noteState.value,
             accountWithUsers.value,
@@ -194,13 +194,13 @@ class RenoteViewModel @Inject constructor(
 
 }
 
-data class RenoteDialogViewModelUiState(
+data class RenoteViewModelUiState(
     val targetNoteId: Note.Id?,
-    val noteState: RenoteDialogViewModelTargetNoteState,
+    val noteState: RenoteViewModelTargetNoteState,
     val accounts: List<AccountWithUser>,
 )
 
-data class RenoteDialogViewModelTargetNoteState(
+data class RenoteViewModelTargetNoteState(
     val syncState: ResultState<Unit>,
     val note: Note?,
 )
@@ -212,25 +212,6 @@ data class AccountWithUser(
     val isEnable: Boolean,
 )
 
-//sealed interface RenoteActionResultEvent {
-//    val noteId: Note.Id
-//    val type: Type
-//
-//    data class Success(
-//        override val noteId: Note.Id,
-//        override val type: Type
-//    ) : RenoteActionResultEvent
-//
-//    data class Failed(
-//        override val noteId: Note.Id,
-//        override val type: Type
-//    ) : RenoteActionResultEvent
-//
-//    enum class Type {
-//        Renote, UnRenote
-//    }
-//}
-
 sealed interface RenoteActionResultEvent {
     data class Renote(val result: Result<List<Result<Note>>>, val noteId: Note.Id, val accounts: List<Long>) : RenoteActionResultEvent
     data class UnRenote(val result: Result<Unit>, val noteId: Note.Id) : RenoteActionResultEvent
@@ -239,7 +220,6 @@ private fun NoteRelation.canRenote(account: Account, user: User): Boolean {
     if (note.canRenote(user.id)) {
         return true
     }
-
 
     // NOTE: 公開範囲がpublicなら可能
     if (note.visibility is Visibility.Public && !note.visibility.isLocalOnly()) {

@@ -75,11 +75,14 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
                             viewModel.renote()
                             dismiss()
                         },
+                        onDeleteRenoteButtonCLicked = {
+                            viewModel.unRenote()
+                            dismiss()
+                        },
                         onQuoteRenoteButtonClicked = {
                             notesViewModel.showQuoteNoteEditor(noteId)
                             dismiss()
-                        }) {
-                    }
+                        })
                 }
             }
         }
