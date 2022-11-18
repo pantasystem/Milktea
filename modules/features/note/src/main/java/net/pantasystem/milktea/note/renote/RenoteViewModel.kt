@@ -213,9 +213,15 @@ data class AccountWithUser(
 )
 
 sealed interface RenoteActionResultEvent {
-    data class Renote(val result: Result<List<Result<Note>>>, val noteId: Note.Id, val accounts: List<Long>) : RenoteActionResultEvent
+    data class Renote(
+        val result: Result<List<Result<Note>>>,
+        val noteId: Note.Id,
+        val accounts: List<Long>
+    ) : RenoteActionResultEvent
+
     data class UnRenote(val result: Result<Unit>, val noteId: Note.Id) : RenoteActionResultEvent
 }
+
 private fun NoteRelation.canRenote(account: Account, user: User): Boolean {
     if (note.canRenote(user.id)) {
         return true
@@ -236,6 +242,10 @@ private fun NoteRelation.canRenote(account: Account, user: User): Boolean {
         return true
     }
 
-    return false
+    // NOTE: 投稿のホストとアカウントが同一ホストかつ公開範囲の場合はRenote可能
+    if (note.visibility is Visibility.Home && this.user.host == account.getHost()) {
+        return true
+    }
 
+    return false
 }
