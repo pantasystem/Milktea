@@ -1,7 +1,5 @@
 package net.pantasystem.milktea.model.notes.renote
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.Account
@@ -29,59 +27,31 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
         accountIds: List<Long>
     ): Result<List<Result<Note>>> = runCatching {
         coroutineScope {
-
-            val relatedAccount = accountRepository.get(noteId.accountId).getOrThrow()
-
             val accounts = accountIds.map {
                 accountRepository.get(it).getOrThrow()
             }
             val note = recursiveSearchHasContentNote(noteId).getOrThrow()
-            val user = userRepository.find(note.userId)
-
-            val noteUri = note.uri ?: "https://${user.host}/notes/${note.id.noteId}"
-
-            // NOTE: 元々ノートに関連付けされていたアカウントと同一ホストでなければIdの解決を行う必要がある。
-            val accountWithResolvedNotes = resolveAccounts(noteUri, accounts.filter {
-                it.getHost() != relatedAccount.getHost()
-            })
-
-
-            val sameInstanceAccountWithNotes = accounts.filter {
-                it.getHost() == relatedAccount.getHost()
-            }.map { account ->
-                async {
-                    // NOTE: アカウントに関連づけられたNoteを探索する
-                    noteRepository.find(Note.Id(account.accountId, note.id.noteId)).getOrThrow()
-                        .let {
-                            account to it
-                        }
-                }
-            }.awaitAll()
-
-            (accountWithResolvedNotes + sameInstanceAccountWithNotes).map { (account, note) ->
-                async {
-                    renote(account, note)
-                }
-            }.awaitAll()
-        }
-
-
-    }
-
-    private suspend fun resolveAccounts(
-        noteUri: String,
-        accounts: List<Account>
-    ): List<Pair<Account, Note>> {
-        return coroutineScope {
-            accounts.map { account ->
-                async {
-                    apResolverRepository.resolve(account.accountId, noteUri).getOrThrow().let {
-                        account to (it as ApResolver.TypeNote).note
-                    }
-                }
-            }.awaitAll()
+            accounts.map {
+                resolveAndRenote(note, it.accountId)
+            }
         }
     }
+
+    private suspend fun resolveAndRenote(sourceNote: Note, accountId: Long): Result<Note> = runCatching {
+        val account = accountRepository.get(accountId).getOrThrow()
+        val relatedSourceNoteAccount = accountRepository.get(sourceNote.id.accountId).getOrThrow()
+        val user = userRepository.find(sourceNote.userId)
+        val noteUri = sourceNote.uri ?: "https://${user.host}/notes/${sourceNote.id.noteId}"
+        val relatedNote = if (account.getHost() != relatedSourceNoteAccount.getHost()) {
+            (apResolverRepository.resolve(accountId, noteUri).getOrThrow() as ApResolver.TypeNote)
+                .note
+        } else {
+            noteRepository.find(Note.Id(account.accountId, sourceNote.id.noteId)).getOrThrow()
+        }
+
+        renote(account, relatedNote).getOrThrow()
+    }
+
 
     private suspend fun renote(account: Account, note: Note): Result<Note> = runCatching {
         if (note.canRenote(User.Id(account.accountId, account.remoteId))) {
