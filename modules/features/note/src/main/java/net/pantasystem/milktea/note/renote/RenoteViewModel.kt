@@ -13,7 +13,6 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -24,7 +23,7 @@ import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class RenoteDialogViewModel @Inject constructor(
+class RenoteViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val accountRepository: AccountRepository,
     val userRepository: UserRepository,
@@ -87,9 +86,9 @@ class RenoteDialogViewModel @Inject constructor(
     ) { accountWithUser, selectedIds ->
         accountWithUser.map { (account, user) ->
             AccountWithUser(
-                account = account,
+                accountId = account.accountId,
                 user = user,
-                isSelected = selectedIds.contains(account.accountId)
+                isSelected = selectedIds.any { id -> id == account.accountId }
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -142,6 +141,7 @@ class RenoteDialogViewModel @Inject constructor(
 
     fun setTargetNoteId(noteId: Note.Id) {
         _targetNoteId.value = noteId
+        _selectedAccountIds.value = listOf(noteId.accountId)
     }
 
     fun toggleAddAccount(accountId: Long) {
@@ -201,7 +201,7 @@ data class RenoteDialogViewModelTargetNoteState(
 )
 
 data class AccountWithUser(
-    val account: Account,
+    val accountId: Long,
     val user: User,
     val isSelected: Boolean,
 )
