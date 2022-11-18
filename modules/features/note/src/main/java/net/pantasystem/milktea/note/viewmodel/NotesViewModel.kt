@@ -29,7 +29,6 @@ import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
-import net.pantasystem.milktea.model.notes.renote.CreateRenoteUseCase
 import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
@@ -43,7 +42,6 @@ class NotesViewModel @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val toggleReactionUseCase: ToggleReactionUseCase,
     private val favoriteRepository: FavoriteRepository,
-    private val renoteUseCase: CreateRenoteUseCase,
     val accountStore: AccountStore,
     val draftNoteRepository: DraftNoteRepository,
 ) : ViewModel() {
@@ -51,7 +49,6 @@ class NotesViewModel @Inject constructor(
 
     val statusMessage = EventBus<String>()
 
-    private val errorStatusMessage = EventBus<String>()
 
     val quoteRenoteTarget = EventBus<Note>()
 
@@ -74,20 +71,6 @@ class NotesViewModel @Inject constructor(
         loadNoteState(note)
     }
 
-
-    fun renote(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
-            renoteUseCase(noteId).onSuccess {
-                withContext(Dispatchers.Main) {
-                    statusMessage.event = "renoteしました"
-                }
-            }.onFailure {
-                withContext(Dispatchers.Main) {
-                    errorStatusMessage.event = "renote失敗しました"
-                }
-            }
-        }
-    }
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -191,18 +174,6 @@ class NotesViewModel @Inject constructor(
 
     }
 
-
-    fun unRenote(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
-            noteRepository.delete(noteId).onSuccess {
-                withContext(Dispatchers.Main) {
-                    statusMessage.event = "削除に成功しました"
-                }
-            }.onFailure { t ->
-                Log.d(TAG, "unrenote失敗", t)
-            }
-        }
-    }
 
     private fun loadNoteState(planeNoteViewData: PlaneNoteViewData) {
         viewModelScope.launch(Dispatchers.IO) {

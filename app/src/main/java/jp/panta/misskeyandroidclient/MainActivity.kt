@@ -38,6 +38,8 @@ import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.CreateNoteTaskExecutor
+import net.pantasystem.milktea.note.renote.RenoteResultHandler
+import net.pantasystem.milktea.note.renote.RenoteViewModel
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -77,6 +79,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     private val reportViewModel: ReportViewModel by viewModels()
 
     private val scrollToTopViewModel: ScrollToTopViewModel by viewModels()
+
+    private val renoteViewMode by viewModels<RenoteViewModel>()
 
     private lateinit var toggleNavigationDrawerDelegate: ToggleNavigationDrawerDelegate
 
@@ -133,6 +137,13 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             requestPostNotificationsPermissionLauncher = requestPermissionLauncher,
             changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView),
             configStore = settingStore
+        ).setup()
+
+        RenoteResultHandler(
+            viewModel = renoteViewMode,
+            lifecycle = lifecycle,
+            scope = lifecycleScope,
+            context = this
         ).setup()
 
         if (savedInstanceState == null) {

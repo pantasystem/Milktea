@@ -1,8 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -260,5 +259,24 @@ class NoteRepositoryImpl @Inject constructor(
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
 
+    }
+
+    override suspend fun sync(noteId: Note.Id): Result<Unit> = runCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            val note = misskeyAPIProvider.get(account).showNote(NoteRequest(
+                i = account.getI(encryption),
+                noteId = noteId.noteId
+            )).throwIfHasError().body()!!
+            noteDataSourceAdder.addNoteDtoToDataSource(account, note)
+        }
+    }
+
+    override fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>> {
+        return noteDataSource.observeIn(noteIds)
+    }
+
+    override fun observeOne(noteId: Note.Id): Flow<Note?> {
+        return noteDataSource.observeOne(noteId)
     }
 }

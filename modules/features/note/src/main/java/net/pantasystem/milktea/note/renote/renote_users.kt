@@ -24,6 +24,8 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.renote.ItemRenoteAction
+import net.pantasystem.milktea.note.renote.ItemRenoteUser
 import net.pantasystem.milktea.note.renote.RenotesViewModel
 
 

@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note.renote
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
