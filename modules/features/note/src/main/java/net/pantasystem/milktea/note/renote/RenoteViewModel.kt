@@ -157,8 +157,12 @@ class RenoteViewModel @Inject constructor(
             }
             if (isExists) {
                 accounts - accountId
-            } else {
+
+                // NOTE: 三件以上同時にRenoteするのは流石に不味そうなので三件以上同時にRenoteできないようにする。
+            } else if ((accounts.size + 1) < 3) {
                 accounts + accountId
+            } else {
+                accounts
             }
         }
     }

@@ -55,47 +55,9 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
         )
     }
 
-    val isRenotedByMe by lazy {
+    private val isRenotedByMe by lazy {
         requireArguments().getBoolean("IS_RENOTED_BY_ME", false)
     }
-
-//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-//
-//        val dialog = super.onCreateDialog(savedInstanceState)
-//        val view = View.inflate(context, R.layout.dialog_renote, null)
-//        dialog.setContentView(view)
-//        val binding = DialogRenoteBinding.bind(view)
-//        val account = accountStore.currentAccount
-//        //val requestSetting =
-//
-//
-//        if(account != null){
-//
-//            if(isRenotedByMe){
-//                binding.unRenoteBase.visibility = View.VISIBLE
-//
-//            }else{
-//                binding.unRenoteBase.visibility = View.GONE
-//            }
-//
-//            binding.unRenote.setOnClickListener {
-//                notesViewModel.unRenote(noteId)
-//                dismiss()
-//            }
-//
-//            binding.renote.setOnClickListener{
-//                notesViewModel.renote(noteId)
-//                dismiss()
-//            }
-//
-//            binding.quoteRenote.setOnClickListener {
-//                notesViewModel.showQuoteNoteEditor(noteId)
-//                dismiss()
-//            }
-//
-//        }
-//        return dialog
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,7 +98,7 @@ class RenoteBottomSheetDialog : BottomSheetDialogFragment() {
                             if (isRenotedByMe) {
                                 RenoteButtonLayout(
                                     onClick = {
-                                        notesViewModel.unRenote(noteId)
+                                        viewModel.unRenote()
                                         dismiss()
                                     },
                                     icon = Icons.Default.FormatQuote,
