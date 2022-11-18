@@ -23,4 +23,6 @@ interface NoteRepository {
 
     suspend fun syncChildren(noteId: Note.Id): Result<Unit>
 
+    suspend fun sync(noteId: Note.Id): Result<Unit>
+
 }
