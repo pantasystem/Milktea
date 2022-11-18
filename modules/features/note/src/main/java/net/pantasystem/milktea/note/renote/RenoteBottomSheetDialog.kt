@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.view
+package net.pantasystem.milktea.note.renote
 
 import android.app.Dialog
 import android.os.Bundle

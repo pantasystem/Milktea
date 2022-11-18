@@ -12,6 +12,7 @@ import net.pantasystem.milktea.note.reaction.ReactionSelectionDialog
 import net.pantasystem.milktea.note.reaction.RemoteReactionEmojiSuggestionDialog
 import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
 import net.pantasystem.milktea.note.reaction.picker.ReactionPickerDialog
+import net.pantasystem.milktea.note.renote.RenoteBottomSheetDialog
 import net.pantasystem.milktea.note.renote.RenotesBottomSheetDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
