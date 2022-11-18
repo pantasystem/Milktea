@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes
 
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 
@@ -24,5 +25,9 @@ interface NoteRepository {
     suspend fun syncChildren(noteId: Note.Id): Result<Unit>
 
     suspend fun sync(noteId: Note.Id): Result<Unit>
+
+    fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>>
+
+    fun observeOne(noteId: Note.Id): Flow<Note?>
 
 }
