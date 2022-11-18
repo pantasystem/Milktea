@@ -170,20 +170,12 @@ class RenoteViewModel @Inject constructor(
     fun renote() {
         val noteId = _targetNoteId.value
             ?: return
+        val accountIds = _selectedAccountIds.value
         viewModelScope.launch(Dispatchers.IO) {
-            renoteUseCase(noteId, _selectedAccountIds.value).onSuccess {
-                _resultEvents.tryEmit(
-                    RenoteActionResultEvent.Success(
-                        noteId, RenoteActionResultEvent.Type.Renote
-                    )
-                )
-            }.onFailure {
-                _resultEvents.tryEmit(
-                    RenoteActionResultEvent.Failed(
-                        noteId, RenoteActionResultEvent.Type.Renote
-                    )
-                )
-            }
+            val result = renoteUseCase(noteId, accountIds)
+            _resultEvents.tryEmit(
+                RenoteActionResultEvent.Renote(result, noteId, accountIds)
+            )
         }
     }
 
@@ -192,19 +184,10 @@ class RenoteViewModel @Inject constructor(
         val noteId = _targetNoteId.value
             ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            noteRepository.delete(noteId).onSuccess {
-                _resultEvents.tryEmit(
-                    RenoteActionResultEvent.Success(
-                        noteId, RenoteActionResultEvent.Type.UnRenote
-                    )
-                )
-            }.onFailure { t ->
-                _resultEvents.tryEmit(
-                    RenoteActionResultEvent.Failed(
-                        noteId, RenoteActionResultEvent.Type.UnRenote
-                    )
-                )
-            }
+            val result = noteRepository.delete(noteId)
+            _resultEvents.tryEmit(
+                RenoteActionResultEvent.UnRenote(result, noteId = noteId)
+            )
         }
     }
 
@@ -229,25 +212,29 @@ data class AccountWithUser(
     val isEnable: Boolean,
 )
 
+//sealed interface RenoteActionResultEvent {
+//    val noteId: Note.Id
+//    val type: Type
+//
+//    data class Success(
+//        override val noteId: Note.Id,
+//        override val type: Type
+//    ) : RenoteActionResultEvent
+//
+//    data class Failed(
+//        override val noteId: Note.Id,
+//        override val type: Type
+//    ) : RenoteActionResultEvent
+//
+//    enum class Type {
+//        Renote, UnRenote
+//    }
+//}
+
 sealed interface RenoteActionResultEvent {
-    val noteId: Note.Id
-    val type: Type
-
-    data class Success(
-        override val noteId: Note.Id,
-        override val type: Type
-    ) : RenoteActionResultEvent
-
-    data class Failed(
-        override val noteId: Note.Id,
-        override val type: Type
-    ) : RenoteActionResultEvent
-
-    enum class Type {
-        Renote, UnRenote
-    }
+    data class Renote(val result: Result<List<Result<Note>>>, val noteId: Note.Id, val accounts: List<Long>) : RenoteActionResultEvent
+    data class UnRenote(val result: Result<Unit>, val noteId: Note.Id) : RenoteActionResultEvent
 }
-
 private fun NoteRelation.canRenote(account: Account, user: User): Boolean {
     if (note.canRenote(user.id)) {
         return true
