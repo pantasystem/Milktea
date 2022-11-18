@@ -1,67 +1,104 @@
 package net.pantasystem.milktea.note.renote
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.common_compose.CustomEmojiText
+import net.pantasystem.milktea.model.emoji.Emoji
 
 @Composable
 fun RenoteTargetAccountRowList(
-    accounts: List<AccountWithUser>
+    modifier: Modifier = Modifier,
+    accounts: List<AccountWithUser>,
+    onClick: (Long) -> Unit,
 ) {
-
+    Row(
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        accounts.forEach {
+            SelectableAvatarOnlyAccount(
+                isSelected = it.isSelected,
+                avatarUrl = it.user.avatarUrl ?: "",
+                onClick = {
+                    onClick(it.accountId)
+                },
+                username = it.user.displayName,
+                emojis = it.user.emojis,
+            )
+        }
+    }
 }
 
 @Composable
 fun SelectableAvatarOnlyAccount(
     modifier: Modifier = Modifier,
     isSelected: Boolean,
+    username: String,
     avatarUrl: String,
+    emojis: List<Emoji>,
     onClick: () -> Unit,
 ) {
-    Box(
-        modifier = modifier.padding(4.dp),
-        contentAlignment = Alignment.TopEnd,
+    Column(
+        modifier = modifier.width(56.dp).padding(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Box(
 
-        Image(
-            painter = rememberAsyncImagePainter(avatarUrl),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(48.dp)
-                .clickable { onClick() }
-        )
-        if (isSelected) {
-            Icon(
-                Icons.Default.CheckCircle,
+            contentAlignment = Alignment.TopEnd,
+        ) {
+
+            Image(
+                painter = rememberAsyncImagePainter(avatarUrl),
                 contentDescription = null,
-                tint = MaterialTheme.colors.primary
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(48.dp)
+                    .clickable { onClick() }
+                    .background(Color.Black)
             )
-        } else {
-            Icon(
-                Icons.Default.CheckCircleOutline,
-                contentDescription = null,
-                tint = MaterialTheme.colors.primary
-            )
+            val tint = MaterialTheme.colors.primary
+            val background = if (isSelected) Color.White else Color.Transparent
+
+            if (isSelected) {
+                Icon(
+                    Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.background(background, CircleShape)
+
+                )
+            } else {
+                Icon(
+                    Icons.Outlined.Circle,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.background(background, CircleShape)
+                )
+
+            }
+
         }
+        CustomEmojiText(text = username, emojis = emojis, maxLines = 1, fontSize = 8.sp)
     }
+
 }
 
 @Composable
@@ -70,6 +107,8 @@ fun PreviewSelectableAvatarOnlyAccount() {
     SelectableAvatarOnlyAccount(
         avatarUrl = "",
         onClick = {},
-        isSelected = true
+        isSelected = true,
+        username = "@harunon",
+        emojis = emptyList()
     )
 }
