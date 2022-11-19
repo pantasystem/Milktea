@@ -2,13 +2,13 @@
 <resources>
     <string name="time_machine">回到未来</string>
     <string name="dialog_timemachine_message">请指定您要显示的时间线的时间</string>
-    <string name="show_error">Show Error</string>
+    <string name="show_error">显示错误</string>
 
     <string name="timeout_error">超时</string>
     <string name="server_error">服务器错误</string>
     <string name="bot_error">你是人类吗？</string>
     <string name="auth_error">用户身份验证错误</string>
     <string name="parameter_error">参数错误</string>
-    <string name="timeline_unauthorized_error">未認証エラー</string>
+    <string name="timeline_unauthorized_error">未认证错误（Unauthorized）</string>
     <string name="reauthenticate">重新认证</string>
 </resources>
