@@ -47,7 +47,7 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
     return this.copy(
         reactionCounts = list,
         myReaction = if(e.body.userId == account.remoteId) e.body.reaction else this.myReaction,
-        emojis = emojis
+        emojis = emojis?.distinct()
     )
 }
 
