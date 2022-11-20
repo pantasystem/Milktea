@@ -19,8 +19,7 @@ fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
 
     return this.copy(
         reactionCounts = newList,
-        myReaction = if(e.body.userId == account.remoteId) null else e.body.reaction
-
+        myReaction = if(e.body.userId == account.remoteId) null else this.myReaction
     )
 }
 
