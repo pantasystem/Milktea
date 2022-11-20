@@ -2,7 +2,7 @@
     "title": {
         "follow": "Followed",
         "mention": "Mentioned by {{name}}",
-        "reply": "Replyed by {{name}}",
+        "reply": "Replied by {{name}}",
         "renote": "Renoted by {{name}",
         "quote": "Quoted by {{name}}",
         "reaction": "{{reaction}}:{{name}}",
