@@ -108,6 +108,8 @@ class NoteEditorViewModel @Inject constructor(
 
     val textRemaining = combine(maxTextLength, state.map { it.text }) { max, t ->
         max - (t?.codePointCount(0, t.length) ?: 0)
+    }.catch {
+        logger.error("observe meta error", it)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val maxFileCount = accountStore.observeCurrentAccount.filterNotNull().mapNotNull {
