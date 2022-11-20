@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sensitive">敏感内容</string>
+
     <string name="future">未来</string>
     <string name="now">现在</string>
     <string name="year_ago">年</string>
