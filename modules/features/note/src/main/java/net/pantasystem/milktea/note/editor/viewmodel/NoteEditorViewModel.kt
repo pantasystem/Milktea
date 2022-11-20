@@ -28,7 +28,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.instance.MetaDataSource
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -44,7 +44,7 @@ class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val metaRepository: MetaDataSource,
+    private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
     private val accountStore: AccountStore,
     private val createNoteTaskExecutor: CreateNoteTaskExecutor,
@@ -98,8 +98,12 @@ class NoteEditorViewModel @Inject constructor(
     }.asLiveData()
 
 
-    val maxTextLength = accountStore.observeCurrentAccount.filterNotNull().map {
-        metaRepository.get(it.instanceDomain)?.maxNoteTextLength ?: 1500
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val maxTextLength = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+        metaRepository.observe(account.instanceDomain).filterNotNull().map { meta ->
+            meta.maxNoteTextLength ?: 1500
+        }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val textRemaining = combine(maxTextLength, state.map { it.text }) { max, t ->
