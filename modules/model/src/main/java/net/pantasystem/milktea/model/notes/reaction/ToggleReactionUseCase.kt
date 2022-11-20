@@ -2,7 +2,7 @@ package net.pantasystem.milktea.model.notes.reaction
 
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.instance.FetchMeta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
@@ -20,7 +20,7 @@ class ToggleReactionUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
     private val reactionHistoryDao: ReactionHistoryDao,
     private val getAccount: GetAccount,
-    private val fetchMeta: FetchMeta,
+    private val metaRepository: MetaRepository,
     private val checkEmoji: CheckEmoji,
 ) : UseCase {
 
@@ -31,7 +31,7 @@ class ToggleReactionUseCase @Inject constructor(
             val sendReaction =
                 if (
                     checkEmoji.checkEmoji(reaction)
-                    || fetchMeta.fetch(account.instanceDomain)
+                    || metaRepository.find(account.instanceDomain).getOrThrow()
                         .isOwnEmojiBy(reactionObj)
                     || LegacyReaction.reactionMap.containsKey(reaction)
                 ) {

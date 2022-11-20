@@ -1,7 +1,8 @@
-package net.pantasystem.milktea.model.instance
+package net.pantasystem.milktea.data.infrastructure.instance
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.model.instance.Meta
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -98,12 +98,18 @@ class NoteEditorViewModel @Inject constructor(
     }.asLiveData()
 
 
-    val maxTextLength = accountStore.observeCurrentAccount.filterNotNull().map {
-        metaRepository.get(it.instanceDomain)?.maxNoteTextLength ?: 1500
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val maxTextLength = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+        metaRepository.observe(account.instanceDomain).filterNotNull().map { meta ->
+            meta.maxNoteTextLength ?: 1500
+        }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val textRemaining = combine(maxTextLength, state.map { it.text }) { max, t ->
         max - (t?.codePointCount(0, t.length) ?: 0)
+    }.catch {
+        logger.error("observe meta error", it)
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     val maxFileCount = accountStore.observeCurrentAccount.filterNotNull().mapNotNull {
@@ -451,7 +457,7 @@ class NoteEditorViewModel @Inject constructor(
                 } catch (e: Exception) {
                     logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
 
             } catch (e: NullPointerException) {
                 logger.error("下書き保存に失敗した", e)

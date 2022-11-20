@@ -4,8 +4,8 @@ import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.generateEmptyNote
@@ -57,10 +57,10 @@ class ToggleReactionUseCaseTest {
                 get(any())
             } doReturn account
         }
-        val fetchMeta = mock<FetchMeta> {
+        val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                fetch(account.instanceDomain)
-            } doReturn meta
+                find(account.instanceDomain)
+            } doReturn Result.success(meta)
         }
 
         val checkEmoji = mock<CheckEmoji> {
@@ -72,7 +72,7 @@ class ToggleReactionUseCaseTest {
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = fetchMeta,
+            metaRepository = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = checkEmoji
         )
@@ -127,10 +127,10 @@ class ToggleReactionUseCaseTest {
                 get(any())
             } doReturn account
         }
-        val fetchMeta = mock<FetchMeta> {
+        val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                fetch(account.instanceDomain)
-            } doReturn meta
+                find(account.instanceDomain)
+            } doReturn Result.success(meta)
         }
 
         val checkEmoji = mock<CheckEmoji> {
@@ -142,7 +142,7 @@ class ToggleReactionUseCaseTest {
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = fetchMeta,
+            metaRepository = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = checkEmoji
         )
@@ -201,10 +201,10 @@ class ToggleReactionUseCaseTest {
                 get(any())
             } doReturn account
         }
-        val fetchMeta = mock<FetchMeta> {
+        val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                fetch(account.instanceDomain)
-            } doReturn meta
+                find(account.instanceDomain)
+            } doReturn Result.success(meta)
         }
         val checkEmoji = mock<CheckEmoji> {
             onBlocking {
@@ -214,7 +214,7 @@ class ToggleReactionUseCaseTest {
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = fetchMeta,
+            metaRepository = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = checkEmoji
         )
@@ -264,15 +264,15 @@ class ToggleReactionUseCaseTest {
                 get(any())
             } doReturn account
         }
-        val fetchMeta = mock<FetchMeta> {
+        val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                fetch(account.instanceDomain)
-            } doReturn meta
+                find(account.instanceDomain)
+            } doReturn Result.success(meta)
         }
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = fetchMeta,
+            metaRepository = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = mock {
                 onBlocking {
@@ -325,15 +325,15 @@ class ToggleReactionUseCaseTest {
                 get(any())
             } doReturn account
         }
-        val fetchMeta = mock<FetchMeta> {
+        val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                fetch(account.instanceDomain)
-            } doReturn meta
+                find(account.instanceDomain)
+            } doReturn Result.success(meta)
         }
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = fetchMeta,
+            metaRepository = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = mock {
                 onBlocking {
@@ -387,15 +387,15 @@ class ToggleReactionUseCaseTest {
                 get(any())
             } doReturn account
         }
-        val fetchMeta = mock<FetchMeta> {
+        val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                fetch(account.instanceDomain)
-            } doReturn meta
+                find(account.instanceDomain)
+            } doReturn Result.success(meta)
         }
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
-            fetchMeta = fetchMeta,
+            metaRepository = fetchMeta,
             reactionHistoryDao = reactionHistoryDao,
             checkEmoji = mock {
                 onBlocking {

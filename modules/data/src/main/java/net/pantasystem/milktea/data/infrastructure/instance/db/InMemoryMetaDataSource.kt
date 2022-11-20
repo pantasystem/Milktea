@@ -1,14 +1,14 @@
 package net.pantasystem.milktea.data.infrastructure.instance.db
 
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaDataSource
 
-class InMemoryMetaRepository : MetaRepository {
+class InMemoryMetaDataSource : MetaDataSource {
 
     private val instanceDomainAndMeta = MutableStateFlow(emptyMap<String, Meta>())
     private val lock = Mutex()

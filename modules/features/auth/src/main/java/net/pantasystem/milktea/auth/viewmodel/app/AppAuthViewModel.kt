@@ -22,8 +22,8 @@ import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
-import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import java.util.regex.Pattern
 import javax.inject.Inject
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp as CreateTootApp
@@ -53,7 +53,7 @@ class AppAuthViewModel @Inject constructor(
     private val customAuthStore: CustomAuthStore,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val metaStore: FetchMeta,
+    private val metaReopsitory: MetaRepository,
     private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
     loggerFactory: Logger.Factory,
     accountRepository: AccountRepository,
@@ -160,9 +160,7 @@ class AppAuthViewModel @Inject constructor(
                 runCatching {
                     coroutineScope {
                         val misskey = withContext(Dispatchers.IO) {
-                            runCatching {
-                                metaStore.fetch(url)
-                            }.onFailure {
+                            metaReopsitory.find(url).onFailure {
                                 Log.e("AppAuthViewModel", "fetch meta error", it)
                             }.getOrNull()
                         }
