@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.instance
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.instance.Meta
@@ -16,25 +19,32 @@ class MetaRepositoryImpl @Inject constructor(
 ): MetaRepository {
 
     override suspend fun sync(instanceDomain: String): Result<Unit> = runCatching {
-        val meta = fetch(instanceDomain)
-        metaDataSource.add(meta)
-        metaCache.put(instanceDomain, meta)
+        withContext(Dispatchers.IO) {
+            val meta = fetch(instanceDomain)
+            metaDataSource.add(meta)
+            metaCache.put(instanceDomain, meta)
+            misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
+        }
     }
 
     override suspend fun find(instanceDomain: String): Result<Meta> = runCatching {
-        val cacheMeta = metaCache.get(instanceDomain)
-        if (cacheMeta != null) {
-            return@runCatching cacheMeta
+        withContext(Dispatchers.IO) {
+            val cacheMeta = metaCache.get(instanceDomain)
+            if (cacheMeta != null) {
+                return@withContext cacheMeta
+            }
+            val localMeta = metaDataSource.get(instanceDomain)
+            if (localMeta == null) {
+                val meta = fetch(instanceDomain)
+                metaDataSource.add(meta)
+            } else {
+                localMeta
+            }.also { meta ->
+                metaCache.put(instanceDomain, meta)
+                misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
+            }
         }
-        val localMeta = metaDataSource.get(instanceDomain)
-        if (localMeta == null) {
-            val meta = fetch(instanceDomain)
-            metaCache.put(instanceDomain, meta)
-            metaDataSource.add(meta)
-        } else {
-            metaCache.put(instanceDomain, localMeta)
-            localMeta
-        }
+
     }
 
     override fun get(instanceDomain: String): Meta? {
@@ -42,7 +52,12 @@ class MetaRepositoryImpl @Inject constructor(
     }
 
     override fun observe(instanceDomain: String): Flow<Meta?> {
-        return metaDataSource.observe(instanceDomain)
+        return metaDataSource.observe(instanceDomain).onEach { meta ->
+            if (meta != null) {
+                metaCache.put(instanceDomain, meta)
+                misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
+            }
+        }
     }
 
     private suspend fun fetch(instanceDomain: String): Meta {
