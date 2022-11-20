@@ -29,7 +29,6 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.instance.FetchMeta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ColorSettingStore
 import javax.inject.Inject
@@ -44,8 +43,6 @@ class MiApplication : Application() {
     @Inject
     internal lateinit var mSettingStore: SettingStore
 
-    @Inject
-    internal lateinit var mFetchMeta: FetchMeta
 
     private lateinit var sharedPreferences: SharedPreferences
 
