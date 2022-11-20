@@ -24,27 +24,25 @@ fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
 }
 
 fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
-    var hasItem = false
+    val hasItem = this.reactionCounts.any { count ->
+        count.reaction == e.body.reaction
+    }
     var list = this.reactionCounts.map { count ->
         if(count.reaction == e.body.reaction) {
-            hasItem = true
             count.copy(count = count.count + 1)
         }else{
             count
         }
     }
+
     if(!hasItem) {
-        val added = list.toMutableList()
-        added.add(ReactionCount(reaction = e.body.reaction, count = 1))
-        list = added
+        list = list + ReactionCount(reaction = e.body.reaction, count = 1)
     }
-    val emojis = e.body.emoji?.let {
-        this.emojis?.let {
-            it.toMutableList().also { eList ->
-                eList.add(e.body.emoji!!)
-            }
-        }
-    }?: this.emojis
+
+    val emojis =when (val emoji = e.body.emoji) {
+        null -> this.emojis
+        else -> (this.emojis ?: emptyList()) + emoji
+    }
 
     return this.copy(
         reactionCounts = list,
