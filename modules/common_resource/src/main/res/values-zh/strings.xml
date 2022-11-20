@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Milktea</string>
-    <string name="navigation_drawer_open">打开导引栏抽屉</string>
-    <string name="navigation_drawer_close">关闭导引栏抽屉</string>
+    <string name="navigation_drawer_open">打开导航栏抽屉</string>
+    <string name="navigation_drawer_close">关闭导航栏抽屉</string>
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">导引栏页首</string>
+    <string name="nav_header_desc">导航栏页首</string>
     <string name="action_settings">设置</string>
 
     <string name="menu_home">主页</string>
@@ -15,22 +15,22 @@
     <string name="menu_send">发送</string>
     <string name="search">搜索</string>
     <string name="notification">通知</string>
-    <string name="message">讯息</string>
+    <string name="message">消息</string>
     <string name="start_auth">用户身份验证</string>
     <string name="selecting_instance">选中的实例</string>
 <!--    <string name="welcome">欢迎</string>-->
 <!--    <string name="san">先生 / 女士</string>-->
     <string name="following">关注中</string>
     <string name="follower">关注者</string>
-    <string name="renote">转帖</string>
-    <string name="quote_renote">引用转帖</string>
+    <string name="renote">转发</string>
+    <string name="quote_renote">引用转发</string>
     <string name="discovery">发现</string>
-    <string name="renote_was">转帖</string>
+    <string name="renote_was">转发</string>
     <string name="input_custom_emoji">自定义表情</string>
     <string name="title_activity_settings">设置</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">讯息</string>
+    <string name="messages_header">消息</string>
     <string name="sync_header">同步</string>
 
     <!-- Messages Preferences -->
@@ -40,17 +40,17 @@
     <!-- Sync Preferences -->
     <string name="sync_title">定期同步</string>
     <string name="attachment_title">下载附件</string>
-    <string name="attachment_summary_on">自动下载附件</string>
-    <string name="attachment_summary_off">手动下载附件</string>
+    <string name="attachment_summary_on">自动</string>
+    <string name="attachment_summary_off">手动</string>
     <string name="setting">设置</string>
-    <string name="nav_like">喜欢的</string>
+    <string name="nav_like">收藏</string>
     <string name="nav_list">列表</string>
-    <string name="nav_cloud">云盘</string>
+    <string name="nav_cloud">网盘</string>
     <string name="nav_setting_tab">选项卡设置</string>
     <string name="add_search">添加搜索</string>
     <string name="save_setting">保存设置</string>
-    <string name="tab_selected">已选择的</string>
-    <string name="tab_selectable">从下方区域选择</string>
+    <string name="tab_selected">已添加</string>
+    <string name="tab_selectable">从下方添加</string>
     <string name="title_featured">热门</string>
 
 <!--    <string name="create_folder">创建文件夹</string>-->
@@ -63,44 +63,44 @@
     <string name="cw_hint">注释（选填）</string>
     <string name="show_reply">显示回复</string>
     <string name="show_conversation">查看对话</string>
-    <string name="copy_url">复制帖文链接</string>
+    <string name="copy_url">复制链接</string>
     <string name="copy_content">复制内容</string>
     <string name="show_detail">详细</string>
-    <string name="favorite">喜爱</string>
-    <string name="remove_favorite">移出喜爱</string>
+    <string name="favorite">收藏</string>
+    <string name="remove_favorite">移出收藏</string>
     <string name="remove">移除</string>
 
-    <string name="pin">置顶帖文</string>
+    <string name="pin">置顶</string>
     <string name="media">媒体</string>
     <string name="follow">关注</string>
 
     <string name="include_local_renotes">在时间线上显示本地转帖</string>
-    <string name="include_renoted_my_notes">在时间线上显示被转帖的帖文</string>
+    <string name="include_renoted_my_notes">在时间线上显示被转帖的帖子</string>
     <string name="include_my_renotes">在时间线上显示你的转帖</string>
     <string name="auto_load_timeline">自动加载时间线</string>
     <string name="timeline">时间线</string>
 
-    <string name="capture_note_when_stopped">退出时获取帖文</string>
-    <string name="auto_load_when_stopped">退出时自动加载时间线</string>
+    <string name="capture_note_when_stopped">即使实例停止也自动加载帖子</string>
+    <string name="auto_load_when_stopped">即使实例停止也自动加载时间轴</string>
     <string name="sync">同步</string>
 
-    <string name="movement">动向</string>
-    <string name="remove_note">删除帖文</string>
+    <string name="movement">同步中</string>
+    <string name="remove_note">删除帖子</string>
 
-    <string name="hide_removed_note">隐藏已删除的帖文</string>
+    <string name="hide_removed_note">隐藏已删除的帖子</string>
 
-    <string name="appearance">个性化</string>
+    <string name="appearance">外观</string>
     <string name="theme">主题</string>
     <string name="theme_white">亮色</string>
-    <string name="theme_black">黑暗</string>
-    <string name="theme_dark">昏暗</string>
+    <string name="theme_black">黑色</string>
+    <string name="theme_dark">暗色</string>
     <string name="theme_bread">薄饼</string>
 
     <string name="title_activity_media">媒体活动</string>
     <string name="dummy_button">虚拟按钮</string>
     <string name="dummy_content">虚拟\n内容</string>
 
-    <string name="sensitive_content">NSFW信息</string>
+    <string name="sensitive_content">敏感内容</string>
 
     <string name="thumbnail">缩略图</string>
     <string name="play_media">播放</string>
@@ -113,6 +113,7 @@
     <string name="mention_by">被 %s 提及</string>
     <string name="reacted_by">被 %s 回应</string>
     <string name="renoted_by">被 %s 转帖</string>
+    <string name="follow_requested_by">收到来自 %s 的关注请求</string>
     <string name="poll_ended">投票结束</string>
 
     <string name="input_message">有什么新鲜事?</string>
@@ -120,34 +121,34 @@
     <string name="manifest_user_name_pattern">&quot;@&quot;\w([\w-]*\w)?(?:@[\w.\-]+\w)?</string>
     <string name="followee_state">已关注</string>
     <string name="mute">静音</string>
-    <string name="block">屏蔽</string>
+    <string name="block">拉黑</string>
     <string name="unmute">取消静音</string>
-    <string name="unblock">取消屏蔽</string>
+    <string name="unblock">取消拉黑</string>
 
     <string name="add_to_tab">添加至标签栏</string>
 
-    <string name="detail">详细</string>
+    <string name="detail">详情</string>
 
-    <string name="instance_domain">实例域名</string>
+    <string name="instance_domain">实例 URL</string>
     <string name="sign_in">登录</string>
     <string name="user_name">用户名</string>
     <string name="password">密码</string>
     <string name="sign_out">登出</string>
-    <string name="token">Token 令牌</string>
+    <string name="token">令牌</string>
 
-    <string name="add_app">添加 app</string>
+    <string name="add_app">添加应用</string>
     <string name="selected_account">选中的账号</string>
-    <string name="selected_app">选中的 app</string>
-    <string name="custom_app">自定义 app</string>
+    <string name="selected_app">选中的应用</string>
+    <string name="custom_app">自定义应用</string>
 
-    <string name="custom_app_name">App 名称</string>
+    <string name="custom_app_name">应用名称</string>
     <string name="custom_app_description">应用概述</string>
 
-    <string name="your_app_name">自定义 app 名称</string>
+    <string name="your_app_name">自定义应用名称</string>
     <string name="description_of_app_description">在用户身份验证时显示</string>
     <string name="create">创建</string>
 
-    <string name="auth_failed">认证失败</string>
+    <string name="auth_failed">失败</string>
     <string name="expired">过期</string>
 
     <string name="auth_required">需要用户进行身份验证</string>
@@ -161,11 +162,11 @@
 
     <string name="visibility_public">公开</string>
     <string name="visibility_home">主页</string>
-    <string name="visibility_follower">仅关注</string>
+    <string name="visibility_follower">仅关注者</string>
     <string name="visibility_specified">私信</string>
-    <string name="visibility_public_local_only">公开(本地)</string>
-    <string name="visibility_home_local_only">主页(本地)</string>
-    <string name="visibility_follower_local_only">仅关注(本地)</string>
+    <string name="visibility_public_local_only">公开（本地）</string>
+    <string name="visibility_home_local_only">主页（本地）</string>
+    <string name="visibility_follower_local_only">仅关注者（本地）</string>
 
     <string name="show">展示</string>
     <string name="user_list">用户列表</string>
@@ -177,7 +178,7 @@
 
     <string name="host">主机</string>
     <string name="select_user">选择用户</string>
-    <string name="selecting_users">选中用户</string>
+    <string name="selecting_users">选择用户</string>
     <string name="https">https://</string>
     <string name="conversation">会话</string>
     <string name="add_address">添加地址</string>
@@ -206,21 +207,21 @@
     <string name="license">许可</string>
     <string name="standard_reaction">标准回应</string>
     <string name="set_the_reaction_displayed_in_the_reaction_picker">设置常用回应</string>
-    <string name="reaction_picker">回应待选</string>
-    <string name="list_picker">列出待选</string>
-    <string name="simple_picker">简单待选</string>
+    <string name="reaction_picker">回应选择器</string>
+    <string name="list_picker">列表选择器</string>
+    <string name="simple_picker">简单选择器</string>
     <string name="enter_reaction">输入回应</string>
-    <string name="click_to_delete_the_reaction">点击删除回应</string>
-    <string name="confirm_delete_reaction">确认删除回应</string>
-    <string name="delete_reaction">删除回应</string>
+    <string name="click_to_delete_the_reaction">点击以移除回应</string>
+    <string name="confirm_delete_reaction">确认移除回应</string>
+    <string name="delete_reaction">移除回应</string>
     <string name="user">用户</string>
     <string name="note_opacity">帖文不透明度</string>
-    <string name="transparent">透明度</string>
-    <string name="opaque">不透明度</string>
+    <string name="transparent">透明</string>
+    <string name="opaque">不透明</string>
     <string name="background_image">背景图片</string>
     <string name="hide_bottom_navigation">隐藏底部菜单</string>
     <string name="user_name_as_default_display_name">将用户名设置为默认显示名称</string>
-    <string name="successfully_created_the_app">成功创建 App</string>
+    <string name="successfully_created_the_app">成功创建应用</string>
     <string name="continue_auth">继续</string>
 
     <string name="home_timeline">主页</string>
@@ -230,7 +231,7 @@
     <string name="mention">提及</string>
     <string name="add_tab">添加选项卡</string>
     <string name="list">列表</string>
-    <string name="tag">主题标签</string>
+    <string name="tag">话题标签</string>
     <string name="featured">特色</string>
     <string name="antenna">天线</string>
     <string name="rename">重命名</string>
@@ -239,7 +240,7 @@
 
     <string name="update_timeline_in_background">在后台更新时间线</string>
 
-    <string name="edit_tab_name">编辑 选项卡 名称</string>
+    <string name="edit_tab_name">编辑选项卡名称</string>
 
     <string name="follow_request_accepted_by">关注请求已被 %s 接受</string>
     <string name="confirm_deletion">确认删除</string>
@@ -253,7 +254,7 @@
     <string name="notes_from_users_in_the_specified_group">来自特定群组的帖文</string>
     <string name="include_replies">包含回复</string>
     <string name="keywords_to_receive">想要收到的关键词</string>
-    <string name="keyword_input_method">用空格分隔表示"与", 用换行分隔表示"或"。</string>
+    <string name="keyword_input_method">用空格分隔表示“与”, 用换行分隔表示“或”。</string>
     <string name="keywords_to_exclude">要排除的关键词</string>
     <string name="case_sensitive">大小写敏感</string>
     <string name="notify_notes">当有新帖文时提醒</string>
@@ -286,42 +287,41 @@
     <string name="please_again_to_finish">再按一次关闭</string>
 
     <string name="url_preview">链接内容预览</string>
-    <string name="summaly_server_url">中继服务器 URL</string>
-    <string name="displayed_url_preview">URL 预览样式</string>
+    <string name="summaly_server_url">预览服务器 URL</string>
+    <string name="displayed_url_preview">URL 预览</string>
     <string name="preview_display_test">测试预览样式</string>
     <string name="test_url">测试 URL</string>
     <string name="from_misskey_api">使用 Misskey API</string>
-    <string name="specify_summaly_server">指定中继服务器</string>
+    <string name="specify_summaly_server">指定预览服务器</string>
     <string name="use_app_implementation_deprecated">使用自带实现（已被弃用）</string>
 
     <string name="use_simple_editor">使用简易编辑器</string>
     <string name="retry">重试</string>
-    <string name="failed_to_get_the_note">帖文获取失败</string>
+    <string name="failed_to_get_the_note">获取帖文失败</string>
 
 
     <string name="refresh">刷新</string>
 
-    <string name="long_text">由于太长已为你自动折叠（文本量：%d）</string>
-    <string name="show_more">显示更多（数量：%d）</string>
+    <string name="long_text">由于太长已为你自动折叠（长度：%d）</string>
+    <string name="show_more">显示更多（长度：%d）</string>
     <string name="hide">隐藏</string>
     <string name="text_length_limit">文本长度限制</string>
-    <string name="returns_limit">回报限制</string>
-    <string name="height_limit">Height limit</string>
-    <string name="disable_height_limit">Disable height limit</string>
+    <string name="returns_limit">换行限制（自动折叠帖子）</string>
+    <string name="height_limit">高度限制</string>
+    <string name="disable_height_limit">禁用高度限制</string>
     <string name="auto_note_folding">自动折叠帖文</string>
     <string name="add_to_list">添加至列表</string>
     <string name="promotion">晋升</string>
     <string name="waiting_4_approval">正在等待批准</string>
 <!--    <string name="i_have_approved">我已批准的</string>-->
 <!--    <string name="waiting_4_u_to_approve">等待批准</string>-->
-    <string name="learn_note_visibility">帖文可见性</string>
+    <string name="learn_note_visibility">记住帖文可见性</string>
     <string name="accept">接受</string>
     <string name="reject">拒绝</string>
-    <string name="follow_requested_by">收到来自 %s 的关注请求</string>
     <string name="local">本地</string>
     <string name="add_user_list">添加用户列表</string>
     <string name="edit_note">编辑帖文</string>
-    <string name="gallery_favorite_button">相册喜爱按钮</string>
+    <string name="gallery_favorite_button">相册收藏按钮</string>
     <string name="popular_posts">流行趋势</string>
     <string name="gallery">相册</string>
     <string name="my_posts">我的帖文</string>
@@ -336,7 +336,7 @@
     <string name="description">描述</string>
     <string name="pick_image">选择图片</string>
     <string name="pick_image_from_device">从设备中选取图片</string>
-    <string name="pick_image_from_drive">从云盘中选取图片</string>
+    <string name="pick_image_from_drive">从网盘中选取图片</string>
     <string name="successfully_created_note">成功创建帖文</string>
     <string name="sensitive">敏感内容</string>
 <!--    <string name="authentication_url">用户身份验证 URL</string>-->
@@ -344,11 +344,11 @@
     <string name="request_follow">%s 请求关注你</string>
 
     <string name="copied_to_clipboard">已复制到剪贴板</string>
-    <string name="follow_approval_pending">待处理的关注请求</string>
+    <string name="follow_approval_pending">等待关注批准</string>
     <string name="request_follow_from_u">请求关注</string>
     <string name="unfollow">取消关注</string>
     <string name="unknown_notification">未知的提醒</string>
-    <string name="unknown_notification_msg" formatted="false">未知的提醒。请截图并报告给开发者。通知id：%s，类型：%s，发送者ID：%s,</string>
+    <string name="unknown_notification_msg" formatted="false">未知的提醒。请截图并报告给开发者。notificationId:%s, type:%s, senderID:%s,</string>
 
     <string name="translated_from_s">翻译自 %s： \n</string>
     <string name="error_s">发生错误: %s</string>
@@ -357,14 +357,14 @@
     <string name="send">发送</string>
     <string name="successful_report">举报成功</string>
     <string name="report_failed">举报失败</string>
-    <string name="mark_as_nsfw">将内容标记为NSFW</string>
+    <string name="mark_as_nsfw">标记为NSFW</string>
     <string name="undo_nsfw">取消NSFW标签</string>
 <!--    <string name="file_deletion_confirmation">确认删除</string>-->
     <string name="cancel">取消</string>
 <!--    <string name="do_u_want_2_delete_s">你确定要删除 %s 吗？</string>-->
     <string name="remove_attachment">删除附件</string>
-    <string name="warning_s">警告:%s</string>
-    <string name="reservation_at">自动发布的日期和时间</string>
+    <string name="warning_s">警告：%s</string>
+    <string name="reservation_at">自动发布日期和时间</string>
     <string name="warning_reservation_msg">可能不会按照预期的时间发布</string>
     <string name="create_mention">创建提及</string>
     <string name="change_nickname">更改昵称</string>
@@ -378,22 +378,22 @@
 
 <!--    <string name="edit_caption">编辑标题</string>-->
 <!--    <string name="input_caption">输入标题</string>-->
-    <string name="animation">头像图标动画</string>
+    <string name="animation">动画</string>
     <string name="avatar_icon_animation">头像图标动画</string>
-    <string name="security_setting">Security</string>
+    <string name="security_setting">安全</string>
 
     <string name="send_a_crash_report">发送崩溃报告</string>
     <string name="crash_reports_are_useful_for_development">崩溃报告对开发很有用</string>
-    <string name="agree">Agree</string>
-    <string name="enable_google_analytics">启用谷歌分析</string>
-    <string name="consent_to_collect_behavior_history_message">行为历史由 Google Analytics 收集，对开发很有用。</string>
+    <string name="agree">同意</string>
+    <string name="enable_google_analytics">启用Google Analytics</string>
+    <string name="consent_to_collect_behavior_history_message">同意 Google Analytics 收集行为历史，对开发很有用。</string>
     <string name="disagree">不同意</string>
 
     <string name="consent_to_collect_behavior_history">动作历史集合</string>
     <string name="search_custom_emojis">搜索表情符号</string>
     <string name="notification_group_invited_message">您已被邀请加入一个群组: %s</string>
 
-    <string name="groups">组列表</string>
+    <string name="groups">群组</string>
 
     <string name="is_enable_instance_ticker">使用实例代码</string>
 
