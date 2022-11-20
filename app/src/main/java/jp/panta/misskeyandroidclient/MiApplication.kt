@@ -30,7 +30,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.FetchMeta
-import net.pantasystem.milktea.model.instance.MetaCache
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ColorSettingStore
 import javax.inject.Inject
 
@@ -51,9 +51,11 @@ class MiApplication : Application() {
 
     @Inject
     internal lateinit var mAccountStore: AccountStore
-
+//
+//    @Inject
+//    internal lateinit var mMetaCache: MetaCache
     @Inject
-    internal lateinit var mMetaCache: MetaCache
+    lateinit var metaRepository: MetaRepository
 
     @Inject
     internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -213,8 +215,9 @@ class MiApplication : Application() {
 
     private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String) {
         try {
-            val meta = mFetchMeta.fetch(instanceDomain, isForceFetch = true)
-            mMetaCache.put(instanceDomain, meta)
+
+            metaRepository.sync(instanceDomain).getOrThrow()
+            val meta = metaRepository.find(instanceDomain).getOrThrow()
             misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)

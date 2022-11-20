@@ -4,13 +4,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.MetaDataSource
 
-class RoomMetaRepository(
+class RoomMetaDataSource(
     private val metaDAO: MetaDAO,
     private val emojiAliasDAO: EmojiAliasDAO,
     val database: DataBase
-) : MetaRepository {
+) : MetaDataSource {
 
     override suspend fun add(meta: Meta): Meta {
         return database.runInTransaction<Meta>{

@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
@@ -51,8 +50,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     private var mNoteViewModel: NotesViewModel? = null
     val notesViewModel by activityViewModels<NotesViewModel>()
 
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     @Inject
     lateinit var accountStore: AccountStore

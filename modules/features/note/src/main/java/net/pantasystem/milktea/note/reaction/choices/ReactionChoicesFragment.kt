@@ -15,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentReactionChoicesBinding
@@ -52,8 +51,6 @@ class ReactionChoicesFragment : Fragment() {
     }
 
 
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     @Inject
     lateinit var accountStore: AccountStore

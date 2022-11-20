@@ -18,7 +18,6 @@ import net.pantasystem.milktea.messaging.viewmodel.MessageEditorViewModel
 import net.pantasystem.milktea.messaging.viewmodel.MessageViewModel
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.MessagingId
 import javax.inject.Inject
 
@@ -52,8 +51,6 @@ class MessageFragment : Fragment() {
     @Inject
     lateinit var accountStore: AccountStore
 
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     @Inject
     lateinit var driveNavigation: DriveNavigation

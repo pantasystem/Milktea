@@ -4,19 +4,19 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
-import net.pantasystem.milktea.data.infrastructure.instance.db.RoomMetaRepository
+import net.pantasystem.milktea.data.infrastructure.instance.db.RoomMetaDataSource
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.MetaDataSource
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 
-class RoomMetaRepositoryTest {
+class RoomMetaDataSourceTest {
 
-    private lateinit var metaRepository: MetaRepository
+    private lateinit var metaRepository: MetaDataSource
 
     private lateinit var database: DataBase
 
@@ -28,7 +28,7 @@ class RoomMetaRepositoryTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
 
-        metaRepository = RoomMetaRepository(database.metaDAO(), database.emojiAliasDAO(), database)
+        metaRepository = RoomMetaDataSource(database.metaDAO(), database.emojiAliasDAO(), database)
 
         emojis = listOf(
             Emoji("wakaru"),

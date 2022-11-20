@@ -28,7 +28,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.MetaDataSource
 import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -44,7 +44,7 @@ class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val metaRepository: MetaRepository,
+    private val metaRepository: MetaDataSource,
     private val driveFileRepository: DriveFileRepository,
     private val accountStore: AccountStore,
     private val createNoteTaskExecutor: CreateNoteTaskExecutor,
@@ -451,7 +451,7 @@ class NoteEditorViewModel @Inject constructor(
                 } catch (e: Exception) {
                     logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
 
             } catch (e: NullPointerException) {
                 logger.error("下書き保存に失敗した", e)

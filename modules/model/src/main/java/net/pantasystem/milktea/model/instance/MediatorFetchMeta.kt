@@ -1,10 +1,9 @@
 package net.pantasystem.milktea.model.instance
 
 import net.pantasystem.milktea.common.Logger
-import java.lang.IllegalStateException
 
 class MediatorFetchMeta(
-    private val metaRepository : MetaRepository,
+    private val metaDataSource : MetaDataSource,
     private val fetchMeta: FetchMeta,
     val loggerFactory: Logger.Factory,
     ) : FetchMeta {
@@ -15,7 +14,7 @@ class MediatorFetchMeta(
 
     override suspend fun fetch(instanceDomain: String, isForceFetch: Boolean): Meta {
         try{
-            val local = metaRepository.get(instanceDomain)
+            val local = metaDataSource.get(instanceDomain)
             var remoteError: Throwable? = null
             if(local == null || isForceFetch){
                 val remote = try{
@@ -26,7 +25,7 @@ class MediatorFetchMeta(
                 }
                 if(remote != null){
                     return try{
-                        metaRepository.add(remote)
+                        metaDataSource.add(remote)
                     }catch(e: Exception){
                         throw e
                     }

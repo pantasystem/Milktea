@@ -37,7 +37,7 @@ object NoteReactionViewHelper {
             context.applicationContext,
             BindingProvider::class.java
         )
-        val cache = entryPoint.metaCache()
+        val cache = entryPoint.metaRepository()
 
         val textReaction = LegacyReaction.reactionMap[reaction] ?: reaction
         val metaEmojis = cache.get(note.account.instanceDomain)?.emojis ?: emptyList()

@@ -2,14 +2,12 @@ package net.pantasystem.milktea.model.instance
 
 import kotlinx.coroutines.flow.Flow
 
-
 interface MetaRepository {
+    suspend fun sync(instanceDomain: String): Result<Unit>
 
-    suspend fun add(meta: Meta) : Meta
+    fun observe(instanceDomain: String): Flow<Meta?>
 
-    suspend fun get(instanceDomain: String) : Meta?
+    fun get(instanceDomain: String): Meta?
 
-    suspend fun delete(meta: Meta)
-
-    fun observe(instanceDomain: String) : Flow<Meta?>
+    suspend fun find(instanceDomain: String): Result<Meta>
 }

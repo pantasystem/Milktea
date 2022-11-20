@@ -1,18 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.instance.db
 
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MediatorMetaRepository @Inject constructor(
-    private val roomMetaRepository: RoomMetaRepository,
-    private val inMemoryMetaRepository: InMemoryMetaRepository,
-) : MetaRepository {
+class MediatorMetaDataSource @Inject constructor(
+    private val roomMetaRepository: RoomMetaDataSource,
+    private val inMemoryMetaRepository: InMemoryMetaDataSource,
+) : MetaDataSource {
 
     override suspend fun add(meta: Meta): Meta {
         return inMemoryMetaRepository.add(roomMetaRepository.add(meta))
