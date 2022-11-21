@@ -1,10 +1,17 @@
 package net.pantasystem.milktea.user.reaction
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -23,8 +30,23 @@ class UserReactionsViewModel @Inject constructor(
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     accountRepository: AccountRepository,
     private val userDataSource: UserDataSource,
+    storeFactory: UserReactionPagingStore.Factory,
+    loggerFactory: Logger.Factory,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val _userId = MutableStateFlow<User.Id?>(null)
+    //    private val _userId = MutableStateFlow<User.Id?>(null)
+    companion object {
+        const val ACCOUNT_ID = "accountId"
+        const val USER_ID = "userId"
+    }
+    val logger = loggerFactory.create("UserReactionsViewModel")
+
+    private val userId by lazy {
+        User.Id(
+            accountId = savedStateHandle[ACCOUNT_ID]!!,
+            id = savedStateHandle[USER_ID]!!
+        )
+    }
 
     private val currentAccountWatcher = CurrentAccountWatcher(
         accountRepository = accountRepository,
@@ -41,10 +63,40 @@ class UserReactionsViewModel @Inject constructor(
     )
 
 
+    private val store = storeFactory.create(userId)
+    val state = store.state.map { pageableState ->
+        pageableState.suspendConvert { list ->
+            list.map {
+                UserReactionBindingModel(
+                    reaction = it.reaction,
+                    user = userDataSource.observe(it.user.id)
+                        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), it.user),
+                    note = cache.get(it.note)
+                )
+            }
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        PageableState.Loading.Init()
+    )
 
-    fun setUserId(userId: User.Id) {
-        _userId.value = userId
-        currentAccountWatcher.currentAccountId = userId.accountId
+    init {
+        loadPrevious()
     }
 
+    fun loadPrevious() {
+        viewModelScope.launch {
+            store.loadPrevious().onFailure {
+                logger.error("loadPrevious error", it)
+            }
+        }
+    }
+
+    fun clearAndLoadPrevious() {
+        viewModelScope.launch {
+            store.clear()
+            loadPrevious()
+        }
+    }
 }
