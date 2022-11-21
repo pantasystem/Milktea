@@ -15,6 +15,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.model.user.User
@@ -75,11 +76,17 @@ class UserReactionsFragment : Fragment(R.layout.fragment_user_reactions) {
                 viewModel.state.collect {
                     val list = (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
                     adapter.submitList(list)
+
+                    binding.swipeRefreshLayout.isRefreshing = it is PageableState.Loading
                 }
             }
         }
 
         binding.userReactionsListView.addOnScrollListener(_scrollListener)
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.clearAndLoadPrevious()
+        }
 
     }
 
