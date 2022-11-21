@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -214,6 +215,11 @@ class UserDetailActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mViewModel.tabTypes.collect { tabs ->
+                    binding.userTimelineTab.tabMode = if (tabs.size > 4) {
+                        TabLayout.MODE_SCROLLABLE
+                    } else {
+                        TabLayout.MODE_FIXED
+                    }
                     adapter.submitList(tabs)
                 }
             }
