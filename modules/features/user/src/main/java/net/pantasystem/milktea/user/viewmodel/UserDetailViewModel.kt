@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
@@ -99,10 +100,7 @@ class UserDetailViewModel @AssistedInject constructor(
                 noteRelationGetter.get(it.getOrThrow()).getOrNull()
             }.map { note ->
                 PlaneNoteViewData(
-                    note,
-                    accountWatcher.getAccount(),
-                    noteCaptureAPIAdapter,
-                    translationStore
+                    note, accountWatcher.getAccount(), noteCaptureAPIAdapter, translationStore
                 )
             }
         }.onEach {
@@ -132,14 +130,22 @@ class UserDetailViewModel @AssistedInject constructor(
         StringSource(R.string.registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val tabTypes = combine(accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()) { account, user ->
-        val isEnableGallery = misskeyAPIProvider.get(account.instanceDomain) is MisskeyAPIV1275
-        val isPublicReaction = user.isPublicReactions
+    val tabTypes = combine(
+        accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()
+    ) { account, user ->
+        val api = misskeyAPIProvider.get(account.instanceDomain)
+        val isEnableGallery = api is MisskeyAPIV1275
+        val isPublicReaction =
+            api is MisskeyAPIV12 && (user.isPublicReactions || user.id == User.Id(
+                account.accountId, account.remoteId
+            ))
         listOfNotNull(
             UserDetailTabType.UserTimeline(user.id),
             UserDetailTabType.PinNote(user.id),
             UserDetailTabType.Media(user.id),
-            if (isEnableGallery) UserDetailTabType.Gallery(user.id, accountId = account.accountId) else null,
+            if (isEnableGallery) UserDetailTabType.Gallery(
+                user.id, accountId = account.accountId
+            ) else null,
             if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -300,7 +306,6 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
 
-
     private suspend fun getUserId(): User.Id {
         if (userId != null) {
             return userId
@@ -319,8 +324,7 @@ class UserDetailViewModel @AssistedInject constructor(
 
 @Suppress("UNCHECKED_CAST")
 fun UserDetailViewModel.Companion.provideFactory(
-    assistedFactory: UserDetailViewModel.ViewModelAssistedFactory,
-    userId: User.Id
+    assistedFactory: UserDetailViewModel.ViewModelAssistedFactory, userId: User.Id
 ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return assistedFactory.create(userId, null) as T
@@ -343,7 +347,9 @@ sealed class UserDetailTabType(
 
     data class UserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
     data class PinNote(val userId: User.Id) : UserDetailTabType(R.string.pin)
-    data  class Gallery(val userId: User.Id, val accountId: Long) : UserDetailTabType(R.string.gallery)
+    data class Gallery(val userId: User.Id, val accountId: Long) :
+        UserDetailTabType(R.string.gallery)
+
     data class Reactions(val userId: User.Id) : UserDetailTabType(R.string.reaction)
     data class Media(val userId: User.Id) : UserDetailTabType(R.string.media)
 }
