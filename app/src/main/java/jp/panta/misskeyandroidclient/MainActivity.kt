@@ -117,8 +117,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         ).initViewModelListener()
 
 
-        startService(Intent(this, NotificationService::class.java))
-
         setupNavigation()
         setupOnBackPressedDispatcherCallBack()
 

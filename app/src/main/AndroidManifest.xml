@@ -113,10 +113,6 @@
             </intent-filter>
         </activity>
 
-        <service
-                android:name=".NotificationService"
-                android:enabled="true"
-                android:exported="false" />
 
         <activity android:name="net.pantasystem.milktea.media.MediaActivity" />
         <activity android:name="net.pantasystem.milktea.setting.activities.SettingAppearanceActivity" />
