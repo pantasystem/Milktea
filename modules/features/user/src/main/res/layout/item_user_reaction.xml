@@ -65,6 +65,7 @@
                 <include android:id="@+id/simpleNote"
                         layout="@layout/item_simple_note"
                         app:note="@{bindingModel.note}"
+                        noteCardActionListener="@{noteCardActionListener}"
 
                         />
             </FrameLayout>
