@@ -110,4 +110,7 @@ dependencies {
     kapt libs.glide.compiler
     implementation libs.accompanist.glide
 
+    implementation libs.androidx.swiperefreshlayout
+
+
 }

@@ -371,7 +371,8 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             updatedAt = updatedAt,
             fields = fields?.map {
                 User.Field(it.name, it.value)
-            }?: emptyList()
+            }?: emptyList(),
+            isPublicReactions = publicReactions ?: false,
         )
     } else {
         return User.Simple(

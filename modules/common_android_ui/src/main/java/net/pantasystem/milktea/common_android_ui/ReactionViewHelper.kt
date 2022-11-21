@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 
 object ReactionViewHelper {
@@ -32,6 +33,23 @@ object ReactionViewHelper {
         reaction: String
     ) {
         setReaction(this.context, reactionImageView, reactionStringView, reaction)
+    }
+
+    @BindingAdapter("emojis", "reaction")
+    @JvmStatic
+    fun ImageView.setCustomEmoji(
+        emojis: List<Emoji>?,
+        reaction: String?,
+    ) {
+        reaction ?: return
+        val emoji = emojis?.firstOrNull {
+            ":${it.name}:" == reaction
+        } ?: return
+
+        GlideApp.with(this)
+            .load(emoji.url)
+            .centerCrop()
+            .into(this)
     }
 
     /*private var emojiHandler: Handler? = null

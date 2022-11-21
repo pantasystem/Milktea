@@ -81,6 +81,7 @@ sealed interface User : Entity {
         val fields: List<Field>,
         val createdAt: Instant?,
         val updatedAt: Instant?,
+        val isPublicReactions: Boolean,
     ) : User {
         companion object
 
@@ -214,6 +215,7 @@ fun User.Detail.Companion.make(
     fields: List<User.Field>? = null,
     createdAt: Instant? = null,
     updatedAt: Instant? = null,
+    isPublicReactions: Boolean = false,
 ): User.Detail {
     return User.Detail(
         id,
@@ -246,5 +248,6 @@ fun User.Detail.Companion.make(
         fields ?: emptyList(),
         createdAt,
         updatedAt,
+        isPublicReactions = isPublicReactions,
     )
 }

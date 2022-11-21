@@ -1,16 +1,18 @@
 package net.pantasystem.milktea.api.misskey.v12
 
+import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11Diff
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaDTO
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
 import net.pantasystem.milktea.api.misskey.v12.channel.*
-import net.pantasystem.milktea.api.misskey.I
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.api.misskey.v12.user.reaction.UserReaction
+import net.pantasystem.milktea.api.misskey.v12.user.reaction.UserReactionRequest
 import retrofit2.Response
 
 open class MisskeyAPIV12(misskey: MisskeyAPI, private val misskeyAPIV12Diff: MisskeyAPIV12Diff, misskeyAPIV11Diff: MisskeyAPIV11Diff) : MisskeyAPIV11(misskey, misskeyAPIV11Diff),
@@ -49,4 +51,6 @@ open class MisskeyAPIV12(misskey: MisskeyAPI, private val misskeyAPIV12Diff: Mis
     override suspend fun channelTimeline(dto: NoteRequest): Response<List<NoteDTO>?> = misskeyAPIV12Diff.channelTimeline(dto)
 
     override suspend fun followedChannels(dto: FindPageable): Response<List<ChannelDTO>> = misskeyAPIV12Diff.followedChannels(dto)
+
+    override suspend fun getUserReactions(request: UserReactionRequest): Response<List<UserReaction>> = misskeyAPIV12Diff.getUserReactions(request)
 }
