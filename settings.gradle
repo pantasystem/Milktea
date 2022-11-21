@@ -68,6 +68,7 @@ dependencyResolutionManagement {
             library("androidx-swiperefreshlayout", "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
             library("flexbox", "com.google.android.flexbox:flexbox:3.0.0")
             library("okhttp3-logging-inspector", 'com.squareup.okhttp3:logging-interceptor:4.10.0')
+            library("androidx-hilt-navigation-compose", 'androidx.hilt:hilt-navigation-compose:1.0.0')
 
         }
     }
