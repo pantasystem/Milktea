@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -425,8 +426,27 @@ class UserTimelinePagerAdapterV2(
 
     fun submitList(list: List<UserDetailTabType>) {
 
+        val old = tabs
         tabs = list
-        notifyDataSetChanged()
+        val callback = object : DiffUtil.Callback() {
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return old[oldItemPosition] == list[newItemPosition]
+            }
+
+            override fun getNewListSize(): Int {
+                return list.size
+            }
+
+            override fun getOldListSize(): Int {
+                return old.size
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return old[oldItemPosition] == list[newItemPosition]
+            }
+        }
+        val result = DiffUtil.calculateDiff(callback)
+        result.dispatchUpdatesTo(this)
     }
 
 
