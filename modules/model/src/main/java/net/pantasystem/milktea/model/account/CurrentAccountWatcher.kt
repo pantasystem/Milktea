@@ -8,13 +8,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * @param currentAccountId 監視するアカウントを固定する場合はここに対象のアカウントのIdを指定します。
  */
 class CurrentAccountWatcher(
-    private val currentAccountId: Long?,
+    var currentAccountId: Long?,
     val accountRepository: AccountRepository
 ) {
     @ExperimentalCoroutinesApi
-    val account = currentAccountId?.let {
-        accountRepository.watchAccount(it)
-    }?: accountRepository.watchCurrentAccount()
+    val account
+        get() = currentAccountId?.let {
+            accountRepository.watchAccount(it)
+        }?: accountRepository.watchCurrentAccount()
 
     suspend fun getAccount() : Account {
         return currentAccountId?.let {
