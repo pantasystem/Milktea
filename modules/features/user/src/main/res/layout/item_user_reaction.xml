@@ -60,7 +60,8 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@id/reactionState"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:id="@+id/simpleNoteBase">
                 <include android:id="@+id/simpleNote"
                         layout="@layout/item_simple_note"
                         app:note="@{bindingModel.note}"
