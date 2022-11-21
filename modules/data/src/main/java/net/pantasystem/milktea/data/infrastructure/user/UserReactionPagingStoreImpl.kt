@@ -142,6 +142,7 @@ class UserReactionPagingImpl(
                     type = userReaction.type,
                     noteId = note.id,
                     userId = user.id,
+                    createdAt = userReaction.createdAt,
                 ),
                 note = noteRelationGetter.get(note).getOrThrow(),
                 user = user

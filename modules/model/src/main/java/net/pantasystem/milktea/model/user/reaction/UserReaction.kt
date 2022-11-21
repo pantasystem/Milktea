@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.user.reaction
 
+import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.user.User
@@ -8,7 +9,8 @@ data class UserReaction(
     val id: Id,
     val type: String,
     val noteId: Note.Id,
-    val userId: User.Id
+    val userId: User.Id,
+    val createdAt: Instant,
 ) {
     data class Id(
         val accountId: Long,
