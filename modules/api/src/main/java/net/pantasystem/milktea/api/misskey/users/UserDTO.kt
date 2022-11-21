@@ -53,6 +53,7 @@ data class UserDTO(
 
     val createdAt: Instant? = null,
     val updatedAt: Instant? = null,
+    val publicReactions: Boolean? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
@@ -78,6 +79,4 @@ data class UserDTO(
     val displayName: String
         get() = name ?: userName
 
-    val shortDisplayName: String
-        get() = "@" + this.userName
 }

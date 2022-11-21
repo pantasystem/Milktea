@@ -138,6 +138,7 @@ class MediatorUserDataSource @Inject constructor(
                                 birthday = user.birthday,
                                 createdAt = user.createdAt,
                                 updatedAt = user.updatedAt,
+                                publicReactions = user.isPublicReactions
                             )
                         )
 

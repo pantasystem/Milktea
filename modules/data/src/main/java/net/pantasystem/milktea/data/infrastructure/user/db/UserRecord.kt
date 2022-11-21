@@ -77,6 +77,7 @@ data class UserDetailedStateRecord(
     val birthday: LocalDate?,
     val createdAt: Instant?,
     val updatedAt: Instant?,
+    val publicReactions: Boolean?,
     @PrimaryKey(autoGenerate = false) val userId: Long
 )
 
@@ -312,7 +313,8 @@ data class UserRelated(
                 updatedAt = detail.updatedAt,
                 fields = fields?.map {
                     User.Field(it.name, it.value)
-                } ?: emptyList()
+                } ?: emptyList(),
+                isPublicReactions = detail.publicReactions ?: false,
             )
         }
     }
