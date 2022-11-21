@@ -16,8 +16,9 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
+import net.pantasystem.milktea.model.channel.Channel
 
 data class ChannelTypeWithTitle(
     val type: ChannelListType,
@@ -28,6 +29,7 @@ data class ChannelTypeWithTitle(
 @Composable
 fun ChannelScreen(
     onNavigateUp: () -> Unit,
+    onNavigateChannelDetail: (channel: Channel.Id) -> Unit,
     accountStore: AccountStore,
     channelViewModel: ChannelViewModel,
 ) {
@@ -86,6 +88,7 @@ fun ChannelScreen(
                     listType = channelTypeWithTitleList[pagerState.currentPage].type,
                     account = currentAccount!!,
                     viewModel = channelViewModel,
+                    navigateToDetailView = onNavigateChannelDetail
                 )
             }
         }
