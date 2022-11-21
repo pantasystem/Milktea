@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
@@ -54,6 +55,7 @@ import net.pantasystem.milktea.user.nickname.EditNicknameDialog
 import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
 import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
+import net.pantasystem.milktea.user.reaction.UserReactionsFragment
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
@@ -210,14 +212,19 @@ class UserDetailActivity : AppCompatActivity() {
             mViewModel.sync()
             mViewModel.user.observe(this) { detail ->
                 if (detail != null) {
-                    val adapter = UserTimelinePagerAdapterV2(ar, detail.id.id, isEnableGallery)
+                    val adapter = UserTimelinePagerAdapterV2(
+                        ar,
+                        detail.id.id,
+                        isEnableGallery,
+                        detail.isPublicReactions
+                    )
                     binding.userTimelinePager.adapter = adapter
 
                     TabLayoutMediator(
                         binding.userTimelineTab,
                         binding.userTimelinePager
                     ) { tab, position ->
-                        tab.text = adapter.titles[position]
+                        tab.text = getString(adapter.tabTypes[position].titleRes)
                     }.attach()
                     supportActionBar?.title = detail.displayUserName
                 }
@@ -309,34 +316,41 @@ class UserDetailActivity : AppCompatActivity() {
     inner class UserTimelinePagerAdapterV2(
         val account: Account,
         val userId: String,
-        enableGallery: Boolean = false
+        enableGallery: Boolean = false,
+        enableUserReactions: Boolean = false,
     ) : FragmentStateAdapter(this) {
-        val titles = if (enableGallery) listOf(
-            getString(R.string.post),
-            getString(R.string.pin),
-            getString(R.string.media),
-            getString(R.string.gallery)
-        ) else listOf(getString(R.string.post), getString(R.string.pin), getString(R.string.media))
+
+        val tabTypes = listOfNotNull(
+            TabTypes.UserTimeline,
+            TabTypes.PinNote,
+            TabTypes.Media,
+            if (enableGallery) TabTypes.Gallery else null,
+            if (enableUserReactions) TabTypes.Reactions else null,
+        )
+
+
         private val requestTimeline = Pageable.UserTimeline(userId)
         private val requestMedia = Pageable.UserTimeline(userId, withFiles = true)
 
         @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
         override fun createFragment(position: Int): Fragment {
-            return when (position) {
-                0 -> pageableFragmentFactory.create(requestTimeline)
-                1 -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
-                2 -> pageableFragmentFactory.create(requestMedia)
-                3 -> GalleryPostsFragment.newInstance(
+            return when (tabTypes[position]) {
+                TabTypes.UserTimeline -> pageableFragmentFactory.create(requestTimeline)
+                TabTypes.PinNote -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
+                TabTypes.Gallery -> GalleryPostsFragment.newInstance(
                     Pageable.Gallery.User(userId),
                     account.accountId
                 )
-                else -> throw IllegalArgumentException("こんなものはない！！")
+                TabTypes.Reactions -> UserReactionsFragment.newInstance(User.Id(account.accountId, userId))
+                TabTypes.Media -> pageableFragmentFactory.create(requestMedia)
             }
+
         }
 
         override fun getItemCount(): Int {
-            return titles.size
+            return tabTypes.size
         }
+
 
     }
 
@@ -432,4 +446,12 @@ class UserDetailActivity : AppCompatActivity() {
     private fun addPageToTab() {
         mViewModel.toggleUserTimelineTab()
     }
+}
+
+enum class TabTypes(
+    @StringRes val titleRes: Int
+) {
+    UserTimeline(
+        R.string.post
+    ), PinNote(R.string.pin), Gallery(R.string.gallery), Reactions(R.string.reaction), Media(R.string.media)
 }
