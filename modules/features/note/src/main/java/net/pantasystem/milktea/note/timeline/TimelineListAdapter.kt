@@ -17,14 +17,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
-import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineErrorBinding
-import net.pantasystem.milktea.note.poll.PollListAdapter
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.view.NoteCardAction
@@ -65,7 +63,6 @@ class TimelineListAdapter(
 
     sealed class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : TimelineListItemViewHolderBase(view){
         abstract val binding: T
-        private var mNoteIdAndPollListAdapter: Pair<Note.Id, PollListAdapter>? = null
         abstract val lifecycleOwner: LifecycleOwner
         abstract val reactionCountsView: RecyclerView
         abstract val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
