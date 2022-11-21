@@ -9,11 +9,11 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -23,12 +23,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
@@ -41,7 +37,6 @@ import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
@@ -56,6 +51,7 @@ import net.pantasystem.milktea.user.profile.ConfirmUserBlockDialog
 import net.pantasystem.milktea.user.profile.UserProfileFieldListAdapter
 import net.pantasystem.milktea.user.profile.mute.SpecifyMuteExpiredAtDialog
 import net.pantasystem.milktea.user.reaction.UserReactionsFragment
+import net.pantasystem.milktea.user.viewmodel.UserDetailTabType
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
 import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
@@ -169,6 +165,7 @@ class UserDetailActivity : AppCompatActivity() {
             R.layout.activity_user_detail
         )
         binding.lifecycleOwner = this
+        binding.userViewModel = mViewModel
         setSupportActionBar(binding.userDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -203,95 +200,86 @@ class UserDetailActivity : AppCompatActivity() {
         )
             .initViewModelListener()
 
-        accountStore.observeCurrentAccount.filterNotNull().onEach { ar ->
+        val adapter = UserTimelinePagerAdapterV2(pageableFragmentFactory, this)
+        binding.userTimelinePager.adapter = adapter
 
-            binding.userViewModel = mViewModel
+        TabLayoutMediator(
+            binding.userTimelineTab,
+            binding.userTimelinePager
+        ) { tab, position ->
+            tab.text = getString(adapter.tabs[position].title)
+        }.attach()
+        
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mViewModel.tabTypes.collect { tabs ->
+                    adapter.submitList(tabs)
+                }
+            }
+        }
 
-            val isEnableGallery =
-                misskeyAPIProvider.get(ar.instanceDomain) is MisskeyAPIV1275
-            mViewModel.sync()
-            mViewModel.user.observe(this) { detail ->
-                if (detail != null) {
-                    val adapter = UserTimelinePagerAdapterV2(
-                        ar,
-                        detail.id.id,
-                        isEnableGallery,
-                        detail.isPublicReactions
+        mViewModel.showFollowers.observe(this) {
+            if (it != null) {
+                supportActionBar?.title = it.displayUserName
+            }
+
+            it?.let {
+                val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
+                startActivity(intent)
+            }
+        }
+
+        mViewModel.showFollows.observe(this) {
+            it?.let {
+                val intent = FollowFollowerActivity.newIntent(this, it.id, true)
+                startActivity(intent)
+            }
+        }
+
+
+        lifecycleScope.launch {
+            mViewModel.userState.collect {
+                invalidateOptionsMenu()
+                supportActionBar?.title = it?.displayUserName
+            }
+        }
+
+        invalidateOptionsMenu()
+
+
+        binding.showRemoteUser.setOnClickListener {
+            val account = accountStore.currentAccount
+            if (account != null) {
+                mViewModel.user.value?.getProfileUrl(account)?.let {
+                    val uri = Uri.parse(it)
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, uri)
                     )
-                    binding.userTimelinePager.adapter = adapter
-
-                    TabLayoutMediator(
-                        binding.userTimelineTab,
-                        binding.userTimelinePager
-                    ) { tab, position ->
-                        tab.text = getString(adapter.tabTypes[position].titleRes)
-                    }.attach()
-                    supportActionBar?.title = detail.displayUserName
-                }
-
-            }
-
-
-
-            mViewModel.showFollowers.observe(this) {
-                it?.let {
-                    val intent = FollowFollowerActivity.newIntent(this, it.id, isFollowing = false)
-                    startActivity(intent)
                 }
             }
+        }
 
-            mViewModel.showFollows.observe(this) {
-                it?.let {
-                    val intent = FollowFollowerActivity.newIntent(this, it.id, true)
-                    startActivity(intent)
+        binding.showRemoteUserInRemotePage.setOnClickListener {
+            val account = accountStore.currentAccount
+            if (account != null) {
+
+                mViewModel.user.value?.getRemoteProfileUrl(account)?.let {
+                    val uri = Uri.parse(it)
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, uri)
+                    )
                 }
             }
+        }
 
-
-            lifecycleScope.launch {
-                mViewModel.userState.collect {
-                    invalidateOptionsMenu()
-                    supportActionBar?.title = it?.displayUserName
-                }
+        binding.createMention.setOnClickListener {
+            mViewModel.user.value?.displayUserName?.let {
+                val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
+                startActivity(intent)
             }
 
-            invalidateOptionsMenu()
+        }
 
-
-            binding.showRemoteUser.setOnClickListener {
-                val account = accountStore.currentAccount
-                if (account != null) {
-                    mViewModel.user.value?.getProfileUrl(account)?.let {
-                        val uri = Uri.parse(it)
-                        startActivity(
-                            Intent(Intent.ACTION_VIEW, uri)
-                        )
-                    }
-                }
-            }
-
-            binding.showRemoteUserInRemotePage.setOnClickListener {
-                val account = accountStore.currentAccount
-                if (account != null) {
-
-                    mViewModel.user.value?.getRemoteProfileUrl(account)?.let {
-                        val uri = Uri.parse(it)
-                        startActivity(
-                            Intent(Intent.ACTION_VIEW, uri)
-                        )
-                    }
-                }
-            }
-
-            binding.createMention.setOnClickListener {
-                mViewModel.user.value?.displayUserName?.let {
-                    val intent = NoteEditorActivity.newBundle(this, mentions = listOf(it))
-                    startActivity(intent)
-                }
-
-            }
-
-        }.launchIn(lifecycleScope)
 
         binding.editNicknameButton.setOnClickListener {
             EditNicknameDialog().show(supportFragmentManager, "editNicknameDialog")
@@ -313,46 +301,6 @@ class UserDetailActivity : AppCompatActivity() {
 
     }
 
-    inner class UserTimelinePagerAdapterV2(
-        val account: Account,
-        val userId: String,
-        enableGallery: Boolean = false,
-        enableUserReactions: Boolean = false,
-    ) : FragmentStateAdapter(this) {
-
-        val tabTypes = listOfNotNull(
-            TabTypes.UserTimeline,
-            TabTypes.PinNote,
-            TabTypes.Media,
-            if (enableGallery) TabTypes.Gallery else null,
-            if (enableUserReactions) TabTypes.Reactions else null,
-        )
-
-
-        private val requestTimeline = Pageable.UserTimeline(userId)
-        private val requestMedia = Pageable.UserTimeline(userId, withFiles = true)
-
-        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-        override fun createFragment(position: Int): Fragment {
-            return when (tabTypes[position]) {
-                TabTypes.UserTimeline -> pageableFragmentFactory.create(requestTimeline)
-                TabTypes.PinNote -> PinNoteFragment.newInstance(userId = User.Id(account.accountId, userId), null)
-                TabTypes.Gallery -> GalleryPostsFragment.newInstance(
-                    Pageable.Gallery.User(userId),
-                    account.accountId
-                )
-                TabTypes.Reactions -> UserReactionsFragment.newInstance(User.Id(account.accountId, userId))
-                TabTypes.Media -> pageableFragmentFactory.create(requestMedia)
-            }
-
-        }
-
-        override fun getItemCount(): Int {
-            return tabTypes.size
-        }
-
-
-    }
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -448,10 +396,38 @@ class UserDetailActivity : AppCompatActivity() {
     }
 }
 
-enum class TabTypes(
-    @StringRes val titleRes: Int
-) {
-    UserTimeline(
-        R.string.post
-    ), PinNote(R.string.pin), Gallery(R.string.gallery), Reactions(R.string.reaction), Media(R.string.media)
+class UserTimelinePagerAdapterV2(
+    val pageableFragmentFactory: PageableFragmentFactory,
+    activity: FragmentActivity,
+) : FragmentStateAdapter(activity) {
+
+    var tabs: List<UserDetailTabType> = emptyList()
+        private set
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    override fun createFragment(position: Int): Fragment {
+        return when(val tab = tabs[position]) {
+            is UserDetailTabType.Gallery -> GalleryPostsFragment.newInstance(
+                Pageable.Gallery.User(tab.userId.id),
+                tab.accountId
+            )
+            is UserDetailTabType.Media -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, withFiles = true))
+            is UserDetailTabType.PinNote -> PinNoteFragment.newInstance(userId = tab.userId, null)
+            is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
+            is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id))
+        }
+
+    }
+
+    override fun getItemCount(): Int {
+        return tabs.size
+    }
+
+    fun submitList(list: List<UserDetailTabType>) {
+
+        tabs = list
+        notifyDataSetChanged()
+    }
+
+
 }
