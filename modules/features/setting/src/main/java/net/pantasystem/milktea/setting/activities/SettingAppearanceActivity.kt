@@ -240,15 +240,6 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
 
-                            SettingTitleTile(text = stringResource(id = R.string.animation))
-                            SwitchTile(
-                                checked = currentConfigState.isEnableTimelineScrollAnimation,
-                                onChanged = {
-                                    currentConfigState =
-                                        currentConfigState.copy(isEnableTimelineScrollAnimation = it)
-                                }) {
-                                Text(stringResource(id = R.string.avatar_icon_animation))
-                            }
                         }
 
 
@@ -260,7 +251,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
 
     }
 
-    fun showFileManager() {
+    private fun showFileManager() {
         val intent = driveNavigation.newIntent(DriveNavigationArgs(
             selectableFileMaxSize = 1,
             accountId = accountStore.currentAccountId

@@ -2,11 +2,13 @@ package net.pantasystem.milktea.note.timeline
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
-import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -37,7 +39,6 @@ import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
-import kotlin.math.abs
 
 @AndroidEntryPoint
 class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view), ScrollableTop,
@@ -266,24 +267,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private val mScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            if (settingStore.configState.value.isEnableTimelineScrollAnimation) {
-                val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
-                val vh = recyclerView.findViewHolderForAdapterPosition(firstVisibleItemPosition)
-                val firstVisibleVH = vh as? TimelineListAdapter.NoteViewHolderBase<*>
-                if (firstVisibleVH != null) {
-                    val icon = firstVisibleVH.getAvatarIcon()
-                    val parent = icon.parent as ViewGroup
-                    val y = (abs(vh.itemView.top) + icon.marginTop + parent.paddingTop).toFloat()
-                    if ((y + icon.height) <= (parent.height)) {
-                        icon.y = y
-                    }
-                }
-            }
-
             val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
             mFirstVisibleItemPosition = firstVisibleItemPosition
             mViewModel.position = firstVisibleItemPosition
-
         }
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
