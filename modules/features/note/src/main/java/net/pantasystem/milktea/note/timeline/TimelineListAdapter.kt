@@ -4,9 +4,7 @@ package net.pantasystem.milktea.note.timeline
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.view.isVisible
-import androidx.core.view.marginTop
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
@@ -95,7 +93,6 @@ class TimelineListAdapter(
         }
 
         abstract fun onBind(note: PlaneNoteViewData)
-        abstract fun getAvatarIcon(): ImageView
 
         private var mCurrentNote: PlaneNoteViewData? = null
 
@@ -108,10 +105,6 @@ class TimelineListAdapter(
 
             onBind(mCurrentNote!!)
             binding.lifecycleOwner = lifecycleOwner
-            val parent = getAvatarIcon().parent
-            if (parent is ViewGroup) {
-                getAvatarIcon().y = getAvatarIcon().marginTop.toFloat() + parent.paddingTop
-            }
             binding.executePendingBindings()
         }
 
@@ -189,9 +182,7 @@ class TimelineListAdapter(
 
         }
 
-        override fun getAvatarIcon(): ImageView {
-            return binding.simpleNote.avatarIcon
-        }
+
     }
 
     inner class HasReplyToNoteViewHolder(override val binding: ItemHasReplyToNoteBinding): NoteViewHolderBase<ItemHasReplyToNoteBinding>(binding.root){
@@ -212,9 +203,7 @@ class TimelineListAdapter(
 
             }
         }
-        override fun getAvatarIcon(): ImageView {
-            return binding.simpleNote.avatarIcon
-        }
+
     }
 
 
