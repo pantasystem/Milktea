@@ -200,7 +200,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         viewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner) {
             Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
-            val dialog = VisibilitySelectionDialog()
+            val dialog = VisibilitySelectionDialogV2()
             dialog.show(childFragmentManager, "NoteEditor")
         }
 

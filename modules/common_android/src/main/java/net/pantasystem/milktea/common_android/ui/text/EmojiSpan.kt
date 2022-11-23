@@ -59,7 +59,7 @@ abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan()
 
 
     private fun updateImageDrawableSize(paint: Paint) {
-        val emojiSize = (paint.textSize * 1.1).toInt()
+        val emojiSize = (paint.textSize * 1.2).toInt()
         if (emojiSize != textSize) {
             textSize = emojiSize
             imageDrawable?.setBounds(0, 0, emojiSize, emojiSize)

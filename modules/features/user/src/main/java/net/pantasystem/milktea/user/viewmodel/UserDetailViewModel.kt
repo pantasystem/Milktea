@@ -25,7 +25,7 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -42,7 +42,6 @@ class UserDetailViewModel @AssistedInject constructor(
     private val updateNicknameUseCase: UpdateNicknameUseCase,
     private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
-    private val noteDataSource: NoteDataSource,
     private val settingStore: SettingStore,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
@@ -50,6 +49,7 @@ class UserDetailViewModel @AssistedInject constructor(
     private val userRepository: UserRepository,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val noteRepository: NoteRepository,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -80,16 +80,15 @@ class UserDetailViewModel @AssistedInject constructor(
             throw IllegalArgumentException()
         }
     }.mapNotNull {
-        logger.debug("flow user:$it")
         it as? User.Detail
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = userState.asLiveData()
 
-    private val pinNotesState = userState.filterNotNull().map {
-        it.pinnedNoteIds?.map { id ->
-            noteDataSource.get(id)
-        } ?: emptyList()
+    private val pinNotesState = userState.filterNotNull().mapNotNull { user ->
+        user.pinnedNoteIds?.let {
+            noteRepository.findIn(it)
+        }
     }
 
 
@@ -97,7 +96,7 @@ class UserDetailViewModel @AssistedInject constructor(
     val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
         pinNotesState.map { notes ->
             notes.mapNotNull {
-                noteRelationGetter.get(it.getOrThrow()).getOrNull()
+                noteRelationGetter.get(it).getOrNull()
             }.map { note ->
                 PlaneNoteViewData(
                     note, accountWatcher.getAccount(), noteCaptureAPIAdapter, translationStore
@@ -158,6 +157,16 @@ class UserDetailViewModel @AssistedInject constructor(
             "userIdかfqdnUserNameのいずれかが指定されている必要があります。"
         }
         sync()
+
+        viewModelScope.launch {
+            userState.filterNotNull().collect { user ->
+                (user.pinnedNoteIds ?: emptyList()).map {
+                    async {
+                        noteRepository.sync(it)
+                    }
+                }.awaitAll()
+            }
+        }
     }
 
 
