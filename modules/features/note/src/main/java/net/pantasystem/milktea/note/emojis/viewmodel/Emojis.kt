@@ -16,21 +16,19 @@ sealed class Emojis : IEmoji {
     companion object{
         @JvmStatic
         fun categoryBy(emojis: List<Emoji>): List<Emojis>{
-            val list = ArrayList<Emojis>()
-            emojis.groupBy {
+            return emojis.groupBy {
                 it.category
-            }.forEach {
+            }.map {
                 val c = it.key
-                c?.let{
-                    list.add(EmojiCategory(c))
+                listOfNotNull(
+                    c?.let {
+                        EmojiCategory(c)
+                    },
+
+                ) + it.value.map { emoji ->
+                    CustomEmoji(emoji)
                 }
-                list.addAll(
-                    it.value.map{ emoji ->
-                        CustomEmoji(emoji)
-                    }
-                )
-            }
-            return list
+            }.flatten()
         }
     }
 
