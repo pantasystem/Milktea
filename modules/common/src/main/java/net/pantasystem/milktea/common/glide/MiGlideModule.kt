@@ -30,8 +30,8 @@ class MiGlideModule : AppGlideModule(){
             .register(FrameSeqDecoder::class.java, Bitmap::class.java, FrameSeqDecoderBitmapTranscoder(glide))
             .register(SVG::class.java, BitmapDrawable::class.java, SvgBitmapTransCoder(context))
             .append(InputStream::class.java, SVG::class.java, SvgDecoder())
-            .append(BlurHashSource::class.java, BlurHash::class.java, BlurHashModelLoader.Factory())
-            .append(BlurHash::class.java, BlurHash::class.java, BlurHashResourceDecoder())
+            .prepend(BlurHashSource::class.java, BlurHash::class.java, BlurHashModelLoader.Factory())
+            .prepend(BlurHash::class.java, BlurHash::class.java, BlurHashResourceDecoder())
             .register(BlurHash::class.java, BitmapDrawable::class.java, BlurHashTransCoder(context))
     }
 
