@@ -43,7 +43,8 @@ data class FileProperty (
             thumbnailUrl,
             isSensitive,
             null,
-            comment
+            comment,
+            blurhash = blurhash,
         )
     }
 
