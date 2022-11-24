@@ -37,6 +37,7 @@ data class DriveFileRecord(
     val folderId: String?,
     val userId: String?,
     val comment: String?,
+    val blurhash: String?,
 
     @PrimaryKey(autoGenerate = true) val id: Long,
 ) {
@@ -57,6 +58,7 @@ data class DriveFileRecord(
                 User.Id(relatedAccountId, it)
             },
             comment = comment,
+            blurhash = blurhash,
             isSensitive = isSensitive,
         )
     }
@@ -84,6 +86,7 @@ data class DriveFileRecord(
             thumbnailUrl = file.thumbnailUrl,
             folderId = file.folderId,
             userId = file.userId?.id,
+            blurhash = file.blurhash,
             comment = file.comment
         )
     }
@@ -122,6 +125,7 @@ fun DriveFileRecord.Companion.from(fileProperty: FileProperty): DriveFileRecord 
         comment = fileProperty.comment,
         isSensitive = fileProperty.isSensitive,
         relatedAccountId = fileProperty.id.accountId,
+        blurhash = fileProperty.blurhash,
         id = 0L
     )
 }

@@ -95,5 +95,6 @@ fun PreviewItemSimpleUser() {
         nickname = null,
         isSameHost = true,
         instance = null,
+        avatarBlurhash = null,
     ), onSelected = {})
 }

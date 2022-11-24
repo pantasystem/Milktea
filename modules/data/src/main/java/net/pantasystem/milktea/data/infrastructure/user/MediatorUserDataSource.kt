@@ -84,6 +84,7 @@ class MediatorUserDataSource @Inject constructor(
                 isSameHost = user.isSameHost,
                 name = user.name,
                 userName = user.userName,
+                avatarBlurhash = user.avatarBlurhash,
             )
             when (result) {
                 AddResult.Canceled -> {

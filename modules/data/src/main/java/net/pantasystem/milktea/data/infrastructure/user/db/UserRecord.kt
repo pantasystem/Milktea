@@ -41,6 +41,7 @@ data class UserRecord(
     val isBot: Boolean?,
     val host: String,
     val isSameHost: Boolean,
+    val avatarBlurhash: String?,
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 )
 
@@ -199,7 +200,8 @@ data class UserView(
     val host: String,
     val isSameHost: Boolean,
     val id: Long,
-    val nickname: String?
+    val nickname: String?,
+    val avatarBlurhash: String?
 )
 
 data class UserRelated(
@@ -266,7 +268,8 @@ data class UserRelated(
                         name = user.nickname
                     )
                 },
-                instance = instanceInfo
+                instance = instanceInfo,
+                avatarBlurhash = user.avatarBlurhash,
             )
         } else {
             return User.Detail(
@@ -315,6 +318,7 @@ data class UserRelated(
                     User.Field(it.name, it.value)
                 } ?: emptyList(),
                 isPublicReactions = detail.publicReactions ?: false,
+                avatarBlurhash = user.avatarBlurhash,
             )
         }
     }

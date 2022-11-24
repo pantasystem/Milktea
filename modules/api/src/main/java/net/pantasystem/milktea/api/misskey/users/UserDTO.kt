@@ -54,6 +54,7 @@ data class UserDTO(
     val createdAt: Instant? = null,
     val updatedAt: Instant? = null,
     val publicReactions: Boolean? = null,
+    val avatarBlurhash: String? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
