@@ -20,7 +20,8 @@ data class FilePropertyDTO(
     val url: String,
     val thumbnailUrl: String? = null,
     val attachedNoteIds: List<String>? = null,
-    val properties: Properties? = null
+    val properties: Properties? = null,
+    val blurhash: String? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable

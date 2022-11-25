@@ -38,6 +38,7 @@ fun FilePropertyDTO.toFileProperty(account: Account): FileProperty {
         isSensitive = isSensitive ?: false,
         url = getUrl(account.instanceDomain),
         thumbnailUrl = getThumbnailUrl(account.instanceDomain),
+        blurhash = blurhash,
         properties = properties?.let {
             FileProperty.Properties(it.width, it.height)
         }
@@ -373,6 +374,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
                 User.Field(it.name, it.value)
             }?: emptyList(),
             isPublicReactions = publicReactions ?: false,
+            avatarBlurhash = avatarBlurhash
         )
     } else {
         return User.Simple(
@@ -386,7 +388,8 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             host = this.host ?: account.getHost(),
             nickname = null,
             isSameHost = host == null,
-            instance = instanceInfo
+            instance = instanceInfo,
+            avatarBlurhash = avatarBlurhash
         )
     }
 

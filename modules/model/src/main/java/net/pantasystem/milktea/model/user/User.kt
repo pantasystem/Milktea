@@ -27,6 +27,7 @@ sealed interface User : Entity {
     val nickname: UserNickname?
     val isSameHost: Boolean
     val instance: InstanceInfo?
+    val avatarBlurhash: String?
 
 
     data class Id(
@@ -45,7 +46,8 @@ sealed interface User : Entity {
         override val host: String,
         override val nickname: UserNickname?,
         override val isSameHost: Boolean,
-        override val instance: InstanceInfo?
+        override val instance: InstanceInfo?,
+        override val avatarBlurhash: String?
     ) : User {
         companion object
     }
@@ -60,6 +62,7 @@ sealed interface User : Entity {
         override val isBot: Boolean?,
         override val host: String,
         override val nickname: UserNickname?,
+        override val avatarBlurhash: String?,
         val description: String?,
         val followersCount: Int?,
         val followingCount: Int?,
@@ -167,6 +170,7 @@ fun User.Simple.Companion.make(
     nickname: UserNickname? = null,
     isSameHost: Boolean? = null,
     instance: User.InstanceInfo? = null,
+    avatarBlurhash: String? = null,
 ): User.Simple {
     return User.Simple(
         id,
@@ -179,7 +183,8 @@ fun User.Simple.Companion.make(
         host = host ?: "",
         nickname = nickname,
         isSameHost = isSameHost ?: false,
-        instance = instance
+        instance = instance,
+        avatarBlurhash = avatarBlurhash
     )
 }
 
@@ -216,7 +221,8 @@ fun User.Detail.Companion.make(
     createdAt: Instant? = null,
     updatedAt: Instant? = null,
     isPublicReactions: Boolean = false,
-): User.Detail {
+    avatarBlurhash: String? = null,
+    ): User.Detail {
     return User.Detail(
         id,
         userName,
@@ -227,6 +233,7 @@ fun User.Detail.Companion.make(
         isBot,
         host ?: "",
         nickname,
+        avatarBlurhash,
         description,
         followersCount,
         followingCount,

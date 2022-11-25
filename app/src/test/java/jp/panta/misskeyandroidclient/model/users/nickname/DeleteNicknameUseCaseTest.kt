@@ -37,6 +37,7 @@ class DeleteNicknameUseCaseTest {
             nickname = null,
             isSameHost = true,
             instance = null,
+            avatarBlurhash = null,
         )
         deleteNicknameUseCase = DeleteNicknameUseCase(
             userDataSource = userDataSource,

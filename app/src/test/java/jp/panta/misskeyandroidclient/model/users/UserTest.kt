@@ -20,6 +20,7 @@ class UserTest : TestCase() {
             nickname = null,
             isSameHost = true,
             instance = null,
+            avatarBlurhash = null,
         )
 
         val profileUrl = user.getProfileUrl(
@@ -48,6 +49,7 @@ class UserTest : TestCase() {
             nickname = null,
             isSameHost = false,
             instance = null,
+            avatarBlurhash = null,
         )
 
         val profileUrl = user.getProfileUrl(

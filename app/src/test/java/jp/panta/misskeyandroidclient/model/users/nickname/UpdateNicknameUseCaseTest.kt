@@ -35,6 +35,7 @@ class UpdateNicknameUseCaseTest {
                 nickname = null,
                 isSameHost = true,
                 instance = null,
+                avatarBlurhash = null,
             )
             userDataSource.add(user)
 

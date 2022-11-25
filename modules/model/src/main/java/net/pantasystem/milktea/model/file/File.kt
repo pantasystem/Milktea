@@ -60,6 +60,7 @@ data class File(
     val isSensitive: Boolean?,
     val folderId: String? = null,
     val comment: String? = null,
+    val blurhash: String? = null,
 ) : JSerializable {
     enum class AboutMediaType {
         VIDEO, IMAGE, SOUND, OTHER

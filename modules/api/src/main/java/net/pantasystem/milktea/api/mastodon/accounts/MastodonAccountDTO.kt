@@ -67,6 +67,7 @@ data class MastodonAccountDTO (
             isSameHost = acct.split("@").getOrNull(1) == null
                     || acct.split("@").getOrNull(1) == account.getHost(),
             instance = null,
+            avatarBlurhash = null,
         )
     }
 }

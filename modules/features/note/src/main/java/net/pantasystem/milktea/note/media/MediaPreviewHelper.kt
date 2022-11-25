@@ -17,6 +17,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.wasabeef.glide.transformations.BlurTransformation
+import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.file.File
@@ -41,14 +43,18 @@ object MediaPreviewHelper {
         }
         val listener = View.OnClickListener {
             val activity = FragmentComponentManager.findActivity(it.context) as Activity
-            val intent = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
-                .mediaNavigation().newIntent(MediaNavigationArgs.Files(
-                    files = previewAbleFileList.map { fvd ->
-                        fvd.file
-                    },
-                    index = previewAbleFileList.indexOfFirst { f ->
-                        f === previewAbleFile
-                    })
+            val intent = EntryPointAccessors.fromActivity(
+                activity,
+                NavigationEntryPointForBinding::class.java
+            )
+                .mediaNavigation().newIntent(
+                    MediaNavigationArgs.Files(
+                        files = previewAbleFileList.map { fvd ->
+                            fvd.file
+                        },
+                        index = previewAbleFileList.indexOfFirst { f ->
+                            f === previewAbleFile
+                        })
                 )
             val context = it.context
 
@@ -114,12 +120,24 @@ object MediaPreviewHelper {
         file ?: return
         if (file.isHiding) {
             Glide.with(this)
-                .load(file.file.thumbnailUrl)
-                .transform(BlurTransformation(32, 4), CenterCrop())
+                .let {
+                    when (val blurhash = file.file.blurhash) {
+                        null -> it.load(file.file.thumbnailUrl)
+                            .transform(BlurTransformation(32, 4), CenterCrop())
+                        else -> it.load(
+                            BlurHashSource(blurhash)
+                        )
+                    }
+                }
                 .into(this)
         } else {
             Glide.with(this)
                 .load(file.file.thumbnailUrl)
+                .thumbnail(GlideApp.with(this).load(
+                    file.file.blurhash?.let {
+                        BlurHashSource(it)
+                    }
+                ))
                 .centerCrop()
                 .into(this)
         }

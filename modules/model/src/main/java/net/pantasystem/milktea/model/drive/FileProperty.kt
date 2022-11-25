@@ -18,6 +18,7 @@ data class FileProperty (
     val comment: String? = null,
     val properties: Properties? = null,
     val isSensitive: Boolean = false,
+    val blurhash: String? = null,
     val url: String,
     val thumbnailUrl: String? = null,
 ) : JSerializable{
@@ -42,7 +43,8 @@ data class FileProperty (
             thumbnailUrl,
             isSensitive,
             null,
-            comment
+            comment,
+            blurhash = blurhash,
         )
     }
 
