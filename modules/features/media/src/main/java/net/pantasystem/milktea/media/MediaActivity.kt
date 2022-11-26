@@ -1,10 +1,9 @@
 @file:Suppress("DEPRECATION")
+
 package net.pantasystem.milktea.media
 
 import android.app.Activity
-import android.app.DownloadManager
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -15,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.MediaNavigation
@@ -29,7 +29,7 @@ class MediaNavigationImpl @Inject constructor(
     val activity: Activity
 ) : MediaNavigation {
     override fun newIntent(args: MediaNavigationArgs): Intent {
-        return when(args) {
+        return when (args) {
             is MediaNavigationArgs.AFile -> {
                 val intent = Intent(activity, MediaActivity::class.java)
                 intent.putExtra(MediaNavigationKeys.EXTRA_FILE, args.file)
@@ -49,16 +49,16 @@ class MediaNavigationImpl @Inject constructor(
 @AndroidEntryPoint
 class MediaActivity : AppCompatActivity() {
 
-    private sealed class Media : Serializable{
-        data class FileMedia(val file: File): Media()
+    private sealed class Media : Serializable {
+        data class FileMedia(val file: File) : Media()
     }
 
 
-    companion object{
+    companion object {
 
 
-        fun newInstance(activity: FragmentActivity, files: List<File>, index: Int) : Intent{
-            return Intent(activity, MediaActivity::class.java).apply{
+        fun newInstance(activity: FragmentActivity, files: List<File>, index: Int): Intent {
+            return Intent(activity, MediaActivity::class.java).apply {
                 putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(files))
                 putExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, index)
             }
@@ -80,30 +80,25 @@ class MediaActivity : AppCompatActivity() {
         setSupportActionBar(mBinding.mediaToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-
         val file = intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILE) as File?
 
-
-        val files = (intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILES) as List<*>?)?.mapNotNull {
-            it as File?
-        }
+        val files =
+            (intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILES) as List<*>?)?.mapNotNull {
+                it as File?
+            }
 
 
         val fileCurrentIndex = intent.getIntExtra(MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX, 0)
-
-
-
-        val list = when{
-
-            files != null && files.isNotEmpty() ->{
-                files.map{
+        val list = when {
+            files != null && files.isNotEmpty() -> {
+                files.map {
                     Media.FileMedia(it)
                 }
             }
-            file != null ->{
+            file != null -> {
                 listOf<Media>(Media.FileMedia(file))
             }
-            else ->{
+            else -> {
                 Log.e(MediaNavigationKeys.TAG, "params must not null")
                 throw IllegalArgumentException()
             }
@@ -118,10 +113,10 @@ class MediaActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             android.R.id.home -> finish()
-            R.id.download_file ->{
-                mCurrentMedia?.let{ m ->
+            R.id.download_file -> {
+                mCurrentMedia?.let { m ->
                     val file = (m as Media.FileMedia).file
                     downloadFile(file)
                 }
@@ -134,91 +129,65 @@ class MediaActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.menu_media, menu)
         val media = mCurrentMedia
-        if(media is Media.FileMedia){
-            menu.findItem(R.id.download_file)?.isVisible = media.file.path?.startsWith("http") == true
+        if (media is Media.FileMedia) {
+            menu.findItem(R.id.download_file)?.isVisible =
+                media.file.path?.startsWith("http") == true
         }
         return super.onCreateOptionsMenu(menu)
     }
 
-    fun setCurrentFileIndex(index: Int){
-        try{
+    fun setCurrentFileIndex(index: Int) {
+        try {
             mCurrentMedia = mMedias?.get(index)
             Log.d(MediaNavigationKeys.TAG, "現在の画像:$mCurrentMedia")
-        }catch(e: IndexOutOfBoundsException){
+        } catch (e: IndexOutOfBoundsException) {
             Log.d(MediaNavigationKeys.TAG, "お探しのメディアは存在しません。", e)
         }
     }
 
-    private fun downloadFile(file: File){
+    private fun downloadFile(file: File) {
         Log.d(MediaNavigationKeys.TAG, "ダウンロードを開始します:$file")
-        Toast.makeText(this, String.format(getString(R.string.start_downloading_placeholder, file.name)), Toast.LENGTH_LONG).show()
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-
-        val uri = Uri.parse(file.path)
-
-        val request = DownloadManager.Request(uri)
-            .setMimeType(file.type)
-            .setTitle(file.name)
-            //.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, file.name)
-
-            .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE or DownloadManager.Request.NETWORK_WIFI)
-            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        val id = downloadManager.enqueue(request)
-
-        Log.d(MediaNavigationKeys.TAG, getStatus(downloadManager, id))
-
+        Toast.makeText(
+            this,
+            String.format(getString(R.string.start_downloading_placeholder, file.name)),
+            Toast.LENGTH_LONG
+        ).show()
+        WorkManager.getInstance(this)
+            .enqueue(
+                RemoteFileDownloadWorkManager.createWorkRequest(
+                    name = file.name,
+                    type = when (file.aboutMediaType) {
+                        File.AboutMediaType.VIDEO -> DownloadContentType.Video
+                        File.AboutMediaType.IMAGE -> DownloadContentType.Image
+                        File.AboutMediaType.SOUND -> DownloadContentType.Audio
+                        File.AboutMediaType.OTHER -> return
+                    },
+                    url = file.path ?: "",
+                )
+            )
     }
 
     private inner class MediaPagerAdapter(
         private val list: List<Media>
-    ) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+    ) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
         override fun getCount(): Int {
             return list.size
         }
 
         override fun getItem(position: Int): Fragment {
             return when (val item = list[position]) {
-                is Media.FileMedia -> createFragment(position,item.file)
+                is Media.FileMedia -> createFragment(position, item.file)
             }
         }
     }
 
-    private fun createFragment(index: Int, file: File): Fragment{
+    private fun createFragment(index: Int, file: File): Fragment {
 
-        return if(file.type?.contains("image") == true){
+        return if (file.type?.contains("image") == true) {
             ImageFragment.newInstance(index, file)
-        }else{
+        } else {
             PlayerFragment.newInstance(index, file.path!!)
         }
     }
 
-    private fun getStatus(downloadManager: DownloadManager, id: Long): String {
-        val query: DownloadManager.Query = DownloadManager.Query()
-        query.setFilterById(id)
-        val cursor = downloadManager.query(query)
-        if (!cursor.moveToFirst()) {
-            Log.e(MediaNavigationKeys.TAG, "Empty row")
-            return "Wrong downloadId"
-        }
-
-        val columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-        val status = cursor.getInt(columnIndex)
-        val columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON)
-        val reason = cursor.getInt(columnReason)
-
-        val statusText: String = when (status) {
-            DownloadManager.STATUS_SUCCESSFUL -> "Successful"
-            DownloadManager.STATUS_FAILED -> {
-                "Failed: $reason"
-            }
-            DownloadManager.STATUS_PENDING -> "Pending"
-            DownloadManager.STATUS_RUNNING -> "Running"
-            DownloadManager.STATUS_PAUSED-> {
-                "Paused: $reason"
-            }
-            else -> "Unknown"
-        }
-
-        return statusText
-    }
 }

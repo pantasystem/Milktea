@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,8 +15,8 @@ import java.io.OutputStream
 import java.net.URL
 
 class RemoteFileDownloadWorkManager(
-    val context: Context,
-    val params: WorkerParameters
+    private val context: Context,
+    private val params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
     companion object {
@@ -22,7 +24,11 @@ class RemoteFileDownloadWorkManager(
         const val EXTRA_MIME_TYPE = "RemoteFileDownloadWorkManager.MIME_TYPE"
         const val EXTRA_FILE_NAME = "RemoteFileDownloadWorkManager.FILE_NAME"
 
-        fun createWorkRequest(type: DownloadContentType, url: String, name: String): OneTimeWorkRequest {
+        fun createWorkRequest(
+            type: DownloadContentType,
+            url: String,
+            name: String
+        ): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<RemoteFileDownloadWorkManager>()
                 .setInputData(
                     Data.Builder()
@@ -35,10 +41,11 @@ class RemoteFileDownloadWorkManager(
     }
 
     override suspend fun doWork(): Result {
-        return try {
 
+        return try {
+            val fileName = params.inputData.getString(EXTRA_FILE_NAME)!!
             val type = DownloadContentType.values()[params.inputData.getInt(EXTRA_MIME_TYPE, 0)]
-            val mediaCollection = when(type) {
+            val mediaCollection = when (type) {
                 DownloadContentType.Video -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         MediaStore.Video.Media.getContentUri(
@@ -68,10 +75,9 @@ class RemoteFileDownloadWorkManager(
                 }
             }
 
-            val fileName = params.inputData.getString(EXTRA_FILE_NAME)!!
 
             val contentDetail = ContentValues().apply {
-                when(type) {
+                when (type) {
                     DownloadContentType.Video -> put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
                     DownloadContentType.Image -> put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
                     DownloadContentType.Audio -> put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
@@ -81,16 +87,31 @@ class RemoteFileDownloadWorkManager(
             val uri = context.contentResolver.insert(mediaCollection, contentDetail)
 
             withContext(Dispatchers.IO) {
-                URL(params.inputData.getString(EXTRA_DOWNLOAD_URL)).openConnection().getInputStream().use { inputStream ->
-                    context.contentResolver.openOutputStream(uri!!).use { outputStream ->
-                        inputStream.transferToOutputStream(outputStream!!)
+                URL(params.inputData.getString(EXTRA_DOWNLOAD_URL)).openConnection()
+                    .getInputStream().use { inputStream ->
+                        context.contentResolver.openOutputStream(uri!!).use { outputStream ->
+                            inputStream.transferToOutputStream(outputStream!!)
+                        }
                     }
-                }
             }
 
-
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.success_download_file_message),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             Result.success()
         } catch (e: Exception) {
+            Log.e("RemoteFileDownloadWM", "download error", e)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.failed_download_file_message),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             Result.failure()
         }
     }
