@@ -91,7 +91,7 @@ class NoteRelationGetter @Inject constructor(
 
             val renote = if (deep) {
                 note.renoteId?.let {
-                    get(it, false)
+                    get(it, note.isRenote())
                 }
             } else null
             val reply = if (deep) {

@@ -69,6 +69,7 @@ dependencyResolutionManagement {
             library("flexbox", "com.google.android.flexbox:flexbox:3.0.0")
             library("okhttp3-logging-inspector", 'com.squareup.okhttp3:logging-interceptor:4.10.0')
             library("androidx-hilt-navigation-compose", 'androidx.hilt:hilt-navigation-compose:1.0.0')
+            library("androidx-work-ktx", "androidx.work:work-runtime-ktx:2.7.1")
 
         }
     }
