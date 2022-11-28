@@ -100,8 +100,6 @@ class AlarmNotePostReceiver : BroadcastReceiver() {
     }
 
     private fun showCreateNoteFailureNotification(context: Context, notificationManager: NotificationManager,  draftNoteId: Long) {
-        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_close_clear_cancel)
             .setContentTitle(context.getString(R.string.note_creation_failure))

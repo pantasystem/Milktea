@@ -1,24 +1,21 @@
 package jp.panta.misskeyandroidclient.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 
-@InstallIn(SingletonComponent::class)
-@EntryPoint
-interface SubscriptionRegistrationWorkerProvider {
-    fun subscriptionRegistration(): SubscriptionRegistration
-}
-class SubscriptionRegistrationWorker(
-    context: Context,
-    params: WorkerParameters
+
+@HiltWorker
+class SubscriptionRegistrationWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val subscriptionRegistration: SubscriptionRegistration,
 ) : CoroutineWorker(context, params) {
 
     companion object {
@@ -26,13 +23,13 @@ class SubscriptionRegistrationWorker(
     }
 
     override suspend fun doWork(): Result {
-        val entryPoint = EntryPointAccessors.fromApplication(
-            applicationContext,
-            SubscriptionRegistrationWorkerProvider::class.java
-        )
-        return withContext(Dispatchers.IO) {
-            entryPoint.subscriptionRegistration().registerAll()
-            Result.success()
+        return try {
+            return withContext(Dispatchers.IO) {
+                subscriptionRegistration.registerAll()
+                Result.success()
+            }
+        } catch (e: Exception) {
+            Result.failure()
         }
     }
 }
