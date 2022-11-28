@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.app_store.notes
+package net.pantasystem.milktea.model.notes
 
 
 import kotlinx.datetime.Instant
@@ -6,12 +6,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.from
-import net.pantasystem.milktea.model.notes.CreateNote
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftPoll
-import net.pantasystem.milktea.model.notes.isLocalOnly
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
 import net.pantasystem.milktea.model.user.User
 import java.util.*

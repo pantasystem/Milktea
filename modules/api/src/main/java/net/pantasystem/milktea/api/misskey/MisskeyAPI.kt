@@ -22,7 +22,6 @@ import net.pantasystem.milktea.api.misskey.notes.translation.TranslationResult
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.api.misskey.register.Subscription
-import net.pantasystem.milktea.api.misskey.register.SubscriptionState
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
@@ -32,6 +31,7 @@ import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
 import net.pantasystem.milktea.model.notes.poll.Vote
+import net.pantasystem.milktea.model.sw.register.SubscriptionState
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -8,9 +8,10 @@ import jp.panta.misskeyandroidclient.BuildConfig
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistrationImpl
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionUnRegistrationImpl
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.model.sw.register.SubscriptionUnRegistration
 import java.util.*
 import javax.inject.Singleton
@@ -27,7 +28,7 @@ object PushSubscriptionModule {
         misskeyAPIProvider: MisskeyAPIProvider,
         loggerFactory: Logger.Factory
     ): SubscriptionRegistration {
-        return SubscriptionRegistration(
+        return SubscriptionRegistrationImpl(
             accountRepository,
             encryption,
             misskeyAPIProvider,

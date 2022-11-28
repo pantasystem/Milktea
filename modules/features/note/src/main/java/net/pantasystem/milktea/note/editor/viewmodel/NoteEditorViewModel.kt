@@ -9,8 +9,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.notes.NoteEditingState
-import net.pantasystem.milktea.app_store.notes.toCreateNote
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState

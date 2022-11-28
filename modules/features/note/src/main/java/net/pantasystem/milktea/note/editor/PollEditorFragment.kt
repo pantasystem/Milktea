@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.app_store.notes.PollExpiresAt
+import net.pantasystem.milktea.model.notes.PollExpiresAt
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentPollEditorBinding
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel

@@ -1,8 +1,8 @@
 package jp.panta.misskeyandroidclient.model.notes
 
 import junit.framework.TestCase
-import net.pantasystem.milktea.app_store.notes.AddMentionResult
-import net.pantasystem.milktea.app_store.notes.NoteEditingState
+import net.pantasystem.milktea.model.notes.AddMentionResult
+import net.pantasystem.milktea.model.notes.NoteEditingState
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty

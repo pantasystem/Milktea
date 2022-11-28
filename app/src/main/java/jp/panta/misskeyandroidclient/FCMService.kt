@@ -15,7 +15,6 @@ import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
-import jp.panta.misskeyandroidclient.workers.SubscriptionRegistrationWorker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -25,6 +24,7 @@ import net.pantasystem.milktea.model.notification.toPushNotification
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.user.activity.UserDetailActivity
+import net.pantasystem.milktea.worker.sw.SubscriptionRegistrationWorker
 import javax.inject.Inject
 
 const val NOTIFICATION_CHANNEL_ID =

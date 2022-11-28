@@ -25,7 +25,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
-import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistrationImpl
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
@@ -85,7 +85,7 @@ class MiApplication : Application(), Configuration.Provider {
     internal lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
 
     @Inject
-    internal lateinit var mSubscriptionRegistration: SubscriptionRegistration
+    internal lateinit var mSubscriptionRegistration: SubscriptionRegistrationImpl
 
     @Inject
     internal lateinit var misskeyAPIProvider: MisskeyAPIProvider

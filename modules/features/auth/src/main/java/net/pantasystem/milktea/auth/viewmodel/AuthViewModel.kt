@@ -15,9 +15,9 @@ import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
-import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject

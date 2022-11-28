@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.notes.toCreateNote
+import net.pantasystem.milktea.model.notes.toCreateNote
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog

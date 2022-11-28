@@ -7,7 +7,7 @@
 
         <variable
                 name="choice"
-                type="net.pantasystem.milktea.app_store.notes.PollChoiceState" />
+                type="net.pantasystem.milktea.model.notes.PollChoiceState" />
     </data>
     <LinearLayout
             android:orientation="horizontal" android:layout_width="match_parent"
