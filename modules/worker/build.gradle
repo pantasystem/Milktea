@@ -56,4 +56,9 @@ dependencies {
     implementation libs.androidx.work.ktx
     implementation libs.hilt.work
     kapt libs.androidx.hilt.compiler
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    implementation libs.lifecycle.livedata
+
+
 }

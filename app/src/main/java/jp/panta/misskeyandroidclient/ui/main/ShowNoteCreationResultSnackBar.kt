@@ -2,39 +2,55 @@ package jp.panta.misskeyandroidclient.ui.main
 
 import android.app.Activity
 import android.view.View
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
-import net.pantasystem.milktea.note.NoteDetailActivity
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.model.CreateNoteTaskExecutor
-import net.pantasystem.milktea.model.TaskState
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.note.NoteDetailActivity
+import net.pantasystem.milktea.worker.note.CreateNoteWorker
 
 internal class ShowNoteCreationResultSnackBar(
     private val activity: Activity,
-    private val noteTaskExecutor: CreateNoteTaskExecutor,
     private val view: View
 ) {
 
-    operator fun invoke(taskState: TaskState<Note>) {
-        when (taskState) {
-            is TaskState.Error -> {
-                activity.getString(R.string.note_creation_failure).showSnackBar(
-                    activity.getString(R.string.retry) to ({
-                        noteTaskExecutor.dispatch(taskState.task)
-                    })
-                )
-            }
-            is TaskState.Success -> {
+    operator fun invoke(workInfo: WorkInfo) {
+        when (workInfo.state) {
+            WorkInfo.State.ENQUEUED -> Unit
+            WorkInfo.State.RUNNING -> Unit
+            WorkInfo.State.SUCCEEDED -> {
+                val noteId =
+                    workInfo.outputData.getLong(CreateNoteWorker.EXTRA_ACCOUNT_ID, -1).takeIf {
+                        it != -1L
+                    }?.let {
+                        Note.Id(
+                            it,
+                            workInfo.outputData.getString(CreateNoteWorker.EXTRA_NOTE_ID) ?: ""
+                        )
+                    } ?: return
                 activity.getString(R.string.successfully_created_note).showSnackBar(
                     activity.getString(R.string.show) to ({
                         activity.startActivity(
-                            NoteDetailActivity.newIntent(activity, taskState.res.id)
+                            NoteDetailActivity.newIntent(activity, noteId)
                         )
                     })
                 )
             }
-            is TaskState.Executing -> {
+            WorkInfo.State.FAILED -> {
+                val draftNoteId =
+                    workInfo.outputData.getLong(CreateNoteWorker.EXTRA_DRAFT_NOTE_ID, -1).takeIf {
+                        it != -1L
+                    } ?: return
+                activity.getString(R.string.note_creation_failure).showSnackBar(
+                    activity.getString(R.string.retry) to ({
+                        WorkManager.getInstance(activity)
+                            .enqueue(CreateNoteWorker.createWorker(draftNoteId))
+                    })
+                )
             }
+            WorkInfo.State.BLOCKED -> Unit
+            WorkInfo.State.CANCELLED -> Unit
         }
     }
 

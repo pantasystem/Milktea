@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.CreateNoteUseCase
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -19,13 +20,14 @@ class CreateNoteWorker @AssistedInject constructor(
     private val createNoteUseCase: CreateNoteUseCase,
     private val draftNoteRepository: DraftNoteRepository,
     private val accountRepository: AccountRepository,
+    loggerFactory: Logger.Factory
 ) : CoroutineWorker(context, params) {
     companion object {
         const val EXTRA_DRAFT_NOTE_ID = "DRAFT_NOTE_ID"
         const val EXTRA_NOTE_ID = "NOTE_ID"
         const val EXTRA_ACCOUNT_ID = "ACCOUNT_ID"
 
-        fun createWorker(draftNoteId: Long): WorkRequest {
+        fun createWorker(draftNoteId: Long): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<CreateNoteWorker>()
                 .addTag(WorkerTags.CreateNote.name)
                 .setInputData(
@@ -36,22 +38,19 @@ class CreateNoteWorker @AssistedInject constructor(
         }
     }
 
+    val logger = loggerFactory.create("CreateNoteWorker")
+
     override suspend fun doWork(): Result {
         val draftNoteId = params.inputData.getLong(EXTRA_DRAFT_NOTE_ID, -1)
         if (draftNoteId == -1L) {
             return Result.failure()
         }
-
-        val workManager = WorkManager.getInstance(applicationContext)
-        workManager.getWorkInfosByTagLiveData(WorkerTags.CreateNote.name).observeForever {
-            it.map {
-
-            }
-        }
         return draftNoteRepository.findOne(draftNoteId).mapCatching {
             it.toNoteEditingState().toCreateNote(accountRepository.get(it.accountId).getOrThrow())
         }.mapCatching {
             createNoteUseCase.invoke(it).getOrThrow()
+        }.onFailure {
+            logger.error("Create Failed", it)
         }.fold(
             onSuccess = {
                 Result.success(workDataOf(
