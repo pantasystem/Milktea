@@ -223,7 +223,8 @@ internal class MainActivityEventHandler(
     private fun showCreateNoteTaskStatusSnackBar(state: WorkInfo) {
         ShowNoteCreationResultSnackBar(
             activity,
-            binding.appBarMain.simpleNotification
+            binding.appBarMain.simpleNotification,
+            createNoteWorkerExecutor,
         )(state)
     }
 }

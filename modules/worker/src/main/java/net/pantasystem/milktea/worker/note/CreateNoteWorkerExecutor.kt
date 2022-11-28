@@ -2,7 +2,6 @@ package net.pantasystem.milktea.worker.note
 
 import android.content.Context
 import androidx.lifecycle.asFlow
-import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
@@ -10,9 +9,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.worker.WorkerIdsModel
 import net.pantasystem.milktea.worker.WorkerTags
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,7 +25,7 @@ class CreateNoteWorkerExecutor @Inject constructor(
         val request = CreateNoteWorker.createWorker(draftNoteId)
         workerIdsModel.add(request.id)
         WorkManager.getInstance(context)
-            .enqueueUniqueWork("createNote", ExistingWorkPolicy.APPEND_OR_REPLACE, request)
+            .enqueue(request)
     }
 
     /**
@@ -45,10 +44,10 @@ class CreateNoteWorkerExecutor @Inject constructor(
             .asFlow()
             .filterNotNull().map {
                 workerIdsModel.filterActiveWorkInfoList(it)
-            }.onEach { list ->
-                list.forEach {
-                    workerIdsModel.remove(it.id)
-                }
             }
+    }
+
+    fun onHandled(id: UUID) {
+        workerIdsModel.remove(id)
     }
 }

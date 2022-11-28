@@ -3,16 +3,17 @@ package jp.panta.misskeyandroidclient.ui.main
 import android.app.Activity
 import android.view.View
 import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.google.android.material.snackbar.Snackbar
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.worker.note.CreateNoteWorker
+import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
 internal class ShowNoteCreationResultSnackBar(
     private val activity: Activity,
-    private val view: View
+    private val view: View,
+    private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
 ) {
 
     operator fun invoke(workInfo: WorkInfo) {
@@ -36,6 +37,7 @@ internal class ShowNoteCreationResultSnackBar(
                         )
                     })
                 )
+                createNoteWorkerExecutor.onHandled(workInfo.id)
             }
             WorkInfo.State.FAILED -> {
                 val draftNoteId =
@@ -44,10 +46,10 @@ internal class ShowNoteCreationResultSnackBar(
                     } ?: return
                 activity.getString(R.string.note_creation_failure).showSnackBar(
                     activity.getString(R.string.retry) to ({
-                        WorkManager.getInstance(activity)
-                            .enqueue(CreateNoteWorker.createWorker(draftNoteId))
+                        createNoteWorkerExecutor.enqueue(draftNoteId)
                     })
                 )
+                createNoteWorkerExecutor.onHandled(workInfo.id)
             }
             WorkInfo.State.BLOCKED -> Unit
             WorkInfo.State.CANCELLED -> Unit
