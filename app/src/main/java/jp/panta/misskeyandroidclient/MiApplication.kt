@@ -10,6 +10,8 @@ import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.WorkManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
@@ -25,14 +27,12 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -50,20 +50,13 @@ class MiApplication : Application(), Configuration.Provider {
 
     @Inject
     internal lateinit var mAccountStore: AccountStore
-//
-//    @Inject
-//    internal lateinit var mMetaCache: MetaCache
+
     @Inject
     lateinit var metaRepository: MetaRepository
 
     @Inject
     internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
 
-    @Inject
-    internal lateinit var urlPreviewProvider: UrlPreviewStoreProvider
-
-    @Inject
-    internal lateinit var colorSettingStore: ColorSettingStore
 
     @Inject
     internal lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
@@ -96,7 +89,8 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     internal lateinit var debuggerSetupManager: DebuggerSetupManager
 
-    @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -175,11 +169,12 @@ class MiApplication : Application(), Configuration.Provider {
             }
         }
 
-        mAccountStore.state.distinctUntilChangedBy { state ->
-            state.accounts.map { it.accountId } to state.currentAccountId
-        }.onEach {
-            setUpMetaMap(it.accounts)
-        }.launchIn(applicationScope + Dispatchers.IO)
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "syncMeta",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncMetaWorker.createPeriodicWorkRequest()
+            )
 
         applicationScope.launch {
             mSettingStore.configState.map {
@@ -209,30 +204,5 @@ class MiApplication : Application(), Configuration.Provider {
             .setWorkerFactory(workerFactory)
             .build()
     }
-
-    private suspend fun setUpMetaMap(accounts: List<Account>) {
-        coroutineScope {
-            accounts.map { ac ->
-                async {
-                    loadInstanceMetaAndSetupAPI(ac.instanceDomain)
-                }
-            }.awaitAll()
-        }
-    }
-
-
-    private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String) {
-        try {
-
-            metaRepository.sync(instanceDomain).getOrThrow()
-            val meta = metaRepository.find(instanceDomain).getOrThrow()
-            misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
-        } catch (e: Exception) {
-            FirebaseCrashlytics.getInstance().recordException(e)
-            logger.error("metaの読み込み一連処理に失敗したでち", e)
-        }
-    }
-
-
 
 }
