@@ -280,28 +280,21 @@ class NoteEditorViewModel @Inject constructor(
     fun post() {
         currentAccount.value?.let { account ->
             viewModelScope.launch(Dispatchers.IO) {
-
                 val reservationPostingAt = _state.value.reservationPostingAt
-                if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
-                    val createNote = _state.value.toCreateNote(account)
-                    draftNoteService.save(createNote).onFailure {
-                        logger.error("登録失敗", it)
-                    }.onSuccess {
-                        createNoteWorkerExecutor.enqueue(it.draftNoteId)
+                draftNoteService.save(_state.value.toCreateNote(account)).mapCatching { dfNote ->
+                    if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
+                        createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
+                    } else {
+                        noteReservationPostExecutor.register(dfNote)
                     }
-                } else {
-                    draftNoteService.save(_state.value.toCreateNote(account))
-                        .mapCatching { dfNote ->
-                            noteReservationPostExecutor.register(dfNote)
-                        }.onFailure {
-                        logger.error("登録失敗", it)
+                }.onSuccess {
+                    withContext(Dispatchers.Main) {
+                        isPost.event = true
                     }
-                }
-                withContext(Dispatchers.Main) {
-                    isPost.event = true
+                }.onFailure {
+                    logger.error("登録失敗", it)
                 }
             }
-
         }
 
     }
