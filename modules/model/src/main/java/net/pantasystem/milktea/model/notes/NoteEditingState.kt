@@ -378,6 +378,8 @@ fun DraftNote.toNoteEditingState(): NoteEditingState {
         reservationPostingAt = reservationPostingAt?.let {
             Instant.fromEpochMilliseconds(it.time)
         },
+        channelId = channelId,
+        textCursorPos = null,
     )
 }
 
