@@ -72,6 +72,10 @@ dependencyResolutionManagement {
             library("androidx-work-ktx", "androidx.work:work-runtime-ktx:2.7.1")
             library("hilt-work", "androidx.hilt:hilt-work:1.0.0")
             library("androidx-hilt-compiler", "androidx.hilt:hilt-compiler:1.0.0")
+
+            library("androidx-test-ext-junit", "androidx.test.ext:junit:1.1.4")
+            library("junit", "junit:junit:4.13.2")
+            library("androidx-test-espresso-core", "androidx.test.espresso:espresso-core:3.5.0")
         }
     }
 }
@@ -104,3 +108,4 @@ include ':modules:features:user'
 include ':modules:features:notification'
 include ':modules:features:search'
 include ':modules:features:favorite'
+include ':modules:worker'
