@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.app_store.notes.PollChoiceState
+import net.pantasystem.milktea.model.notes.PollChoiceState
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemEditPollChoiceBinding
 import java.util.*

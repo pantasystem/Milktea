@@ -41,7 +41,7 @@ class CreateNoteTask(
     }
 }
 
-fun CreateNote.task(createNoteUseCase: CreateNoteUseCase) : CreateNoteTask {
+fun CreateNote.task(createNoteUseCase: CreateNoteUseCase): CreateNoteTask {
     return CreateNoteTask(createNoteUseCase, this)
 }
 

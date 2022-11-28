@@ -25,7 +25,6 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
-import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
@@ -33,6 +32,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ColorSettingStore
+import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる

@@ -9,8 +9,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.notes.NoteEditingState
-import net.pantasystem.milktea.app_store.notes.toCreateNote
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
@@ -18,7 +16,6 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
-import net.pantasystem.milktea.model.CreateNoteTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.channel.Channel
@@ -35,6 +32,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -47,8 +45,6 @@ class NoteEditorViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
     private val accountStore: AccountStore,
-    private val createNoteTaskExecutor: CreateNoteTaskExecutor,
-    private val createNoteUseCase: CreateNoteUseCase,
     private val draftNoteService: DraftNoteService,
     private val draftNoteRepository: DraftNoteRepository,
     private val noteReservationPostExecutor: NoteReservationPostExecutor,
@@ -57,6 +53,7 @@ class NoteEditorViewModel @Inject constructor(
     private val noteRepository: NoteRepository,
     private val channelRepository: ChannelRepository,
     private val noteEditorSwitchAccountExecutor: NoteEditorSwitchAccountExecutor,
+    private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
 ) : ViewModel() {
 
 
@@ -155,11 +152,6 @@ class NoteEditorViewModel @Inject constructor(
     val isLocalOnly = _state.map {
         it.visibility.isLocalOnly()
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
-
-    val isLocalOnlyEnabled = _state.map {
-        it.visibility is CanLocalOnly
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     val reservationPostingAt = _state.map {
         it.reservationPostingAt
@@ -288,24 +280,21 @@ class NoteEditorViewModel @Inject constructor(
     fun post() {
         currentAccount.value?.let { account ->
             viewModelScope.launch(Dispatchers.IO) {
-
                 val reservationPostingAt = _state.value.reservationPostingAt
-                if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
-                    val createNote = _state.value.toCreateNote(account)
-                    createNoteTaskExecutor.dispatch(createNote.task(createNoteUseCase))
-                } else {
-                    draftNoteService.save(_state.value.toCreateNote(account))
-                        .mapCatching { dfNote ->
-                            noteReservationPostExecutor.register(dfNote)
-                        }.onFailure {
-                        logger.error("登録失敗", it)
+                draftNoteService.save(_state.value.toCreateNote(account)).mapCatching { dfNote ->
+                    if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
+                        createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
+                    } else {
+                        noteReservationPostExecutor.register(dfNote)
                     }
-                }
-                withContext(Dispatchers.Main) {
-                    isPost.event = true
+                }.onSuccess {
+                    withContext(Dispatchers.Main) {
+                        isPost.event = true
+                    }
+                }.onFailure {
+                    logger.error("登録失敗", it)
                 }
             }
-
         }
 
     }

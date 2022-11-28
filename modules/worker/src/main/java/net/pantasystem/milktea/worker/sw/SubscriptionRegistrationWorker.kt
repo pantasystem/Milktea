@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.workers
+package net.pantasystem.milktea.worker.sw
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -8,7 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 
 
 @HiltWorker

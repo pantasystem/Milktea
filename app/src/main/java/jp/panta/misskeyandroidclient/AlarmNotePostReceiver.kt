@@ -12,8 +12,8 @@ import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.app_store.notes.toCreateNote
-import net.pantasystem.milktea.app_store.notes.toNoteEditingState
+import net.pantasystem.milktea.model.notes.toCreateNote
+import net.pantasystem.milktea.model.notes.toNoteEditingState
 import net.pantasystem.milktea.common_android.notification.NotificationUtil
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.AccountRepository

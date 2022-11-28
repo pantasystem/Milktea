@@ -50,9 +50,10 @@ dependencies {
     implementation project(path: ':modules:common_android_ui')
 
     implementation libs.androidx.constraintlayout
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation project(path: ':modules:worker')
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.espresso.core
     implementation project(path: ':modules:api_streaming')
     implementation project(path: ':modules:common_android')
     implementation project(path: ':modules:common_viewmodel')

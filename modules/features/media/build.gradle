@@ -45,9 +45,10 @@ dependencies {
     implementation project(path: ':modules:common_navigation')
     implementation project(path: ':modules:common_navigation')
     implementation project(path: ':modules:common_android')
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation project(path: ':modules:worker')
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.espresso.core
 
     //ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.18.1'

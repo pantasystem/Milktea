@@ -4,45 +4,46 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
+import androidx.work.WorkInfo
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
-import net.pantasystem.milktea.model.CreateNoteTaskExecutor
-import net.pantasystem.milktea.model.TaskState
-import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
 import net.pantasystem.milktea.user.ReportStateHandler
+import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 
-internal class MainActivityEventHandler (
+internal class MainActivityEventHandler(
     val activity: MainActivity,
     val binding: ActivityMainBinding,
     val lifecycleScope: CoroutineScope,
     val lifecycleOwner: LifecycleOwner,
     val mainViewModel: MainViewModel,
     val reportViewModel: ReportViewModel,
-    val noteTaskExecutor: CreateNoteTaskExecutor,
+    private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     val accountStore: AccountStore,
     val authorizationNavigation: AuthorizationNavigation,
     val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
     private val configStore: SettingStore,
-){
+    private val draftNoteService: DraftNoteService
+) {
+
 
     fun setup() {
         // NOTE: 各バージョンに合わせMenuを制御している
@@ -73,6 +74,7 @@ internal class MainActivityEventHandler (
         collectUnauthorizedState()
         collectConfirmGoogleAnalyticsState()
         collectRequestPostNotificationState()
+        collectDraftNoteSavedEvent()
     }
 
     private fun collectCrashlyticsCollectionState() {
@@ -123,9 +125,13 @@ internal class MainActivityEventHandler (
         // NOTE: ノート作成処理の状態をSnackBarで表示する
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                noteTaskExecutor.tasks.collect { taskState ->
-                    showCreateNoteTaskStatusSnackBar(taskState)
-                }
+                createNoteWorkerExecutor.getCreateNoteWorkInfosInAppActives()
+                    .collect { workInfoList ->
+                        Log.d("collectCreateNoteState", "workInfoList:$workInfoList")
+                        workInfoList.forEach {
+                            showCreateNoteTaskStatusSnackBar(it)
+                        }
+                    }
             }
         }
     }
@@ -180,7 +186,7 @@ internal class MainActivityEventHandler (
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
                 mainViewModel.isRequestPushNotificationPermission.collect { requestPermission ->
-                    if ( requestPermission &&
+                    if (requestPermission &&
                         ContextCompat.checkSelfPermission(
                             activity,
                             Manifest.permission.POST_NOTIFICATIONS
@@ -194,15 +200,31 @@ internal class MainActivityEventHandler (
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun collectDraftNoteSavedEvent() {
+        lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+                    draftNoteService.getDraftNoteSavedEventBy(it.accountId)
+                }.collect(
+                    ShowRequestSchedulePostResultSnackBar(
+                        activity,
+                        binding.appBarMain.simpleNotification
+                    )::invoke
+                )
+            }
+        }
+    }
+
     private fun showSendReportStateFrom(state: ReportState) {
         ReportStateHandler().invoke(binding.appBarMain.simpleNotification, state)
     }
 
-    private fun showCreateNoteTaskStatusSnackBar(taskState: TaskState<Note>) {
+    private fun showCreateNoteTaskStatusSnackBar(state: WorkInfo) {
         ShowNoteCreationResultSnackBar(
             activity,
-            noteTaskExecutor,
-            binding.appBarMain.simpleNotification
-        )(taskState)
+            binding.appBarMain.simpleNotification,
+            createNoteWorkerExecutor,
+        )(state)
     }
 }

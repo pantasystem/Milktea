@@ -400,5 +400,6 @@
 <!--    <string name="owned">私の</string>-->
     <string name="groups">グループ一覧</string>
     <string name="is_enable_instance_ticker">Instance Tickerを使う</string>
+    <string name="successfully_created_schedule_note">スケジュール投稿が正常に作成されました</string>
 
 </resources>

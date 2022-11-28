@@ -13,11 +13,7 @@ data class Subscription(
     @SerialName("publickey") val publicKey: String
 ) : JSerializable
 
-@Serializable
-data class SubscriptionState(
-    val state: String,
-    val key: String
-)
+
 
 @Serializable
 data class UnSubscription(

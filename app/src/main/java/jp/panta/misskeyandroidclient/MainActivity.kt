@@ -23,8 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.*
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -37,11 +35,12 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
-import net.pantasystem.milktea.model.CreateNoteTaskExecutor
+import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
 import net.pantasystem.milktea.note.renote.RenoteViewModel
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
+import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import javax.inject.Inject
 
 
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
     lateinit var settingStore: SettingStore
 
     @Inject
-    lateinit var noteTaskExecutor: CreateNoteTaskExecutor
+    lateinit var createNoteWorkerExecutor: CreateNoteWorkerExecutor
 
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
@@ -71,6 +70,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
+
+    @Inject
+    lateinit var draftNoteService: DraftNoteService
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -84,7 +86,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     private lateinit var toggleNavigationDrawerDelegate: ToggleNavigationDrawerDelegate
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme.invoke()
@@ -130,11 +131,12 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             lifecycleOwner = this,
             lifecycleScope = lifecycleScope,
             mainViewModel = mainViewModel,
-            noteTaskExecutor = noteTaskExecutor,
+            createNoteWorkerExecutor = createNoteWorkerExecutor,
             reportViewModel = reportViewModel,
             requestPostNotificationsPermissionLauncher = requestPermissionLauncher,
             changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView),
-            configStore = settingStore
+            configStore = settingStore,
+            draftNoteService = draftNoteService,
         ).setup()
 
         RenoteResultHandler(
