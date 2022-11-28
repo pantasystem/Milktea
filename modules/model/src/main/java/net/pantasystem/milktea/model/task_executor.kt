@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.gallery.GalleryPost
-import net.pantasystem.milktea.model.notes.Note
 
 /**
  * アプリケーションのスコープの範囲内で完了するタスク
@@ -57,9 +56,6 @@ class TaskExecutorImpl<T>(
 
     }
 }
-class CreateNoteTaskExecutor(
-    private val taskExecutorImpl: TaskExecutor<Note>
-) : TaskExecutor<Note> by taskExecutorImpl
 
 class CreateGalleryTaskExecutor(
     private val taskExecutorImpl: TaskExecutor<GalleryPost>
