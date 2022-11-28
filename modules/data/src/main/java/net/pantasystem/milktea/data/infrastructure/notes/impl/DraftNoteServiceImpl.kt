@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftLocalFile
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.from
@@ -18,6 +21,15 @@ class DraftNoteServiceImpl @Inject constructor(
     private val driveFileRepository: DriveFileRepository,
     private val draftNoteDao: DraftNoteDao,
 ) : DraftNoteService {
+
+    private val draftNoteSavedEvent = MutableSharedFlow<DraftNoteSavedEvent>(
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 256
+    )
+
+    override fun getDraftNoteSavedEventBy(accountId: Long): Flow<DraftNoteSavedEvent> {
+        return draftNoteSavedEvent
+    }
 
     override suspend fun save(createNote: CreateNote): Result<DraftNote> {
         return runCatching {
@@ -53,20 +65,25 @@ class DraftNoteServiceImpl @Inject constructor(
                     replyId = createNote.replyId?.noteId,
                     renoteId = createNote.renoteId?.noteId,
                     draftPoll = draftPoll,
-                    reservationPostingAt = createNote.scheduleWillPostAt?.toEpochMilliseconds()?.let {
-                        Date(it)
-                    },
+                    reservationPostingAt = createNote.scheduleWillPostAt?.toEpochMilliseconds()
+                        ?.let {
+                            Date(it)
+                        },
                     channelId = createNote.channelId,
                     draftNoteId = createNote.draftNoteId ?: 0L
                 )
             ).getOrThrow()
+        }.onFailure {
+            draftNoteSavedEvent.tryEmit(DraftNoteSavedEvent.Failed(createNote, it))
+        }.onSuccess {
+            draftNoteSavedEvent.tryEmit(DraftNoteSavedEvent.Success(it))
         }
 
     }
 
     override suspend fun save(draftNoteFile: DraftNoteFile): Result<DraftNoteFile> {
         return runCatching {
-            when(draftNoteFile) {
+            when (draftNoteFile) {
                 is DraftNoteFile.Local -> {
                     draftNoteDao.insertDraftLocalFile(DraftLocalFile.from(draftNoteFile))
                     draftNoteFile
