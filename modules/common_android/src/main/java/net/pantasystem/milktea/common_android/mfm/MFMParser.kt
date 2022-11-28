@@ -238,11 +238,11 @@ object MFMParser{
                 val c = sourceText[ position - 1 ]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
                 if( (c != '\r' && c != '\n') && parent.elementType != ElementType.QUOTE){
-                    println("直前の文字が改行コードではないかつ、親が引用コードではない")
+//                    println("直前の文字が改行コードではないかつ、親が引用コードではない")
                     return null
                 }
                 if( parent.elementType.elementClass.weight < ElementType.QUOTE.elementClass.weight && parent.elementType != ElementType.ROOT){
-                    println("親ノードのほうが小さい")
+//                    println("親ノードのほうが小さい")
                     return null
                 }
             }
@@ -254,7 +254,7 @@ object MFMParser{
                 return null
             }
             val nodeEnd = matcher.end()
-            println(matcher.group(1))
+//            println(matcher.group(1))
 
 
             // > の後に何もない場合キャンセルする
