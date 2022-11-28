@@ -8,6 +8,8 @@ import android.util.Log
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
@@ -35,7 +37,7 @@ import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
 @HiltAndroidApp
-class MiApplication : Application() {
+class MiApplication : Application(), Configuration.Provider {
 
     @Inject
     internal lateinit var mAccountRepository: AccountRepository
@@ -93,6 +95,9 @@ class MiApplication : Application() {
 
     @Inject
     internal lateinit var debuggerSetupManager: DebuggerSetupManager
+
+    @Inject lateinit var workerFactory: HiltWorkerFactory
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -197,6 +202,12 @@ class MiApplication : Application() {
         FirebaseAnalytics.getInstance(this).setUserId(
             clientIdRepository.getOrCreate().clientId
         )
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 
     private suspend fun setUpMetaMap(accounts: List<Account>) {
