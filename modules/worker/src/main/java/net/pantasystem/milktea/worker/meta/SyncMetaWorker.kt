@@ -25,7 +25,7 @@ class SyncMetaWorker @AssistedInject constructor(
 
     companion object {
         fun createPeriodicWorkRequest(): PeriodicWorkRequest {
-            return PeriodicWorkRequestBuilder<SyncMetaWorker>(4, TimeUnit.HOURS)
+            return PeriodicWorkRequestBuilder<SyncMetaWorker>(12, TimeUnit.HOURS)
                 .build()
         }
     }
