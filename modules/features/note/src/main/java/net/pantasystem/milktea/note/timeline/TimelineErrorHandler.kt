@@ -34,7 +34,7 @@ class TimelineErrorHandler(
                     .show()
             }
             is APIError.InternalServerException -> {
-                Toast.makeText(context, R.string.auth_error, Toast.LENGTH_LONG)
+                Toast.makeText(context, R.string.server_error, Toast.LENGTH_LONG)
                     .show()
             }
             is APIError.ClientException -> {

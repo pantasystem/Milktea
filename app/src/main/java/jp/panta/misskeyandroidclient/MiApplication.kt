@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Looper
 import android.util.Log
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
@@ -10,6 +8,8 @@ import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.WorkManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
@@ -19,20 +19,18 @@ import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
-import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.setting.ColorSettingStore
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.worker.meta.SyncMetaWorker
+import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
+import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -46,24 +44,13 @@ class MiApplication : Application(), Configuration.Provider {
     internal lateinit var mSettingStore: SettingStore
 
 
-    private lateinit var sharedPreferences: SharedPreferences
-
     @Inject
     internal lateinit var mAccountStore: AccountStore
-//
-//    @Inject
-//    internal lateinit var mMetaCache: MetaCache
-    @Inject
-    lateinit var metaRepository: MetaRepository
+
 
     @Inject
     internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
 
-    @Inject
-    internal lateinit var urlPreviewProvider: UrlPreviewStoreProvider
-
-    @Inject
-    internal lateinit var colorSettingStore: ColorSettingStore
 
     @Inject
     internal lateinit var mainEventDispatcherFactory: MediatorMainEventDispatcher.Factory
@@ -96,7 +83,8 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     internal lateinit var debuggerSetupManager: DebuggerSetupManager
 
-    @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -120,9 +108,6 @@ class MiApplication : Application(), Configuration.Provider {
                 .setMetadataLoadStrategy(LOAD_STRATEGY_MANUAL)
         )
         EmojiCompat.get().load()
-
-
-        sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
 
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
@@ -167,19 +152,20 @@ class MiApplication : Application(), Configuration.Provider {
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
-        applicationScope.launch(Dispatchers.IO) {
-            runCatching {
-                mSubscriptionRegistration.registerAll()
-            }.onFailure { e ->
-                logger.error("register error", e)
-            }
-        }
 
-        mAccountStore.state.distinctUntilChangedBy { state ->
-            state.accounts.map { it.accountId } to state.currentAccountId
-        }.onEach {
-            setUpMetaMap(it.accounts)
-        }.launchIn(applicationScope + Dispatchers.IO)
+        WorkManager.getInstance(this).apply {
+            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
+            enqueueUniquePeriodicWork(
+                "syncMeta",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncMetaWorker.createPeriodicWorkRequest()
+            )
+            enqueueUniquePeriodicWork(
+                "syncLoggedInUsers",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
+            )
+        }
 
         applicationScope.launch {
             mSettingStore.configState.map {
@@ -209,30 +195,5 @@ class MiApplication : Application(), Configuration.Provider {
             .setWorkerFactory(workerFactory)
             .build()
     }
-
-    private suspend fun setUpMetaMap(accounts: List<Account>) {
-        coroutineScope {
-            accounts.map { ac ->
-                async {
-                    loadInstanceMetaAndSetupAPI(ac.instanceDomain)
-                }
-            }.awaitAll()
-        }
-    }
-
-
-    private suspend fun loadInstanceMetaAndSetupAPI(instanceDomain: String) {
-        try {
-
-            metaRepository.sync(instanceDomain).getOrThrow()
-            val meta = metaRepository.find(instanceDomain).getOrThrow()
-            misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
-        } catch (e: Exception) {
-            FirebaseCrashlytics.getInstance().recordException(e)
-            logger.error("metaの読み込み一連処理に失敗したでち", e)
-        }
-    }
-
-
 
 }

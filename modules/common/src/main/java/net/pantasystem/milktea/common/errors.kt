@@ -25,10 +25,10 @@ sealed class APIError(msg: String) : Exception(msg){
     data class ClientException(override val error: Error?) : APIError("error:$error")
     data class AuthenticationException(override val error: Error?) : APIError("error:$error")
     data class ForbiddenException(override val error: Error?) : APIError("error:$error")
-    data class IAmAIException(override val error: Error?) : APIError("error:$error")
-    data class InternalServerException(override val error: Error?) : APIError("error:$error")
-    data class SomethingException(override val error: Error?, val statusCode: Int) : APIError("error:$error, statusCode:$statusCode")
-    data class NotFoundException(override val error: Error?) : APIError("error:$error")
+    data class IAmAIException(override val error: Error?) : APIError("API Error I am AI Error:$error")
+    data class InternalServerException(override val error: Error?) : APIError("API Error Internal Server Error:$error")
+    data class SomethingException(override val error: Error?, val statusCode: Int) : APIError("API Error:$error, statusCode:$statusCode")
+    data class NotFoundException(override val error: Error?) : APIError("API Error Not Found:$error")
 }
 
 val formatter = Json
@@ -48,7 +48,9 @@ fun<T> Response<T>.throwIfHasError(): Response<T> {
             404 -> throw APIError.NotFoundException(it)
             418 -> throw APIError.IAmAIException(it)
             500 -> throw APIError.InternalServerException(it)
-            else -> APIError.SomethingException(it, code())
+            else -> if (code() in 400..599) {
+                throw APIError.SomethingException(it, code())
+            }
 
         }
     }

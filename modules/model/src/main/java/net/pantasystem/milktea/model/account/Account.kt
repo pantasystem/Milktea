@@ -16,16 +16,16 @@ import java.io.Serializable
         Index("userName")
     ]
 )
-data class Account (
+data class Account(
     val remoteId: String,
     val instanceDomain: String,
     val userName: String,
     val encryptedToken: String,
     @Ignore val pages: List<Page>,
-    @ColumnInfo(name ="instanceType", defaultValue = "misskey") val instanceType: InstanceType,
+    @ColumnInfo(name = "instanceType", defaultValue = "misskey") val instanceType: InstanceType,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
-): Serializable{
+) : Serializable {
 
 
     enum class InstanceType {
@@ -33,11 +33,13 @@ data class Account (
     }
 
 
-    constructor(remoteId: String,
-                instanceDomain: String,
-                userName: String,
-                instanceType: InstanceType,
-                encryptedToken: String) :
+    constructor(
+        remoteId: String,
+        instanceDomain: String,
+        userName: String,
+        instanceType: InstanceType,
+        encryptedToken: String
+    ) :
             this(
                 remoteId,
                 instanceDomain,
@@ -48,13 +50,22 @@ data class Account (
             )
 
 
+    @Ignore
+    private var decryptedI: String? = null
 
-    fun getI(encryption: Encryption): String{
-        return try{
-            encryption.decrypt(this.remoteId, this.encryptedToken)
-                ?: throw UnauthorizedException()
-        }catch(e: Exception){
-            throw UnauthorizedException()
+    fun getI(encryption: Encryption): String {
+        return try {
+            synchronized(this) {
+                when (val i = decryptedI) {
+                    null -> (encryption.decrypt(this.remoteId, this.encryptedToken)
+                        ?: throw UnauthorizedException()).also { token ->
+                        decryptedI = token
+                    }
+                    else -> i
+                }
+            }
+        } catch (e: Exception) {
+            throw UnauthorizedException(e.stackTraceToString())
         }
     }
 
@@ -69,12 +80,12 @@ data class Account (
 
 }
 
-class AccountInstanceTypeConverter{
+class AccountInstanceTypeConverter {
 
     @TypeConverter
-    fun convert(type: Account.InstanceType): String{
+    fun convert(type: Account.InstanceType): String {
         // NOTE: enum.nameで取得するとリファクタリング時にデータが壊れる可能性があるのであえて愚直に変換している
-        return when(type) {
+        return when (type) {
             Account.InstanceType.MISSKEY -> "misskey"
             Account.InstanceType.MASTODON -> "mastodon"
         }
@@ -83,7 +94,7 @@ class AccountInstanceTypeConverter{
     @TypeConverter
     fun convert(type: String): Account.InstanceType {
         // NOTE: enum.nameで取得するとリファクタリング時にデータが壊れる可能性があるのであえて愚直に変換している
-        return when(type) {
+        return when (type) {
             "misskey" -> Account.InstanceType.MISSKEY
             "mastodon" -> Account.InstanceType.MASTODON
             else -> throw IllegalArgumentException("未知のアカウント種別です")
