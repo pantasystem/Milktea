@@ -30,6 +30,7 @@ import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
+import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -159,6 +160,12 @@ class MiApplication : Application(), Configuration.Provider {
                 "syncMeta",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncMetaWorker.createPeriodicWorkRequest()
+            )
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "syncLoggedInUsers",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
             )
 
         applicationScope.launch {
