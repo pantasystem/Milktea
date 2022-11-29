@@ -50,6 +50,7 @@ data class Account(
             )
 
 
+    @Ignore
     private var decryptedI: String? = null
 
     fun getI(encryption: Encryption): String {
