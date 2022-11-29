@@ -86,8 +86,32 @@ sealed class ChannelBody : StreamingEvent(){
 
         @Serializable
         @SerialName("readAllMessagingMessage")
-        data class ReadAllMessagingMessages(
-            override val id: String
+        data class ReadAllMessagingMessages(override val id: String) : Main()
+
+        @Serializable
+        @SerialName("readAllUnreadSpecifiedNotes")
+        data class ReadAllUnreadSpecifiedNotes(override val id: String) : Main()
+
+        @Serializable
+        @SerialName("readAllChannels")
+        data class ReadAllChannels(override val id: String) : Main()
+
+        @Serializable
+        @SerialName("readAllUnreadMentions")
+        data class ReadAllUnreadMentions(override val id: String) : Main()
+
+        @Serializable
+        @SerialName("readNotifications")
+        data class ReadNotifications(
+            override val id: String,
+            val body: List<String>
+        ) : Main()
+
+        @Serializable
+        @SerialName("unreadAntenna")
+        data class UnreadAntenna(
+            override val id: String,
+            val body: AntennaDTO
         ) : Main()
 
         @Serializable
