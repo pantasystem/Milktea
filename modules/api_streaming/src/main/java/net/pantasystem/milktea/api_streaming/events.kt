@@ -274,3 +274,14 @@ data class NoteUpdated (
 
 
 }
+
+@SerialName("emojiAdded")
+@Serializable
+data class EmojiAdded(
+    val body: Body,
+) : StreamingEvent() {
+    @Serializable
+    data class Body(
+        val emoji: Emoji
+    )
+}
