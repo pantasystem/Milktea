@@ -1,8 +1,6 @@
 package jp.panta.misskeyandroidclient
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Looper
 import android.util.Log
 import androidx.emoji2.bundled.BundledEmojiCompatConfig
@@ -21,7 +19,6 @@ import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.getPreferenceName
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
@@ -30,9 +27,9 @@ import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDi
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
+import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -46,13 +43,9 @@ class MiApplication : Application(), Configuration.Provider {
     internal lateinit var mSettingStore: SettingStore
 
 
-    private lateinit var sharedPreferences: SharedPreferences
-
     @Inject
     internal lateinit var mAccountStore: AccountStore
 
-    @Inject
-    lateinit var metaRepository: MetaRepository
 
     @Inject
     internal lateinit var mSocketWithAccountProvider: SocketWithAccountProvider
@@ -115,9 +108,6 @@ class MiApplication : Application(), Configuration.Provider {
         )
         EmojiCompat.get().load()
 
-
-        sharedPreferences = getSharedPreferences(getPreferenceName(), Context.MODE_PRIVATE)
-
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
 
@@ -161,14 +151,9 @@ class MiApplication : Application(), Configuration.Provider {
             logger.error("致命的なエラー", e)
         }.launchIn(applicationScope + Dispatchers.IO)
 
-        applicationScope.launch(Dispatchers.IO) {
-            runCatching {
-                mSubscriptionRegistration.registerAll()
-            }.onFailure { e ->
-                logger.error("register error", e)
-            }
-        }
 
+        WorkManager.getInstance(this)
+            .enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
                 "syncMeta",
