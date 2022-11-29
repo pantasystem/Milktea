@@ -153,20 +153,19 @@ class MiApplication : Application(), Configuration.Provider {
         }.launchIn(applicationScope + Dispatchers.IO)
 
 
-        WorkManager.getInstance(this)
-            .enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
+        WorkManager.getInstance(this).apply {
+            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
+            enqueueUniquePeriodicWork(
                 "syncMeta",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncMetaWorker.createPeriodicWorkRequest()
             )
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
+            enqueueUniquePeriodicWork(
                 "syncLoggedInUsers",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
             )
+        }
 
         applicationScope.launch {
             mSettingStore.configState.map {
