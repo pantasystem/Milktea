@@ -103,7 +103,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         mBinding.simpleEditor = this
 
-        mBinding.lifecycleOwner = this
+        mBinding.lifecycleOwner = viewLifecycleOwner
         mBinding.noteEditorViewModel = mViewModel
 
         val userChipAdapter =
@@ -183,7 +183,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.poll.collect { poll ->
+                viewModel.uiState.collect { uiState ->
+                    val poll = uiState.poll
                     if (poll == null) {
                         removePollFragment()
                     } else {
@@ -378,6 +379,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     }
 
+    @Suppress("DEPRECATION")
     private val registerForOpenDriveActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -414,6 +416,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
+    @Suppress("DEPRECATION")
     private val selectUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
@@ -425,6 +428,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             }
         }
 
+    @Suppress("DEPRECATION")
     private val selectMentionToUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
