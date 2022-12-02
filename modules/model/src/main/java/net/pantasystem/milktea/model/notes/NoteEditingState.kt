@@ -35,22 +35,10 @@ data class NoteEditingState(
     val channelId: Channel.Id? = null,
 ) {
 
-    val hasCw: Boolean
+    private val hasCw: Boolean
         get() = cw != null
 
-    val totalFilesCount: Int
-        get() = this.files.size
 
-    val isSpecified: Boolean
-        get() = this.visibility is Visibility.Specified
-
-    val isLocalOnly: Boolean
-        get() = this.visibility.isLocalOnly()
-
-
-    fun setDraftNote(draftNote: DraftNote?): NoteEditingState {
-        return draftNote?.toNoteEditingState() ?: this
-    }
 
     fun changeRenoteId(renoteId: Note.Id?): NoteEditingState {
         return copy(
@@ -58,11 +46,7 @@ data class NoteEditingState(
         )
     }
 
-    fun changeReplyTo(replyId: Note.Id?): NoteEditingState {
-        return copy(
-            replyId = replyId
-        )
-    }
+
 
     fun checkValidate(textMaxLength: Int = 3000, maxFileCount: Int = 4): Boolean {
         if (this.files.size > maxFileCount) {
@@ -135,11 +119,7 @@ data class NoteEditingState(
         )
     }
 
-    fun changePollExpiresAt(expiresAt: PollExpiresAt): NoteEditingState {
-        return this.copy(
-            poll = this.poll?.copy(expiresAt = expiresAt)
-        )
-    }
+
 
     fun setAccount(account: Account?): NoteEditingState {
         if (author == null) {
@@ -278,14 +258,6 @@ data class NoteEditingState(
         return this
     }
 
-    fun shouldDiscardingConfirmation(): Boolean {
-        val address = (visibility as? Visibility.Specified)?.visibleUserIds
-            ?: emptyList()
-        return !text.isNullOrBlank()
-                || files.isNotEmpty()
-                || !poll?.choices.isNullOrEmpty()
-                || address.isNotEmpty()
-    }
 }
 
 sealed interface PollExpiresAt : java.io.Serializable {
@@ -437,4 +409,37 @@ fun List<AppFile>.removeFile(appFile: AppFile): List<AppFile> {
     return toMutableList().apply {
         remove(appFile)
     }
+}
+
+
+fun PollEditingState?.removePollChoice(id: UUID): PollEditingState? {
+    return this?.copy(
+        choices = this.choices.filterNot { choice ->
+            choice.id == id
+        }
+    )
+}
+
+fun PollEditingState?.updatePollChoice(id: UUID, text: String): PollEditingState? {
+    return this?.copy(
+        choices = choices.map { choice ->
+            if (choice.id == id) {
+                choice.copy(
+                    text = text
+                )
+            } else {
+                choice
+            }
+        }
+    )
+}
+
+fun PollEditingState?.addPollChoice(): PollEditingState? {
+    return this?.copy(
+        choices = choices.toMutableList().also { list ->
+            list.add(
+                PollChoiceState("")
+            )
+        }
+    )
 }
