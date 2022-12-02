@@ -20,7 +20,7 @@ class ReservationPostDatePickerDialog : AppCompatDialogFragment(), DatePickerDia
 
         val viewModel  = ViewModelProvider(requireActivity())[NoteEditorViewModel::class.java]
         mViewModel = viewModel
-        val date = viewModel.state.value.reservationPostingAt ?: Clock.System.now()
+        val date = viewModel.uiState.value.sendToState.schedulePostAt ?: Clock.System.now()
         val local = date.toLocalDateTime(TimeZone.currentSystemDefault())
 
         return DatePickerDialog(requireActivity(), this, local.year, local.monthNumber - 1, local.dayOfMonth)
@@ -37,13 +37,7 @@ class ReservationPostDatePickerDialog : AppCompatDialogFragment(), DatePickerDia
         c.set(Calendar.MONTH, p2)
         c.set(Calendar.DAY_OF_MONTH, p3)
 
-        mViewModel?.state?.value?.let { state ->
-            mViewModel?.updateState(
-                state.copy(
-                    reservationPostingAt = Instant.fromEpochMilliseconds(c.time.time)
-                )
-            )
-        }
+        mViewModel?.setSchedulePostAt(Instant.fromEpochMilliseconds(c.time.time))
     }
 
 }
