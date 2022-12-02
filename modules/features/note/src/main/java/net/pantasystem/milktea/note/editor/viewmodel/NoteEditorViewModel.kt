@@ -146,7 +146,6 @@ class NoteEditorViewModel @Inject constructor(
 
 
     val showVisibilitySelectionEvent = EventBus<Unit>()
-    private val visibilitySelectedEvent = EventBus<Unit>()
 
 
     val address = visibility.map {
@@ -453,7 +452,6 @@ class NoteEditorViewModel @Inject constructor(
         logger.debug("公開範囲がセットされた:$visibility")
         savedStateHandle.setChannelId(null)
         savedStateHandle.setVisibility(visibility)
-        this.visibilitySelectedEvent.event = Unit
     }
 
     fun setChannelId(channelId: Channel.Id?) {
