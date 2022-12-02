@@ -25,7 +25,6 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
-import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
@@ -113,9 +112,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
 
         mBinding.accountViewModel = accountViewModel
-        accountViewModel.switchAccount.observe(this) {
-            AccountSwitchingDialog().show(childFragmentManager, "tag")
-        }
+
         accountViewModel.showProfile.observe(this) {
             val intent = userDetailNavigation.newIntent(
                 UserDetailNavigationArgs.UserId(
