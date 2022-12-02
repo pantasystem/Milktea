@@ -57,31 +57,32 @@ class NoteEditorViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
+    private val currentAccount = MutableStateFlow<Account?>(null)
+
     val text = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Text.name, null)
 
     val cw = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Cw.name, null)
-
-    private val currentAccount = MutableStateFlow<Account?>(null)
-
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    val currentUser: StateFlow<UserViewData?> =
-        currentAccount.filterNotNull().map {
-            val userId = User.Id(it.accountId, it.remoteId)
-            userViewDataFactory.create(
-                userId,
-                viewModelScope,
-                dispatcher
-            )
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
-
-
     val hasCw = savedStateHandle.getStateFlow(NoteEditorSavedStateKey.HasCW.name, false)
+
+    val files = savedStateHandle.getStateFlow<List<AppFile>>(
+        NoteEditorSavedStateKey.PickedFiles.name,
+        emptyList()
+    )
+
+    val totalImageCount = files.map {
+        it.size
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    private val channelId =
+        savedStateHandle.getStateFlow<Channel.Id?>(NoteEditorSavedStateKey.ChannelId.name, null)
+    private val replyId =
+        savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.ReplyId.name, null)
+    private val renoteId =
+        savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.RenoteId.name, null)
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -107,6 +108,49 @@ class NoteEditorViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
+    val visibility = savedStateHandle.getStateFlow<Visibility>(
+        NoteEditorSavedStateKey.Visibility.name,
+        Visibility.Public(false)
+    )
+
+    val isLocalOnly = visibility.map {
+        it.isLocalOnly()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val reservationPostingAt =
+        savedStateHandle.getStateFlow<Date?>(NoteEditorSavedStateKey.ScheduleAt.name, null)
+
+    val poll = savedStateHandle.getStateFlow<PollEditingState?>(
+        NoteEditorSavedStateKey.Poll.name,
+        null
+    )
+
+    private val noteEditorFormState = combine(text, cw, hasCw) { text, cw, hasCw ->
+        NoteEditorFormState(
+            text = text,
+            cw = cw,
+            hasCw = hasCw
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
+
+    val address = visibility.map {
+        it as? Visibility.Specified
+    }.map {
+        it?.visibleUserIds?.map { uId ->
+            setUpUserViewData(uId)
+        } ?: emptyList()
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val isSpecified = visibility.map {
+        it is Visibility.Specified
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val textRemaining = combine(maxTextLength, noteEditorFormState.map { it.text }) { max, t ->
+        max - (t?.codePointCount(0, t.length) ?: 0)
+    }.catch {
+        logger.error("observe meta error", it)
+    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val channels = currentAccount.filterNotNull().flatMapLatest {
         suspend {
@@ -122,69 +166,18 @@ class NoteEditorViewModel @Inject constructor(
         initialValue = ResultState.Loading(StateContent.NotExist())
     )
 
-    val files = savedStateHandle.getStateFlow<List<AppFile>>(
-        NoteEditorSavedStateKey.PickedFiles.name,
-        emptyList()
-    )
+    @FlowPreview
+    @ExperimentalCoroutinesApi
+    val currentUser: StateFlow<UserViewData?> =
+        currentAccount.filterNotNull().map {
+            val userId = User.Id(it.accountId, it.remoteId)
+            userViewDataFactory.create(
+                userId,
+                viewModelScope,
+                dispatcher
+            )
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val totalImageCount = files.map {
-        it.size
-    }.asLiveData()
-
-
-    val visibility = savedStateHandle.getStateFlow<Visibility>(
-        NoteEditorSavedStateKey.Visibility.name,
-        Visibility.Public(false)
-    )
-    val isLocalOnly = visibility.map {
-        it.isLocalOnly()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
-
-    val reservationPostingAt =
-        savedStateHandle.getStateFlow<Date?>(NoteEditorSavedStateKey.ScheduleAt.name, null)
-
-
-    val address = visibility.map {
-        it as? Visibility.Specified
-    }.map {
-        it?.visibleUserIds?.map { uId ->
-            setUpUserViewData(uId)
-        } ?: emptyList()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-
-    private fun setUpUserViewData(userId: User.Id): UserViewData {
-        return userViewDataFactory.create(userId, viewModelScope, dispatcher)
-    }
-
-    val isSpecified = visibility.map {
-        it is Visibility.Specified
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
-    val poll =
-        savedStateHandle.getStateFlow<PollEditingState?>(NoteEditorSavedStateKey.Poll.name, null)
-
-    private val noteEditorFormState = combine(text, cw, hasCw) { text, cw, hasCw ->
-        NoteEditorFormState(
-            text = text,
-            cw = cw,
-            hasCw = hasCw
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
-
-    val textRemaining = combine(maxTextLength, noteEditorFormState.map { it.text }) { max, t ->
-        max - (t?.codePointCount(0, t.length) ?: 0)
-    }.catch {
-        logger.error("observe meta error", it)
-    }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
-
-    private val channelId =
-        savedStateHandle.getStateFlow<Channel.Id?>(NoteEditorSavedStateKey.ChannelId.name, null)
-    private val replyId =
-        savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.ReplyId.name, null)
-    private val renoteId =
-        savedStateHandle.getStateFlow<Note.Id?>(NoteEditorSavedStateKey.RenoteId.name, null)
 
     private val draftNoteId =
         savedStateHandle.getStateFlow<Long?>(NoteEditorSavedStateKey.DraftNoteId.name, null)
@@ -240,6 +233,29 @@ class NoteEditorViewModel @Inject constructor(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
 
+    init {
+        accountStore.observeCurrentAccount.filterNotNull().map {
+            it to noteEditorSwitchAccountExecutor(
+                currentAccount.value,
+                noteEditorSendToState.value,
+                it
+            )
+        }.onEach { (account, result) ->
+            currentAccount.value = account
+            savedStateHandle.setReplyId(result.replyId)
+            savedStateHandle.setRenoteId(result.renoteId)
+            savedStateHandle.setVisibility(result.visibility)
+            savedStateHandle.setChannelId(result.channelId)
+        }.launchIn(viewModelScope + Dispatchers.IO)
+
+        currentAccount.filterNotNull().onEach {
+            val v = settingStore.getNoteVisibility(it.accountId)
+            if (channelId.value == null) {
+                savedStateHandle.setVisibility(v)
+            }
+        }.launchIn(viewModelScope + Dispatchers.IO)
+    }
+
     fun setRenoteTo(noteId: Note.Id?) {
         savedStateHandle.setRenoteId(noteId)
     }
@@ -281,28 +297,6 @@ class NoteEditorViewModel @Inject constructor(
 
     }
 
-    init {
-        accountStore.observeCurrentAccount.filterNotNull().map {
-            it to noteEditorSwitchAccountExecutor(
-                currentAccount.value,
-                noteEditorSendToState.value,
-                it
-            )
-        }.onEach { (account, result) ->
-            currentAccount.value = account
-            savedStateHandle.setReplyId(result.replyId)
-            savedStateHandle.setRenoteId(result.renoteId)
-            savedStateHandle.setVisibility(result.visibility)
-            savedStateHandle.setChannelId(result.channelId)
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
-        currentAccount.filterNotNull().onEach {
-            val v = settingStore.getNoteVisibility(it.accountId)
-            if (channelId.value == null) {
-                savedStateHandle.setVisibility(v)
-            }
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
 
     fun changeText(text: String) {
         savedStateHandle[NoteEditorSavedStateKey.Text.name] = text
@@ -419,9 +413,6 @@ class NoteEditorViewModel @Inject constructor(
         return files.value.size
     }
 
-    fun changeCwEnabled() {
-        savedStateHandle.setHasCw(!savedStateHandle.getHasCw())
-    }
 
     fun enablePoll() {
         val poll =
@@ -435,6 +426,10 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setText(text: String) {
         savedStateHandle.setText(text)
+    }
+
+    fun changeCwEnabled() {
+        savedStateHandle.setHasCw(!savedStateHandle.getHasCw())
     }
 
     fun setCw(text: String?) {
@@ -510,7 +505,7 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            when(val account = currentAccount.value) {
+            when (val account = currentAccount.value) {
                 null -> Result.failure(UnauthorizedException())
                 else -> Result.success(account)
             }.mapCatching { account ->
@@ -530,6 +525,10 @@ class NoteEditorViewModel @Inject constructor(
 
     fun clear() {
         savedStateHandle.applyBy(NoteEditorUiState())
+    }
+
+    private fun setUpUserViewData(userId: User.Id): UserViewData {
+        return userViewDataFactory.create(userId, viewModelScope, dispatcher)
     }
 
 
