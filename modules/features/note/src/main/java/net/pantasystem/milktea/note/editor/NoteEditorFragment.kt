@@ -278,7 +278,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorViewModel.setReplyTo(replyToNoteId)
         noteEditorViewModel.setRenoteTo(quoteToNoteId)
         noteEditorViewModel.setChannelId(channelId)
-        if (draftNoteId != null) {
+        if (draftNoteId != null && savedInstanceState == null) {
             noteEditorViewModel.setDraftNoteId(draftNoteId!!)
         }
 
@@ -332,13 +332,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             Log.d("NoteEditorActivity", "text changed:$e")
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
-
-        noteEditorViewModel.state.onEach {
-            if (it.textCursorPos != null && it.text != null) {
-                binding.inputMain.setText(it.text ?: "")
-                binding.inputMain.setSelection(it.textCursorPos ?: 0)
-            }
-        }.launchIn(lifecycleScope)
 
         noteEditorViewModel.isPost.observe(viewLifecycleOwner) {
             if (it) {
@@ -525,15 +518,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorViewModel.addMentionUserNames(userNames, pos).let { newPos ->
             Log.d(
                 "NoteEditorActivity",
-                "text:${noteEditorViewModel.state.value.text}, stateText:${noteEditorViewModel.state.value.text}"
+                "text:${noteEditorViewModel.uiState.value.formState.text}, stateText:${noteEditorViewModel.uiState.value.formState.text}"
             )
-            binding.inputMain.setText(noteEditorViewModel.state.value.text ?: "")
+            binding.inputMain.setText(noteEditorViewModel.uiState.value.formState.text ?: "")
             binding.inputMain.setSelection(newPos)
         }
     }
 
     private fun showDriveFileSelector() {
-        val selectedSize = noteEditorViewModel.state.value.totalFilesCount
+        val selectedSize = noteEditorViewModel.uiState.value.totalFilesCount
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = noteEditorViewModel.maxFileCount.value - selectedSize
         val intent = driveNavigation.newIntent(
@@ -628,7 +621,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
     }
 
-
+    @Suppress("DEPRECATION")
     private val openDriveActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =
@@ -686,7 +679,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-
+    @Suppress("DEPRECATION")
     private val selectUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
@@ -699,6 +692,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
+    @Suppress("DEPRECATION")
     private val selectMentionToUserResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
