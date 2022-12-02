@@ -516,11 +516,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     private fun addMentionUserNames(userNames: List<String>) {
         val pos = binding.inputMain.selectionEnd
         noteEditorViewModel.addMentionUserNames(userNames, pos).let { newPos ->
-            Log.d(
-                "NoteEditorActivity",
-                "text:${noteEditorViewModel.uiState.value.formState.text}, stateText:${noteEditorViewModel.uiState.value.formState.text}"
-            )
-            binding.inputMain.setText(noteEditorViewModel.uiState.value.formState.text ?: "")
+            binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
             binding.inputMain.setSelection(newPos)
         }
     }
