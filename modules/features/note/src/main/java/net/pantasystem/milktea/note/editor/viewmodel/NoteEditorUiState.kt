@@ -80,7 +80,7 @@ fun NoteEditorUiState.toCreateNote(account: Account): CreateNote {
         author = account,
         visibility = sendToState.visibility,
         text = formState.text,
-        cw = if (formState.hasCw) formState.text else null,
+        cw = if (formState.hasCw) formState.cw else null,
         viaMobile = false,
         files = files,
         replyId = sendToState.replyId,
