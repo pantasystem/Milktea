@@ -2,13 +2,16 @@ package net.pantasystem.milktea.note
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteEditorBinding
 import net.pantasystem.milktea.note.editor.NoteEditorFragment
@@ -82,8 +85,17 @@ class NoteEditorActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         var text: String? = null
-        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true) {
-            text = intent.getStringExtra(Intent.EXTRA_TEXT)
+
+        when {
+            intent?.action == Intent.ACTION_SEND -> {
+                if (intent.type?.startsWith("text/") == true) {
+                    text = intent.getStringExtra(Intent.EXTRA_TEXT)
+                }
+                if (intent.type?.startsWith("image/") == true) {
+                    handleSendImage(intent)
+                }
+            }
+            else -> Unit
         }
 
         val accountId: Long? =
@@ -126,5 +138,16 @@ class NoteEditorActivity : AppCompatActivity() {
 
     }
 
+    @Suppress("DEPRECATION")
+    private fun handleSendImage(intent: Intent) {
+        (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
+            val size = mViewModel.fileTotal()
+            if (size > mViewModel.maxFileCount.value) {
+                Log.d("NoteEditorActivity", "失敗しました")
+            } else {
+                mViewModel.add(uri.toAppFile(this))
+            }
+        }
+    }
 
 }
