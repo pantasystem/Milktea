@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.wada811.databinding.dataBinding
@@ -150,6 +151,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             handleIntent()
         }
 
+        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
     }
 
     override fun setToolbar(toolbar: Toolbar) {
@@ -157,6 +159,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         toggleNavigationDrawerDelegate.updateToolbar(toolbar)
     }
 
+    override fun onResume() {
+        super.onResume()
+        GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
+    }
 
     /**
      * シンプルエディターの表示・非表示を行う
