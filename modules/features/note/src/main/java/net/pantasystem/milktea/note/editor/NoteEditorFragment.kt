@@ -223,6 +223,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             finishOrConfirmSaveAsDraftOrDelete()
         }
         noteEditorToolbar.lifecycleOwner = viewLifecycleOwner
+        noteEditorToolbar.noteVisibility.setOnClickListener {
+            Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
+            val dialog = VisibilitySelectionDialogV2()
+            dialog.show(childFragmentManager, "NoteEditor")
+        }
 
 
         confirmViewModel = ViewModelProvider(requireActivity())[ConfirmViewModel::class.java]
@@ -340,11 +345,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        noteEditorViewModel.showVisibilitySelectionEvent.observe(viewLifecycleOwner) {
-            Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
-            val dialog = VisibilitySelectionDialogV2()
-            dialog.show(childFragmentManager, "NoteEditor")
-        }
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
