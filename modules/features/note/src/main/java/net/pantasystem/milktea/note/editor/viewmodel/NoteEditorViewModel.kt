@@ -145,9 +145,6 @@ class NoteEditorViewModel @Inject constructor(
         savedStateHandle.getStateFlow<Date?>(NoteEditorSavedStateKey.ScheduleAt.name, null)
 
 
-    val showVisibilitySelectionEvent = EventBus<Unit>()
-
-
     val address = visibility.map {
         it as? Visibility.Specified
     }.map {
@@ -434,10 +431,6 @@ class NoteEditorViewModel @Inject constructor(
 
     fun disablePoll() {
         savedStateHandle.setPoll(null)
-    }
-
-    fun showVisibilitySelection() {
-        showVisibilitySelectionEvent.event = Unit
     }
 
     fun setText(text: String) {
