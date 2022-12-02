@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.model.notes.toCreateNote
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
@@ -43,6 +42,7 @@ import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSimpleEditorBinding
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
+import net.pantasystem.milktea.note.editor.viewmodel.toCreateNote
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelectionViewModel
 import javax.inject.Inject
@@ -352,21 +352,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         selectMentionToUserResult.launch(intent)
     }
 
-//    override fun onSelect(file: File?) {
-//        file?.let{
-//            val intent = Intent(requireContext(), MediaActivity::class.java)
-//            intent.putExtra(MediaActivity.EXTRA_FILE, file)
-//            startActivity(intent)
-//        }
-//
-//    }
-//
-//    override fun onDetach(file: File?) {
-//        file?.let{
-//            mViewModel.removeFileNoteEditorData(file)
-//        }
-//    }
-
     override fun closeMenu() {
         isShowEditorMenu.value = false
     }
@@ -381,7 +366,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         lifecycleScope.launch(Dispatchers.IO) {
 
             accountStore.currentAccount?.let {
-                draftNoteService.save(mViewModel.state.value.toCreateNote(it)).onSuccess {
+                draftNoteService.save(mViewModel.uiState.value.toCreateNote(it)).onSuccess {
                     withContext(Dispatchers.Main) {
                         val intent = NoteEditorActivity.newBundle(requireContext(), draftNoteId = it.draftNoteId)
                         startActivity(intent)

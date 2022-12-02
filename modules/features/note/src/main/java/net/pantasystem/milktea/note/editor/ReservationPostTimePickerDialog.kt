@@ -22,7 +22,7 @@ class ReservationPostTimePickerDialog : AppCompatDialogFragment(),
     private val mViewModel: NoteEditorViewModel by activityViewModels()
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val viewModel = mViewModel
-        val local = (viewModel.state.value.reservationPostingAt ?: Clock.System.now()).toLocalDateTime(TimeZone.currentSystemDefault())
+        val local = (viewModel.uiState.value.sendToState.schedulePostAt ?: Clock.System.now()).toLocalDateTime(TimeZone.currentSystemDefault())
         return TimePickerDialog(requireActivity(), this, local.hour, local.minute, true)
     }
 
@@ -32,11 +32,7 @@ class ReservationPostTimePickerDialog : AppCompatDialogFragment(),
         c.time = date
         c.set(Calendar.HOUR_OF_DAY, p1)
         c.set(Calendar.MINUTE, p2)
-        mViewModel.updateState(
-            mViewModel.state.value.copy(
-                reservationPostingAt = Instant.fromEpochMilliseconds(c.time.time)
-            )
-        )
+        mViewModel.setSchedulePostAt(Instant.fromEpochMilliseconds(c.time.time))
 
     }
 }

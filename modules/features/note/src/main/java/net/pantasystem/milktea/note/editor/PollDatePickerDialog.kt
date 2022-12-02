@@ -41,14 +41,8 @@ class PollDatePickerDialog : AppCompatDialogFragment(), DatePickerDialog.OnDateS
         c.set(Calendar.MONTH, p2)
         c.set(Calendar.DAY_OF_MONTH, p3)
 
-        mViewModel.state.value.let { state ->
-            mViewModel.updateState(
-                state.copy(
-                    poll = state.poll?.copy(
-                        expiresAt = PollExpiresAt.DateAndTime(Instant.fromEpochMilliseconds(c.time.time))
-                    )
-                )
-            )
-        }
+        mViewModel.setPollExpiresAt(
+            PollExpiresAt.DateAndTime(Instant.fromEpochMilliseconds(c.time.time))
+        )
     }
 }

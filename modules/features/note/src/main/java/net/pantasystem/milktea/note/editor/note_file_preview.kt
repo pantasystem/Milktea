@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.editor
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,14 +24,14 @@ fun NoteFilePreview(
     dataSource: FilePropertyDataSource,
     onShow: (FilePreviewTarget)->Unit
 ) {
-    val files = noteEditorViewModel.files.observeAsState()
+    val files = noteEditorViewModel.files.collectAsState()
     val maxFileCount = noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
 
     Row (
         verticalAlignment = Alignment.CenterVertically,
     ){
         HorizontalFilePreviewList(
-            files = files.value ?: emptyList(),
+            files = files.value,
             repository = fileRepository,
             modifier = Modifier.weight(1f),
             dataSource = dataSource,
@@ -48,9 +49,10 @@ fun NoteFilePreview(
                 }
             }
         )
-        Text(
-            "${files.value?.size ?: 0}/${maxFileCount.value}"
-        )
+        if (files.value.isNotEmpty())
+            Text(
+                "${files.value.size}/${maxFileCount.value}"
+            )
     }
 
 }

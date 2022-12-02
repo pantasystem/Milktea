@@ -72,8 +72,8 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
     val channelsState by viewModel.channels.collectAsState()
     val channels =
         (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()
-    val state by viewModel.state.collectAsState()
-    val channelId = state.channelId
+    val state by viewModel.uiState.collectAsState()
+    val channelId = state.sendToState.channelId
     Surface(
         Modifier
             .fillMaxWidth()

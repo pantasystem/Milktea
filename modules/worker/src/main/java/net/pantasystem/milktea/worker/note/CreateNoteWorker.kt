@@ -10,7 +10,6 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.CreateNoteUseCase
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.toCreateNote
-import net.pantasystem.milktea.model.notes.toNoteEditingState
 import net.pantasystem.milktea.worker.WorkerTags
 
 @HiltWorker
@@ -46,7 +45,7 @@ class CreateNoteWorker @AssistedInject constructor(
             return Result.failure()
         }
         return draftNoteRepository.findOne(draftNoteId).mapCatching {
-            it.toNoteEditingState().toCreateNote(accountRepository.get(it.accountId).getOrThrow())
+            it.toCreateNote(accountRepository.get(it.accountId).getOrThrow())
         }.mapCatching {
             createNoteUseCase.invoke(it).getOrThrow()
         }.onFailure {

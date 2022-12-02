@@ -31,13 +31,9 @@ class PollTimePickerDialog : AppCompatDialogFragment(), TimePickerDialog.OnTimeS
         c.time = date
         c.set(Calendar.HOUR_OF_DAY, p1)
         c.set(Calendar.MINUTE, p2)
-        mViewModel.updateState(
-            mViewModel.state.value.copy(
-                poll = mViewModel.state.value.poll?.copy(
-                    expiresAt = PollExpiresAt.DateAndTime(
-                        Instant.fromEpochMilliseconds(c.time.time)
-                    )
-                )
+        mViewModel.setPollExpiresAt(
+            PollExpiresAt.DateAndTime(
+                Instant.fromEpochMilliseconds(c.time.time)
             )
         )
 
