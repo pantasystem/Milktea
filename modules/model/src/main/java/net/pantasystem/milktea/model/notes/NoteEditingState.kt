@@ -131,9 +131,7 @@ data class NoteEditingState(
 
     fun removeFile(file: AppFile): NoteEditingState {
         return this.copy(
-            files = this.files.toMutableList().apply {
-                remove(file)
-            }
+            files = this.files.removeFile(file)
         )
     }
 
@@ -253,13 +251,7 @@ data class NoteEditingState(
 
     fun toggleFileSensitiveStatus(appFile: AppFile.Local): NoteEditingState {
         return copy(
-            files = files.map {
-                if (it === appFile || it is AppFile.Local && it.isAttributeSame(appFile)) {
-                    appFile.copy(isSensitive = !appFile.isSensitive)
-                } else {
-                    it
-                }
-            }
+            files = files.toggleFileSensitiveStatus(appFile)
         )
     }
 
@@ -296,9 +288,11 @@ data class NoteEditingState(
     }
 }
 
-sealed interface PollExpiresAt {
+sealed interface PollExpiresAt : java.io.Serializable {
     object Infinity : PollExpiresAt
-    data class DateAndTime(val expiresAt: Instant) : PollExpiresAt
+    data class DateAndTime(val expiresAt: Date) : PollExpiresAt {
+        constructor(expiresAt: Instant) : this(Date(expiresAt.toEpochMilliseconds()))
+    }
 
     fun asDate(): Date? {
         return this.expiresAt()?.toEpochMilliseconds()?.let {
@@ -310,7 +304,7 @@ sealed interface PollExpiresAt {
 fun PollExpiresAt.expiresAt(): Instant? {
     return when (this) {
         is PollExpiresAt.Infinity -> null
-        is PollExpiresAt.DateAndTime -> this.expiresAt
+        is PollExpiresAt.DateAndTime -> Instant.fromEpochMilliseconds(this.expiresAt.time)
     }
 }
 
@@ -318,7 +312,7 @@ data class PollEditingState(
     val choices: List<PollChoiceState>,
     val multiple: Boolean,
     val expiresAt: PollExpiresAt = PollExpiresAt.Infinity
-) {
+) : java.io.Serializable {
 
     val isExpiresAtDateTime: Boolean
         get() = expiresAt is PollExpiresAt.DateAndTime
@@ -339,7 +333,7 @@ data class PollEditingState(
 data class PollChoiceState(
     val text: String,
     val id: UUID = UUID.randomUUID()
-)
+) : java.io.Serializable
 
 fun DraftNote.toNoteEditingState(): NoteEditingState {
     return NoteEditingState(
@@ -410,4 +404,37 @@ fun NoteEditingState.toCreateNote(account: Account): CreateNote {
         channelId = channelId,
         scheduleWillPostAt = reservationPostingAt
     )
+}
+
+fun List<AppFile>.toggleFileSensitiveStatus(appFile: AppFile.Local): List<AppFile> {
+    return this.map {
+        if (it === appFile || it is AppFile.Local && it.isAttributeSame(appFile)) {
+            appFile.copy(isSensitive = !appFile.isSensitive)
+        } else {
+            it
+        }
+    }
+}
+
+fun String?.addMentionUserNames(userNames: List<String>, pos: Int): Pair<String?, Int> {
+    val mentionBuilder = StringBuilder()
+    userNames.forEachIndexed { index, userName ->
+        if (index < userNames.size - 1) {
+            // NOTE: 次の文字がつながらないようにする
+            mentionBuilder.appendLine("$userName ")
+        } else {
+            // NOTE: 次の文字がつながらないようにする
+            mentionBuilder.append("$userName ")
+        }
+    }
+    val builder = StringBuilder(this ?: "")
+    builder.insert(pos, mentionBuilder.toString())
+    val nextPos = pos + mentionBuilder.length
+    return builder.toString() to nextPos
+}
+
+fun List<AppFile>.removeFile(appFile: AppFile): List<AppFile> {
+    return toMutableList().apply {
+        remove(appFile)
+    }
 }
