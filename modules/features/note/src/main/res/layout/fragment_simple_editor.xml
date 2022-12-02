@@ -90,7 +90,7 @@
                     app:circleIcon="@{noteEditorViewModel.currentUser.user.avatarUrl}"
 
                     tools:ignore="ContentDescription"
-                    tools:src="@mipmap/ic_launcher" />
+                     />
 
             <ImageButton
                     android:id="@+id/selectFileFromLocal"
@@ -167,7 +167,6 @@
                     android:layout_margin="4dp"
                     android:layout_weight="1"
                     android:adjustViewBounds="true"
-                    android:onClick="@{()-> noteEditorViewModel.showVisibilitySelection()}"
                     app:noteVisibility="@{noteEditorViewModel.visibility}"
                     tools:ignore="ContentDescription"
                     tools:src="@drawable/ic_language_black_24dp"

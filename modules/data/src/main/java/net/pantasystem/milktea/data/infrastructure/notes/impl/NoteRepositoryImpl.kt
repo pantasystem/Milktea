@@ -56,7 +56,7 @@ class NoteRepositoryImpl @Inject constructor(
                 uploader.get(createNote.author)
             ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.mapCatching {
-            misskeyAPIProvider.get(createNote.author).create(it).body()?.createdNote
+            misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError().body()?.createdNote
         }.onFailure {
             logger.error("create note error", it)
         }

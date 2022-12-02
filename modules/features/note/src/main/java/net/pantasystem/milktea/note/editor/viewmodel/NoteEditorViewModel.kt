@@ -44,7 +44,7 @@ class NoteEditorViewModel @Inject constructor(
     private val filePropertyDataSource: FilePropertyDataSource,
     private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
-    private val accountStore: AccountStore,
+    accountStore: AccountStore,
     private val draftNoteService: DraftNoteService,
     private val draftNoteRepository: DraftNoteRepository,
     private val noteReservationPostExecutor: NoteReservationPostExecutor,
@@ -71,7 +71,7 @@ class NoteEditorViewModel @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val currentUser: StateFlow<UserViewData?> =
-        accountStore.state.map { it.currentAccount }.filterNotNull().map {
+        currentAccount.filterNotNull().map {
             val userId = User.Id(it.accountId, it.remoteId)
             userViewDataFactory.create(
                 userId,
@@ -86,7 +86,7 @@ class NoteEditorViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
+        currentAccount.filterNotNull().flatMapLatest { account ->
             metaRepository.observe(account.instanceDomain).filterNotNull().map { meta ->
                 meta.maxNoteTextLength ?: 1500
             }
@@ -97,7 +97,7 @@ class NoteEditorViewModel @Inject constructor(
         )
 
 
-    val maxFileCount = accountStore.observeCurrentAccount.filterNotNull().mapNotNull {
+    val maxFileCount = currentAccount.filterNotNull().mapNotNull {
         metaRepository.get(it.instanceDomain)?.getVersion()
     }.map {
         if (it >= Version("12.100.2")) {
@@ -108,7 +108,7 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val channels = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+    val channels = currentAccount.filterNotNull().flatMapLatest {
         suspend {
             channelRepository.findFollowedChannels(it.accountId).onFailure {
                 logger.error("load channel error", it)
@@ -143,10 +143,6 @@ class NoteEditorViewModel @Inject constructor(
 
     val reservationPostingAt =
         savedStateHandle.getStateFlow<Date?>(NoteEditorSavedStateKey.ScheduleAt.name, null)
-
-
-    val showVisibilitySelectionEvent = EventBus<Unit>()
-    private val visibilitySelectedEvent = EventBus<Unit>()
 
 
     val address = visibility.map {
@@ -300,7 +296,7 @@ class NoteEditorViewModel @Inject constructor(
             savedStateHandle.setChannelId(result.channelId)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
-        accountStore.observeCurrentAccount.filterNotNull().onEach {
+        currentAccount.filterNotNull().onEach {
             val v = settingStore.getNoteVisibility(it.accountId)
             if (channelId.value == null) {
                 savedStateHandle.setVisibility(v)
@@ -346,8 +342,11 @@ class NoteEditorViewModel @Inject constructor(
     fun post() {
         currentAccount.value?.let { account ->
             viewModelScope.launch(Dispatchers.IO) {
-                val reservationPostingAt = uiState.value.sendToState.schedulePostAt
-                draftNoteService.save(uiState.value.toCreateNote(account)).mapCatching { dfNote ->
+                val reservationPostingAt =
+                    savedStateHandle.getNoteEditingUiState(account).sendToState.schedulePostAt
+                draftNoteService.save(
+                    savedStateHandle.getNoteEditingUiState(account).toCreateNote(account)
+                ).mapCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                         createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
                     } else {
@@ -434,10 +433,6 @@ class NoteEditorViewModel @Inject constructor(
         savedStateHandle.setPoll(null)
     }
 
-    fun showVisibilitySelection() {
-        showVisibilitySelectionEvent.event = Unit
-    }
-
     fun setText(text: String) {
         savedStateHandle.setText(text)
     }
@@ -450,7 +445,6 @@ class NoteEditorViewModel @Inject constructor(
         logger.debug("公開範囲がセットされた:$visibility")
         savedStateHandle.setChannelId(null)
         savedStateHandle.setVisibility(visibility)
-        this.visibilitySelectedEvent.event = Unit
     }
 
     fun setChannelId(channelId: Channel.Id?) {
@@ -516,23 +510,16 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                try {
-                    val account = accountStore.currentAccount ?: throw UnauthorizedException()
-                    val result =
-                        draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
-                    isSaveNoteAsDraft.event = result.draftNoteId
-                } catch (e: Exception) {
-                    logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
-                }
-            } catch (e: NullPointerException) {
+            when(val account = currentAccount.value) {
+                null -> Result.failure(UnauthorizedException())
+                else -> Result.success(account)
+            }.mapCatching { account ->
+                draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
+            }.onSuccess { result ->
+                isSaveNoteAsDraft.event = result.draftNoteId
+            }.onFailure { e ->
                 logger.error("下書き保存に失敗した", e)
-
-            } catch (e: Throwable) {
-                logger.error("下書き保存に失敗した", e)
-
             }
-
         }
     }
 
