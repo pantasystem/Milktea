@@ -82,20 +82,11 @@ class PollEditorFragment : Fragment(R.layout.fragment_poll_editor){
         mBinding.deadLineType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, id: Long) {
                 if(deadLineType[position] == getString(R.string.indefinite_period)){
-                    viewModel.updateState(viewModel.state.value.changePollExpiresAt(PollExpiresAt.Infinity))
+                    viewModel.setPollExpiresAt(PollExpiresAt.Infinity)
                 }else{
-                    viewModel.updateState(
-                        viewModel
-                            .state
-                            .value
-                            .changePollExpiresAt(
-                                PollExpiresAt.DateAndTime(
-                                    Clock.System.now().plus(1.days)
-                                )
-                            )
-                    )
-
-
+                    viewModel.setPollExpiresAt(PollExpiresAt.DateAndTime(
+                        Clock.System.now().plus(1.days)
+                    ))
                 }
             }
 
