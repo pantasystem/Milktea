@@ -519,23 +519,16 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                try {
-                    val account = currentAccount.value ?: throw UnauthorizedException()
-                    val result =
-                        draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
-                    isSaveNoteAsDraft.event = result.draftNoteId
-                } catch (e: Exception) {
-                    logger.error("下書き書き込み中にエラー発生：失敗してしまった", e)
-                }
-            } catch (e: NullPointerException) {
+            when(val account = currentAccount.value) {
+                null -> Result.failure(UnauthorizedException())
+                else -> Result.success(account)
+            }.mapCatching { account ->
+                draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
+            }.onSuccess { result ->
+                isSaveNoteAsDraft.event = result.draftNoteId
+            }.onFailure { e ->
                 logger.error("下書き保存に失敗した", e)
-
-            } catch (e: Throwable) {
-                logger.error("下書き保存に失敗した", e)
-
             }
-
         }
     }
 
