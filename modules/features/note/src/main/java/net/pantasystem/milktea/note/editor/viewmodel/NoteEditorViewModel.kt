@@ -278,19 +278,19 @@ class NoteEditorViewModel @Inject constructor(
             draftNoteRepository.findOne(id).mapCatching {
                 it.toNoteEditingState()
             }.onSuccess { note ->
-                currentAccount.value = note.author
-                savedStateHandle.setVisibility(note.visibility)
-                savedStateHandle.setText(note.text)
-                savedStateHandle.setCw(note.cw)
-                savedStateHandle.setHasCw(note.cw != null)
+                currentAccount.value = note.currentAccount
+                savedStateHandle.setVisibility(note.sendToState.visibility)
+                savedStateHandle.setText(note.formState.text)
+                savedStateHandle.setCw(note.formState.cw)
+                savedStateHandle.setHasCw(note.formState.hasCw)
                 savedStateHandle.setFiles(note.files)
-                savedStateHandle.setReplyId(note.replyId)
-                savedStateHandle.setRenoteId(note.renoteId)
+                savedStateHandle.setReplyId(note.sendToState.replyId)
+                savedStateHandle.setRenoteId(note.sendToState.renoteId)
                 savedStateHandle.setPoll(note.poll)
-                savedStateHandle.setDraftNoteId(note.draftNoteId)
-                savedStateHandle.setChannelId(note.channelId)
+                savedStateHandle.setDraftNoteId(note.sendToState.draftNoteId)
+                savedStateHandle.setChannelId(note.sendToState.channelId)
                 savedStateHandle.setScheduleAt(
-                    note.reservationPostingAt?.let {
+                    note.sendToState.schedulePostAt?.let {
                         Date(it.toEpochMilliseconds())
                     }
                 )

@@ -5,10 +5,7 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.file.from
-import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.poll.CreatePoll
-import net.pantasystem.milktea.model.user.User
 import java.util.*
 
 data class AddMentionResult(
@@ -307,48 +304,6 @@ data class PollChoiceState(
     val id: UUID = UUID.randomUUID()
 ) : java.io.Serializable
 
-fun DraftNote.toNoteEditingState(): NoteEditingState {
-    return NoteEditingState(
-        text = this.text,
-        cw = this.cw,
-        draftNoteId = this.draftNoteId,
-        visibility = Visibility(
-            type = this.visibility,
-            isLocalOnly = this.localOnly ?: false,
-            visibleUserIds = this.visibleUserIds?.map {
-                User.Id(accountId = accountId, id = it)
-            }),
-        viaMobile = this.viaMobile ?: true,
-        poll = this.draftPoll?.let {
-            PollEditingState(
-                choices = it.choices.map { choice ->
-                    PollChoiceState(choice)
-                },
-                expiresAt = it.expiresAt?.let { ex ->
-                    PollExpiresAt.DateAndTime(
-                        Instant.fromEpochMilliseconds(ex)
-                    )
-                } ?: PollExpiresAt.Infinity,
-                multiple = it.multiple
-            )
-        },
-        replyId = this.replyId?.let {
-            Note.Id(accountId = accountId, noteId = it)
-        },
-        renoteId = this.renoteId?.let {
-            Note.Id(accountId = accountId, noteId = it)
-        },
-        files = draftFiles?.map {
-            AppFile.from(it)
-        } ?: emptyList(),
-        reservationPostingAt = reservationPostingAt?.let {
-            Instant.fromEpochMilliseconds(it.time)
-        },
-        channelId = channelId,
-        textCursorPos = null,
-    )
-}
-
 fun PollEditingState.toCreatePoll(): CreatePoll {
     return CreatePoll(
         choices = this.choices.map {
@@ -361,22 +316,6 @@ fun PollEditingState.toCreatePoll(): CreatePoll {
 
 
 
-fun NoteEditingState.toCreateNote(account: Account): CreateNote {
-    return CreateNote(
-        author = account,
-        visibility = visibility,
-        text = text,
-        cw = cw,
-        viaMobile = false,
-        files = files,
-        replyId = replyId,
-        renoteId = renoteId,
-        poll = poll?.toCreatePoll(),
-        draftNoteId = draftNoteId,
-        channelId = channelId,
-        scheduleWillPostAt = reservationPostingAt
-    )
-}
 
 fun List<AppFile>.toggleFileSensitiveStatus(appFile: AppFile.Local): List<AppFile> {
     return this.map {

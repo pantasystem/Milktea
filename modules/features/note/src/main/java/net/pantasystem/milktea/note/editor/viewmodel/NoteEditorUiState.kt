@@ -4,7 +4,10 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.user.User
 
 
 data class NoteEditorFormState(
@@ -90,4 +93,51 @@ fun NoteEditorUiState.toCreateNote(account: Account): CreateNote {
         channelId = sendToState.channelId,
         scheduleWillPostAt = sendToState.schedulePostAt,
     )
+}
+
+
+fun DraftNote.toNoteEditingState(): NoteEditorUiState {
+    return NoteEditorUiState(
+        formState = NoteEditorFormState(
+            text = this.text,
+            cw = this.cw,
+            hasCw = this.cw != null,
+        ),
+        sendToState = NoteEditorSendToState(
+            draftNoteId = this.draftNoteId,
+            visibility = Visibility(
+                type = this.visibility,
+                isLocalOnly = this.localOnly ?: false,
+                visibleUserIds = this.visibleUserIds?.map {
+                    User.Id(accountId = accountId, id = it)
+                }),
+            replyId = this.replyId?.let {
+                Note.Id(accountId = accountId, noteId = it)
+            },
+            renoteId = this.renoteId?.let {
+                Note.Id(accountId = accountId, noteId = it)
+            },
+            channelId = channelId,
+            schedulePostAt = reservationPostingAt?.let {
+                Instant.fromEpochMilliseconds(it.time)
+            },
+        ),
+        poll = this.draftPoll?.let {
+            PollEditingState(
+                choices = it.choices.map { choice ->
+                    PollChoiceState(choice)
+                },
+                expiresAt = it.expiresAt?.let { ex ->
+                    PollExpiresAt.DateAndTime(
+                        Instant.fromEpochMilliseconds(ex)
+                    )
+                } ?: PollExpiresAt.Infinity,
+                multiple = it.multiple
+            )
+        },
+        files = draftFiles?.map {
+            AppFile.from(it)
+        } ?: emptyList(),
+
+        )
 }
