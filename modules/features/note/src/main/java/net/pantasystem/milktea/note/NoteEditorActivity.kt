@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -95,6 +96,9 @@ class NoteEditorActivity : AppCompatActivity() {
                     handleSendImage(intent)
                 }
             }
+            intent.action == Intent.ACTION_SEND_MULTIPLE && intent.type?.startsWith("image/") == true -> {
+                handleSendImages(intent)
+            }
             else -> Unit
         }
 
@@ -141,12 +145,23 @@ class NoteEditorActivity : AppCompatActivity() {
     @Suppress("DEPRECATION")
     private fun handleSendImage(intent: Intent) {
         (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
-            val size = mViewModel.fileTotal()
-            if (size > mViewModel.maxFileCount.value) {
-                Log.d("NoteEditorActivity", "失敗しました")
-            } else {
-                mViewModel.add(uri.toAppFile(this))
-            }
+            addFileFromUri(uri)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun handleSendImages(intent: Intent) {
+        intent.getParcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.mapNotNull {
+                it as? Uri
+            }?.map(::addFileFromUri)
+    }
+
+    private fun addFileFromUri(uri: Uri) {
+        val size = mViewModel.fileTotal()
+        if (size > mViewModel.maxFileCount.value) {
+            Log.d("NoteEditorActivity", "失敗しました")
+        } else {
+            mViewModel.add(uri.toAppFile(this))
         }
     }
 
