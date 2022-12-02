@@ -78,3 +78,21 @@ fun SavedStateHandle.getVisibility(): Visibility {
 fun SavedStateHandle.setDraftNoteId(id: Long?) {
     this[NoteEditorSavedStateKey.DraftNoteId.name] = id
 }
+
+fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
+    setVisibility(note.sendToState.visibility)
+    setText(note.formState.text)
+    setCw(note.formState.cw)
+    setHasCw(note.formState.hasCw)
+    setFiles(note.files)
+    setReplyId(note.sendToState.replyId)
+    setRenoteId(note.sendToState.renoteId)
+    setPoll(note.poll)
+    setDraftNoteId(note.sendToState.draftNoteId)
+    setChannelId(note.sendToState.channelId)
+    setScheduleAt(
+        note.sendToState.schedulePostAt?.let {
+            Date(it.toEpochMilliseconds())
+        }
+    )
+}

@@ -279,21 +279,7 @@ class NoteEditorViewModel @Inject constructor(
                 it.toNoteEditingState()
             }.onSuccess { note ->
                 currentAccount.value = note.currentAccount
-                savedStateHandle.setVisibility(note.sendToState.visibility)
-                savedStateHandle.setText(note.formState.text)
-                savedStateHandle.setCw(note.formState.cw)
-                savedStateHandle.setHasCw(note.formState.hasCw)
-                savedStateHandle.setFiles(note.files)
-                savedStateHandle.setReplyId(note.sendToState.replyId)
-                savedStateHandle.setRenoteId(note.sendToState.renoteId)
-                savedStateHandle.setPoll(note.poll)
-                savedStateHandle.setDraftNoteId(note.sendToState.draftNoteId)
-                savedStateHandle.setChannelId(note.sendToState.channelId)
-                savedStateHandle.setScheduleAt(
-                    note.sendToState.schedulePostAt?.let {
-                        Date(it.toEpochMilliseconds())
-                    }
-                )
+                savedStateHandle.applyBy(note)
             }
         }
 
@@ -556,13 +542,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     fun clear() {
-        savedStateHandle.setVisibility(Visibility.Public(false))
-        savedStateHandle.setHasCw(false)
-        savedStateHandle.setCw(null)
-        savedStateHandle.setText(null)
-        savedStateHandle.setFiles(emptyList())
-        savedStateHandle.setPoll(null)
-        savedStateHandle.setScheduleAt(null)
+        savedStateHandle.applyBy(NoteEditorUiState())
     }
 
 
