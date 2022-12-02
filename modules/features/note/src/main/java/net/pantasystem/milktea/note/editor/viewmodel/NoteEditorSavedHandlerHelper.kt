@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.note.editor.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
+import kotlinx.datetime.Instant
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.Note
@@ -21,6 +23,10 @@ fun SavedStateHandle.getText(): String? {
     return this[NoteEditorSavedStateKey.Text.name]
 }
 
+fun SavedStateHandle.getCw(): String? {
+    return this[NoteEditorSavedStateKey.Cw.name]
+}
+
 fun SavedStateHandle.setCw(text: String?) {
     this[NoteEditorSavedStateKey.Cw.name] = text
 }
@@ -37,6 +43,10 @@ fun SavedStateHandle.setChannelId(channelId: Channel.Id?) {
     this[NoteEditorSavedStateKey.ChannelId.name] = channelId
 }
 
+fun SavedStateHandle.getChannelId(): Channel.Id? {
+    return this[NoteEditorSavedStateKey.ChannelId.name]
+}
+
 
 fun SavedStateHandle.setReplyId(noteId: Note.Id?) {
     this[NoteEditorSavedStateKey.ReplyId.name] = noteId
@@ -46,9 +56,20 @@ fun SavedStateHandle.setRenoteId(noteId: Note.Id?) {
     this[NoteEditorSavedStateKey.RenoteId.name] = noteId
 }
 
+fun SavedStateHandle.getRenoteId(): Note.Id? {
+    return this[NoteEditorSavedStateKey.RenoteId.name]
+}
+
+fun SavedStateHandle.getReplyId(): Note.Id? {
+    return this[NoteEditorSavedStateKey.ReplyId.name]
+}
 
 fun SavedStateHandle.setScheduleAt(date: Date?) {
     this[NoteEditorSavedStateKey.ScheduleAt.name] = date
+}
+
+fun SavedStateHandle.getScheduleAt(): Date? {
+    return this[NoteEditorSavedStateKey.ScheduleAt.name]
 }
 
 fun SavedStateHandle.setHasCw(hasCw: Boolean) {
@@ -79,6 +100,10 @@ fun SavedStateHandle.setDraftNoteId(id: Long?) {
     this[NoteEditorSavedStateKey.DraftNoteId.name] = id
 }
 
+fun SavedStateHandle.getDraftNoteId(): Long? {
+    return this[NoteEditorSavedStateKey.DraftNoteId.name]
+}
+
 fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
     setVisibility(note.sendToState.visibility)
     setText(note.formState.text)
@@ -94,5 +119,28 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
         note.sendToState.schedulePostAt?.let {
             Date(it.toEpochMilliseconds())
         }
+    )
+}
+
+fun SavedStateHandle.getNoteEditingUiState(account: Account?): NoteEditorUiState {
+    return NoteEditorUiState(
+        formState = NoteEditorFormState(
+            text = getText(),
+            cw = getCw(),
+            hasCw = getHasCw(),
+        ),
+        sendToState = NoteEditorSendToState(
+            visibility = getVisibility(),
+            channelId = getChannelId(),
+            renoteId = getRenoteId(),
+            replyId = getReplyId(),
+            schedulePostAt = getScheduleAt()?.let {
+                Instant.fromEpochMilliseconds(it.time)
+            },
+            draftNoteId = getDraftNoteId()
+        ),
+        poll = getPoll(),
+        files = getFiles(),
+        currentAccount = account,
     )
 }
