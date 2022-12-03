@@ -16,8 +16,8 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.Activities
-import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android.ui.getParentActivity
+import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteDetailBinding
+import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -95,7 +96,7 @@ class NoteDetailActivity : AppCompatActivity() {
 
         mIsMainActive = intent.getBooleanExtra(EXTRA_IS_MAIN_ACTIVE, true)
 
-        net.pantasystem.milktea.note.view.ActionNoteHandler(
+        ActionNoteHandler(
             this,
             notesViewModel,
             ViewModelProvider(this)[ConfirmViewModel::class.java],
@@ -104,9 +105,11 @@ class NoteDetailActivity : AppCompatActivity() {
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(
             R.id.fragment_base,
-            pageableFragmentFactory.create(Pageable.Show(
-                noteId!!
-            ))
+            pageableFragmentFactory.create(
+                mAccountId, Pageable.Show(
+                    noteId!!
+                )
+            )
         )
         ft.commit()
 

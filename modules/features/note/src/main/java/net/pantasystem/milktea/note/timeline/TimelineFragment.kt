@@ -48,6 +48,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
         private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
 
         fun newInstance(page: Page): TimelineFragment {
             return TimelineFragment().apply {
@@ -57,10 +58,13 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }
 
-        fun newInstance(pageable: Pageable): TimelineFragment {
+        fun newInstance(pageable: Pageable, accountId: Long? = null): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_PAGEABLE, pageable)
+                    if (accountId != null) {
+                        putLong(EXTRA_ACCOUNT_ID, accountId)
+                    }
                 }
             }
         }
@@ -76,7 +80,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         TimelineViewModel.provideViewModel(
             timelineViewModelFactory,
             null,
-            mPage?.accountId,
+            mPage?.accountId ?: accountId,
             mPageable
         )
     }
@@ -103,10 +107,18 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
+    @Suppress("DEPRECATION")
     private val mPage: Page? by lazy {
         arguments?.getSerializable(EXTRA_PAGE) as? Page
     }
 
+    private val accountId: Long? by lazy {
+        arguments?.getLong(EXTRA_ACCOUNT_ID, -1).takeIf {
+            it != -1L
+        }
+    }
+
+    @Suppress("DEPRECATION")
     private val mPageable: Pageable by lazy {
         val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
         mPage?.pageable() ?: pageable ?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
