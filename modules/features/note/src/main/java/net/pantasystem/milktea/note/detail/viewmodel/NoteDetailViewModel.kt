@@ -121,6 +121,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                         noteCaptureAdapter,
                         noteTranslationStore,
                     ).also {
+                        it.capture()
                         cache.put(it)
                     }
                 }
@@ -160,13 +161,14 @@ class NoteDetailViewModel @AssistedInject constructor(
                 val account = currentAccountWatcher.getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
                     .getOrThrow()
-
-                noteRepository.syncConversation(note.id)
+                noteRepository.syncConversation(note.id).getOrThrow()
                 recursiveSync(note.id).getOrThrow()
+                noteRepository.sync(note.id)
             } catch (e: Exception) {
                 Log.w("NoteDetailViewModel", "loadDetail失敗", e)
             }
         }
+
     }
 
 
