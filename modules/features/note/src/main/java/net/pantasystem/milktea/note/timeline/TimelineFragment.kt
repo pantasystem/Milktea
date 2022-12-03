@@ -35,7 +35,6 @@ import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -46,24 +45,16 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     companion object {
 
-        private const val EXTRA_PAGE = "jp.panta.misskeyandroidclient.EXTRA_PAGE"
-        private const val EXTRA_PAGEABLE = "jp.panta.misskeyandroidclient.EXTRA_PAGEABLE"
-        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.EXTRA_ACCOUNT_ID"
-
         fun newInstance(page: Page): TimelineFragment {
-            return TimelineFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(EXTRA_PAGE, page)
-                }
-            }
+            return newInstance(page.pageable(), page.accountId)
         }
 
         fun newInstance(pageable: Pageable, accountId: Long? = null): TimelineFragment {
             return TimelineFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(EXTRA_PAGEABLE, pageable)
+                    putSerializable(TimelineViewModel.EXTRA_PAGEABLE, pageable)
                     if (accountId != null) {
-                        putLong(EXTRA_ACCOUNT_ID, accountId)
+                        putLong(TimelineViewModel.EXTRA_ACCOUNT_ID, accountId)
                     }
                 }
             }
@@ -73,17 +64,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private lateinit var mLinearLayoutManager: LinearLayoutManager
 
-    @Inject
-    lateinit var timelineViewModelFactory: TimelineViewModel.ViewModelAssistedFactory
 
-    private val mViewModel: TimelineViewModel by viewModels<TimelineViewModel> {
-        TimelineViewModel.provideViewModel(
-            timelineViewModelFactory,
-            null,
-            mPage?.accountId ?: accountId,
-            mPageable
-        )
-    }
+    private val mViewModel: TimelineViewModel by viewModels()
 
     private val timeMachineEventViewModel by activityViewModels<TimeMachineEventViewModel>()
 
@@ -107,22 +89,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
-    @Suppress("DEPRECATION")
-    private val mPage: Page? by lazy {
-        arguments?.getSerializable(EXTRA_PAGE) as? Page
-    }
 
-    private val accountId: Long? by lazy {
-        arguments?.getLong(EXTRA_ACCOUNT_ID, -1).takeIf {
-            it != -1L
-        }
-    }
 
-    @Suppress("DEPRECATION")
-    private val mPageable: Pageable by lazy {
-        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as? Pageable
-        mPage?.pageable() ?: pageable ?: throw IllegalStateException("構築に必要な情報=Pageableがありません。")
-    }
 
     /**
      * タイムラインが画面上に表示されているかを判定するフラグ
@@ -259,7 +227,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onResume()
 
         isShowing = true
-        currentPageableTimelineViewModel.setCurrentPageable(mPageable)
+        currentPageableTimelineViewModel.setCurrentPageable(mViewModel.pageable)
         try {
             mLinearLayoutManager.scrollToPosition(mViewModel.position)
         } catch (_: Exception) {
