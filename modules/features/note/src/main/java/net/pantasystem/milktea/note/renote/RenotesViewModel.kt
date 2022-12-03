@@ -1,9 +1,11 @@
 package net.pantasystem.milktea.note.renote
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,29 +21,28 @@ import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.renote.Renote
 import net.pantasystem.milktea.model.user.User
-import javax.inject.Inject
 
-@HiltViewModel
-class RenotesViewModel @Inject constructor(
+class RenotesViewModel @AssistedInject constructor(
     private val renotesPagingServiceFactory: RenotesPagingService.Factory,
     private val noteGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     accountStore: AccountStore,
     loggerFactory: Logger.Factory,
-    savedStateHandle: SavedStateHandle,
+    @Assisted val noteId: Note.Id,
 ) : ViewModel() {
 
-
-    companion object {
-        const val EXTRA_NOTE_ID = "RenotesViewModel.EXTRA_NOTE_ID"
+    @AssistedFactory
+    interface ViewModelAssistedFactory {
+        fun create(noteId: Note.Id): RenotesViewModel
     }
-    val noteId: Note.Id = savedStateHandle[EXTRA_NOTE_ID]
-        ?: throw IllegalArgumentException()
+
+    companion object;
 
     private val renotesPagingService by lazy {
         renotesPagingServiceFactory.create(noteId)
     }
+
 
     private val logger = loggerFactory.create("RenotesVM")
 
@@ -115,5 +116,15 @@ class RenotesViewModel @Inject constructor(
                 }
             }
         }
+    }
+}
+
+fun RenotesViewModel.Companion.provideViewModel(
+    factory: RenotesViewModel.ViewModelAssistedFactory,
+    noteId: Note.Id
+) = object : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return factory.create(noteId) as T
     }
 }

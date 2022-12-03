@@ -21,22 +21,38 @@ import net.pantasystem.milktea.note.view.RenoteUsersScreen
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RenotesBottomSheetDialog : BottomSheetDialogFragment() {
+class RenotesBottomSheetDialog : BottomSheetDialogFragment(){
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
     companion object {
-        fun newInstance(noteId: Note.Id): RenotesBottomSheetDialog {
+        private const val EXTRA_ACCOUNT_ID = "ACCOUNT_ID"
+        private const val EXTRA_NOTE_ID = "NOTE_ID"
+
+        fun newInstance(noteId: Note.Id) : RenotesBottomSheetDialog {
             return RenotesBottomSheetDialog().also {
                 it.arguments = Bundle().also { bundle ->
-                    bundle.putSerializable(RenotesViewModel.EXTRA_NOTE_ID, noteId)
+                    bundle.putLong(EXTRA_ACCOUNT_ID, noteId.accountId)
+                    bundle.putString(EXTRA_NOTE_ID, noteId.noteId)
                 }
             }
         }
     }
 
-    private val viewModel by viewModels<RenotesViewModel>()
+    @Inject
+    lateinit var renotesViewModelAssistedFactory: RenotesViewModel.ViewModelAssistedFactory
+
+
+
+    private val viewModel by viewModels<RenotesViewModel> {
+        val noteId = arguments?.let {
+            val aId = it.getLong(EXTRA_ACCOUNT_ID)
+            val nId = it.getString(EXTRA_NOTE_ID)!!
+            Note.Id(aId, nId)
+        }!!
+        RenotesViewModel.provideViewModel(renotesViewModelAssistedFactory, noteId)
+    }
 
 
     private val bottomSheetDialogBehavior: BottomSheetBehavior<FrameLayout>?
@@ -59,11 +75,9 @@ class RenotesBottomSheetDialog : BottomSheetDialogFragment() {
                         renotesViewModel = viewModel,
                         onSelected = { nr ->
                             dismiss()
-                            val intent = userDetailNavigation.newIntent(
-                                UserDetailNavigationArgs.UserId(
-                                    nr.user.id
-                                )
-                            )
+                            val intent = userDetailNavigation.newIntent(UserDetailNavigationArgs.UserId(
+                                nr.user.id
+                            ))
                             startActivity(intent)
                         },
                         onScrollState = { state ->

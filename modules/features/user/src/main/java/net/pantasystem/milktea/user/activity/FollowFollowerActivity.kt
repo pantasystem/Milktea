@@ -17,13 +17,15 @@ import net.pantasystem.milktea.user.compose.screen.FollowFollowerRoute
 import net.pantasystem.milktea.user.viewmodel.FollowFollowerViewModel
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 import net.pantasystem.milktea.user.viewmodel.UserDetailViewModel
+import net.pantasystem.milktea.user.viewmodel.provideFactory
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class FollowFollowerActivity : AppCompatActivity() {
 
     companion object {
-
+        private const val EXTRA_USER_ID =
+            "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_USER_ID"
         private const val EXTRA_VIEW_CURRENT =
             "net.pantasystem.milktea.user.activity.FollowFollowerActivity.EXTRA_VIEW_CURRENT"
         private const val FOLLOWING_VIEW_MODE = 0
@@ -31,7 +33,7 @@ class FollowFollowerActivity : AppCompatActivity() {
 
         fun newIntent(context: Context, userId: User.Id, isFollowing: Boolean): Intent {
             return Intent(context, FollowFollowerActivity::class.java).apply {
-                putExtra(FollowFollowerViewModel.EXTRA_USER_ID, userId)
+                putExtra(EXTRA_USER_ID, userId)
                 putExtra(
                     EXTRA_VIEW_CURRENT,
                     if (isFollowing) FOLLOWING_VIEW_MODE else FOLLOWER_VIEW_MODE
@@ -48,8 +50,12 @@ class FollowFollowerActivity : AppCompatActivity() {
 
     private val toggleFollowFollowerViewModel: ToggleFollowViewModel by viewModels()
 
-
-    private val followFollowerViewModel by viewModels<FollowFollowerViewModel>()
+    @Inject
+    lateinit var viewModelFactory: FollowFollowerViewModel.ViewModelAssistedFactory
+    private val followFollowerViewModel by viewModels<FollowFollowerViewModel> {
+        val userId = intent.getSerializableExtra(EXTRA_USER_ID) as User.Id
+        FollowFollowerViewModel.provideFactory(viewModelFactory, userId)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
