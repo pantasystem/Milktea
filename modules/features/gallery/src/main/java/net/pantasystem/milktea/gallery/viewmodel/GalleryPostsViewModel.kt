@@ -42,8 +42,8 @@ class GalleryPostsViewModel @Inject constructor(
         const val EXTRA_ACCOUNT_ID = "GalleryPostsViewModel.EXTRA_ACCOUNT_ID"
     }
 
-    val pageable: Pageable.Gallery = savedStateHandle[EXTRA_PAGEABLE]
-        ?: throw IllegalArgumentException()
+    val pageable: Pageable.Gallery = requireNotNull(savedStateHandle[EXTRA_PAGEABLE])
+
     val accountId: Long? = savedStateHandle.get<Long?>(EXTRA_ACCOUNT_ID).takeIf {
         it != -1L
     }

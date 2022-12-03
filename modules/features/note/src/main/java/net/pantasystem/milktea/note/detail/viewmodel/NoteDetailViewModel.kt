@@ -38,7 +38,7 @@ class NoteDetailViewModel @Inject constructor(
         it != -1L
     }
 
-    val noteId: String = savedStateHandle[EXTRA_NOTE_ID] ?: throw IllegalArgumentException()
+    val noteId: String = requireNotNull(savedStateHandle[EXTRA_NOTE_ID])
 
     private val currentAccountWatcher: CurrentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
 

@@ -56,7 +56,7 @@ class TimelineViewModel @Inject constructor(
         const val EXTRA_PAGEABLE = "TimelineViewModel.EXTRA_PAGEABLE"
     }
 
-    val pageable: Pageable = savedStateHandle[EXTRA_PAGEABLE] ?: throw IllegalArgumentException()
+    val pageable: Pageable = requireNotNull(savedStateHandle[EXTRA_PAGEABLE])
     val accountId: Long? = savedStateHandle[EXTRA_ACCOUNT_ID]
 
     val tag = "TimelineViewModel"
