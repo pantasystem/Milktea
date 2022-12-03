@@ -1,11 +1,9 @@
 package net.pantasystem.milktea.user.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,21 +14,22 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
+import javax.inject.Inject
 
-class FollowFollowerViewModel @AssistedInject constructor(
+@HiltViewModel
+class FollowFollowerViewModel @Inject constructor(
     followFollowerPagingStoreFactory: FollowFollowerPagingStore.Factory,
     private val userRepository: UserRepository,
-    private val userDataSource: UserDataSource,
-    private val loggerFactory: Logger.Factory,
-    @Assisted val userId: User.Id
+    userDataSource: UserDataSource,
+    loggerFactory: Logger.Factory,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    companion object
-
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(userId: User.Id): FollowFollowerViewModel
+    companion object {
+        const val EXTRA_USER_ID = "FollowFollowerViewModel.EXTRA_USER_ID"
     }
+
+    val userId: User.Id = requireNotNull(savedStateHandle.get<User.Id>(EXTRA_USER_ID))
 
     val logger = loggerFactory.create("FollowFollowerVM")
 
@@ -123,13 +122,3 @@ data class FollowFollowerUiState(
     val followerUsersState: PageableState<List<User.Id>> = PageableState.Loading.Init(),
     val followUsersState: PageableState<List<User.Id>> = PageableState.Loading.Init()
 )
-
-fun FollowFollowerViewModel.Companion.provideFactory(
-    factory: FollowFollowerViewModel.ViewModelAssistedFactory,
-    userId: User.Id,
-) = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        @Suppress("UNCHECKED_CAST")
-        return factory.create(userId) as T
-    }
-}

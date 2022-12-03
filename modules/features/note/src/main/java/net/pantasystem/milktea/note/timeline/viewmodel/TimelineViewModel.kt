@@ -1,12 +1,10 @@
 package net.pantasystem.milktea.note.timeline.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -23,7 +21,6 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
@@ -36,9 +33,11 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import java.io.IOException
 import java.net.SocketTimeoutException
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TimelineViewModel @AssistedInject constructor(
+@HiltViewModel
+class TimelineViewModel @Inject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     noteStreaming: NoteStreaming,
     accountRepository: AccountRepository,
@@ -49,21 +48,16 @@ class TimelineViewModel @AssistedInject constructor(
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     private val accountStore: AccountStore,
     private val wordFilterConfigRepository: WordFilterConfigRepository,
-    @Assisted val account: Account?,
-    @Assisted val accountId: Long? = account?.accountId,
-    @Assisted val pageable: Pageable,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(
-            account: Account?,
-            accountId: Long?,
-            pageable: Pageable,
-        ): TimelineViewModel
+    companion object {
+        const val EXTRA_ACCOUNT_ID = "TimelineViewModel.EXTRA_ACCOUNT_ID"
+        const val EXTRA_PAGEABLE = "TimelineViewModel.EXTRA_PAGEABLE"
     }
 
-    companion object
+    val pageable: Pageable = requireNotNull(savedStateHandle[EXTRA_PAGEABLE])
+    val accountId: Long? = savedStateHandle[EXTRA_ACCOUNT_ID]
 
     val tag = "TimelineViewModel"
 
@@ -169,18 +163,6 @@ class TimelineViewModel @AssistedInject constructor(
 
 }
 
-@Suppress("UNCHECKED_CAST")
-fun TimelineViewModel.Companion.provideViewModel(
-    assistedFactory: TimelineViewModel.ViewModelAssistedFactory,
-    account: Account?,
-    accountId: Long? = account?.accountId,
-    pageable: Pageable,
-
-    ) = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return assistedFactory.create(account, accountId, pageable) as T
-    }
-}
 
 sealed interface TimelineListItem {
     object Loading : TimelineListItem

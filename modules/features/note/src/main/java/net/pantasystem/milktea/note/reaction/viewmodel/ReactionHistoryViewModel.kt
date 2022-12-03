@@ -1,12 +1,10 @@
 package net.pantasystem.milktea.note.reaction.viewmodel
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
@@ -19,22 +17,24 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import javax.inject.Inject
 
 
-class ReactionHistoryViewModel @AssistedInject constructor(
+@HiltViewModel
+class ReactionHistoryViewModel @Inject constructor(
     reactionHistoryDataSource: ReactionHistoryDataSource,
     paginatorFactory: ReactionHistoryPaginator.Factory,
     val loggerFactory: Logger.Factory,
-    @Assisted val noteId: Note.Id,
-    @Assisted val type: String?
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(noteId: Note.Id, type: String?): ReactionHistoryViewModel
+    companion object {
+        const val EXTRA_NOTE_ID = "ReactionHistoryViewModel.EXTRA_NOTE_ID"
+        const val EXTRA_TYPE = "ReactionHistoryViewModel.TYPE"
     }
 
-    companion object
+    val noteId: Note.Id = requireNotNull(savedStateHandle[EXTRA_NOTE_ID])
+    val type: String? = savedStateHandle[EXTRA_TYPE]
 
     val logger = loggerFactory.create("ReactionHistoryVM")
 
@@ -66,15 +66,4 @@ class ReactionHistoryViewModel @AssistedInject constructor(
         }
     }
 
-}
-
-@Suppress("UNCHECKED_CAST")
-fun ReactionHistoryViewModel.Companion.provideViewModel(
-    factory: ReactionHistoryViewModel.ViewModelAssistedFactory,
-    noteId: Note.Id,
-    type: String?
-) = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return factory.create(noteId, type) as T
-    }
 }

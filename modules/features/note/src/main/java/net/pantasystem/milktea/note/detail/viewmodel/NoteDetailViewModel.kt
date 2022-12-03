@@ -1,12 +1,10 @@
 package net.pantasystem.milktea.note.detail.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
@@ -14,12 +12,13 @@ import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
+import javax.inject.Inject
 
-class NoteDetailViewModel @AssistedInject constructor(
+@HiltViewModel
+class NoteDetailViewModel @Inject constructor(
     accountRepository: AccountRepository,
     private val noteCaptureAdapter: NoteCaptureAPIAdapter,
     private val noteRelationGetter: NoteRelationGetter,
@@ -27,16 +26,19 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val noteTranslationStore: NoteTranslationStore,
     private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     private val noteDataSource: NoteDataSource,
-    @Assisted val show: Pageable.Show,
-    @Assisted val accountId: Long? = null,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-        fun create(show: Pageable.Show, accountId: Long?): NoteDetailViewModel
+    companion object {
+        const val EXTRA_NOTE_ID = "NoteDetailViewModel.NOTE_ID"
+        const val EXTRA_ACCOUNT_ID = "NoteDetailViewModel.ACCOUNT_ID"
     }
 
-    companion object;
+    val accountId: Long? = savedStateHandle.get<Long?>(EXTRA_ACCOUNT_ID).takeIf {
+        it != -1L
+    }
+
+    val noteId: String = requireNotNull(savedStateHandle[EXTRA_NOTE_ID])
 
     private val currentAccountWatcher: CurrentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
 
@@ -53,7 +55,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val note = suspend {
         currentAccountWatcher.getAccount()
     }.asFlow().flatMapLatest {
-        noteDataSource.observeOne(Note.Id(it.accountId, show.noteId))
+        noteDataSource.observeOne(Note.Id(it.accountId, noteId))
     }.onStart {
         emit(null)
     }
@@ -159,7 +161,7 @@ class NoteDetailViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val account = currentAccountWatcher.getAccount()
-                val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
+                val note = noteRepository.find(Note.Id(account.accountId, noteId))
                     .getOrThrow()
                 noteRepository.syncConversation(note.id).getOrThrow()
                 recursiveSync(note.id).getOrThrow()
@@ -188,7 +190,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     suspend fun getUrl(): String {
         val account = currentAccountWatcher.getAccount()
-        return "${account.instanceDomain}/notes/${show.noteId}"
+        return "${account.instanceDomain}/notes/${noteId}"
     }
 
 
@@ -204,16 +206,6 @@ class NoteDetailViewModel @AssistedInject constructor(
 
 }
 
-@Suppress("UNCHECKED_CAST")
-fun NoteDetailViewModel.Companion.provideFactory(
-    factory: NoteDetailViewModel.ViewModelAssistedFactory,
-    show: Pageable.Show,
-    accountId: Long? = null,
-) = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return factory.create(show, accountId) as T
-    }
-}
 
 sealed interface NoteType {
     data class Detail(val note: NoteRelation) : NoteType
