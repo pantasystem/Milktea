@@ -20,6 +20,7 @@ import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.gallery.viewmodel.GalleryPostsViewModel
+import net.pantasystem.milktea.gallery.viewmodel.provideFactory
 import net.pantasystem.milktea.model.account.page.Pageable
 import javax.inject.Inject
 
@@ -27,13 +28,16 @@ import javax.inject.Inject
 class GalleryPostsFragment : Fragment() {
 
     companion object {
+        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.view.gallery.ACCOUNT_ID"
+        private const val EXTRA_PAGEABLE =
+            "jp.panta.misskeyandroidclient.view.gallery.EXTRA_PAGEABLE"
 
         fun newInstance(pageable: Pageable.Gallery, accountId: Long?): GalleryPostsFragment {
             return GalleryPostsFragment().apply {
                 arguments = Bundle().also {
-                    it.putSerializable(GalleryPostsViewModel.EXTRA_PAGEABLE, pageable)
+                    it.putSerializable(EXTRA_PAGEABLE, pageable)
                     if (accountId != null) {
-                        it.putLong(GalleryPostsViewModel.EXTRA_ACCOUNT_ID, accountId)
+                        it.putLong(EXTRA_ACCOUNT_ID, accountId)
                     }
                 }
             }
@@ -41,9 +45,14 @@ class GalleryPostsFragment : Fragment() {
     }
 
 
+    val pageable: Pageable.Gallery by lazy {
+        arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
+    }
 
     private val currentTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
+    @Inject
+    lateinit var viewModelFactory: GalleryPostsViewModel.ViewModelAssistedFactory
 
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
@@ -55,7 +64,15 @@ class GalleryPostsFragment : Fragment() {
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
 
-    val viewModel: GalleryPostsViewModel by viewModels()
+    val viewModel: GalleryPostsViewModel by viewModels {
+        val pageable = arguments?.getSerializable(EXTRA_PAGEABLE) as Pageable.Gallery
+        var accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)
+        if (accountId == -1L) {
+            accountId = null
+        }
+
+        GalleryPostsViewModel.provideFactory(viewModelFactory, pageable, accountId)
+    }
 
 
     override fun onCreateView(
@@ -121,7 +138,7 @@ class GalleryPostsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        currentTimelineViewModel.setCurrentPageable(viewModel.pageable)
+        currentTimelineViewModel.setCurrentPageable(pageable)
     }
 
 }
