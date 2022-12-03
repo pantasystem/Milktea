@@ -1,12 +1,8 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package net.pantasystem.milktea.gallery.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
@@ -19,6 +15,7 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -34,19 +31,21 @@ class GalleryPostsViewModel @AssistedInject constructor(
     galleryRepository: GalleryRepository,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userRepository: UserRepository,
-    private val accountRepository: AccountRepository,
+    accountRepository: AccountRepository,
     private val galleryPostsStoreFactory: GalleryPostsStore.Factory,
-    @Assisted val pageable: Pageable.Gallery,
-    @Assisted private var accountId: Long?,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel(), GalleryToggleLikeOrUnlike {
 
-
-    @AssistedFactory
-    interface ViewModelAssistedFactory {
-
-        fun create(pageable: Pageable.Gallery, accountId: Long?): GalleryPostsViewModel
+    companion object {
+        const val EXTRA_PAGEABLE = "GalleryPostsViewModel.EXTRA_PAGEABLE"
+        const val EXTRA_ACCOUNT_ID = "GalleryPostsViewModel.EXTRA_ACCOUNT_ID"
     }
-    companion object;
+
+    val pageable: Pageable.Gallery = savedStateHandle[EXTRA_PAGEABLE]
+        ?: throw IllegalArgumentException()
+    val accountId: Long? = savedStateHandle.get<Long?>(EXTRA_ACCOUNT_ID).takeIf {
+        it != -1L
+    }
 
     private val galleryPostsStore: GalleryPostsStore by lazy {
         galleryPostsStoreFactory.create(pageable, this::getAccount)
@@ -73,6 +72,8 @@ class GalleryPostsViewModel @AssistedInject constructor(
     private val _visibleFileIds = MutableStateFlow<Set<FileProperty.Id>>(emptySet())
     val visibleFileIds: StateFlow<Set<FileProperty.Id>>
         get() = _visibleFileIds
+
+    private val accountWatcher = CurrentAccountWatcher(accountId, accountRepository)
 
     init {
         galleryDataSource.events().mapNotNull {
@@ -202,23 +203,9 @@ class GalleryPostsViewModel @AssistedInject constructor(
         }
     }
 
-    suspend fun getAccount(): Account {
-        return accountId?.let {
-            accountRepository.get(it).getOrThrow()
-        } ?: accountRepository.getCurrentAccount().getOrThrow().also {
-            accountId = it.accountId
-        }
+    private suspend fun getAccount(): Account {
+        return accountWatcher.getAccount()
     }
 
 
-}
-
-fun GalleryPostsViewModel.Companion.provideFactory(
-    factory: GalleryPostsViewModel.ViewModelAssistedFactory,
-    pageable: Pageable.Gallery,
-    accountId: Long?
-) = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return factory.create(pageable, accountId) as T
-    }
 }
