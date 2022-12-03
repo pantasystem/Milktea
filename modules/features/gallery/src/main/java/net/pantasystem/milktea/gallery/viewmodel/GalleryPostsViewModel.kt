@@ -3,7 +3,7 @@ package net.pantasystem.milktea.gallery.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -24,9 +24,10 @@ import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryPostRelation
 import net.pantasystem.milktea.model.gallery.GalleryRepository
 import net.pantasystem.milktea.model.user.UserRepository
+import javax.inject.Inject
 
-class GalleryPostsViewModel @AssistedInject constructor(
-
+@HiltViewModel
+class GalleryPostsViewModel @Inject constructor(
     private val galleryDataSource: GalleryDataSource,
     galleryRepository: GalleryRepository,
     private val filePropertyDataSource: FilePropertyDataSource,
