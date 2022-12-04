@@ -3,8 +3,11 @@ package net.pantasystem.milktea.common_android_ui.account.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
@@ -28,7 +31,6 @@ class AccountViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
-    private val accountViewDataFactory: AccountViewData.Factory,
     private val subscriptionUnRegistration: SubscriptionUnRegistration,
     private val metaRepository: MetaRepository,
 ) : ViewModel() {
@@ -36,15 +38,6 @@ class AccountViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("AccountViewModel")
 
-    @FlowPreview
-    val accounts = accountStore.observeAccounts.map { accounts ->
-        accounts.map { ac ->
-            accountViewDataFactory.create(ac, viewModelScope)
-        }
-    }.catch { e ->
-        logger.debug("アカウントロードエラー", e = e)
-    }.flowOn(Dispatchers.IO)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val users = accountStore.observeAccounts.flatMapLatest { accounts ->
         val flows = accounts.map {
@@ -113,7 +106,6 @@ class AccountViewModel @Inject constructor(
 
     val showProfile = EventBus<Account>()
 
-    val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init {
         accountStore.observeCurrentAccount.filterNotNull().onEach { ac ->
@@ -126,7 +118,6 @@ class AccountViewModel @Inject constructor(
     }
 
     fun setSwitchTargetConnectionInstance(account: Account) {
-        switchTargetConnectionInstanceEvent.event = Unit
         viewModelScope.launch(Dispatchers.IO) {
             accountStore.setCurrent(account)
         }
@@ -156,24 +147,6 @@ class AccountViewModel @Inject constructor(
         showProfile.event = account
     }
 
-    @FlowPreview
-    fun signOut(accountViewData: AccountViewData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                subscriptionUnRegistration
-                    .unregister(accountViewData.account.accountId)
-            } catch (e: Throwable) {
-                logger.warning("token解除処理失敗", e = e)
-            }
-            try {
-                accountRepository.delete(accountViewData.account)
-            } catch (e: Throwable) {
-                logger.error("ログアウト処理失敗", e)
-            }
-            logger.info("ログアウト処理成功")
-
-        }
-    }
 
     fun signOut(account: Account) {
         viewModelScope.launch(Dispatchers.IO) {
