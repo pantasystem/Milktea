@@ -57,7 +57,7 @@ fun AccountSwitchingDialogLayout(
             LazyColumn(
                 Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(250.dp)
                     .nestedScroll(
                         rememberNestedScrollInteropConnection()
                     )
