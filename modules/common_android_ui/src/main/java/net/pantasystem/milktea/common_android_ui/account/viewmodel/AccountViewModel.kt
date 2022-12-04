@@ -11,6 +11,8 @@ import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -27,7 +29,8 @@ class AccountViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
     private val accountViewDataFactory: AccountViewData.Factory,
-    private val subscriptionUnRegistration: SubscriptionUnRegistration
+    private val subscriptionUnRegistration: SubscriptionUnRegistration,
+    private val metaRepository: MetaRepository,
 ) : ViewModel() {
 
 
@@ -52,16 +55,34 @@ class AccountViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
+        val flows = accounts.map {
+            metaRepository.observe(it.instanceDomain).flowOn(Dispatchers.IO)
+        }
+        combine(flows) {
+            it.toList()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     private val accountWithUserList = combine(
         accountStore.observeAccounts,
         users,
-        accountStore.observeCurrentAccount
-    ) { accounts, users, current ->
+        accountStore.observeCurrentAccount,
+        metaList,
+    ) { accounts, users, current, metaList ->
         val userMap = users.associateBy {
             it.id.accountId
         }
+        val metaMap = metaList.filterNotNull().associateBy {
+            it.uri
+        }
         accounts.map {
-            AccountWithUser(it, userMap[it.accountId], current?.accountId == it.accountId)
+            AccountInfo(
+                it,
+                userMap[it.accountId],
+                metaMap[it.instanceDomain],
+                current?.accountId == it.accountId
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -176,8 +197,14 @@ class AccountViewModel @Inject constructor(
 
 }
 
-data class AccountWithUser(val account: Account, val user: User?, val isCurrentAccount: Boolean)
+data class AccountInfo(
+    val account: Account,
+    val user: User?,
+    val instanceMeta: Meta?,
+    val isCurrentAccount: Boolean
+)
+
 data class AccountViewModelUiState(
     val currentAccount: Account? = null,
-    val accounts: List<AccountWithUser> = emptyList(),
+    val accounts: List<AccountInfo> = emptyList(),
 )
