@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountInfo
+import net.pantasystem.milktea.common_compose.CustomEmojiText
 
 @Composable
 fun AccountTile(
@@ -63,15 +65,48 @@ fun AccountTile(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Top
             ) {
-                Text(
-                    account.user?.shortDisplayName ?: account.account.userName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(account.account.getHost())
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (account.user?.name != null) {
+                        CustomEmojiText(
+                            text = account.user.name ?: "", emojis = account.user.emojis,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                    Text(
+                        account.user?.shortDisplayName ?: account.account.userName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (account.instanceMeta?.iconUrl != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(account.instanceMeta.iconUrl),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clip(
+                                    RoundedCornerShape(4.dp)
+                                ),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    Text(account.account.getHost())
+                }
             }
 
-            CircleCheckbox(selected = account.isCurrentAccount, modifier = Modifier.align(Alignment.CenterVertically))
+            CircleCheckbox(
+                selected = account.isCurrentAccount,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
         }
     }
 }

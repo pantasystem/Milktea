@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':modules:common_viewmodel')
     implementation project(path: ':modules:common_resource')
     implementation project(path: ':modules:common')
+    implementation project(path: ':modules:common_compose')
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_navigation')
 
