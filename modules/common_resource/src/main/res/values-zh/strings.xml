@@ -397,6 +397,7 @@
 
     <string name="is_enable_instance_ticker">使用实例代码</string>
     <string name="successfully_created_schedule_note">已成功创建计划帖子</string>
+    <string name="account">帐户</string>
 
     <!--    <string name="n_people">%d位用户</string>-->
 <!--    <string name="n_posts">%d篇帖文</string>-->

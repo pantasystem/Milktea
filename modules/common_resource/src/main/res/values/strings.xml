@@ -137,6 +137,7 @@
 
     <string name="add_app">Add app</string>
     <string name="selected_account">Selected account</string>
+    <string name="account">Account</string>
     <string name="selected_app">Selected app</string>
     <string name="custom_app">Custom app</string>
 
