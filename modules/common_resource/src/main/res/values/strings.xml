@@ -392,5 +392,6 @@
 
     <string name="is_enable_instance_ticker">Use Instance Ticker</string>
     <string name="successfully_created_schedule_note">Successfully created a schedule post</string>
+    <string name="switch_account">Switch Account</string>
 
 </resources>

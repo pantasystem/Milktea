@@ -175,6 +175,22 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    fun signOut(account: Account) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                subscriptionUnRegistration
+                    .unregister(account.accountId)
+            }.onFailure { e ->
+                logger.warning("token解除処理失敗", e = e)
+            }
+            runCatching {
+                accountRepository.delete(account)
+            }.onFailure { e ->
+                logger.error("ログアウト処理失敗", e)
+            }
+        }
+    }
+
     fun addPage(page: Page) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -207,4 +223,10 @@ data class AccountInfo(
 data class AccountViewModelUiState(
     val currentAccount: Account? = null,
     val accounts: List<AccountInfo> = emptyList(),
-)
+) {
+    val currentAccountInfo: AccountInfo? by lazy {
+        accounts.firstOrNull {
+            it.account.accountId == currentAccount?.accountId
+        }
+    }
+}

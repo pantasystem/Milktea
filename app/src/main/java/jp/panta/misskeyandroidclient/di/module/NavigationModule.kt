@@ -5,13 +5,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import jp.panta.misskeyandroidclient.MainNavigationImpl
-import net.pantasystem.milktea.user.activity.SearchAndSelectUserNavigationImpl
+import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.search.SearchNavigationImpl
+import net.pantasystem.milktea.setting.activities.AccountSettingActivityNavigationImpl
+import net.pantasystem.milktea.user.activity.SearchAndSelectUserNavigationImpl
 import net.pantasystem.milktea.user.activity.UserDetailNavigationImpl
-import net.pantasystem.milktea.common_navigation.MainNavigation
-import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation
-import net.pantasystem.milktea.common_navigation.SearchNavigation
-import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -28,4 +26,7 @@ abstract class NavigationModule {
 
     @Binds
     abstract fun bindSearchResultNavigation(impl: SearchNavigationImpl): SearchNavigation
+
+    @Binds
+    abstract fun bindAccountSettingNav(impl: AccountSettingActivityNavigationImpl) : AccountSettingNavigation
 }

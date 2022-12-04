@@ -10,8 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
-import net.pantasystem.milktea.common_navigation.AuthorizationArgs
-import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_navigation.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -19,6 +18,12 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var authorizationNavigation: AuthorizationNavigation
+
+    @Inject
+    lateinit var userDetailNavigation: UserDetailNavigation
+
+    @Inject
+    lateinit var accountSettingNavigation: AccountSettingNavigation
 
     val viewModel: AccountViewModel by activityViewModels()
 
@@ -32,11 +37,13 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
                         AccountSwitchingDialogLayout(
                             uiState = uiState,
                             onSettingButtonClicked = {
-                                // TODO: アカウント設定画面を作成してそこに遷移するようにする
+                                startActivity(accountSettingNavigation.newIntent(Unit))
                                 dismiss()
                             },
                             onAvatarIconClicked = {
-                                viewModel.showProfile(it.account)
+                                startActivity(
+                                    userDetailNavigation.newIntent(UserDetailNavigationArgs.UserName(it.user?.userName ?: it.account.userName))
+                                )
                                 dismiss()
                             },
                             onAccountClicked = {

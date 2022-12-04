@@ -32,7 +32,7 @@ fun AccountSwitchingDialogLayout(
     onAccountClicked: (AccountInfo) -> Unit,
     onAddAccountButtonClicked: () -> Unit,
 ) {
-    Surface(Modifier.fillMaxWidth()) {
+    Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
         Column(
             Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
