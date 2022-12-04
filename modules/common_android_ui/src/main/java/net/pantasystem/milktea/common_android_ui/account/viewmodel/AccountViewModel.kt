@@ -1,7 +1,6 @@
-package net.pantasystem.milktea.common_viewmodel.viewmodel
+package net.pantasystem.milktea.common_android_ui.account.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -41,7 +40,8 @@ class AccountViewModel @Inject constructor(
         }
     }.catch { e ->
         logger.debug("アカウントロードエラー", e = e)
-    }.asLiveData()
+    }.flowOn(Dispatchers.IO)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
@@ -50,7 +50,7 @@ class AccountViewModel @Inject constructor(
         userDataSource.observe(User.Id(account.accountId, account.remoteId)).map {
             it as? User.Detail
         }
-    }.asLiveData()
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val switchAccount = EventBus<Int>()
 
@@ -143,3 +143,8 @@ class AccountViewModel @Inject constructor(
     }
 
 }
+
+data class AccountWithUser(val account: Account, val user: User, val isCurrentAccount: Boolean)
+data class AccountViewModelUiState(
+    val accounts: List<AccountWithUser>,
+)

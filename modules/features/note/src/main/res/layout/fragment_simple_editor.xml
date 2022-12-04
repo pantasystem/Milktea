@@ -13,7 +13,7 @@
 
         <variable
                 name="accountViewModel"
-                type="net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel" />
+                type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel" />
 
         <variable
                 name="simpleEditor"

@@ -7,10 +7,10 @@
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
         <variable
                 name="accountViewData"
-                type="net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewData" />
+                type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewData" />
         <variable
                 name="accountViewModel"
-                type="net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel" />
+                type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel" />
 
 
 

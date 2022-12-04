@@ -10,7 +10,7 @@
                 type="net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel" />
         <variable
                 name="accountViewModel"
-                type="net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel" />
+                type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

@@ -7,12 +7,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewData
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.common_android_ui.databinding.ItemAccountBinding
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 
 @FlowPreview
 @ExperimentalCoroutinesApi

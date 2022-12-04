@@ -4,7 +4,10 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,11 +15,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common_android_ui.R
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewData
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewData
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -49,9 +53,14 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
         val accountViewModel = ViewModelProvider(activity)[AccountViewModel::class.java]
 
         val adapter = AccountListAdapter(diff, accountViewModel, activity)
-        accountViewModel.accounts.observe(this) {
-            adapter.submitList(it?: emptyList())
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                accountViewModel.accounts.collect {
+                    adapter.submitList(it)
+                }
+            }
         }
+
         accountsView.adapter = adapter
         accountViewModel.switchTargetConnectionInstanceEvent.observe(activity) {
             dismiss()

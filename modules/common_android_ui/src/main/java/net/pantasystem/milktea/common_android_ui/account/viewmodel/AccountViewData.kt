@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.common_viewmodel.viewmodel
+package net.pantasystem.milktea.common_android_ui.account.viewmodel
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
