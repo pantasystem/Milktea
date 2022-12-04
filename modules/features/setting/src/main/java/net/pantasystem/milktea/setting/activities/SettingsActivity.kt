@@ -90,6 +90,16 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        val accountSetting = MoveSettingActivityPanel(
+            titleStringRes = R.string.account,
+            activity = AccountSettingActivity::class.java,
+            context = this
+        ).apply {
+            startActivityEventBus.observe(this@SettingsActivity) {
+                startActivity(Intent(this@SettingsActivity, it))
+            }
+        }
+
         val licenseActivitySetting =
             MoveSettingActivityPanel(
                 titleStringRes = R.string.license,
@@ -106,6 +116,7 @@ class SettingsActivity : AppCompatActivity() {
             titleStringRes = null,
             context = this,
             items = listOf(
+                accountSetting,
                 movementSetting,
                 tabSetting,
                 appearanceSetting,
