@@ -49,7 +49,7 @@ fun AccountTile(
         ) {
             Image(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .clickable {
                         onAvatarClick(account)
