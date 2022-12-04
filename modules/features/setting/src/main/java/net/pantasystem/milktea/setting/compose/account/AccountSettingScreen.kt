@@ -40,11 +40,13 @@ fun AccountSettingScreen(
                     sheetState.hide()
                 }
             },
-            onAvatarIconClicked = {
+            onAvatarIconClicked = { accountInfo ->
                 scope.launch {
                     sheetState.hide()
                 }
-                onShowUser(UserDetailNavigationArgs.UserName(it.user?.userName ?: it.account.userName))
+                onShowUser(UserDetailNavigationArgs.UserName(accountInfo.user?.let {
+                    "@${it.userName}@${it.host}"
+                } ?: "@${accountInfo.account.userName}@${accountInfo.account.getHost()}"))
             },
             onAccountClicked = {
                 scope.launch {

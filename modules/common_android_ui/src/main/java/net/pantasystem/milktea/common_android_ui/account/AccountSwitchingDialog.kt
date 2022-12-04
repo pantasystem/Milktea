@@ -40,9 +40,11 @@ class AccountSwitchingDialog : BottomSheetDialogFragment() {
                                 startActivity(accountSettingNavigation.newIntent(Unit))
                                 dismiss()
                             },
-                            onAvatarIconClicked = {
+                            onAvatarIconClicked = { accountInfo ->
                                 startActivity(
-                                    userDetailNavigation.newIntent(UserDetailNavigationArgs.UserName(it.user?.userName ?: it.account.userName))
+                                    userDetailNavigation.newIntent(UserDetailNavigationArgs.UserName(accountInfo.user?.let {
+                                        "@${it.userName}@${it.host}"
+                                    } ?: "@${accountInfo.account.userName}@${accountInfo.account.getHost()}"))
                                 )
                                 dismiss()
                             },
