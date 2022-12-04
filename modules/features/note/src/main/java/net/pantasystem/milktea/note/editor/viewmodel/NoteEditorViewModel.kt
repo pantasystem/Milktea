@@ -18,6 +18,7 @@ import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelRepository
@@ -54,6 +55,7 @@ class NoteEditorViewModel @Inject constructor(
     private val channelRepository: ChannelRepository,
     private val noteEditorSwitchAccountExecutor: NoteEditorSwitchAccountExecutor,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
+    private val accountRepository: AccountRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -288,7 +290,10 @@ class NoteEditorViewModel @Inject constructor(
     fun setDraftNoteId(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             draftNoteRepository.findOne(id).mapCatching {
-                it.toNoteEditingState()
+                val account = accountRepository.get(it.accountId).getOrThrow()
+                it.toNoteEditingState().copy(
+                    currentAccount = account
+                )
             }.onSuccess { note ->
                 currentAccount.value = note.currentAccount
                 savedStateHandle.applyBy(note)
