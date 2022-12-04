@@ -1,17 +1,21 @@
-package net.pantasystem.milktea.common_viewmodel.viewmodel
+package net.pantasystem.milktea.common_android_ui.account.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -27,21 +31,63 @@ class AccountViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
-    private val accountViewDataFactory: AccountViewData.Factory,
-    private val subscriptionUnRegistration: SubscriptionUnRegistration
+    private val subscriptionUnRegistration: SubscriptionUnRegistration,
+    private val metaRepository: MetaRepository,
 ) : ViewModel() {
 
 
     private val logger = loggerFactory.create("AccountViewModel")
 
-    @FlowPreview
-    val accounts = accountStore.observeAccounts.map { accounts ->
-        accounts.map { ac ->
-            accountViewDataFactory.create(ac, viewModelScope)
+
+    private val users = accountStore.observeAccounts.flatMapLatest { accounts ->
+        val flows = accounts.map {
+            userDataSource.observe(User.Id(it.accountId, it.remoteId)).flowOn(Dispatchers.IO)
         }
-    }.catch { e ->
-        logger.debug("アカウントロードエラー", e = e)
-    }.asLiveData()
+        combine(flows) {
+            it.toList()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
+        val flows = accounts.map {
+            metaRepository.observe(it.instanceDomain).flowOn(Dispatchers.IO)
+        }
+        combine(flows) {
+            it.toList()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val accountWithUserList = combine(
+        accountStore.observeAccounts,
+        users,
+        accountStore.observeCurrentAccount,
+        metaList,
+    ) { accounts, users, current, metaList ->
+        val userMap = users.associateBy {
+            it.id.accountId
+        }
+        val metaMap = metaList.filterNotNull().associateBy {
+            it.uri
+        }
+        accounts.map {
+            AccountInfo(
+                it,
+                userMap[it.accountId],
+                metaMap[it.instanceDomain],
+                current?.accountId == it.accountId
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val uiState = combine(
+        accountStore.observeCurrentAccount,
+        accountWithUserList
+    ) { current, accounts ->
+        AccountViewModelUiState(
+            currentAccount = current,
+            accounts = accounts
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AccountViewModelUiState())
 
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
@@ -50,7 +96,7 @@ class AccountViewModel @Inject constructor(
         userDataSource.observe(User.Id(account.accountId, account.remoteId)).map {
             it as? User.Detail
         }
-    }.asLiveData()
+    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val switchAccount = EventBus<Int>()
 
@@ -60,12 +106,11 @@ class AccountViewModel @Inject constructor(
 
     val showProfile = EventBus<Account>()
 
-    val switchTargetConnectionInstanceEvent = EventBus<Unit>()
 
     init {
         accountStore.observeCurrentAccount.filterNotNull().onEach { ac ->
             userRepository
-                .find(User.Id(ac.accountId, ac.remoteId), true)
+                .sync(User.Id(ac.accountId, ac.remoteId))
         }.catch { e ->
             logger.error("現在のアカウントの取得に失敗した", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
@@ -73,7 +118,6 @@ class AccountViewModel @Inject constructor(
     }
 
     fun setSwitchTargetConnectionInstance(account: Account) {
-        switchTargetConnectionInstanceEvent.event = Unit
         viewModelScope.launch(Dispatchers.IO) {
             accountStore.setCurrent(account)
         }
@@ -103,22 +147,20 @@ class AccountViewModel @Inject constructor(
         showProfile.event = account
     }
 
-    @FlowPreview
-    fun signOut(accountViewData: AccountViewData) {
+
+    fun signOut(account: Account) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
+            runCatching {
                 subscriptionUnRegistration
-                    .unregister(accountViewData.account.accountId)
-            } catch (e: Throwable) {
+                    .unregister(account.accountId)
+            }.onFailure { e ->
                 logger.warning("token解除処理失敗", e = e)
             }
-            try {
-                accountRepository.delete(accountViewData.account)
-            } catch (e: Throwable) {
+            runCatching {
+                accountRepository.delete(account)
+            }.onFailure { e ->
                 logger.error("ログアウト処理失敗", e)
             }
-            logger.info("ログアウト処理成功")
-
         }
     }
 
@@ -142,4 +184,22 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+}
+
+data class AccountInfo(
+    val account: Account,
+    val user: User?,
+    val instanceMeta: Meta?,
+    val isCurrentAccount: Boolean
+)
+
+data class AccountViewModelUiState(
+    val currentAccount: Account? = null,
+    val accounts: List<AccountInfo> = emptyList(),
+) {
+    val currentAccountInfo: AccountInfo? by lazy {
+        accounts.firstOrNull {
+            it.account.accountId == currentAccount?.accountId
+        }
+    }
 }

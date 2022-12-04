@@ -12,7 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 

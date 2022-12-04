@@ -42,7 +42,7 @@ import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_viewmodel.viewmodel.AccountViewModel
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ResultType

@@ -19,10 +19,10 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
@@ -83,9 +83,8 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mTabViewModel.currentAccount.filterNotNull().distinctUntilChanged().collect { account ->
-                    mPages = account.pages
-                    val pages = account.pages
+                mTabViewModel.pages.collect { pages ->
+                    mPages = pages
                     mPagerAdapter.setList(
                         pages.sortedBy {
                             it.weight
@@ -103,6 +102,16 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
                             TabLayout.MODE_FIXED
                         }
                     }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mTabViewModel.currentUser.filterNotNull().collect {
+                    GlideApp.with(binding.currentAccountView)
+                        .load(it.avatarUrl)
+                        .circleCrop()
+                        .into(binding.currentAccountView)
                 }
             }
         }
@@ -189,7 +198,7 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
             mPagerAdapter.scrollableTopFragments.forEach {
                 it.showTop()
             }
-        } catch (e: UninitializedPropertyAccessException) {
+        } catch (_: UninitializedPropertyAccessException) {
 
         }
 

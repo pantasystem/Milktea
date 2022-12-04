@@ -31,6 +31,10 @@ android {
     }
     buildFeatures {
         dataBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = compose_version
     }
 }
 
@@ -44,6 +48,7 @@ dependencies {
     implementation project(path: ':modules:common_viewmodel')
     implementation project(path: ':modules:common_resource')
     implementation project(path: ':modules:common')
+    implementation project(path: ':modules:common_compose')
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_navigation')
 
@@ -70,6 +75,19 @@ dependencies {
     implementation libs.fragment.ktx
     implementation libs.activity.ktx
     implementation libs.animation.apng
+
+    // compose
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
 
 
 }

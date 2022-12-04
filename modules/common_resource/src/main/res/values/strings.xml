@@ -137,6 +137,7 @@
 
     <string name="add_app">Add app</string>
     <string name="selected_account">Selected account</string>
+    <string name="account">Account</string>
     <string name="selected_app">Selected app</string>
     <string name="custom_app">Custom app</string>
 
@@ -391,5 +392,6 @@
 
     <string name="is_enable_instance_ticker">Use Instance Ticker</string>
     <string name="successfully_created_schedule_note">Successfully created a schedule post</string>
+    <string name="switch_account">Switch Account</string>
 
 </resources>
