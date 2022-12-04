@@ -43,6 +43,38 @@ class AccountViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    private val users = accountStore.observeAccounts.flatMapLatest { accounts ->
+        val flows = accounts.map {
+            userDataSource.observe(User.Id(it.accountId, it.remoteId)).flowOn(Dispatchers.IO)
+        }
+        combine(flows) {
+            it.toList()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val accountWithUserList = combine(
+        accountStore.observeAccounts,
+        users,
+        accountStore.observeCurrentAccount
+    ) { accounts, users, current ->
+        val userMap = users.associateBy {
+            it.id.accountId
+        }
+        accounts.map {
+            AccountWithUser(it, userMap[it.accountId], current?.accountId == it.accountId)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val uiState = combine(
+        accountStore.observeCurrentAccount,
+        accountWithUserList
+    ) { current, accounts ->
+        AccountViewModelUiState(
+            currentAccount = current,
+            accounts = accounts
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AccountViewModelUiState())
+
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
@@ -65,7 +97,7 @@ class AccountViewModel @Inject constructor(
     init {
         accountStore.observeCurrentAccount.filterNotNull().onEach { ac ->
             userRepository
-                .find(User.Id(ac.accountId, ac.remoteId), true)
+                .sync(User.Id(ac.accountId, ac.remoteId))
         }.catch { e ->
             logger.error("現在のアカウントの取得に失敗した", e = e)
         }.launchIn(viewModelScope + Dispatchers.IO)
@@ -144,7 +176,8 @@ class AccountViewModel @Inject constructor(
 
 }
 
-data class AccountWithUser(val account: Account, val user: User, val isCurrentAccount: Boolean)
+data class AccountWithUser(val account: Account, val user: User?, val isCurrentAccount: Boolean)
 data class AccountViewModelUiState(
-    val accounts: List<AccountWithUser>,
+    val currentAccount: Account? = null,
+    val accounts: List<AccountWithUser> = emptyList(),
 )
