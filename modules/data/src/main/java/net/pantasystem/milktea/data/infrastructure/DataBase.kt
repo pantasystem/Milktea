@@ -7,6 +7,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountInstanceTypeConverter
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.infrastructure.core.*
@@ -34,8 +36,6 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.data.infrastructure.user.db.*
-import net.pantasystem.milktea.data.infrastructure.account.db.AccountInstanceTypeConverter
-import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
 import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
@@ -56,7 +56,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
 
         UrlPreview::class,
         AccountRecord::class,
-        net.pantasystem.milktea.model.account.page.Page::class,
+        net.pantasystem.milktea.model.account.page.PageRecord::class,
         MetaDTO::class,
         EmojiDTO::class,
         EmojiAlias::class,

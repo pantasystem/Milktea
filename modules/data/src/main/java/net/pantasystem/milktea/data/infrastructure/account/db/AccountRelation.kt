@@ -4,19 +4,21 @@ import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.account.page.PageRecord
 
 @DatabaseView
 class AccountRelation{
     @Embedded lateinit var account: AccountRecord
 
-    @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = Page::class)
-    lateinit var pages: List<Page>
+    @Relation(parentColumn = "accountId", entityColumn = "accountId", entity = PageRecord::class)
+    lateinit var pages: List<PageRecord>
 
     @Ignore
     fun toAccount(): AccountRecord {
         return account.copy(pages = pages.sortedBy {
             it.weight
+        }.map {
+            it.toPage()
         })
     }
 }
