@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes.reaction.history
+package net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -22,9 +22,3 @@ interface ReactionHistoryDao{
     fun insert(reactionHistory: ReactionHistoryRecord)
 }
 
-interface ReactionHistoryRepository {
-    suspend fun create(reactionHistory: ReactionHistory): Result<Unit>
-    fun observeSumReactions(instanceDomain: String): Flow<List<ReactionHistoryCount>>
-    suspend fun sumReactions(instanceDomain: String): List<ReactionHistoryCount>
-    suspend fun findAll(): List<ReactionHistory>
-}
