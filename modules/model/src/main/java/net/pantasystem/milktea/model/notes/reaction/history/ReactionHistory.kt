@@ -1,15 +1,7 @@
 package net.pantasystem.milktea.model.notes.reaction.history
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "reaction_history")
 data class ReactionHistory(
     val reaction: String,
-    @ColumnInfo(name = "instance_domain")
-    val instanceDomain: String
-){
-    @PrimaryKey(autoGenerate = true)
+    val instanceDomain: String,
     var id: Long? = null
-}
+)

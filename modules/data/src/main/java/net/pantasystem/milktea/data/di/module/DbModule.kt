@@ -18,8 +18,8 @@ import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotific
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import javax.inject.Singleton
 
 @Module

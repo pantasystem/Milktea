@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes.reaction.usercustom
+package net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

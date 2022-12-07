@@ -6,8 +6,12 @@ import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
-import net.pantasystem.milktea.model.account.*
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountNotFoundException
+import net.pantasystem.milktea.model.account.AccountRegistrationFailedException
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import java.util.concurrent.Callable
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"
@@ -110,9 +114,17 @@ class RoomAccountRepository(
                 }
                 Log.d("Repo", "削除されたページ:$removedPages ${exPages.size}, ${pages.size}")
 
-                pageDAO.deleteAll(removedPages)
-                pageDAO.updateAll(updatedPages)
-                pageDAO.insertAll(addedPages)
+                runBlocking {
+                    pageDAO.deleteAll(removedPages.map {
+                        PageRecord.from(it)
+                    })
+                    pageDAO.updateAll(updatedPages.map {
+                        PageRecord.from(it)
+                    })
+                    pageDAO.insertAll(addedPages.map {
+                        PageRecord.from(it)
+                    })
+                }
 
                 exAccount = runBlocking {
                     get(exAccount!!.accountId).getOrThrow()

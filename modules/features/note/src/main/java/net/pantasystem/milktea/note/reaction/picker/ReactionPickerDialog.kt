@@ -22,7 +22,7 @@ import net.pantasystem.milktea.common_android_ui.reaction.ReactionAutoCompleteAr
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogReactionPickerBinding
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel

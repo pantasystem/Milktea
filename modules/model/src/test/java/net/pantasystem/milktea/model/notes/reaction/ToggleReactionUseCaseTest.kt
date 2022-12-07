@@ -10,7 +10,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.generateEmptyNote
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -42,7 +42,7 @@ class ToggleReactionUseCaseTest {
                 Emoji(name = "kawaii")
             )
         )
-        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
             "misskey.io",
@@ -73,7 +73,7 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao,
+            reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = checkEmoji
         )
         runBlocking {
@@ -112,7 +112,7 @@ class ToggleReactionUseCaseTest {
                 Emoji(name = "kawaii"), Emoji(name = "wakaranai")
             )
         )
-        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
             "misskey.io",
@@ -143,7 +143,7 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao,
+            reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = checkEmoji
         )
         runBlocking {
@@ -156,7 +156,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            insert(ReactionHistory(":wakaranai:", "misskey.io"))
+            create(ReactionHistory(":wakaranai:", "misskey.io"))
         }
     }
 
@@ -186,7 +186,7 @@ class ToggleReactionUseCaseTest {
                 Emoji(name = "kawaii")
             )
         )
-        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
             "misskey.io",
@@ -215,7 +215,7 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao,
+            reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = checkEmoji
         )
 
@@ -227,7 +227,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            insert(ReactionHistory(":kawaii:", "misskey.io"))
+            create(ReactionHistory(":kawaii:", "misskey.io"))
         }
     }
 
@@ -249,7 +249,7 @@ class ToggleReactionUseCaseTest {
         }
 
         val meta = Meta(uri = "misskey.io",)
-        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
             "misskey.io",
@@ -273,7 +273,7 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao,
+            reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = mock {
                 onBlocking {
                     checkEmoji(any())
@@ -289,7 +289,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            insert(ReactionHistory("👍", "misskey.io"))
+            create(ReactionHistory("👍", "misskey.io"))
         }
     }
     @Test
@@ -310,7 +310,7 @@ class ToggleReactionUseCaseTest {
         }
 
         val meta = Meta(uri = "misskey.io",)
-        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
             "misskey.io",
@@ -334,7 +334,7 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao,
+            reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = mock {
                 onBlocking {
                     checkEmoji(any())
@@ -350,7 +350,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            insert(ReactionHistory("🥺", "misskey.io"))
+            create(ReactionHistory("🥺", "misskey.io"))
         }
     }
 
@@ -372,7 +372,7 @@ class ToggleReactionUseCaseTest {
         }
 
         val meta = Meta(uri = "misskey.io",)
-        val reactionHistoryDao = mock<ReactionHistoryDao>()
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
             "misskey.io",
@@ -396,7 +396,7 @@ class ToggleReactionUseCaseTest {
             getAccount = getAccount,
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
-            reactionHistoryDao = reactionHistoryDao,
+            reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = mock {
                 onBlocking {
                     checkEmoji(any())
@@ -412,7 +412,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            insert(ReactionHistory("like", "misskey.io"))
+            create(ReactionHistory("like", "misskey.io"))
         }
     }
 }

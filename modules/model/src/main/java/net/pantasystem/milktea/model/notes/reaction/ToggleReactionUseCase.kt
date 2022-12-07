@@ -6,7 +6,7 @@ import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,7 +18,7 @@ interface CheckEmoji {
 @Singleton
 class ToggleReactionUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
-    private val reactionHistoryDao: ReactionHistoryDao,
+    private val reactionHistoryRepository: ReactionHistoryRepository,
     private val getAccount: GetAccount,
     private val metaRepository: MetaRepository,
     private val checkEmoji: CheckEmoji,
@@ -42,12 +42,12 @@ class ToggleReactionUseCase @Inject constructor(
             val note = noteRepository.find(noteId).getOrThrow()
             if (note.myReaction.isNullOrBlank()) {
                 if (noteRepository.reaction(CreateReaction(noteId, sendReaction)).getOrThrow()) {
-                    reactionHistoryDao.insert(ReactionHistory(sendReaction, account.instanceDomain))
+                    reactionHistoryRepository.create(ReactionHistory(sendReaction, account.instanceDomain))
                 }
             } else if (note.myReaction != sendReaction) {
                 noteRepository.unreaction(noteId).getOrThrow()
                 if (noteRepository.reaction(CreateReaction(noteId, sendReaction)).getOrThrow()) {
-                    reactionHistoryDao.insert(ReactionHistory(sendReaction, account.instanceDomain))
+                    reactionHistoryRepository.create(ReactionHistory(sendReaction, account.instanceDomain))
                 }
             } else {
                 noteRepository.unreaction(noteId).getOrThrow()

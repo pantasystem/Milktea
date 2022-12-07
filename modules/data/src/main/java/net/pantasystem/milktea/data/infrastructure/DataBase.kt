@@ -7,7 +7,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountInstanceTypeConverter
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
+import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
@@ -24,6 +27,10 @@ import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
 import net.pantasystem.milktea.data.infrastructure.list.UserListRecord
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryRecord
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRegexRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionWordRecord
@@ -34,18 +41,12 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.data.infrastructure.user.db.*
-import net.pantasystem.milktea.data.infrastructure.account.db.AccountInstanceTypeConverter
-import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.model.notes.reaction.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.model.url.UrlPreview
+import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 
 @Database(
     entities = [
         EncryptedConnectionInformation::class,
-        ReactionHistory::class,
+        ReactionHistoryRecord::class,
         Account::class,
         ReactionUserSetting::class,
         Page::class,
@@ -54,9 +55,9 @@ import net.pantasystem.milktea.model.url.UrlPreview
         DraftFileDTO::class,
         DraftNoteDTO::class,
 
-        UrlPreview::class,
+        UrlPreviewRecord::class,
         AccountRecord::class,
-        net.pantasystem.milktea.model.account.page.Page::class,
+        PageRecord::class,
         MetaDTO::class,
         EmojiDTO::class,
         EmojiAlias::class,
