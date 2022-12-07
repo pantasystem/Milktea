@@ -27,6 +27,8 @@ import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
 import net.pantasystem.milktea.data.infrastructure.list.UserListRecord
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryRecord
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRecord
@@ -39,9 +41,7 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.data.infrastructure.user.db.*
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryRecord
-import net.pantasystem.milktea.model.url.UrlPreview
+import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 
 @Database(
     entities = [
@@ -55,7 +55,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
         DraftFileDTO::class,
         DraftNoteDTO::class,
 
-        UrlPreview::class,
+        UrlPreviewRecord::class,
         AccountRecord::class,
         PageRecord::class,
         MetaDTO::class,
