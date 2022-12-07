@@ -8,6 +8,53 @@ import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.page.Page
 import java.io.Serializable
 
+data class Account(
+    val remoteId: String,
+    val instanceDomain: String,
+    val userName: String,
+    val token: String,
+    val pages: List<Page>,
+    val instanceType: InstanceType,
+    var accountId: Long = 0
+) : Serializable {
+
+    enum class InstanceType {
+        MISSKEY, MASTODON
+    }
+
+    constructor(
+        remoteId: String,
+        instanceDomain: String,
+        userName: String,
+        instanceType: InstanceType,
+        token: String
+    ) :
+            this(
+                remoteId,
+                instanceDomain,
+                userName,
+                token,
+                emptyList(),
+                instanceType
+            )
+
+
+
+    fun getHost(): String {
+        if (instanceDomain.startsWith("https://")) {
+            return instanceDomain.substring("https://".length, instanceDomain.length)
+        } else if (instanceDomain.startsWith("http://")) {
+            return instanceDomain.substring("http://".length, instanceDomain.length)
+        }
+        return instanceDomain
+    }
+
+    fun getI(encryption: Encryption): String {
+        return token
+    }
+
+}
+
 @Entity(
     tableName = "account_table",
     indices = [
@@ -16,28 +63,55 @@ import java.io.Serializable
         Index("userName")
     ]
 )
-data class Account(
+data class AccountRecord(
     val remoteId: String,
     val instanceDomain: String,
     val userName: String,
     val encryptedToken: String,
     @Ignore val pages: List<Page>,
-    @ColumnInfo(name = "instanceType", defaultValue = "misskey") val instanceType: InstanceType,
+    @ColumnInfo(name = "instanceType", defaultValue = "misskey") val instanceType: Account.InstanceType,
     @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
 ) : Serializable {
 
 
-    enum class InstanceType {
-        MISSKEY, MASTODON
+
+    companion object {
+        @Ignore
+        fun from(account: Account, encryption: Encryption): AccountRecord {
+            val encryptedToken = encryption.encrypt(account.remoteId, account.token)
+            return AccountRecord(
+                remoteId = account.remoteId,
+                instanceDomain = account.instanceDomain,
+                userName = account.userName,
+                encryptedToken = encryptedToken,
+                pages = account.pages,
+                instanceType = account.instanceType,
+                accountId = account.accountId
+            )
+        }
     }
 
+    @Ignore
+    fun toAccount(encryption: Encryption): Account {
+        val decryptedToken = encryption.decrypt(remoteId, encryptedToken)
+            ?: throw UnauthorizedException()
+        return Account(
+            remoteId = remoteId,
+            instanceDomain = instanceDomain,
+            userName = userName,
+            token = decryptedToken,
+            pages = pages,
+            instanceType = instanceType,
+            accountId = accountId,
+        )
+    }
 
     constructor(
         remoteId: String,
         instanceDomain: String,
         userName: String,
-        instanceType: InstanceType,
+        instanceType: Account.InstanceType,
         encryptedToken: String
     ) :
             this(

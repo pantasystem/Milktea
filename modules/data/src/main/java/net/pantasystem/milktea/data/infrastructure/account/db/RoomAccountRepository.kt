@@ -3,12 +3,10 @@ package net.pantasystem.milktea.data.infrastructure.account.db
 import android.content.SharedPreferences
 import android.util.Log
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountNotFoundException
-import net.pantasystem.milktea.model.account.AccountRegistrationFailedException
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.*
 import net.pantasystem.milktea.model.account.page.Page
 import java.util.concurrent.Callable
 
@@ -19,6 +17,7 @@ class RoomAccountRepository(
     private val sharedPreferences: SharedPreferences,
     private val accountDao: AccountDAO,
     private val pageDAO: PageDAO,
+    private val encryption: Encryption,
 ) : AccountRepository {
 
     private val listeners = mutableSetOf<AccountRepository.Listener>()
@@ -41,35 +40,35 @@ class RoomAccountRepository(
             var isNeedDeepUpdate = isUpdatePages
 
             if (account.accountId > 0) {
-                exAccount = accountDao.getAccountRelation(account.accountId)?.toAccount()
+                exAccount = accountDao.getAccountRelation(account.accountId)?.toAccount()?.toAccount(encryption)
             }
             if (exAccount == null) {
                 exAccount = accountDao.findByUserNameAndInstanceDomain(
                     account.userName,
                     account.instanceDomain
-                )?.toAccount()
+                )?.toAccount()?.toAccount(encryption)
             }
 
             if (exAccount == null) {
                 exAccount = accountDao.findByRemoteIdAndInstanceDomain(
                     account.remoteId,
                     account.instanceDomain
-                )?.toAccount()
+                )?.toAccount()?.toAccount(encryption)
             }
 
             if (exAccount == null) {
-                val id = accountDao.insert(account)
-                exAccount = accountDao.get(id) ?: throw AccountRegistrationFailedException()
+                val id = accountDao.insert(AccountRecord.from(account, encryption))
+                exAccount = accountDao.get(id)?.toAccount(encryption) ?: throw AccountRegistrationFailedException()
                 Log.d("RoomAccountRepository", "insertしました: $exAccount")
                 isNeedDeepUpdate = true
             } else {
                 exAccount = exAccount.copy(
                     remoteId = account.remoteId,
                     instanceDomain = account.instanceDomain,
-                    encryptedToken = account.encryptedToken,
+                    token = account.token,
                     userName = account.userName
                 ).also {
-                    accountDao.update(it)
+                    accountDao.update(AccountRecord.from(it, encryption))
                 }
             }
 
@@ -130,7 +129,7 @@ class RoomAccountRepository(
     }
 
     override suspend fun delete(account: Account) {
-        accountDao.delete(account)
+        accountDao.delete(AccountRecord.from(account, encryption))
         publish(AccountRepository.Event.Deleted(account.accountId))
     }
 
@@ -138,7 +137,7 @@ class RoomAccountRepository(
     @Throws(AccountNotFoundException::class)
     override suspend fun get(accountId: Long): Result<Account> {
         return runCatching {
-            accountDao.getAccountRelation(accountId)?.toAccount()
+            accountDao.getAccountRelation(accountId)?.toAccount()?.toAccount(encryption)
                 ?: throw AccountNotFoundException(
                     accountId
                 )
@@ -148,7 +147,7 @@ class RoomAccountRepository(
     override suspend fun findAll(): Result<List<Account>> {
         return runCatching {
             accountDao.findAll().map {
-                it.toAccount()
+                it.toAccount().toAccount(encryption)
             }
         }
     }
@@ -159,11 +158,11 @@ class RoomAccountRepository(
         val current = accountDao.getAccountRelation(currentAccountId)
         return runCatching {
             if (current == null) {
-                val first = accountDao.findAll().firstOrNull()?.toAccount()
+                val first = accountDao.findAll().firstOrNull()?.toAccount()?.toAccount(encryption)
                     ?: throw AccountNotFoundException(currentAccountId)
                 setCurrentAccount(first).getOrThrow()
             } else {
-                current.toAccount()
+                current.toAccount().toAccount(encryption)
             }
         }
 

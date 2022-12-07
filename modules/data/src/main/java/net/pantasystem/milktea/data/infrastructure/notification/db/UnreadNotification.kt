@@ -2,12 +2,12 @@ package net.pantasystem.milktea.data.infrastructure.notification.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRecord
 
 @Entity(
     primaryKeys = ["accountId", "notificationId"],
     foreignKeys = [ForeignKey(
-        entity = Account::class,
+        entity = AccountRecord::class,
         parentColumns = ["accountId"],
         childColumns = ["accountId"],
         onUpdate = ForeignKey.CASCADE,

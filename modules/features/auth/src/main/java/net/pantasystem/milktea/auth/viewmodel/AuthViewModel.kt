@@ -29,7 +29,6 @@ class AuthViewModel @Inject constructor(
     private val accountStore: AccountStore,
     private val userDataSource: UserDataSource,
     private val accountRepository: AccountRepository,
-    val encryption: Encryption,
     val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
     val subscriptionRegistration: SubscriptionRegistration,
 
@@ -150,7 +149,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val account = accountRepository.add(
-                    a.accessToken.newAccount(a.instanceBaseURL, encryption),
+                    a.accessToken.newAccount(a.instanceBaseURL),
                     false
                 ).getOrThrow()
                 val user = when (a.accessToken) {

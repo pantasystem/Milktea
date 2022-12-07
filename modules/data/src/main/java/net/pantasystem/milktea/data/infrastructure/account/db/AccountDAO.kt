@@ -1,13 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.account.db
 
 import androidx.room.*
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRecord
 
 @Dao
 abstract class AccountDAO{
 
     @Query("select * from account_table where accountId = :accountId")
-    abstract fun get(accountId: Long): Account?
+    abstract fun get(accountId: Long): AccountRecord?
 
     @Transaction
     @Query("select * from account_table where accountId = :accountId")
@@ -32,13 +32,13 @@ abstract class AccountDAO{
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(account: Account): Long
+    abstract fun insert(account: AccountRecord): Long
 
     @Delete
-    abstract fun delete(account: Account)
+    abstract fun delete(account: AccountRecord)
 
     @Update
-    abstract fun update(account: Account)
+    abstract fun update(account: AccountRecord)
 
 
 

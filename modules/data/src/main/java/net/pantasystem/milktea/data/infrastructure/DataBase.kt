@@ -54,7 +54,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
         DraftNoteDTO::class,
 
         UrlPreview::class,
-        net.pantasystem.milktea.model.account.Account::class,
+        net.pantasystem.milktea.model.account.AccountRecord::class,
         net.pantasystem.milktea.model.account.page.Page::class,
         MetaDTO::class,
         EmojiDTO::class,

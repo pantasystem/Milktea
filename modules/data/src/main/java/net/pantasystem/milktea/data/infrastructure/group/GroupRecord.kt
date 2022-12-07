@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.group
 
 import androidx.room.*
 import kotlinx.datetime.Instant
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRecord
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.user.User
 
@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.user.User
     foreignKeys = [
         ForeignKey(
             parentColumns = ["accountId"],
-            entity = Account::class,
+            entity = AccountRecord::class,
             childColumns = ["accountId"],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE,
