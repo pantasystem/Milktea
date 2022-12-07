@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notification.db
 
 import androidx.room.*
-import net.pantasystem.milktea.model.notification.AccountNotificationCount
 import kotlinx.coroutines.flow.Flow
 
 @Dao

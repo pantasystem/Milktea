@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notification
+package net.pantasystem.milktea.data.infrastructure.notification.db
 
 import androidx.room.Entity
 
