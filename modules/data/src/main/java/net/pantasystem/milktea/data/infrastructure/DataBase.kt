@@ -27,6 +27,8 @@ import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
 import net.pantasystem.milktea.data.infrastructure.list.UserListRecord
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRegexRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionWordRecord
@@ -37,16 +39,14 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.data.infrastructure.user.db.*
-import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRecord
 import net.pantasystem.milktea.model.url.UrlPreview
 
 @Database(
     entities = [
         EncryptedConnectionInformation::class,
-        ReactionHistory::class,
+        ReactionHistoryRecord::class,
         Account::class,
         ReactionUserSetting::class,
         Page::class,
