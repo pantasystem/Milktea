@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.data.infrastructure.account.db.RoomAccountRepository
+import net.pantasystem.milktea.data.infrastructure.auth.KeyStoreSystemEncryption
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -15,7 +18,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 
-class RoomAccountRepositoryTest{
+class RoomAccountRepositoryTest {
 
     private lateinit var database: DataBase
 
@@ -23,20 +26,36 @@ class RoomAccountRepositoryTest{
 
     private lateinit var accountDAO: AccountDAO
 
+    private lateinit var encryption: Encryption
+
     @Before
-    fun setupRepository(){
+    fun setupRepository() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, DataBase::class.java).build()
-        roomAccountRepository = RoomAccountRepository(database, context.getSharedPreferences("test", Context.MODE_PRIVATE), database.accountDAO(), database.pageDAO())
+        encryption = KeyStoreSystemEncryption(context)
+
+        roomAccountRepository = RoomAccountRepository(
+            database,
+            context.getSharedPreferences("test", Context.MODE_PRIVATE),
+            database.accountDAO(),
+            database.pageDAO(),
+            encryption = encryption,
+        )
         accountDAO = database.accountDAO()
     }
 
     @Test
-    fun addAccountTest(){
+    fun addAccountTest() {
         val remoteId = "hogehoge"
         val instanceDomain = "http://misskey.io"
         val userName = "Panta"
-        val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY,"hogehogehoge")
+        val account = Account(
+            remoteId,
+            instanceDomain,
+            userName,
+            Account.InstanceType.MISSKEY,
+            "hogehogehoge"
+        )
         runBlocking {
             val result = roomAccountRepository.add(account).getOrThrow()
 
@@ -46,7 +65,13 @@ class RoomAccountRepositoryTest{
             assertEquals(1, result.accountId)
             println(result)
 
-            val account2 = Account(remoteId, instanceDomain, "Test", Account.InstanceType.MISSKEY, "hogehogehoge")
+            val account2 = Account(
+                remoteId,
+                instanceDomain,
+                "Test",
+                Account.InstanceType.MISSKEY,
+                "hogehogehoge"
+            )
 
             val result2 = roomAccountRepository.add(account2).getOrThrow()
             assertEquals("Test", result2.userName)
@@ -59,15 +84,22 @@ class RoomAccountRepositoryTest{
     }
 
     @Test
-    fun addAccountUpdateTest(){
+    fun addAccountUpdateTest() {
         val remoteId = "hogehoge"
         val instanceDomain = "http://misskey.io"
         val userName = "Panta"
-        val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY, "hogehogehoge")
+        val account = Account(
+            remoteId,
+            instanceDomain,
+            userName,
+            Account.InstanceType.MISSKEY,
+            "hogehogehoge"
+        )
         runBlocking {
             val result = roomAccountRepository.add(account).getOrThrow()
 
-            val updated = result.copy(pages = listOf(Page(result.accountId, "hoge", 0, Pageable.Favorite)))
+            val updated =
+                result.copy(pages = listOf(Page(result.accountId, "hoge", 0, Pageable.Favorite)))
             assertEquals(result.accountId, updated.accountId)
             assertEquals(updated.accountId, 1)
             val updatedResult = roomAccountRepository.add(updated, true).getOrThrow()
@@ -81,13 +113,19 @@ class RoomAccountRepositoryTest{
     }
 
     @Test
-    fun insertAccountTest(){
+    fun insertAccountTest() {
         val remoteId = "hogehoge"
         val instanceDomain = "http://misskey.io"
         val userName = "Panta"
-        val account = Account(remoteId, instanceDomain, userName, Account.InstanceType.MISSKEY,"hogehogehoge")
+        val account = Account(
+            remoteId,
+            instanceDomain,
+            userName,
+            Account.InstanceType.MISSKEY,
+            "hogehogehoge"
+        )
         runBlocking {
-            val resultId = accountDAO.insert(account)
+            val resultId = accountDAO.insert(AccountRecord.from(account, encryption))
             assertNotEquals(0, resultId)
             val result = accountDAO.get(resultId)!!
             assertEquals(account.userName, result.userName)
