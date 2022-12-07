@@ -1,21 +1,22 @@
 package net.pantasystem.milktea.data.infrastructure.gallery
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.api.misskey.v12_75_0.GetPosts
-import net.pantasystem.milktea.api.misskey.v12_75_0.LikedGalleryPost
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
-import net.pantasystem.milktea.model.instance.IllegalVersionException
-
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.api.misskey.v12_75_0.GetPosts
+import net.pantasystem.milktea.api.misskey.v12_75_0.LikedGalleryPost
+import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
-import net.pantasystem.milktea.data.infrastructure.*
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.toEntity
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
+import net.pantasystem.milktea.model.instance.IllegalVersionException
 import net.pantasystem.milktea.model.user.UserDataSource
 
 data class LikedGalleryPostId(
@@ -87,7 +88,6 @@ class LikedGalleryPostsLoader(
     private val idGetter: IdGetter<String>,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val getAccount: suspend ()-> Account,
-    private val encryption: Encryption
 ) : FutureLoader<LikedGalleryPost>, PreviousLoader<LikedGalleryPost> {
 
     override suspend fun loadFuture(): Result<List<LikedGalleryPost>> {
@@ -97,7 +97,7 @@ class LikedGalleryPostsLoader(
             api.likedGalleryPosts(
                 GetPosts(
                     sinceId = idGetter.getSinceId(),
-                    i = getAccount.invoke().getI(encryption)
+                    i = getAccount.invoke().token
                 )
             ).throwIfHasError().body()!!
         }
@@ -111,7 +111,7 @@ class LikedGalleryPostsLoader(
             api.likedGalleryPosts(
                 GetPosts(
                     untilId = idGetter.getUntilId(),
-                    i = getAccount.invoke().getI(encryption)
+                    i = getAccount.invoke().token
                 )
             ).throwIfHasError().body()!!
         }

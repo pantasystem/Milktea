@@ -13,7 +13,6 @@ import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.ui.SafeUnbox
@@ -35,7 +34,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val encryption: Encryption,
     private val translationStore: NoteTranslationStore,
     private val noteRepository: NoteRepository,
     private val accountRepository: AccountRepository,
@@ -180,7 +178,7 @@ class NotesViewModel @Inject constructor(
             runCatching {
                 val response = getMisskeyAPI()?.noteState(
                     NoteRequest(
-                        i = getAccount()?.getI(encryption)!!,
+                        i = getAccount()?.token!!,
                         noteId = planeNoteViewData.toShowNote.note.id.noteId
                     )
                 )?.throwIfHasError()

@@ -4,7 +4,6 @@ import net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO
 import net.pantasystem.milktea.api.misskey.drive.ShowFile
 import net.pantasystem.milktea.api.misskey.drive.UpdateFileDTO
 import net.pantasystem.milktea.api.misskey.drive.from
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
@@ -21,7 +20,6 @@ class DriveFileRepositoryImpl @Inject constructor(
     val getAccount: GetAccount,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val driveFileDataSource: FilePropertyDataSource,
-    private val encryption: Encryption,
     private val driveFileUploaderProvider: FileUploaderProvider,
 ) : DriveFileRepository {
     override suspend fun find(id: FileProperty.Id): FileProperty {
@@ -31,7 +29,7 @@ class DriveFileRepositoryImpl @Inject constructor(
         }
         val account = getAccount.get(id.accountId)
         val api = misskeyAPIProvider.get(account.instanceDomain)
-        val response = api.showFile(ShowFile(fileId = id.fileId, i = account.getI(encryption)))
+        val response = api.showFile(ShowFile(fileId = id.fileId, i = account.token))
             .throwIfHasError()
         val fp = response.body()!!.toFileProperty(account)
         driveFileDataSource.add(fp)
@@ -44,7 +42,7 @@ class DriveFileRepositoryImpl @Inject constructor(
         val fileProperty = find(id)
         val result = api.updateFile(
             UpdateFileDTO(
-                account.getI(encryption),
+                account.token,
                 fileId = id.fileId,
                 isSensitive = !fileProperty.isSensitive,
                 name = fileProperty.name,
@@ -71,7 +69,7 @@ class DriveFileRepositoryImpl @Inject constructor(
             val account = getAccount.get(id.accountId)
             val property = this.find(id)
             misskeyAPIProvider.get(account).deleteFile(
-                DeleteFileDTO(i = account.getI(encryption), fileId = id.fileId)
+                DeleteFileDTO(i = account.token, fileId = id.fileId)
             )
             driveFileDataSource.remove(property)
         }
@@ -82,7 +80,7 @@ class DriveFileRepositoryImpl @Inject constructor(
             val res = misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
                 .updateFile(
                     UpdateFileDTO.from(
-                        getAccount.get(updateFileProperty.fileId.accountId).getI(encryption),
+                        getAccount.get(updateFileProperty.fileId.accountId).token,
                         updateFileProperty,
                     )
                 ).throwIfHasError()

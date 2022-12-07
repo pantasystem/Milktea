@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -32,7 +31,6 @@ class UserRepositoryImpl @Inject constructor(
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
     val loggerFactory: Logger.Factory,
 ) : UserRepository {
     private val logger: Logger by lazy {
@@ -60,7 +58,7 @@ class UserRepositoryImpl @Inject constructor(
             if (localResult.getOrNull() == null) {
                 val res = misskeyAPIProvider.get(account).showUser(
                     RequestUser(
-                        i = account.getI(encryption),
+                        i = account.token,
                         userId = userId.id,
                         detail = true
                     )
@@ -102,7 +100,7 @@ class UserRepositoryImpl @Inject constructor(
         val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
         val res = misskeyAPI.showUser(
             RequestUser(
-                i = account.getI(encryption),
+                i = account.token,
                 userName = userName,
                 host = host,
                 detail = detail
@@ -136,7 +134,7 @@ class UserRepositoryImpl @Inject constructor(
     ) = runCatching<Unit> {
         withContext(Dispatchers.IO) {
             val ac = accountRepository.get(accountId).getOrThrow()
-            val i = ac.getI(encryption)
+            val i = ac.token
             val api = misskeyAPIProvider.get(ac)
 
             val results = SearchByUserAndHost(api)
@@ -172,7 +170,7 @@ class UserRepositoryImpl @Inject constructor(
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
         val res = misskeyAPIProvider.get(account).muteUser(
             CreateMuteUserRequest(
-                i = account.getI(encryption),
+                i = account.token,
                 userId = createMute.userId.id,
                 expiresAt = createMute.expiresAt?.toEpochMilliseconds()
             )
@@ -202,7 +200,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun follow(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
-        val req = RequestUser(userId = userId.id, i = account.getI(encryption))
+        val req = RequestUser(userId = userId.id, i = account.token)
         logger.debug("follow req:$req")
         val res = misskeyAPIProvider.get(account).followUser(req)
         res.throwIfHasError()
@@ -223,10 +221,10 @@ class UserRepositoryImpl @Inject constructor(
 
         val res = if (user.isLocked) {
             misskeyAPIProvider.get(account)
-                .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.getI(encryption)))
+                .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.token))
         } else {
             misskeyAPIProvider.get(account)
-                .unFollowUser(RequestUser(userId = userId.id, i = account.getI(encryption)))
+                .unFollowUser(RequestUser(userId = userId.id, i = account.token))
         }
         res.throwIfHasError()
         if (res.isSuccessful) {
@@ -249,7 +247,7 @@ class UserRepositoryImpl @Inject constructor(
             val res = misskeyAPIProvider.get(account)
                 .acceptFollowRequest(
                     AcceptFollowRequest(
-                        i = account.getI(encryption),
+                        i = account.token,
                         userId = userId.id
                     )
                 )
@@ -275,7 +273,7 @@ class UserRepositoryImpl @Inject constructor(
             }
             val res = misskeyAPIProvider.get(account).rejectFollowRequest(
                 RejectFollowRequest(
-                    i = account.getI(encryption),
+                    i = account.token,
                     userId = userId.id
                 )
             )
@@ -297,7 +295,7 @@ class UserRepositoryImpl @Inject constructor(
         reducer: (User.Detail) -> User.Detail
     ): Boolean {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.getI(encryption)))
+        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.token))
         res.throwIfHasError()
         if (res.isSuccessful) {
 
@@ -312,7 +310,7 @@ class UserRepositoryImpl @Inject constructor(
         val api = report.userId.getMisskeyAPI()
         val res = api.report(
             ReportDTO(
-                i = account.getI(encryption),
+                i = account.token,
                 comment = report.comment,
                 userId = report.userId.id
             )
@@ -323,7 +321,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
         val account = accountRepository.get(accountId).getOrThrow()
-        val request = RequestUser.from(query, account.getI(encryption))
+        val request = RequestUser.from(query, account.token)
         val res = misskeyAPIProvider.get(account).getUsers(request)
             .throwIfHasError()
         return res.body()?.map {
@@ -339,7 +337,7 @@ class UserRepositoryImpl @Inject constructor(
                 .getOrThrow()
             val user = misskeyAPIProvider.get(account)
                 .showUser(
-                    RequestUser(i = account.getI(encryption), userId = userId.id, detail = true)
+                    RequestUser(i = account.token, userId = userId.id, detail = true)
                 ).throwIfHasError()
                 .body()!!.toUser(account, true)
             userDataSource.add(user)
@@ -357,7 +355,7 @@ class UserRepositoryImpl @Inject constructor(
                 val users = misskeyAPIProvider.get(account)
                     .showUsers(
                         RequestUser(
-                            i = account.getI(encryption),
+                            i = account.token,
                             userIds = userIds.map { it.id },
                             detail = true
                         )

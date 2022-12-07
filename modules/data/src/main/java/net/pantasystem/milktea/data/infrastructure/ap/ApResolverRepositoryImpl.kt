@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
 import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
@@ -18,7 +17,6 @@ import javax.inject.Inject
 class ApResolverRepositoryImpl @Inject constructor(
     private val apiProvider: MisskeyAPIProvider,
     private val getAccount: GetAccount,
-    private val encryption: Encryption,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val userDataSource: UserDataSource,
 ): ApResolverRepository {
@@ -26,7 +24,7 @@ class ApResolverRepositoryImpl @Inject constructor(
     override suspend fun resolve(accountId: Long, uri: String): Result<ApResolver> = runCatching {
         withContext(Dispatchers.IO) {
             val account = getAccount.get(accountId)
-            val result = apiProvider.get(account).resolve(ApResolveRequest(i = account.getI(encryption), uri = uri))
+            val result = apiProvider.get(account).resolve(ApResolveRequest(i = account.token, uri = uri))
                 .throwIfHasError()
                 .body()!!
             when(result) {

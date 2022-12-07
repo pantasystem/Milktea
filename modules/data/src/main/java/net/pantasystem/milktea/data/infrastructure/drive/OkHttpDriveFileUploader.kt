@@ -8,7 +8,6 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.AppFile
@@ -33,7 +32,6 @@ class OkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
     val json: Json,
-    val encryption: Encryption,
     private val okHttpClientProvider: OkHttpClientProvider,
 ) : FileUploader {
     override suspend fun upload(file: UploadSource, isForce: Boolean): FilePropertyDTO {
@@ -50,7 +48,7 @@ class OkHttpDriveFileUploader(
 
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.getI(encryption))
+                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.token)
                 .addFormDataPart(OkHttpDriveFileUploaderConstants.force, isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart(
@@ -100,7 +98,7 @@ class OkHttpDriveFileUploader(
             val client = getOkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.getI(encryption))
+                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.token)
                 .addFormDataPart(OkHttpDriveFileUploaderConstants.force, isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart(

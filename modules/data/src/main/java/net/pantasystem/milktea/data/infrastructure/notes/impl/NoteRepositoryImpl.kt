@@ -6,7 +6,6 @@ import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -31,7 +30,6 @@ class NoteRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
-    val encryption: Encryption,
     private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val getAccount: GetAccount,
@@ -45,7 +43,6 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCatching {
         val task = PostNoteTask(
-            encryption,
             createNote,
             createNote.author,
             loggerFactory,
@@ -70,7 +67,7 @@ class NoteRepositoryImpl @Inject constructor(
         val account = getAccount.get(noteId.accountId)
         return runCatching {
             misskeyAPIProvider.get(account).delete(
-                DeleteNote(i = account.getI(encryption), noteId = noteId.noteId)
+                DeleteNote(i = account.token, noteId = noteId.noteId)
             ).throwIfHasError()
         }
     }
@@ -94,7 +91,7 @@ class NoteRepositoryImpl @Inject constructor(
         note = try {
             misskeyAPIProvider.get(account).showNote(
                 NoteRequest(
-                    i = account.getI(encryption),
+                    i = account.token,
                     noteId = noteId.noteId
                 )
             ).throwIfHasError().body()?.let { resDTO ->
@@ -163,7 +160,7 @@ class NoteRepositoryImpl @Inject constructor(
         val account = getAccount.get(noteId.accountId)
         misskeyAPIProvider.get(account).vote(
             Vote(
-                i = getAccount.get(noteId.accountId).getI(encryption),
+                i = getAccount.get(noteId.accountId).token,
                 choice = choice.index,
                 noteId = noteId.noteId
             )
@@ -174,7 +171,7 @@ class NoteRepositoryImpl @Inject constructor(
         val account = getAccount.get(createReaction.noteId.accountId)
         val res = misskeyAPIProvider.get(account).createReaction(
             CreateReactionDTO(
-                i = account.getI(encryption),
+                i = account.token,
                 noteId = createReaction.noteId.noteId,
                 reaction = createReaction.reaction
             )
@@ -189,7 +186,7 @@ class NoteRepositoryImpl @Inject constructor(
         val res = misskeyAPIProvider.get(account).deleteReaction(
             DeleteNote(
                 noteId = note.id.noteId,
-                i = account.getI(encryption)
+                i = account.token
             )
         )
         res.throwIfHasError()
@@ -215,7 +212,7 @@ class NoteRepositoryImpl @Inject constructor(
                         val account = accountMap.getValue(noteId.accountId)
                         misskeyAPIProvider.get(account).showNote(
                             NoteRequest(
-                                i = account.getI(encryption),
+                                i = account.token,
                                 noteId = noteId.noteId,
                             )
                         ).throwIfHasError().body()?.let {
@@ -236,7 +233,7 @@ class NoteRepositoryImpl @Inject constructor(
         val account = getAccount.get(noteId.accountId)
         val dtoList = misskeyAPIProvider.get(account).children(
             NoteRequest(
-                i = account.getI(encryption),
+                i = account.token,
                 noteId = noteId.noteId,
                 limit = 100,
             )
@@ -250,7 +247,7 @@ class NoteRepositoryImpl @Inject constructor(
         val account = getAccount.get(noteId.accountId)
         val dtoList = misskeyAPIProvider.get(account).conversation(
             NoteRequest(
-                i = account.getI(encryption),
+                i = account.token,
                 noteId = noteId.noteId,
 
             )
@@ -265,7 +262,7 @@ class NoteRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val account = getAccount.get(noteId.accountId)
             val note = misskeyAPIProvider.get(account).showNote(NoteRequest(
-                i = account.getI(encryption),
+                i = account.token,
                 noteId = noteId.noteId
             )).throwIfHasError().body()!!
             noteDataSourceAdder.addNoteDtoToDataSource(account, note)

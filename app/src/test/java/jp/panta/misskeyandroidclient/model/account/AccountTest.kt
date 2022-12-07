@@ -11,7 +11,7 @@ class AccountTest : TestCase() {
         val account = Account(
             instanceDomain = "https://example.com",
             userName = "",
-            encryptedToken = "",
+            token = "",
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
@@ -22,7 +22,7 @@ class AccountTest : TestCase() {
         val account = Account(
             instanceDomain = "http://example.com",
             userName = "",
-            encryptedToken = "",
+            token = "",
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
@@ -33,7 +33,7 @@ class AccountTest : TestCase() {
         val account = Account(
             instanceDomain = "example.com",
             userName = "",
-            encryptedToken = "",
+            token = "",
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )

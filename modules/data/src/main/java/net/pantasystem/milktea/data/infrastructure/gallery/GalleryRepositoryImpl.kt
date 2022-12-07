@@ -4,7 +4,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.api.misskey.v12_75_0.*
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
@@ -27,7 +26,6 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.CreateGallery as CreateGalle
 class GalleryRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val galleryDataSource: GalleryDataSource,
-    private val encryption: Encryption,
     private val fileUploaderProvider: FileUploaderProvider,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
@@ -56,7 +54,7 @@ class GalleryRepositoryImpl @Inject constructor(
 
         val created = getMisskeyAPI(createGalleryPost.author).createGallery(
             CreateGalleryDTO(
-                createGalleryPost.author.getI(encryption),
+                createGalleryPost.author.token,
                 createGalleryPost.title,
                 createGalleryPost.description,
                 fileIds = files.map {
@@ -77,7 +75,7 @@ class GalleryRepositoryImpl @Inject constructor(
         val account = accountRepository.get(id.accountId).getOrThrow()
         val res = getMisskeyAPI(account).deleteGallery(
             Delete(
-                i = account.getI(encryption),
+                i = account.token,
                 postId = id.galleryId
             )
         ).throwIfHasError()
@@ -93,7 +91,7 @@ class GalleryRepositoryImpl @Inject constructor(
         val account = accountRepository.get(id.accountId).getOrThrow()
         val res = getMisskeyAPI(account).showGallery(
             Show(
-                i = account.getI(encryption),
+                i = account.token,
                 postId = id.galleryId
             )
         ).throwIfHasError()
@@ -110,7 +108,7 @@ class GalleryRepositoryImpl @Inject constructor(
         val account = accountRepository.get(id.accountId).getOrThrow()
         getMisskeyAPI(account).likeGallery(
             Like(
-                i = account.getI(encryption),
+                i = account.token,
                 postId = id.galleryId
             )
         ).throwIfHasError()
@@ -123,7 +121,7 @@ class GalleryRepositoryImpl @Inject constructor(
         val account = accountRepository.get(id.accountId).getOrThrow()
         getMisskeyAPI(account).unlikeGallery(
             UnLike(
-                i = account.getI(encryption),
+                i = account.token,
                 postId = id.galleryId
             )
         ).throwIfHasError()
@@ -150,7 +148,7 @@ class GalleryRepositoryImpl @Inject constructor(
         }
         val body = getMisskeyAPI(account).updateGallery(
             Update(
-                i = account.getI(encryption),
+                i = account.token,
                 postId = updateGalleryPost.id.galleryId,
                 description = updateGalleryPost.description,
                 title = updateGalleryPost.title,

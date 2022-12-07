@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.FuturePagingController
@@ -22,7 +21,6 @@ import javax.inject.Inject
 
 
 
-
 class GalleryPostsStoreImpl(
     pageable: Pageable.Gallery,
     getAccount: suspend () -> Account,
@@ -30,7 +28,6 @@ class GalleryPostsStoreImpl(
     filePropertyDataSource: FilePropertyDataSource,
     userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
-    encryption: Encryption
 ) : GalleryPostsStore {
 
     class Factory @Inject constructor(
@@ -38,7 +35,6 @@ class GalleryPostsStoreImpl(
         val filePropertyDataSource: FilePropertyDataSource,
         val userDataSource: UserDataSource,
         val galleryDataSource: GalleryDataSource,
-        val encryption: Encryption
     ) : GalleryPostsStore.Factory{
         override fun create(pageable: Pageable.Gallery,
                    getAccount: suspend () -> Account,): GalleryPostsStore {
@@ -49,7 +45,6 @@ class GalleryPostsStoreImpl(
                     filePropertyDataSource,
                     userDataSource,
                     galleryDataSource,
-                    encryption
                 )
             } else {
                 GalleryPostsStoreImpl(
@@ -59,7 +54,6 @@ class GalleryPostsStoreImpl(
                     filePropertyDataSource,
                     userDataSource,
                     galleryDataSource,
-                    encryption
                 )
             }
         }
@@ -72,7 +66,7 @@ class GalleryPostsStoreImpl(
     private val entityAdder =
         GalleryPostsConverter(getAccount, filePropertyDataSource, userDataSource, galleryDataSource)
     private val loader =
-        GalleryPostsLoader(pageable, galleryPostState, misskeyAPIProvider, getAccount, encryption)
+        GalleryPostsLoader(pageable, galleryPostState, misskeyAPIProvider, getAccount)
     private val previousPagingController =
         PreviousPagingController(entityAdder, this, galleryPostState, loader)
     private val futurePaginatorController =
@@ -101,7 +95,6 @@ class LikedGalleryPostStoreImpl(
     filePropertyDataSource: FilePropertyDataSource,
     userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
-    encryption: Encryption
 ) : GalleryPostsStore {
 
     override val mutex: Mutex = Mutex()
@@ -114,7 +107,7 @@ class LikedGalleryPostStoreImpl(
         galleryDataSource
     )
     private val loader =
-        LikedGalleryPostsLoader(galleryPostState, misskeyAPIProvider, getAccount, encryption)
+        LikedGalleryPostsLoader(galleryPostState, misskeyAPIProvider, getAccount)
     private val previousPagingController =
         PreviousPagingController(entityAdder, this, galleryPostState, loader)
     private val futurePaginatorController =

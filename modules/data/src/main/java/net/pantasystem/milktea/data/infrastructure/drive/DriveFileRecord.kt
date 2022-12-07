@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.drive
 
 import androidx.room.*
 import kotlinx.datetime.Instant
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.user.User
 
@@ -15,7 +15,7 @@ import net.pantasystem.milktea.model.user.User
     ],
     foreignKeys = [
         ForeignKey(
-            entity = Account::class,
+            entity = AccountRecord::class,
             parentColumns = ["accountId"],
             childColumns = ["relatedAccountId"],
             onDelete = ForeignKey.CASCADE,

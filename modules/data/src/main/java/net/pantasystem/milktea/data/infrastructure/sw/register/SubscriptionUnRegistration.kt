@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.sw.register
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -15,7 +14,6 @@ import kotlin.coroutines.suspendCoroutine
 class SubscriptionUnRegistrationImpl @Inject constructor(
 
     val accountRepository: AccountRepository,
-    val encryption: Encryption,
     val lang: String,
     val misskeyAPIProvider: MisskeyAPIProvider,
     private val publicKey: String,
@@ -38,7 +36,7 @@ class SubscriptionUnRegistrationImpl @Inject constructor(
         ).build()
         apiProvider.swUnRegister(
             UnSubscription(
-            i = account.getI(encryption),
+            i = account.token,
             endpoint = endpoint
         )
         ).throwIfHasError()

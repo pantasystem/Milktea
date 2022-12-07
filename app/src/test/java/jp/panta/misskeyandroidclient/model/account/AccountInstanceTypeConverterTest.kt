@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.account
 
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountInstanceTypeConverter
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountInstanceTypeConverter
 import org.junit.Assert.*
 import org.junit.Test
 

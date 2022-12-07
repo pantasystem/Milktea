@@ -83,7 +83,7 @@ class ChannelPagingModel @AssistedInject constructor(
 //        logger.debug("loadFuture type:$type, sinceId:$sinceId")
 //        val account = accountRepository.get(accountId).getOrThrow()
 //        val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
-//        val i = account.getI(encryption)
+//        val i = account.token
 //        val res = when (type) {
 //            ChannelListType.FOLLOWED -> api.followedChannels(
 //                FindPageable(
@@ -109,7 +109,7 @@ class ChannelPagingModel @AssistedInject constructor(
     override suspend fun loadPrevious(): Result<List<ChannelDTO>> {
         val account = accountRepository.get(accountId).getOrThrow()
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
-        val i = account.getI(encryption)
+        val i = account.token
         val res = when (type) {
             ChannelListType.FOLLOWED -> {
                 logger.debug("loadPrevious:${_state.value}")

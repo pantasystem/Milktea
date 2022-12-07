@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.api.mastodon
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.mastodon.MastodonAPI
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.model.account.Account
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -11,7 +10,6 @@ import javax.inject.Singleton
 @Singleton
 class MastodonAPIProvider @Inject constructor(
     private val mastodonAPIFactory: MastodonAPIFactory,
-    val encryption: Encryption,
 ){
 
     data class Key(
@@ -37,7 +35,7 @@ class MastodonAPIProvider @Inject constructor(
         if (account.instanceType == Account.InstanceType.MISSKEY) {
             throw IllegalArgumentException("アカウント種別Misskeyは受け入れていません")
         }
-        return get(account.instanceDomain, account.getI(encryption))
+        return get(account.instanceDomain, account.token)
 
     }
 

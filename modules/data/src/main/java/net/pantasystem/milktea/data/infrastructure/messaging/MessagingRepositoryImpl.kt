@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
@@ -16,7 +15,6 @@ import javax.inject.Inject
 
 class MessagingRepositoryImpl @Inject constructor(
     private val getAccount: GetAccount,
-    private val encryption: Encryption,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val groupDataSource: GroupDataSource,
     private val userDataSource: UserDataSource,
@@ -29,9 +27,7 @@ class MessagingRepositoryImpl @Inject constructor(
     ): Result<List<MessageRelation>> = runCatching {
         val account = getAccount.get(accountId)
         val request = RequestMessageHistory(
-            i = account.getI(
-                encryption
-            ), group = isGroup, limit = 100
+            i = account.token, group = isGroup, limit = 100
         )
 
         val res = misskeyAPIProvider.get(account).getMessageHistory(request)

@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploader
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
@@ -17,7 +16,6 @@ import java.io.Serializable
 import net.pantasystem.milktea.api.misskey.notes.CreateNote as CreateNoteDTO
 
 class PostNoteTask(
-    val encryption: Encryption,
     val createNote: CreateNote,
     val account: Account,
     loggerFactory: Logger.Factory,
@@ -40,7 +38,7 @@ class PostNoteTask(
         return if(ok){
             logger.debug("投稿データを作成しました。")
             CreateNoteDTO(
-                i = createNote.author.getI(encryption),
+                i = createNote.author.token,
                 visibility = createNote.visibility.type(),
                 localOnly = (createNote.visibility as? CanLocalOnly)?.isLocalOnly,
                 visibleUserIds = createNote.visibleUserIds(),

@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.BuildConfig
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.sw.register.SubscriptionRegistrationImpl
@@ -24,13 +23,11 @@ object PushSubscriptionModule {
     @Provides
     fun provideSubscriptionRegistration(
         accountRepository: AccountRepository,
-        encryption: Encryption,
         misskeyAPIProvider: MisskeyAPIProvider,
         loggerFactory: Logger.Factory
     ): SubscriptionRegistration {
         return SubscriptionRegistrationImpl(
             accountRepository,
-            encryption,
             misskeyAPIProvider,
             lang = Locale.getDefault().language,
             loggerFactory,
@@ -44,12 +41,10 @@ object PushSubscriptionModule {
     @Provides
     fun provideUnSubscriptionRegistration(
         accountRepository: AccountRepository,
-        encryption: Encryption,
         misskeyAPIProvider: MisskeyAPIProvider,
     ): SubscriptionUnRegistration {
         return SubscriptionUnRegistrationImpl(
             accountRepository,
-            encryption,
             lang = Locale.getDefault().language,
             misskeyAPIProvider = misskeyAPIProvider,
             endpointBase = BuildConfig.PUSH_TO_FCM_SERVER_BASE_URL,

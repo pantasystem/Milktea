@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.channel
 
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.channel.*
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
@@ -15,14 +14,13 @@ import javax.inject.Inject
 class ChannelAPIAdapterWebImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption
 ) : ChannelAPIAdapter {
     override suspend fun findOne(id: Channel.Id): Result<ChannelDTO> {
         return runCatching {
             val account = id.getAccount()
             id.getAPI().showChannel(
                 ShowChannelDTO(
-                i = account.getI(encryption),
+                i = account.token,
                 channelId = id.channelId
             )
             ).throwIfHasError().body()!!
@@ -35,7 +33,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
             val account = accountRepository.get(model.accountId).getOrThrow()
             (misskeyAPIProvider.get(account) as MisskeyAPIV12).createChannel(
                 CreateChannelDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     name = model.name,
                     description = model.description,
                     bannerId = model.bannerId
@@ -49,7 +47,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
             val account = id.getAccount()
             id.getAPI().followChannel(
                 FollowChannelDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     channelId = id.channelId
                 )
             ).throwIfHasError()
@@ -61,7 +59,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
             val account = id.getAccount()
             id.getAPI().unFollowChannel(
                 UnFollowChannelDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     channelId = id.channelId
                 )
             ).throwIfHasError()
@@ -74,7 +72,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
             model.id.getAPI()
                 .updateChannel(
                     UpdateChannelDTO(
-                        i = account.getI(encryption),
+                        i = account.token,
                         name = model.name,
                         description = model.description,
                         bannerId = model.bannerId
@@ -94,7 +92,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
             val account = accountRepository.get(accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
             api.followedChannels(FindPageable(
-                i = account.getI(encryption),
+                i = account.token,
                 sinceId = sinceId?.channelId,
                 untilId = untilId?.channelId,
                 limit = limit,

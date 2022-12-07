@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user.db
 import androidx.room.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
@@ -15,7 +15,7 @@ import net.pantasystem.milktea.model.user.nickname.UserNickname
         ForeignKey(
             parentColumns = ["accountId"],
             childColumns = ["accountId"],
-            entity = Account::class,
+            entity = AccountRecord::class,
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         )

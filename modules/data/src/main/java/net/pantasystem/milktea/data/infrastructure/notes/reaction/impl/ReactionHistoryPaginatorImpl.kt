@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.notes.reaction.impl
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -21,7 +20,6 @@ class ReactionHistoryPaginatorImpl(
     private val reactionHistoryDataSource: ReactionHistoryDataSource,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val accountRepository: AccountRepository,
-    private val encryption: Encryption,
     private val userDataSource: UserDataSource
 ) : ReactionHistoryPaginator {
 
@@ -29,7 +27,6 @@ class ReactionHistoryPaginatorImpl(
         private val reactionHistoryDataSource: ReactionHistoryDataSource,
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val accountRepository: AccountRepository,
-        private val encryption: Encryption,
         private val userDataSource: UserDataSource
     ) : ReactionHistoryPaginator.Factory {
         override fun create(reactionHistoryRequest: ReactionHistoryRequest) : ReactionHistoryPaginator {
@@ -38,7 +35,6 @@ class ReactionHistoryPaginatorImpl(
                 reactionHistoryDataSource,
                 misskeyAPIProvider,
                 accountRepository,
-                encryption,
                 userDataSource
             )
         }
@@ -56,7 +52,7 @@ class ReactionHistoryPaginatorImpl(
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
             val res = misskeyAPI.reactions(
                 RequestReactionHistoryDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     offset = offset,
                     limit = limit,
                     noteId = reactionHistoryRequest.noteId.noteId,

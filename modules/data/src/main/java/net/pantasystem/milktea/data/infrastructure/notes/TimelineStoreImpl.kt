@@ -14,7 +14,6 @@ import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.app_store.notes.TimelineStore
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
@@ -39,7 +38,6 @@ class TimelineStoreImpl(
     private val noteAdder: NoteDataSourceAdder,
     noteDataSource: NoteDataSource,
     private val getAccount: suspend () -> Account,
-    private val encryption: Encryption,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
@@ -48,7 +46,6 @@ class TimelineStoreImpl(
     class Factory @Inject constructor(
         private val noteAdder: NoteDataSourceAdder,
         private val noteDataSource: NoteDataSource,
-        private val encryption: Encryption,
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val noteRelationGetter: NoteRelationGetter,
     ) : TimelineStore.Factory {
@@ -62,7 +59,6 @@ class TimelineStoreImpl(
                 noteAdder,
                 noteDataSource,
                 getAccount,
-                encryption,
                 misskeyAPIProvider,
                 coroutineScope,
                 noteRelationGetter,
@@ -83,13 +79,13 @@ class TimelineStoreImpl(
         when (pageableTimeline) {
             is Pageable.Favorite -> {
                 FavoriteNoteTimelinePagingStoreImpl(
-                    pageableTimeline, noteAdder, getAccount, encryption, misskeyAPIProvider
+                    pageableTimeline, noteAdder, getAccount, misskeyAPIProvider
                 )
             }
             else -> TimelinePagingStoreImpl(
                 pageableTimeline, noteAdder, getAccount, {
                     initialUntilDate
-                },encryption, misskeyAPIProvider
+                }, misskeyAPIProvider
             )
         }
     }
@@ -235,7 +231,6 @@ class TimelinePagingStoreImpl(
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
     private val getInitialUntilDate: () -> Instant?,
-    private val encryption: Encryption,
     private val misskeyAPIProvider: MisskeyAPIProvider,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
     IdGetter<Note.Id>, TimelinePagingBase {
@@ -266,7 +261,7 @@ class TimelinePagingStoreImpl(
                 return@runCatching emptyList()
             }
             val builder = NoteRequest.Builder(
-                i = getAccount.invoke().getI(encryption),
+                i = getAccount.invoke().token,
                 pageable = pageableTimeline,
                 limit = LIMIT
             )
@@ -286,7 +281,7 @@ class TimelinePagingStoreImpl(
             }
 
             val builder = NoteRequest.Builder(
-                i = getAccount.invoke().getI(encryption),
+                i = getAccount.invoke().token,
                 pageable = pageableTimeline,
                 limit = LIMIT
             )
@@ -355,7 +350,6 @@ class FavoriteNoteTimelinePagingStoreImpl(
     val pageableTimeline: Pageable.Favorite,
     val noteAdder: NoteDataSourceAdder,
     val getAccount: suspend () -> Account,
-    val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
 ) : EntityConverter<Favorite, Note.Id>, PreviousLoader<Favorite>, FutureLoader<Favorite>,
     IdGetter<String>, StateLocker, TimelinePagingBase {
@@ -397,7 +391,7 @@ class FavoriteNoteTimelinePagingStoreImpl(
         val ac = getAccount.invoke()
         return runCatching {
             misskeyAPIProvider.get(getAccount.invoke()).favorites(
-                NoteRequest.Builder(pageableTimeline, ac.getI(encryption), limit = LIMIT)
+                NoteRequest.Builder(pageableTimeline, ac.token, limit = LIMIT)
                     .build(NoteRequest.Conditions(sinceId = getSinceId()))
             ).throwIfHasError().body()!!
         }
@@ -407,7 +401,7 @@ class FavoriteNoteTimelinePagingStoreImpl(
         return runCatching {
             val ac = getAccount.invoke()
             misskeyAPIProvider.get(getAccount.invoke()).favorites(
-                NoteRequest.Builder(pageableTimeline, ac.getI(encryption), limit = LIMIT)
+                NoteRequest.Builder(pageableTimeline, ac.token, limit = LIMIT)
                     .build(NoteRequest.Conditions(untilId = getUntilId()))
             ).throwIfHasError().body()!!
         }

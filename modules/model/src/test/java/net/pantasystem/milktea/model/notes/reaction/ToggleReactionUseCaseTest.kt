@@ -47,7 +47,7 @@ class ToggleReactionUseCaseTest {
             "testId",
             "misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
-            encryptedToken = "test",
+            token = "test",
             userName = "test",
             accountId = 0L,
             pages = emptyList(),
@@ -117,7 +117,7 @@ class ToggleReactionUseCaseTest {
             "testId",
             "misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
-            encryptedToken = "test",
+            token = "test",
             userName = "test",
             accountId = 0L,
             pages = emptyList(),
@@ -191,7 +191,7 @@ class ToggleReactionUseCaseTest {
             "testId",
             "misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
-            encryptedToken = "test",
+            token = "test",
             userName = "test",
             accountId = 0L,
             pages = emptyList(),
@@ -254,7 +254,7 @@ class ToggleReactionUseCaseTest {
             "testId",
             "misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
-            encryptedToken = "test",
+            token = "test",
             userName = "test",
             accountId = 0L,
             pages = emptyList(),
@@ -315,10 +315,10 @@ class ToggleReactionUseCaseTest {
             "testId",
             "misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
-            encryptedToken = "test",
+            token = "test",
             userName = "test",
             accountId = 0L,
-            pages = emptyList(),
+            pages = emptyList()
         )
         val getAccount = mock<GetAccount> {
             onBlocking {
@@ -377,10 +377,10 @@ class ToggleReactionUseCaseTest {
             "testId",
             "misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
-            encryptedToken = "test",
+            token = "test",
             userName = "test",
             accountId = 0L,
-            pages = emptyList(),
+            pages = emptyList()
         )
         val getAccount = mock<GetAccount> {
             onBlocking {
