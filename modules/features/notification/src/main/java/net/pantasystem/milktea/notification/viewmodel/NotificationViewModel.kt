@@ -13,7 +13,6 @@ import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -36,7 +35,6 @@ import javax.inject.Inject
 class NotificationViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val userRepository: UserRepository,
-    private val encryption: Encryption,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
     private val noteTranslationStore: NoteTranslationStore,
@@ -126,7 +124,7 @@ class NotificationViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             logger.debug("in launch")
             val account = accountRepository.getCurrentAccount().getOrThrow()
-            val request = NotificationRequest(i = account.getI(encryption), limit = 20)
+            val request = NotificationRequest(i = account.token, limit = 20)
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
 
             runCatching {
@@ -170,7 +168,7 @@ class NotificationViewModel @Inject constructor(
             val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
 
             val request = NotificationRequest(
-                i = account.getI(encryption),
+                i = account.token,
                 limit = 20,
                 untilId = untilId.notificationId
             )

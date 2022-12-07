@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.groups.*
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -22,7 +21,6 @@ class GroupRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val accountRepository: AccountRepository,
     private val groupDataSource: GroupDataSource,
-    private val encryption: Encryption,
     private val loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
 ) : GroupRepository {
@@ -39,7 +37,7 @@ class GroupRepositoryImpl @Inject constructor(
 
             val res = api.createGroup(
                 CreateGroupDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     name = createGroup.name
                 )
             ).throwIfHasError()
@@ -63,7 +61,7 @@ class GroupRepositoryImpl @Inject constructor(
             val api = getMisskeyAPI(account)
 
             val res =
-                api.showGroup(ShowGroupDTO(account.getI(encryption), groupId = groupId.groupId))
+                api.showGroup(ShowGroupDTO(account.token, groupId = groupId.groupId))
                     .throwIfHasError()
             val body = res.body()
                 ?: throw GroupNotFoundException(groupId)
@@ -80,7 +78,7 @@ class GroupRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             val account = accountRepository.get(accountId).getOrThrow()
             val api =
-                getMisskeyAPI(account).joinedGroups(I(account.getI(encryption))).throwIfHasError()
+                getMisskeyAPI(account).joinedGroups(I(account.token)).throwIfHasError()
             val groups = api.body()?.map {
                 it.toGroup(account.accountId)
             } ?: emptyList()
@@ -98,7 +96,7 @@ class GroupRepositoryImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             val account = accountRepository.get(accountId).getOrThrow()
             val api =
-                getMisskeyAPI(account).ownedGroups(I(account.getI(encryption))).throwIfHasError()
+                getMisskeyAPI(account).ownedGroups(I(account.token)).throwIfHasError()
             val groups = api.body()?.map {
                 it.toGroup(account.accountId)
             } ?: emptyList()
@@ -118,7 +116,7 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
             getMisskeyAPI(account).pullUser(
                 RemoveUserDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     userId = pull.userId.id,
                     groupId = pull.groupId.groupId
                 )
@@ -126,7 +124,7 @@ class GroupRepositoryImpl @Inject constructor(
                 .throwIfHasError()
 
             group = group.copy(userIds = group.userIds.filterNot {
-                pull.userId == pull.userId
+                it == pull.userId
             })
             groupDataSource.add(group)
             group
@@ -139,7 +137,7 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(transfer.groupId.accountId).getOrThrow()
             val body = getMisskeyAPI(account).transferGroup(
                 TransferGroupDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     groupId = transfer.groupId.groupId,
                     userId = transfer.userId.id
                 )
@@ -158,7 +156,7 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
             val body = getMisskeyAPI(account).updateGroup(
                 UpdateGroupDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     groupId = updateGroup.groupId.groupId,
                     name = updateGroup.name
                 )
@@ -178,7 +176,7 @@ class GroupRepositoryImpl @Inject constructor(
             getMisskeyAPI(account).invite(
                 InviteUserDTO(
                     groupId = invite.groupId.groupId,
-                    i = account.getI(encryption),
+                    i = account.token,
                     userId = invite.userId.id,
                 )
             ).throwIfHasError()
@@ -190,7 +188,7 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(invitationId.accountId).getOrThrow()
             getMisskeyAPI(account).acceptInvitation(
                 AcceptInvitationDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     invitationId = invitationId.invitationId
                 )
             ).throwIfHasError()
@@ -202,7 +200,7 @@ class GroupRepositoryImpl @Inject constructor(
             val account = accountRepository.get(invitationId.accountId).getOrThrow()
             getMisskeyAPI(account).rejectInvitation(
                 RejectInvitationDTO(
-                    i = account.getI(encryption),
+                    i = account.token,
                     invitationId = invitationId.invitationId
                 )
             ).throwIfHasError()

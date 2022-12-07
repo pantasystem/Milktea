@@ -9,7 +9,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
-import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.app_store.messaging.MessagePagingStore
+import net.pantasystem.milktea.app_store.messaging.MessagingPagingState
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
@@ -18,22 +19,18 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.messaging.Message
-import net.pantasystem.milktea.app_store.messaging.MessagePagingStore
 import net.pantasystem.milktea.model.messaging.MessagingId
-import net.pantasystem.milktea.app_store.messaging.MessagingPagingState
 import javax.inject.Inject
 
 class MessagePagingStoreImpl @Inject constructor(
     val getAccount: GetAccount,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
     messageAdder: MessageAdder,
 ) : MessagePagingStore {
 
     private val messagePagingModel: MessagePagingModel = MessagePagingModel(
         getAccount = getAccount,
         misskeyAPIProvider = misskeyAPIProvider,
-        encryption = encryption,
         messageAdder = messageAdder,
     )
 
@@ -160,7 +157,6 @@ class MessagingPreviousPaging<DTO, E>(
 class MessagePagingModel(
     val getAccount: GetAccount,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
     private val messageAdder: MessageAdder,
     var messagingId: MessagingId? = null,
 ) : StateLocker, PreviousLoader<MessageDTO>, FutureLoader<MessageDTO>,
@@ -193,7 +189,7 @@ class MessagePagingModel(
         val account = getAccount.get(messagingId!!.accountId)
         misskeyAPIProvider.get(account).getMessages(
             RequestMessage(
-                i = account.getI(encryption),
+                i = account.token,
                 sinceId = getSinceId()?.messageId,
                 groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
                 userId = (messagingId as? MessagingId.Direct)?.userId?.id
@@ -208,7 +204,7 @@ class MessagePagingModel(
         val account = getAccount.get(messagingId!!.accountId)
         misskeyAPIProvider.get(account).getMessages(
             RequestMessage(
-                i = account.getI(encryption),
+                i = account.token,
                 untilId = getUntilId()?.messageId,
                 groupId = (messagingId as? MessagingId.Group)?.groupId?.groupId,
                 userId = (messagingId as? MessagingId.Direct)?.userId?.id

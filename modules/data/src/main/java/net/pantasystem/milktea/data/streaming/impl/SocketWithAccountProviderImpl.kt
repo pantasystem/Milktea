@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.streaming.impl
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -15,7 +14,6 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider as ISock
  * SocketをAccountに基づきいい感じにリソースを取得できるようにする
  */
 class SocketWithAccountProviderImpl @Inject constructor(
-    val encryption: Encryption,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
     val okHttpClientProvider: OkHttpClientProvider
@@ -45,7 +43,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
                 uri = "wss" + uri.substring(5, uri.length) + "/streaming"
             }
             try {
-                val i = account.getI(encryption)
+                val i = account.token
                 uri = "${uri}?i=$i"
 
             }catch (e: UnauthorizedException) {

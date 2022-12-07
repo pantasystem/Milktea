@@ -8,12 +8,13 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.translation.Translate
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationsState
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.Translation
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,7 +24,6 @@ class NoteTranslationStoreImpl @Inject constructor(
     val noteRepository: NoteRepository,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption
 ) : NoteTranslationStore {
 
     private val _state = MutableStateFlow(NoteTranslationsState(emptyMap(), emptySet(), emptyMap()))
@@ -48,7 +48,7 @@ class NoteTranslationStoreImpl @Inject constructor(
             val account = accountRepository.get(noteId.accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account.instanceDomain)
             val req = Translate(
-                i = account.getI(encryption),
+                i = account.token,
                 targetLang = Locale.getDefault().language,
                 noteId = noteId.noteId,
             )

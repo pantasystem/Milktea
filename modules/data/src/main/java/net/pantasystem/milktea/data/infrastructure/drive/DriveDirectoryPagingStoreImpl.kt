@@ -111,7 +111,7 @@ class DriveDirectoryPagingImpl(
         return runCatching {
             val account = account ?: throw UnauthorizedException()
             misskeyAPIProvider.get(account)
-                .getFolders(RequestFolder(i = account.getI(encryption), untilId = getUntilId(), folderId = directory?.id))
+                .getFolders(RequestFolder(i = account.token, untilId = getUntilId(), folderId = directory?.id))
                 .throwIfHasError()
                 .body()!!
         }

@@ -11,7 +11,6 @@ import net.pantasystem.milktea.api.misskey.list.CreateList
 import net.pantasystem.milktea.api.misskey.list.ListId
 import net.pantasystem.milktea.api.misskey.list.ListUserOperation
 import net.pantasystem.milktea.api.misskey.list.UpdateList
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
@@ -26,7 +25,6 @@ import javax.inject.Singleton
 
 @Singleton
 class UserListRepositoryWebAPIImpl @Inject constructor(
-    val encryption: Encryption,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val accountRepository: AccountRepository,
     private val userListDao: UserListDao
@@ -34,7 +32,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
         val account = accountRepository.get(accountId).getOrThrow()
         val api = misskeyAPIProvider.get(account)
-        val body = api.userList(I(account.getI(encryption)))
+        val body = api.userList(I(account.token))
             .throwIfHasError()
             .body()
         return body!!.map {
@@ -46,7 +44,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         val account = accountRepository.get(accountId).getOrThrow()
         val res = misskeyAPIProvider.get(account).createList(
             CreateList(
-                account.getI(encryption),
+                account.token,
                 name = name
             )
         ).throwIfHasError()
@@ -59,7 +57,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         val account = accountRepository.get(listId.accountId).getOrThrow()
         misskeyAPIProvider.get(account).updateList(
             UpdateList(
-                account.getI(encryption),
+                account.token,
                 name = name,
                 listId = listId.userListId
             )
@@ -76,7 +74,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
             ListUserOperation(
                 userId = userId.id,
                 listId = listId.userListId,
-                i = account.getI(encryption)
+                i = account.token
             )
         ).throwIfHasError()
     }
@@ -91,7 +89,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
             ListUserOperation(
                 userId = userId.id,
                 listId = listId.userListId,
-                i = account.getI(encryption)
+                i = account.token
             )
         ).throwIfHasError()
     }
@@ -99,14 +97,14 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun delete(listId: UserList.Id) {
         val account = accountRepository.get(listId.accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account)
-        misskeyAPI.deleteList(ListId(account.getI(encryption), listId.userListId))
+        misskeyAPI.deleteList(ListId(account.token, listId.userListId))
             .throwIfHasError()
     }
 
     override suspend fun findOne(userListId: UserList.Id): UserList {
         val account = accountRepository.get(userListId.accountId).getOrThrow()
         val misskeyAPI = misskeyAPIProvider.get(account)
-        val res = misskeyAPI.showList(ListId(account.getI(encryption), userListId.userListId))
+        val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
             .throwIfHasError()
         return res.body()!!.toEntity(account)
     }

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.update
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.v12_75_0.GetPosts
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
@@ -83,7 +82,6 @@ class GalleryPostsLoader (
     private val idGetter: IdGetter<String>,
     private val apiProvider: MisskeyAPIProvider,
     private val getAccount: suspend () -> Account,
-    private val encryption: Encryption
 ) : FutureLoader<GalleryPostDTO>, PreviousLoader<GalleryPostDTO> {
     init{
         if(pageable is Pageable.Gallery.ILikedPosts){
@@ -105,7 +103,7 @@ class GalleryPostsLoader (
 
 
     suspend fun api(sinceId: String? = null, untilId: String? = null) : suspend ()-> Response<List<GalleryPostDTO>>{
-        val i = getAccount.invoke().getI(encryption)
+        val i = getAccount.invoke().token
         val api = apiProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
         when(pageable) {

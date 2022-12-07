@@ -1,29 +1,29 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.*
-
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.drive.RequestFile
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import javax.inject.Inject
 
 
 class FilePropertyPagingStoreImpl @Inject constructor(
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
-    encryption: Encryption,
 ) : FilePropertyPagingStore {
 
     private var currentDirectoryId: String? = null
@@ -33,7 +33,6 @@ class FilePropertyPagingStoreImpl @Inject constructor(
     companion object;
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,
-        encryption,
         filePropertyDataSource,
         {
             currentAccount?: throw UnauthorizedException()
@@ -93,7 +92,6 @@ class FilePropertyPagingStoreImpl @Inject constructor(
 
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val encryption: Encryption,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val getAccount: suspend () -> Account,
     private val getCurrentFolderId: () -> String?,
@@ -134,7 +132,7 @@ class FilePropertyPagingImpl(
                 RequestFile(
                     folderId = getCurrentFolderId.invoke(),
                     untilId = this.getUntilId(),
-                    i = getAccount.invoke().getI(encryption),
+                    i = getAccount.invoke().token,
                     limit = 20
                 )
             ).throwIfHasError().body()!!

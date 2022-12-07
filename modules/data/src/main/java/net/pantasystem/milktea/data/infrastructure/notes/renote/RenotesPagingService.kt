@@ -6,7 +6,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.notes.FindRenotes
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
@@ -35,7 +34,6 @@ class RenotesPagingServiceImpl(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val accountRepository: AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
-    val encryption: Encryption,
 
     ) : RenotesPagingService {
 
@@ -43,7 +41,6 @@ class RenotesPagingServiceImpl(
         val misskeyAPIProvider: MisskeyAPIProvider,
         val accountRepository: AccountRepository,
         val noteDataSourceAdder: NoteDataSourceAdder,
-        val encryption: Encryption,
     ) : RenotesPagingService.Factory {
         override fun create(noteId: Note.Id): RenotesPagingService {
             return RenotesPagingServiceImpl(
@@ -51,7 +48,6 @@ class RenotesPagingServiceImpl(
                 misskeyAPIProvider,
                 accountRepository,
                 noteDataSourceAdder,
-                encryption,
             )
         }
     }
@@ -60,7 +56,6 @@ class RenotesPagingServiceImpl(
         misskeyAPIProvider,
         accountRepository,
         noteDataSourceAdder,
-        encryption
     )
     private val controller =
         PreviousPagingController(pagingImpl, pagingImpl, pagingImpl, pagingImpl)
@@ -89,7 +84,6 @@ class RenotesPagingImpl(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val accountRepository: AccountRepository,
     val noteDataSourceAdder: NoteDataSourceAdder,
-    val encryption: Encryption,
 ) : PreviousLoader<NoteDTO>,
     EntityConverter<NoteDTO, Renote>,
     StateLocker,
@@ -106,7 +100,7 @@ class RenotesPagingImpl(
     override suspend fun loadPrevious(): Result<List<NoteDTO>> {
         return runCatching {
             val account = accountRepository.get(targetNoteId.accountId).getOrThrow()
-            val i = account.getI(encryption)
+            val i = account.token
 
             misskeyAPIProvider.get(account.instanceDomain)
                 .renotes(FindRenotes(i = i, noteId = targetNoteId.noteId, untilId = getUntilId()))

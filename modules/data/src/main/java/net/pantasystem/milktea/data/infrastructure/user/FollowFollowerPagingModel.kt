@@ -11,7 +11,6 @@ import net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.RequestType
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
@@ -30,7 +29,6 @@ class FollowFollowerPagingStoreImpl(
     override val type: RequestType,
     val userDataSource: UserDataSource,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
     val getAccount: GetAccount,
     val loggerFactory: Logger.Factory,
     val noteDataSourceAdder: NoteDataSourceAdder,
@@ -40,7 +38,6 @@ class FollowFollowerPagingStoreImpl(
         val userDataSource: UserDataSource,
         val misskeyAPIProvider: MisskeyAPIProvider,
         val loggerFactory: Logger.Factory,
-        val encryption: Encryption,
         val getAccount: GetAccount,
         val noteDataSourceAdder: NoteDataSourceAdder
     ) : FollowFollowerPagingStore.Factory {
@@ -49,7 +46,6 @@ class FollowFollowerPagingStoreImpl(
                 type,
                 misskeyAPIProvider = misskeyAPIProvider,
                 loggerFactory = loggerFactory,
-                encryption = encryption,
                 getAccount = getAccount,
                 userDataSource = userDataSource,
                 noteDataSourceAdder = noteDataSourceAdder
@@ -58,7 +54,6 @@ class FollowFollowerPagingStoreImpl(
     }
 
     private val factory: PaginatorFactory = PaginatorFactory(
-        encryption = encryption,
         getAccount = getAccount,
         logger = loggerFactory,
         misskeyAPIProvider = misskeyAPIProvider,
@@ -149,7 +144,6 @@ internal interface Paginator {
 @Singleton
 internal class PaginatorFactory @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
     val getAccount: GetAccount,
 
     val logger: Logger.Factory,
@@ -162,7 +156,6 @@ internal class PaginatorFactory @Inject constructor(
                 account,
                 api,
                 type,
-                encryption,
                 idHolder,
             )
         } else {
@@ -170,7 +163,6 @@ internal class PaginatorFactory @Inject constructor(
                 account,
                 api as MisskeyAPIV11,
                 type,
-                encryption,
                 logger.create("DefaultPaginator"),
                 idHolder,
             )
@@ -191,7 +183,6 @@ internal class DefaultPaginator(
     val account: Account,
     private val misskeyAPI: MisskeyAPIV11,
     val type: RequestType,
-    val encryption: Encryption,
     private val logger: Logger?,
     override val idHolder: IdHolder,
 
@@ -205,7 +196,7 @@ internal class DefaultPaginator(
         logger?.debug("next: ${idHolder.nextId}")
         val res = api.invoke(
             RequestUser(
-                account.getI(encryption),
+                account.token,
                 userId = type.userId.id,
                 untilId = idHolder.nextId
             )
@@ -230,7 +221,6 @@ internal class V10Paginator(
     val account: Account,
     private val misskeyAPIV10: MisskeyAPIV10,
     val type: RequestType,
-    val encryption: Encryption,
     override val idHolder: IdHolder,
     ) : Paginator {
     private val api =
@@ -239,7 +229,7 @@ internal class V10Paginator(
     override suspend fun next(): List<UserDTO> {
         val res = api.invoke(
             RequestFollowFollower(
-                i = account.getI(encryption),
+                i = account.token,
                 cursor = idHolder.nextId,
                 userId = type.userId.id
             )

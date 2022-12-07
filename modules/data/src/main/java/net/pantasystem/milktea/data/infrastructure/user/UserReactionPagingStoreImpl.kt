@@ -7,7 +7,6 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.user.reaction.UserReactionRequest
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
@@ -66,7 +65,6 @@ class UserReactionPagingImpl(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val noteRelationGetter: NoteRelationGetter,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val encryption: Encryption,
 ) : StateLocker, PreviousLoader<UserReactionDTO>,
     PaginationState<UserReactionRelation>, EntityConverter<UserReactionDTO, UserReactionRelation>,
     IdGetter<String> {
@@ -78,7 +76,6 @@ class UserReactionPagingImpl(
         val noteRelationGetter: NoteRelationGetter,
         val misskeyAPIProvider: MisskeyAPIProvider,
         val accountRepository: AccountRepository,
-        val encryption: Encryption,
     ){
         fun create(userId: User.Id): UserReactionPagingImpl {
             return UserReactionPagingImpl(
@@ -86,7 +83,6 @@ class UserReactionPagingImpl(
                 userDataSource = userDataSource,
                 noteDataSourceAdder = noteDataSourceAdder,
                 misskeyAPIProvider = misskeyAPIProvider,
-                encryption = encryption,
                 accountRepository = accountRepository,
                 noteRelationGetter = noteRelationGetter,
             )
@@ -105,7 +101,7 @@ class UserReactionPagingImpl(
         val account = accountRepository.get(userId.accountId).getOrThrow()
         (misskeyAPIProvider.get(account) as MisskeyAPIV12).getUserReactions(
             UserReactionRequest(
-                i = account.getI(encryption),
+                i = account.token,
                 untilId = getUntilId(),
                 limit = 20,
                 userId = userId.id

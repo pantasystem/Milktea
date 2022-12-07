@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.messaging
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
@@ -18,7 +17,6 @@ class MessageRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val messageDataSource: MessageDataSource,
     val accountRepository: AccountRepository,
-    val encryption: Encryption,
     val messageAdder: MessageAdder,
 ) : MessageRepository {
 
@@ -27,7 +25,7 @@ class MessageRepositoryImpl @Inject constructor(
         val account = accountRepository.get(messageId.accountId).getOrThrow()
         val result = misskeyAPIProvider.get(account).readMessage(
             MessageAction(
-                account.getI(encryption),
+                account.token,
                 null,
                 null,
                 null,
@@ -48,7 +46,7 @@ class MessageRepositoryImpl @Inject constructor(
     @Throws(IOException::class)
     override suspend fun create(createMessage: CreateMessage): Message {
         val account = accountRepository.get(createMessage.accountId).getOrThrow()
-        val i = account.getI(encryption)
+        val i = account.token
         val action = when (createMessage) {
             is CreateMessage.Group -> {
                 MessageAction(
@@ -85,7 +83,7 @@ class MessageRepositoryImpl @Inject constructor(
         val account = accountRepository.get(messageId.accountId).getOrThrow()
         val result = misskeyAPIProvider.get(account).deleteMessage(
             MessageAction(
-                account.getI(encryption),
+                account.token,
                 null,
                 null,
                 null,

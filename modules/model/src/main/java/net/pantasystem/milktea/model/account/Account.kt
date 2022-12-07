@@ -49,9 +49,6 @@ data class Account(
         return instanceDomain
     }
 
-    fun getI(encryption: Encryption): String {
-        return token
-    }
 
 }
 
@@ -127,21 +124,6 @@ data class AccountRecord(
     @Ignore
     private var decryptedI: String? = null
 
-    fun getI(encryption: Encryption): String {
-        return try {
-            synchronized(this) {
-                when (val i = decryptedI) {
-                    null -> (encryption.decrypt(this.remoteId, this.encryptedToken)
-                        ?: throw UnauthorizedException()).also { token ->
-                        decryptedI = token
-                    }
-                    else -> i
-                }
-            }
-        } catch (e: Exception) {
-            throw UnauthorizedException(e.stackTraceToString())
-        }
-    }
 
     fun getHost(): String {
         if (instanceDomain.startsWith("https://")) {
