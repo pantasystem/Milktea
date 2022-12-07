@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.notification.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import net.pantasystem.milktea.model.account.AccountRecord
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 
 @Entity(
     primaryKeys = ["accountId", "notificationId"],

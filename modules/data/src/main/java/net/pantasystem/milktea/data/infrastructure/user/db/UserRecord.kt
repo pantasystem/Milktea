@@ -3,7 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user.db
 import androidx.room.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import net.pantasystem.milktea.model.account.AccountRecord
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User

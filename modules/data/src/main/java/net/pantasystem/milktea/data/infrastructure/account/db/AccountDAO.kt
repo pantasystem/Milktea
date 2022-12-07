@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.account.db
 
 import androidx.room.*
-import net.pantasystem.milktea.model.account.AccountRecord
 
 @Dao
 abstract class AccountDAO{

@@ -2,7 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.list
 
 import androidx.room.*
 import kotlinx.datetime.Instant
-import net.pantasystem.milktea.model.account.AccountRecord
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
 

@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
-import net.pantasystem.milktea.model.account.AccountRecord
+import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile

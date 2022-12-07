@@ -4,7 +4,6 @@ import androidx.room.DatabaseView
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import net.pantasystem.milktea.model.account.AccountRecord
 import net.pantasystem.milktea.model.account.page.Page
 
 @DatabaseView
