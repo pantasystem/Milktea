@@ -27,7 +27,7 @@ class InMemoryNoteDataSourceTest {
         account = Account(
             remoteId = "piyo",
             instanceDomain = "",
-            encryptedToken = "",
+            token = "",
             userName = "piyoName",
             instanceType = Account.InstanceType.MISSKEY
         )

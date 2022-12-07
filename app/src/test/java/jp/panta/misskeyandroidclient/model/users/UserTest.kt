@@ -26,7 +26,7 @@ class UserTest : TestCase() {
         val profileUrl = user.getProfileUrl(
             Account(
                 instanceDomain = "https://example.com",
-                encryptedToken = "",
+                token = "",
                 remoteId = "",
                 userName = "",
                 instanceType = Account.InstanceType.MISSKEY
@@ -55,7 +55,7 @@ class UserTest : TestCase() {
         val profileUrl = user.getProfileUrl(
             Account(
                 instanceDomain = "https://example.com",
-                encryptedToken = "",
+                token = "",
                 remoteId = "",
                 userName = "",
                 instanceType = Account.InstanceType.MISSKEY
