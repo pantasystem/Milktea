@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.model.instance
 
-import androidx.room.Ignore
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -41,7 +40,6 @@ data class Meta(
 ) {
 
 
-    @Ignore
     fun getVersion(): Version {
         return Version(version)
     }
