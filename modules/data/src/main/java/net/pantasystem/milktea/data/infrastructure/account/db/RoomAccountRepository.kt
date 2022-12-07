@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRegistrationFailedException
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.PageRecord
+import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import java.util.concurrent.Callable
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"

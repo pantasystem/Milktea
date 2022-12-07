@@ -10,6 +10,7 @@ import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountInstanceTypeConverter
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
+import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import net.pantasystem.milktea.data.infrastructure.account.page.db.TimelinePageTypeConverter
 import net.pantasystem.milktea.data.infrastructure.core.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
@@ -56,7 +57,7 @@ import net.pantasystem.milktea.model.url.UrlPreview
 
         UrlPreview::class,
         AccountRecord::class,
-        net.pantasystem.milktea.model.account.page.PageRecord::class,
+        PageRecord::class,
         MetaDTO::class,
         EmojiDTO::class,
         EmojiAlias::class,

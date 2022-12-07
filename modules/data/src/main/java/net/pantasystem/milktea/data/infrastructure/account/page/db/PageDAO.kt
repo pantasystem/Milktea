@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.account.page.db
 
 import androidx.room.*
-import net.pantasystem.milktea.model.account.page.PageRecord
 
 @Dao
 interface PageDAO{
