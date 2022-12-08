@@ -68,7 +68,8 @@ class VisibilitySelectionDialogV2 : BottomSheetDialogFragment() {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
-    val visibility by viewModel.visibility.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val visibility = uiState.sendToState.visibility
     val channelsState by viewModel.channels.collectAsState()
     val channels =
         (channelsState.content as? StateContent.Exist)?.rawContent ?: emptyList()

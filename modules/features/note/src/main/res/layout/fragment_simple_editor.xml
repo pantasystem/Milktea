@@ -167,7 +167,7 @@
                     android:layout_margin="4dp"
                     android:layout_weight="1"
                     android:adjustViewBounds="true"
-                    app:noteVisibility="@{noteEditorViewModel.visibility}"
+                    app:noteVisibility="@{noteEditorViewModel.uiState.sendToState.visibility}"
                     tools:ignore="ContentDescription"
                     tools:src="@drawable/ic_language_black_24dp"
 
