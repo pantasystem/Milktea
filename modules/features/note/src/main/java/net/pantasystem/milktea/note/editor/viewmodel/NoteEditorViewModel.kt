@@ -68,7 +68,7 @@ class NoteEditorViewModel @Inject constructor(
 
     val text = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Text.name, null)
 
-    val textCursorPos = MutableSharedFlow<Int>(extraBufferCapacity = 10)
+    val textCursorPos = MutableSharedFlow<TextWithCursorPos>(extraBufferCapacity = 10)
 
     val cw = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Cw.name, null)
     val hasCw = savedStateHandle.getStateFlow(NoteEditorSavedStateKey.HasCW.name, false)
@@ -294,7 +294,7 @@ class NoteEditorViewModel @Inject constructor(
                         users.map { it.displayUserName }, 0
                     )
                 savedStateHandle.setText(text)
-                textCursorPos.tryEmit(pos)
+                textCursorPos.tryEmit(TextWithCursorPos(text, pos))
             }
         }
     }
@@ -551,3 +551,5 @@ class NoteEditorViewModel @Inject constructor(
 
 
 }
+
+data class TextWithCursorPos(val text: String?, val cursorPos: Int)

@@ -158,7 +158,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     @Inject
     lateinit var loggerFactory: Logger.Factory
 
-    val logger = loggerFactory.create("NoteEditorFragment")
+    val logger by lazy {
+        loggerFactory.create("NoteEditorFragment")
+    }
 
     internal lateinit var confirmViewModel: ConfirmViewModel
 
@@ -451,9 +453,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.textCursorPos.collect {
                 try {
                     binding.inputMain.setText(
-                        noteEditorViewModel.text.value ?: ""
+                        it.text
                     )
-                    binding.inputMain.setSelection(it)
+                    binding.inputMain.setSelection(it.cursorPos)
                 } catch (e: Throwable) {
                     logger.error("setCursorPos error", e = e)
                 }
