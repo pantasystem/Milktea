@@ -92,8 +92,8 @@ fun SavedStateHandle.setVisibility(visibility: Visibility) {
     this[NoteEditorSavedStateKey.Visibility.name] = visibility
 }
 
-fun SavedStateHandle.getVisibility(): Visibility {
-    return this[NoteEditorSavedStateKey.Visibility.name] ?: Visibility.Public(false)
+fun SavedStateHandle.getVisibility(): Visibility? {
+    return this[NoteEditorSavedStateKey.Visibility.name]
 }
 
 fun SavedStateHandle.setDraftNoteId(id: Long?) {
@@ -130,7 +130,7 @@ fun SavedStateHandle.getNoteEditingUiState(account: Account?): NoteEditorUiState
             hasCw = getHasCw(),
         ),
         sendToState = NoteEditorSendToState(
-            visibility = getVisibility(),
+            visibility = getVisibility() ?: Visibility.Public(false),
             channelId = getChannelId(),
             renoteId = getRenoteId(),
             replyId = getReplyId(),
