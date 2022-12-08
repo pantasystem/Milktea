@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
@@ -33,6 +32,8 @@ import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import java.util.*
@@ -50,13 +51,13 @@ class NoteEditorViewModel @Inject constructor(
     private val draftNoteRepository: DraftNoteRepository,
     private val noteReservationPostExecutor: NoteReservationPostExecutor,
     private val userViewDataFactory: UserViewData.Factory,
-    private val settingStore: SettingStore,
     private val noteRepository: NoteRepository,
     private val channelRepository: ChannelRepository,
     private val noteEditorSwitchAccountExecutor: NoteEditorSwitchAccountExecutor,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     private val accountRepository: AccountRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val localConfigRepository: LocalConfigRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -110,10 +111,23 @@ class NoteEditorViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
-    val visibility = savedStateHandle.getStateFlow<Visibility>(
+    private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
         NoteEditorSavedStateKey.Visibility.name,
-        Visibility.Public(false)
+        null
     )
+    val visibility = combine(_visibility, currentAccount.filterNotNull().map {
+        localConfigRepository.getRememberVisibility(it.accountId).getOrElse {
+            RememberVisibility.None
+        }
+    }, channelId) { formVisibilityState, settingVisibilityState, channelId ->
+        when {
+            formVisibilityState != null -> formVisibilityState
+            settingVisibilityState is RememberVisibility.None -> Visibility.Public(false)
+            settingVisibilityState is RememberVisibility.Remember -> settingVisibilityState.visibility
+            channelId != null -> Visibility.Public(true)
+            else -> Visibility.Public(false)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Visibility.Public(false))
 
     val isLocalOnly = visibility.map {
         it.isLocalOnly()
@@ -243,18 +257,13 @@ class NoteEditorViewModel @Inject constructor(
                 it
             )
         }.onEach { (account, result) ->
-            currentAccount.value = account
-            savedStateHandle.setReplyId(result.replyId)
-            savedStateHandle.setRenoteId(result.renoteId)
-            savedStateHandle.setVisibility(result.visibility)
-            savedStateHandle.setChannelId(result.channelId)
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
-        currentAccount.filterNotNull().onEach {
-            val v = settingStore.getNoteVisibility(it.accountId)
-            if (channelId.value == null) {
-                savedStateHandle.setVisibility(v)
+            if (account.accountId != currentAccount.value?.accountId && currentAccount.value != null) {
+                savedStateHandle.setReplyId(result.replyId)
+                savedStateHandle.setRenoteId(result.renoteId)
+                savedStateHandle.setVisibility(result.visibility)
+                savedStateHandle.setChannelId(result.channelId)
             }
+            currentAccount.value = account
         }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
@@ -448,11 +457,12 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun setChannelId(channelId: Channel.Id?) {
-        val visibility = savedStateHandle.getVisibility()
         savedStateHandle.setChannelId(channelId)
-        savedStateHandle.setVisibility(
-            if (channelId == null) visibility else Visibility.Public(true),
-        )
+        if (channelId == null) {
+            return
+        } else {
+            savedStateHandle.setVisibility(Visibility.Public(true))
+        }
     }
 
     fun toggleReservationAt() {

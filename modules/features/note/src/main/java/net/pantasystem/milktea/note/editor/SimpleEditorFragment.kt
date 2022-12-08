@@ -25,9 +25,9 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.*
-import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -306,7 +306,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     }
 
     private fun showDriveFileSelector() {
-        val selectedSize = mViewModel.totalImageCount.value ?: 0
+        val selectedSize = mViewModel.totalImageCount.value
 
         //Directoryは既に選択済みのファイルの数も含めてしまうので選択済みの数も合わせる
         val selectableMaxSize = 4 - selectedSize
