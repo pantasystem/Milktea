@@ -68,6 +68,8 @@ class NoteEditorViewModel @Inject constructor(
 
     val text = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Text.name, null)
 
+    val textCursorPos = MutableSharedFlow<Int>(extraBufferCapacity = 10)
+
     val cw = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Cw.name, null)
     val hasCw = savedStateHandle.getStateFlow(NoteEditorSavedStateKey.HasCW.name, false)
 
@@ -287,11 +289,12 @@ class NoteEditorViewModel @Inject constructor(
             }
 
             getAllMentionUsersUseCase(noteId).onSuccess { users ->
-                val (text, _) = savedStateHandle.getText()
+                val (text, pos) = savedStateHandle.getText()
                     .addMentionUserNames(
                         users.map { it.displayUserName }, 0
                     )
                 savedStateHandle.setText(text)
+                textCursorPos.tryEmit(pos)
             }
         }
     }

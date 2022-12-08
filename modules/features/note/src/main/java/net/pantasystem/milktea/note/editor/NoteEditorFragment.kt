@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,17 +31,18 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.PermissionUtil
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
 import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ResultType
@@ -155,6 +155,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    lateinit var loggerFactory: Logger.Factory
+
+    val logger = loggerFactory.create("NoteEditorFragment")
+
     internal lateinit var confirmViewModel: ConfirmViewModel
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
@@ -195,7 +200,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private val mentions by lazy(LazyThreadSafetyMode.NONE) {
         requireArguments().getStringArray(EXTRA_MENTIONS)?.let {
-            Log.d("NoteEditorActivity", "mentions:${it.toList()}")
+            logger.debug("mentions:${it.toList()}")
             it.toList()
         }
     }
@@ -224,7 +229,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
         noteEditorToolbar.lifecycleOwner = viewLifecycleOwner
         noteEditorToolbar.noteVisibility.setOnClickListener {
-            Log.d("NoteEditorActivity", "公開範囲を設定しようとしています")
+            logger.debug("公開範囲を設定しようとしています")
             val dialog = VisibilitySelectionDialogV2()
             dialog.show(childFragmentManager, "NoteEditor")
         }
@@ -334,7 +339,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
         binding.inputMain.addTextChangedListener { e ->
-            Log.d("NoteEditorActivity", "text changed:$e")
+            logger.debug("text changed:$e")
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
 
@@ -441,6 +446,20 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
         }
+
+        lifecycleScope.launch {
+            noteEditorViewModel.textCursorPos.collect {
+                try {
+                    binding.inputMain.setText(
+                        noteEditorViewModel.text.value ?: ""
+                    )
+                    binding.inputMain.setSelection(it)
+                } catch (e: Throwable) {
+                    logger.error("setCursorPos error", e = e)
+                }
+            }
+        }
+
         if (mentions != null && savedInstanceState == null) {
             addMentionUserNames(mentions!!)
         }
@@ -456,7 +475,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
             binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
             binding.inputMain.setSelection(newPos)
-            Log.d("NoteEditorActivity", "入力されたデータ:${binding.inputMain.text}")
+            logger.debug("入力されたデータ:${binding.inputMain.text}")
         }
     }
 
@@ -624,7 +643,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 (result?.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
                     it as? FileProperty.Id
                 }
-            Log.d("NoteEditorActivity", "result:${ids}")
+            logger.debug("result:${ids}")
             val size = noteEditorViewModel.fileTotal()
 
             if (ids != null && ids.isNotEmpty() && size + ids.size <= noteEditorViewModel.maxFileCount.value) {
@@ -640,10 +659,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 val size = noteEditorViewModel.fileTotal()
 
                 if (size > noteEditorViewModel.maxFileCount.value) {
-                    Log.d("NoteEditorActivity", "失敗しました")
+                    logger.debug("失敗しました")
                 } else {
                     noteEditorViewModel.add(uri.toAppFile(requireContext()))
-                    Log.d("NoteEditorActivity", "成功しました")
+                    logger.debug("成功しました")
                 }
 
             }
