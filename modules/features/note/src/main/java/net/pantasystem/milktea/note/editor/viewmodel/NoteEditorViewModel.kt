@@ -262,8 +262,10 @@ class NoteEditorViewModel @Inject constructor(
             if (account.accountId != currentAccount.value?.accountId && currentAccount.value != null) {
                 savedStateHandle.setReplyId(result.replyId)
                 savedStateHandle.setRenoteId(result.renoteId)
-                savedStateHandle.setVisibility(result.visibility)
                 savedStateHandle.setChannelId(result.channelId)
+            }
+            if (currentAccount.value != null) {
+                savedStateHandle.setVisibility(null)
             }
             currentAccount.value = account
         }.launchIn(viewModelScope + Dispatchers.IO)

@@ -88,7 +88,7 @@ fun SavedStateHandle.setPoll(value: PollEditingState?) {
     this[NoteEditorSavedStateKey.Poll.name] = value
 }
 
-fun SavedStateHandle.setVisibility(visibility: Visibility) {
+fun SavedStateHandle.setVisibility(visibility: Visibility?) {
     this[NoteEditorSavedStateKey.Visibility.name] = visibility
 }
 
