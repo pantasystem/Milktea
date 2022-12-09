@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.url
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
@@ -10,7 +11,7 @@ data class UrlPreview(
     val icon: String?,
     val description: String?,
     val thumbnail: String?,
-    val siteName: String?
+    @SerialName("sitename") val siteName: String?
     //val sensitive: Boolean
     //val player,
 )
