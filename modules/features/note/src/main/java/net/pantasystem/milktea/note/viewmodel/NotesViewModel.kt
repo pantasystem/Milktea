@@ -40,9 +40,8 @@ class NotesViewModel @Inject constructor(
 
     val quoteRenoteTarget = EventBus<Note>()
 
-    val shareTarget = EventBus<PlaneNoteViewData>()
 
-    val confirmDeletionEvent = EventBus<PlaneNoteViewData>()
+    val confirmDeletionEvent = EventBus<NoteRelation>()
 
     val confirmDeleteAndEditEvent = EventBus<NoteRelation>()
 

@@ -17,7 +17,6 @@ import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 
 class ActionNoteHandler(
@@ -27,11 +26,6 @@ class ActionNoteHandler(
     val settingStore: SettingStore,
 
     ) {
-
-
-    private val shareTargetObserver = Observer<PlaneNoteViewData> {
-
-    }
 
     private val statusMessageObserver = Observer<String> {
         Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
@@ -53,12 +47,12 @@ class ActionNoteHandler(
         )
     }
 
-    private val confirmDeletionEventObserver = Observer<PlaneNoteViewData> {
+    private val confirmDeletionEventObserver = Observer<NoteRelation> {
         confirmViewModel.confirmEvent.event = ConfirmCommand(
             activity.getString(R.string.confirm_deletion),
             null,
             eventType = "delete_note",
-            args = it.toShowNote.note
+            args = it.note
         )
     }
 
@@ -104,8 +98,6 @@ class ActionNoteHandler(
     fun initViewModelListener() {
 
 
-        mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
-        mNotesViewModel.shareTarget.observe(activity, shareTargetObserver)
 
 
         mNotesViewModel.statusMessage.removeObserver(statusMessageObserver)
