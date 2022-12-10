@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
+import net.pantasystem.milktea.note.option.NoteOptionDialog
 import net.pantasystem.milktea.note.reaction.ReactionSelectionDialog
 import net.pantasystem.milktea.note.reaction.RemoteReactionEmojiSuggestionDialog
 import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
@@ -34,7 +35,8 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnOptionButtonClicked -> {
-                notesViewModel.setTargetToShare(action.note)
+                NoteOptionDialog.newInstance(action.note.toShowNote.note.id)
+                    .show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnPollChoiceClicked -> {
                 notesViewModel.vote(
