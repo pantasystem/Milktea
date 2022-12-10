@@ -7,12 +7,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.watchAccount
 import net.pantasystem.milktea.model.notes.Note
@@ -27,6 +31,7 @@ class NoteOptionViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val noteRelationGetter: NoteRelationGetter,
     val loggerFactory: Logger.Factory,
+    private val translationStore: NoteTranslationStore,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
@@ -39,15 +44,14 @@ class NoteOptionViewModel @Inject constructor(
 
     val noteIdFlow = savedStateHandle.getStateFlow<Note.Id?>(NOTE_ID, null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val noteState = noteIdFlow.filterNotNull().flatMapLatest {
-        suspend {
-            loadNoteState(it).getOrThrow()
-        }.asLoadingStateFlow()
+    val noteState = noteIdFlow.filterNotNull().map { noteId ->
+        loadNoteState(noteId).onFailure {
+            logger.error("noteState load error", it)
+        }.getOrNull()
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
+        null
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,7 +73,9 @@ class NoteOptionViewModel @Inject constructor(
             noteId = id,
             noteState = state,
             note = note?.note,
-            isMyNote = note?.note?.userId?.id == ac?.remoteId
+            isMyNote = note?.note?.userId?.id == ac?.remoteId,
+            currentAccount = ac,
+            noteRelation = note
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteOptionUiState())
 
@@ -85,13 +91,21 @@ class NoteOptionViewModel @Inject constructor(
         }
     }
 
+    fun translate(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            translationStore.translate(noteId)
+        }
+    }
+
+
 
 }
 
 data class NoteOptionUiState(
     val noteId: Note.Id? = null,
-    val noteState: ResultState<NoteState> = ResultState.Loading(StateContent.NotExist()),
+    val noteState: NoteState? = null,
     val note: Note? = null,
     val noteRelation: NoteRelation? = null,
     val isMyNote: Boolean = false,
+    val currentAccount: Account? = null
 )
