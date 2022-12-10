@@ -101,11 +101,13 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         },
                         onDeleteButtonClicked = {
                             notesViewModel.confirmDeletionEvent.event = it
+                            dismiss()
                         },
                         onReportButtonClicked ={
                             val baseUrl = uiState.currentAccount?.instanceDomain
                             val report = it?.toReport(baseUrl!!)
                             notesViewModel.confirmReportEvent.event = report
+                            dismiss()
                         }
                     )
 
