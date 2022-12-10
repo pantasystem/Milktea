@@ -14,15 +14,17 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.R
@@ -30,17 +32,26 @@ import net.pantasystem.milktea.note.view.NormalBottomSheetDialogSelectionLayout
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 @AndroidEntryPoint
-class ShareBottomSheetDialog : BottomSheetDialogFragment() {
+class NoteOptionDialog : BottomSheetDialogFragment() {
 
+    companion object {
+        fun newInstance(noteId: Note.Id): NoteOptionDialog {
+            return NoteOptionDialog().apply {
+                arguments = Bundle().apply {
+                    putSerializable(NoteOptionViewModel.NOTE_ID, noteId)
+                }
+            }
+        }
+    }
+    val viewModel: NoteOptionViewModel by viewModels()
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-        val viewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
-        val note = viewModel.shareTarget.event
+        val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
+//        val note = notesViewModel.shareTarget.event
 
         dialog.setContentView(ComposeView(requireContext()).apply {
             setContent {
-                val noteState by viewModel.shareNoteState.observeAsState()
-
+                val uiState by viewModel.uiState.collectAsState()
                 MdcTheme {
                     Surface(Modifier.fillMaxWidth()) {
                         Column(Modifier.fillMaxWidth()) {
@@ -49,7 +60,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                                     requireActivity().startActivity(
                                         NoteDetailActivity.newIntent(
                                             requireActivity(),
-                                            noteId = note?.toShowNote?.note?.id!!
+                                            noteId = uiState.note?.id!!
                                         )
                                     )
                                     dismiss()
@@ -61,13 +72,13 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                                 onClick = {
                                     val clipboardManager =
                                         context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                                    if (clipboardManager == null || note == null) {
+                                    if (clipboardManager == null || uiState.note == null) {
                                         dismiss()
                                     } else {
                                         clipboardManager.setPrimaryClip(
                                             ClipData.newPlainText(
                                                 "",
-                                                note.toShowNote.note.text
+                                                uiState.note?.text
                                             )
                                         )
                                         dismiss()
@@ -79,8 +90,8 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                             )
                             NormalBottomSheetDialogSelectionLayout(
                                 onClick = {
-                                    val baseUrl = viewModel.getAccount()?.instanceDomain
-                                    val url = "$baseUrl/notes/${note?.id?.noteId}"
+                                    val baseUrl = uiState.currentAccount?.instanceDomain
+                                    val url = "$baseUrl/notes/${uiState.note?.id?.noteId}"
                                     val intent = Intent().apply {
                                         action = ACTION_SEND
                                         type = "text/plain"
@@ -99,8 +110,8 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                             )
                             NormalBottomSheetDialogSelectionLayout(
                                 onClick = {
-                                    val baseUrl = viewModel.getAccount()?.instanceDomain
-                                    val url = "$baseUrl/notes/${note?.id?.noteId}"
+                                    val baseUrl = uiState.currentAccount?.instanceDomain
+                                    val url = "$baseUrl/notes/${uiState.note?.id?.noteId}"
                                     val intent = Intent().apply {
                                         action = ACTION_SEND
                                         type = "text/plain"
@@ -120,17 +131,17 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                             Divider()
                             NormalBottomSheetDialogSelectionLayout(
                                 onClick = {
-                                    viewModel.translate(note?.toShowNote?.note?.id!!)
+                                    viewModel.translate(uiState.noteId!!)
                                     dismiss()
                                 },
                                 icon = Icons.Default.Translate,
                                 text = stringResource(id = R.string.translate)
                             )
                             Divider()
-                            if (noteState?.isFavorited == true) {
+                            if (uiState.noteState?.isFavorited == true) {
                                 NormalBottomSheetDialogSelectionLayout(
                                     onClick = {
-                                        viewModel.deleteFavorite()
+                                        notesViewModel.deleteFavorite(uiState.noteId!!)
                                         dismiss()
                                     },
                                     icon = Icons.Filled.Star,
@@ -141,7 +152,7 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                             } else {
                                 NormalBottomSheetDialogSelectionLayout(
                                     onClick = {
-                                        viewModel.addFavorite()
+                                        notesViewModel.addFavorite(uiState.noteId!!)
                                         dismiss()
                                     },
                                     icon = Icons.Outlined.Star,
@@ -149,12 +160,12 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                                 )
                             }
 
-                            if (note?.isMyNote == true) {
+                            if (uiState.isMyNote) {
                                 Divider()
                                 NormalBottomSheetDialogSelectionLayout(
                                     onClick = {
-                                        note.let { n ->
-                                            viewModel.confirmDeleteAndEditEvent.event = n
+                                        uiState.noteRelation.let { n ->
+                                            notesViewModel.confirmDeleteAndEditEvent.event = n
                                         }
                                         dismiss()
                                     },
@@ -163,8 +174,8 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                                 )
                                 NormalBottomSheetDialogSelectionLayout(
                                     onClick = {
-                                        viewModel.confirmDeletionEvent.event =
-                                            viewModel.shareTarget.event
+                                        notesViewModel.confirmDeletionEvent.event =
+                                            notesViewModel.shareTarget.event
                                     },
                                     icon = Icons.Default.Delete,
                                     text = stringResource(id = R.string.remove_note)
@@ -173,11 +184,11 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                             Divider()
                             NormalBottomSheetDialogSelectionLayout(
                                 onClick = {
-                                    val baseUrl = viewModel.getAccount()?.instanceDomain
+                                    val baseUrl = uiState.currentAccount?.instanceDomain
 
-                                    note?.let {
-                                        val report = it.toShowNote.toReport(baseUrl!!)
-                                        viewModel.confirmReportEvent.event = report
+                                    uiState.noteRelation?.let {
+                                        val report = it.toReport(baseUrl!!)
+                                        notesViewModel.confirmReportEvent.event = report
                                     }
                                     dismiss()
                                 },
