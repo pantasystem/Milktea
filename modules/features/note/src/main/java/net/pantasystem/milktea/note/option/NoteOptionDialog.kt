@@ -103,26 +103,6 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                                     )
                                     dismiss()
                                 },
-                                icon = Icons.Default.ContentCopy,
-                                text = stringResource(id = R.string.copy_url)
-                            )
-                            NormalBottomSheetDialogSelectionLayout(
-                                onClick = {
-                                    val baseUrl = uiState.currentAccount?.instanceDomain
-                                    val url = "$baseUrl/notes/${uiState.note?.id?.noteId}"
-                                    val intent = Intent().apply {
-                                        action = ACTION_SEND
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, url)
-                                    }
-                                    startActivity(
-                                        Intent.createChooser(
-                                            intent,
-                                            getString(R.string.share)
-                                        )
-                                    )
-                                    dismiss()
-                                },
                                 icon = Icons.Default.Share,
                                 text = stringResource(id = R.string.share)
                             )
