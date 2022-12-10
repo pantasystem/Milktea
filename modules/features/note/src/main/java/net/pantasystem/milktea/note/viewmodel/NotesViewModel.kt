@@ -1,24 +1,15 @@
 package net.pantasystem.milktea.note.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.notes.NoteState
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.ui.SafeUnbox
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -34,10 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val translationStore: NoteTranslationStore,
     private val noteRepository: NoteRepository,
-    private val accountRepository: AccountRepository,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val toggleReactionUseCase: ToggleReactionUseCase,
     private val favoriteRepository: FavoriteRepository,
     val accountStore: AccountStore,
@@ -54,20 +42,12 @@ class NotesViewModel @Inject constructor(
 
     val confirmDeletionEvent = EventBus<PlaneNoteViewData>()
 
-    val confirmDeleteAndEditEvent = EventBus<PlaneNoteViewData>()
+    val confirmDeleteAndEditEvent = EventBus<NoteRelation>()
 
     val confirmReportEvent = EventBus<Report>()
 
-    val shareNoteState = MutableLiveData<NoteState>()
-
-
     val openNoteEditor = EventBus<DraftNote?>()
 
-
-    fun setTargetToShare(note: PlaneNoteViewData) {
-        shareTarget.event = note
-        loadNoteState(note)
-    }
 
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
@@ -110,37 +90,27 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    fun addFavorite(note: PlaneNoteViewData? = shareTarget.event) {
-        note ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            favoriteRepository.create(note.toShowNote.note.id).onSuccess {
-                Log.d(TAG, "お気に入りに追加しました")
-                withContext(Dispatchers.Main) {
-                    statusMessage.event = "お気に入りに追加しました"
-                }
+    fun addFavorite(noteId: Note.Id) {
+        viewModelScope.launch {
+            favoriteRepository.create(noteId).onSuccess {
+                statusMessage.event = "お気に入りに追加しました"
+
             }.onFailure { t ->
-                Log.e(TAG, "お気に入りに追加失敗しました", t)
-                withContext(Dispatchers.Main) {
-                    statusMessage.event = "お気に入りにへの追加に失敗しました"
-                }
+                statusMessage.event = "お気に入りにへの追加に失敗しました"
             }
         }
     }
 
-    fun deleteFavorite(note: PlaneNoteViewData? = shareTarget.event) {
-        note ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = favoriteRepository.delete(note.toShowNote.note.id).getOrNull() != null
-            withContext(Dispatchers.Main) {
-                statusMessage.event = if (result) {
-                    "お気に入りから削除しました"
-                } else {
-                    "お気に入りの削除に失敗しました"
-                }
+    fun deleteFavorite(noteId: Note.Id) {
+        viewModelScope.launch {
+            val result = favoriteRepository.delete(noteId).getOrNull() != null
+            statusMessage.event = if (result) {
+                "お気に入りから削除しました"
+            } else {
+                "お気に入りの削除に失敗しました"
             }
         }
     }
-
 
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -173,29 +143,6 @@ class NotesViewModel @Inject constructor(
     }
 
 
-    private fun loadNoteState(planeNoteViewData: PlaneNoteViewData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val response = getMisskeyAPI()?.noteState(
-                    NoteRequest(
-                        i = getAccount()?.token!!,
-                        noteId = planeNoteViewData.toShowNote.note.id.noteId
-                    )
-                )?.throwIfHasError()
-
-                val nowNoteId = shareTarget.event?.toShowNote?.note?.id?.noteId
-                if (nowNoteId == planeNoteViewData.toShowNote.note.id.noteId) {
-                    val state = response?.body()!!
-                    Log.d(TAG, "state: $state")
-                    shareNoteState.postValue(state)
-                }
-            }.onFailure { t ->
-                Log.e(TAG, "note stateの取得に失敗しました", t)
-            }
-        }
-
-    }
-
 
     fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
         if (noteId == null || poll == null || choice == null) {
@@ -212,22 +159,6 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun translate(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
-            translationStore.translate(noteId)
-        }
-    }
-
-    private suspend fun getMisskeyAPI(): MisskeyAPI? {
-        return runCatching {
-            val account = accountRepository.getCurrentAccount().getOrThrow()
-            misskeyAPIProvider.get(account.instanceDomain)
-        }.getOrNull()
-    }
-
-    fun getAccount(): Account? {
-        return accountStore.currentAccount
-    }
 
 
 }
