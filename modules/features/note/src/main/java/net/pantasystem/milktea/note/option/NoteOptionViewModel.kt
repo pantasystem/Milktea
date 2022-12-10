@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
@@ -16,7 +17,6 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.watchAccount
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -35,13 +35,13 @@ class NoteOptionViewModel @Inject constructor(
         const val NOTE_ID = "NoteOptionViewModel.NOTE_ID"
     }
 
-    val logger by lazy {
+    private val logger by lazy {
         loggerFactory.create("NoteOptionViewModel")
     }
 
-    val noteIdFlow = savedStateHandle.getStateFlow<Note.Id?>(NOTE_ID, null)
+    private val noteIdFlow = savedStateHandle.getStateFlow<Note.Id?>(NOTE_ID, null)
 
-    val noteState = noteIdFlow.filterNotNull().map { noteId ->
+    private val noteState = noteIdFlow.filterNotNull().map { noteId ->
         loadNoteState(noteId).onFailure {
             logger.error("noteState load error", it)
         }.getOrNull()
@@ -60,9 +60,10 @@ class NoteOptionViewModel @Inject constructor(
 
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val currentAccount = noteIdFlow.filterNotNull().flatMapLatest {
-        accountRepository.watchAccount(it.accountId)
+    val currentAccount = noteIdFlow.filterNotNull().map { noteId ->
+        accountRepository.get(noteId.accountId).onFailure {
+            logger.error("get account error", it)
+        }.getOrNull()
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val uiState = combine(noteIdFlow, noteState, note, currentAccount) { id, state, note, ac ->
@@ -75,6 +76,16 @@ class NoteOptionViewModel @Inject constructor(
             noteRelation = note
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteOptionUiState())
+
+    init {
+        viewModelScope.launch {
+            noteIdFlow.filterNotNull().map {
+                noteRepository.sync(it)
+            }.catch {
+                logger.error("sync note error", it)
+            }.collect()
+        }
+    }
 
     private suspend fun loadNoteState(id: Note.Id): Result<NoteState> = runCatching {
         withContext(Dispatchers.IO) {
