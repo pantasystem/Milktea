@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.view
 
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -17,7 +16,6 @@ import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
-import net.pantasystem.milktea.note.option.ShareBottomSheetDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
@@ -32,9 +30,7 @@ class ActionNoteHandler(
 
 
     private val shareTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "share clicked :$it")
-        ShareBottomSheetDialog()
-            .show(activity.supportFragmentManager, "MainActivity")
+
     }
 
     private val statusMessageObserver = Observer<String> {
@@ -66,12 +62,12 @@ class ActionNoteHandler(
         )
     }
 
-    private val confirmDeleteAndEditEventObserver = Observer<PlaneNoteViewData> {
+    private val confirmDeleteAndEditEventObserver = Observer<NoteRelation> {
         confirmViewModel.confirmEvent.event = ConfirmCommand(
             null,
             activity.getString(R.string.confirm_delete_and_edit_note_description),
             eventType = "delete_and_edit_note",
-            args = it.toShowNote
+            args = it
         )
     }
 
