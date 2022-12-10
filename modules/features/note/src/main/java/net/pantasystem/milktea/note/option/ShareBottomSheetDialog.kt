@@ -127,20 +127,28 @@ class ShareBottomSheetDialog : BottomSheetDialogFragment() {
                                 text = stringResource(id = R.string.translate)
                             )
                             Divider()
-                            NormalBottomSheetDialogSelectionLayout(
-                                onClick = {
-                                    if (noteState?.isFavorited == true) {
+                            if (noteState?.isFavorited == true) {
+                                NormalBottomSheetDialogSelectionLayout(
+                                    onClick = {
                                         viewModel.deleteFavorite()
-                                    } else {
+                                        dismiss()
+                                    },
+                                    icon = Icons.Filled.Star,
+                                    text = stringResource(
+                                        id = R.string.remove_favorite
+                                    )
+                                )
+                            } else {
+                                NormalBottomSheetDialogSelectionLayout(
+                                    onClick = {
                                         viewModel.addFavorite()
-                                    }
-                                    dismiss()
-                                },
-                                icon = if (noteState?.isFavorited == true) Icons.Filled.Star else Icons.Outlined.Star,
-                                text = if (noteState?.isFavorited == true) stringResource(
-                                    id = R.string.remove_favorite
-                                ) else stringResource(id = R.string.favorite)
-                            )
+                                        dismiss()
+                                    },
+                                    icon = Icons.Outlined.Star,
+                                    text = stringResource(id = R.string.favorite)
+                                )
+                            }
+
                             if (note?.isMyNote == true) {
                                 Divider()
                                 NormalBottomSheetDialogSelectionLayout(
