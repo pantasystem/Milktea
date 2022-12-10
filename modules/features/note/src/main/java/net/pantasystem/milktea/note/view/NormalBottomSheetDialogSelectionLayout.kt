@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.note.renote
+package net.pantasystem.milktea.note.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun RenoteButtonLayout(
+fun NormalBottomSheetDialogSelectionLayout(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     icon: ImageVector,
@@ -52,8 +52,8 @@ fun RenoteButtonLayout(
 fun PreviewRenoteButtonLayout() {
     Surface() {
         Column {
-            RenoteButtonLayout(onClick = {  }, icon = Icons.Default.Repeat, text = "Renote")
-            RenoteButtonLayout(onClick = {  }, icon = Icons.Default.FormatQuote, text = "Quote")
+            NormalBottomSheetDialogSelectionLayout(onClick = {  }, icon = Icons.Default.Repeat, text = "Renote")
+            NormalBottomSheetDialogSelectionLayout(onClick = {  }, icon = Icons.Default.FormatQuote, text = "Quote")
         }
     }
 

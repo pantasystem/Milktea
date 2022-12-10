@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.view.NormalBottomSheetDialogSelectionLayout
 
 @Composable
 fun RenoteDialogContent(
@@ -29,7 +30,7 @@ fun RenoteDialogContent(
                 .padding(vertical = 8.dp)
         ) {
             RenoteTargetAccountRowList(accounts = uiState.accounts, onClick = onToggleAddAccount)
-            RenoteButtonLayout(
+            NormalBottomSheetDialogSelectionLayout(
                 onClick = onRenoteButtonClicked,
                 icon = Icons.Default.Repeat,
                 text = stringResource(id = R.string.renote)
@@ -37,7 +38,7 @@ fun RenoteDialogContent(
 
             Spacer(modifier = Modifier.height(8.dp))
             if (isRenotedByMe) {
-                RenoteButtonLayout(
+                NormalBottomSheetDialogSelectionLayout(
                     onClick = onDeleteRenoteButtonCLicked,
                     icon = Icons.Default.FormatQuote,
                     text = stringResource(id = R.string.unrenote)
@@ -46,7 +47,7 @@ fun RenoteDialogContent(
 
             }
 
-            RenoteButtonLayout(
+            NormalBottomSheetDialogSelectionLayout(
                 onClick = onQuoteRenoteButtonClicked,
                 icon = Icons.Default.FormatQuote,
                 text = stringResource(id = R.string.quote_renote)
