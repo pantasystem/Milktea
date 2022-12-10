@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.ui.SafeUnbox
 import net.pantasystem.milktea.model.notes.Note
@@ -30,6 +31,7 @@ class NotesViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
     val accountStore: AccountStore,
     val draftNoteRepository: DraftNoteRepository,
+    private val translationStore: NoteTranslationStore,
 ) : ViewModel() {
     private val TAG = "NotesViewModel"
 
@@ -156,6 +158,12 @@ class NotesViewModel @Inject constructor(
                     Log.d(TAG, "投票に失敗しました")
                 }
             }
+        }
+    }
+
+    fun translate(noteId: Note.Id) {
+        viewModelScope.launch(Dispatchers.IO) {
+            translationStore.translate(noteId)
         }
     }
 

@@ -19,8 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,11 +44,9 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
         }
     }
     val viewModel: NoteOptionViewModel by viewModels()
+    val notesViewModel: NotesViewModel by activityViewModels()
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
-        val notesViewModel = ViewModelProvider(requireActivity())[NotesViewModel::class.java]
-//        val note = notesViewModel.shareTarget.event
-
         dialog.setContentView(ComposeView(requireContext()).apply {
             setContent {
                 val uiState by viewModel.uiState.collectAsState()
@@ -131,7 +129,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             Divider()
                             NormalBottomSheetDialogSelectionLayout(
                                 onClick = {
-                                    viewModel.translate(uiState.noteId!!)
+                                    notesViewModel.translate(uiState.noteId!!)
                                     dismiss()
                                 },
                                 icon = Icons.Default.Translate,

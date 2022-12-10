@@ -7,11 +7,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteState
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -31,7 +29,6 @@ class NoteOptionViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val noteRelationGetter: NoteRelationGetter,
     val loggerFactory: Logger.Factory,
-    private val translationStore: NoteTranslationStore,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
@@ -90,14 +87,6 @@ class NoteOptionViewModel @Inject constructor(
             ).throwIfHasError().body()!!
         }
     }
-
-    fun translate(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
-            translationStore.translate(noteId)
-        }
-    }
-
-
 
 }
 
