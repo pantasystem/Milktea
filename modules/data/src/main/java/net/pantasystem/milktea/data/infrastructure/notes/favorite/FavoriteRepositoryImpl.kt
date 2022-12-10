@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.favorite
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
 import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
 import net.pantasystem.milktea.common.throwIfHasError
@@ -19,21 +21,25 @@ class FavoriteRepositoryImpl @Inject constructor(
 
     override suspend fun create(noteId: Note.Id): Result<Unit> {
         return runCatching {
-            val token = auth.getToken(noteId.accountId)
-                ?: throw UnauthorizedException()
-            misskeyAPIProvider.get(getAccount.get(noteId.accountId))
-                .createFavorite(CreateFavorite(i = token, noteId = noteId.noteId))
-                .throwIfHasError()
+            withContext(Dispatchers.IO) {
+                val token = auth.getToken(noteId.accountId)
+                    ?: throw UnauthorizedException()
+                misskeyAPIProvider.get(getAccount.get(noteId.accountId))
+                    .createFavorite(CreateFavorite(i = token, noteId = noteId.noteId))
+                    .throwIfHasError()
+            }
         }
     }
 
     override suspend fun delete(noteId: Note.Id): Result<Unit> {
         return runCatching {
-            val token = auth.getToken(noteId.accountId)
-                ?: throw UnauthorizedException()
-            misskeyAPIProvider.get(getAccount.get(noteId.accountId))
-                .deleteFavorite(DeleteFavorite(i = token, noteId = noteId.noteId))
-                .throwIfHasError()
+            withContext(Dispatchers.IO) {
+                val token = auth.getToken(noteId.accountId)
+                    ?: throw UnauthorizedException()
+                misskeyAPIProvider.get(getAccount.get(noteId.accountId))
+                    .deleteFavorite(DeleteFavorite(i = token, noteId = noteId.noteId))
+                    .throwIfHasError()
+            }
         }
     }
 }

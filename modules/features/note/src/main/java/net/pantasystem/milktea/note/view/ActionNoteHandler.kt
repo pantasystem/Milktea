@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.view
 
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -18,7 +17,6 @@ import net.pantasystem.milktea.model.user.report.Report
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 
 class ActionNoteHandler(
@@ -28,13 +26,6 @@ class ActionNoteHandler(
     val settingStore: SettingStore,
 
     ) {
-
-
-    private val shareTargetObserver = Observer<PlaneNoteViewData> {
-        Log.d("MainActivity", "share clicked :$it")
-        ShareBottomSheetDialog()
-            .show(activity.supportFragmentManager, "MainActivity")
-    }
 
     private val statusMessageObserver = Observer<String> {
         Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
@@ -56,21 +47,21 @@ class ActionNoteHandler(
         )
     }
 
-    private val confirmDeletionEventObserver = Observer<PlaneNoteViewData> {
+    private val confirmDeletionEventObserver = Observer<NoteRelation> {
         confirmViewModel.confirmEvent.event = ConfirmCommand(
             activity.getString(R.string.confirm_deletion),
             null,
             eventType = "delete_note",
-            args = it.toShowNote.note
+            args = it.note
         )
     }
 
-    private val confirmDeleteAndEditEventObserver = Observer<PlaneNoteViewData> {
+    private val confirmDeleteAndEditEventObserver = Observer<NoteRelation> {
         confirmViewModel.confirmEvent.event = ConfirmCommand(
             null,
             activity.getString(R.string.confirm_delete_and_edit_note_description),
             eventType = "delete_and_edit_note",
-            args = it.toShowNote
+            args = it
         )
     }
 
@@ -107,8 +98,6 @@ class ActionNoteHandler(
     fun initViewModelListener() {
 
 
-        mNotesViewModel.shareTarget.removeObserver(shareTargetObserver)
-        mNotesViewModel.shareTarget.observe(activity, shareTargetObserver)
 
 
         mNotesViewModel.statusMessage.removeObserver(statusMessageObserver)

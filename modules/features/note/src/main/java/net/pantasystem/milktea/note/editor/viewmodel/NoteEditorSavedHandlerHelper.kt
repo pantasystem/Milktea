@@ -122,7 +122,7 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
     )
 }
 
-fun SavedStateHandle.getNoteEditingUiState(account: Account?): NoteEditorUiState {
+fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibility?): NoteEditorUiState {
     return NoteEditorUiState(
         formState = NoteEditorFormState(
             text = getText(),
@@ -130,7 +130,7 @@ fun SavedStateHandle.getNoteEditingUiState(account: Account?): NoteEditorUiState
             hasCw = getHasCw(),
         ),
         sendToState = NoteEditorSendToState(
-            visibility = getVisibility() ?: Visibility.Public(false),
+            visibility = visibility ?: getVisibility() ?: Visibility.Public(false),
             channelId = getChannelId(),
             renoteId = getRenoteId(),
             replyId = getReplyId(),

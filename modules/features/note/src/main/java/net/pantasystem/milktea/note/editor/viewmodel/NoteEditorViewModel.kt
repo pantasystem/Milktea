@@ -356,9 +356,9 @@ class NoteEditorViewModel @Inject constructor(
         currentAccount.value?.let { account ->
             viewModelScope.launch(Dispatchers.IO) {
                 val reservationPostingAt =
-                    savedStateHandle.getNoteEditingUiState(account).sendToState.schedulePostAt
+                    savedStateHandle.getNoteEditingUiState(account, visibility.value).sendToState.schedulePostAt
                 draftNoteService.save(
-                    savedStateHandle.getNoteEditingUiState(account).toCreateNote(account)
+                    savedStateHandle.getNoteEditingUiState(account, visibility.value).toCreateNote(account)
                 ).mapCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                         createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
