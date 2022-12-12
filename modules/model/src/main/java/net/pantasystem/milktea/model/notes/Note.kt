@@ -66,11 +66,16 @@ data class Note(
         return renoteId != null
     }
 
+
+    fun isRenoteOnly(): Boolean {
+        return isRenote() && !hasContent()
+    }
+
     /**
      * ファイル、投票、テキストなどのコンテンツを持っているか
      */
     fun hasContent(): Boolean {
-        return !(text == null && fileIds.isNullOrEmpty() && poll == null)
+        return text != null || !fileIds.isNullOrEmpty() || poll != null
     }
 
     fun isOwnReaction(reaction: Reaction): Boolean {
