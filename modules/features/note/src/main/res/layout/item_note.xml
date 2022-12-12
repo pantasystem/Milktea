@@ -44,6 +44,7 @@
                     layout="@layout/item_simple_note"
                     app:note="@{note}"
                     app:noteCardActionListener="@{noteCardActionListener}"
+                    android:visibility="@{note.isOnlyVisibleRenoteStatusMessage ? View.GONE : View.VISIBLE }"
                     />
 
         </LinearLayout>
