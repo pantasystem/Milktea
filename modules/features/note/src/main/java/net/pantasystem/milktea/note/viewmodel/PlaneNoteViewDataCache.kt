@@ -44,7 +44,10 @@ class PlaneNoteViewDataCache(
         }
     }
 
-    suspend fun getByIds(ids: List<Note.Id>): List<PlaneNoteViewData> {
+    suspend fun getByIds(
+        ids: List<Note.Id>,
+        isGoneAfterRenotes: Boolean = true
+    ): List<PlaneNoteViewData> {
         val notExistsIds = lock.withLock {
             ids.filter {
                 cache[it] == null
@@ -60,9 +63,26 @@ class PlaneNoteViewDataCache(
         val map = (exists + newList).associateBy {
             it.id
         }
-        return ids.mapNotNull {
+        val notes = ids.mapNotNull {
             map[it]
         }
+
+        // NOTE: リノートが連続している場合は、そのコンテンツを省略するフラグを立てる処理
+        if (isGoneAfterRenotes) {
+            for (i in 0 until notes.size - 1) {
+                val current = notes[i]
+                val next = notes[i + 1]
+                if (current.note.note.isRenoteOnly()
+                    && next.note.note.isRenoteOnly()
+                    && current.note.note.renoteId == next.note.note.renoteId
+                ) {
+                    current.isOnlyVisibleRenoteStatusMessage.postValue(true)
+                } else {
+                    current.isOnlyVisibleRenoteStatusMessage.postValue(false)
+                }
+            }
+        }
+        return notes
     }
 
     suspend fun put(viewData: PlaneNoteViewData): PlaneNoteViewData {

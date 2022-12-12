@@ -42,7 +42,6 @@ open class PlaneNoteViewData(
             }
         }
 
-    val isMyNote = account.remoteId == toShowNote.user.id.id
 
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
@@ -90,8 +89,6 @@ open class PlaneNoteViewData(
 
 
     val textNode = MFMParser.parse(toShowNote.note.text, toShowNote.note.emojis)
-    val urls = textNode?.getUrls()
-
 
     val translateState: LiveData<ResultState<Translation?>?> =
         this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
@@ -109,6 +106,8 @@ open class PlaneNoteViewData(
         it.aboutMediaType == File.AboutMediaType.IMAGE || it.aboutMediaType == File.AboutMediaType.VIDEO
     } ?: emptyList()
     val media = MediaViewData(previewableFiles)
+
+    val isOnlyVisibleRenoteStatusMessage = MutableLiveData<Boolean>(false)
 
 
     val urlPreviewList = MutableLiveData<List<UrlPreview>>()
