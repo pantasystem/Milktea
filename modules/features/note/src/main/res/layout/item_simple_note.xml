@@ -328,14 +328,10 @@
                                 android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
                                 android:textColor="?attr/colorAccent"
                                 android:text="@{SafeUnbox.unboxString(note.subContentFoldingStatusMessage)}"
-                                android:onClick="@{()-> note.changeSubContentFolding() }"
                                 app:layout_constraintTop_toBottomOf="@id/subCw"
                                 app:layout_constraintStart_toStartOf="parent"
-                                noteId="@{ note.subNote.note.id }"
-                                onToggleCw="@{ note::changeSubContentFolding }"
-                                targetView="@{ subNoteText }"
-                                isVisible="@{ note.subContentFolding }"
-                                app:emojiCompatEnabled="false"
+
+                                android:onClick="@{ () -> note.changeSubContentFolding() }"
                                 />
 
                         <TextView
@@ -346,9 +342,9 @@
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                                 app:textNode="@{note.subNoteTextNode}"
-                                android:visibility="@{SafeUnbox.unbox(note.subContentFolding)? View.GONE : View.VISIBLE }"
                                 app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
-                                app:layout_constraintStart_toStartOf="parent"/>
+                                app:layout_constraintStart_toStartOf="parent"
+                                android:visibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>
 
                         <include
                                 layout="@layout/media_preview"
@@ -357,11 +353,13 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="200dp"
                                 android:layout_below="@id/subNoteText"
-                                android:visibility="@{note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
+                                android:visibility="@{note.subContentFolding || note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
                                 tools:layout_height="20dp"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toBottomOf="@id/subNoteText"/>
+                                app:layout_constraintTop_toBottomOf="@id/subNoteText"
+                                android:layout_marginTop="2dp"
+                                />
 
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
