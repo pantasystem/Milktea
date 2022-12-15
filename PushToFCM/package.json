@@ -13,7 +13,7 @@
     "concat-stream": "^2.0.0",
     "crypt": "^0.0.2",
     "encoding-japanese": "^1.0.30",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "firebase-admin": "^10.0.2",
     "fs": "^0.0.1-security",
     "i18n": "^0.13.3",
