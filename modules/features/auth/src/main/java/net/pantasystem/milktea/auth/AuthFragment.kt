@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.whenResumed
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -48,35 +48,26 @@ class AuthFragment : Fragment() {
 
         binding.lifecycleOwner = this
         binding.appAuthViewModel = appAuthViewModel
-        appAuthViewModel.waiting4UserAuthorization.observe(viewLifecycleOwner) {
-            it?.let {
-                if (appAuthViewModel.isOpenInWebView.value) {
-                    startActivity(
-                        Intent(
-                            requireContext(),
-                            WebViewAuthActivity::class.java
-                        ).also { intent ->
-                            intent.putExtra(EXTRA_AUTH_URL, it.generateAuthUrl())
-                            intent.putExtra(EXTRA_USERNAME, appAuthViewModel.username.value)
-                        })
-                } else {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))
-
+        lifecycleScope.launch {
+            whenResumed {
+                appAuthViewModel.waiting4UserAuthorizationStepEvent.collect {
+                    if (appAuthViewModel.isOpenInWebView.value) {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                WebViewAuthActivity::class.java
+                            ).also { intent ->
+                                intent.putExtra(EXTRA_AUTH_URL, it.generateAuthUrl())
+                                intent.putExtra(EXTRA_USERNAME, appAuthViewModel.username.value)
+                            })
+                    } else {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))
+                    }
+                    authViewModel.setState(it)
                 }
-                authViewModel.setState(it)
-                appAuthViewModel.waiting4UserAuthorization.postValue(null)
             }
         }
 
-        appAuthViewModel.app.observe(viewLifecycleOwner) { app ->
-            if (app != null) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.successfully_created_the_app) + " ${app.name}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 appAuthViewModel.errors.collect {
