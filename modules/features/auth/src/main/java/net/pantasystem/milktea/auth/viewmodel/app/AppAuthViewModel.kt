@@ -7,13 +7,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
-import net.pantasystem.milktea.api.misskey.auth.createObtainToken
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import java.util.*
@@ -31,8 +28,8 @@ class AppAuthViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     val accountStore: AccountStore,
     val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
-    val mastodonAPIProvider: MastodonAPIProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val getAccessToken: GetAccessToken,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -58,7 +55,6 @@ class AppAuthViewModel @Inject constructor(
             StateContent.NotExist()
         )
     )
-
 
     private val authUserInputState = combine(instanceDomain, appName) { domain, name ->
         AuthUserInputState(
@@ -132,7 +128,6 @@ class AppAuthViewModel @Inject constructor(
             logger.error("アカウント登録処理失敗", it)
         }.getOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
 
     val state = combine(
         instanceInfo,
@@ -225,26 +220,7 @@ class AppAuthViewModel @Inject constructor(
         ?: throw IllegalStateException("現在の状態: ${state.value}でアクセストークンを取得することはできません。")
         viewModelScope.launch(Dispatchers.IO) {
 
-            runCatching {
-                when (a) {
-                    is Authorization.Waiting4UserAuthorization.Misskey -> {
-                        val accessToken =
-                            misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
-                                UserKey(
-                                    appSecret = a.appSecret,
-                                    a.session.token
-                                )
-                            )
-                                .throwIfHasError().body()
-                                ?: throw IllegalStateException("response bodyがありません。")
-                        accessToken.toModel(a.appSecret)
-                    }
-                    is Authorization.Waiting4UserAuthorization.Mastodon -> {
-                        getAccessToken4Mastodon(a, code!!)
-                    }
-                }
-
-            }.onSuccess {
+            getAccessToken.getAccessToken(a, code).onSuccess {
                 val authenticated = Authorization.Approved(
                     a.instanceBaseURL,
                     it
@@ -261,27 +237,4 @@ class AppAuthViewModel @Inject constructor(
         confirmAddAccountEventFlow.tryEmit(Date().time)
     }
 
-    private suspend fun getAccessToken4Mastodon(
-        a: Authorization.Waiting4UserAuthorization.Mastodon,
-        code: String
-    ): AccessToken.Mastodon {
-        try {
-            logger.debug("認証種別Mastodon: $a")
-            val obtainToken = a.client.createObtainToken(scope = a.scope, code = code)
-            val accessToken = mastodonAPIProvider.get(a.instanceBaseURL).obtainToken(obtainToken)
-                .throwIfHasError()
-                .body()
-            logger.debug("accessToken:$accessToken")
-            val me = mastodonAPIProvider.get(a.instanceBaseURL, accessToken!!.accessToken)
-                .verifyCredentials()
-                .throwIfHasError()
-            logger.debug("自身の情報, code=${me.code()}, message=${me.message()}")
-            val account = me.body()!!
-            return accessToken.toModel(account)
-        } catch (e: Exception) {
-            logger.warning("AccessToken取得失敗", e = e)
-            throw e
-        }
-    }
 }
-

@@ -14,7 +14,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.databinding.FragmentAuthResultBinding
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
@@ -25,7 +24,6 @@ class AuthResultFragment : Fragment(){
 
     lateinit var binding: FragmentAuthResultBinding
 
-    val viewModel: AuthViewModel by activityViewModels()
     val appAuthViewModel: AppAuthViewModel by activityViewModels()
 
     override fun onCreateView(
