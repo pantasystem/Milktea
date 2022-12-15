@@ -34,7 +34,7 @@ class AppAuthViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("AppAuthViewModel")
 
-    val instanceDomain = MutableStateFlow("")
+    val instanceDomain = MutableStateFlow("misskey.io")
 
     val isOpenInWebView = MutableStateFlow(false)
 
