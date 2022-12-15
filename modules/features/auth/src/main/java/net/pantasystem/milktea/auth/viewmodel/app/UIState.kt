@@ -35,6 +35,12 @@ sealed interface InstanceType {
     data class Misskey(val instance: Meta) : InstanceType
 }
 
+sealed interface GenerateTokenResult {
+    object Success : GenerateTokenResult
+    object Fixed : GenerateTokenResult
+    object Failure : GenerateTokenResult
+
+}
 data class AuthUiState(
     val formState: AuthUserInputState,
     val metaState: ResultState<InstanceType>,

@@ -18,7 +18,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.databinding.FragmentAppAuthBinding
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.auth.viewmodel.app.AuthErrors
 
@@ -30,7 +29,6 @@ class AuthFragment : Fragment() {
     lateinit var binding: FragmentAppAuthBinding
 
     private val appAuthViewModel: AppAuthViewModel by activityViewModels()
-    private val authViewModel: AuthViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,10 +61,10 @@ class AuthFragment : Fragment() {
                     } else {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.generateAuthUrl())))
                     }
-                    authViewModel.setState(it)
                 }
             }
         }
+
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {

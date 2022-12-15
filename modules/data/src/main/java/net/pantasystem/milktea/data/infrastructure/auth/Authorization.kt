@@ -1,13 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.auth
 
 
+import net.pantasystem.milktea.api.misskey.auth.Session
 import net.pantasystem.milktea.api.misskey.auth.generateAuthUrl
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.TemporarilyAuthState
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.api.misskey.auth.Session
 
 
 /**

@@ -11,14 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.wada811.databinding.dataBinding
-import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.auth.databinding.FragmentWaiting4UserAuthorizationBinding
+import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
+import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -26,7 +26,7 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
 
     private val binding: FragmentWaiting4UserAuthorizationBinding by dataBinding()
 
-    private val authViewModel: AuthViewModel by activityViewModels()
+    private val viewModel: AppAuthViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,8 +35,8 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
             return@setOnKeyListener true
         }
 
-        authViewModel.authorization.mapNotNull {
-            it as? Authorization.Waiting4UserAuthorization
+        viewModel.state.mapNotNull {
+            it.stateType as? Authorization.Waiting4UserAuthorization
         }.onEach {
             when (it) {
                 is Authorization.Waiting4UserAuthorization.Mastodon -> {
@@ -53,7 +53,7 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
 
         binding.copyToClipboardButton.setOnClickListener {
             (requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager)?.also { clipboardManager ->
-                (authViewModel.authorization.value as? Authorization.Waiting4UserAuthorization.Misskey)?.session?.url?.let {
+                (viewModel.state.value.stateType as? Authorization.Waiting4UserAuthorization.Misskey)?.session?.url?.let {
                     clipboardManager.setPrimaryClip(ClipData.newPlainText("misskey auth url", it))
                     Toast.makeText(
                         requireContext(),
@@ -65,7 +65,7 @@ class Waiting4userAuthorizationFragment : Fragment(R.layout.fragment_waiting_4_u
         }
 
         binding.approvedButton.setOnClickListener {
-            authViewModel.getAccessToken()
+            viewModel.getAccessToken()
         }
     }
 }
