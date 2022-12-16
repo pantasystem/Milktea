@@ -95,6 +95,8 @@ class AppAuthViewModel @Inject constructor(
 
     private val waiting4UserApprove = startAuthEventFlow.flatMapLatest {
         instanceInfo
+    }.filterNot {
+        it.inputState.isIdPassword
     }.flatMapLatest {
         suspend {
             when (val meta = it.meta.content) {
@@ -211,6 +213,24 @@ class AppAuthViewModel @Inject constructor(
         }.onEach {
             approved.value = it.rawContent
         }.launchIn(viewModelScope + Dispatchers.IO)
+
+        // NOTE: id, passwordのサポート
+        authUserInputState.flatMapLatest {  state ->
+            startAuthEventFlow.distinctUntilChanged().map {
+                state
+            }
+        }.map {
+            authService.signIn(it)
+        }.onEach { result ->
+            result.onSuccess {
+                approved.value = Authorization.Approved(
+                    instanceBaseURL = it.baseUrl,
+                    accessToken = it
+                )
+            }.onFailure {
+                logger.error("signIn failed", it)
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun clearHostName() {
