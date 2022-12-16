@@ -402,7 +402,7 @@ object MFMParser {
                 if (accountHost == null) {
                     return ""
                 }
-                // NOTE: 投稿主とアカウントの所有者が同一のアカウントである時
+                // NOTE: 投稿主とアカウントの所有者が同一のホスト(インスタンス)である時
                 if (userHost == accountHost) {
                     return ""
                 }
