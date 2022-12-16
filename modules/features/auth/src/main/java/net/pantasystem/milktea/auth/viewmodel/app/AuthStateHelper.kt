@@ -4,8 +4,10 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
+import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
+import net.pantasystem.milktea.api.misskey.auth.SignInRequest
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
@@ -39,7 +41,6 @@ class AuthStateHelper @Inject constructor(
     val accountStore: AccountStore,
     val subscriptionRegistration: SubscriptionRegistration,
     val userDataSource: UserDataSource,
-
     ) {
     private val urlPattern =
         Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
@@ -174,12 +175,42 @@ class AuthStateHelper @Inject constructor(
                     true
                 ) as User.Detail
             }
+            is AccessToken.MisskeyIdAndPassword -> {
+                (a.accessToken as AccessToken.MisskeyIdAndPassword).user.toUser(
+                    account,
+                    true
+                ) as User.Detail
+            }
         }
         userDataSource.add(user)
         accountStore.addAccount(account)
         subscriptionRegistration.register(account.accountId)
 
         return Authorization.Finish(account, user)
+    }
+
+    suspend fun signIn(formState: AuthUserInputState): Result<AccessToken.MisskeyIdAndPassword> = runCatching {
+        withContext(Dispatchers.IO) {
+
+            val baseUrl = toEnableUrl(requireNotNull(formState.host))
+            val api = misskeyAPIServiceBuilder.buildAuthAPI(baseUrl)
+            require(formState.isIdPassword) {
+                "入力がid, passwordのパターンと異なります"
+            }
+            val res = api.signIn(SignInRequest(
+                username = requireNotNull(formState.username),
+                password = formState.password,
+            )).throwIfHasError().body()
+            requireNotNull(res)
+            val userDTO = misskeyAPIProvider.get(baseUrl).i(I(
+                res.i
+            )).throwIfHasError().body()
+            AccessToken.MisskeyIdAndPassword(
+                baseUrl = baseUrl,
+                accessToken = res.i,
+                user = requireNotNull(userDTO)
+            )
+        }
     }
 
     fun checkUrlPattern(url: String): Boolean {
