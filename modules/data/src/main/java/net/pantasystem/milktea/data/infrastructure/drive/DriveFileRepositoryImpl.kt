@@ -28,7 +28,7 @@ class DriveFileRepositoryImpl @Inject constructor(
             return file
         }
         val account = getAccount.get(id.accountId)
-        val api = misskeyAPIProvider.get(account.instanceDomain)
+        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
         val response = api.showFile(ShowFile(fileId = id.fileId, i = account.token))
             .throwIfHasError()
         val fp = response.body()!!.toFileProperty(account)
@@ -38,7 +38,7 @@ class DriveFileRepositoryImpl @Inject constructor(
 
     override suspend fun toggleNsfw(id: FileProperty.Id) {
         val account = getAccount.get(id.accountId)
-        val api = misskeyAPIProvider.get(account.instanceDomain)
+        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
         val fileProperty = find(id)
         val result = api.updateFile(
             UpdateFileDTO(

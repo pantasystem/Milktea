@@ -38,9 +38,9 @@ class SocketWithAccountProviderImpl @Inject constructor(
             }
 
 
-            var uri = account.instanceDomain
+            var uri = account.normalizedInstanceDomain
             if(uri.startsWith("https")) {
-                uri = "wss" + uri.substring(5, uri.length) + "/streaming"
+                uri = "wss://" + account.getHost() + "/streaming"
             }
             try {
                 val i = account.token

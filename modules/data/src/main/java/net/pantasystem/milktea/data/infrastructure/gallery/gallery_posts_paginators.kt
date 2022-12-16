@@ -104,7 +104,7 @@ class GalleryPostsLoader (
 
     suspend fun api(sinceId: String? = null, untilId: String? = null) : suspend ()-> Response<List<GalleryPostDTO>>{
         val i = getAccount.invoke().token
-        val api = apiProvider.get(getAccount.invoke().instanceDomain) as? MisskeyAPIV1275
+        val api = apiProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
         when(pageable) {
             is Pageable.Gallery.MyPosts -> {

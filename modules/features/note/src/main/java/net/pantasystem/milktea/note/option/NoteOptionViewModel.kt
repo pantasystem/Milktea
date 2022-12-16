@@ -90,7 +90,7 @@ class NoteOptionViewModel @Inject constructor(
     private suspend fun loadNoteState(id: Note.Id): Result<NoteState> = runCatching {
         withContext(Dispatchers.IO) {
             val account = accountRepository.get(id.accountId).getOrThrow()
-            misskeyAPIProvider.get(account.instanceDomain).noteState(
+            misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
                 NoteRequest(
                     i = account.token,
                     noteId = id.noteId

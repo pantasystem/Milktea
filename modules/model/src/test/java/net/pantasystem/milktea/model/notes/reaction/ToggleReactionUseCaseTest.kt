@@ -45,7 +45,7 @@ class ToggleReactionUseCaseTest {
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
-            "misskey.io",
+            "https://misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
             token = "test",
             userName = "test",
@@ -59,7 +59,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.instanceDomain)
+                find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
 
@@ -107,7 +107,7 @@ class ToggleReactionUseCaseTest {
         }
 
         val meta = Meta(
-            uri = "misskey.io",
+            uri = "https://misskey.io",
             emojis = listOf(
                 Emoji(name = "kawaii"), Emoji(name = "wakaranai")
             )
@@ -115,7 +115,7 @@ class ToggleReactionUseCaseTest {
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
-            "misskey.io",
+            "https://misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
             token = "test",
             userName = "test",
@@ -129,7 +129,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.instanceDomain)
+                find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
 
@@ -156,7 +156,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory(":wakaranai:", "misskey.io"))
+            create(ReactionHistory(":wakaranai:", "https://misskey.io"))
         }
     }
 
@@ -181,7 +181,7 @@ class ToggleReactionUseCaseTest {
         }
 
         val meta = Meta(
-            uri = "misskey.io",
+            uri = "https://misskey.io",
             emojis = listOf(
                 Emoji(name = "kawaii")
             )
@@ -189,7 +189,7 @@ class ToggleReactionUseCaseTest {
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
-            "misskey.io",
+            "https://misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
             token = "test",
             userName = "test",
@@ -203,7 +203,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.instanceDomain)
+                find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
         val checkEmoji = mock<CheckEmoji> {
@@ -227,7 +227,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory(":kawaii:", "misskey.io"))
+            create(ReactionHistory(":kawaii:", "https://misskey.io"))
         }
     }
 
@@ -248,11 +248,11 @@ class ToggleReactionUseCaseTest {
             } doReturn targetNote
         }
 
-        val meta = Meta(uri = "misskey.io",)
+        val meta = Meta(uri = "https://misskey.io",)
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
-            "misskey.io",
+            "https://misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
             token = "test",
             userName = "test",
@@ -266,7 +266,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.instanceDomain)
+                find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
         val useCase = ToggleReactionUseCase(
@@ -289,7 +289,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("👍", "misskey.io"))
+            create(ReactionHistory("👍", "https://misskey.io"))
         }
     }
     @Test
@@ -309,11 +309,11 @@ class ToggleReactionUseCaseTest {
             } doReturn targetNote
         }
 
-        val meta = Meta(uri = "misskey.io",)
+        val meta = Meta(uri = "https://misskey.io",)
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
-            "misskey.io",
+            "https://misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
             token = "test",
             userName = "test",
@@ -327,7 +327,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.instanceDomain)
+                find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
         val useCase = ToggleReactionUseCase(
@@ -350,7 +350,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("🥺", "misskey.io"))
+            create(ReactionHistory("🥺", "https://misskey.io"))
         }
     }
 
@@ -371,11 +371,11 @@ class ToggleReactionUseCaseTest {
             } doReturn targetNote
         }
 
-        val meta = Meta(uri = "misskey.io",)
+        val meta = Meta(uri = "https://misskey.io",)
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
-            "misskey.io",
+            "https://misskey.io",
             instanceType = Account.InstanceType.MISSKEY,
             token = "test",
             userName = "test",
@@ -389,7 +389,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.instanceDomain)
+                find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
         val useCase = ToggleReactionUseCase(
@@ -412,7 +412,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("like", "misskey.io"))
+            create(ReactionHistory("like", "https://misskey.io"))
         }
     }
 }

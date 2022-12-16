@@ -93,7 +93,7 @@ class NoteEditorViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
         currentAccount.filterNotNull().flatMapLatest { account ->
-            metaRepository.observe(account.instanceDomain).filterNotNull().map { meta ->
+            metaRepository.observe(account.normalizedInstanceDomain).filterNotNull().map { meta ->
                 meta.maxNoteTextLength ?: 1500
             }
         }.stateIn(
@@ -104,7 +104,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     val maxFileCount = currentAccount.filterNotNull().mapNotNull {
-        metaRepository.get(it.instanceDomain)?.getVersion()
+        metaRepository.get(it.normalizedInstanceDomain)?.getVersion()
     }.map {
         if (it >= Version("12.100.2")) {
             16

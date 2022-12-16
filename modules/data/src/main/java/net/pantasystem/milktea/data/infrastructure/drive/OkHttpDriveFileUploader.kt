@@ -67,7 +67,7 @@ class OkHttpDriveFileUploader(
             val requestBody = requestBodyBuilder.build()
 
             val request =
-                Request.Builder().url(URL("${account.instanceDomain}/api/drive/files/create"))
+                Request.Builder().url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
@@ -122,7 +122,7 @@ class OkHttpDriveFileUploader(
             val requestBody = requestBodyBuilder.build()
 
             val request =
-                Request.Builder().url(URL("${account.instanceDomain}/api/drive/files/create"))
+                Request.Builder().url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code

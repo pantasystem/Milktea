@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.account
 
 import net.pantasystem.milktea.model.account.page.Page
 import java.io.Serializable
+import java.net.URL
 
 data class Account(
     val remoteId: String,
@@ -34,13 +35,23 @@ data class Account(
                 instanceType
             )
 
-
+    val normalizedInstanceDomain: String by lazy {
+        val url = URL(instanceDomain)
+        var str = "${url.protocol}://${url.host}"
+        if (url.port != -1) {
+            if (url.port != 80 || url.port != 443) {
+                str += ":${url.port}"
+            }
+        }
+        str
+    }
 
     fun getHost(): String {
         if (instanceDomain.startsWith("https://")) {
-            return instanceDomain.substring("https://".length, instanceDomain.length)
+            return URL(instanceDomain).host
+
         } else if (instanceDomain.startsWith("http://")) {
-            return instanceDomain.substring("http://".length, instanceDomain.length)
+            return URL(instanceDomain).host
         }
         return instanceDomain
     }

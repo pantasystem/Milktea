@@ -34,7 +34,7 @@ class SyncMetaWorker @AssistedInject constructor(
             coroutineScope {
                 accounts.map {
                     async {
-                        metaRepository.sync(it.instanceDomain)
+                        metaRepository.sync(it.normalizedInstanceDomain)
                     }
                 }.awaitAll()
             }.forEach {

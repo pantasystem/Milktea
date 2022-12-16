@@ -7,10 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,7 +22,7 @@ class ReactionPickerDialogViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userConfigReactions = _currentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionUserSettingDao.observeByInstanceDomain(ac.instanceDomain).map { list ->
+        reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain).map { list ->
             list.sortedBy {
                 it.weight
             }.map {

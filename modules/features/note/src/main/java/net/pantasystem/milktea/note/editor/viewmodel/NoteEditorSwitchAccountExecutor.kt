@@ -79,7 +79,7 @@ class NoteEditorSwitchAccountExecutor @Inject constructor(
     ): Result<NoteEditorSwitchAccountExecutorResult> = runCatching {
         if (noteEditingState.renoteId != null) {
             val renote = noteRepository.find(noteEditingState.renoteId).getOrThrow()
-            val url = "${fromAccount?.instanceDomain}/notes/${renote.id.noteId}"
+            val url = "${fromAccount?.normalizedInstanceDomain}/notes/${renote.id.noteId}"
             val toRenoteNote = resolverRepository.resolve(account.accountId, url)
                 .getOrThrow() as ApResolver.TypeNote
             noteEditingState.copy(renoteId = toRenoteNote.note.id)
@@ -95,7 +95,7 @@ class NoteEditorSwitchAccountExecutor @Inject constructor(
     ): Result<NoteEditorSwitchAccountExecutorResult> = runCatching {
         if (noteEditingState.replyId != null) {
             val reply = noteRepository.find(noteEditingState.replyId).getOrThrow()
-            val url = "${fromAccount?.instanceDomain}/notes/${reply.id.noteId}"
+            val url = "${fromAccount?.normalizedInstanceDomain}/notes/${reply.id.noteId}"
             val toReplyNote = resolverRepository.resolve(account.accountId, url)
                 .getOrThrow() as ApResolver.TypeNote
             noteEditingState.copy(replyId = toReplyNote.note.id)

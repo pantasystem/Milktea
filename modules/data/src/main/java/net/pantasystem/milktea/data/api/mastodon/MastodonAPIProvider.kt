@@ -35,7 +35,7 @@ class MastodonAPIProvider @Inject constructor(
         if (account.instanceType == Account.InstanceType.MISSKEY) {
             throw IllegalArgumentException("アカウント種別Misskeyは受け入れていません")
         }
-        return get(account.instanceDomain, account.token)
+        return get(account.normalizedInstanceDomain, account.token)
 
     }
 

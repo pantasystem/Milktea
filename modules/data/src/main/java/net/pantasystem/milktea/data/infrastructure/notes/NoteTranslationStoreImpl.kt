@@ -46,7 +46,7 @@ class NoteTranslationStoreImpl @Inject constructor(
 
         runCatching {
             val account = accountRepository.get(noteId.accountId).getOrThrow()
-            val api = misskeyAPIProvider.get(account.instanceDomain)
+            val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
             val req = Translate(
                 i = account.token,
                 targetLang = Locale.getDefault().language,

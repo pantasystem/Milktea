@@ -163,7 +163,7 @@ class GalleryRepositoryImpl @Inject constructor(
     }
 
     private fun getMisskeyAPI(account: Account): MisskeyAPIV1275 {
-        return misskeyAPIProvider.get(account.instanceDomain) as? MisskeyAPIV1275
+        return misskeyAPIProvider.get(account.normalizedInstanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
     }
 }

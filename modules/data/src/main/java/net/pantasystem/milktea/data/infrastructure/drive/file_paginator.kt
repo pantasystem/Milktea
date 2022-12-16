@@ -128,7 +128,7 @@ class FilePropertyPagingImpl(
 
     override suspend fun loadPrevious(): Result<List<FilePropertyDTO>> {
         return runCatching {
-            misskeyAPIProvider.get(getAccount.invoke().instanceDomain).getFiles(
+            misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain).getFiles(
                 RequestFile(
                     folderId = getCurrentFolderId.invoke(),
                     untilId = this.getUntilId(),

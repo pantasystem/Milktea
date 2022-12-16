@@ -128,7 +128,7 @@ class MainViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
         return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.instanceDomain)
+            metaRepository.observe(it.normalizedInstanceDomain)
         }.map {
             it?.let {
                 misskeyAPIProvider.get(it.uri, it.getVersion())
