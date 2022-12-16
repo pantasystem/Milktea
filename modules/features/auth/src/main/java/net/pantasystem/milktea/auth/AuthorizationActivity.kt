@@ -3,6 +3,7 @@ package net.pantasystem.milktea.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -11,8 +12,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
@@ -47,7 +48,6 @@ class AuthorizationNavigationImpl @Inject constructor(
 @AndroidEntryPoint
 class AuthorizationActivity : AppCompatActivity() {
 
-    private val mViewModel: AuthViewModel by viewModels()
     private val appAuthViewModel: AppAuthViewModel by viewModels()
 
     @Inject
@@ -63,17 +63,24 @@ class AuthorizationActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mViewModel.authorization.collect {
-                    if(it is Authorization.Finish) {
+                appAuthViewModel.state.collect {
+                    Log.d("AuthorizationActivity","state:$it")
+                    if(it.stateType is Authorization.Finish) {
                         startActivity(mainNavigation.newIntent(Unit))
                         finish()
                         return@collect
                     }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                appAuthViewModel.stateTypeEvents.filterNot {
+                    it is Authorization.Finish
+                }.collect {
                     changeFragment(it)
                 }
             }
-
-
         }
 
         val username = intent.getStringExtra(EXTRA_USERNAME)
@@ -120,15 +127,13 @@ class AuthorizationActivity : AppCompatActivity() {
         if(callbackToken?.isNotBlank() == true) {
             authStore.getCustomAuthBridge()?.let {
                 val state = Authorization.Waiting4UserAuthorization.from(it)
-                mViewModel.setState(state)
-                mViewModel.getAccessToken()
+                appAuthViewModel.getAccessToken(w4a = state)
 
             }
         } else if (callbackMastodonCode?.isNotBlank() == true) {
             authStore.getCustomAuthBridge()?.let {
                 val state = Authorization.Waiting4UserAuthorization.from(it)
-                mViewModel.setState(state)
-                mViewModel.getAccessToken(callbackMastodonCode)
+                appAuthViewModel.getAccessToken(callbackMastodonCode, w4a = state)
             }
         }
     }

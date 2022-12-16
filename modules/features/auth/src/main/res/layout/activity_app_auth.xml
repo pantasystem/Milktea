@@ -84,7 +84,7 @@
                 android:text="@string/auth"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:enabled="@{appAuthViewModel.validatedInstanceDomain}"
+                android:enabled="@{appAuthViewModel.state.validatedInstanceDomain}"
                 android:onClick="@{()-> appAuthViewModel.auth()}"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

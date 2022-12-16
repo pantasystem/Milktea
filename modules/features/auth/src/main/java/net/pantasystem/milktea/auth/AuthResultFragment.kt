@@ -14,7 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.databinding.FragmentAuthResultBinding
-import net.pantasystem.milktea.auth.viewmodel.AuthViewModel
+import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 
@@ -24,7 +24,7 @@ class AuthResultFragment : Fragment(){
 
     lateinit var binding: FragmentAuthResultBinding
 
-    val viewModel: AuthViewModel by activityViewModels()
+    val appAuthViewModel: AppAuthViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,10 +39,10 @@ class AuthResultFragment : Fragment(){
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.authorization.collect {
-                    if(it is Authorization.Approved) {
-                        if (it.accessToken is AccessToken.Misskey) {
-                            binding.user = (it.accessToken as AccessToken.Misskey).user
+                appAuthViewModel.state.collect {
+                    if(it.stateType is Authorization.Approved) {
+                        if (it.stateType.accessToken is AccessToken.Misskey) {
+                            binding.user = (it.stateType.accessToken as AccessToken.Misskey).user
                         }
                         binding.continueAuth.isEnabled = true
                     }
@@ -51,7 +51,7 @@ class AuthResultFragment : Fragment(){
         }
 
         binding.continueAuth.setOnClickListener {
-            viewModel.confirmApprove()
+            appAuthViewModel.onConfirmAddAccount()
         }
 
     }

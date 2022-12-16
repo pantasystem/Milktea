@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 
-suspend fun<T> (suspend () -> T).asLoadingStateFlow(): Flow<ResultState<T>> {
+fun<T> (suspend () -> T).asLoadingStateFlow(): Flow<ResultState<T>> {
 
     return flow {
         emit(ResultState.Fixed(StateContent.NotExist()))

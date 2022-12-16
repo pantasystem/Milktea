@@ -1,9 +1,6 @@
 package net.pantasystem.milktea.api.misskey
 
-import net.pantasystem.milktea.api.misskey.auth.AccessToken
-import net.pantasystem.milktea.api.misskey.auth.AppSecret
-import net.pantasystem.milktea.api.misskey.auth.Session
-import net.pantasystem.milktea.api.misskey.auth.UserKey
+import net.pantasystem.milktea.api.misskey.auth.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -15,4 +12,7 @@ interface MisskeyAuthAPI {
 
     @POST("api/auth/session/userkey")
     suspend fun getAccessToken(@Body userKey: UserKey): Response<AccessToken>
+
+    @POST("/api/signin")
+    suspend fun signIn(@Body body: SignInRequest): Response<SignInResponse>
 }
