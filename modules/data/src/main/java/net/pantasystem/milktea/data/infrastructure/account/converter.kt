@@ -5,7 +5,6 @@ package net.pantasystem.milktea.data.infrastructure.account
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.Hash
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
-import net.pantasystem.milktea.data.infrastructure.core.AccountRelation
 import net.pantasystem.milktea.model.account.Account
 
 
@@ -28,6 +27,12 @@ fun AccessToken.Mastodon.newAccount(
     )
 }
 
+fun AccessToken.MisskeyIdAndPassword.newAccount(instanceDomain: String): Account {
+    return this.user.newAccount(
+        instanceDomain,
+        accessToken,
+    )
+}
 
 fun AccessToken.newAccount(instanceDomain: String): Account {
     return when(this) {
@@ -35,6 +40,9 @@ fun AccessToken.newAccount(instanceDomain: String): Account {
             this.newAccount(instanceDomain)
         }
         is AccessToken.Mastodon -> {
+            this.newAccount(instanceDomain)
+        }
+        is AccessToken.MisskeyIdAndPassword -> {
             this.newAccount(instanceDomain)
         }
     }
@@ -62,30 +70,3 @@ fun UserDTO.newAccount(instanceDomain: String, token: String): Account {
         instanceType = Account.InstanceType.MISSKEY
     )
 }
-@Suppress("DEPRECATION")
-fun AccountRelation.newAccount(user: UserDTO?): Account?{
-    val ci = getCurrentConnectionInformation()
-        ?: return null
-    return user?.newAccount(ci.instanceBaseUrl, ci.encryptedI)
-        ?: Account(
-            remoteId = ci.accountId,
-            instanceDomain = ci.instanceBaseUrl,
-            userName = "",
-            /*name = "",
-            description = "",
-            followersCount = 0,
-            followingCount = 0,
-            notesCount = 0,
-            isBot = false,
-            isCat = false,
-            avatarUrl = null,
-            bannerUrl = null,*/
-            token = "",
-//            pages = this.pages.mapNotNull{
-//                it.toPage()
-//            },
-            pages = emptyList(),
-            instanceType = Account.InstanceType.MISSKEY,
-        )
-}
-
