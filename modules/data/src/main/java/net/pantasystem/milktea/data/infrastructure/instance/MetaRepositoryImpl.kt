@@ -20,7 +20,7 @@ class MetaRepositoryImpl @Inject constructor(
 
     override suspend fun sync(instanceDomain: String): Result<Unit> = runCatching {
         withContext(Dispatchers.IO) {
-            val meta = fetch(instanceDomain)
+            val meta = fetch(instanceDomain).copy(uri = instanceDomain)
             metaDataSource.add(meta)
             metaCache.put(instanceDomain, meta)
             misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
@@ -35,7 +35,7 @@ class MetaRepositoryImpl @Inject constructor(
             }
             val localMeta = metaDataSource.get(instanceDomain)
             if (localMeta == null) {
-                val meta = fetch(instanceDomain)
+                val meta = fetch(instanceDomain).copy(uri = instanceDomain)
                 metaDataSource.add(meta)
             } else {
                 localMeta
