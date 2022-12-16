@@ -132,7 +132,7 @@ class UserDetailViewModel @AssistedInject constructor(
     val tabTypes = combine(
         accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()
     ) { account, user ->
-        val api = misskeyAPIProvider.get(account.instanceDomain)
+        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
         val isEnableGallery = api is MisskeyAPIV1275
         val isPublicReaction =
             api is MisskeyAPIV12 && (user.isPublicReactions || user.id == User.Id(

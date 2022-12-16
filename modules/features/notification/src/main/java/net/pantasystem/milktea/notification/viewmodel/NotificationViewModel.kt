@@ -125,7 +125,7 @@ class NotificationViewModel @Inject constructor(
             logger.debug("in launch")
             val account = accountRepository.getCurrentAccount().getOrThrow()
             val request = NotificationRequest(i = account.token, limit = 20)
-            val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
+            val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
 
             runCatching {
                 val notificationDTOList = misskeyAPI.notification(request).throwIfHasError().body()
@@ -165,7 +165,7 @@ class NotificationViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             val account = accountRepository.getCurrentAccount().getOrThrow()
-            val misskeyAPI = misskeyAPIProvider.get(account.instanceDomain)
+            val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
 
             val request = NotificationRequest(
                 i = account.token,
