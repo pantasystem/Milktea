@@ -38,8 +38,10 @@ data class Account(
     val normalizedInstanceDomain: String by lazy {
         val url = URL(instanceDomain)
         var str = "${url.protocol}://${url.host}"
-        if (url.port != 80 || url.port != 443) {
-            str += ":${url.port}"
+        if (url.port != -1) {
+            if (url.port != 80 || url.port != 443) {
+                str += ":${url.port}"
+            }
         }
         str
     }
