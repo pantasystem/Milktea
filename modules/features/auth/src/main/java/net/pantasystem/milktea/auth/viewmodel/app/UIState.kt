@@ -16,6 +16,19 @@ data class AuthUserInputState(
     val isIdPassword: Boolean by lazy {
         userNameRegex.matches(rawInputInstanceDomain)
     }
+
+    val username: String? by lazy {
+        runCatching {
+            userNameRegex.find(rawInputInstanceDomain)?.groups?.get(1)
+        }.getOrNull()?.value
+    }
+
+    val host: String? by lazy {
+        runCatching {
+            userNameRegex.find(rawInputInstanceDomain)?.groups?.get(2)
+        }.getOrNull()?.value
+    }
+
 }
 
 data class BeforeAuthState(
@@ -48,7 +61,7 @@ sealed interface GenerateTokenResult {
 
 }
 
-val userNameRegex = Regex("""\A@([\w._\-]+)(@[\w._\-]+)?""")
+val userNameRegex = Regex("""\A@([\w._\-]+)@([\w._\-]+)""")
 
 data class AuthUiState(
     val formState: AuthUserInputState,
