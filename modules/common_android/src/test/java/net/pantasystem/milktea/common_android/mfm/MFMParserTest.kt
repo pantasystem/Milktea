@@ -56,5 +56,21 @@ class MFMParserTest {
     }
 
 
+    @Test
+    fun getMentionHost_Pattern1() {
+        val host = MFMParser.getMentionHost(
+            hostInMentionText = "@pokemon.mastportal.info",
+            accountHost = "misskey.io",
+            userHost = "mstdn.jp"
+        )
+        Assert.assertEquals("@pokemon.mastportal.info", host)
+    }
+
+    @Test
+    fun mentionPattern() {
+        val matcher = MFMParser.mentionPattern.matcher("@Panta@pokemon.mastportal.info")
+        Assert.assertTrue(matcher.find())
+        Assert.assertEquals("@pokemon.mastportal.info", matcher.group(2))
+    }
 
 }

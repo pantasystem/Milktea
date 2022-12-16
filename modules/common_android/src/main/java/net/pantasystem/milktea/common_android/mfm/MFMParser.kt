@@ -7,7 +7,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object MFMParser {
-    private val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
+    internal val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
     private val titlePattern = Pattern.compile("""\A[【\[]([^\n\[\]【】]+)[】\]](\n|\z)""")
 
     private val searchPattern =
@@ -412,7 +412,7 @@ object MFMParser {
                 position + matcher.start(),
                 position + matcher.end(),
                 text = "@${matcher.nullableGroup(1)}${getMentionHost(
-                    hostInMentionText = matcher.nullableGroup(1),
+                    hostInMentionText = matcher.nullableGroup(2),
                     accountHost = accountHost,
                     userHost = userHost,
                     
