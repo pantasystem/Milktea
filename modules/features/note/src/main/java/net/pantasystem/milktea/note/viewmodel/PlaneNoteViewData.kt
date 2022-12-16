@@ -81,7 +81,7 @@ open class PlaneNoteViewData(
         toShowNote.note.cw, toShowNote.note.emojis,
         userHost = toShowNote.user
             .host,
-        isSameHost = toShowNote.user.isSameHost
+        accountHost = account.getHost()
     )
 
     //true　折り畳み
@@ -94,8 +94,10 @@ open class PlaneNoteViewData(
 
 
     val textNode = MFMParser.parse(
-        toShowNote.note.text, toShowNote.note.emojis, userHost = toShowNote.user
-            .host, isSameHost = toShowNote.user.isSameHost
+        toShowNote.note.text, toShowNote.note.emojis,
+        userHost = toShowNote.user
+            .host,
+        accountHost = account.getHost()
     )
 
     val translateState: LiveData<ResultState<Translation?>?> =
@@ -171,7 +173,7 @@ open class PlaneNoteViewData(
     val subNoteTextNode = MFMParser.parse(
         subNote?.note?.text,
         subNote?.note?.emojis,
-        isSameHost = subNote?.user?.isSameHost,
+        accountHost = account.getHost(),
         userHost = subNote?.user?.host
     )
 
@@ -179,7 +181,7 @@ open class PlaneNoteViewData(
     val subCwNode = MFMParser.parse(
         subNote?.note?.cw,
         subNote?.note?.emojis,
-        isSameHost = subNote?.user?.isSameHost,
+        accountHost = account.getHost(),
         userHost = subNote?.user?.host
     )
 
