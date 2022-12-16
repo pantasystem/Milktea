@@ -77,7 +77,12 @@ open class PlaneNoteViewData(
     val avatarUrl = toShowNote.user.avatarUrl
 
     val cw = toShowNote.note.cw
-    val cwNode = MFMParser.parse(toShowNote.note.cw, toShowNote.note.emojis)
+    val cwNode = MFMParser.parse(
+        toShowNote.note.cw, toShowNote.note.emojis,
+        userHost = toShowNote.user
+            .host,
+        isSameHost = toShowNote.user.isSameHost
+    )
 
     //true　折り畳み
     val text = toShowNote.note.text
@@ -88,7 +93,10 @@ open class PlaneNoteViewData(
     }
 
 
-    val textNode = MFMParser.parse(toShowNote.note.text, toShowNote.note.emojis)
+    val textNode = MFMParser.parse(
+        toShowNote.note.text, toShowNote.note.emojis, userHost = toShowNote.user
+            .host, isSameHost = toShowNote.user.isSameHost
+    )
 
     val translateState: LiveData<ResultState<Translation?>?> =
         this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
@@ -160,10 +168,20 @@ open class PlaneNoteViewData(
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     private val subNoteText = subNote?.note?.text
-    val subNoteTextNode = MFMParser.parse(subNote?.note?.text, subNote?.note?.emojis)
+    val subNoteTextNode = MFMParser.parse(
+        subNote?.note?.text,
+        subNote?.note?.emojis,
+        isSameHost = subNote?.user?.isSameHost,
+        userHost = subNote?.user?.host
+    )
 
     val subCw = subNote?.note?.cw
-    val subCwNode = MFMParser.parse(subNote?.note?.cw, subNote?.note?.emojis)
+    val subCwNode = MFMParser.parse(
+        subNote?.note?.cw,
+        subNote?.note?.emojis,
+        isSameHost = subNote?.user?.isSameHost,
+        userHost = subNote?.user?.host
+    )
 
     //true　折り畳み
     val subContentFolding = MutableLiveData(subCw != null)

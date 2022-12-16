@@ -8,14 +8,17 @@ import java.util.regex.Pattern
 
 object MFMParser{
 
-    fun parse(text: String?, emojis: List<Emoji>? = emptyList()): Root?{
+    fun parse(text: String?, emojis: List<Emoji>? = emptyList(), userHost: String? = null, isSameHost: Boolean? = null): Root?{
         text?: return null
         //println("textSize:${text.length}")
+        println("userHost:$userHost")
         val root = Root(text)
         NodeParser(text, root,
             emojis?.associate {
                 it.name to it
-            } ?: emptyMap()
+            } ?: emptyMap(),
+            userHost = userHost,
+            isSameHost = isSameHost
         ).parse()
         return root
     }
@@ -34,7 +37,9 @@ object MFMParser{
         val parent: Node,
         private val emojiNameMap: Map<String, Emoji>,
         val start: Int = parent.insideStart,
-        val end: Int = parent.insideEnd
+        val end: Int = parent.insideEnd,
+        val userHost: String?,
+        val isSameHost: Boolean?,
     ){
         // タグ探索開始
         // タグ探索中
@@ -119,7 +124,7 @@ object MFMParser{
                         // 新たに発見した子NodeのためにNodeParserを作成する
                         // 新たに発見した子Nodeの内側を捜索するのでparentは新たに発見した子Nodeになる
                         if(node is Node){
-                            NodeParser(sourceText, parent = node, emojiNameMap = emojiNameMap).parse()
+                            NodeParser(sourceText, parent = node, emojiNameMap = emojiNameMap, userHost = userHost, isSameHost = isSameHost).parse()
                         }
 
 
@@ -381,12 +386,24 @@ object MFMParser{
             if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight){
                 return null
             }
+            val host = if (isSameHost == true) {
+                ""
+            } else matcher.nullableGroup(2).let { host ->
+                if (host.isNullOrBlank()) {
+                    userHost?.let {
+                        "@$it"
+                    }
+                } else {
+                    host
+                }
+            } ?: ""
+
             return Mention(
                 position + matcher.start(),
                 position + matcher.end(),
                 position + matcher.start(),
                 position + matcher.end(),
-                text = matcher.group(),
+                text = "@${matcher.nullableGroup(1)}$host",
                 host = matcher.nullableGroup(2)
             )
         }
