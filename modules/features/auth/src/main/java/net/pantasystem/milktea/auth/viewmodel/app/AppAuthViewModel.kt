@@ -99,15 +99,21 @@ class AppAuthViewModel @Inject constructor(
         it.inputState.isIdPassword
     }.flatMapLatest {
         suspend {
-            when (val meta = it.meta.content) {
-                is StateContent.Exist -> authService.createWaiting4Approval(
-                    it.inputState.instanceDomain,
-                    authService.createApp(
-                        it.inputState.instanceDomain,
-                        instanceType = meta.rawContent,
-                        appName = it.inputState.appName
+                when (val meta = it.meta.content) {
+                is StateContent.Exist -> {
+                    val instanceBase = when(val info = meta.rawContent) {
+                        is InstanceType.Mastodon -> info.instance.uri
+                        is InstanceType.Misskey -> info.instance.uri
+                    }
+                    authService.createWaiting4Approval(
+                        instanceBase,
+                        authService.createApp(
+                            instanceBase,
+                            instanceType = meta.rawContent,
+                            appName = it.inputState.appName
+                        )
                     )
-                )
+                }
 
                 is StateContent.NotExist -> throw IllegalStateException()
             }
