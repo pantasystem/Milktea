@@ -42,6 +42,8 @@ class AppAuthViewModel @Inject constructor(
 
     val appName = MutableStateFlow("Milktea")
 
+    val password = MutableStateFlow("")
+
     private val metaState = instanceDomain.map {
         authService.toEnableUrl(it)
     }.filter {
@@ -56,15 +58,21 @@ class AppAuthViewModel @Inject constructor(
         )
     )
 
-    private val authUserInputState = combine(instanceDomain, appName) { domain, name ->
+    private val authUserInputState = combine(
+        instanceDomain,
+        appName,
+        password
+    ) { domain, name, password ->
         AuthUserInputState(
             instanceDomain = authService.toEnableUrl(domain),
             appName = name,
+            rawInputInstanceDomain = domain,
+            password = password
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        AuthUserInputState("misskey.io", "Milktea")
+        AuthUserInputState("misskey.io", "", "Milktea", "")
     )
 
     private val instanceInfo = authUserInputState.flatMapLatest {

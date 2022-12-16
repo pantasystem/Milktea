@@ -36,6 +36,7 @@ class AuthFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_app_auth, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -44,7 +45,6 @@ class AuthFragment : Fragment() {
 
         appAuthViewModel.appName.value = getString(R.string.app_name)
 
-        binding.lifecycleOwner = this
         binding.appAuthViewModel = appAuthViewModel
         lifecycleScope.launch {
             whenResumed {

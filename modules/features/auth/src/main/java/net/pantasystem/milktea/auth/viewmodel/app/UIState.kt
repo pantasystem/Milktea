@@ -9,8 +9,14 @@ import net.pantasystem.milktea.model.instance.Meta
 
 data class AuthUserInputState(
     val instanceDomain: String,
-    val appName: String
-)
+    val rawInputInstanceDomain: String,
+    val appName: String,
+    val password: String,
+) {
+    val isIdPassword: Boolean by lazy {
+        userNameRegex.matches(rawInputInstanceDomain)
+    }
+}
 
 data class BeforeAuthState(
     val inputState: AuthUserInputState,
@@ -41,6 +47,9 @@ sealed interface GenerateTokenResult {
     object Failure : GenerateTokenResult
 
 }
+
+val userNameRegex = Regex("""\A@([\w._\-]+)(@[\w._\-]+)?""")
+
 data class AuthUiState(
     val formState: AuthUserInputState,
     val metaState: ResultState<InstanceType>,

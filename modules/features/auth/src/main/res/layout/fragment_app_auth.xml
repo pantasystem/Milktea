@@ -76,12 +76,26 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:visibility="@{ appAuthViewModel.state.formState.idPassword ? View.GONE : View.VISIBLE }">
                     <com.google.android.material.textfield.TextInputEditText
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/custom_app_name"
                             android:text="@={appAuthViewModel.appName}"/>
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{ appAuthViewModel.state.formState.idPassword ? View.VISIBLE : View.GONE }">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/inputPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/password"
+                            android:text="@={appAuthViewModel.password}"
+                            android:inputType="textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/useWebViewSwitch"
