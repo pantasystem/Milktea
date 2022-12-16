@@ -7,6 +7,21 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object MFMParser {
+    private val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
+    private val titlePattern = Pattern.compile("""\A[【\[]([^\n\[\]【】]+)[】\]](\n|\z)""")
+
+    private val searchPattern =
+        Pattern.compile("""^(.+?)[ |　]((?i)Search|検索|\[検索]|\[Search])$""", Pattern.MULTILINE)
+    private val linkPattern =
+        Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
+    private val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""", Pattern.DOTALL)
+    private val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""", Pattern.DOTALL)
+    private val quotePattern = Pattern.compile("""^>[ ]?([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
+    private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
+    private val urlPattern =
+        Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+    private val spaceCRLFPattern = Pattern.compile("""\s""")
+    private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
 
     fun parse(
         text: String?,
@@ -154,8 +169,7 @@ object MFMParser {
          */
 
         private fun parseTypeStar(): Node? {
-            val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""", Pattern.DOTALL)
-            val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""", Pattern.DOTALL)
+
             val currentInside = sourceText.substring(position, parent.insideEnd)
 
             if (animationPattern.matcher(currentInside).find()) {
@@ -261,7 +275,6 @@ object MFMParser {
                     return null
                 }
             }
-            val quotePattern = Pattern.compile("""^>[ ]?([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
             val matcher = quotePattern.matcher(sourceText.substring(position, parent.insideEnd))
 
 
@@ -287,12 +300,7 @@ object MFMParser {
             )
         }
 
-        private val titlePattern = Pattern.compile("""\A[【\[]([^\n\[\]【】]+)[】\]](\n|\z)""")
 
-        private val searchPattern =
-            Pattern.compile("""^(.+?)[ |　]((?i)Search|検索|\[検索]|\[Search])$""", Pattern.MULTILINE)
-        private val linkPattern =
-            Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
 
         private fun parseTitle(): Node? {
             if (position > 0) {
@@ -369,7 +377,6 @@ object MFMParser {
             )
         }
 
-        private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
         private fun parseEmoji(): EmojiElement? {
             val matcher = emojiPattern.matcher(sourceText.substring(position, parent.insideEnd))
             if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight) {
@@ -389,7 +396,6 @@ object MFMParser {
             )
         }
 
-        private val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
         private fun parseMention(): Mention? {
             if (!beforeSpaceCheck()) {
                 return null
@@ -398,35 +404,6 @@ object MFMParser {
             if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight) {
                 return null
             }
-            fun getHost(): String {
-                if (accountHost == null) {
-                    return ""
-                }
-                // NOTE: 投稿主とアカウントの所有者が同一のホスト(インスタンス)である時
-                if (userHost == accountHost) {
-                    return ""
-                }
-
-                // NOTE: メンション中に含まれるHost部
-                val hostInMentionText = matcher.nullableGroup(2)
-
-                // NOTE: 投稿先ユーザーのインスタンスとと現在のアカウントのインスタンスが異なり、
-                // かつホストの指定がない場合はメンション部に投稿先のインスタンスのホストを付け足して表示する
-                if (hostInMentionText.isNullOrBlank()) {
-                    return userHost?.let {
-                        "@$it"
-                    } ?: ""
-                }
-
-                // NOTE: 投稿先インスタンスと現在のアカウントのインスタンスが異なり、
-                // かつテキスト中のメンションのホスト部の指定があり
-                // テキスト中のメンションのホスト部が現在のアカウントインスタンスと同一の場合は省略して表示する
-                if (hostInMentionText == accountHost) {
-                    return ""
-                }
-
-                return ""
-            }
 
 
             return Mention(
@@ -434,12 +411,16 @@ object MFMParser {
                 position + matcher.end(),
                 position + matcher.start(),
                 position + matcher.end(),
-                text = "@${matcher.nullableGroup(1)}${getHost()}",
+                text = "@${matcher.nullableGroup(1)}${getMentionHost(
+                    hostInMentionText = matcher.nullableGroup(1),
+                    accountHost = accountHost,
+                    userHost = userHost,
+                    
+                )}",
                 host = matcher.nullableGroup(2)
             )
         }
 
-        private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
         private fun parseHashTag(): HashTag? {
             if (!beforeSpaceCheck()) {
                 return null
@@ -459,8 +440,7 @@ object MFMParser {
 
         }
 
-        private val urlPattern =
-            Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+
 
         private fun parseUrl(): Link? {
             val matcher = urlPattern.matcher(sourceText.substring(position, parent.insideEnd))
@@ -491,7 +471,6 @@ object MFMParser {
             }
         }
 
-        private val spaceCRLFPattern = Pattern.compile("""\s""")
         private fun beforeSpaceCheck(): Boolean {
             return position <= parent.insideStart || spaceCRLFPattern.matcher(sourceText[position - 1].toString())
                 .find()
@@ -523,5 +502,33 @@ object MFMParser {
             null
         }
     }
+
+    internal fun getMentionHost(hostInMentionText: String?, accountHost: String?, userHost: String?): String {
+        if (accountHost == null) {
+            return ""
+        }
+        // NOTE: 投稿主とアカウントの所有者が同一のホスト(インスタンス)である時
+        if (userHost == accountHost) {
+            return ""
+        }
+
+        // NOTE: 投稿先ユーザーのインスタンスとと現在のアカウントのインスタンスが異なり、
+        // かつホストの指定がない場合はメンション部に投稿先のインスタンスのホストを付け足して表示する
+        if (hostInMentionText.isNullOrBlank()) {
+            return userHost?.let {
+                "@$it"
+            } ?: ""
+        }
+
+        // NOTE: 投稿先インスタンスと現在のアカウントのインスタンスが異なり、
+        // かつテキスト中のメンションのホスト部の指定があり
+        // テキスト中のメンションのホスト部が現在のアカウントインスタンスと同一の場合は省略して表示する
+        if (hostInMentionText == accountHost) {
+            return ""
+        }
+
+        return hostInMentionText
+    }
+
 
 }
