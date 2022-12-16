@@ -78,8 +78,8 @@ object ReactionViewHelper {
         //Log.d("ReactionViewHelper", "reaction $reaction")
         if (reaction.startsWith(":") && reaction.endsWith(":")) {
             val account = accountStore.currentAccount
-            val emojis = if (account?.instanceDomain != null) {
-                cache.get(account.instanceDomain)?.emojis ?: emptyList()
+            val emojis = if (account?.normalizedInstanceDomain != null) {
+                cache.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
             } else {
                 emptyList()
             }

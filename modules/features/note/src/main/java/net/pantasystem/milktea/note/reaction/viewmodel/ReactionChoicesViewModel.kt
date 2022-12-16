@@ -33,12 +33,12 @@ class ReactionChoicesViewModel @Inject constructor(
     }.flowOn(Dispatchers.IO)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val reactionCount = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionHistoryDao.observeSumReactions(ac.instanceDomain)
+        reactionHistoryDao.observeSumReactions(ac.normalizedInstanceDomain)
     }.flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val userSetting = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionUserSettingDao.observeByInstanceDomain(ac.instanceDomain)
+        reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain)
     }
 
     // 検索時の候補

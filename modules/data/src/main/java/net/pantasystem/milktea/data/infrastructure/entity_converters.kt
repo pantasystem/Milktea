@@ -36,8 +36,8 @@ fun FilePropertyDTO.toFileProperty(account: Account): FileProperty {
         folderId = folderId,
         comment = comment,
         isSensitive = isSensitive ?: false,
-        url = getUrl(account.instanceDomain),
-        thumbnailUrl = getThumbnailUrl(account.instanceDomain),
+        url = getUrl(account.normalizedInstanceDomain),
+        thumbnailUrl = getThumbnailUrl(account.normalizedInstanceDomain),
         blurhash = blurhash,
         properties = properties?.let {
             FileProperty.Properties(it.width, it.height)

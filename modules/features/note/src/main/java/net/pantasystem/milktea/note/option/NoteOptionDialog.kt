@@ -68,7 +68,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             }
                         },
                         onShareButtonClicked = {
-                            val baseUrl = uiState.currentAccount?.instanceDomain
+                            val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
                             val url = "$baseUrl/notes/${it?.id?.noteId}"
                             val intent = Intent().apply {
                                 action = ACTION_SEND
@@ -104,7 +104,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onReportButtonClicked ={
-                            val baseUrl = uiState.currentAccount?.instanceDomain
+                            val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
                             val report = it?.toReport(baseUrl!!)
                             notesViewModel.confirmReportEvent.event = report
                             dismiss()

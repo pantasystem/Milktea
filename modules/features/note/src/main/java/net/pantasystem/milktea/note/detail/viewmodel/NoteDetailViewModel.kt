@@ -188,7 +188,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     suspend fun getUrl(): String {
         val account = currentAccountWatcher.getAccount()
-        return "${account.instanceDomain}/notes/${show.noteId}"
+        return "${account.normalizedInstanceDomain}/notes/${show.noteId}"
     }
 
 

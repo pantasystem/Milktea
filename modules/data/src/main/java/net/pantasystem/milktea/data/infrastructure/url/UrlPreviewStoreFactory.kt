@@ -20,7 +20,7 @@ class UrlPreviewStoreFactory(
 
 
     fun create(): UrlPreviewStore {
-        val url = account?.instanceDomain
+        val url = account?.normalizedInstanceDomain
             ?: summalyUrl
         return UrlPreviewMediatorStore(urlPreviewDAO, createUrlPreviewStore(url))
     }

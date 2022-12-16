@@ -29,7 +29,7 @@ class UrlPreviewStoreProvider @Inject constructor(
         account: Account,
         isReplace: Boolean
     ): UrlPreviewStore {
-        return account.instanceDomain.let { accountUrl ->
+        return account.normalizedInstanceDomain.let { accountUrl ->
 
             var store = mUrlPreviewStoreInstanceBaseUrlMap[accountUrl]
             if (store == null || isReplace) {

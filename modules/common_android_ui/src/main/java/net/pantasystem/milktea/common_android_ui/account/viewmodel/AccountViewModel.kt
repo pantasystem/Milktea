@@ -73,7 +73,7 @@ class AccountViewModel @Inject constructor(
             AccountInfo(
                 it,
                 userMap[it.accountId],
-                metaMap[it.instanceDomain],
+                metaMap[it.normalizedInstanceDomain],
                 current?.accountId == it.accountId
             )
         }
