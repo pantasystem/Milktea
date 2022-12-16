@@ -410,15 +410,15 @@ object MFMParser {
                 // NOTE: メンション中に含まれるHost部
                 val hostInMentionText = matcher.nullableGroup(2)
 
-                // NOTE: 投稿先インスタンスと現在のアカウントが異なり、
-                // かつホストの指定がない場合は投稿先のインスタンスのホストを付け足して表示する
+                // NOTE: 投稿先ユーザーのインスタンスとと現在のアカウントのインスタンスが異なり、
+                // かつホストの指定がない場合はメンション部に投稿先のインスタンスのホストを付け足して表示する
                 if (hostInMentionText.isNullOrBlank()) {
                     return userHost?.let {
                         "@$it"
                     } ?: ""
                 }
 
-                // NOTE: 投稿先インスタンスと現在のアカウントが異なり、
+                // NOTE: 投稿先インスタンスと現在のアカウントのインスタンスが異なり、
                 // かつテキスト中のメンションのホスト部の指定があり
                 // テキスト中のメンションのホスト部が現在のアカウントインスタンスと同一の場合は省略して表示する
                 if (hostInMentionText == accountHost) {
