@@ -29,7 +29,7 @@ class ReactionChoicesViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val meta = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        metaRepository.observe(ac.instanceDomain)
+        metaRepository.observe(ac.normalizedInstanceDomain)
     }.flowOn(Dispatchers.IO)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val reactionCount = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->

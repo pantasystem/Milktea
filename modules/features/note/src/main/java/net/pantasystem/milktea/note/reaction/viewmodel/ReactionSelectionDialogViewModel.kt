@@ -26,7 +26,7 @@ class ReactionSelectionDialogViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val filteredEmojis = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        metaRepository.observe(ac.instanceDomain)
+        metaRepository.observe(ac.normalizedInstanceDomain)
     }.filterNotNull().mapNotNull {
         it.emojis
     }.flatMapLatest { emojis ->
@@ -50,7 +50,7 @@ class ReactionSelectionDialogViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val categories = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-        metaRepository.observe(it.instanceDomain)
+        metaRepository.observe(it.normalizedInstanceDomain)
     }.mapNotNull {
         it?.emojis
     }.map { emojis ->

@@ -31,7 +31,7 @@ class ToggleReactionUseCase @Inject constructor(
             val sendReaction =
                 if (
                     checkEmoji.checkEmoji(reaction)
-                    || metaRepository.find(account.instanceDomain).getOrThrow()
+                    || metaRepository.find(account.normalizedInstanceDomain).getOrThrow()
                         .isOwnEmojiBy(reactionObj)
                     || LegacyReaction.reactionMap.containsKey(reaction)
                 ) {

@@ -20,9 +20,9 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionAutoCompleteArrayAdapter
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogReactionPickerBinding
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
@@ -89,7 +89,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         }
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.instanceDomain)
+            metaRepository.observe(it.normalizedInstanceDomain)
         }.mapNotNull {
             it?.emojis
         }.onEach { emojis ->

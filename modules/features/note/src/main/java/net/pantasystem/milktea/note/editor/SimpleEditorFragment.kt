@@ -124,7 +124,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.instanceDomain)
+            metaRepository.observe(it.normalizedInstanceDomain)
         }.mapNotNull {
             it?.emojis
         }.distinctUntilChanged().onEach { emojis ->

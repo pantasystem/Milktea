@@ -61,7 +61,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(){
             Log.d("PickerDialog", "アダプターをセットアップしました")
 
             accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-                metaRepository.observe(it.instanceDomain)
+                metaRepository.observe(it.normalizedInstanceDomain)
             }.map {
                 it?.emojis?: emptyList()
             }.onEach {

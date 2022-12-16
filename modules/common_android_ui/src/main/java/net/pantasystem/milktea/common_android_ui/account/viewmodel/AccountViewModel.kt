@@ -50,7 +50,7 @@ class AccountViewModel @Inject constructor(
 
     private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
         val flows = accounts.map {
-            metaRepository.observe(it.instanceDomain).flowOn(Dispatchers.IO)
+            metaRepository.observe(it.normalizedInstanceDomain).flowOn(Dispatchers.IO)
         }
         combine(flows) {
             it.toList()
