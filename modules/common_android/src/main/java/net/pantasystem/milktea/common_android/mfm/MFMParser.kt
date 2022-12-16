@@ -6,16 +6,40 @@ import java.net.URLDecoder
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-object MFMParser{
+object MFMParser {
+    internal val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
+    private val titlePattern = Pattern.compile("""\A[【\[]([^\n\[\]【】]+)[】\]](\n|\z)""")
 
-    fun parse(text: String?, emojis: List<Emoji>? = emptyList()): Root?{
-        text?: return null
+    private val searchPattern =
+        Pattern.compile("""^(.+?)[ |　]((?i)Search|検索|\[検索]|\[Search])$""", Pattern.MULTILINE)
+    private val linkPattern =
+        Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
+    private val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""", Pattern.DOTALL)
+    private val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""", Pattern.DOTALL)
+    private val quotePattern = Pattern.compile("""^>[ ]?([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
+    private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
+    private val urlPattern =
+        Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+    private val spaceCRLFPattern = Pattern.compile("""\s""")
+    private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
+
+    fun parse(
+        text: String?,
+        emojis: List<Emoji>? = emptyList(),
+        userHost: String? = null,
+        accountHost: String? = null
+    ): Root? {
+        text ?: return null
         //println("textSize:${text.length}")
+        println("userHost:$userHost")
         val root = Root(text)
-        NodeParser(text, root,
+        NodeParser(
+            text, root,
             emojis?.associate {
                 it.name to it
-            } ?: emptyMap()
+            } ?: emptyMap(),
+            userHost = userHost,
+            accountHost = accountHost,
         ).parse()
         return root
     }
@@ -34,8 +58,10 @@ object MFMParser{
         val parent: Node,
         private val emojiNameMap: Map<String, Emoji>,
         val start: Int = parent.insideStart,
-        val end: Int = parent.insideEnd
-    ){
+        val end: Int = parent.insideEnd,
+        val userHost: String?,
+        val accountHost: String?,
+    ) {
         // タグ探索開始
         // タグ探索中
         // タグ探索完了
@@ -54,7 +80,7 @@ object MFMParser{
          * 第一段階としてタグの先頭の文字に該当するかを検証する
          * キャンセルされたときはここからやり直される
          */
-        private val parserMap: Map<Char, List<()-> Element?>> = mapOf(
+        private val parserMap: Map<Char, List<() -> Element?>> = mapOf(
             '<' to listOf(::parseBlock), //斜体、小文字、中央揃え、横伸縮、左右反転、回転、飛び跳ねる
             '~' to listOf(::parseStrike), //打消し線
             //'(' to ::parseExpansion, //横伸縮
@@ -77,28 +103,28 @@ object MFMParser{
          * @param tagStart 次に存在するNodeの始点
          * text<Node> この場合だと4になる
          */
-        private fun recoveryBeforeText(tagStart: Int){
+        private fun recoveryBeforeText(tagStart: Int) {
             // 文字数が０より多いとき
-            if((tagStart - finallyDetected) > 0){
+            if ((tagStart - finallyDetected) > 0) {
                 val text = sourceText.substring(finallyDetected, tagStart)
                 parent.childElements.add(Text(text, finallyDetected))
             }
         }
 
-        fun parse(){
-            while(position < end){
+        fun parse() {
+            while (position < end) {
                 val parser = parserMap[sourceText[position]]
 
-                if(parser == null){
+                if (parser == null) {
                     // 何にも該当しない場合は繰り上げる
-                    position ++
-                }else{
+                    position++
+                } else {
 
                     val node = parser.mapNotNull {
                         it.invoke()
                     }.firstOrNull()
                     // nodeが実際に存在したとき
-                    if(node != null){
+                    if (node != null) {
 
                         // positionは基本的にはNodeの開始地点のままなので発見したNodeの終了地点にする
                         position = node.end
@@ -111,20 +137,25 @@ object MFMParser{
                         finallyDetected = node.end
 
 
-
                         // 発見したNodeを追加する
                         parent.childElements.add(node)
 
 
                         // 新たに発見した子NodeのためにNodeParserを作成する
                         // 新たに発見した子Nodeの内側を捜索するのでparentは新たに発見した子Nodeになる
-                        if(node is Node){
-                            NodeParser(sourceText, parent = node, emojiNameMap = emojiNameMap).parse()
+                        if (node is Node) {
+                            NodeParser(
+                                sourceText,
+                                parent = node,
+                                emojiNameMap = emojiNameMap,
+                                userHost = userHost,
+                                accountHost = accountHost
+                            ).parse()
                         }
 
 
-                    }else{
-                        position ++
+                    } else {
+                        position++
                     }
                 }
             }
@@ -137,21 +168,20 @@ object MFMParser{
          * タグの開始位置や終了位置、内部要素の開始、終了位置は正規表現とMatcherを利用し現在のポジションと合わせ相対的に求める
          */
 
-        private fun parseTypeStar(): Node?{
-            val boldPattern = Pattern.compile("""\A\*\*(.+?)\*\*""", Pattern.DOTALL)
-            val animationPattern = Pattern.compile("""\A\*\*\*(.+?)\*\*\*""", Pattern.DOTALL)
+        private fun parseTypeStar(): Node? {
+
             val currentInside = sourceText.substring(position, parent.insideEnd)
 
-            if(animationPattern.matcher(currentInside).find()){
+            if (animationPattern.matcher(currentInside).find()) {
                 // アニメーションはサポートしていないため終了
                 return null
             }
 
             val matcher = boldPattern.matcher(currentInside)
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
-            if(parent.elementType.elementClass.weight < ElementType.BOLD.elementClass.weight || parent.elementType == ElementType.BOLD){
+            if (parent.elementType.elementClass.weight < ElementType.BOLD.elementClass.weight || parent.elementType == ElementType.BOLD) {
                 return null
             }
 
@@ -165,18 +195,18 @@ object MFMParser{
             )
         }
 
-        private fun parseBlock(): Node?{
+        private fun parseBlock(): Node? {
             val pattern = Pattern.compile("""\A<([a-z]+)>(.+?)</\1>""", Pattern.DOTALL)
             val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
-            }else{
-                val tagName = matcher.group(1)?: return null
+            } else {
+                val tagName = matcher.group(1) ?: return null
 
-                val tag = MFMContract.blockTypeTagNameMap[tagName]?: return null
+                val tag = MFMContract.blockTypeTagNameMap[tagName] ?: return null
 
                 // Parentより自分のほうが重い又は同じタグの場合無効
-                if(parent.elementType.elementClass.weight < tag.elementClass.weight || parent.elementType == tag){
+                if (parent.elementType.elementClass.weight < tag.elementClass.weight || parent.elementType == tag) {
                     return null
                 }
 
@@ -192,13 +222,13 @@ object MFMParser{
             }
         }
 
-        private fun parseStrike(): Node?{
+        private fun parseStrike(): Node? {
             val pattern = Pattern.compile("""\A~~(.+?)~~""", Pattern.DOTALL)
             val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
-            if(parent.elementType.elementClass.weight < ElementType.STRIKE.elementClass.weight || parent.elementType == ElementType.STRIKE){
+            if (parent.elementType.elementClass.weight < ElementType.STRIKE.elementClass.weight || parent.elementType == ElementType.STRIKE) {
                 return null
             }
             val child = matcher.group(1)
@@ -213,14 +243,13 @@ object MFMParser{
         }
 
 
-
-        private fun parseCode(): Node?{
+        private fun parseCode(): Node? {
             val pattern = Pattern.compile("""\A```(.*)```""", Pattern.DOTALL)
             val matcher = pattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
-            if(parent.elementType != ElementType.ROOT){
+            if (parent.elementType != ElementType.ROOT) {
                 return null
             }
             return Node(
@@ -232,25 +261,24 @@ object MFMParser{
             )
         }
 
-        private fun parseQuote(): Node?{
+        private fun parseQuote(): Node? {
 
-            if(position > 0){
-                val c = sourceText[ position - 1 ]
+            if (position > 0) {
+                val c = sourceText[position - 1]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
-                if( (c != '\r' && c != '\n') && parent.elementType != ElementType.QUOTE){
+                if ((c != '\r' && c != '\n') && parent.elementType != ElementType.QUOTE) {
 //                    println("直前の文字が改行コードではないかつ、親が引用コードではない")
                     return null
                 }
-                if( parent.elementType.elementClass.weight < ElementType.QUOTE.elementClass.weight && parent.elementType != ElementType.ROOT){
+                if (parent.elementType.elementClass.weight < ElementType.QUOTE.elementClass.weight && parent.elementType != ElementType.ROOT) {
 //                    println("親ノードのほうが小さい")
                     return null
                 }
             }
-            val quotePattern = Pattern.compile("""^>[ ]?([^\n\r]+)(\n\r|\n)?""", Pattern.MULTILINE)
             val matcher = quotePattern.matcher(sourceText.substring(position, parent.insideEnd))
 
 
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
             val nodeEnd = matcher.end()
@@ -258,7 +286,7 @@ object MFMParser{
 
 
             // > の後に何もない場合キャンセルする
-            if(nodeEnd + position <= position){
+            if (nodeEnd + position <= position) {
                 return null
             }
             ///println("inside:$inside")
@@ -272,27 +300,24 @@ object MFMParser{
             )
         }
 
-        private val titlePattern = Pattern.compile("""\A[【\[]([^\n\[\]【】]+)[】\]](\n|\z)""")
 
-        private val searchPattern = Pattern.compile("""^(.+?)[ |　]((?i)Search|検索|\[検索]|\[Search])$""", Pattern.MULTILINE)
-        private val linkPattern = Pattern.compile("""\??\[(.+?)]\((https?|ftp)(://[-_.!~*'()a-zA-Z0-9;/?:@&=+${'$'},%#]+)\)""")
 
-        private fun parseTitle(): Node?{
-            if(position > 0){
-                val c = sourceText[ position - 1 ]
+        private fun parseTitle(): Node? {
+            if (position > 0) {
+                val c = sourceText[position - 1]
                 // 直前の文字が改行コードではないかつ、親が引用コードではない
-                if( (c != '\r' && c != '\n') ){
+                if ((c != '\r' && c != '\n')) {
                     return null
                 }
-                if( parent.elementType != ElementType.ROOT){
+                if (parent.elementType != ElementType.ROOT) {
                     return null
                 }
             }
             val matcher = titlePattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
-            if(parent.elementType != ElementType.ROOT){
+            if (parent.elementType != ElementType.ROOT) {
                 return null
             }
             return Node(
@@ -309,15 +334,15 @@ object MFMParser{
          * 要素が見つかれば他の要素のルールと同じく要素の末端が次のポジションになる
          * 戻るポイントは基本的には検索済みであるが要素は発見されなかった場所なので無視してしまうリスクは限りなくゼロに近い。
          */
-        private fun parseSearch(): Search?{
+        private fun parseSearch(): Search? {
 
             val targetText = sourceText.substring(finallyDetected, parent.insideEnd)
             val matcher = searchPattern.matcher(targetText)
-            if(!matcher.find() || parent.elementType != ElementType.ROOT){
+            if (!matcher.find() || parent.elementType != ElementType.ROOT) {
                 return null
             }
 
-            val text = matcher.group(1)?: return null
+            val text = matcher.group(1) ?: return null
             return Search(
                 text = text,
                 start = finallyDetected + matcher.start(),
@@ -328,20 +353,20 @@ object MFMParser{
         }
 
 
-        private fun parseLink(): Link?{
+        private fun parseLink(): Link? {
 
             val targetText = sourceText.substring(position, parent.insideEnd)
             val matcher = linkPattern.matcher(targetText)
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
 
-            if(parent.elementType.elementClass.weight <= ElementClass.LINK.weight){
+            if (parent.elementType.elementClass.weight <= ElementClass.LINK.weight) {
                 return null
             }
 
-            val text = matcher.group(1)?: return null
-            val url = matcher.group(2)?: return null
+            val text = matcher.group(1) ?: return null
+            val url = matcher.group(2) ?: return null
             return Link(
                 text = text,
                 start = position + matcher.start(),
@@ -352,13 +377,12 @@ object MFMParser{
             )
         }
 
-        private val emojiPattern = Pattern.compile("""\A:([a-zA-Z0-9+\-_]+):""")
-        private fun parseEmoji(): EmojiElement?{
+        private fun parseEmoji(): EmojiElement? {
             val matcher = emojiPattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight){
+            if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight) {
                 return null
             }
-            val tagName = matcher.group(1)?: return null
+            val tagName = matcher.group(1) ?: return null
             val emoji: Emoji = emojiNameMap[tagName]
                 ?: return null
 
@@ -372,32 +396,37 @@ object MFMParser{
             )
         }
 
-        private val mentionPattern = Pattern.compile("""\A@([\w._\-]+)(@[\w._\-]+)?""")
-        private fun parseMention(): Mention?{
-            if(!beforeSpaceCheck()){
+        private fun parseMention(): Mention? {
+            if (!beforeSpaceCheck()) {
                 return null
             }
             val matcher = mentionPattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight){
+            if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight) {
                 return null
             }
+
+
             return Mention(
                 position + matcher.start(),
                 position + matcher.end(),
                 position + matcher.start(),
                 position + matcher.end(),
-                text = matcher.group(),
+                text = "@${matcher.nullableGroup(1)}${getMentionHost(
+                    hostInMentionText = matcher.nullableGroup(2),
+                    accountHost = accountHost,
+                    userHost = userHost,
+                    
+                )}",
                 host = matcher.nullableGroup(2)
             )
         }
 
-        private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
-        private fun parseHashTag(): HashTag?{
-            if(!beforeSpaceCheck()){
+        private fun parseHashTag(): HashTag? {
+            if (!beforeSpaceCheck()) {
                 return null
             }
             val matcher = hashTagPattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight){
+            if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.MENTION.elementClass.weight) {
                 return null
             }
 
@@ -411,16 +440,17 @@ object MFMParser{
 
         }
 
-        private val urlPattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
-        private fun parseUrl(): Link?{
+
+
+        private fun parseUrl(): Link? {
             val matcher = urlPattern.matcher(sourceText.substring(position, parent.insideEnd))
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return null
             }
-            fun decodeUrl(url: String): String{
+            fun decodeUrl(url: String): String {
                 return URLDecoder.decode(url.replace("%20", "+"), "UTF-8")
             }
-            return if(matcher.nullableGroup(1) == "http"){
+            return if (matcher.nullableGroup(1) == "http") {
                 Link(
                     decodeUrl(matcher.group()),
                     position + matcher.start(),
@@ -429,48 +459,76 @@ object MFMParser{
                     position + matcher.end(),
                     matcher.group()
                 )
-            }else {
+            } else {
                 Link(
-                    decodeUrl(matcher.nullableGroup(3)?: matcher.group()),
+                    decodeUrl(matcher.nullableGroup(3) ?: matcher.group()),
                     position + matcher.start(),
                     position + matcher.end(),
-                    position + (matcher.nullableStart(3)?: matcher.start()),
-                    position + (matcher.nullableEnd(3)?: matcher.end()),
+                    position + (matcher.nullableStart(3) ?: matcher.start()),
+                    position + (matcher.nullableEnd(3) ?: matcher.end()),
                     url = matcher.group()
                 )
             }
         }
 
-        private val spaceCRLFPattern = Pattern.compile("""\s""")
-        private fun beforeSpaceCheck(): Boolean{
-            return position <= parent.insideStart || spaceCRLFPattern.matcher(sourceText[ position - 1].toString()).find()
+        private fun beforeSpaceCheck(): Boolean {
+            return position <= parent.insideStart || spaceCRLFPattern.matcher(sourceText[position - 1].toString())
+                .find()
 
         }
 
     }
 
-    private fun Matcher.nullableGroup(group: Int): String?{
-        return try{
+    private fun Matcher.nullableGroup(group: Int): String? {
+        return try {
             this.group(group)
-        }catch(e: Exception){
+        } catch (e: Exception) {
             null
         }
     }
 
-    private fun Matcher.nullableStart(group: Int): Int?{
-        return try{
+    private fun Matcher.nullableStart(group: Int): Int? {
+        return try {
             this.start(group)
-        }catch(e: Exception){
+        } catch (e: Exception) {
             null
         }
     }
 
-    private fun Matcher.nullableEnd(group: Int): Int?{
-        return try{
+    private fun Matcher.nullableEnd(group: Int): Int? {
+        return try {
             this.end(group)
-        }catch(e: Exception){
+        } catch (e: Exception) {
             null
         }
     }
+
+    internal fun getMentionHost(hostInMentionText: String?, accountHost: String?, userHost: String?): String {
+        if (accountHost == null) {
+            return ""
+        }
+        // NOTE: 投稿主とアカウントの所有者が同一のホスト(インスタンス)である時
+        if (userHost == accountHost) {
+            return ""
+        }
+
+        // NOTE: 投稿先ユーザーのインスタンスとと現在のアカウントのインスタンスが異なり、
+        // かつホストの指定がない場合はメンション部に投稿先のインスタンスのホストを付け足して表示する
+        if (hostInMentionText.isNullOrBlank()) {
+            return userHost?.let {
+                "@$it"
+            } ?: ""
+        }
+
+        // NOTE: 投稿先インスタンスと現在のアカウントのインスタンスが異なり、
+        // かつテキスト中のメンションのホスト部の指定があり
+        // テキスト中のメンションのホスト部が現在のアカウントインスタンスと同一の場合は省略して表示する
+        if (hostInMentionText == accountHost) {
+            return ""
+        }
+
+        return hostInMentionText
+    }
+
 
 }
