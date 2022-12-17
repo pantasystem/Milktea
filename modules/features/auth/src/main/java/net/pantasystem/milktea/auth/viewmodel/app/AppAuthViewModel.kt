@@ -93,10 +93,12 @@ class AppAuthViewModel @Inject constructor(
 
     private val startAuthEventFlow = MutableSharedFlow<Long>(extraBufferCapacity = 100)
 
-    private val waiting4UserApprove = startAuthEventFlow.flatMapLatest {
-        instanceInfo
-    }.filterNot {
+    private val waiting4UserApprove = instanceInfo.filterNot {
         it.inputState.isIdPassword
+    }.flatMapLatest { state ->
+        startAuthEventFlow.map {
+            state
+        }
     }.flatMapLatest {
         suspend {
                 when (val meta = it.meta.content) {

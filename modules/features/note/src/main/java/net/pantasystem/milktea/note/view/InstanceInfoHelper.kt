@@ -21,7 +21,7 @@ object InstanceInfoHelper {
         val provider = EntryPointAccessors.fromApplication(this.context.applicationContext, BindingProvider::class.java)
 
         val enable = info?.name != null
-                && info.iconUrl != null
+                && info.faviconUrl != null
                 && provider.settingStore().configState.value.isEnableInstanceTicker
         this.isVisible = enable
         if (enable) {
@@ -29,11 +29,11 @@ object InstanceInfoHelper {
 
             val iconDrawable = DrawableEmojiSpan(emojiAdapter)
             Glide.with(this)
-                .load(info!!.iconUrl)
+                .load(info!!.faviconUrl)
                 .override(this.textSize.toInt())
                 .into(iconDrawable.target)
-            text =  SpannableStringBuilder(":${info.iconUrl}:${info.name}").apply {
-                setSpan(iconDrawable, 0, ":${info.iconUrl}:".length, 0)
+            text =  SpannableStringBuilder(":${info.faviconUrl}:${info.name}").apply {
+                setSpan(iconDrawable, 0, ":${info.faviconUrl}:".length, 0)
             }
             when(val color = info.themeColorNumber.getOrNull()) {
                 null -> {
