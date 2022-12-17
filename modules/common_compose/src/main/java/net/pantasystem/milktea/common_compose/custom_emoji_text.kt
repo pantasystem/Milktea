@@ -40,25 +40,20 @@ fun String.findCustomEmojiInText(emojis: List<Emoji>): List<EmojiPos> {
         patternBuilder.append("):")
     }.toString()
 
-    val matcher = Pattern.compile(pattern).matcher(this)
-
-    val matches = mutableListOf<EmojiPos>()
-
-    while (matcher.find()) {
-        val emoji = emojis.firstOrNull {
-            it.name == this.substring(matcher.start() + 1, matcher.end() - 1)
-        }
-        if (emoji != null) {
-            matches.add(
-                EmojiPos(
-                    emoji,
-                    matcher.start(),
-                    matcher.end()
-                )
+    val regex =  Regex(pattern)
+    return regex.findAll(this).mapNotNull { result ->
+        val matchedText = this.substring(result.range.first + 1, result.range.last)
+        emojis.firstOrNull {
+            it.name == matchedText
+        }?.let {
+            EmojiPos(
+                it,
+                result.range.first,
+                result.range.last + 1,
             )
         }
-    }
-    return matches
+    }.toList()
+
 }
 
 
