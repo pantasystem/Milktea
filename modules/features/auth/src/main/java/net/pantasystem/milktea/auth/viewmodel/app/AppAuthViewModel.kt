@@ -13,6 +13,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.ClientIdRepository
 import java.util.*
 import javax.inject.Inject
 
@@ -29,7 +30,8 @@ class AppAuthViewModel @Inject constructor(
     val accountStore: AccountStore,
     val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
     val misskeyAPIProvider: MisskeyAPIProvider,
-    val getAccessToken: GetAccessToken,
+    private val getAccessToken: GetAccessToken,
+    private val clientIdRepository: ClientIdRepository,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -164,7 +166,8 @@ class AppAuthViewModel @Inject constructor(
                 waiting4Approve.content is StateContent.Exist -> (waiting4Approve.content as StateContent.Exist).rawContent
                 else -> Authorization.BeforeAuthentication
             },
-            waiting4ApproveState = waiting4Approve
+            waiting4ApproveState = waiting4Approve,
+            clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}"
         )
     }.stateIn(
         viewModelScope,

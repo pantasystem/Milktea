@@ -188,6 +188,9 @@ class MiApplication : Application(), Configuration.Provider {
         FirebaseAnalytics.getInstance(this).setUserId(
             clientIdRepository.getOrCreate().clientId
         )
+        FirebaseCrashlytics.getInstance().setUserId(
+            clientIdRepository.getOrCreate().clientId
+        )
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

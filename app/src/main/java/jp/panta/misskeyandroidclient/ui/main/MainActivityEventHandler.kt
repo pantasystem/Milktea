@@ -9,6 +9,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import androidx.work.WorkInfo
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
@@ -172,8 +174,38 @@ internal class MainActivityEventHandler(
     private fun collectUnauthorizedState() {
         lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                accountStore.state.collect {
-                    if (it.isUnauthorized) {
+                accountStore.state.collect { state ->
+                    FirebaseCrashlytics.getInstance().setCustomKey(
+                        "CURRENT_ACCOUNT_USER_ID",
+                        state.currentAccount?.remoteId ?: ""
+                    )
+                    FirebaseCrashlytics.getInstance().setCustomKey(
+                        "CURRENT_INSTANCE_DOMAIN",
+                        state.currentAccount?.instanceDomain ?: ""
+                    )
+                    FirebaseCrashlytics.getInstance().setCustomKey(
+                        "CURRENT_USERNAME",
+                        state.currentAccount?.userName ?: ""
+                    )
+                    FirebaseAnalytics.getInstance(activity).setUserProperty(
+                        "CURRENT_ACCOUNT_USER_ID",
+                        state.currentAccount?.let {
+                            it.remoteId.substring(0, 36.coerceAtMost(it.remoteId.length))
+                        }
+                    )
+                    FirebaseAnalytics.getInstance(activity).setUserProperty(
+                        "CURRENT_INSTANCE_DOMAIN",
+                        state.currentAccount?.let {
+                            it.instanceDomain.substring(0, 36.coerceAtMost(it.instanceDomain.length))
+                        }
+                    )
+                    FirebaseAnalytics.getInstance(activity).setUserProperty(
+                        "CURRENT_USERNAME",
+                        state.currentAccount?.let {
+                            it.userName.substring(0, 36.coerceAtMost(it.userName.length))
+                        }
+                    )
+                    if (state.isUnauthorized) {
                         activity.startActivity(
                             authorizationNavigation.newIntent(AuthorizationArgs.New)
                         )

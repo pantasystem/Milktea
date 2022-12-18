@@ -198,7 +198,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://みすきー.com", account.normalizedInstanceDomain)
+        Assert.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
     }
 
     @Test

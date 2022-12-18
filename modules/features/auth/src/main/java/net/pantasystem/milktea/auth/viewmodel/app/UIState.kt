@@ -68,7 +68,8 @@ data class AuthUiState(
     val metaState: ResultState<InstanceType>,
     val stateType: Authorization,
     val waiting4ApproveState: ResultState<Authorization.Waiting4UserAuthorization> = ResultState.Fixed(
-        StateContent.NotExist())
+        StateContent.NotExist()),
+    val clientId: String = ""
 ) {
     val isProgress by lazy {
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
