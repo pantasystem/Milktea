@@ -49,6 +49,8 @@ internal class MainActivityEventHandler(
         // NOTE: 各バージョンに合わせMenuを制御している
         mainViewModel.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
             changeNavMenuVisibilityFromAPIVersion(api)
+        }.catch {
+            Log.e("MainActivity", "check version error", it)
         }.launchIn(lifecycleScope)
 
 
