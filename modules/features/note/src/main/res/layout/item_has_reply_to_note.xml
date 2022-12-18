@@ -31,6 +31,8 @@
                     targetButton="@{replyAutoExpandableButton}"
                     onExpandedChanged="@{hasReplyToNote::expandReplyNote}"
                     overflowExpanded="@{hasReplyToNote.replyExpanded}"
+                    app:expandableButton="@id/replyAutoExpandableButton"
+
                     >
 
                 <Button
