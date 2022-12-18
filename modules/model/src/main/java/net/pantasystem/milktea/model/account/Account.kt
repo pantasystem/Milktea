@@ -36,25 +36,58 @@ data class Account(
             )
 
     val normalizedInstanceDomain: String by lazy {
-        val url = URL(instanceDomain)
-        var str = "${url.protocol}://${url.host}"
+
+        val protocol = getProtocol().ifBlank {
+            "https"
+        }
+        var str = "${protocol}://${getProtocolLess()}"
+        val url = URL(str)
+
+        str = "${protocol}://${getHost()}"
         if (url.port != -1) {
-            if (url.port != 80 || url.port != 443) {
-                str += ":${url.port}"
-            }
+            str += ":${url.port}"
         }
         str
     }
 
     fun getHost(): String {
+        val protocol = getProtocol()
+        val instanceDomain = instanceDomain.trim()
+        val protocolLess = getProtocolLess()
         if (instanceDomain.startsWith("https://")) {
-            return URL(instanceDomain).host
+            return URL("$protocol://$protocolLess").host
 
         } else if (instanceDomain.startsWith("http://")) {
-            return URL(instanceDomain).host
+            return URL("$protocol://$protocolLess").host
+        } else if (instanceDomain.indexOf("://") > 0) {
+            return URL("$protocol://$protocolLess").host
         }
         return instanceDomain
     }
 
+    private fun getProtocol(): String {
+        val instanceDomain = instanceDomain.trim()
+        if (instanceDomain.startsWith("https://")) {
+            return URL(instanceDomain).protocol
+        } else if (instanceDomain.startsWith("http://")) {
+            return URL(instanceDomain).protocol
+        } else if (instanceDomain.indexOf("://") > 0) {
+            return URL(instanceDomain).protocol
+        }
+        return ""
+    }
+
+    private fun getProtocolLess(): String {
+        val protocol = getProtocol()
+        val instanceDomain = instanceDomain.trim()
+        var protocolLess = instanceDomain.substring(protocol.length, instanceDomain.length)
+        while(protocolLess.startsWith(":")) {
+            protocolLess = protocolLess.substring(":".length, protocolLess.length)
+        }
+        while(protocolLess.startsWith("/")) {
+            protocolLess = protocolLess.substring("/".length, protocolLess.length)
+        }
+        return protocolLess
+    }
 
 }
