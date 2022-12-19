@@ -179,10 +179,6 @@ class AppAuthViewModel @Inject constructor(
         )
     )
 
-    val stateTypeEvents = state.map {
-        it.stateType
-    }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
-
     val errors = state.map {
         it.errors
     }
@@ -230,6 +226,8 @@ class AppAuthViewModel @Inject constructor(
             startAuthEventFlow.distinctUntilChanged().map {
                 state
             }
+        }.filter {
+            it.isIdPassword
         }.map {
             authService.signIn(it)
         }.onEach { result ->
