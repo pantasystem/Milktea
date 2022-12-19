@@ -4,15 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -59,7 +60,7 @@ class AuthorizationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
-        setContentView(R.layout.activity_authorization)
+//        setContentView(R.layout.activity_authorization)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -73,13 +74,10 @@ class AuthorizationActivity : AppCompatActivity() {
                 }
             }
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                appAuthViewModel.stateTypeEvents.filterNot {
-                    it is Authorization.Finish
-                }.collect {
-                    changeFragment(it)
-                }
+
+        setContent {
+            MdcTheme {
+                AuthScreen(authViewModel = appAuthViewModel)
             }
         }
 
@@ -94,29 +92,6 @@ class AuthorizationActivity : AppCompatActivity() {
 
     }
 
-    /**
-     * フラグメントの状態をAuthorizationに合わせて変化させる
-     */
-    private fun changeFragment(authorization: Authorization) {
-        val fragment = when(authorization) {
-
-            is Authorization.BeforeAuthentication -> {
-                AuthFragment()
-            }
-            is Authorization.Waiting4UserAuthorization -> {
-                Waiting4userAuthorizationFragment()
-            }
-            is Authorization.Approved -> {
-                AuthResultFragment()
-            }
-            is Authorization.Finish -> {
-                throw IllegalStateException("Finishは期待されていません")
-            }
-        }
-        val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fragment_base, fragment)
-        ft.commit()
-    }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
