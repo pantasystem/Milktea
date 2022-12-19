@@ -48,7 +48,7 @@ dependencyResolutionManagement {
             library('accompanist-glide', 'com.google.accompanist:accompanist-glide:0.14.0')
             library('animation-apng', 'com.github.penfeizhou.android.animation:apng:2.23.0')
 
-            library('wada811-databinding', 'com.github.wada811:DataBinding-ktx:5.0.2')
+            library('wada811-databinding', 'com.github.wada811:DataBinding-ktx:6.1.0')
 
             library('appcompat-appcompat', 'androidx.appcompat:appcompat:1.6.0-rc01')
             library('android-material-material', 'com.google.android.material:material:1.6.1')
