@@ -4,7 +4,7 @@ object LegacyReaction {
 
     val reactionMap = mapOf(
         "angry" to "\uD83D\uDCA2",  // 💢
-        "confused" to "\uD83D\uDE22", // 😢
+        "confused" to "\uD83D\uDE25", // 😥
         "congrats" to "\uD83C\uDF89", // 🎉
         "hmm" to "\uD83E\uDD14",    //  🤔
         "laugh" to "\uD83D\uDE06",  // 😆
