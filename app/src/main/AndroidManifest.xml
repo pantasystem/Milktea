@@ -71,6 +71,7 @@
         <activity
                 android:name="net.pantasystem.milktea.auth.AuthorizationActivity"
                 android:exported="true"
+                android:windowSoftInputMode="adjustResize"
                 android:launchMode="singleInstance">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
