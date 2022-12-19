@@ -18,6 +18,7 @@ import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 fun AuthScreen(
     modifier: Modifier = Modifier,
     authViewModel: AppAuthViewModel,
+    onCopyToClipboard: (String) -> Unit,
 ) {
     val uiState by authViewModel.state.collectAsState()
 
@@ -66,7 +67,15 @@ fun AuthScreen(
                     )
                 }
                 is Authorization.Waiting4UserAuthorization -> {
-                    Waiting4ApproveScreen()
+                    Waiting4ApproveScreen(
+                        state = stateType,
+                        onApprovedButtonClicked = {
+                            authViewModel.getAccessToken()
+                        },
+                        onCopyAuthUrlButtonClicked = {
+                            onCopyToClipboard(stateType.generateAuthUrl())
+                        }
+                    )
                 }
                 is Authorization.Approved -> {
                     AuthApprovedScreen()
