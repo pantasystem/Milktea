@@ -1,24 +1,32 @@
 package net.pantasystem.milktea.auth
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import net.pantasystem.milktea.auth.viewmodel.app.AuthUiState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun AuthScreen(
     modifier: Modifier = Modifier,
-    authUiState: AuthUiState
+    authViewModel: AppAuthViewModel,
 ) {
+    val uiState by authViewModel.state.collectAsState()
+
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.windowInsetsPadding(
+            WindowInsets
+                .navigationBars
+                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+        ),
         topBar = {
             TopAppBar(
                 title = {
@@ -28,11 +36,34 @@ fun AuthScreen(
         }
     ) { paddingValues ->
         Box(
-            Modifier.fillMaxSize().padding(paddingValues)
+            Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            when (val stateType = authUiState.stateType) {
+            when (val stateType = uiState.stateType) {
                 Authorization.BeforeAuthentication -> {
-                    AuthFormScreen()
+                    val password by authViewModel.password.collectAsState()
+                    val appName by authViewModel.appName.collectAsState()
+                    val instanceDomain by authViewModel.instanceDomain.collectAsState()
+                    AuthFormScreen(
+                        uiState = uiState,
+                        password = password,
+                        appName = appName,
+                        instanceDomain = instanceDomain,
+                        onInputInstanceDomain = {
+                            authViewModel.instanceDomain.value = it
+                        },
+                        onInputAppName = {
+                            authViewModel.appName.value = it
+                        },
+                        onInputPassword = {
+                            authViewModel.password.value = it
+                        },
+                        onStartAuthButtonClicked = {
+                            authViewModel.auth()
+                        },
+                        clientId = "",
+                    )
                 }
                 is Authorization.Waiting4UserAuthorization -> {
                     Waiting4ApproveScreen()
