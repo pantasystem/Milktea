@@ -2,6 +2,8 @@ package net.pantasystem.milktea.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.auth.viewmodel.app.AuthUiState
@@ -73,7 +78,12 @@ fun AuthFormScreen(
                     maxLines = 1,
                     label = {
                         Text(stringResource(R.string.password))
-                    }
+                    },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
                 )
             } else {
                 OutlinedTextField(
@@ -101,7 +111,8 @@ fun AuthFormScreen(
         ) {
             Button(
                 onClick = onStartAuthButtonClicked,
-                enabled = uiState.metaState is ResultState.Fixed && uiState.metaState.content is StateContent.Exist
+                enabled = uiState.metaState is ResultState.Fixed && uiState.metaState.content is StateContent.Exist,
+                shape = RoundedCornerShape(32.dp)
             ) {
                 Text(stringResource(R.string.start_auth))
             }
