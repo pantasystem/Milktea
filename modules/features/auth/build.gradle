@@ -32,7 +32,12 @@ android {
     }
     buildFeatures {
         dataBinding true
+        compose true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = compose_version
+    }
+
 }
 
 dependencies {
