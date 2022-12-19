@@ -31,7 +31,20 @@ fun AuthScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(R.string.auth))
+                    when(uiState.stateType) {
+                        is Authorization.Approved -> {
+                            Text(stringResource(id = R.string.success))
+                        }
+                        Authorization.BeforeAuthentication -> {
+                            Text(stringResource(R.string.auth))
+                        }
+                        is Authorization.Finish -> {
+                            Text("認証完了")
+                        }
+                        is Authorization.Waiting4UserAuthorization -> {
+                            Text(stringResource(id = R.string.waiting_4_approval))
+                        }
+                    }
                 }
             )
         }
@@ -78,7 +91,12 @@ fun AuthScreen(
                     )
                 }
                 is Authorization.Approved -> {
-                    AuthApprovedScreen()
+                    AuthApprovedScreen(
+                        state = stateType,
+                        onConfirm = {
+                            authViewModel.onConfirmAddAccount()
+                        }
+                    )
                 }
                 is Authorization.Finish -> {
 
