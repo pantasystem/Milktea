@@ -82,7 +82,7 @@ fun AuthFormScreen(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
                     label = {
-                        Text(stringResource(R.string.app_name))
+                        Text(stringResource(R.string.custom_app_name))
                     }
                 )
             }
