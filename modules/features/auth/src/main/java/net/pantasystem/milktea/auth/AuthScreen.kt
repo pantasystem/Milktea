@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.auth
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -9,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.auth.viewmodel.app.AppAuthViewModel
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
@@ -30,6 +32,8 @@ fun AuthScreen(
         ),
         topBar = {
             TopAppBar(
+                backgroundColor = MaterialTheme.colors.surface,
+                elevation = 0.dp,
                 title = {
                     when(uiState.stateType) {
                         is Authorization.Approved -> {
@@ -76,7 +80,7 @@ fun AuthScreen(
                         onStartAuthButtonClicked = {
                             authViewModel.auth()
                         },
-                        clientId = "",
+                        clientId = uiState.clientId,
                     )
                 }
                 is Authorization.Waiting4UserAuthorization -> {
