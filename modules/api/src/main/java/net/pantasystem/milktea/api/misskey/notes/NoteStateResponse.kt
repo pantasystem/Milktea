@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class NoteStateResponse(
     val isFavorited: Boolean,
     val isWatching: Boolean,
-    val isMutedThread: Boolean = false
+    val isMutedThread: Boolean? = null,
 )

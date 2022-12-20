@@ -82,27 +82,29 @@ fun NoteOptionDialogLayout(
                 )
             }
 
-            if (uiState.noteState?.isMutedThread == true) {
-                NormalBottomSheetDialogSelectionLayout(
-                    onClick = {
-                        onDeleteThreadMuteButtonClicked(requireNotNull(uiState.noteId))
-                    },
-                    icon = Icons.Default.VolumeMute,
-                    text = stringResource(
-                        id = R.string.unmute_thread
+            if (uiState.noteState != null && uiState.noteState.isMutedThread == null) {
+                if (uiState.noteState.isMutedThread == true) {
+                    NormalBottomSheetDialogSelectionLayout(
+                        onClick = {
+                            onDeleteThreadMuteButtonClicked(requireNotNull(uiState.noteId))
+                        },
+                        icon = Icons.Default.VolumeMute,
+                        text = stringResource(
+                            id = R.string.unmute_thread
+                        )
                     )
-                )
-            } else {
-                NormalBottomSheetDialogSelectionLayout(
-                    onClick = {
-                        onCreateThreadMuteButtonClicked(requireNotNull(uiState.noteId))
-                    },
-                    icon = Icons.Default.VolumeMute,
-                    text = stringResource(
-                        id = R.string.mute_thread
+                } else {
+                    NormalBottomSheetDialogSelectionLayout(
+                        onClick = {
+                            onCreateThreadMuteButtonClicked(requireNotNull(uiState.noteId))
+                        },
+                        icon = Icons.Default.VolumeMute,
+                        text = stringResource(
+                            id = R.string.mute_thread
+                        )
                     )
-                )
 
+                }
             }
 
             if (uiState.isMyNote) {
