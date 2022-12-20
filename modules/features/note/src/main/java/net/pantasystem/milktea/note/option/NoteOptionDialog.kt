@@ -110,10 +110,12 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onCreateThreadMuteButtonClicked = {
-
+                            viewModel.createThreadMute(it)
+                            dismiss()
                         },
                         onDeleteThreadMuteButtonClicked = {
-
+                            viewModel.deleteThreadMute(it)
+                            dismiss()
                         }
                     )
 

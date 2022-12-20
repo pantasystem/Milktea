@@ -29,7 +29,7 @@ class NoteOptionViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val noteRelationGetter: NoteRelationGetter,
     val loggerFactory: Logger.Factory,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
         const val NOTE_ID = "NoteOptionViewModel.NOTE_ID"
@@ -84,6 +84,24 @@ class NoteOptionViewModel @Inject constructor(
             }.catch {
                 logger.error("sync note error", it)
             }.collect()
+        }
+    }
+
+    fun createThreadMute(noteId: Note.Id) {
+        viewModelScope.launch {
+            noteRepository.createThreadMute(noteId).onFailure {
+                logger.error("create thread mute failed", it)
+            }
+            savedStateHandle[NOTE_ID] = noteId
+        }
+    }
+
+    fun deleteThreadMute(noteId: Note.Id) {
+        viewModelScope.launch {
+            noteRepository.deleteThreadMute(noteId).onFailure {
+                logger.error("delete thread mute failed", it)
+            }
+            savedStateHandle[NOTE_ID] = noteId
         }
     }
 
