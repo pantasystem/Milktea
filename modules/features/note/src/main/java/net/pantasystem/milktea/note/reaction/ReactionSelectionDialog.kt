@@ -19,7 +19,6 @@ import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
@@ -28,8 +27,8 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesFragment
-import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -188,4 +187,11 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
     }
 
+}
+
+sealed interface TabType {
+    object UserCustom : TabType
+    object OftenUse : TabType
+    object All : TabType
+    data class Category(val name: String) : TabType
 }
