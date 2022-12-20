@@ -138,7 +138,7 @@ interface MisskeyAPI {
     suspend fun searchNote(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/state")
-    suspend fun noteState(@Body noteRequest: NoteRequest): Response<NoteState>
+    suspend fun noteState(@Body noteRequest: NoteRequest): Response<NoteStateResponse>
 
     @POST("api/notes/show")
     suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>

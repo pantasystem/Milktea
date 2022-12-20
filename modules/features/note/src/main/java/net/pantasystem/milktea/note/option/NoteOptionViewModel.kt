@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.notes.NoteState
+import net.pantasystem.milktea.api.misskey.notes.NoteStateResponse
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -105,7 +105,7 @@ class NoteOptionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadNoteState(id: Note.Id): Result<NoteState> = runCatching {
+    private suspend fun loadNoteState(id: Note.Id): Result<NoteStateResponse> = runCatching {
         withContext(Dispatchers.IO) {
             val account = accountRepository.get(id.accountId).getOrThrow()
             misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
@@ -121,7 +121,7 @@ class NoteOptionViewModel @Inject constructor(
 
 data class NoteOptionUiState(
     val noteId: Note.Id? = null,
-    val noteState: NoteState? = null,
+    val noteState: NoteStateResponse? = null,
     val note: Note? = null,
     val noteRelation: NoteRelation? = null,
     val isMyNote: Boolean = false,
