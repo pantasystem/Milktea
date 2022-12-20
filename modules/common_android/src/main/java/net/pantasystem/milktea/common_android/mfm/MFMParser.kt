@@ -503,13 +503,34 @@ object MFMParser {
         }
     }
 
+    /**
+     * メンションのホスト部を投稿者とアカウントのホストに合わせて正しいホスト部の文字列を返す観数
+     * @param hostInMentionText Nullまたはから文字、または先頭の文字が@で始まる2文字以上のアットマーク+ホスト部で構成されます
+     * @Param accountHost 現在ログインしているアカウントが所属するインスタンスのホスト
+     * @param userHost その投稿の投稿主が所属するインスタンスのホスト
+     */
     internal fun getMentionHost(hostInMentionText: String?, accountHost: String?, userHost: String?): String {
         if (accountHost == null) {
             return ""
         }
+
+        // メンションのアットマーク部分を取り除く
+        val sendTo = hostInMentionText?.let {
+            if (it.startsWith("@") && it.length > 1) {
+                it.substring(1, it.length)
+            } else {
+                it
+            }
+        }
+
         // NOTE: 投稿主とアカウントの所有者が同一のホスト(インスタンス)である時
         if (userHost == accountHost) {
-            return ""
+            // メンションの送信先インスタンスと、アカウントのインスタンスが同じの場合は空にする
+            return if (sendTo == accountHost) {
+                ""
+            } else {
+                hostInMentionText ?: ""
+            }
         }
 
         // NOTE: 投稿先ユーザーのインスタンスとと現在のアカウントのインスタンスが異なり、
