@@ -27,24 +27,31 @@ class ReactionChoicesViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val meta = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
         metaRepository.observe(ac.normalizedInstanceDomain)
     }.flowOn(Dispatchers.IO)
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val reactionCount = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionHistoryDao.observeSumReactions(ac.normalizedInstanceDomain)
-    }.flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val userSetting = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain)
-    }
+    private val reactionCount =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+            reactionHistoryDao.observeSumReactions(ac.normalizedInstanceDomain)
+        }.flowOn(Dispatchers.IO)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val userSetting =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+            reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain)
+        }
 
     // 検索時の候補
     val uiState =
-        combine(meta, accountStore.observeCurrentAccount, reactionCount, userSetting) { meta, ac, counts, settings ->
+        combine(
+            meta,
+            accountStore.observeCurrentAccount,
+            reactionCount,
+            userSetting
+        ) { meta, ac, counts, settings ->
             ReactionSelectionUiState(
                 account = ac,
                 meta = meta,
@@ -71,27 +78,7 @@ data class ReactionSelectionUiState(
         reactionHistoryCounts.map {
             it.reaction
         }.mapNotNull { reaction ->
-            if (reaction.codePointCount(0, reaction.length) == 1) {
-                EmojiType.UtfEmoji(reaction)
-            } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
-                    "@"
-                )) {
-                (reaction.replace(":", "").split("@")[0]).let { name ->
-                    meta?.emojis?.firstOrNull {
-                        it.name == name
-                    }?.let {
-                        EmojiType.CustomEmoji(it)
-                    }
-                }
-            } else if (LegacyReaction.reactionMap[reaction] != null) {
-                EmojiType.Legacy(reaction)
-            }else {
-                meta?.emojis?.firstOrNull {
-                    it.name == reaction.replace(":", "")
-                }?.let {
-                    EmojiType.CustomEmoji(it)
-                }
-            }
+            EmojiType.from(meta?.emojis, reaction)
         }.distinct()
     }
 
@@ -106,23 +93,7 @@ data class ReactionSelectionUiState(
 
     val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
-            if (setting.reaction.codePointCount(0, setting.reaction.length) == 1) {
-                EmojiType.UtfEmoji(setting.reaction)
-            } else if (setting.reaction.startsWith(":") || setting.reaction.endsWith(":")) {
-                meta?.emojis?.firstOrNull {
-                    it.name == setting.reaction.replace(":", "")
-                }?.let {
-                    EmojiType.CustomEmoji(it)
-                }
-            } else if (LegacyReaction.reactionMap[setting.reaction] != null) {
-                EmojiType.Legacy(setting.reaction)
-            }  else {
-                meta?.emojis?.firstOrNull {
-                    it.name == setting.reaction.replace(":", "")
-                }?.let {
-                    EmojiType.CustomEmoji(it)
-                }
-            }
+            EmojiType.from(meta?.emojis, setting.reaction)
         }.ifEmpty {
             LegacyReaction.defaultReaction.map {
                 EmojiType.Legacy(it)
@@ -137,7 +108,7 @@ data class ReactionSelectionUiState(
 
         }?.map {
             EmojiType.CustomEmoji(it)
-        }?: emptyList()
+        } ?: emptyList()
     }
 
 }
@@ -146,10 +117,11 @@ sealed interface EmojiType {
     data class Legacy(val type: String) : EmojiType
     data class CustomEmoji(val emoji: Emoji) : EmojiType
     data class UtfEmoji(val code: String) : EmojiType
+    companion object
 }
 
 fun EmojiType.toTextReaction(): String {
-    return when(val type = this) {
+    return when (val type = this) {
         is EmojiType.CustomEmoji -> {
             ":${type.emoji.name}:"
         }
@@ -162,3 +134,28 @@ fun EmojiType.toTextReaction(): String {
     }
 }
 
+
+fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType? {
+    return if (reaction.codePointCount(0, reaction.length) == 1) {
+        EmojiType.UtfEmoji(reaction)
+    } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
+            "@"
+        )
+    ) {
+        (reaction.replace(":", "").split("@")[0]).let { name ->
+            emojis?.firstOrNull {
+                it.name == name
+            }?.let {
+                EmojiType.CustomEmoji(it)
+            }
+        }
+    } else if (LegacyReaction.reactionMap[reaction] != null) {
+        EmojiType.Legacy(reaction)
+    } else {
+        emojis?.firstOrNull {
+            it.name == reaction.replace(":", "")
+        }?.let {
+            EmojiType.CustomEmoji(it)
+        }
+    }
+}
