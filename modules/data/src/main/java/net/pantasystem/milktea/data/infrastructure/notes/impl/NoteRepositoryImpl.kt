@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
@@ -53,7 +54,8 @@ class NoteRepositoryImpl @Inject constructor(
                 uploader.get(createNote.author)
             ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
         }.mapCatching {
-            misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError().body()?.createdNote
+            misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError()
+                .body()?.createdNote
         }.onFailure {
             logger.error("create note error", it)
         }
@@ -250,7 +252,7 @@ class NoteRepositoryImpl @Inject constructor(
                 i = account.token,
                 noteId = noteId.noteId,
 
-            )
+                )
         ).throwIfHasError().body()!!
         dtoList.map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
@@ -261,11 +263,55 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCatching {
         withContext(Dispatchers.IO) {
             val account = getAccount.get(noteId.accountId)
-            val note = misskeyAPIProvider.get(account).showNote(NoteRequest(
-                i = account.token,
-                noteId = noteId.noteId
-            )).throwIfHasError().body()!!
+            val note = misskeyAPIProvider.get(account).showNote(
+                NoteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId
+                )
+            ).throwIfHasError().body()!!
             noteDataSourceAdder.addNoteDtoToDataSource(account, note)
+        }
+    }
+
+    override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            misskeyAPIProvider.get(account).createThreadMute(
+                ToggleThreadMuteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId
+                )
+            ).throwIfHasError()
+        }
+    }
+
+    override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            misskeyAPIProvider.get(account).deleteThreadMute(
+                ToggleThreadMuteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId,
+                )
+            ).throwIfHasError()
+        }
+    }
+
+    override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
+                NoteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId
+                )
+            ).throwIfHasError().body()!!.let {
+                NoteState(
+                    isFavorited = it.isFavorited,
+                    isMutedThread = it.isMutedThread,
+                    isWatching = it.isWatching
+                )
+            }
         }
     }
 

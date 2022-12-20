@@ -108,6 +108,14 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             val report = it?.toReport(baseUrl!!)
                             notesViewModel.confirmReportEvent.event = report
                             dismiss()
+                        },
+                        onCreateThreadMuteButtonClicked = {
+                            viewModel.createThreadMute(it)
+                            dismiss()
+                        },
+                        onDeleteThreadMuteButtonClicked = {
+                            viewModel.deleteThreadMute(it)
+                            dismiss()
                         }
                     )
 

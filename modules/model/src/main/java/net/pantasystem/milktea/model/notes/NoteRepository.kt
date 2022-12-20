@@ -26,6 +26,12 @@ interface NoteRepository {
 
     suspend fun sync(noteId: Note.Id): Result<Unit>
 
+    suspend fun createThreadMute(noteId: Note.Id): Result<Unit>
+
+    suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit>
+
+    suspend fun findNoteState(noteId: Note.Id): Result<NoteState>
+
     fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>>
 
     fun observeOne(noteId: Note.Id): Flow<Note?>

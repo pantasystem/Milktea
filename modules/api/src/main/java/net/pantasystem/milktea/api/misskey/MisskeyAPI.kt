@@ -15,6 +15,7 @@ import net.pantasystem.milktea.api.misskey.messaging.RequestMessage
 import net.pantasystem.milktea.api.misskey.notes.*
 import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
 import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
+import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.api.misskey.notes.reaction.ReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
 import net.pantasystem.milktea.api.misskey.notes.translation.Translate
@@ -137,7 +138,7 @@ interface MisskeyAPI {
     suspend fun searchNote(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     @POST("api/notes/state")
-    suspend fun noteState(@Body noteRequest: NoteRequest): Response<NoteState>
+    suspend fun noteState(@Body noteRequest: NoteRequest): Response<NoteStateResponse>
 
     @POST("api/notes/show")
     suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>
@@ -252,4 +253,10 @@ interface MisskeyAPI {
 
     @POST("api/ap/show")
     suspend fun resolve(@Body req: ApResolveRequest) : Response<ApResolveResult>
+
+    @POST("api/notes/thread-muting/create")
+    suspend fun createThreadMute(@Body req: ToggleThreadMuteRequest) : Response<Unit>
+
+    @POST("api/notes/thread-muting/delete")
+    suspend fun deleteThreadMute(@Body req: ToggleThreadMuteRequest) : Response<Unit>
 }

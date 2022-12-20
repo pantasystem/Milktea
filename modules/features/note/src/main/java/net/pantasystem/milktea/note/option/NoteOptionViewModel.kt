@@ -8,11 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.notes.NoteState
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
@@ -20,6 +16,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.NoteState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,7 +26,7 @@ class NoteOptionViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val noteRelationGetter: NoteRelationGetter,
     val loggerFactory: Logger.Factory,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     companion object {
         const val NOTE_ID = "NoteOptionViewModel.NOTE_ID"
@@ -42,7 +39,7 @@ class NoteOptionViewModel @Inject constructor(
     private val noteIdFlow = savedStateHandle.getStateFlow<Note.Id?>(NOTE_ID, null)
 
     private val noteState = noteIdFlow.filterNotNull().map { noteId ->
-        loadNoteState(noteId).onFailure {
+        noteRepository.findNoteState(noteId).onFailure {
             logger.error("noteState load error", it)
         }.getOrNull()
     }.stateIn(
@@ -87,15 +84,21 @@ class NoteOptionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadNoteState(id: Note.Id): Result<NoteState> = runCatching {
-        withContext(Dispatchers.IO) {
-            val account = accountRepository.get(id.accountId).getOrThrow()
-            misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
-                NoteRequest(
-                    i = account.token,
-                    noteId = id.noteId
-                )
-            ).throwIfHasError().body()!!
+    fun createThreadMute(noteId: Note.Id) {
+        viewModelScope.launch {
+            noteRepository.createThreadMute(noteId).onFailure {
+                logger.error("create thread mute failed", it)
+            }
+            savedStateHandle[NOTE_ID] = noteId
+        }
+    }
+
+    fun deleteThreadMute(noteId: Note.Id) {
+        viewModelScope.launch {
+            noteRepository.deleteThreadMute(noteId).onFailure {
+                logger.error("delete thread mute failed", it)
+            }
+            savedStateHandle[NOTE_ID] = noteId
         }
     }
 

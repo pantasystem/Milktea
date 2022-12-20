@@ -24,6 +24,8 @@ fun NoteOptionDialogLayout(
     onTranslateButtonClicked: (noteId: Note.Id) -> Unit,
     onDeleteFavoriteButtonClicked: (noteId: Note.Id) -> Unit,
     onCreateFavoriteButtonClicked: (noteId: Note.Id) -> Unit,
+    onCreateThreadMuteButtonClicked: (noteId: Note.Id) -> Unit,
+    onDeleteThreadMuteButtonClicked: (noteId: Note.Id) -> Unit,
     onDeleteAndEditButtonClicked: (NoteRelation?) -> Unit,
     onDeleteButtonClicked: (NoteRelation?) -> Unit,
     onReportButtonClicked: (NoteRelation?) -> Unit,
@@ -78,6 +80,31 @@ fun NoteOptionDialogLayout(
                     icon = Icons.Outlined.Star,
                     text = stringResource(id = R.string.favorite)
                 )
+            }
+
+            if (uiState.noteState == null || uiState.noteState.isMutedThread != null) {
+                if (uiState.noteState?.isMutedThread == true) {
+                    NormalBottomSheetDialogSelectionLayout(
+                        onClick = {
+                            onDeleteThreadMuteButtonClicked(requireNotNull(uiState.noteId))
+                        },
+                        icon = Icons.Default.VolumeMute,
+                        text = stringResource(
+                            id = R.string.unmute_thread
+                        )
+                    )
+                } else {
+                    NormalBottomSheetDialogSelectionLayout(
+                        onClick = {
+                            onCreateThreadMuteButtonClicked(requireNotNull(uiState.noteId))
+                        },
+                        icon = Icons.Default.VolumeMute,
+                        text = stringResource(
+                            id = R.string.mute_thread
+                        )
+                    )
+
+                }
             }
 
             if (uiState.isMyNote) {
