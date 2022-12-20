@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentReactionChoicesBinding
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionChoicesViewModel
+import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,18 +72,17 @@ class ReactionChoicesFragment : Fragment() {
 
         val columns = view.context.resources.getInteger(R.integer.reaction_choices_columns)
 
-        val adapter =
-            ReactionChoicesAdapter {
-                val selection = (parentFragment as? ReactionSelection)
-                    ?: (requireActivity() as? ReactionSelection)
-                Log.w("ReactionChoicesFragment", "ReactionSelectionの実装が行われていません")
-                selection?.selectReaction(it)
-            }
+        val adapter = EmojiChoicesAdapter{
+            val selection = (parentFragment as? ReactionSelection)
+                ?: (requireActivity() as? ReactionSelection)
+            Log.w("ReactionChoicesFragment", "ReactionSelectionの実装が行われていません")
+            selection?.selectReaction(it.toTextReaction())
+        }
+
         val layoutManager = GridLayoutManager(view.context, columns)
 
         binding.reactionsView.layoutManager = layoutManager
         binding.reactionsView.adapter = adapter
-
 
         val typeOrdinal = arguments?.getInt(EXTRA_TYPE) ?: 0
 
@@ -95,14 +94,14 @@ class ReactionChoicesFragment : Fragment() {
                             adapter.submitList(uiState.all)
                         }
                         Type.FREQUENCY -> {
-                            adapter.submitList(uiState.frequencyUsedReactions)
+                            adapter.submitList(uiState.frequencyUsedReactionsV2)
                         }
                         Type.CATEGORY -> {
                             val category = arguments?.getString(EXTRA_CATEGORY) ?: return@collect
                             adapter.submitList(uiState.getCategoryBy(category))
                         }
                         Type.USER -> {
-                            adapter.submitList(uiState.userSettingTextReactions)
+                            adapter.submitList(uiState.userSettingEmojis)
                         }
                     }
                 }

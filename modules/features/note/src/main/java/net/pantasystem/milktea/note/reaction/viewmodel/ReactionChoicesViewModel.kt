@@ -10,6 +10,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
@@ -26,24 +27,31 @@ class ReactionChoicesViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val meta = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
         metaRepository.observe(ac.normalizedInstanceDomain)
     }.flowOn(Dispatchers.IO)
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val reactionCount = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionHistoryDao.observeSumReactions(ac.normalizedInstanceDomain)
-    }.flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val userSetting = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain)
-    }
+    private val reactionCount =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+            reactionHistoryDao.observeSumReactions(ac.normalizedInstanceDomain)
+        }.flowOn(Dispatchers.IO)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val userSetting =
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+            reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain)
+        }
 
     // 検索時の候補
     val uiState =
-        combine(meta, accountStore.observeCurrentAccount, reactionCount, userSetting) { meta, ac, counts, settings ->
+        combine(
+            meta,
+            accountStore.observeCurrentAccount,
+            reactionCount,
+            userSetting
+        ) { meta, ac, counts, settings ->
             ReactionSelectionUiState(
                 account = ac,
                 meta = meta,
@@ -64,52 +72,90 @@ data class ReactionSelectionUiState(
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<ReactionUserSetting>,
 ) {
-    val frequencyUsedReactions: List<String> get() {
-        return reactionHistoryCounts.map {
+
+
+    val frequencyUsedReactionsV2: List<EmojiType> by lazy {
+        reactionHistoryCounts.map {
             it.reaction
-        }.map { reaction ->
-            if (reaction.codePointCount(0, reaction.length) == 1) {
-                reaction
-            } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
-                    "@"
-                )
-            ) {
-                (reaction.replace(":", "").split("@")[0]).let {
-                    ":$it:"
-                }
-            } else {
-                reaction
-            }
-        }.filter { reaction ->
-            reaction.codePointCount(0, reaction.length) == 1
-                    || meta?.emojis?.any {
-                it.name == reaction.replace(":", "")
-            } ?: false
+        }.mapNotNull { reaction ->
+            EmojiType.from(meta?.emojis, reaction)
         }.distinct()
     }
 
-    val all: List<String> get() {
-        return LegacyReaction.defaultReaction + (meta?.emojis?.map {
-            ":${it.name}:"
+    val all: List<EmojiType> by lazy {
+        LegacyReaction.defaultReaction.map {
+            EmojiType.Legacy(it)
+        } + (meta?.emojis?.map {
+            EmojiType.CustomEmoji(it)
         } ?: emptyList())
     }
 
-    val userSettingTextReactions: List<String> get() {
-        return userSettingReactions.map {
-            it.reaction
+
+    val userSettingEmojis: List<EmojiType> by lazy {
+        userSettingReactions.mapNotNull { setting ->
+            EmojiType.from(meta?.emojis, setting.reaction)
         }.ifEmpty {
-            LegacyReaction.defaultReaction
+            LegacyReaction.defaultReaction.map {
+                EmojiType.Legacy(it)
+            }
         }
     }
 
-    fun getCategoryBy(category: String): List<String> {
+
+    fun getCategoryBy(category: String): List<EmojiType> {
         return meta?.emojis?.filter {
             it.category == category
 
         }?.map {
-            ":${it.name}:"
-        }?: emptyList()
+            EmojiType.CustomEmoji(it)
+        } ?: emptyList()
     }
 
 }
 
+sealed interface EmojiType {
+    data class Legacy(val type: String) : EmojiType
+    data class CustomEmoji(val emoji: Emoji) : EmojiType
+    data class UtfEmoji(val code: String) : EmojiType
+    companion object
+}
+
+fun EmojiType.toTextReaction(): String {
+    return when (val type = this) {
+        is EmojiType.CustomEmoji -> {
+            ":${type.emoji.name}:"
+        }
+        is EmojiType.Legacy -> {
+            type.type
+        }
+        is EmojiType.UtfEmoji -> {
+            type.code
+        }
+    }
+}
+
+
+fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType? {
+    return if (reaction.codePointCount(0, reaction.length) == 1) {
+        EmojiType.UtfEmoji(reaction)
+    } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
+            "@"
+        )
+    ) {
+        (reaction.replace(":", "").split("@")[0]).let { name ->
+            emojis?.firstOrNull {
+                it.name == name
+            }?.let {
+                EmojiType.CustomEmoji(it)
+            }
+        }
+    } else if (LegacyReaction.reactionMap[reaction] != null) {
+        EmojiType.Legacy(reaction)
+    } else {
+        emojis?.firstOrNull {
+            it.name == reaction.replace(":", "")
+        }?.let {
+            EmojiType.CustomEmoji(it)
+        }
+    }
+}

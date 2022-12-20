@@ -2,16 +2,14 @@
 
 package net.pantasystem.milktea.note.reaction
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -19,17 +17,18 @@ import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
+import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
 import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesFragment
-import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
+import net.pantasystem.milktea.note.reaction.viewmodel.TabType
+import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -85,9 +84,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         binding.lifecycleOwner = this
 
 
-
-        val searchedReactionAdapter = ReactionChoicesAdapter {
-            notesViewModel.toggleReaction(noteId, it)
+        val searchedReactionAdapter = EmojiChoicesAdapter {
+            notesViewModel.toggleReaction(noteId, it.toTextReaction())
             dismiss()
         }
 
@@ -97,7 +95,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         mNoteViewModel = notesViewModel
         binding.reactionChoicesTab.setupWithViewPager(binding.reactionChoicesViewPager)
 
-        val adapter = ReactionChoicesPagerAdapter()
+        val adapter = ReactionChoicesPagerAdapter(childFragmentManager, requireContext())
         binding.reactionChoicesViewPager.adapter = adapter
 
         lifecycleScope.launch {
@@ -134,54 +132,37 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         dismiss()
     }
 
-    inner class ReactionChoicesPagerAdapter :
-        FragmentPagerAdapter(childFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    class ReactionChoicesPagerAdapter(fragmentManager: FragmentManager, val context: Context) :
+        FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-        private var categoryList: List<String> = emptyList()
+        private var categoryList: List<TabType> = emptyList()
         override fun getCount(): Int {
-            return 3 + categoryList.size
+            return categoryList.size
         }
 
         override fun getPageTitle(position: Int): CharSequence {
-            return when (position) {
-                0 -> {
-                    getString(R.string.user)
-                }
-                1 -> {
-                    getString(R.string.often_use)
-                }
-                2 -> {
-                    getString(R.string.all)
-                }
-
-                else -> {
-                    categoryList[position - 3]
-                }
+            return when(val type = categoryList[position]) {
+                TabType.All -> context.getString(R.string.all)
+                is TabType.Category -> type.name
+                TabType.OftenUse -> context.getString(R.string.often_use)
+                TabType.UserCustom -> context.getString(R.string.user)
             }
         }
 
         override fun getItem(position: Int): Fragment {
-            return when (position) {
-                0 -> {
-                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.USER)
-                }
-                1 -> {
-                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.FREQUENCY)
-                }
-                2 -> {
-                    ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.DEFAULT)
-                }
-                else -> {
-                    val categoryName = categoryList[position - 3]
-                    ReactionChoicesFragment.newInstance(
-                        ReactionChoicesFragment.Type.CATEGORY,
-                        categoryName
-                    )
-                }
+            return when(val type = categoryList[position]) {
+                TabType.All -> ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.DEFAULT)
+                is TabType.Category -> ReactionChoicesFragment.newInstance(
+                    ReactionChoicesFragment.Type.CATEGORY,
+                    type.name,
+                )
+                TabType.OftenUse -> ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.FREQUENCY)
+                TabType.UserCustom -> ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.USER)
             }
+
         }
 
-        fun setList(list: List<String>) {
+        fun setList(list: List<TabType>) {
             categoryList = list
             notifyDataSetChanged()
         }
@@ -189,3 +170,4 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     }
 
 }
+
