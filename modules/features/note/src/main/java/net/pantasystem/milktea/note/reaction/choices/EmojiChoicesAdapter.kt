@@ -50,16 +50,16 @@ class EmojiChoicesAdapter(
                     .centerCrop()
                     .into(holder.binding.reactionImagePreview)
                 holder.binding.reactionStringPreview.isVisible = false
-                holder.binding.reactionStringPreview.isVisible = true
+                holder.binding.reactionImagePreview.isVisible = true
             }
             is EmojiType.Legacy -> {
+                holder.binding.reactionImagePreview.isVisible = false
                 holder.binding.reactionStringPreview.isVisible = true
-                holder.binding.reactionStringPreview.isVisible = false
                 holder.binding.reactionStringPreview.text = requireNotNull(LegacyReaction.reactionMap[emojiType.type])
             }
             is EmojiType.UtfEmoji -> {
                 holder.binding.reactionStringPreview.isVisible = true
-                holder.binding.reactionStringPreview.isVisible = false
+                holder.binding.reactionImagePreview.isVisible = false
                 holder.binding.reactionStringPreview.text = emojiType.code
             }
         }
