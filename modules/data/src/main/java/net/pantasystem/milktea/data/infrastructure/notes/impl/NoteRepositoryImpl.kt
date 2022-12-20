@@ -297,6 +297,24 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
+                NoteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId
+                )
+            ).throwIfHasError().body()!!.let {
+                NoteState(
+                    isFavorited = it.isFavorited,
+                    isMutedThread = it.isMutedThread,
+                    isWatching = it.isWatching
+                )
+            }
+        }
+    }
+
     override fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>> {
         return noteDataSource.observeIn(noteIds)
     }
