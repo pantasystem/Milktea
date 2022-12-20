@@ -65,29 +65,7 @@ data class ReactionSelectionUiState(
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<ReactionUserSetting>,
 ) {
-    val frequencyUsedReactions: List<String> get() {
-        return reactionHistoryCounts.map {
-            it.reaction
-        }.map { reaction ->
-            if (reaction.codePointCount(0, reaction.length) == 1) {
-                reaction
-            } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
-                    "@"
-                )
-            ) {
-                (reaction.replace(":", "").split("@")[0]).let {
-                    ":$it:"
-                }
-            } else {
-                reaction
-            }
-        }.filter { reaction ->
-            reaction.codePointCount(0, reaction.length) == 1
-                    || meta?.emojis?.any {
-                it.name == reaction.replace(":", "")
-            } ?: false
-        }.distinct()
-    }
+
 
     val frequencyUsedReactionsV2: List<EmojiType> by lazy {
         reactionHistoryCounts.map {
@@ -105,7 +83,9 @@ data class ReactionSelectionUiState(
                         EmojiType.CustomEmoji(it)
                     }
                 }
-            } else {
+            } else if (LegacyReaction.reactionMap[reaction] != null) {
+                EmojiType.Legacy(reaction)
+            }else {
                 meta?.emojis?.firstOrNull {
                     it.name == reaction.replace(":", "")
                 }?.let {
@@ -115,38 +95,43 @@ data class ReactionSelectionUiState(
         }.distinct()
     }
 
-    val all: List<String> get() {
-        return LegacyReaction.defaultReaction + (meta?.emojis?.map {
-            ":${it.name}:"
-        } ?: emptyList())
-    }
-
-    val allV2: List<EmojiType> get() {
-        return LegacyReaction.defaultReaction.map {
+    val all: List<EmojiType> by lazy {
+        LegacyReaction.defaultReaction.map {
             EmojiType.Legacy(it)
         } + (meta?.emojis?.map {
             EmojiType.CustomEmoji(it)
         } ?: emptyList())
     }
 
-    val userSettingTextReactions: List<String> get() {
-        return userSettingReactions.map {
-            it.reaction
+
+    val userSettingEmojis: List<EmojiType> by lazy {
+        userSettingReactions.mapNotNull { setting ->
+            if (setting.reaction.codePointCount(0, setting.reaction.length) == 1) {
+                EmojiType.UtfEmoji(setting.reaction)
+            } else if (setting.reaction.startsWith(":") || setting.reaction.endsWith(":")) {
+                meta?.emojis?.firstOrNull {
+                    it.name == setting.reaction.replace(":", "")
+                }?.let {
+                    EmojiType.CustomEmoji(it)
+                }
+            } else if (LegacyReaction.reactionMap[setting.reaction] != null) {
+                EmojiType.Legacy(setting.reaction)
+            }  else {
+                meta?.emojis?.firstOrNull {
+                    it.name == setting.reaction.replace(":", "")
+                }?.let {
+                    EmojiType.CustomEmoji(it)
+                }
+            }
         }.ifEmpty {
-            LegacyReaction.defaultReaction
+            LegacyReaction.defaultReaction.map {
+                EmojiType.Legacy(it)
+            }
         }
     }
 
-    fun getCategoryBy(category: String): List<String> {
-        return meta?.emojis?.filter {
-            it.category == category
 
-        }?.map {
-            ":${it.name}:"
-        }?: emptyList()
-    }
-
-    fun getCategoryByV2(category: String): List<EmojiType> {
+    fun getCategoryBy(category: String): List<EmojiType> {
         return meta?.emojis?.filter {
             it.category == category
 
@@ -161,5 +146,19 @@ sealed interface EmojiType {
     data class Legacy(val type: String) : EmojiType
     data class CustomEmoji(val emoji: Emoji) : EmojiType
     data class UtfEmoji(val code: String) : EmojiType
+}
+
+fun EmojiType.toTextReaction(): String {
+    return when(val type = this) {
+        is EmojiType.CustomEmoji -> {
+            ":${type.emoji.name}:"
+        }
+        is EmojiType.Legacy -> {
+            type.type
+        }
+        is EmojiType.UtfEmoji -> {
+            type.code
+        }
+    }
 }
 
