@@ -74,7 +74,7 @@ class MFMParserTest {
     }
 
     @Test
-    fun getMentionHost_OtherHost() {
+    fun getMentionHost_GiveSameUserAndAccountHostInMentionHostOtherInstance() {
         val host = MFMParser.getMentionHost(
             hostInMentionText = "@misskey.pantasystem.com",
             accountHost = "misskey.io",
