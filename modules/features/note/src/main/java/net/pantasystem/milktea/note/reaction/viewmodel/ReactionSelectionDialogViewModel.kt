@@ -7,8 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.note.reaction.TabType
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,26 +52,33 @@ class ReactionSelectionDialogViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val categories = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
         metaRepository.observe(it.normalizedInstanceDomain)
-    }.mapNotNull {
-        it?.emojis
-    }.map { emojis ->
-        val categoryNames = emojis.filter {
-            it.category != null
-        }.groupBy {
-            it.category ?: ""
-        }.keys
-
-        listOf(
-            TabType.UserCustom,
-            TabType.OftenUse,
-            TabType.All
-        ) + categoryNames.map {
-            TabType.Category(it)
-        }
+    }.map{
+        it.makeTabItems()
     }.distinctUntilChanged()
         .flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-
 }
 
+
+sealed interface TabType {
+    object UserCustom : TabType
+    object OftenUse : TabType
+    object All : TabType
+    data class Category(val name: String) : TabType
+}
+
+fun Meta?.makeTabItems(): List<TabType> {
+    val categoryNames = this?.emojis?.filter {
+        it.category != null
+    }?.groupBy {
+        it.category ?: ""
+    }?.keys ?: emptySet()
+
+    return listOf(
+        TabType.UserCustom,
+        TabType.OftenUse,
+        TabType.All
+    ) + categoryNames.map {
+        TabType.Category(it)
+    }
+}

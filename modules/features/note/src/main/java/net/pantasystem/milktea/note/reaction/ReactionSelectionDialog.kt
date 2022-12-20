@@ -26,6 +26,7 @@ import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesFragment
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
+import net.pantasystem.milktea.note.reaction.viewmodel.TabType
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -170,9 +171,3 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
 }
 
-sealed interface TabType {
-    object UserCustom : TabType
-    object OftenUse : TabType
-    object All : TabType
-    data class Category(val name: String) : TabType
-}
