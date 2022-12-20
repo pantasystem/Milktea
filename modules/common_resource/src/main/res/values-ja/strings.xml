@@ -403,5 +403,7 @@
     <string name="successfully_created_schedule_note">スケジュール投稿が正常に作成されました</string>
     <string name="account">アカウント</string>
     <string name="switch_account">アカウント切り替え</string>
+    <string name="mute_thread">スレッドをミュート</string>
+    <string name="unmute_thread">スレッドのミュートを解除</string>
 
 </resources>

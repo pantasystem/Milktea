@@ -393,5 +393,7 @@
     <string name="is_enable_instance_ticker">Use Instance Ticker</string>
     <string name="successfully_created_schedule_note">Successfully created a schedule post</string>
     <string name="switch_account">Switch Account</string>
+    <string name="mute_thread">Mute thread</string>
+    <string name="unmute_thread">Unmute thread</string>
 
 </resources>
