@@ -10,6 +10,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
@@ -88,9 +89,43 @@ data class ReactionSelectionUiState(
         }.distinct()
     }
 
+    val frequencyUsedReactionsV2: List<EmojiType> by lazy {
+        reactionHistoryCounts.map {
+            it.reaction
+        }.mapNotNull { reaction ->
+            if (reaction.codePointCount(0, reaction.length) == 1) {
+                EmojiType.UtfEmoji(reaction)
+            } else if (reaction.startsWith(":") && reaction.endsWith(":") && reaction.contains(
+                    "@"
+                )) {
+                (reaction.replace(":", "").split("@")[0]).let { name ->
+                    meta?.emojis?.firstOrNull {
+                        it.name == name
+                    }?.let {
+                        EmojiType.CustomEmoji(it)
+                    }
+                }
+            } else {
+                meta?.emojis?.firstOrNull {
+                    it.name == reaction.replace(":", "")
+                }?.let {
+                    EmojiType.CustomEmoji(it)
+                }
+            }
+        }.distinct()
+    }
+
     val all: List<String> get() {
         return LegacyReaction.defaultReaction + (meta?.emojis?.map {
             ":${it.name}:"
+        } ?: emptyList())
+    }
+
+    val allV2: List<EmojiType> get() {
+        return LegacyReaction.defaultReaction.map {
+            EmojiType.Legacy(it)
+        } + (meta?.emojis?.map {
+            EmojiType.CustomEmoji(it)
         } ?: emptyList())
     }
 
@@ -111,5 +146,20 @@ data class ReactionSelectionUiState(
         }?: emptyList()
     }
 
+    fun getCategoryByV2(category: String): List<EmojiType> {
+        return meta?.emojis?.filter {
+            it.category == category
+
+        }?.map {
+            EmojiType.CustomEmoji(it)
+        }?: emptyList()
+    }
+
+}
+
+sealed interface EmojiType {
+    data class Legacy(val type: String) : EmojiType
+    data class CustomEmoji(val emoji: Emoji) : EmojiType
+    data class UtfEmoji(val code: String) : EmojiType
 }
 
