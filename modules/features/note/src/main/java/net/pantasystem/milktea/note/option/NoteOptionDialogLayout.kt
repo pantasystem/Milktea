@@ -82,8 +82,8 @@ fun NoteOptionDialogLayout(
                 )
             }
 
-            if (uiState.noteState?.isMutedThread != null) {
-                if (uiState.noteState.isMutedThread == true) {
+            if (uiState.noteState == null || uiState.noteState.isMutedThread != null) {
+                if (uiState.noteState?.isMutedThread == true) {
                     NormalBottomSheetDialogSelectionLayout(
                         onClick = {
                             onDeleteThreadMuteButtonClicked(requireNotNull(uiState.noteId))
