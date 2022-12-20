@@ -19,14 +19,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common_android_ui.reaction.ReactionChoicesAdapter
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
+import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
 import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesFragment
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.TabType
+import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
@@ -83,9 +84,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         binding.lifecycleOwner = this
 
 
-
-        val searchedReactionAdapter = ReactionChoicesAdapter {
-            notesViewModel.toggleReaction(noteId, it)
+        val searchedReactionAdapter = EmojiChoicesAdapter {
+            notesViewModel.toggleReaction(noteId, it.toTextReaction())
             dismiss()
         }
 

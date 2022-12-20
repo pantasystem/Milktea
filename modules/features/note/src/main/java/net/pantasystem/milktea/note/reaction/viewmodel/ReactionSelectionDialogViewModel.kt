@@ -43,7 +43,7 @@ class ReactionSelectionDialogViewModel @Inject constructor(
         }
     }.map { emojis ->
         emojis.map {
-            ":${it.name}:"
+            EmojiType.CustomEmoji(it)
         }
     }.distinctUntilChanged()
         .flowOn(Dispatchers.IO)
