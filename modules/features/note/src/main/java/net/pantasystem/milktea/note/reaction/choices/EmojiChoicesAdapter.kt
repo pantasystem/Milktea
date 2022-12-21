@@ -43,10 +43,11 @@ class EmojiChoicesAdapter(
         )
     }
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        when(val emojiType = getItem(position)) {
+        val item = getItem(position)
+        when(item) {
             is EmojiType.CustomEmoji -> {
                 GlideApp.with(holder.binding.reactionImagePreview)
-                    .load(emojiType.emoji.url ?: emojiType.emoji.uri)
+                    .load(item.emoji.url ?: item.emoji.uri)
                     .centerCrop()
                     .into(holder.binding.reactionImagePreview)
                 holder.binding.reactionStringPreview.isVisible = false
@@ -55,16 +56,16 @@ class EmojiChoicesAdapter(
             is EmojiType.Legacy -> {
                 holder.binding.reactionImagePreview.isVisible = false
                 holder.binding.reactionStringPreview.isVisible = true
-                holder.binding.reactionStringPreview.text = requireNotNull(LegacyReaction.reactionMap[emojiType.type])
+                holder.binding.reactionStringPreview.text = requireNotNull(LegacyReaction.reactionMap[item.type])
             }
             is EmojiType.UtfEmoji -> {
                 holder.binding.reactionStringPreview.isVisible = true
                 holder.binding.reactionImagePreview.isVisible = false
-                holder.binding.reactionStringPreview.text = emojiType.code
+                holder.binding.reactionStringPreview.text = item.code
             }
         }
         holder.binding.root.setOnClickListener {
-            emojiSelection(getItem(position))
+            emojiSelection(item)
         }
         holder.binding.executePendingBindings()
     }
