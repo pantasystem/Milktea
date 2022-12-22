@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import javax.inject.Inject
@@ -31,15 +32,8 @@ class ReactionSelectionDialogViewModel @Inject constructor(
     }.filterNotNull().mapNotNull {
         it.emojis
     }.flatMapLatest { emojis ->
-        searchWord.map { word ->
-            word.replace(":", "")
-        }.map { word ->
-            emojis.filter { emoji ->
-                emoji.name.contains(word)
-                        || emoji.aliases?.any { alias ->
-                    alias.startsWith(word)
-                } ?: false
-            }
+        searchWord.map {
+            emojis.filterEmojiBy(it)
         }
     }.map { emojis ->
         emojis.map {
@@ -80,5 +74,15 @@ fun Meta?.makeTabItems(): List<TabType> {
         TabType.All
     ) + categoryNames.map {
         TabType.Category(it)
+    }
+}
+
+fun List<Emoji>.filterEmojiBy(word: String): List<Emoji> {
+    val w = word.replace(":", "")
+    return filter { emoji ->
+        emoji.name.contains(w)
+                || emoji.aliases?.any { alias ->
+            alias.startsWith(w)
+        } ?: false
     }
 }
