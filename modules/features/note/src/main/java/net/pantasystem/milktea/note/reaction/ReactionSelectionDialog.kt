@@ -1,15 +1,13 @@
-@file:Suppress("DEPRECATION")
 
 package net.pantasystem.milktea.note.reaction
-
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.fragment.app.*
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,9 +22,8 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
-import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesFragment
+import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesPagerAdapter
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
-import net.pantasystem.milktea.note.reaction.viewmodel.TabType
 import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -132,42 +129,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
         dismiss()
     }
 
-    class ReactionChoicesPagerAdapter(fragmentManager: FragmentManager, val context: Context) :
-        FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-        private var categoryList: List<TabType> = emptyList()
-        override fun getCount(): Int {
-            return categoryList.size
-        }
-
-        override fun getPageTitle(position: Int): CharSequence {
-            return when(val type = categoryList[position]) {
-                TabType.All -> context.getString(R.string.all)
-                is TabType.Category -> type.name
-                TabType.OftenUse -> context.getString(R.string.often_use)
-                TabType.UserCustom -> context.getString(R.string.user)
-            }
-        }
-
-        override fun getItem(position: Int): Fragment {
-            return when(val type = categoryList[position]) {
-                TabType.All -> ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.DEFAULT)
-                is TabType.Category -> ReactionChoicesFragment.newInstance(
-                    ReactionChoicesFragment.Type.CATEGORY,
-                    type.name,
-                )
-                TabType.OftenUse -> ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.FREQUENCY)
-                TabType.UserCustom -> ReactionChoicesFragment.newInstance(ReactionChoicesFragment.Type.USER)
-            }
-
-        }
-
-        fun setList(list: List<TabType>) {
-            categoryList = list
-            notifyDataSetChanged()
-        }
-
-    }
 
 }
 
