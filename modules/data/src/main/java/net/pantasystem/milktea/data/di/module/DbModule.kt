@@ -11,15 +11,16 @@ import net.pantasystem.milktea.data.infrastructure.*
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
+import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.list.UserListDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import javax.inject.Singleton
 
 @Module
@@ -96,4 +97,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideUserListDao(db: DataBase): UserListDao = db.userListDao()
+
+    @Provides
+    @Singleton
+    fun provideInstanceInfoDao(db: DataBase): InstanceInfoDao = db.instanceInfoDao()
 }
