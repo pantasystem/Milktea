@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface InstanceInfoRepository {
 
-    suspend fun findAll(): Result<InstanceInfo>
+    suspend fun findAll(): Result<List<InstanceInfo>>
 
     suspend fun sync(): Result<Unit>
 
