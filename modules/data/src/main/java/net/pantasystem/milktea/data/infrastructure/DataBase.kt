@@ -38,10 +38,10 @@ import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConf
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
+import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.data.infrastructure.user.db.*
-import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 
 @Database(
     entities = [
@@ -82,8 +82,9 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 
         UserListRecord::class,
         UserListMemberIdRecord::class,
+        InstanceInfoRecord::class,
     ],
-    version = 27,
+    version = 28,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -102,6 +103,7 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
         AutoMigration(from = 24, to = 25),
         AutoMigration(from = 25, to = 26),
         AutoMigration(from = 26, to = 27),
+        AutoMigration(from = 27, to = 28),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -150,4 +152,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun wordFilterConfigDao(): WordFilterConfigDao
 
     abstract fun userListDao(): UserListDao
+
+    abstract fun instanceInfoDao(): InstanceInfoDao
 }
