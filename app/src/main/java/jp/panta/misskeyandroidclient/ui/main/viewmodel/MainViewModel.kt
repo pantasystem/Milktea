@@ -109,7 +109,7 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            accountStore.observeCurrentAccount.filterNotNull().collect(emojiEventHandler::observe)
+            accountStore.observeCurrentAccount.collect(emojiEventHandler::observe)
         }
     }
 

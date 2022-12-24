@@ -16,12 +16,14 @@ class EmojiEventHandlerImpl @Inject constructor(
 
     private var currentAccount: Account? = null
 
-    override fun observe(account: Account) {
+    override fun observe(account: Account?) {
         synchronized(this) {
             currentAccount?.let {
                 socketProvider.get(it)
             }?.removeMessageEventListener(this)
-            socketProvider.get(account.accountId)?.addMessageEventListener(this)
+            if (account != null) {
+                socketProvider.get(account.accountId)?.addMessageEventListener(this)
+            }
             currentAccount = account
 
         }
@@ -30,7 +32,9 @@ class EmojiEventHandlerImpl @Inject constructor(
     override fun onMessage(e: StreamingEvent): Boolean {
         return when(e) {
             is EmojiAdded -> {
-                executor.invoke(requireNotNull(currentAccount).normalizedInstanceDomain)
+                if (currentAccount != null) {
+                    executor.invoke(requireNotNull(currentAccount).normalizedInstanceDomain)
+                }
                 true
             }
             else -> {
