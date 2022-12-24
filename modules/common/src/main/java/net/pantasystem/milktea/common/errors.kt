@@ -40,7 +40,6 @@ fun<T> Response<T>.throwIfHasError(): Response<T> {
         }
     }.getOrNull()
     error.let {
-        println("throwIfHasError: endpoint:${this.raw().request.url} code:${this.code()}, errorBody:${error}, body:${body()}")
         when(this.code()) {
             400 -> throw APIError.ClientException(it)
             401 -> throw APIError.AuthenticationException(it)

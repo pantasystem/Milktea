@@ -31,7 +31,6 @@ object MFMParser {
     ): Root? {
         text ?: return null
         //println("textSize:${text.length}")
-        println("userHost:$userHost")
         val root = Root(text)
         NodeParser(
             text, root,
