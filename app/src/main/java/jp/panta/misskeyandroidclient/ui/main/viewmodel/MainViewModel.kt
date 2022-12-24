@@ -20,6 +20,7 @@ import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.model.emoji.EmojiEventHandler
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
@@ -38,6 +39,7 @@ class MainViewModel @Inject constructor(
     private val configRepository: LocalConfigRepository,
     private val metaRepository: MetaRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val emojiEventHandler: EmojiEventHandler,
     settingStore: SettingStore
 ) : ViewModel() {
     val logger by lazy {
@@ -104,6 +106,12 @@ class MainViewModel @Inject constructor(
     ) { unc, umc->
         MainUiState(unc, umc)
     }.stateIn(viewModelScope, SharingStarted.Lazily, MainUiState())
+
+    init {
+        viewModelScope.launch {
+            accountStore.observeCurrentAccount.collect(emojiEventHandler::observe)
+        }
+    }
 
     fun setCrashlyticsCollectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
