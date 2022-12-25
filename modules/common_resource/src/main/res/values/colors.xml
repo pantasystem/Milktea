@@ -9,7 +9,7 @@
     <color name="colorItemNotSelected">#727272</color>
     <color name="colorItemSelected">#202020</color>
 
-    <color name="colorNormalReaction">#A7A6A6</color>
+    <color name="colorNormalReaction">#CCCCCC</color>
     <color name="colorSelectedReaction">#FB8C00</color>
     <color name="colorMessageSelf">#FFA95B</color>
     <color name="colorMessageRecipient">#FFFFFF</color>
