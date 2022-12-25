@@ -59,12 +59,13 @@ object NoteReactionViewHelper {
             ) {
 
                 GlideApp.with(context)
-                    .load(emoji.url ?: emoji.url)
+                    .load(emoji.url ?: emoji.uri)
+                    .fitCenter()
                     .into(reactionImageTypeView)
             } else {
                 GlideApp.with(reactionImageTypeView.context)
                     .load(emoji.url ?: emoji.uri)
-                    .centerCrop()
+                    .fitCenter()
                     .into(reactionImageTypeView)
             }
         }
