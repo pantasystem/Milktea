@@ -1,11 +1,7 @@
 package net.pantasystem.milktea.note.reaction.history
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -13,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.notes.Note
@@ -21,19 +18,19 @@ import net.pantasystem.milktea.note.databinding.FragmentReactionHistoryListBindi
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ReactionHistoryListFragment : Fragment() {
+class ReactionHistoryListFragment : Fragment(R.layout.fragment_reaction_history_list) {
 
     companion object {
         private const val EXTRA_NOTE_ID = "NOTE_ID"
         private const val EXTRA_ACCOUNT_ID = "EXTRA_ACCOUNT_ID"
         private const val EXTRA_TYPE = "EXTRA_TYPE"
 
-        fun newInstance(noteId: Note.Id, type: String? = null) : ReactionHistoryListFragment {
+        fun newInstance(noteId: Note.Id, type: String? = null): ReactionHistoryListFragment {
             return ReactionHistoryListFragment().also {
                 it.arguments = Bundle().also { bundle ->
                     bundle.putString(EXTRA_NOTE_ID, noteId.noteId)
                     bundle.putLong(EXTRA_ACCOUNT_ID, noteId.accountId)
-                    type?.let{
+                    type?.let {
                         bundle.putString(EXTRA_TYPE, type)
                     }
                 }
@@ -41,7 +38,8 @@ class ReactionHistoryListFragment : Fragment() {
         }
     }
 
-    lateinit var binding: FragmentReactionHistoryListBinding
+    private val binding: FragmentReactionHistoryListBinding by dataBinding()
+
     lateinit var mLinearLayoutManager: LinearLayoutManager
 
     @Inject
@@ -56,69 +54,33 @@ class ReactionHistoryListFragment : Fragment() {
         ReactionHistoryViewModel.provideViewModel(assistedFactory, noteId, type)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_reaction_history_list, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val aId = requireArguments().getLong(EXTRA_ACCOUNT_ID, -1)
-        val nId = requireArguments().getString(EXTRA_NOTE_ID)
-        requireNotNull(nId)
-        require(aId != -1L)
-//        viewModel.isLoading.observe(viewLifecycleOwner) {
-//            if(it == true && viewModel.histories.value.isNullOrEmpty()) {
-//                // 初期読み込み
-//                binding.progress.visibility = View.VISIBLE
-//                binding.historiesView.visibility = View.GONE
-//            }else{
-//                binding.progress.visibility = View.GONE
-//                binding.historiesView.visibility = View.VISIBLE
-//            }
-//        }
-        val simpleUserListAdapter =
-            SimpleUserListAdapter(requireActivity())
-        binding.historiesView.adapter = simpleUserListAdapter
+        val listAdapter = ReactionHistoryListAdapter(requireActivity())
+        binding.historiesView.adapter = listAdapter
         mLinearLayoutManager = LinearLayoutManager(requireContext())
         binding.historiesView.layoutManager = mLinearLayoutManager
         binding.historiesView.addOnScrollListener(mScrollListener)
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { uiState ->
-                    simpleUserListAdapter.submitList(uiState.items)
+                    listAdapter.submitList(uiState.items)
                 }
             }
         }
-//        viewModel.histories.observe(viewLifecycleOwner) {
-//            it?.let {
-//                it.map { rh ->
-//                    rh.user
-//                }.let { users ->
-//                    simpleUserListAdapter.submitList(users)
-//                }
-//            }
-//        }
         viewModel.next()
     }
 
-    private val mScrollListener = object : RecyclerView.OnScrollListener(){
+    private val mScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-
             val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
             val itemCount = mLinearLayoutManager.itemCount
 
-
-            if(endVisibleItemPosition == (itemCount - 1)){
-                Log.d("", "後ろ")
+            if (endVisibleItemPosition == (itemCount - 1)) {
                 viewModel.next()
-
             }
 
         }

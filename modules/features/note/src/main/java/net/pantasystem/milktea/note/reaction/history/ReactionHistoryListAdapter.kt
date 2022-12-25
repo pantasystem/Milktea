@@ -17,7 +17,7 @@ import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemReactionHistoryHeaderBinding
 import net.pantasystem.milktea.note.reaction.viewmodel.EmojiType
 
-class SimpleUserListAdapter(
+class ReactionHistoryListAdapter(
     val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<ReactionHistoryListType, ReactionHistoryViewHolder>(Diff()) {
 
