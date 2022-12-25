@@ -8,14 +8,16 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentReactionHistoryListBinding
-import net.pantasystem.milktea.note.reaction.viewmodel.ReactionHistoryViewModel
-import net.pantasystem.milktea.note.reaction.viewmodel.provideViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -70,31 +72,38 @@ class ReactionHistoryListFragment : Fragment() {
         val nId = requireArguments().getString(EXTRA_NOTE_ID)
         requireNotNull(nId)
         require(aId != -1L)
-        viewModel.isLoading.observe(viewLifecycleOwner) {
-            if(it == true && viewModel.histories.value.isNullOrEmpty()) {
-                // 初期読み込み
-                binding.progress.visibility = View.VISIBLE
-                binding.historiesView.visibility = View.GONE
-            }else{
-                binding.progress.visibility = View.GONE
-                binding.historiesView.visibility = View.VISIBLE
-            }
-        }
+//        viewModel.isLoading.observe(viewLifecycleOwner) {
+//            if(it == true && viewModel.histories.value.isNullOrEmpty()) {
+//                // 初期読み込み
+//                binding.progress.visibility = View.VISIBLE
+//                binding.historiesView.visibility = View.GONE
+//            }else{
+//                binding.progress.visibility = View.GONE
+//                binding.historiesView.visibility = View.VISIBLE
+//            }
+//        }
         val simpleUserListAdapter =
-            net.pantasystem.milktea.common_android_ui.user.SimpleUserListAdapter(requireActivity())
+            SimpleUserListAdapter(requireActivity())
         binding.historiesView.adapter = simpleUserListAdapter
         mLinearLayoutManager = LinearLayoutManager(requireContext())
         binding.historiesView.layoutManager = mLinearLayoutManager
         binding.historiesView.addOnScrollListener(mScrollListener)
-        viewModel.histories.observe(viewLifecycleOwner) {
-            it?.let {
-                it.map { rh ->
-                    rh.user
-                }.let { users ->
-                    simpleUserListAdapter.submitList(users)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.uiState.collect { uiState ->
+                    simpleUserListAdapter.submitList(uiState.items)
                 }
             }
         }
+//        viewModel.histories.observe(viewLifecycleOwner) {
+//            it?.let {
+//                it.map { rh ->
+//                    rh.user
+//                }.let { users ->
+//                    simpleUserListAdapter.submitList(users)
+//                }
+//            }
+//        }
         viewModel.next()
     }
 
