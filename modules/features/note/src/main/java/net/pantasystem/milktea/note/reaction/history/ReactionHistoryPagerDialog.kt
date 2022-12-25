@@ -49,7 +49,9 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
         }
     }
 
-    lateinit var binding: DialogReactionHistoryPagerBinding
+    private var _binding: DialogReactionHistoryPagerBinding? = null
+    val binding: DialogReactionHistoryPagerBinding
+        get() = requireNotNull(_binding)
 
     private val pagerViewModel by viewModels<ReactionHistoryPagerViewModel>()
 
@@ -75,7 +77,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(
+        _binding = DataBindingUtil.inflate(
             inflater,
             R.layout.dialog_reaction_history_pager,
             container,
@@ -130,6 +132,11 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
         }
 
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setCustomEmojiSpanIntoTabs(uiState: ReactionHistoryPagerUiState) {

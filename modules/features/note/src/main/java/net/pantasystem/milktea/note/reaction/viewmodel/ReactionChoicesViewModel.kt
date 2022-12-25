@@ -142,12 +142,15 @@ fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType?
             "@"
         )
     ) {
-        (reaction.replace(":", "").split("@")[0]).let { name ->
+        val nameOnly = reaction.replace(":", "")
+        (emojis?.firstOrNull {
+            it.name == nameOnly
+        } ?: (nameOnly.split("@")[0]).let { name ->
             emojis?.firstOrNull {
                 it.name == name
-            }?.let {
-                EmojiType.CustomEmoji(it)
             }
+        })?.let {
+            EmojiType.CustomEmoji(it)
         }
     } else if (LegacyReaction.reactionMap[reaction] != null) {
         EmojiType.Legacy(reaction)
