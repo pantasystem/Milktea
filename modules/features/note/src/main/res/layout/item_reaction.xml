@@ -40,7 +40,8 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="4dp"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                android:scaleType="fitCenter" />
         <TextView
                 android:id="@+id/reactionText"
                 android:layout_width="wrap_content"
