@@ -79,11 +79,10 @@ class MisskeyAPIServiceBuilder @Inject constructor(
                 val diff = retrofit.create(MisskeyAPIV10Diff::class.java)
                 return MisskeyAPIV10(build(baseUrl), diff)
             }
-            version.isInRange(Version.Major.V_11)
-                    || version.isInRange(Version.Major.V_12) ->{
+            version.isInRange(Version.Major.V_11) || version.isInRange(Version.Major.V_12) || version.isInRange(Version.Major.V_13) ->{
                 val baseAPI = build(baseUrl)
                 val misskeyAPIV11Diff = retrofit.create(MisskeyAPIV11Diff::class.java)
-                if(version.isInRange(Version.Major.V_12)){
+                if(version.isInRange(Version.Major.V_12) || version.isInRange(Version.Major.V_13)){
                     val misskeyAPI12DiffImpl = retrofit.create(MisskeyAPIV12Diff::class.java)
                     if(version >= Version("12.75.0")) {
                         val misskeyAPIV1275Diff = retrofit.create(MisskeyAPIV1275Diff::class.java)
