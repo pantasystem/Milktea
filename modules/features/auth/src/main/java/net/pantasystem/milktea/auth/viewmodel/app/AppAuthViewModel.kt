@@ -14,6 +14,7 @@ import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import java.util.*
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ class AppAuthViewModel @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
+    private val instanceInfoRepository: InstanceInfoRepository,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -59,6 +61,9 @@ class AppAuthViewModel @Inject constructor(
             StateContent.NotExist()
         )
     )
+
+    private val instances = instanceInfoRepository.observeAll()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val authUserInputState = combine(
         instanceDomain,
@@ -103,9 +108,9 @@ class AppAuthViewModel @Inject constructor(
         }
     }.flatMapLatest {
         suspend {
-                when (val meta = it.meta.content) {
+            when (val meta = it.meta.content) {
                 is StateContent.Exist -> {
-                    val instanceBase = when(val info = meta.rawContent) {
+                    val instanceBase = when (val info = meta.rawContent) {
                         is InstanceType.Mastodon -> info.instance.uri
                         is InstanceType.Misskey -> info.instance.uri
                     }
@@ -149,13 +154,20 @@ class AppAuthViewModel @Inject constructor(
         }.getOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val state = combine(
-        instanceInfo,
+    private val combineStates = combine(
         waiting4UserApprove,
         approved,
         finished,
         generateTokenResult
-    ) { formState, waiting4Approve, approved, finished, result ->
+    ) { waiting4Approve, approved, finished, result ->
+        CombineStates(waiting4Approve, approved, finished, result)
+    }
+
+    val state = combine(
+        instanceInfo,
+        combineStates,
+        instances,
+    ) { formState, (waiting4Approve, approved, finished, result), instances ->
         AuthUiState(
             formState = formState.inputState,
             metaState = formState.meta,
@@ -167,7 +179,8 @@ class AppAuthViewModel @Inject constructor(
                 else -> Authorization.BeforeAuthentication
             },
             waiting4ApproveState = waiting4Approve,
-            clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}"
+            clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
+            instances = instances
         )
     }.stateIn(
         viewModelScope,
@@ -222,7 +235,7 @@ class AppAuthViewModel @Inject constructor(
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         // NOTE: id, passwordのサポート
-        authUserInputState.flatMapLatest {  state ->
+        authUserInputState.flatMapLatest { state ->
             startAuthEventFlow.distinctUntilChanged().map {
                 state
             }
@@ -240,6 +253,12 @@ class AppAuthViewModel @Inject constructor(
                 logger.error("signIn failed", it)
             }
         }.launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            instanceInfoRepository.sync().onFailure {
+                logger.error("sync instance info error", it)
+            }
+        }
     }
 
     fun clearHostName() {
@@ -275,3 +294,10 @@ class AppAuthViewModel @Inject constructor(
     }
 
 }
+
+private data class CombineStates(
+    val waiting4UserApprove: ResultState<Authorization.Waiting4UserAuthorization>,
+    val approved: Authorization.Approved? = null,
+    val finished: Authorization.Finish? = null,
+    val generateTokenResult: GenerateTokenResult = GenerateTokenResult.Fixed
+)

@@ -1,7 +1,5 @@
 package net.pantasystem.milktea.model.instance
 
-import java.lang.IndexOutOfBoundsException
-
 class Version : Comparable<Version>{
 
     enum class Major{
@@ -18,6 +16,11 @@ class Version : Comparable<Version>{
         V_12{
             override fun range(version: Version): Boolean {
                 return version >= Version("12") && version < Version("13")
+            }
+        },
+        V_13 {
+            override fun range(version: Version): Boolean {
+                return version >= Version("13") && version < Version("14")
             }
         };
 

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.api.milktea.CreateInstanceRequest
 import net.pantasystem.milktea.api.milktea.InstanceInfoResponse
 import net.pantasystem.milktea.api.milktea.MilkteaAPIServiceBuilder
 import net.pantasystem.milktea.common.throwIfHasError
@@ -63,6 +64,11 @@ class InstanceInfoRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun postInstance(host: String): Result<Unit> = runCatching {
+        withContext(Dispatchers.IO) {
+            milkteaAPIService.createInstance(CreateInstanceRequest(host = host)).throwIfHasError()
+        }
+    }
 
 }
 

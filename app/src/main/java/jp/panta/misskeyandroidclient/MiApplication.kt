@@ -28,6 +28,7 @@ import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
 import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
@@ -164,6 +165,11 @@ class MiApplication : Application(), Configuration.Provider {
                 "syncLoggedInUsers",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
+            )
+            enqueueUniquePeriodicWork(
+                "scheduleAuthInstancePostWorker",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
             )
         }
 
