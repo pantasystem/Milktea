@@ -92,11 +92,11 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
             searchWordTextField = binding.searchReactionEditText,
             viewModel = viewModel,
             onReactionSelected = {
-                notesViewModel.toggleReaction(noteId, viewModel.searchWord.value)
+                notesViewModel.toggleReaction(noteId, it)
                 dismiss()
             },
             onSearchEmojiTextFieldEntered = {
-                notesViewModel.toggleReaction(noteId, viewModel.searchWord.value)
+                notesViewModel.toggleReaction(noteId, it)
                 dismiss()
             }
         )
