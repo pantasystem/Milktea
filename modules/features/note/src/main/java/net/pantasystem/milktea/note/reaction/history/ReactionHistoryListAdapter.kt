@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common_android_ui.databinding.ItemSimpleUserBinding
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemReactionHistoryHeaderBinding
+import net.pantasystem.milktea.note.databinding.ItemSimpleUserBinding
 import net.pantasystem.milktea.note.reaction.viewmodel.EmojiType
 
 class ReactionHistoryListAdapter(
