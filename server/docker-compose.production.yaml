@@ -2,7 +2,9 @@
 version: "3.9"
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.production
     tty: true
     ports:
       - "3001:8080"
@@ -17,6 +19,8 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_USER: dbuser
       POSTGRES_DB: database
+    volumes:
+      - ./db:/var/lib/postgresql/data
     ports:
       - "5433:5432"
   proxy:
