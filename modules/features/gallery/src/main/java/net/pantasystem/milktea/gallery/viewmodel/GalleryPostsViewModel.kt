@@ -153,7 +153,7 @@ class GalleryPostsViewModel @AssistedInject constructor(
         if (galleryPostsStore.mutex.isLocked) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             galleryPostsStore.clear()
             galleryPostsStore.loadPrevious()
         }
@@ -172,13 +172,13 @@ class GalleryPostsViewModel @AssistedInject constructor(
         if (galleryPostsStore.mutex.isLocked) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             galleryPostsStore.loadPrevious()
         }
     }
 
     fun toggleFavorite(galleryId: GalleryPost.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             toggle(galleryId)
         }
     }

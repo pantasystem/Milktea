@@ -168,7 +168,7 @@ class FileViewModel @AssistedInject constructor(
 
 
     fun uploadFile(file: AppFile.Local) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val currentDir = driveStore.state.value.path.path.lastOrNull()?.id
                 val account = currentAccountWatcher.getAccount()

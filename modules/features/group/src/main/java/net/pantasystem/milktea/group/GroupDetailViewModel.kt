@@ -170,7 +170,7 @@ class GroupDetailViewModel @Inject constructor(
     fun save() {
         val type = uiStateType.value
         if (type is GroupDetailUiStateType.Editing) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 runCancellableCatching {
                     if (type.groupId == null) {
                         groupRepository.create(

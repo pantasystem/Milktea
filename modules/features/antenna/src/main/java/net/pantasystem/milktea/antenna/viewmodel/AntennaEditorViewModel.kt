@@ -39,7 +39,7 @@ class AntennaEditorViewModel @Inject constructor(
 
 
     private val mAntenna = MutableStateFlow<Antenna?>(null).apply {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 fetch()
             }.onFailure {
@@ -202,7 +202,7 @@ class AntennaEditorViewModel @Inject constructor(
     
     fun createOrUpdate(){
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val account = getAccount().getOrThrow()
                 val antenna = mAntenna.value
