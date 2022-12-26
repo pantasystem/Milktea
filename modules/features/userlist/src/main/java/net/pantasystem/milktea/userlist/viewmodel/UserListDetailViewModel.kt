@@ -6,13 +6,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common_viewmodel.UserViewData
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -22,7 +21,6 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 
 class UserListDetailViewModel @AssistedInject constructor(
-    private val userViewDataFactory: UserViewData.Factory,
     private val userListRepository: UserListRepository,
     private val userDataSource: UserDataSource,
     private val accountStore: AccountStore,
@@ -54,12 +52,6 @@ class UserListDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
-    val listUsers = userListRepository.observeOne(listId).filterNotNull().map {
-        it.userList.userIds.map { id ->
-            userViewDataFactory.create(id, viewModelScope)
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
     val isAddedToTab = accountStore.observeAccounts.mapNotNull {
         it.firstOrNull { ac ->
             ac.accountId == listId.accountId
@@ -84,7 +76,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     }
 
     fun load() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 userListRepository.syncOne(listId)
             }.onSuccess {
@@ -98,7 +90,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     }
 
     fun updateName(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 userListRepository.update(listId, name)
                 userListRepository.syncOne(listId).getOrThrow()
@@ -113,7 +105,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     fun pushUser(userId: User.Id) {
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 userListRepository.appendUser(listId, userId)
                 userListRepository.syncOne(listId).getOrThrow()
@@ -129,7 +121,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     fun pullUser(userId: User.Id) {
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 userListRepository.removeUser(listId, userId)
                 userListRepository.syncOne(listId).getOrThrow()
