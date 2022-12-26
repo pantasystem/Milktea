@@ -120,7 +120,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun setSwitchTargetConnectionInstance(account: Account) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             accountStore.setCurrent(account)
         }
     }
@@ -151,7 +151,7 @@ class AccountViewModel @Inject constructor(
 
 
     fun signOut(account: Account) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 subscriptionUnRegistration
                     .unregister(account.accountId)
@@ -164,7 +164,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun addPage(page: Page) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 accountStore.addPage(page)
             } catch (e: Throwable) {
@@ -174,7 +174,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun removePage(page: Page) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 accountStore.removePage(page)
             } catch (e: Throwable) {

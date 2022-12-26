@@ -122,7 +122,7 @@ class AntennaEditorViewModel @Inject constructor(
 
 
     val userListList = MediatorLiveData<List<UserList>>().apply{
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val account = getAccount().getOrThrow()
                 userListRepository.findByAccountId(account.accountId)
@@ -246,7 +246,7 @@ class AntennaEditorViewModel @Inject constructor(
 
     fun removeRemote(){
         val antennaId = _antennaId.value ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             antennaRepository.delete(antennaId).onSuccess {
                 withContext(Dispatchers.Main) {
                     antennaRemovedEvent.event = Unit

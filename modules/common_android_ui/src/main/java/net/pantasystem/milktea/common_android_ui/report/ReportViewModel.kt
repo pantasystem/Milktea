@@ -3,7 +3,6 @@ package net.pantasystem.milktea.common_android_ui.report
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.user.User
@@ -60,7 +59,7 @@ class ReportViewModel @Inject constructor(
     }
 
     fun submit() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             sendReportUseCase.invoke(state.value).collect {
                 _state.value = it
             }

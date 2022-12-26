@@ -266,7 +266,7 @@ class AppAuthViewModel @Inject constructor(
     fun getAccessToken(code: String? = null, w4a: Authorization.Waiting4UserAuthorization? = null) {
         val a = w4a ?: (waiting4UserApprove.value.content as? StateContent.Exist)?.rawContent
         ?: throw IllegalStateException("現在の状態: ${state.value}でアクセストークンを取得することはできません。")
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
             getAccessToken.getAccessToken(a, code).onSuccess {
                 val authenticated = Authorization.Approved(

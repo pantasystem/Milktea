@@ -70,7 +70,7 @@ class AntennaListViewModel @Inject constructor(
     private val deleteResultEvent = EventBus<Boolean>()
 
     fun loadInit() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val account = accountRepository.getCurrentAccount().getOrThrow()
                 antennaRepository.findByAccountId(account.accountId).getOrThrow()
@@ -88,7 +88,7 @@ class AntennaListViewModel @Inject constructor(
 
             it.pageParams.antennaId == antenna.id.antennaId
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (paged == null) {
                 accountStore.addPage(
                     PageableTemplate(accountStore.currentAccount!!)
@@ -118,7 +118,7 @@ class AntennaListViewModel @Inject constructor(
     }
 
     fun deleteAntenna(antenna: Antenna) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             antennaRepository.delete(antenna.id).onSuccess {
                 loadInit()
             }.onFailure {

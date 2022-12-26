@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.antenna.databinding.FragmentAntennaEditorBinding
 import net.pantasystem.milktea.antenna.viewmodel.AntennaEditorViewModel
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
@@ -38,6 +40,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
 
     val viewModel: AntennaEditorViewModel by activityViewModels()
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -165,11 +168,9 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         binding.specifiedUserListView.adapter = userChipAdapter
         binding.specifiedUserListView.applyFlexBoxLayout(requireContext())
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             viewModel.users.collect {
-                withContext(Dispatchers.Main) {
-                    userChipAdapter.submitList(it)
-                }
+                userChipAdapter.submitList(it)
             }
         }
 
