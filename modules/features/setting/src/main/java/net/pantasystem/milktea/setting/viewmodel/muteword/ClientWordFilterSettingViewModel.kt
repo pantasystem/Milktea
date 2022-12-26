@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigTextParser
 import javax.inject.Inject
@@ -22,7 +23,7 @@ class ClientWordFilterSettingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.get().mapCatching {
+            repository.get().mapCancellableCatching {
                 WordFilterConfigTextParser.fromConfig(it).getOrThrow()
             }.onSuccess {
                 muteWordsFieldState = it
@@ -36,7 +37,7 @@ class ClientWordFilterSettingViewModel @Inject constructor(
 
     fun save() {
         viewModelScope.launch {
-            WordFilterConfigTextParser.fromText(muteWordsFieldState).mapCatching {
+            WordFilterConfigTextParser.fromText(muteWordsFieldState).mapCancellableCatching {
                 repository.save(it).getOrThrow()
             }.onSuccess {
 

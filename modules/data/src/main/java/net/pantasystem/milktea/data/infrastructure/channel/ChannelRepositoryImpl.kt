@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.channel
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.*
 
@@ -65,12 +66,12 @@ class ChannelRepositoryImpl(
         limit: Int
     ): Result<List<Channel>> = runCatching {
         withContext(Dispatchers.IO) {
-            channelAPIAdapter.findFollowedChannels(accountId, sinceId, untilId, 99).mapCatching { list ->
+            channelAPIAdapter.findFollowedChannels(accountId, sinceId, untilId, 99).mapCancellableCatching { list ->
                 val account = accountRepository.get(accountId).getOrThrow()
                 list.map {
                     it.toModel(account)
                 }
-            }.mapCatching {
+            }.mapCancellableCatching {
                 channelStateModel.addAll(it)
                 it
             }.getOrThrow()

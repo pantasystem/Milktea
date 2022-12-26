@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.data.gettters
 
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
@@ -8,7 +10,6 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
-import net.pantasystem.milktea.common.runCancellableCatching
 
 
 @Singleton
@@ -30,7 +31,7 @@ class NoteRelationGetter @Inject constructor(
             notesMap.getOrElse(noteId) {
                 noteRepository.find(noteId).getOrThrow()
             }
-        }.mapCatching {
+        }.mapCancellableCatching {
             get(
                 it,
                 deep,

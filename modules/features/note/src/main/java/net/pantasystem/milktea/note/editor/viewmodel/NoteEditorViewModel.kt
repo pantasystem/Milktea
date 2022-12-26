@@ -300,7 +300,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setDraftNoteId(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            draftNoteRepository.findOne(id).mapCatching {
+            draftNoteRepository.findOne(id).mapCancellableCatching {
                 val account = accountRepository.get(it.accountId).getOrThrow()
                 it.toNoteEditingState().copy(
                     currentAccount = account
@@ -356,7 +356,7 @@ class NoteEditorViewModel @Inject constructor(
                     savedStateHandle.getNoteEditingUiState(account, visibility.value).sendToState.schedulePostAt
                 draftNoteService.save(
                     savedStateHandle.getNoteEditingUiState(account, visibility.value).toCreateNote(account)
-                ).mapCatching { dfNote ->
+                ).mapCancellableCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                         createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
                     } else {
@@ -525,7 +525,7 @@ class NoteEditorViewModel @Inject constructor(
             when (val account = currentAccount.value) {
                 null -> Result.failure(UnauthorizedException())
                 else -> Result.success(account)
-            }.mapCatching { account ->
+            }.mapCancellableCatching { account ->
                 draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
             }.onSuccess { result ->
                 isSaveNoteAsDraft.event = result.draftNoteId

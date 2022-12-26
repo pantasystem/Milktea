@@ -11,6 +11,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -32,7 +33,7 @@ class SyncLoggedInUserInfoWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        return accountRepository.findAll().mapCatching { accounts ->
+        return accountRepository.findAll().mapCancellableCatching { accounts ->
             val userIds = accounts.map {
                 User.Id(it.accountId, it.remoteId)
             }

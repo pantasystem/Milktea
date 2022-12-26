@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.drive.DriveStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -87,7 +88,7 @@ class DriveViewModel @AssistedInject constructor(
 
     fun setUsingGridView(value: Boolean) {
         viewModelScope.launch {
-            configRepository.get().mapCatching { config ->
+            configRepository.get().mapCancellableCatching { config ->
                 configRepository.save(
                     config.copy(isDriveUsingGridView = value)
                 )

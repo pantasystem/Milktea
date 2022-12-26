@@ -7,6 +7,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.R
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -34,7 +35,7 @@ class MainActivityInitialIntentHandler(
         val pushNotification = intent.extras?.toPushNotification()?.getOrNull()
         if (pushNotification != null) {
             activity.lifecycleScope.launch {
-                accountRepository.get(pushNotification.accountId).mapCatching {
+                accountRepository.get(pushNotification.accountId).mapCancellableCatching {
                     accountRepository.setCurrentAccount(it).getOrThrow()
                 }.onSuccess {
                     navigateBy(pushNotification)

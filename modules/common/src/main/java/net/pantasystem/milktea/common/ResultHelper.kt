@@ -14,9 +14,6 @@ inline fun <T, R> T.runCancellableCatching(block: T.() -> R): Result<R> {
 }
 
 inline fun <R> runCancellableCatching(block: () -> R): Result<R> {
-    runCatching(block).mapCatching {
-
-    }
     return try {
         Result.success(block())
     } catch (e: CancellationException) {
@@ -26,7 +23,7 @@ inline fun <R> runCancellableCatching(block: () -> R): Result<R> {
     }
 }
 
-public inline fun <R, T> Result<T>.mapCancellableCatching(transform: (value: T) -> R): Result<R> {
+inline fun <R, T> Result<T>.mapCancellableCatching(transform: (value: T) -> R): Result<R> {
     val successResult = getOrNull()
     return when {
         successResult != null -> runCancellableCatching { transform(successResult) }

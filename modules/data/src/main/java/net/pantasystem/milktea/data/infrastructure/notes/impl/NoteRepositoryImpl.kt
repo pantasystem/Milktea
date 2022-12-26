@@ -6,10 +6,7 @@ import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
-import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
@@ -54,7 +51,7 @@ class NoteRepositoryImpl @Inject constructor(
             task.execute(
                 uploader.get(createNote.author)
             ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
-        }.mapCatching {
+        }.mapCancellableCatching {
             misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError()
                 .body()?.createdNote
         }.onFailure {
