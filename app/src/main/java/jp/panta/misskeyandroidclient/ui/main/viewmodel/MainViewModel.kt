@@ -16,6 +16,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
