@@ -14,6 +14,7 @@ import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
@@ -62,7 +63,6 @@ class NotificationViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_LATEST,
         extraBufferCapacity = 100
     )
-    val error: Flow<Throwable> = _error
     private var notifications: List<NotificationViewData> = emptyList()
         set(value) {
             notificationsLiveData.postValue(value)
