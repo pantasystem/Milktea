@@ -147,7 +147,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onPushNotificationConfirmed() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             configRepository.get().mapCancellableCatching {
                 configRepository.save(it.copy(isConfirmedPostNotification = true))
             }.onFailure {

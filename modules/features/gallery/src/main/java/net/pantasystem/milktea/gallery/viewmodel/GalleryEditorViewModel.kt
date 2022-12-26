@@ -3,7 +3,6 @@ package net.pantasystem.milktea.gallery.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -149,7 +148,7 @@ class GalleryEditorViewModel @Inject constructor(
                 }
             }
             is AppFile.Remote -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     runCancellableCatching {
                         driveFileRepository.toggleNsfw(file.id)
                     }.onFailure {
@@ -162,7 +161,7 @@ class GalleryEditorViewModel @Inject constructor(
 
 
     fun addFilePropertyIds(ids: List<FileProperty.Id>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             filePropertyDataSource.findIn(ids).onSuccess { files ->
                 _state.update { state ->
                     val list = state.pickedImages.toMutableList().also { list ->
