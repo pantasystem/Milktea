@@ -39,7 +39,7 @@ class ReactionPickerDialogViewModel @Inject constructor(
         if (accountId == null) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             accountRepository.get(accountId).onSuccess {
                 setCurrentAccount(it)
             }

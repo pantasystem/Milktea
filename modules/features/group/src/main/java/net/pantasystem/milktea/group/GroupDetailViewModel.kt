@@ -6,10 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.*
 import net.pantasystem.milktea.model.user.User
@@ -152,7 +149,7 @@ class GroupDetailViewModel @Inject constructor(
 
     fun inviteUsers(userIds: List<User.Id>) {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 userIds.map {
                     async {
                         groupRepository.invite(
@@ -173,8 +170,8 @@ class GroupDetailViewModel @Inject constructor(
     fun save() {
         val type = uiStateType.value
         if (type is GroupDetailUiStateType.Editing) {
-            viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+            viewModelScope.launch {
+                runCancellableCatching {
                     if (type.groupId == null) {
                         groupRepository.create(
                             CreateGroup(accountStore.currentAccountId!!, type.name)

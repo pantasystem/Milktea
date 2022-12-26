@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.isLocalOnly
@@ -19,13 +20,13 @@ class LocalConfigRepositoryImpl(
 ) : LocalConfigRepository {
 
     override fun get(): Result<Config> {
-        return runCatching {
+        return runCancellableCatching {
             Config.from(sharedPreference.getPrefTypes())
         }
     }
 
     override suspend fun save(config: Config): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val old = get().getOrThrow().prefs()
             sharedPreference.edit {
                 config.prefs().filterNot {
@@ -42,7 +43,7 @@ class LocalConfigRepositoryImpl(
     }
 
     override fun getRememberVisibility(accountId: Long): Result<RememberVisibility> {
-        return runCatching {
+        return runCancellableCatching {
             val isRemember = sharedPreference.getBoolean(
                 RememberVisibility.Keys.IsRememberNoteVisibility.str(),
                 true
@@ -72,7 +73,7 @@ class LocalConfigRepositoryImpl(
     }
 
     override suspend fun save(remember: RememberVisibility): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             when (remember) {
                 is RememberVisibility.Remember -> {
                     val localOnly = (remember.visibility as? CanLocalOnly)?.isLocalOnly ?: false

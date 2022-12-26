@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.data.gettters
 
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
@@ -25,11 +27,11 @@ class NoteRelationGetter @Inject constructor(
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
     ): Result<NoteRelation?> {
-        return runCatching {
+        return runCancellableCatching {
             notesMap.getOrElse(noteId) {
                 noteRepository.find(noteId).getOrThrow()
             }
-        }.mapCatching {
+        }.mapCancellableCatching {
             get(
                 it,
                 deep,
@@ -84,7 +86,7 @@ class NoteRelationGetter @Inject constructor(
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
     ): Result<NoteRelation> {
-        return runCatching {
+        return runCancellableCatching {
             val user = usersMap.getOrElse(note.userId) {
                 userDataSource.get(note.userId).getOrThrow()
             }
@@ -101,7 +103,7 @@ class NoteRelationGetter @Inject constructor(
             } else null
 
             if (featuredId != null) {
-                return@runCatching NoteRelation.Featured(
+                return@runCancellableCatching NoteRelation.Featured(
                     note,
                     user,
                     renote?.getOrNull(),
@@ -112,7 +114,7 @@ class NoteRelationGetter @Inject constructor(
             }
 
             if (promotionId != null) {
-                return@runCatching NoteRelation.Promotion(
+                return@runCancellableCatching NoteRelation.Promotion(
                     note,
                     user,
                     renote?.getOrNull(),
@@ -121,7 +123,7 @@ class NoteRelationGetter @Inject constructor(
                     promotionId
                 )
             }
-            return@runCatching NoteRelation.Normal(
+            return@runCancellableCatching NoteRelation.Normal(
                 note = note,
                 user = user,
                 renote = renote?.getOrNull(),

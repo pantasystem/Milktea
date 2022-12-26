@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.model.account
 
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -59,13 +60,13 @@ class TestAccountRepository : AccountRepository {
     }
 
     override suspend fun findAll(): Result<List<Account>> {
-        return runCatching {
+        return runCancellableCatching {
             accounts.values.toList()
         }
     }
 
     override suspend fun get(accountId: Long): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             accounts[accountId]?: throw AccountNotFoundException()
         }
     }

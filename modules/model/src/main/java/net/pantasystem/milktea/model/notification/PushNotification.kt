@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.model.notification
 
 import android.os.Bundle
+import net.pantasystem.milktea.common.runCancellableCatching
 
 
 data class PushNotification(
@@ -53,7 +54,7 @@ fun Map<String, String?>.toPushNotification(): PushNotification {
     )
 }
 
-fun Bundle.toPushNotification(): Result<PushNotification> = runCatching {
+fun Bundle.toPushNotification(): Result<PushNotification> = runCancellableCatching {
     listOf(
         "title" to getString("title"),
         "body" to getString("body"),

@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -118,7 +120,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun setSwitchTargetConnectionInstance(account: Account) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             accountStore.setCurrent(account)
         }
     }
@@ -149,14 +151,11 @@ class AccountViewModel @Inject constructor(
 
 
     fun signOut(account: Account) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 subscriptionUnRegistration
                     .unregister(account.accountId)
-            }.onFailure { e ->
-                logger.warning("token解除処理失敗", e = e)
-            }
-            runCatching {
+            }.mapCancellableCatching {
                 accountRepository.delete(account)
             }.onFailure { e ->
                 logger.error("ログアウト処理失敗", e)
@@ -165,7 +164,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun addPage(page: Page) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 accountStore.addPage(page)
             } catch (e: Throwable) {
@@ -175,7 +174,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun removePage(page: Page) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 accountStore.removePage(page)
             } catch (e: Throwable) {

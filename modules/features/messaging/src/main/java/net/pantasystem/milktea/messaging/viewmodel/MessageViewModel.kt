@@ -13,6 +13,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.messaging.MessagePagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessageObserver
@@ -43,7 +44,7 @@ class MessageViewModel @Inject constructor(
     val messages = messagePagingStore.state.map { state ->
         state.pageState.suspendConvert { list ->
             list.mapNotNull { id ->
-                runCatching {
+                runCancellableCatching {
                     messageRelationGetter.get(id)
                 }.getOrNull()
             }.asReversed()
@@ -70,21 +71,15 @@ class MessageViewModel @Inject constructor(
         }
     }
 
-    fun loadInit() {
-        viewModelScope.launch(Dispatchers.IO) {
-            messagePagingStore.clear()
-            messagePagingStore.loadPrevious()
-        }
-    }
 
     fun loadOld() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             messagePagingStore.loadPrevious()
         }
     }
 
     fun setMessagingId(messagingId: MessagingId) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             messagePagingStore.setMessagingId(messagingId)
             messagePagingStore.clear()
             messagePagingStore.loadPrevious()
@@ -93,7 +88,7 @@ class MessageViewModel @Inject constructor(
     }
 
     private suspend fun loadMessageTitle(messagingId: MessagingId): Result<String> {
-        return runCatching {
+        return runCancellableCatching {
             when (messagingId) {
                 is MessagingId.Direct -> {
                     userRepository.find(messagingId.userId).displayUserName

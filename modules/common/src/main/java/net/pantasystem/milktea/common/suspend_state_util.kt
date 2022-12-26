@@ -9,7 +9,7 @@ fun<T> (suspend () -> T).asLoadingStateFlow(): Flow<ResultState<T>> {
     return flow {
         emit(ResultState.Fixed(StateContent.NotExist()))
         emit(ResultState.Loading(StateContent.NotExist()))
-        runCatching {
+        runCancellableCatching {
             this@asLoadingStateFlow.invoke()
         }.onSuccess {
             emit(ResultState.Fixed(StateContent.Exist(it)))

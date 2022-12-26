@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import okhttp3.*
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
@@ -107,7 +108,7 @@ class SocketImpl(
                 .build()
 
             mWebSocket = okHttpClient.newWebSocket(request, WebSocketListenerImpl())
-            return mWebSocket != null
+            return true
         }
 
     }
@@ -244,12 +245,12 @@ class SocketImpl(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
-            runCatching {
+            runCancellableCatching {
                 pollingJob.onReceive(text)
             }.onSuccess {
                 return
             }
-            val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
+            val e = runCancellableCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
                 logger.error("デコードエラー msg:$text", e = t)
             }.getOrNull() ?: return
 
@@ -257,7 +258,7 @@ class SocketImpl(
             while (iterator.hasNext()) {
 
                 val listener = iterator.next()
-                val res = runCatching {
+                val res = runCancellableCatching {
                     listener.onMessage(e)
                 }.onFailure {
                     logger.error("メッセージリスナー先でエラー発生", e = it)

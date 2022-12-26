@@ -1,10 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 import net.pantasystem.milktea.model.user.nickname.UserNicknameNotFoundException
 import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 
@@ -22,49 +25,56 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
     private val lock = Mutex()
 
     override suspend fun findOne(id: UserNickname.Id): UserNickname {
-        if (notExistsIds.contains(id)) {
+        return withContext(Dispatchers.IO) {
+            if (notExistsIds.contains(id)) {
+                throw UserNicknameNotFoundException()
+            }
+            val inMem = runCancellableCatching {
+                userNicknameRepositoryOnMemoryImpl.findOne(id)
+            }.getOrNull()
+            if (inMem != null) {
+                return@withContext inMem
+            }
+            val result = userNicknameDAO.findByUserNameAndHost(id.userName, id.host)
+            if (result != null) {
+                return@withContext result.toUserNickname()
+            }
+            lock.withLock {
+                notExistsIds.add(id)
+            }
             throw UserNicknameNotFoundException()
         }
-        val inMem = runCatching {
-            userNicknameRepositoryOnMemoryImpl.findOne(id)
-        }.getOrNull()
-        if (inMem != null) {
-            return inMem
-        }
-        val result = userNicknameDAO.findByUserNameAndHost(id.userName, id.host)
-        if (result != null) {
-            return result.toUserNickname()
-        }
-        lock.withLock {
-            notExistsIds.add(id)
-        }
-        throw UserNicknameNotFoundException()
     }
 
     override suspend fun save(nickname: UserNickname) {
-        val found = userNicknameDAO.findByUserNameAndHost(nickname.id.userName, nickname.id.host)
-        val dto = UserNicknameDTO(
-            userName = nickname.id.userName,
-            host = nickname.id.host,
-            nickname = nickname.name,
-            id = found?.id ?: 0L,
-        )
-        lock.withLock {
-            notExistsIds.remove(nickname.id)
-        }
-        userNicknameRepositoryOnMemoryImpl.save(nickname)
-        if (found == null) {
-            userNicknameDAO.create(dto)
-        } else {
-            userNicknameDAO.update(dto)
+        withContext(Dispatchers.IO) {
+            val found =
+                userNicknameDAO.findByUserNameAndHost(nickname.id.userName, nickname.id.host)
+            val dto = UserNicknameDTO(
+                userName = nickname.id.userName,
+                host = nickname.id.host,
+                nickname = nickname.name,
+                id = found?.id ?: 0L,
+            )
+            lock.withLock {
+                notExistsIds.remove(nickname.id)
+            }
+            userNicknameRepositoryOnMemoryImpl.save(nickname)
+            if (found == null) {
+                userNicknameDAO.create(dto)
+            } else {
+                userNicknameDAO.update(dto)
+            }
         }
     }
 
     override suspend fun delete(id: UserNickname.Id) {
-        lock.withLock {
-            notExistsIds.add(id)
+        withContext(Dispatchers.IO) {
+            lock.withLock {
+                notExistsIds.add(id)
+            }
+            userNicknameDAO.delete(id.userName, id.host)
+            userNicknameRepositoryOnMemoryImpl.delete(id)
         }
-        userNicknameDAO.delete(id.userName, id.host)
-        userNicknameRepositoryOnMemoryImpl.delete(id)
     }
 }

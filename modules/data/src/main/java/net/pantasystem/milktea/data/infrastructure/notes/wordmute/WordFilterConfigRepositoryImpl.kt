@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.muteword.FilterConditionType
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfig
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
@@ -25,7 +26,7 @@ class WordFilterConfigRepositoryImpl @Inject constructor(
         logger.error("observe error", it)
     }.flowOn(Dispatchers.IO).stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    override suspend fun get(): Result<WordFilterConfig> = runCatching{
+    override suspend fun get(): Result<WordFilterConfig> = runCancellableCatching{
         withContext(Dispatchers.IO) {
             wordFilterConfigDao.findAll().toModel()
         }
@@ -35,7 +36,7 @@ class WordFilterConfigRepositoryImpl @Inject constructor(
         return shared.filterNotNull()
     }
 
-    override suspend fun save(config: WordFilterConfig): Result<Unit> = runCatching {
+    override suspend fun save(config: WordFilterConfig): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             wordFilterConfigDao.clear()
             val records = config.conditions.map {

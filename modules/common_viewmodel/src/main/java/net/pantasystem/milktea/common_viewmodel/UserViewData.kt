@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -158,7 +159,7 @@ open class UserViewData(
     private suspend fun initLoad() {
 
         if (user.value == null) {
-            runCatching {
+            runCancellableCatching {
                 if (userId == null) {
                     require(userName != null)
                     userRepository.findByUserName(accountId, userName, host)

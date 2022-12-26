@@ -6,6 +6,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -26,7 +27,7 @@ class SubscriptionRegistrationImpl(
     /**
      * 特定のアカウントをsw/registerに登録します。
      */
-    override suspend fun register(accountId: Long) : Result<SubscriptionState?> = runCatching {
+    override suspend fun register(accountId: Long) : Result<SubscriptionState?> = runCancellableCatching {
         val token = FirebaseMessaging.getInstance().token.asSuspend()
         logger.debug("call register(accountId:$accountId)")
         logger.debug("auth:$auth, publicKey:$publicKey")

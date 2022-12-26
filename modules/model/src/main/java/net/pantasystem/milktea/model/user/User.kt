@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.user
 import android.graphics.Color
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
@@ -121,7 +122,7 @@ sealed interface User : Entity {
     ) {
 
         val themeColorNumber: Result<Int?> by lazy {
-            runCatching {
+            runCancellableCatching {
                 themeColor?.let {
                     Color.parseColor(it)
                 }

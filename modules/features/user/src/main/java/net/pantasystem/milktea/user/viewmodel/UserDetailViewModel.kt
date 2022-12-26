@@ -16,6 +16,8 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -171,10 +173,10 @@ class UserDetailViewModel @AssistedInject constructor(
 
 
     fun sync() {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 getUserId()
-            }.mapCatching { userId ->
+            }.mapCancellableCatching { userId ->
                 userRepository.sync(userId).getOrThrow()
             }.onFailure {
                 logger.error("user sync error", it)
@@ -184,9 +186,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
 
     fun changeFollow() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
-                runCatching {
+                runCancellableCatching {
                     val user = userRepository.find(it.id) as User.Detail
                     if (user.isFollowing || user.hasPendingFollowRequestFromYou) {
                         userRepository.unfollow(user.id)
@@ -211,9 +213,9 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun mute(expiredAt: Instant?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
-                runCatching {
+                runCancellableCatching {
                     userRepository.mute(CreateMute(it.id, expiredAt))
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
@@ -224,9 +226,9 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun unmute() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
-                runCatching {
+                runCancellableCatching {
                     userRepository.unmute(it.id)
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
@@ -237,9 +239,9 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun block() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
-                runCatching {
+                runCancellableCatching {
                     userRepository.block(it.id)
                     userRepository.sync(it.id)
                 }.onFailure {
@@ -250,9 +252,9 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun unblock() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
-                runCatching {
+                runCancellableCatching {
                     userRepository.unblock(it.id)
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
@@ -263,8 +265,8 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun changeNickname(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 val user = findUser()
                 updateNicknameUseCase(user, name)
             }.onSuccess {
@@ -276,8 +278,8 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun deleteNickname() {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 val user = findUser()
                 deleteNicknameUseCase(user)
             }.onSuccess {
@@ -289,8 +291,8 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun toggleUserTimelineTab() {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 val userId = getUserId()
                 val account = accountRepository.get(userId.accountId).getOrThrow()
                 val page = account.pages.firstOrNull {

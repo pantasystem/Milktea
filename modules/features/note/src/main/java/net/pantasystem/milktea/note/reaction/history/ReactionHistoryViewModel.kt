@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
@@ -98,9 +99,9 @@ class ReactionHistoryViewModel @AssistedInject constructor(
             return
         }
         isLoading.value = true
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
-            runCatching {
+            runCancellableCatching {
                 paginator.next()
             }.onFailure {
                 logger.error("リアクションの履歴の取得に失敗しました", e = it)

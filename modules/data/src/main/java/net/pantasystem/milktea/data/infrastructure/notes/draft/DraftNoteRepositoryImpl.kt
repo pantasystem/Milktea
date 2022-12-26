@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.from
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
@@ -18,84 +21,94 @@ class DraftNoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun save(draftNote: DraftNote): Result<DraftNote> {
-        return runCatching {
-            val id = draftNoteDao.insert(DraftNoteDTO.make(draftNote))
+        return runCancellableCatching {
+            withContext(Dispatchers.IO) {
+                val id = draftNoteDao.insert(DraftNoteDTO.make(draftNote))
 
-            logger.debug("draftNoteId:$id")
-            val inserted = draftNote.copy(draftNoteId = id)
-            val pollChoices = draftNote.draftPoll?.choices?.let {
-                it.mapIndexed { index, s ->
-                    PollChoiceDTO(
-                        choice = s,
-                        draftNoteId = id,
-                        weight = index
-                    )
-                }
-            }
-            val visibleUserIdDTOList = draftNote.visibleUserIds?.map {
-                UserIdDTO(draftNoteId = id, userId = it)
-            }
-
-            draftNoteDao.deleteDraftJunctionFilesByDraftNoteId(id)
-
-            val refs = draftNote.draftFiles?.map {
-                when (it) {
-                    is DraftNoteFile.Local -> {
-                        DraftFileJunctionRef(
+                logger.debug("draftNoteId:$id")
+                val inserted = draftNote.copy(draftNoteId = id)
+                val pollChoices = draftNote.draftPoll?.choices?.let {
+                    it.mapIndexed { index, s ->
+                        PollChoiceDTO(
+                            choice = s,
                             draftNoteId = id,
-                            localFileId = draftNoteDao.insertDraftLocalFile(
-                                DraftLocalFile(
-                                    localFileId = it.localFileId,
-                                    filePath = it.filePath,
-                                    folderId = it.folderId,
-                                    name = it.name,
-                                    type = it.type,
-                                    thumbnailUrl = it.thumbnailUrl,
-                                    isSensitive = it.isSensitive,
-                                )
-                            ),
-                            filePropertyId = null,
-                        )
-                    }
-                    is DraftNoteFile.Remote -> {
-                        DraftFileJunctionRef(
-                            draftNoteId = id,
-                            filePropertyId = draftNoteDao.insertDriveFile(DriveFileRecord.from(it.fileProperty)),
-                            localFileId = null,
+                            weight = index
                         )
                     }
                 }
-            } ?: emptyList()
-            draftNoteDao.insertFileRefs(refs)
+                val visibleUserIdDTOList = draftNote.visibleUserIds?.map {
+                    UserIdDTO(draftNoteId = id, userId = it)
+                }
 
-            if (!pollChoices.isNullOrEmpty()) {
-                draftNoteDao.insertPollChoices(pollChoices)
+                draftNoteDao.deleteDraftJunctionFilesByDraftNoteId(id)
+
+                val refs = draftNote.draftFiles?.map {
+                    when (it) {
+                        is DraftNoteFile.Local -> {
+                            DraftFileJunctionRef(
+                                draftNoteId = id,
+                                localFileId = draftNoteDao.insertDraftLocalFile(
+                                    DraftLocalFile(
+                                        localFileId = it.localFileId,
+                                        filePath = it.filePath,
+                                        folderId = it.folderId,
+                                        name = it.name,
+                                        type = it.type,
+                                        thumbnailUrl = it.thumbnailUrl,
+                                        isSensitive = it.isSensitive,
+                                    )
+                                ),
+                                filePropertyId = null,
+                            )
+                        }
+                        is DraftNoteFile.Remote -> {
+                            DraftFileJunctionRef(
+                                draftNoteId = id,
+                                filePropertyId = draftNoteDao.insertDriveFile(
+                                    DriveFileRecord.from(
+                                        it.fileProperty
+                                    )
+                                ),
+                                localFileId = null,
+                            )
+                        }
+                    }
+                } ?: emptyList()
+                draftNoteDao.insertFileRefs(refs)
+
+                if (!pollChoices.isNullOrEmpty()) {
+                    draftNoteDao.insertPollChoices(pollChoices)
+                }
+                if (!visibleUserIdDTOList.isNullOrEmpty()) {
+                    draftNoteDao.insertUserIds(visibleUserIdDTOList)
+                }
+
+                draftNoteDao.getDraftNote(inserted.accountId, inserted.draftNoteId)!!
+
             }
-            if (!visibleUserIdDTOList.isNullOrEmpty()) {
-                draftNoteDao.insertUserIds(visibleUserIdDTOList)
-            }
-
-            draftNoteDao.getDraftNote(inserted.accountId, inserted.draftNoteId)!!
-
         }
     }
 
     override suspend fun delete(draftNoteId: Long): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
+            withContext(Dispatchers.IO) {
 
-            val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
+                val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
 
-            draftNoteDao.deleteDraftNote(
-                relation.draftNoteDTO.accountId,
-                relation.draftNoteDTO.draftNoteId!!
-            )
+                draftNoteDao.deleteDraftNote(
+                    relation.draftNoteDTO.accountId,
+                    relation.draftNoteDTO.draftNoteId!!
+                )
+            }
         }
     }
 
     override suspend fun findOne(draftNoteId: Long): Result<DraftNote> {
-        return runCatching {
-            val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
-            relation.toDraftNote(relation.draftNoteDTO.accountId)
+        return runCancellableCatching {
+            withContext(Dispatchers.IO) {
+                val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
+                relation.toDraftNote(relation.draftNoteDTO.accountId)
+            }
         }
     }
 

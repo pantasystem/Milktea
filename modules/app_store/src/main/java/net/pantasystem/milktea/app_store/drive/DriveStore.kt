@@ -2,6 +2,7 @@ package net.pantasystem.milktea.app_store.drive
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.DirectoryPath
@@ -39,7 +40,7 @@ class DriveStore(
     }
 
     fun select(id: FileProperty.Id) : Boolean {
-        return runCatching {
+        return runCancellableCatching {
             this._state.value = this.state.value.let {
                 it.copy(selectedFilePropertyIds = it.selectedFilePropertyIds?.addAndCopy(id))
             }
@@ -47,7 +48,7 @@ class DriveStore(
     }
 
     fun deselect(id: FileProperty.Id) : Boolean {
-        return runCatching {
+        return runCancellableCatching {
             this._state.value = this.state.value.let {
                 it.copy(selectedFilePropertyIds = it.selectedFilePropertyIds?.removeAndCopy(id))
             }

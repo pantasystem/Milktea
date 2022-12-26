@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.channel
 
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.channel.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
@@ -16,7 +17,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
 ) : ChannelAPIAdapter {
     override suspend fun findOne(id: Channel.Id): Result<ChannelDTO> {
-        return runCatching {
+        return runCancellableCatching {
             val account = id.getAccount()
             id.getAPI().showChannel(
                 ShowChannelDTO(
@@ -29,7 +30,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     }
 
     override suspend fun create(model: CreateChannel): Result<ChannelDTO> {
-        return runCatching {
+        return runCancellableCatching {
             val account = accountRepository.get(model.accountId).getOrThrow()
             (misskeyAPIProvider.get(account) as MisskeyAPIV12).createChannel(
                 CreateChannelDTO(
@@ -43,7 +44,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     }
 
     override suspend fun follow(id: Channel.Id): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val account = id.getAccount()
             id.getAPI().followChannel(
                 FollowChannelDTO(
@@ -55,7 +56,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     }
 
     override suspend fun unFollow(id: Channel.Id): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val account = id.getAccount()
             id.getAPI().unFollowChannel(
                 UnFollowChannelDTO(
@@ -67,7 +68,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
     }
 
     override suspend fun update(model: UpdateChannel): Result<ChannelDTO> {
-        return runCatching {
+        return runCancellableCatching {
             val account = model.id.getAccount()
             model.id.getAPI()
                 .updateChannel(
@@ -88,7 +89,7 @@ class ChannelAPIAdapterWebImpl @Inject constructor(
         untilId: Channel.Id?,
         limit: Int
     ): Result<List<ChannelDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             val account = accountRepository.get(accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
             api.followedChannels(FindPageable(

@@ -6,6 +6,7 @@ import androidx.work.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.CreateNoteUseCase
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -44,9 +45,9 @@ class CreateNoteWorker @AssistedInject constructor(
         if (draftNoteId == -1L) {
             return Result.failure()
         }
-        return draftNoteRepository.findOne(draftNoteId).mapCatching {
+        return draftNoteRepository.findOne(draftNoteId).mapCancellableCatching {
             it.toCreateNote(accountRepository.get(it.accountId).getOrThrow())
-        }.mapCatching {
+        }.mapCancellableCatching {
             createNoteUseCase.invoke(it).getOrThrow()
         }.onFailure {
             logger.error("Create Failed", it)

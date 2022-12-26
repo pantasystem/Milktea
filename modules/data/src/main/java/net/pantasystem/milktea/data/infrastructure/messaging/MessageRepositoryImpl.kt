@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.common.throwIfHasError
@@ -22,81 +24,86 @@ class MessageRepositoryImpl @Inject constructor(
 
     @Throws(IOException::class)
     override suspend fun read(messageId: Message.Id): Boolean {
-        val account = accountRepository.get(messageId.accountId).getOrThrow()
-        val result = misskeyAPIProvider.get(account).readMessage(
-            MessageAction(
-                account.token,
-                null,
-                null,
-                null,
-                null,
-                messageId.messageId
-            )
-        ).isSuccessful
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(messageId.accountId).getOrThrow()
+            val result = misskeyAPIProvider.get(account).readMessage(
+                MessageAction(
+                    account.token,
+                    null,
+                    null,
+                    null,
+                    null,
+                    messageId.messageId
+                )
+            ).isSuccessful
 
-        if (result) {
-            messageDataSource.find(messageId).getOrNull()?.read()?.let {
-                messageDataSource.add(it)
+            if (result) {
+                messageDataSource.find(messageId).getOrNull()?.read()?.let {
+                    messageDataSource.add(it)
+                }
             }
-        }
 
-        return result
+            result
+        }
     }
 
     @Throws(IOException::class)
     override suspend fun create(createMessage: CreateMessage): Message {
-        val account = accountRepository.get(createMessage.accountId).getOrThrow()
-        val i = account.token
-        val action = when (createMessage) {
-            is CreateMessage.Group -> {
-                MessageAction(
-                    i,
-                    groupId = createMessage.groupId.groupId,
-                    text = createMessage.text,
-                    fileId = createMessage.fileId,
-                    messageId = null,
-                    userId = null
-                )
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(createMessage.accountId).getOrThrow()
+            val i = account.token
+            val action = when (createMessage) {
+                is CreateMessage.Group -> {
+                    MessageAction(
+                        i,
+                        groupId = createMessage.groupId.groupId,
+                        text = createMessage.text,
+                        fileId = createMessage.fileId,
+                        messageId = null,
+                        userId = null
+                    )
+                }
+                is CreateMessage.Direct -> {
+                    MessageAction(
+                        i,
+                        groupId = null,
+                        text = createMessage.text,
+                        fileId = createMessage.fileId,
+                        messageId = null,
+                        userId = createMessage.userId.id
+                    )
+                }
             }
-            is CreateMessage.Direct -> {
-                MessageAction(
-                    i,
-                    groupId = null,
-                    text = createMessage.text,
-                    fileId = createMessage.fileId,
-                    messageId = null,
-                    userId = createMessage.userId.id
-                )
-            }
+
+            val body: MessageDTO = misskeyAPIProvider.get(account).createMessage(action)
+                .throwIfHasError()
+                .body() ?: throw IllegalStateException("メッセージの作成に失敗しました")
+
+            messageAdder.add(account, body).message
         }
-
-        val body: MessageDTO = misskeyAPIProvider.get(account).createMessage(action)
-            .throwIfHasError()
-            .body() ?: throw IllegalStateException("メッセージの作成に失敗しました")
-
-        return messageAdder.add(account, body).message
-
     }
 
     @Throws(IOException::class)
     override suspend fun delete(messageId: Message.Id): Boolean {
-        val account = accountRepository.get(messageId.accountId).getOrThrow()
-        val result = misskeyAPIProvider.get(account).deleteMessage(
-            MessageAction(
-                account.token,
-                null,
-                null,
-                null,
-                null,
-                messageId.messageId
-            )
-        ).isSuccessful
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(messageId.accountId).getOrThrow()
+            val result = misskeyAPIProvider.get(account).deleteMessage(
+                MessageAction(
+                    account.token,
+                    null,
+                    null,
+                    null,
+                    null,
+                    messageId.messageId
+                )
+            ).isSuccessful
 
-        if (result) {
-            messageDataSource.delete(messageId)
+            if (result) {
+                messageDataSource.delete(messageId)
+            }
+
+            result
         }
-
-        return result
     }
 
 

@@ -1,9 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.antenna
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaQuery
 import net.pantasystem.milktea.api.misskey.v12.antenna.AntennaToAdd
 import net.pantasystem.milktea.api.misskey.v12.antenna.from
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.GetAccount
@@ -17,59 +20,70 @@ class AntennaRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
 ) : AntennaRepository {
 
-    override suspend fun findByAccountId(accountId: Long): Result<List<Antenna>> = runCatching {
-        val account = getAccount.get(accountId)
-        val body = (misskeyAPIProvider.get(account) as MisskeyAPIV12).getAntennas(
-            AntennaQuery(
-                i = account.token,
-                limit = null,
-                antennaId = null,
+    override suspend fun findByAccountId(accountId: Long): Result<List<Antenna>> = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(accountId)
+            val body = (misskeyAPIProvider.get(account) as MisskeyAPIV12).getAntennas(
+                AntennaQuery(
+                    i = account.token,
+                    limit = null,
+                    antennaId = null,
+                )
+            ).throwIfHasError().body()
+            body?.map {
+                it.toEntity(account)
+            } ?: emptyList()
+        }
+
+    }
+
+    override suspend fun delete(antennaId: Antenna.Id): Result<Unit> = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(antennaId.accountId)
+            (misskeyAPIProvider.get(account) as MisskeyAPIV12).deleteAntenna(
+                AntennaQuery(
+                    antennaId = antennaId.antennaId,
+                    i = account.token,
+                    limit = null
+                )
+            ).throwIfHasError()
+        }
+    }
+
+    override suspend fun create(accountId: Long, params: SaveAntennaParam): Result<Antenna> = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(accountId)
+            val request = AntennaToAdd.from(account.token, params,)
+            (misskeyAPIProvider.get(account) as MisskeyAPIV12).createAntenna(request)
+                .throwIfHasError()
+                .body()
+                ?.toEntity(account)!!
+        }
+    }
+
+    override suspend fun update(antennaId: Antenna.Id, params: SaveAntennaParam): Result<Antenna>  = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(antennaId.accountId)
+            val request = AntennaToAdd.from(account.token, params, antennaId.antennaId)
+            (misskeyAPIProvider.get(account) as MisskeyAPIV12).updateAntenna(request)
+                .throwIfHasError()
+                .body()
+                ?.toEntity(account)!!
+        }
+    }
+
+    override suspend fun find(antennaId: Antenna.Id): Result<Antenna> = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(antennaId.accountId)
+            val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
+
+            val res = api.showAntenna(
+                AntennaQuery(
+                    i = account.token, antennaId = antennaId.antennaId, limit = null
+                )
             )
-        ).throwIfHasError().body()
-        body?.map {
-            it.toEntity(account)
-        } ?: emptyList()
-    }
-
-    override suspend fun delete(antennaId: Antenna.Id): Result<Unit> = runCatching {
-        val account = getAccount.get(antennaId.accountId)
-        (misskeyAPIProvider.get(account) as MisskeyAPIV12).deleteAntenna(
-            AntennaQuery(
-                antennaId = antennaId.antennaId,
-                i = account.token,
-                limit = null
-            )
-        ).throwIfHasError()
-    }
-
-    override suspend fun create(accountId: Long, params: SaveAntennaParam): Result<Antenna> = runCatching {
-        val account = getAccount.get(accountId)
-        val request = AntennaToAdd.from(account.token, params,)
-        (misskeyAPIProvider.get(account) as MisskeyAPIV12).createAntenna(request)
-            .throwIfHasError()
-            .body()
-            ?.toEntity(account)!!
-    }
-
-    override suspend fun update(antennaId: Antenna.Id, params: SaveAntennaParam): Result<Antenna>  = runCatching {
-        val account = getAccount.get(antennaId.accountId)
-        val request = AntennaToAdd.from(account.token, params, antennaId.antennaId)
-        (misskeyAPIProvider.get(account) as MisskeyAPIV12).updateAntenna(request)
-            .throwIfHasError()
-            .body()
-            ?.toEntity(account)!!
-    }
-
-    override suspend fun find(antennaId: Antenna.Id): Result<Antenna> = runCatching {
-        val account = getAccount.get(antennaId.accountId)
-        val api = misskeyAPIProvider.get(account) as MisskeyAPIV12
-
-        val res = api.showAntenna(
-            AntennaQuery(
-                i = account.token, antennaId = antennaId.antennaId, limit = null
-            )
-        )
-        res.throwIfHasError()
-        res.body()?.toEntity(account)!!
+            res.throwIfHasError()
+            res.body()?.toEntity(account)!!
+        }
     }
 }

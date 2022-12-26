@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryNotFoundException
@@ -33,7 +34,7 @@ class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
 
     override val state: StateFlow<Map<GalleryPost.Id, GalleryPost>> = _state
 
-    override suspend fun add(galleryPost: GalleryPost): Result<AddResult> = runCatching {
+    override suspend fun add(galleryPost: GalleryPost): Result<AddResult> = runCancellableCatching {
         val result = lock.withLock {
             val map = galleries.toMutableMap()
             if(galleries[galleryPost.id] == null){
@@ -66,11 +67,11 @@ class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
 
 
 
-    override suspend fun find(galleryPostId: GalleryPost.Id): Result<GalleryPost> = runCatching {
+    override suspend fun find(galleryPostId: GalleryPost.Id): Result<GalleryPost> = runCancellableCatching {
         galleries[galleryPostId] ?: throw GalleryNotFoundException(galleryPostId)
     }
 
-    override suspend fun remove(galleryPostId: GalleryPost.Id): Result<Boolean> = runCatching {
+    override suspend fun remove(galleryPostId: GalleryPost.Id): Result<Boolean> = runCancellableCatching {
         val result = lock.withLock {
             val map = galleries.toMutableMap()
             map.remove(galleryPostId) != null
@@ -79,11 +80,11 @@ class InMemoryGalleryDataSource @Inject constructor(): GalleryDataSource {
         result
     }
 
-    override suspend fun findAll(): Result<List<GalleryPost>> = runCatching {
+    override suspend fun findAll(): Result<List<GalleryPost>> = runCancellableCatching {
         galleries.values.toList()
     }
 
-    override suspend fun filterByAccountId(accountId: Long): Result<List<GalleryPost>> = runCatching {
+    override suspend fun filterByAccountId(accountId: Long): Result<List<GalleryPost>> = runCancellableCatching {
         findAll().getOrThrow().filter {
             it.id.accountId == accountId
         }

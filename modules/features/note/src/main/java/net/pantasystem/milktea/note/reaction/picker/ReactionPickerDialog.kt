@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.flexbox.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -79,7 +78,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
 
         reactionPickerDialogViewModel.setCurrentAccountById(noteId.accountId)
-        lifecycleScope.launch(Dispatchers.IO){
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 reactionPickerDialogViewModel.userConfigReactions.collect { reactions ->
                     adapter.submitList(reactions)

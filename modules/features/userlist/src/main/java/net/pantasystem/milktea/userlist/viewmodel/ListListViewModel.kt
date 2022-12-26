@@ -3,15 +3,11 @@ package net.pantasystem.milktea.userlist.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -93,8 +89,8 @@ class ListListViewModel @Inject constructor(
     }
 
     fun toggle(userList: UserList, userId: User.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 if (userList.userIds.contains(userId)) {
                     userListRepository.removeUser(userList.id, userId)
                 } else {
@@ -109,8 +105,8 @@ class ListListViewModel @Inject constructor(
 
     fun toggleTab(userList: UserList?) {
         userList?.let { ul ->
-            viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+            viewModelScope.launch {
+                runCancellableCatching {
                     val account = accountRepository.get(userList.id.accountId).getOrThrow()
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
@@ -141,8 +137,8 @@ class ListListViewModel @Inject constructor(
     }
 
     fun createUserList(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 val account = accountRepository.getCurrentAccount().getOrThrow()
                 val result = userListRepository.create(account.accountId, name)
                 userListRepository.syncOne(result.id).getOrThrow()

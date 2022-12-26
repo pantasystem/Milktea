@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -32,7 +33,7 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
         return Result.success(result)
     }
 
-    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCancellableCatching {
         list.map {
             add(it).getOrElse {
                 AddResult.Canceled
@@ -40,7 +41,7 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
         }
     }
 
-    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCatching {
+    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCancellableCatching {
         map[filePropertyId]?: throw FilePropertyNotFoundException(filePropertyId)
     }
 

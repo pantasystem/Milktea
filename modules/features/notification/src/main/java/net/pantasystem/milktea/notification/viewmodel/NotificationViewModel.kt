@@ -14,6 +14,7 @@ import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
@@ -62,7 +63,6 @@ class NotificationViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_LATEST,
         extraBufferCapacity = 100
     )
-    val error: Flow<Throwable> = _error
     private var notifications: List<NotificationViewData> = emptyList()
         set(value) {
             notificationsLiveData.postValue(value)
@@ -127,7 +127,7 @@ class NotificationViewModel @Inject constructor(
             val request = NotificationRequest(i = account.token, limit = 20)
             val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
 
-            runCatching {
+            runCancellableCatching {
                 val notificationDTOList = misskeyAPI.notification(request).throwIfHasError().body()
                 logger.debug("res: $notificationDTOList")
                 val viewDataList = notificationDTOList?.toNotificationViewData(account)
@@ -172,7 +172,7 @@ class NotificationViewModel @Inject constructor(
                 limit = 20,
                 untilId = untilId.notificationId
             )
-            val notifications = runCatching {
+            val notifications = runCancellableCatching {
                 misskeyAPI.notification(request).throwIfHasError().body()
             }.getOrNull()
             val list = notifications?.toNotificationViewData(account)
@@ -199,8 +199,8 @@ class NotificationViewModel @Inject constructor(
 
     fun acceptFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
-            viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+            viewModelScope.launch {
+                runCancellableCatching {
                     userRepository.acceptFollowRequest(notification.userId)
                 }.onSuccess {
                     if (it) {
@@ -220,7 +220,7 @@ class NotificationViewModel @Inject constructor(
     fun rejectFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+                runCancellableCatching {
                     userRepository.rejectFollowRequest(notification.userId)
                 }.onSuccess {
                     if (it) {
@@ -237,7 +237,7 @@ class NotificationViewModel @Inject constructor(
     }
 
     fun acceptGroupInvitation(notification: Notification) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (notification is GroupInvitedNotification) {
                 groupRepository.accept(notification.invitationId)
                     .onSuccess {
@@ -274,7 +274,7 @@ class NotificationViewModel @Inject constructor(
 
     private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
         return this.mapNotNull {
-            runCatching {
+            runCancellableCatching {
                 it.toNotificationRelation(account)
             }.onFailure {
                 logger.error("変換失敗", e = it)

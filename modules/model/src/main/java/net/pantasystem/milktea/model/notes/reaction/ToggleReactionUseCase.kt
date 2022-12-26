@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes.reaction
 
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -25,7 +26,7 @@ class ToggleReactionUseCase @Inject constructor(
 ) : UseCase {
 
     suspend operator fun invoke(noteId: Note.Id, reaction: String): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val account = getAccount.get(noteId.accountId)
             val reactionObj = Reaction(reaction)
             val sendReaction =

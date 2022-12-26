@@ -1,9 +1,12 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.api.misskey.auth.createObtainToken
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -25,25 +28,26 @@ class GetAccessToken @Inject constructor(
     }
 
     suspend fun getAccessToken(a: Authorization.Waiting4UserAuthorization, code: String? = null): Result<AccessToken> {
-        return runCatching {
-            when (a) {
-                is Authorization.Waiting4UserAuthorization.Misskey -> {
-                    val accessToken =
-                        misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
-                            UserKey(
-                                appSecret = a.appSecret,
-                                a.session.token
+        return runCancellableCatching {
+            withContext(Dispatchers.IO) {
+                when (a) {
+                    is Authorization.Waiting4UserAuthorization.Misskey -> {
+                        val accessToken =
+                            misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                                UserKey(
+                                    appSecret = a.appSecret,
+                                    a.session.token
+                                )
                             )
-                        )
-                            .throwIfHasError().body()
-                            ?: throw IllegalStateException("response bodyがありません。")
-                    accessToken.toModel(a.appSecret)
-                }
-                is Authorization.Waiting4UserAuthorization.Mastodon -> {
-                    getAccessToken4Mastodon(a, code!!)
+                                .throwIfHasError().body()
+                                ?: throw IllegalStateException("response bodyがありません。")
+                        accessToken.toModel(a.appSecret)
+                    }
+                    is Authorization.Waiting4UserAuthorization.Mastodon -> {
+                        getAccessToken4Mastodon(a, code!!)
+                    }
                 }
             }
-
         }
     }
     private suspend fun getAccessToken4Mastodon(

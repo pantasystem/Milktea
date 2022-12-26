@@ -108,7 +108,7 @@ class DriveDirectoryPagingImpl(
     }
 
     override suspend fun loadPrevious(): Result<List<Directory>> {
-        return runCatching {
+        return runCancellableCatching {
             val account = account ?: throw UnauthorizedException()
             misskeyAPIProvider.get(account)
                 .getFolders(RequestFolder(i = account.token, untilId = getUntilId(), folderId = directory?.id))

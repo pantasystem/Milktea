@@ -4,6 +4,7 @@ package net.pantasystem.milktea.data.infrastructure.messaging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.Message
@@ -33,19 +34,19 @@ class InMemoryMessageDataSource(
         }
     )
 
-    override suspend fun add(message: Message): Result<AddResult> = runCatching {
+    override suspend fun add(message: Message): Result<AddResult> = runCancellableCatching {
         createOrUpdate(message).also {
             updateState()
         }
     }
 
-    override suspend fun addAll(messages: List<Message>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(messages: List<Message>): Result<List<AddResult>> = runCancellableCatching {
         messages.map {
             add(it).getOrElse { AddResult.Canceled }
         }
     }
 
-    override suspend fun delete(messageId: Message.Id): Result<Boolean> = runCatching {
+    override suspend fun delete(messageId: Message.Id): Result<Boolean> = runCancellableCatching {
         remove(messageId).also {
             updateState()
         }
@@ -86,7 +87,7 @@ class InMemoryMessageDataSource(
         }
     }
 
-    override suspend fun readAllMessages(accountId: Long): Result<Unit> = runCatching {
+    override suspend fun readAllMessages(accountId: Long): Result<Unit> = runCancellableCatching {
         readAllMessagesByAccountId(accountId)
         updateState()
     }

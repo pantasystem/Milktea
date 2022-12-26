@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
@@ -24,22 +27,24 @@ class MessagingRepositoryImpl @Inject constructor(
     override suspend fun findMessageSummaries(
         accountId: Long,
         isGroup: Boolean
-    ): Result<List<MessageRelation>> = runCatching {
-        val account = getAccount.get(accountId)
-        val request = RequestMessageHistory(
-            i = account.token, group = isGroup, limit = 100
-        )
+    ): Result<List<MessageRelation>> = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(accountId)
+            val request = RequestMessageHistory(
+                i = account.token, group = isGroup, limit = 100
+            )
 
-        val res = misskeyAPIProvider.get(account).getMessageHistory(request)
-        res.throwIfHasError()
-        res.body()!!.map {
-            it.group?.let { groupDTO ->
-                groupDataSource.add(groupDTO.toGroup(account.accountId))
+            val res = misskeyAPIProvider.get(account).getMessageHistory(request)
+            res.throwIfHasError()
+            res.body()!!.map {
+                it.group?.let { groupDTO ->
+                    groupDataSource.add(groupDTO.toGroup(account.accountId))
+                }
+                it.recipient?.let { userDTO ->
+                    userDataSource.add(userDTO.toUser(account))
+                }
+                messageAdder.add(account, it)
             }
-            it.recipient?.let { userDTO ->
-                userDataSource.add(userDTO.toUser(account))
-            }
-            messageAdder.add(account, it)
         }
     }
 }

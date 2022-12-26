@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +25,6 @@ class MediatorMainEventDispatcher(val logger: Logger) {
     class Factory @Inject constructor(
         val loggerFactory: Logger.Factory,
         val messageDataSource: MessageDataSource,
-        val messageRelationGetter: MessageRelationGetter,
         val unreadNotificationDAO: UnreadNotificationDAO,
         val userDataSource: UserDataSource,
         val notificationRelationGetter: NotificationRelationGetter,
@@ -62,7 +61,7 @@ class MediatorMainEventDispatcher(val logger: Logger) {
     suspend fun dispatch(account: Account, mainEvent: ChannelBody.Main) {
         val iterator = dispatchers.iterator()
         while (iterator.hasNext()) {
-            val result = runCatching {
+            val result = runCancellableCatching {
                 iterator.next().dispatch(account, mainEvent)
             }.getOrElse {
                 false

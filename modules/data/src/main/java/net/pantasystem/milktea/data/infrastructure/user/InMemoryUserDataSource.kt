@@ -4,6 +4,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -24,14 +25,14 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
 
 
 
-    override suspend fun add(user: User): Result<AddResult> = runCatching {
-        return@runCatching createOrUpdate(user).also {
+    override suspend fun add(user: User): Result<AddResult> = runCancellableCatching {
+        return@runCancellableCatching createOrUpdate(user).also {
             publish()
         }
 
     }
 
-    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCancellableCatching {
         users.map {
             add(it).getOrElse {
                 AddResult.Canceled
@@ -39,7 +40,7 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
-    override suspend fun get(userId: User.Id): Result<User> = runCatching {
+    override suspend fun get(userId: User.Id): Result<User> = runCancellableCatching {
         usersLock.withLock {
             userMap[userId]
         } ?: throw UserNotFoundException(userId)
@@ -56,7 +57,7 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         })
     }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCatching {
+    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCancellableCatching {
         usersLock.withLock {
             userMap.filterKeys {
                 it.accountId == accountId
@@ -68,7 +69,7 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }
     }
 
-    override suspend fun remove(user: User): Result<Boolean> = runCatching {
+    override suspend fun remove(user: User): Result<Boolean> = runCancellableCatching {
         usersLock.withLock {
             val map = userMap.toMutableMap()
             val result = map.remove(user.id)
@@ -165,7 +166,7 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         limit: Int,
         nextId: String?,
         host: String?
-    ): Result<List<User>> = runCatching {
+    ): Result<List<User>> = runCancellableCatching {
         all().filter {
             it.id.accountId == accountId
         }.filter {

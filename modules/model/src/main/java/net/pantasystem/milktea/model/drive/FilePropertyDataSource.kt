@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 
 class FilePropertyNotFoundException(filePropertyId: FileProperty.Id) : NoSuchElementException("id:$filePropertyId　は存在しません")
@@ -34,9 +35,9 @@ interface FilePropertyDataSource {
 
     suspend fun find(filePropertyId: FileProperty.Id) : Result<FileProperty>
 
-    suspend fun findIn(ids: List<FileProperty.Id>) : Result<List<FileProperty>> = runCatching {
+    suspend fun findIn(ids: List<FileProperty.Id>) : Result<List<FileProperty>> = runCancellableCatching {
         ids.mapNotNull {
-            runCatching {
+            runCancellableCatching {
                 find(it).getOrNull()
             }.getOrNull()
         }

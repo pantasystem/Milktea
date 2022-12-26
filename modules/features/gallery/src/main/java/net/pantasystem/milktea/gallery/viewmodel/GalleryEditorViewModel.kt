@@ -3,12 +3,12 @@ package net.pantasystem.milktea.gallery.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -148,8 +148,8 @@ class GalleryEditorViewModel @Inject constructor(
                 }
             }
             is AppFile.Remote -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    runCatching {
+                viewModelScope.launch {
+                    runCancellableCatching {
                         driveFileRepository.toggleNsfw(file.id)
                     }.onFailure {
                         logger.info("sensitiveの切り替えに失敗しました。", e = it)
@@ -161,7 +161,7 @@ class GalleryEditorViewModel @Inject constructor(
 
 
     fun addFilePropertyIds(ids: List<FileProperty.Id>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             filePropertyDataSource.findIn(ids).onSuccess { files ->
                 _state.update { state ->
                     val list = state.pickedImages.toMutableList().also { list ->

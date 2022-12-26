@@ -17,6 +17,7 @@ import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.DriveFileRepository
@@ -141,8 +142,8 @@ class FileViewModel @AssistedInject constructor(
         if (filePropertyPagingStore.isLoading) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 filePropertyPagingStore.clear()
                 filePropertyPagingStore.loadPrevious()
             }.onFailure {
@@ -156,8 +157,8 @@ class FileViewModel @AssistedInject constructor(
         if (filePropertyPagingStore.isLoading) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 filePropertyPagingStore.loadPrevious()
             }.onFailure {
                 _error.value = it
@@ -167,7 +168,7 @@ class FileViewModel @AssistedInject constructor(
 
 
     fun uploadFile(file: AppFile.Local) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val currentDir = driveStore.state.value.path.path.lastOrNull()?.id
                 val account = currentAccountWatcher.getAccount()
@@ -183,7 +184,7 @@ class FileViewModel @AssistedInject constructor(
     }
 
     fun toggleNsfw(id: FileProperty.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 filePropertyRepository.toggleNsfw(id)
             } catch (e: Exception) {
@@ -194,7 +195,7 @@ class FileViewModel @AssistedInject constructor(
 
 
     fun deleteFile(id: FileProperty.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             filePropertyRepository.delete(id).onFailure { e ->
                 logger.info("ファイルの削除に失敗しました", e = e)
             }
@@ -202,7 +203,7 @@ class FileViewModel @AssistedInject constructor(
     }
 
     fun updateCaption(id: FileProperty.Id, newCaption: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
             filePropertyRepository.update(
                 filePropertyRepository.find(id)

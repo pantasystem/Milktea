@@ -1,10 +1,8 @@
 package net.pantasystem.milktea.note.draft.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -68,7 +66,7 @@ class DraftNotesViewModel @Inject constructor(
 
 
     fun detachFile(draftNote: DraftNote, file: DraftNoteFile) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             draftNoteRepository.save(
                 draftNote.copy(
                     draftFiles = draftNote.draftFiles?.filterNot {
@@ -82,7 +80,7 @@ class DraftNotesViewModel @Inject constructor(
     }
 
     fun toggleSensitive(file: DraftNoteFile) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (file) {
                 is DraftNoteFile.Remote -> {
                     driveFileRepository.update(
@@ -129,11 +127,9 @@ class DraftNotesViewModel @Inject constructor(
 //    }
 
     fun deleteDraftNote(draftNote: DraftNote) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                draftNoteDao.deleteDraftNote(draftNote)
-            } catch (e: Exception) {
-                Log.e("DraftNotesViewModel", "下書きノート削除に失敗しました", e)
+        viewModelScope.launch {
+            draftNoteRepository.delete(draftNote.draftNoteId).onFailure {
+                logger.error("下書きノートの削除に失敗しました", it)
             }
         }
     }

@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
@@ -91,7 +92,7 @@ class LikedGalleryPostsLoader(
 ) : FutureLoader<LikedGalleryPost>, PreviousLoader<LikedGalleryPost> {
 
     override suspend fun loadFuture(): Result<List<LikedGalleryPost>> {
-        return runCatching {
+        return runCancellableCatching {
             val api = misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
                 ?: throw IllegalVersionException()
             api.likedGalleryPosts(
@@ -105,7 +106,7 @@ class LikedGalleryPostsLoader(
     }
 
     override suspend fun loadPrevious(): Result<List<LikedGalleryPost>> {
-        return runCatching {
+        return runCancellableCatching {
             val api = misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
                 ?: throw IllegalVersionException()
             api.likedGalleryPosts(

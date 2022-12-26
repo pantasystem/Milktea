@@ -1,13 +1,14 @@
 package net.pantasystem.milktea.common.paginator
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import org.junit.Assert.*
-
+import net.pantasystem.milktea.common.runCancellableCatching
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class FuturePagingControllerTest {
@@ -92,7 +93,7 @@ class FuturePagingControllerTest {
 
             override suspend fun loadFuture(): Result<List<String>> {
                 val nextId = (getSinceId()?.toInt() ?: 61) - 1
-                return runCatching {
+                return runCancellableCatching {
                     (0.coerceAtLeast(nextId - 20) .. nextId).toList().asReversed().map {
                         it.toString()
                     }
@@ -109,7 +110,8 @@ class FuturePagingControllerTest {
                 override val mutex: Mutex = Mutex()
             },
             futureLoader = store,
-            state = store
+            state = store,
+            dispatcher = Dispatchers.Default
         )
 
         runBlocking {

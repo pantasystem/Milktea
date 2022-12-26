@@ -11,6 +11,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import java.util.concurrent.TimeUnit
@@ -30,7 +31,7 @@ class SyncMetaWorker @AssistedInject constructor(
         }
     }
     override suspend fun doWork(): Result {
-        return accountRepository.findAll().mapCatching { accounts ->
+        return accountRepository.findAll().mapCancellableCatching { accounts ->
             coroutineScope {
                 accounts.map {
                     async {

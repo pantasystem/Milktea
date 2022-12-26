@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -12,6 +11,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -35,7 +35,7 @@ class ImportReactionFromWebViewViewModel @Inject constructor(
         val decoder = Json {
             ignoreUnknownKeys = true
         }
-        runCatching {
+        runCancellableCatching {
             decoder.decodeFromString<WebClientBaseCache>(result)
         }.onSuccess {
             _reactions.value = it.reactions
@@ -46,7 +46,7 @@ class ImportReactionFromWebViewViewModel @Inject constructor(
     }
 
     fun onOverwriteButtonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
 
                 val account = accountRepository.getCurrentAccount().getOrThrow()

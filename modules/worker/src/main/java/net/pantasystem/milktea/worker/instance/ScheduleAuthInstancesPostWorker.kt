@@ -11,6 +11,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -33,7 +34,7 @@ class ScheduleAuthInstancesPostWorker @AssistedInject constructor(
     }
     override suspend fun doWork(): Result {
         return coroutineScope {
-            runCatching {
+            runCancellableCatching {
                 val config = configRepository.get().getOrThrow()
                 if (config.isAnalyticsCollectionEnabled.isEnabled) {
 

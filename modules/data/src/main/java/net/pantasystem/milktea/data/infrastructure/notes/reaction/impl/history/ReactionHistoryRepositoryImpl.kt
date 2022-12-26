@@ -4,14 +4,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.model.notes.reaction.history.*
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
 import javax.inject.Inject
 
 class ReactionHistoryRepositoryImpl @Inject constructor(
     private val reactionHistoryDao: ReactionHistoryDao
 ): ReactionHistoryRepository {
 
-    override suspend fun create(reactionHistory: ReactionHistory): Result<Unit> = runCatching {
+    override suspend fun create(reactionHistory: ReactionHistory): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             reactionHistoryDao.insert(ReactionHistoryRecord.from(reactionHistory))
         }
@@ -34,8 +37,10 @@ class ReactionHistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sumReactions(instanceDomain: String): List<ReactionHistoryCount> {
-        return reactionHistoryDao.sumReactions(instanceDomain).map {
-            it.toReactionHistoryCount()
+        return withContext(Dispatchers.IO) {
+            reactionHistoryDao.sumReactions(instanceDomain).map {
+                it.toReactionHistoryCount()
+            }
         }
     }
 }

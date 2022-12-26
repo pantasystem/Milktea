@@ -3,7 +3,6 @@ package net.pantasystem.milktea.note.reaction.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -60,11 +59,6 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         )
     )
 
-    val isLoading = filteredEmojis.map {
-        it is ResultState.Loading
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
-
-
     fun setReaction(accountId: Long, reaction: String, noteId: String) {
         _reaction.value = RemoteReaction(
             Reaction(
@@ -76,16 +70,14 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
     fun send() {
         val value = reaction.value ?: return
         val name = value.reaction.getName()
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                toggleReactionUseCase(
-                    Note.Id(
-                        value.currentAccountId,
-                        value.noteId
-                    ),
-                    ":$name:"
-                )
-            }.onFailure {
+        viewModelScope.launch {
+            toggleReactionUseCase(
+                Note.Id(
+                    value.currentAccountId,
+                    value.noteId
+                ),
+                ":$name:"
+            ).onFailure {
                 logger.warning("リアクションの作成失敗", e = it)
             }
         }

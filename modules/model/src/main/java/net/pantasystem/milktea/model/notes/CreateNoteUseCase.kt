@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.model.notes
 
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
-import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -13,13 +13,12 @@ import javax.inject.Singleton
 class CreateNoteUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
     private val draftNoteRepository: DraftNoteRepository,
-    private val driveFileRepository: DriveFileRepository,
     private val settingRepository: LocalConfigRepository,
     private val draftNoteService: DraftNoteService,
 ) : UseCase {
 
     suspend operator fun invoke(createNote: CreateNote): Result<Note> {
-        return runCatching {
+        return runCancellableCatching {
             val createNoteResult = noteRepository.create(createNote)
             if (createNoteResult.isFailure) {
                 draftNoteService.save(createNote)
@@ -30,7 +29,7 @@ class CreateNoteUseCase @Inject constructor(
             }
             setNoteVisibility(createNote)
 
-            return@runCatching result
+            return@runCancellableCatching result
         }
     }
 

@@ -15,6 +15,8 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
@@ -123,7 +125,7 @@ class MainViewModel @Inject constructor(
 
     fun setAnalyticsCollectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 configRepository.save(
                     configRepository.get().getOrThrow().setAnalyticsCollectionEnabled(enabled)
                 ).getOrThrow()
@@ -145,11 +147,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun onPushNotificationConfirmed() {
-        viewModelScope.launch(Dispatchers.IO) {
-            configRepository.get().mapCatching {
+        viewModelScope.launch {
+            configRepository.get().mapCancellableCatching {
                 configRepository.save(it.copy(isConfirmedPostNotification = true))
             }.onFailure {
-
+                logger.error("設定状態の保存に失敗", it)
             }
 
         }

@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
@@ -98,7 +99,7 @@ class RenotesPagingImpl(
     override val mutex: Mutex = Mutex()
 
     override suspend fun loadPrevious(): Result<List<NoteDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             val account = accountRepository.get(targetNoteId.accountId).getOrThrow()
             val i = account.token
 

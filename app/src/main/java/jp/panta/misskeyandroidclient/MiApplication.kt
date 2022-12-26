@@ -114,7 +114,7 @@ class MiApplication : Application(), Configuration.Provider {
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
 
         mAccountRepository.addEventListener { ev ->
-            applicationScope.launch(Dispatchers.IO) {
+            applicationScope.launch {
                 try {
                     if (ev is AccountRepository.Event.Deleted) {
                         mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
@@ -132,7 +132,7 @@ class MiApplication : Application(), Configuration.Provider {
             }
         }
 
-        applicationScope.launch(Dispatchers.IO) {
+        applicationScope.launch {
             try {
                 mAccountStore.initialize()
             } catch (e: Exception) {

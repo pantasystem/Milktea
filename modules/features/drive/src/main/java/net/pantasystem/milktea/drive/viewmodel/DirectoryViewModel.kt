@@ -84,21 +84,21 @@ class DirectoryViewModel @AssistedInject constructor(
     }
 
     fun loadInit() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             driveDirectoryPagingStore.clear()
             driveDirectoryPagingStore.loadPrevious()
         }
     }
 
     fun loadNext() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             driveDirectoryPagingStore.loadPrevious()
         }
     }
 
     fun createDirectory(folderName: String) {
         if (folderName.isNotBlank()) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 driveDirectoryRepository.create(
                     CreateDirectory(
                         accountId = accountWatcher.getAccount().accountId,

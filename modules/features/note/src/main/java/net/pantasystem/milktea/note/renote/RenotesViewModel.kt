@@ -6,13 +6,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
 import net.pantasystem.milktea.model.notes.Note
@@ -77,8 +77,8 @@ class RenotesViewModel @AssistedInject constructor(
     }
 
     fun next() {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 renotesPagingService.next()
             }.onFailure {
                 logger.warning("next error", e = it)
@@ -88,8 +88,8 @@ class RenotesViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+        viewModelScope.launch {
+            runCancellableCatching {
                 renotesPagingService.refresh()
             }.onFailure {
                 logger.warning("refresh error", e = it)

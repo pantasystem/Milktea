@@ -14,6 +14,7 @@ import net.pantasystem.milktea.app_store.messaging.MessagingPagingState
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.MessageAdder
@@ -117,7 +118,7 @@ class MessagingPreviousPaging<DTO, E>(
 
     suspend fun loadPrevious() {
         locker.mutex.withLock {
-            runCatching {
+            runCancellableCatching {
                 val body = previousLoader.loadPrevious().getOrThrow().asReversed()
                 entityConverter.convertAll(body)
             }.onFailure {
@@ -182,7 +183,7 @@ class MessagePagingModel(
         return (_state.value.content as? StateContent.Exist)?.rawContent?.firstOrNull()
     }
 
-    override suspend fun loadFuture(): Result<List<MessageDTO>> = runCatching {
+    override suspend fun loadFuture(): Result<List<MessageDTO>> = runCancellableCatching {
         require(messagingId != null) {
             "messagingIdがNullの段階で読み込みはできません"
         }
@@ -197,7 +198,7 @@ class MessagePagingModel(
         ).throwIfHasError().body()!!
     }
 
-    override suspend fun loadPrevious(): Result<List<MessageDTO>> = runCatching {
+    override suspend fun loadPrevious(): Result<List<MessageDTO>> = runCancellableCatching {
         require(messagingId != null) {
             "messagingIdがNullの段階で読み込みはできません"
         }

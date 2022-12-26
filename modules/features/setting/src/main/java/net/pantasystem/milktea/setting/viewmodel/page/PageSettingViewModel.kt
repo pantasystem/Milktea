@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
@@ -13,6 +12,7 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.page.*
@@ -76,7 +76,7 @@ class PageSettingViewModel @Inject constructor(
             page.weight = index + 1
         }
         Log.d("PageSettingVM", "pages:$list")
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             accountStore.replaceAllPage(list).onFailure {
                 Log.e("PageSettingVM", "保存失敗", it)
             }
@@ -103,7 +103,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     private fun addPage(page: Page) {
-        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
+        val list = ArrayList<Page>(selectedPages.value)
         page.weight = list.size
         list.add(page)
         setList(list)
@@ -111,7 +111,7 @@ class PageSettingViewModel @Inject constructor(
 
     fun addUserPageByIds(userIds: List<User.Id>) {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 userIds.map {
                     async {
                         userRepository.find(it)
@@ -139,7 +139,7 @@ class PageSettingViewModel @Inject constructor(
 
     fun addUsersGalleryByIds(userIds: List<User.Id>) {
         viewModelScope.launch  {
-            runCatching {
+            runCancellableCatching {
                 userIds.map {
                     async {
                         userRepository.find(it)
@@ -154,7 +154,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun removePage(page: Page) {
-        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
+        val list = ArrayList<Page>(selectedPages.value)
         list.remove(page)
         setList(list)
     }

@@ -12,6 +12,7 @@ import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
 import net.pantasystem.milktea.common.BuildConfig
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -130,7 +131,7 @@ class AuthStateHelper @Inject constructor(
                     if (!BuildConfig.DEBUG) {
                         return@withContext null
                     }
-                    runCatching {
+                    runCancellableCatching {
                         mastodonAPIProvider.get(url)
                             .getInstance()
                     }.getOrNull()
@@ -189,7 +190,7 @@ class AuthStateHelper @Inject constructor(
         return Authorization.Finish(account, user)
     }
 
-    suspend fun signIn(formState: AuthUserInputState): Result<AccessToken.MisskeyIdAndPassword> = runCatching {
+    suspend fun signIn(formState: AuthUserInputState): Result<AccessToken.MisskeyIdAndPassword> = runCancellableCatching {
         withContext(Dispatchers.IO) {
 
             val baseUrl = toEnableUrl(requireNotNull(formState.host))

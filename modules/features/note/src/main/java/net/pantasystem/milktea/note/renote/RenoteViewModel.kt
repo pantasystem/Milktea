@@ -3,7 +3,6 @@ package net.pantasystem.milktea.note.renote
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -171,7 +170,7 @@ class RenoteViewModel @Inject constructor(
         val noteId = _targetNoteId.value
             ?: return
         val accountIds = _selectedAccountIds.value
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = renoteUseCase(noteId, accountIds)
             _resultEvents.tryEmit(
                 RenoteActionResultEvent.Renote(result, noteId, accountIds)
@@ -183,7 +182,7 @@ class RenoteViewModel @Inject constructor(
     fun unRenote() {
         val noteId = _targetNoteId.value
             ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val result = noteRepository.delete(noteId)
             _resultEvents.tryEmit(
                 RenoteActionResultEvent.UnRenote(result, noteId = noteId)

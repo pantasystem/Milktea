@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.editor.viewmodel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.ap.ApResolver
@@ -76,7 +77,7 @@ class NoteEditorSwitchAccountExecutor @Inject constructor(
         fromAccount: Account?,
         noteEditingState: NoteEditorSwitchAccountExecutorResult,
         account: Account
-    ): Result<NoteEditorSwitchAccountExecutorResult> = runCatching {
+    ): Result<NoteEditorSwitchAccountExecutorResult> = runCancellableCatching {
         if (noteEditingState.renoteId != null) {
             val renote = noteRepository.find(noteEditingState.renoteId).getOrThrow()
             val url = "${fromAccount?.normalizedInstanceDomain}/notes/${renote.id.noteId}"
@@ -92,7 +93,7 @@ class NoteEditorSwitchAccountExecutor @Inject constructor(
         fromAccount: Account?,
         noteEditingState: NoteEditorSwitchAccountExecutorResult,
         account: Account
-    ): Result<NoteEditorSwitchAccountExecutorResult> = runCatching {
+    ): Result<NoteEditorSwitchAccountExecutorResult> = runCancellableCatching {
         if (noteEditingState.replyId != null) {
             val reply = noteRepository.find(noteEditingState.replyId).getOrThrow()
             val url = "${fromAccount?.normalizedInstanceDomain}/notes/${reply.id.noteId}"
@@ -108,7 +109,7 @@ class NoteEditorSwitchAccountExecutor @Inject constructor(
         noteEditingState: NoteEditorSwitchAccountExecutorResult,
         from: Account?,
         to: Account
-    ): Result<NoteEditorSwitchAccountExecutorResult> = runCatching {
+    ): Result<NoteEditorSwitchAccountExecutorResult> = runCancellableCatching {
         coroutineScope {
             when (val visibility = noteEditingState.visibility) {
                 is Visibility.Specified -> {

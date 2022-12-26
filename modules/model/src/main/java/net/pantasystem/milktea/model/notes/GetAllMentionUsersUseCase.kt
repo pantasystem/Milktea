@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.notes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.user.User
@@ -31,7 +32,7 @@ class GetAllMentionUsersUseCase @Inject constructor(
             if (searchedIds.contains(noteId)) {
                 return@withContext Result.success(users)
             }
-            runCatching {
+            runCancellableCatching {
                 val me = getAccount.get(noteId.accountId)
                 val myId = User.Id(me.accountId, me.remoteId)
                 val note = noteRepository.find(noteId).getOrThrow()

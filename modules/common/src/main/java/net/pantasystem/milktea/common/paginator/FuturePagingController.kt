@@ -1,15 +1,20 @@
 package net.pantasystem.milktea.common.paginator
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 
 
 class FuturePagingController<DTO, E>(
     private val entityConverter: EntityConverter<DTO, E>,
     private val locker: StateLocker,
     private val state: PaginationState<E>,
-    private val futureLoader: FutureLoader<DTO>
+    private val futureLoader: FutureLoader<DTO>,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : FuturePaginator {
     override suspend fun loadFuture(): Result<Int> {
         if (locker.mutex.isLocked) {
@@ -21,9 +26,11 @@ class FuturePagingController<DTO, E>(
                 content = state.getState().content
             )
             state.setState(loading)
-            runCatching {
-                val res = futureLoader.loadFuture().getOrThrow()
-                entityConverter.convertAll(res).asReversed()
+            runCancellableCatching {
+                withContext(dispatcher) {
+                    val res = futureLoader.loadFuture().getOrThrow()
+                    entityConverter.convertAll(res).asReversed()
+                }
             }.onFailure {
                 val errorState = PageableState.Error(
                     state.getState().content,

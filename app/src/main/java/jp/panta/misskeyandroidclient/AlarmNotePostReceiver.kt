@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.notification.NotificationUtil
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -57,7 +58,7 @@ class AlarmNotePostReceiver : BroadcastReceiver() {
             name = "Schedule Note"
         )
         coroutineScope.launch {
-            runCatching {
+            runCancellableCatching {
                 val draftNote =
                     draftNoteDAO.getDraftNote(accountId = accountId, draftNoteId = draftNoteId)
                 draftNote ?: return@launch

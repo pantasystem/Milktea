@@ -10,10 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
@@ -302,8 +299,8 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun setDraftNoteId(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            draftNoteRepository.findOne(id).mapCatching {
+        viewModelScope.launch {
+            draftNoteRepository.findOne(id).mapCancellableCatching {
                 val account = accountRepository.get(it.accountId).getOrThrow()
                 it.toNoteEditingState().copy(
                     currentAccount = account
@@ -354,12 +351,12 @@ class NoteEditorViewModel @Inject constructor(
 
     fun post() {
         currentAccount.value?.let { account ->
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 val reservationPostingAt =
                     savedStateHandle.getNoteEditingUiState(account, visibility.value).sendToState.schedulePostAt
                 draftNoteService.save(
                     savedStateHandle.getNoteEditingUiState(account, visibility.value).toCreateNote(account)
-                ).mapCatching { dfNote ->
+                ).mapCancellableCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                         createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
                     } else {
@@ -385,8 +382,8 @@ class NoteEditorViewModel @Inject constructor(
                     files.value.toggleFileSensitiveStatus(appFile)
             }
             is AppFile.Remote -> {
-                viewModelScope.launch(Dispatchers.IO) {
-                    runCatching {
+                viewModelScope.launch {
+                    runCancellableCatching {
                         driveFileRepository.toggleNsfw(appFile.id)
                     }
                 }
@@ -414,7 +411,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             filePropertyDataSource.findIn(ids).onSuccess {
                 addAllFileProperty(it)
             }
@@ -524,11 +521,11 @@ class NoteEditorViewModel @Inject constructor(
         if (!canSaveDraft()) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (val account = currentAccount.value) {
                 null -> Result.failure(UnauthorizedException())
                 else -> Result.success(account)
-            }.mapCatching { account ->
+            }.mapCancellableCatching { account ->
                 draftNoteService.save(uiState.value.toCreateNote(account)).getOrThrow()
             }.onSuccess { result ->
                 isSaveNoteAsDraft.event = result.draftNoteId

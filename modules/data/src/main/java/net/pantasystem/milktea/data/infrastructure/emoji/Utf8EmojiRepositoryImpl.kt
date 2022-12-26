@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.emoji.Utf8Emoji
 import net.pantasystem.milktea.model.emoji.UtfEmojiRepository
 import okhttp3.OkHttpClient
@@ -40,7 +41,7 @@ class Utf8EmojiRepositoryImpl @Inject constructor(
 
     init {
         coroutineScope.launch(dispatcher) {
-            runCatching {
+            runCancellableCatching {
                 findAll()
             }.onFailure {
                 logger?.error("絵文字の取得に失敗しました", it)

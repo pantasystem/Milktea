@@ -4,10 +4,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.common_android_ui.MFMDecorator
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android_ui.MFMDecorator
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Translation
 import net.pantasystem.milktea.note.R
@@ -28,7 +29,7 @@ object TranslationHelper {
             return
         }
 
-        val translation = runCatching {
+        val translation = runCancellableCatching {
             (state.content as StateContent.Exist).rawContent
         }.getOrNull()
         this.visibility = View.VISIBLE

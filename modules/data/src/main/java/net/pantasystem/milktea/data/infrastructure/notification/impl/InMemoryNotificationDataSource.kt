@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notification.impl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationDataSource
@@ -29,7 +30,7 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
-    override suspend fun add(notification: Notification): Result<AddResult> = runCatching {
+    override suspend fun add(notification: Notification): Result<AddResult> = runCancellableCatching {
         createOrUpdate(notification).also {
             if(it == AddResult.Created) {
                 publish(NotificationDataSource.Event.Created(notification.id, notification))
@@ -39,7 +40,7 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
-    override suspend fun addAll(notifications: Collection<Notification>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(notifications: Collection<Notification>): Result<List<AddResult>> = runCancellableCatching {
         notifications.map {
             add(it).getOrElse {
                 AddResult.Canceled
@@ -47,11 +48,11 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
-    override suspend fun get(notificationId: Notification.Id): Result<Notification> = runCatching {
+    override suspend fun get(notificationId: Notification.Id): Result<Notification> = runCancellableCatching {
         find(notificationId)?: throw NotificationNotFoundException(notificationId)
     }
 
-    override suspend fun remove(notificationId: Notification.Id): Result<Boolean> = runCatching {
+    override suspend fun remove(notificationId: Notification.Id): Result<Boolean> = runCancellableCatching {
         delete(notificationId).also {
             if(it){
                 publish(NotificationDataSource.Event.Deleted(notificationId))
