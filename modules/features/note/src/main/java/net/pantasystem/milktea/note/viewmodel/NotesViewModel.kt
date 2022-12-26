@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.notes.Note
@@ -62,12 +63,11 @@ class NotesViewModel @Inject constructor(
     }
 
     private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> =
-        runCancellableCatching {
-            val note = noteRepository.find(noteId).getOrThrow()
+        noteRepository.find(noteId).mapCancellableCatching { note ->
             if (note.hasContent()) {
                 note
             } else {
-                recursiveSearchHasContentNote(note.renoteId!!).getOrThrow()
+                recursiveSearchHasContentNote(requireNotNull(note.renoteId)).getOrThrow()
             }
         }
 
@@ -85,7 +85,7 @@ class NotesViewModel @Inject constructor(
     fun toggleReaction(noteId: Note.Id, reaction: String) {
         viewModelScope.launch {
             toggleReactionUseCase(noteId, reaction).onFailure {
-
+                logger.error("リアクション失敗", it)
             }
         }
     }
@@ -94,7 +94,6 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             favoriteRepository.create(noteId).onSuccess {
                 statusMessage.event = "お気に入りに追加しました"
-
             }.onFailure {
                 statusMessage.event = "お気に入りにへの追加に失敗しました"
             }
@@ -116,6 +115,8 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             noteRepository.delete(noteId).onSuccess {
                 statusMessage.event = "削除に成功しました"
+            }.onFailure {
+                logger.error("ノート削除に失敗", it)
             }
         }
 
@@ -124,7 +125,6 @@ class NotesViewModel @Inject constructor(
     fun removeAndEditNote(note: NoteRelation) {
         viewModelScope.launch {
             runCancellableCatching {
-
                 val dn = draftNoteRepository.save(note.toDraftNote()).getOrThrow()
                 noteRepository.delete(note.note.id).getOrThrow()
                 dn
