@@ -2,6 +2,8 @@ package net.pantasystem.milktea.data.infrastructure.sw.register
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -12,7 +14,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class SubscriptionUnRegistrationImpl @Inject constructor(
-
     val accountRepository: AccountRepository,
     val lang: String,
     val misskeyAPIProvider: MisskeyAPIProvider,
@@ -23,23 +24,25 @@ class SubscriptionUnRegistrationImpl @Inject constructor(
 
 
     override suspend fun unregister(accountId: Long) {
-        val token = FirebaseMessaging.getInstance().token.asSuspend()
-        val account = accountRepository.get(accountId).getOrThrow()
-        val apiProvider = misskeyAPIProvider.get(account)
-        val endpoint = EndpointBuilder(
-            accountId = account.accountId,
-            deviceToken = token,
-            lang = lang,
-            publicKey = publicKey,
-            endpointBase = endpointBase,
-            auth = auth,
-        ).build()
-        apiProvider.swUnRegister(
-            UnSubscription(
-            i = account.token,
-            endpoint = endpoint
-        )
-        ).throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val token = FirebaseMessaging.getInstance().token.asSuspend()
+            val account = accountRepository.get(accountId).getOrThrow()
+            val apiProvider = misskeyAPIProvider.get(account)
+            val endpoint = EndpointBuilder(
+                accountId = account.accountId,
+                deviceToken = token,
+                lang = lang,
+                publicKey = publicKey,
+                endpointBase = endpointBase,
+                auth = auth,
+            ).build()
+            apiProvider.swUnRegister(
+                UnSubscription(
+                    i = account.token,
+                    endpoint = endpoint
+                )
+            ).throwIfHasError()
+        }
     }
 }
 
