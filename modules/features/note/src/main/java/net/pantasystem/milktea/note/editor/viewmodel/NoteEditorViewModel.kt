@@ -299,7 +299,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun setDraftNoteId(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             draftNoteRepository.findOne(id).mapCancellableCatching {
                 val account = accountRepository.get(it.accountId).getOrThrow()
                 it.toNoteEditingState().copy(
@@ -351,7 +351,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun post() {
         currentAccount.value?.let { account ->
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 val reservationPostingAt =
                     savedStateHandle.getNoteEditingUiState(account, visibility.value).sendToState.schedulePostAt
                 draftNoteService.save(
@@ -382,7 +382,7 @@ class NoteEditorViewModel @Inject constructor(
                     files.value.toggleFileSensitiveStatus(appFile)
             }
             is AppFile.Remote -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     runCancellableCatching {
                         driveFileRepository.toggleNsfw(appFile.id)
                     }
@@ -411,7 +411,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun addFilePropertyFromIds(ids: List<FileProperty.Id>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             filePropertyDataSource.findIn(ids).onSuccess {
                 addAllFileProperty(it)
             }
@@ -521,7 +521,7 @@ class NoteEditorViewModel @Inject constructor(
         if (!canSaveDraft()) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (val account = currentAccount.value) {
                 null -> Result.failure(UnauthorizedException())
                 else -> Result.success(account)
