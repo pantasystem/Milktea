@@ -2,6 +2,7 @@ package net.pantasystem.milktea.app_store.drive
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.DirectoryPath

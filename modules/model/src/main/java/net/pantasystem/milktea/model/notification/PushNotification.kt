@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.model.notification
 
 import android.os.Bundle
+import net.pantasystem.milktea.common.runCancellableCatching
 
 
 data class PushNotification(

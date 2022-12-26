@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 
 @HiltWorker

@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes.reaction
 
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.instance.MetaRepository
