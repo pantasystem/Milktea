@@ -14,49 +14,59 @@ class ChannelRepositoryImpl(
 ) : ChannelRepository {
     override suspend fun findOne(id: Channel.Id): Result<Channel> {
         return runCancellableCatching {
-            var channel = channelStateModel.get(id)
-            if (channel == null) {
-                val account = accountRepository.get(id.accountId).getOrThrow()
-                channel = channelAPIAdapter.findOne(id).getOrThrow()
-                    .toModel(account)
-                channelStateModel.add(channel)
+            withContext(Dispatchers.IO) {
+                var channel = channelStateModel.get(id)
+                if (channel == null) {
+                    val account = accountRepository.get(id.accountId).getOrThrow()
+                    channel = channelAPIAdapter.findOne(id).getOrThrow()
+                        .toModel(account)
+                    channelStateModel.add(channel)
+                }
+                channel
             }
-            return@runCancellableCatching channel
         }
     }
 
     override suspend fun create(model: CreateChannel): Result<Channel> {
         return runCancellableCatching {
-            val account = accountRepository.get(model.accountId).getOrThrow()
-            val channel = channelAPIAdapter.create(model).getOrThrow()
-                .toModel(account)
-            channelStateModel.add(channel)
+            withContext(Dispatchers.IO) {
+                val account = accountRepository.get(model.accountId).getOrThrow()
+                val channel = channelAPIAdapter.create(model).getOrThrow()
+                    .toModel(account)
+                channelStateModel.add(channel)
+            }
         }
     }
 
     override suspend fun follow(id: Channel.Id): Result<Channel> {
         return runCancellableCatching {
-            var channel = findOne(id).getOrThrow()
-            channelAPIAdapter.follow(id).getOrThrow()
-            channel = channel.copy(isFollowing = true)
-            channelStateModel.add(channel)
+            withContext(Dispatchers.IO) {
+                var channel = findOne(id).getOrThrow()
+                channelAPIAdapter.follow(id).getOrThrow()
+                channel = channel.copy(isFollowing = true)
+                channelStateModel.add(channel)
+            }
         }
     }
 
     override suspend fun unFollow(id: Channel.Id): Result<Channel> {
         return runCancellableCatching {
-            var channel = findOne(id).getOrThrow()
-            channelAPIAdapter.unFollow(id).getOrThrow()
-            channel = channel.copy(isFollowing = false)
-            channelStateModel.add(channel)
+            withContext(Dispatchers.IO) {
+                var channel = findOne(id).getOrThrow()
+                channelAPIAdapter.unFollow(id).getOrThrow()
+                channel = channel.copy(isFollowing = false)
+                channelStateModel.add(channel)
+            }
         }
     }
 
     override suspend fun update(model: UpdateChannel): Result<Channel> {
         return runCancellableCatching {
-            val channel = channelAPIAdapter.update(model).getOrThrow()
-            val account = accountRepository.get(model.id.accountId).getOrThrow()
-            channelStateModel.add(channel.toModel(account))
+            withContext(Dispatchers.IO) {
+                val channel = channelAPIAdapter.update(model).getOrThrow()
+                val account = accountRepository.get(model.id.accountId).getOrThrow()
+                channelStateModel.add(channel.toModel(account))
+            }
         }
     }
 
