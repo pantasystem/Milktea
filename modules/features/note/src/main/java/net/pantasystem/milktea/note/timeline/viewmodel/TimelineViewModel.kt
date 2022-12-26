@@ -124,7 +124,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     init {
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().map {
                 currentAccountWatcher.getAccount()
             }.distinctUntilChanged().catch {
@@ -146,19 +146,19 @@ class TimelineViewModel @AssistedInject constructor(
 
 
     fun loadNew() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             timelineStore.loadFuture()
         }
     }
 
     fun loadOld() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             timelineStore.loadPrevious()
         }
     }
 
     fun loadInit(initialUntilDate: Instant? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             cache.clear()
             timelineStore.clear(initialUntilDate)
             timelineStore.loadPrevious()
