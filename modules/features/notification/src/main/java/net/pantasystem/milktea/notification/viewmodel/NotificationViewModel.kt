@@ -199,7 +199,7 @@ class NotificationViewModel @Inject constructor(
 
     fun acceptFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 runCancellableCatching {
                     userRepository.acceptFollowRequest(notification.userId)
                 }.onSuccess {
@@ -237,7 +237,7 @@ class NotificationViewModel @Inject constructor(
     }
 
     fun acceptGroupInvitation(notification: Notification) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (notification is GroupInvitedNotification) {
                 groupRepository.accept(notification.invitationId)
                     .onSuccess {

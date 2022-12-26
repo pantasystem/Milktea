@@ -53,7 +53,7 @@ class NotesViewModel @Inject constructor(
 
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             recursiveSearchHasContentNote(noteId).onSuccess { note ->
                 withContext(Dispatchers.Main) {
                     quoteRenoteTarget.event = note
@@ -84,7 +84,7 @@ class NotesViewModel @Inject constructor(
     }
 
     fun toggleReaction(noteId: Note.Id, reaction: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             toggleReactionUseCase(noteId, reaction).onFailure {
 
             }
@@ -115,18 +115,16 @@ class NotesViewModel @Inject constructor(
     }
 
     fun removeNote(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             noteRepository.delete(noteId).onSuccess {
-                withContext(Dispatchers.Main) {
-                    statusMessage.event = "削除に成功しました"
-                }
+                statusMessage.event = "削除に成功しました"
             }
         }
 
     }
 
     fun removeAndEditNote(note: NoteRelation) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
 
                 val dn = draftNoteRepository.save(note.toDraftNote())
@@ -134,9 +132,7 @@ class NotesViewModel @Inject constructor(
                 noteRepository.delete(note.note.id).getOrThrow()
                 dn
             }.onSuccess {
-                withContext(Dispatchers.Main) {
-                    openNoteEditor.event = it
-                }
+                openNoteEditor.event = it
             }.onFailure { t ->
                 Log.e(TAG, "削除に失敗しました", t)
             }
@@ -151,7 +147,7 @@ class NotesViewModel @Inject constructor(
             return
         }
         if (SafeUnbox.unbox(poll.canVote)) {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch {
                 noteRepository.vote(noteId, choice).onSuccess {
                     Log.d(TAG, "投票に成功しました")
                 }.onFailure {
@@ -162,7 +158,7 @@ class NotesViewModel @Inject constructor(
     }
 
     fun translate(noteId: Note.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             translationStore.translate(noteId)
         }
     }
