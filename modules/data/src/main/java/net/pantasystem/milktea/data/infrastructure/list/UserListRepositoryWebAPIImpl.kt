@@ -31,83 +31,97 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     private val userListDao: UserListDao
 ) : UserListRepository {
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
-        val account = accountRepository.get(accountId).getOrThrow()
-        val api = misskeyAPIProvider.get(account)
-        val body = api.userList(I(account.token))
-            .throwIfHasError()
-            .body()
-        return body!!.map {
-            it.toEntity(account)
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(accountId).getOrThrow()
+            val api = misskeyAPIProvider.get(account)
+            val body = api.userList(I(account.token))
+                .throwIfHasError()
+                .body()
+            body!!.map {
+                it.toEntity(account)
+            }
         }
     }
 
     override suspend fun create(accountId: Long, name: String): UserList {
-        val account = accountRepository.get(accountId).getOrThrow()
-        val res = misskeyAPIProvider.get(account).createList(
-            CreateList(
-                account.token,
-                name = name
-            )
-        ).throwIfHasError()
-        return res.body()!!.toEntity(account).also {
-            upsert(it)
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(accountId).getOrThrow()
+            val res = misskeyAPIProvider.get(account).createList(
+                CreateList(
+                    account.token,
+                    name = name
+                )
+            ).throwIfHasError()
+            res.body()!!.toEntity(account).also {
+                upsert(it)
+            }
         }
     }
 
     override suspend fun update(listId: UserList.Id, name: String) {
-        val account = accountRepository.get(listId.accountId).getOrThrow()
-        misskeyAPIProvider.get(account).updateList(
-            UpdateList(
-                account.token,
-                name = name,
-                listId = listId.userListId
-            )
-        ).throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(listId.accountId).getOrThrow()
+            misskeyAPIProvider.get(account).updateList(
+                UpdateList(
+                    account.token,
+                    name = name,
+                    listId = listId.userListId
+                )
+            ).throwIfHasError()
+        }
     }
 
     override suspend fun appendUser(
         listId: UserList.Id,
         userId: User.Id
     ) {
-        val account = accountRepository.get(listId.accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account)
-        misskeyAPI.pushUserToList(
-            ListUserOperation(
-                userId = userId.id,
-                listId = listId.userListId,
-                i = account.token
-            )
-        ).throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(listId.accountId).getOrThrow()
+            val misskeyAPI = misskeyAPIProvider.get(account)
+            misskeyAPI.pushUserToList(
+                ListUserOperation(
+                    userId = userId.id,
+                    listId = listId.userListId,
+                    i = account.token
+                )
+            ).throwIfHasError()
+        }
     }
 
     override suspend fun removeUser(
         listId: UserList.Id,
         userId: User.Id
     ) {
-        val account = accountRepository.get(listId.accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account)
-        misskeyAPI.pullUserFromList(
-            ListUserOperation(
-                userId = userId.id,
-                listId = listId.userListId,
-                i = account.token
-            )
-        ).throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(listId.accountId).getOrThrow()
+            val misskeyAPI = misskeyAPIProvider.get(account)
+            misskeyAPI.pullUserFromList(
+                ListUserOperation(
+                    userId = userId.id,
+                    listId = listId.userListId,
+                    i = account.token
+                )
+            ).throwIfHasError()
+        }
     }
 
     override suspend fun delete(listId: UserList.Id) {
-        val account = accountRepository.get(listId.accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account)
-        misskeyAPI.deleteList(ListId(account.token, listId.userListId))
-            .throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(listId.accountId).getOrThrow()
+            val misskeyAPI = misskeyAPIProvider.get(account)
+            misskeyAPI.deleteList(ListId(account.token, listId.userListId))
+                .throwIfHasError()
+        }
     }
 
     override suspend fun findOne(userListId: UserList.Id): UserList {
-        val account = accountRepository.get(userListId.accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account)
-        val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
-            .throwIfHasError()
-        return res.body()!!.toEntity(account)
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(userListId.accountId).getOrThrow()
+            val misskeyAPI = misskeyAPIProvider.get(account)
+            val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
+                .throwIfHasError()
+            res.body()!!.toEntity(account)
+        }
     }
 
     override fun observeByAccountId(accountId: Long): Flow<List<UserListWithMembers>> {
@@ -128,54 +142,56 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun syncByAccountId(accountId: Long): Result<Unit> = runCancellableCatching {
-        val source = findByAccountId(accountId)
-        val beforeInsertRecords = source.map { ul ->
-            UserListRecord(
-                serverId = ul.id.userListId,
-                accountId = ul.id.accountId,
-                createdAt = ul.createdAt,
-                name = ul.name,
-            )
-        }
+        withContext(Dispatchers.IO) {
 
-        val resultIds = userListDao.insertAll(beforeInsertRecords)
-        val localLists = userListDao.findUserListWhereIn(accountId, source.map { it.id.userListId })
-
-        val ids = resultIds.mapIndexed { index, resultId ->
-            if (resultId == -1L) {
-                localLists[index].id
-            } else {
-                resultId
+            val source = findByAccountId(accountId)
+            val beforeInsertRecords = source.map { ul ->
+                UserListRecord(
+                    serverId = ul.id.userListId,
+                    accountId = ul.id.accountId,
+                    createdAt = ul.createdAt,
+                    name = ul.name,
+                )
             }
-        }
-        resultIds.forEachIndexed { index, l ->
-            if (l == -1L) {
-                val id = ids[index]
-                val updateTarget = beforeInsertRecords[index]
-                userListDao.update(updateTarget.copy(id = id))
-            }
-        }
 
+            val resultIds = userListDao.insertAll(beforeInsertRecords)
+            val localLists =
+                userListDao.findUserListWhereIn(accountId, source.map { it.id.userListId })
 
-
-        ids.forEachIndexed { index, l ->
-            userListDao.detachUserIds(l)
-            userListDao.attachMemberIds(
-                source[index].userIds.map {
-                    UserListMemberIdRecord(
-                        userId = it.id,
-                        userListId = l
-                    )
+            val ids = resultIds.mapIndexed { index, resultId ->
+                if (resultId == -1L) {
+                    localLists[index].id
+                } else {
+                    resultId
                 }
-            )
-        }
+            }
+            resultIds.forEachIndexed { index, l ->
+                if (l == -1L) {
+                    val id = ids[index]
+                    val updateTarget = beforeInsertRecords[index]
+                    userListDao.update(updateTarget.copy(id = id))
+                }
+            }
 
+
+
+            ids.forEachIndexed { index, l ->
+                userListDao.detachUserIds(l)
+                userListDao.attachMemberIds(
+                    source[index].userIds.map {
+                        UserListMemberIdRecord(
+                            userId = it.id,
+                            userListId = l
+                        )
+                    }
+                )
+            }
+        }
     }
 
     override suspend fun syncOne(userListId: UserList.Id): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val source = findOne(userListId)
-
             upsert(source)
         }
 
