@@ -26,7 +26,7 @@ class SubscriptionRegistrationImpl(
     /**
      * 特定のアカウントをsw/registerに登録します。
      */
-    override suspend fun register(accountId: Long) : Result<SubscriptionState?> = runCatching {
+    override suspend fun register(accountId: Long) : Result<SubscriptionState?> = runCancellableCatching {
         val token = FirebaseMessaging.getInstance().token.asSuspend()
         logger.debug("call register(accountId:$accountId)")
         logger.debug("auth:$auth, publicKey:$publicKey")

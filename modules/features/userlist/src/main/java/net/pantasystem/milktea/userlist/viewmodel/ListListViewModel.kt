@@ -94,7 +94,7 @@ class ListListViewModel @Inject constructor(
 
     fun toggle(userList: UserList, userId: User.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 if (userList.userIds.contains(userId)) {
                     userListRepository.removeUser(userList.id, userId)
                 } else {
@@ -110,7 +110,7 @@ class ListListViewModel @Inject constructor(
     fun toggleTab(userList: UserList?) {
         userList?.let { ul ->
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+                runCancellableCatching {
                     val account = accountRepository.get(userList.id.accountId).getOrThrow()
                     val exPage = account.pages.firstOrNull {
                         val pageable = it.pageable()
@@ -142,7 +142,7 @@ class ListListViewModel @Inject constructor(
 
     fun createUserList(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 val account = accountRepository.getCurrentAccount().getOrThrow()
                 val result = userListRepository.create(account.accountId, name)
                 userListRepository.syncOne(result.id).getOrThrow()

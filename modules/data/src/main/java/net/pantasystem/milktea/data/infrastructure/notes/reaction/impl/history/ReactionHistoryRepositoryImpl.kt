@@ -11,7 +11,7 @@ class ReactionHistoryRepositoryImpl @Inject constructor(
     private val reactionHistoryDao: ReactionHistoryDao
 ): ReactionHistoryRepository {
 
-    override suspend fun create(reactionHistory: ReactionHistory): Result<Unit> = runCatching {
+    override suspend fun create(reactionHistory: ReactionHistory): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             reactionHistoryDao.insert(ReactionHistoryRecord.from(reactionHistory))
         }

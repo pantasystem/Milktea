@@ -40,13 +40,13 @@ class InMemoryMessageDataSource(
         }
     }
 
-    override suspend fun addAll(messages: List<Message>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(messages: List<Message>): Result<List<AddResult>> = runCancellableCatching {
         messages.map {
             add(it).getOrElse { AddResult.Canceled }
         }
     }
 
-    override suspend fun delete(messageId: Message.Id): Result<Boolean> = runCatching {
+    override suspend fun delete(messageId: Message.Id): Result<Boolean> = runCancellableCatching {
         remove(messageId).also {
             updateState()
         }
@@ -87,7 +87,7 @@ class InMemoryMessageDataSource(
         }
     }
 
-    override suspend fun readAllMessages(accountId: Long): Result<Unit> = runCatching {
+    override suspend fun readAllMessages(accountId: Long): Result<Unit> = runCancellableCatching {
         readAllMessagesByAccountId(accountId)
         updateState()
     }

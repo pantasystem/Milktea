@@ -92,7 +92,7 @@ class PreviousPagingControllerTest {
 
             override suspend fun loadPrevious(): Result<List<String>> {
                 val next = (getUntilId()?.toInt()?: 0) + 1
-                return runCatching {
+                return runCancellableCatching {
                     (next until (next + 20)).map { it.toString() }
                 }
             }

@@ -22,7 +22,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
     private val milkteaAPIService by lazy {
         milkteaAPIServiceBuilder.build("https://milktea.pantasystem.net")
     }
-    override suspend fun findAll(): Result<List<InstanceInfo>> = runCatching {
+    override suspend fun findAll(): Result<List<InstanceInfo>> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             instanceInfoDao.findAll().map {
                 it.toModel()
@@ -30,7 +30,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sync(): Result<Unit> = runCatching {
+    override suspend fun sync(): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val instances = requireNotNull(milkteaAPIService.getInstances().throwIfHasError().body())
             val models = instances.map {
@@ -43,7 +43,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findOne(id: String): Result<InstanceInfo> = runCatching {
+    override suspend fun findOne(id: String): Result<InstanceInfo> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             instanceInfoDao.findById(id)?.toModel()
                 ?: throw NoSuchElementException("指定されたId($id)のInstanceInfoは存在しません")
@@ -64,7 +64,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun postInstance(host: String): Result<Unit> = runCatching {
+    override suspend fun postInstance(host: String): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             milkteaAPIService.createInstance(CreateInstanceRequest(host = host)).throwIfHasError()
         }

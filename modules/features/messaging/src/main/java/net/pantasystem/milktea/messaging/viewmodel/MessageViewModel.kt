@@ -43,7 +43,7 @@ class MessageViewModel @Inject constructor(
     val messages = messagePagingStore.state.map { state ->
         state.pageState.suspendConvert { list ->
             list.mapNotNull { id ->
-                runCatching {
+                runCancellableCatching {
                     messageRelationGetter.get(id)
                 }.getOrNull()
             }.asReversed()
@@ -93,7 +93,7 @@ class MessageViewModel @Inject constructor(
     }
 
     private suspend fun loadMessageTitle(messagingId: MessagingId): Result<String> {
-        return runCatching {
+        return runCancellableCatching {
             when (messagingId) {
                 is MessagingId.Direct -> {
                     userRepository.find(messagingId.userId).displayUserName

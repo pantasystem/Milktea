@@ -25,7 +25,7 @@ class GetAccessToken @Inject constructor(
     }
 
     suspend fun getAccessToken(a: Authorization.Waiting4UserAuthorization, code: String? = null): Result<AccessToken> {
-        return runCatching {
+        return runCancellableCatching {
             when (a) {
                 is Authorization.Waiting4UserAuthorization.Misskey -> {
                     val accessToken =

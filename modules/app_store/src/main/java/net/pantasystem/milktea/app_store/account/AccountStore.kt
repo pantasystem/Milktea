@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -84,7 +85,7 @@ class AccountStore @Inject constructor(
     }
 
     suspend fun replaceAllPage(pages: List<Page>): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             val account = _state.value.currentAccount
                 ?: throw IllegalStateException()
             val updated = account.copy(pages = pages)

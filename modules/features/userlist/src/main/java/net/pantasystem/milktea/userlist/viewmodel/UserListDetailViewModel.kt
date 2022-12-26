@@ -85,7 +85,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     fun load() {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 userListRepository.syncOne(listId)
             }.onSuccess {
                 logger.info("load list success")
@@ -99,7 +99,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     fun updateName(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 userListRepository.update(listId, name)
                 userListRepository.syncOne(listId).getOrThrow()
             }.onSuccess {
@@ -114,7 +114,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     fun pushUser(userId: User.Id) {
 
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 userListRepository.appendUser(listId, userId)
                 userListRepository.syncOne(listId).getOrThrow()
             }.onSuccess {
@@ -130,7 +130,7 @@ class UserListDetailViewModel @AssistedInject constructor(
     fun pullUser(userId: User.Id) {
 
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 userListRepository.removeUser(listId, userId)
                 userListRepository.syncOne(listId).getOrThrow()
             }.onFailure { t ->
@@ -145,7 +145,7 @@ class UserListDetailViewModel @AssistedInject constructor(
 
     fun toggleAddToTab() {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 val account = accountRepository.get(listId.accountId)
                     .getOrThrow()
                 val page = account.pages.firstOrNull {

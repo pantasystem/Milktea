@@ -20,7 +20,7 @@ class PreviousPagingController<DTO, E>(
                 content = state.getState().content
             )
             state.setState(loading)
-            runCatching {
+            runCancellableCatching {
                 val res = previousLoader.loadPrevious().getOrThrow()
                 entityConverter.convertAll(res)
             }.onFailure {

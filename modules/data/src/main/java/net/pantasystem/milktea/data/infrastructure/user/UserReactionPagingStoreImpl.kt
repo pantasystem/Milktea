@@ -46,13 +46,13 @@ class UserReactionPagingStoreImpl(
     override val state: Flow<PageableState<List<UserReactionRelation>>>
         get() = pagingImpl.state
 
-    override suspend fun clear(): Result<Unit> = runCatching {
+    override suspend fun clear(): Result<Unit> = runCancellableCatching {
         pagingImpl.mutex.withLock {
             pagingImpl.setState(PageableState.Loading.Init())
         }
     }
 
-    override suspend fun loadPrevious(): Result<Unit> = runCatching {
+    override suspend fun loadPrevious(): Result<Unit> = runCancellableCatching {
         previousPagingController.loadPrevious().getOrThrow()
     }
 }
@@ -97,7 +97,7 @@ class UserReactionPagingImpl(
         get() = _state
 
 
-    override suspend fun loadPrevious(): Result<List<UserReactionDTO>> = runCatching {
+    override suspend fun loadPrevious(): Result<List<UserReactionDTO>> = runCancellableCatching {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         (misskeyAPIProvider.get(account) as MisskeyAPIV12).getUserReactions(
             UserReactionRequest(

@@ -25,7 +25,7 @@ class ToggleReactionUseCase @Inject constructor(
 ) : UseCase {
 
     suspend operator fun invoke(noteId: Note.Id, reaction: String): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val account = getAccount.get(noteId.accountId)
             val reactionObj = Reaction(reaction)
             val sendReaction =

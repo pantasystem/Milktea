@@ -18,7 +18,7 @@ class MetaRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
 ): MetaRepository {
 
-    override suspend fun sync(instanceDomain: String): Result<Unit> = runCatching {
+    override suspend fun sync(instanceDomain: String): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val meta = fetch(instanceDomain)
             metaDataSource.add(meta)
@@ -27,7 +27,7 @@ class MetaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun find(instanceDomain: String): Result<Meta> = runCatching {
+    override suspend fun find(instanceDomain: String): Result<Meta> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val cacheMeta = metaCache.get(instanceDomain)
             if (cacheMeta != null) {

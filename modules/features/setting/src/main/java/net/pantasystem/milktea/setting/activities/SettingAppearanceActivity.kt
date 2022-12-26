@@ -268,13 +268,13 @@ class SettingAppearanceActivity : AppCompatActivity() {
                 }
             val fileId = ids?.firstOrNull() ?: return@registerForActivityResult
             lifecycleScope.launch(Dispatchers.IO) {
-                val file = runCatching {
+                val file = runCancellableCatching {
                     driveFileRepository.find(fileId)
                 }.onFailure {
                     Log.e("SettingAppearanceACT", "画像の取得に失敗", it)
                 }.getOrNull()
                     ?: return@launch
-                runCatching {
+                runCancellableCatching {
                     localConfigRepository.save(
                         localConfigRepository.get().getOrThrow().copy(
                             backgroundImagePath = file.url

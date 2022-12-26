@@ -24,7 +24,7 @@ class MessagingRepositoryImpl @Inject constructor(
     override suspend fun findMessageSummaries(
         accountId: Long,
         isGroup: Boolean
-    ): Result<List<MessageRelation>> = runCatching {
+    ): Result<List<MessageRelation>> = runCancellableCatching {
         val account = getAccount.get(accountId)
         val request = RequestMessageHistory(
             i = account.token, group = isGroup, limit = 100

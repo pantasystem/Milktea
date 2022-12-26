@@ -92,7 +92,7 @@ class FuturePagingControllerTest {
 
             override suspend fun loadFuture(): Result<List<String>> {
                 val nextId = (getSinceId()?.toInt() ?: 61) - 1
-                return runCatching {
+                return runCancellableCatching {
                     (0.coerceAtLeast(nextId - 20) .. nextId).toList().asReversed().map {
                         it.toString()
                     }

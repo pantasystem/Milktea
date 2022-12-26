@@ -35,7 +35,7 @@ class ImportReactionFromWebViewViewModel @Inject constructor(
         val decoder = Json {
             ignoreUnknownKeys = true
         }
-        runCatching {
+        runCancellableCatching {
             decoder.decodeFromString<WebClientBaseCache>(result)
         }.onSuccess {
             _reactions.value = it.reactions

@@ -77,7 +77,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         val value = reaction.value ?: return
         val name = value.reaction.getName()
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 toggleReactionUseCase(
                     Note.Id(
                         value.currentAccountId,

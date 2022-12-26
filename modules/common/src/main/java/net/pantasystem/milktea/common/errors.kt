@@ -34,7 +34,7 @@ sealed class APIError(msg: String) : Exception(msg){
 val formatter = Json
 
 fun<T> Response<T>.throwIfHasError(): Response<T> {
-    val error = runCatching {
+    val error = runCancellableCatching {
         this.errorBody()?.string()?.let {
             formatter.decodeFromString<Error>(it)
         }

@@ -244,12 +244,12 @@ class SocketImpl(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             super.onMessage(webSocket, text)
-            runCatching {
+            runCancellableCatching {
                 pollingJob.onReceive(text)
             }.onSuccess {
                 return
             }
-            val e = runCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
+            val e = runCancellableCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
                 logger.error("デコードエラー msg:$text", e = t)
             }.getOrNull() ?: return
 
@@ -257,7 +257,7 @@ class SocketImpl(
             while (iterator.hasNext()) {
 
                 val listener = iterator.next()
-                val res = runCatching {
+                val res = runCancellableCatching {
                     listener.onMessage(e)
                 }.onFailure {
                     logger.error("メッセージリスナー先でエラー発生", e = it)

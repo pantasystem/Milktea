@@ -33,7 +33,7 @@ class ScheduleAuthInstancesPostWorker @AssistedInject constructor(
     }
     override suspend fun doWork(): Result {
         return coroutineScope {
-            runCatching {
+            runCancellableCatching {
                 val config = configRepository.get().getOrThrow()
                 if (config.isAnalyticsCollectionEnabled.isEnabled) {
 

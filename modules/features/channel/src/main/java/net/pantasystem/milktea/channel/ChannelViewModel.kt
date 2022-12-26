@@ -77,7 +77,7 @@ class ChannelViewModel @Inject constructor(
 
     fun follow(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 channelRepository.follow(channelId)
             }.onFailure {
                 logger.info("follow error:$channelId", e = it)
@@ -87,7 +87,7 @@ class ChannelViewModel @Inject constructor(
 
     fun unFollow(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 channelRepository.unFollow(channelId)
             }.onFailure {
                 logger.info("unFollow error:$channelId", e = it)
@@ -97,7 +97,7 @@ class ChannelViewModel @Inject constructor(
 
     fun toggleTab(channelId: Channel.Id) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 val account = accountRepository.get(channelId.accountId).getOrThrow()
                 val channel = channelRepository.findOne(channelId).getOrThrow()
                 val page = account.newPage(

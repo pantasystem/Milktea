@@ -127,7 +127,7 @@ class NotificationViewModel @Inject constructor(
             val request = NotificationRequest(i = account.token, limit = 20)
             val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
 
-            runCatching {
+            runCancellableCatching {
                 val notificationDTOList = misskeyAPI.notification(request).throwIfHasError().body()
                 logger.debug("res: $notificationDTOList")
                 val viewDataList = notificationDTOList?.toNotificationViewData(account)
@@ -172,7 +172,7 @@ class NotificationViewModel @Inject constructor(
                 limit = 20,
                 untilId = untilId.notificationId
             )
-            val notifications = runCatching {
+            val notifications = runCancellableCatching {
                 misskeyAPI.notification(request).throwIfHasError().body()
             }.getOrNull()
             val list = notifications?.toNotificationViewData(account)
@@ -200,7 +200,7 @@ class NotificationViewModel @Inject constructor(
     fun acceptFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+                runCancellableCatching {
                     userRepository.acceptFollowRequest(notification.userId)
                 }.onSuccess {
                     if (it) {
@@ -220,7 +220,7 @@ class NotificationViewModel @Inject constructor(
     fun rejectFollowRequest(notification: Notification) {
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
-                runCatching {
+                runCancellableCatching {
                     userRepository.rejectFollowRequest(notification.userId)
                 }.onSuccess {
                     if (it) {
@@ -274,7 +274,7 @@ class NotificationViewModel @Inject constructor(
 
     private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
         return this.mapNotNull {
-            runCatching {
+            runCancellableCatching {
                 it.toNotificationRelation(account)
             }.onFailure {
                 logger.error("変換失敗", e = it)

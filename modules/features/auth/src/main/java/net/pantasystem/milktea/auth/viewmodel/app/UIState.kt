@@ -19,13 +19,13 @@ data class AuthUserInputState(
     }
 
     val username: String? by lazy {
-        runCatching {
+        runCancellableCatching {
             userNameRegex.find(rawInputInstanceDomain)?.groups?.get(1)
         }.getOrNull()?.value
     }
 
     val host: String? by lazy {
-        runCatching {
+        runCancellableCatching {
             userNameRegex.find(rawInputInstanceDomain)?.groups?.get(2)
         }.getOrNull()?.value
     }

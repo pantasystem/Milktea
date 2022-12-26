@@ -39,7 +39,7 @@ class DriveStore(
     }
 
     fun select(id: FileProperty.Id) : Boolean {
-        return runCatching {
+        return runCancellableCatching {
             this._state.value = this.state.value.let {
                 it.copy(selectedFilePropertyIds = it.selectedFilePropertyIds?.addAndCopy(id))
             }
@@ -47,7 +47,7 @@ class DriveStore(
     }
 
     fun deselect(id: FileProperty.Id) : Boolean {
-        return runCatching {
+        return runCancellableCatching {
             this._state.value = this.state.value.let {
                 it.copy(selectedFilePropertyIds = it.selectedFilePropertyIds?.removeAndCopy(id))
             }

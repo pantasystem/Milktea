@@ -124,7 +124,7 @@ class MainViewModel @Inject constructor(
 
     fun setAnalyticsCollectionEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 configRepository.save(
                     configRepository.get().getOrThrow().setAnalyticsCollectionEnabled(enabled)
                 ).getOrThrow()

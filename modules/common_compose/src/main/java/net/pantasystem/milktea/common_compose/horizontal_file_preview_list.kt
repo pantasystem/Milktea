@@ -175,7 +175,7 @@ fun RemoteFilePreview(
 
 
     LaunchedEffect(key1 = file.id) {
-        runCatching {
+        runCancellableCatching {
             repository.find(file.id)
         }.onSuccess {
             filePropertyState = ResultState.Fixed(

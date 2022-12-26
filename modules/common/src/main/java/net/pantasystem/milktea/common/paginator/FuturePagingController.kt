@@ -21,7 +21,7 @@ class FuturePagingController<DTO, E>(
                 content = state.getState().content
             )
             state.setState(loading)
-            runCatching {
+            runCancellableCatching {
                 val res = futureLoader.loadFuture().getOrThrow()
                 entityConverter.convertAll(res).asReversed()
             }.onFailure {

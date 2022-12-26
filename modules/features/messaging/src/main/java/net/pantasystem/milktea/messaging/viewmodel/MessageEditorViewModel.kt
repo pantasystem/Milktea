@@ -52,7 +52,7 @@ class MessageEditorViewModel @Inject constructor(
         require(msgId != null)
         viewModelScope.launch(Dispatchers.IO) {
             val createMessage = CreateMessage.Factory.create(msgId, tmpText, tmpFile?.id?.fileId)
-            runCatching { messageRepository.create(createMessage) }.onFailure {
+            runCancellableCatching { messageRepository.create(createMessage) }.onFailure {
                 logger.error("メッセージ作成中にエラー発生", e = it)
                 mErrors.value = it
             }.onSuccess {

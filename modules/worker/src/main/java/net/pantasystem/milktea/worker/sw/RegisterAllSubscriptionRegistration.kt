@@ -25,7 +25,7 @@ class RegisterAllSubscriptionRegistration @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        return runCatching {
+        return runCancellableCatching {
             subscriptionRegistration.registerAll()
         }.fold(
             onSuccess = {

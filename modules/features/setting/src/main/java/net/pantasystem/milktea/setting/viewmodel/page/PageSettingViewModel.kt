@@ -111,7 +111,7 @@ class PageSettingViewModel @Inject constructor(
 
     fun addUserPageByIds(userIds: List<User.Id>) {
         viewModelScope.launch {
-            runCatching {
+            runCancellableCatching {
                 userIds.map {
                     async {
                         userRepository.find(it)
@@ -139,7 +139,7 @@ class PageSettingViewModel @Inject constructor(
 
     fun addUsersGalleryByIds(userIds: List<User.Id>) {
         viewModelScope.launch  {
-            runCatching {
+            runCancellableCatching {
                 userIds.map {
                     async {
                         userRepository.find(it)

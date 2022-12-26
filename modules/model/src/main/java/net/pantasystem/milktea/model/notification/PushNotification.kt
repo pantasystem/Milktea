@@ -53,7 +53,7 @@ fun Map<String, String?>.toPushNotification(): PushNotification {
     )
 }
 
-fun Bundle.toPushNotification(): Result<PushNotification> = runCatching {
+fun Bundle.toPushNotification(): Result<PushNotification> = runCancellableCatching {
     listOf(
         "title" to getString("title"),
         "body" to getString("body"),

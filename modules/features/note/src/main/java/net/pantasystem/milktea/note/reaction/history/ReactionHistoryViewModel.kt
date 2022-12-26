@@ -100,7 +100,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
         isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
 
-            runCatching {
+            runCancellableCatching {
                 paginator.next()
             }.onFailure {
                 logger.error("リアクションの履歴の取得に失敗しました", e = it)
