@@ -17,6 +17,7 @@ import net.pantasystem.milktea.app_store.gallery.GalleryPostSendFavoriteStore
 import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -195,7 +196,7 @@ class GalleryPostsViewModel @AssistedInject constructor(
     }
 
     override suspend fun toggle(galleryId: GalleryPost.Id) {
-        runCatching {
+        runCancellableCatching {
             galleryPostSendFavoriteStore.toggleFavorite(galleryId)
         }.onFailure {
             _error.emit(it)

@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
@@ -41,7 +42,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun find(userId: User.Id, detail: Boolean): User =
         withContext(Dispatchers.IO) {
-            val localResult = runCatching {
+            val localResult = runCancellableCatching {
                 userDataSource.get(userId).let {
                     if (detail) {
                         it.getOrThrow() as? User.Detail
@@ -84,7 +85,7 @@ class UserRepositoryImpl @Inject constructor(
         host: String?,
         detail: Boolean
     ): User = withContext(Dispatchers.IO) {
-        val local = runCatching {
+        val local = runCancellableCatching {
             userDataSource.get(accountId, userName, host).let {
                 if (detail) {
                     it.getOrThrow() as? User.Detail
@@ -131,7 +132,7 @@ class UserRepositoryImpl @Inject constructor(
         accountId: Long,
         userName: String,
         host: String?
-    ) = runCatching<Unit> {
+    ) = runCancellableCatching<Unit> {
         withContext(Dispatchers.IO) {
             val ac = accountRepository.get(accountId).getOrThrow()
             val i = ac.token
@@ -332,7 +333,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sync(userId: User.Id): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val account = accountRepository.get(userId.accountId)
                 .getOrThrow()
             val user = misskeyAPIProvider.get(account)
@@ -345,7 +346,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>> {
-        return runCatching {
+        return runCancellableCatching {
             val accountId = userIds.map { it.accountId }.distinct().firstOrNull()
             if (accountId == null) {
                 emptyList()

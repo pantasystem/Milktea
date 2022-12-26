@@ -8,6 +8,7 @@ import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
@@ -42,14 +43,14 @@ class NoteRepositoryImpl @Inject constructor(
         NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
     }
 
-    override suspend fun create(createNote: CreateNote): Result<Note> = runCatching {
+    override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
         val task = PostNoteTask(
             createNote,
             createNote.author,
             loggerFactory,
             filePropertyDataSource
         )
-        val result = runCatching {
+        val result = runCancellableCatching {
             task.execute(
                 uploader.get(createNote.author)
             ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")

@@ -11,6 +11,7 @@ import net.pantasystem.milktea.api.misskey.list.CreateList
 import net.pantasystem.milktea.api.misskey.list.ListId
 import net.pantasystem.milktea.api.misskey.list.ListUserOperation
 import net.pantasystem.milktea.api.misskey.list.UpdateList
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
@@ -126,7 +127,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
             }
     }
 
-    override suspend fun syncByAccountId(accountId: Long): Result<Unit> = runCatching {
+    override suspend fun syncByAccountId(accountId: Long): Result<Unit> = runCancellableCatching {
         val source = findByAccountId(accountId)
         val beforeInsertRecords = source.map { ul ->
             UserListRecord(
@@ -171,7 +172,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
 
     }
 
-    override suspend fun syncOne(userListId: UserList.Id): Result<Unit> = runCatching {
+    override suspend fun syncOne(userListId: UserList.Id): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val source = findOne(userListId)
 

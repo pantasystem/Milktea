@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft
 
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.from
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
@@ -18,7 +19,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun save(draftNote: DraftNote): Result<DraftNote> {
-        return runCatching {
+        return runCancellableCatching {
             val id = draftNoteDao.insert(DraftNoteDTO.make(draftNote))
 
             logger.debug("draftNoteId:$id")
@@ -81,7 +82,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(draftNoteId: Long): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
 
             val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
 
@@ -93,7 +94,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findOne(draftNoteId: Long): Result<DraftNote> {
-        return runCatching {
+        return runCancellableCatching {
             val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
             relation.toDraftNote(relation.draftNoteDTO.accountId)
         }

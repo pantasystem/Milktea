@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.group.*
@@ -15,7 +16,7 @@ class GroupDataSourceImpl @Inject constructor(
     private val getAccount: GetAccount,
 ) : GroupDataSource {
 
-    override suspend fun add(group: Group): Result<AddResult> = runCatching {
+    override suspend fun add(group: Group): Result<AddResult> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val record = groupDao.findOne(group.id.accountId, group.id.groupId)
             val newEntity = GroupRecord.from(group)
@@ -40,7 +41,7 @@ class GroupDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun addAll(groups: List<Group>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(groups: List<Group>): Result<List<AddResult>> = runCancellableCatching {
         groups.map {
             add(it).getOrElse {
                 AddResult.Canceled
@@ -48,7 +49,7 @@ class GroupDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun delete(groupId: Group.Id): Result<Boolean> = runCatching {
+    override suspend fun delete(groupId: Group.Id): Result<Boolean> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val exists = groupDao.findOne(groupId.accountId, groupId.groupId) != null
             groupDao.delete(groupId.accountId, groupId.groupId)
@@ -56,7 +57,7 @@ class GroupDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun find(groupId: Group.Id): Result<Group> = runCatching {
+    override suspend fun find(groupId: Group.Id): Result<Group> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             groupDao.findOne(groupId.accountId, groupId.groupId)
                 ?.toModel()

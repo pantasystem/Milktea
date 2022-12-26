@@ -17,6 +17,7 @@ import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.gettters.NoteRelationGetter
@@ -116,7 +117,7 @@ class TimelineStoreImpl(
 
 
     override suspend fun loadFuture(): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     FuturePagingController(
@@ -143,7 +144,7 @@ class TimelineStoreImpl(
     }
 
     override suspend fun loadPrevious(): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     PreviousPagingController(
@@ -255,10 +256,10 @@ class TimelinePagingStoreImpl(
     }
 
     override suspend fun loadPrevious(): Result<List<NoteDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             val untilId = getUntilId()?.noteId
             if (pageableTimeline !is UntilPaginate && untilId != null) {
-                return@runCatching emptyList()
+                return@runCancellableCatching emptyList()
             }
             val builder = NoteRequest.Builder(
                 i = getAccount.invoke().token,
@@ -275,9 +276,9 @@ class TimelinePagingStoreImpl(
     }
 
     override suspend fun loadFuture(): Result<List<NoteDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             if (pageableTimeline !is SincePaginate) {
-                return@runCatching emptyList()
+                return@runCancellableCatching emptyList()
             }
 
             val builder = NoteRequest.Builder(
@@ -389,7 +390,7 @@ class FavoriteNoteTimelinePagingStoreImpl(
 
     override suspend fun loadFuture(): Result<List<Favorite>> {
         val ac = getAccount.invoke()
-        return runCatching {
+        return runCancellableCatching {
             misskeyAPIProvider.get(getAccount.invoke()).favorites(
                 NoteRequest.Builder(pageableTimeline, ac.token, limit = LIMIT)
                     .build(NoteRequest.Conditions(sinceId = getSinceId()))

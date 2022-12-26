@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.drive.CreateDirectory
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.drive.DriveDirectoryRepository
 import javax.inject.Inject
+import net.pantasystem.milktea.common.runCancellableCatching
 
 class DriveDirectoryRepositoryImpl @Inject constructor(
     val accountRepository: AccountRepository,
@@ -15,7 +16,7 @@ class DriveDirectoryRepositoryImpl @Inject constructor(
 ) : DriveDirectoryRepository {
 
     override suspend fun create(createDirectory: CreateDirectory): Result<Directory> {
-        return runCatching {
+        return runCancellableCatching {
             val account = accountRepository.get(createDirectory.accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account)
             api.createFolder(CreateFolder(

@@ -10,6 +10,7 @@ import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
@@ -127,7 +128,7 @@ class FilePropertyPagingImpl(
     }
 
     override suspend fun loadPrevious(): Result<List<FilePropertyDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain).getFiles(
                 RequestFile(
                     folderId = getCurrentFolderId.invoke(),

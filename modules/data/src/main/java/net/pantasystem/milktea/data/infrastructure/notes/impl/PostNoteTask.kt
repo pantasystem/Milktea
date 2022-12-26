@@ -5,6 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploader
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
@@ -64,7 +65,7 @@ class PostNoteTask(
     private suspend fun executeFileUpload(fileUploader: FileUploader): Boolean{
         val tmpFiles = createNote.files
         filesIds = coroutineScope {
-            runCatching {
+            runCancellableCatching {
                 tmpFiles?.map {
                     async(Dispatchers.IO) {
                         when(it) {

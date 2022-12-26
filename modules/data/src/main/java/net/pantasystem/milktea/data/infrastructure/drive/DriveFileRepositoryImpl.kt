@@ -14,6 +14,7 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.file.AppFile
 import javax.inject.Inject
+import net.pantasystem.milktea.common.runCancellableCatching
 
 
 class DriveFileRepositoryImpl @Inject constructor(
@@ -55,7 +56,7 @@ class DriveFileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun create(accountId: Long, file: AppFile.Local): Result<FileProperty> {
-        return runCatching {
+        return runCancellableCatching {
             val property = driveFileUploaderProvider.get(getAccount.get(accountId))
                 .upload(UploadSource.LocalFile(file), true)
                 .toFileProperty(getAccount.get(accountId))
@@ -65,7 +66,7 @@ class DriveFileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(id: FileProperty.Id): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             val account = getAccount.get(id.accountId)
             val property = this.find(id)
             misskeyAPIProvider.get(account).deleteFile(
@@ -76,7 +77,7 @@ class DriveFileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun update(updateFileProperty: UpdateFileProperty): Result<FileProperty> {
-        return runCatching {
+        return runCancellableCatching {
             val res = misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
                 .updateFile(
                     UpdateFileDTO.from(
@@ -87,7 +88,7 @@ class DriveFileRepositoryImpl @Inject constructor(
                 .body()!!
             val model = res.toFileProperty(getAccount.get(updateFileProperty.fileId.accountId))
             driveFileDataSource.add(model)
-            return@runCatching model
+            return@runCancellableCatching model
         }
     }
 }

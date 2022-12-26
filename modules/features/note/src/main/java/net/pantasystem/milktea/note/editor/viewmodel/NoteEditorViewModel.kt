@@ -10,10 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
@@ -386,7 +383,7 @@ class NoteEditorViewModel @Inject constructor(
             }
             is AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    runCatching {
+                    runCancellableCatching {
                         driveFileRepository.toggleNsfw(appFile.id)
                     }
                 }

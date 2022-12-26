@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftLocalFile
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.from
@@ -32,7 +33,7 @@ class DraftNoteServiceImpl @Inject constructor(
     }
 
     override suspend fun save(createNote: CreateNote): Result<DraftNote> {
-        return runCatching {
+        return runCancellableCatching {
             val draftFiles = createNote.files?.map {
                 when (it) {
                     is AppFile.Remote -> {
@@ -82,7 +83,7 @@ class DraftNoteServiceImpl @Inject constructor(
     }
 
     override suspend fun save(draftNoteFile: DraftNoteFile): Result<DraftNoteFile> {
-        return runCatching {
+        return runCancellableCatching {
             when (draftNoteFile) {
                 is DraftNoteFile.Local -> {
                     draftNoteDao.insertDraftLocalFile(DraftLocalFile.from(draftNoteFile))

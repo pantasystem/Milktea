@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.account
 
 import net.pantasystem.milktea.model.account.*
 import javax.inject.Inject
+import net.pantasystem.milktea.common.runCancellableCatching
 
 class AuthImpl @Inject constructor(
     val accountRepository: AccountRepository,
@@ -18,7 +19,7 @@ class AuthImpl @Inject constructor(
     }
 
     override suspend fun getCurrentAccount(): Account? {
-        return runCatching {
+        return runCancellableCatching {
             accountRepository.getCurrentAccount().getOrThrow()
         }.getOrNull()
     }
@@ -29,7 +30,7 @@ class AuthImpl @Inject constructor(
     }
 
     override suspend fun check(id: Long): Boolean {
-        return runCatching {
+        return runCancellableCatching {
             accountRepository.get(id)
         }.getOrNull() != null
     }

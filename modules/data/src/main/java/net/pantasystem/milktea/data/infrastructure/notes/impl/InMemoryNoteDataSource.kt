@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
@@ -41,7 +42,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
     }
 
 
-    override suspend fun get(noteId: Note.Id): Result<Note> = runCatching {
+    override suspend fun get(noteId: Note.Id): Result<Note> = runCancellableCatching {
         mutex.withLock{
             if (deleteNoteIds.contains(noteId)) {
                 throw NoteDeletedException(noteId)
@@ -51,7 +52,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
         }
     }
 
-    override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> = runCatching {
+    override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> = runCancellableCatching {
         noteIds.mapNotNull { noteId ->
             notes[noteId]
         }

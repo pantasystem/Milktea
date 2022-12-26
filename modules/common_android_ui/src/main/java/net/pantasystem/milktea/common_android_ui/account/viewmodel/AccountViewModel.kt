@@ -153,10 +153,7 @@ class AccountViewModel @Inject constructor(
             runCatching {
                 subscriptionUnRegistration
                     .unregister(account.accountId)
-            }.onFailure { e ->
-                logger.warning("token解除処理失敗", e = e)
-            }
-            runCatching {
+            }.mapCatching {
                 accountRepository.delete(account)
             }.onFailure { e ->
                 logger.error("ログアウト処理失敗", e)

@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.drive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -24,29 +25,29 @@ class MediatorFilePropertyDataSource @Inject constructor(
     override val state: StateFlow<FilePropertyDataSourceState>
         get() = inMemoryFilePropertyDataSource.state
 
-    override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCatching {
+    override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCancellableCatching {
         val result = inMemoryFilePropertyDataSource.add(fileProperty)
-        val record = runCatching {
+        val record = runCancellableCatching {
             driveFileRecordDao.findOne(fileProperty.id.accountId, fileProperty.id.fileId)
         }.getOrNull()
         try {
             if (record == null) {
                 driveFileRecordDao.insert(DriveFileRecord.from(fileProperty))
-                return@runCatching AddResult.Created
+                return@runCancellableCatching AddResult.Created
             } else if (record.toFileProperty() != fileProperty) {
                 driveFileRecordDao.update(DriveFileRecord.from(fileProperty).copy(id = record.id))
-                return@runCatching AddResult.Updated
+                return@runCancellableCatching AddResult.Updated
             }
         } catch (e: Exception) {
-            return@runCatching AddResult.Canceled
+            return@runCancellableCatching AddResult.Canceled
         }
 
         return result
     }
 
-    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCancellableCatching {
         if (list.isEmpty()) {
-            return@runCatching emptyList()
+            return@runCancellableCatching emptyList()
         }
         val results = inMemoryFilePropertyDataSource.addAll(list)
         val insertResults = driveFileRecordDao.insertAll(list.map {
@@ -86,12 +87,12 @@ class MediatorFilePropertyDataSource @Inject constructor(
         return results
     }
 
-    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCatching {
+    override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCancellableCatching {
         var result = inMemoryFilePropertyDataSource.find(filePropertyId).getOrNull()
         if (result != null) {
-            return@runCatching result
+            return@runCancellableCatching result
         }
-        result = runCatching {
+        result = runCancellableCatching {
             driveFileRecordDao.findOne(filePropertyId.accountId, filePropertyId.fileId)
                 ?.toFileProperty()
         }.getOrNull()
@@ -99,7 +100,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
         result ?: throw FilePropertyNotFoundException(filePropertyId)
     }
 
-    override suspend fun remove(fileProperty: FileProperty): Result<Boolean> = runCatching {
+    override suspend fun remove(fileProperty: FileProperty): Result<Boolean> = runCancellableCatching {
         try {
             driveFileRecordDao.delete(fileProperty.id.accountId, fileProperty.id.fileId)
             true
@@ -145,10 +146,10 @@ class MediatorFilePropertyDataSource @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun findIn(ids: List<FileProperty.Id>): Result<List<FileProperty>> = runCatching {
+    override suspend fun findIn(ids: List<FileProperty.Id>): Result<List<FileProperty>> = runCancellableCatching {
         val inMemories = inMemoryFilePropertyDataSource.findIn(ids).getOrThrow()
         if (inMemories.size == ids.size) {
-            return@runCatching inMemories
+            return@runCancellableCatching inMemories
         }
         val sets = inMemories.map { it.id }.toSet()
         val notExistsIds = ids.filterNot {
@@ -161,7 +162,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
         val map = (inMemories + onDb).associateBy {
             it.id
         }
-        return@runCatching ids.mapNotNull {
+        return@runCancellableCatching ids.mapNotNull {
             map[it]
         }
     }

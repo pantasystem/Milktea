@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.drive
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import net.pantasystem.milktea.common.runCancellableCatching
 
 @Singleton
 class ClearUnUsedDriveFileCacheJob @Inject constructor(
@@ -9,7 +10,7 @@ class ClearUnUsedDriveFileCacheJob @Inject constructor(
 ) {
 
     suspend fun checkAndClear(): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             driveFileRecordDao.deleteUnUsedFiles()
         }
     }

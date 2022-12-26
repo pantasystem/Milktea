@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.CreateGalleryTaskExecutor
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -149,7 +150,7 @@ class GalleryEditorViewModel @Inject constructor(
             }
             is AppFile.Remote -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    runCatching {
+                    runCancellableCatching {
                         driveFileRepository.toggleNsfw(file.id)
                     }.onFailure {
                         logger.info("sensitiveの切り替えに失敗しました。", e = it)

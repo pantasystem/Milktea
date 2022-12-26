@@ -14,6 +14,7 @@ import net.pantasystem.milktea.app_store.user.RequestType
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -90,7 +91,7 @@ class FollowFollowerPagingStoreImpl(
     override suspend fun loadPrevious() {
 
         mutex.withLock {
-            runCatching {
+            runCancellableCatching {
                 val s = _state.value
                 _state.value = when(s) {
                     is PageableState.Loading.Init -> s
