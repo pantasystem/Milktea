@@ -157,7 +157,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val account = currentAccountWatcher.getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
