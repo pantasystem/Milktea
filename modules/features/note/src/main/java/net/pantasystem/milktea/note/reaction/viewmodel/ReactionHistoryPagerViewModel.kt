@@ -55,12 +55,12 @@ class ReactionHistoryPagerViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, ReactionHistoryPagerUiState())
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             noteId.filterNotNull().flatMapLatest { noteId ->
                 adapter.capture(noteId)
-            }.collect()
+            }.flowOn(Dispatchers.IO).collect()
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             noteId.filterNotNull().flatMapLatest {
                 suspend {
                     noteRepository.find(it).getOrThrow()

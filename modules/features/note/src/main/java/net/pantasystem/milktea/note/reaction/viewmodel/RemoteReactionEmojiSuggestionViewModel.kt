@@ -3,11 +3,13 @@ package net.pantasystem.milktea.note.reaction.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -68,16 +70,14 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
     fun send() {
         val value = reaction.value ?: return
         val name = value.reaction.getName()
-        viewModelScope.launch(Dispatchers.IO) {
-            runCancellableCatching {
-                toggleReactionUseCase(
-                    Note.Id(
-                        value.currentAccountId,
-                        value.noteId
-                    ),
-                    ":$name:"
-                )
-            }.onFailure {
+        viewModelScope.launch {
+            toggleReactionUseCase(
+                Note.Id(
+                    value.currentAccountId,
+                    value.noteId
+                ),
+                ":$name:"
+            ).onFailure {
                 logger.warning("リアクションの作成失敗", e = it)
             }
         }
