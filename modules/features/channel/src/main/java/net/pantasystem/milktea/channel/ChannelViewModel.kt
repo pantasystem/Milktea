@@ -3,7 +3,6 @@ package net.pantasystem.milktea.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -11,14 +10,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelPagingModel
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.newPage
 import net.pantasystem.milktea.model.channel.Channel
@@ -52,7 +51,7 @@ class ChannelViewModel @Inject constructor(
 
 
     fun clearAndLoad(key: PagingModelKey) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val model = channelPagingModelHolder.get(key)
             model.clear()
             PreviousPagingController(
@@ -65,7 +64,7 @@ class ChannelViewModel @Inject constructor(
     }
 
     fun follow(channelId: Channel.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 channelRepository.follow(channelId)
             }.onFailure {
@@ -75,7 +74,7 @@ class ChannelViewModel @Inject constructor(
     }
 
     fun unFollow(channelId: Channel.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 channelRepository.unFollow(channelId)
             }.onFailure {
@@ -85,7 +84,7 @@ class ChannelViewModel @Inject constructor(
     }
 
     fun toggleTab(channelId: Channel.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val account = accountRepository.get(channelId.accountId).getOrThrow()
                 val channel = channelRepository.findOne(channelId).getOrThrow()
