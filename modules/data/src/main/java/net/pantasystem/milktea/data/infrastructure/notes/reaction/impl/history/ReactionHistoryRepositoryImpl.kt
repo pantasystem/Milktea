@@ -4,7 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.model.notes.reaction.history.*
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
+import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
 import javax.inject.Inject
 
 class ReactionHistoryRepositoryImpl @Inject constructor(

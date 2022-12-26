@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.milktea.CreateInstanceRequest
 import net.pantasystem.milktea.api.milktea.InstanceInfoResponse
 import net.pantasystem.milktea.api.milktea.MilkteaAPIServiceBuilder
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoRecord
