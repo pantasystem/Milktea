@@ -173,7 +173,7 @@ class UserDetailViewModel @AssistedInject constructor(
 
 
     fun sync() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 getUserId()
             }.mapCancellableCatching { userId ->
@@ -186,7 +186,7 @@ class UserDetailViewModel @AssistedInject constructor(
 
 
     fun changeFollow() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
                     val user = userRepository.find(it.id) as User.Detail
@@ -213,7 +213,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun mute(expiredAt: Instant?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
                     userRepository.mute(CreateMute(it.id, expiredAt))
@@ -226,7 +226,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun unmute() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
                     userRepository.unmute(it.id)
@@ -239,7 +239,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun block() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
                     userRepository.block(it.id)
@@ -252,7 +252,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun unblock() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
                     userRepository.unblock(it.id)
@@ -265,7 +265,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun changeNickname(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val user = findUser()
                 updateNicknameUseCase(user, name)
@@ -278,7 +278,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun deleteNickname() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val user = findUser()
                 deleteNicknameUseCase(user)
@@ -291,7 +291,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
     fun toggleUserTimelineTab() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 val userId = getUserId()
                 val account = accountRepository.get(userId.accountId).getOrThrow()
