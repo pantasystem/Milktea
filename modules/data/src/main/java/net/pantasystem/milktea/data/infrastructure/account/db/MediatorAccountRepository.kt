@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.account.db
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -17,7 +18,7 @@ class MediatorAccountRepository(
     private var mAccounts: List<Account> = listOf()
 
     override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             withContext(Dispatchers.IO) {
                 roomAccountRepository.add(account, isUpdatePages).also {
                     mAccounts = roomAccountRepository.findAll().getOrThrow()
@@ -35,7 +36,7 @@ class MediatorAccountRepository(
     }
 
     override suspend fun findAll(): Result<List<Account>> {
-        return runCatching {
+        return runCancellableCatching {
             withContext(Dispatchers.IO) {
                 if(mAccounts.isEmpty()) {
                     mAccounts = roomAccountRepository.findAll().getOrThrow()
@@ -47,7 +48,7 @@ class MediatorAccountRepository(
 
 
     override suspend fun get(accountId: Long): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             withContext(Dispatchers.IO) {
                 findAll().getOrThrow().firstOrNull {
                     it.accountId == accountId
@@ -64,7 +65,7 @@ class MediatorAccountRepository(
     }
 
     override suspend fun setCurrentAccount(account: Account): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             withContext(Dispatchers.IO) {
                 roomAccountRepository.setCurrentAccount(account).getOrThrow().also {
                     mAccounts = findAll().getOrThrow()
