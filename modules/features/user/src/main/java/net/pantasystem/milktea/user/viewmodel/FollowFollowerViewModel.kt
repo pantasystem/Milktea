@@ -20,8 +20,8 @@ import net.pantasystem.milktea.model.user.UserRepository
 class FollowFollowerViewModel @AssistedInject constructor(
     followFollowerPagingStoreFactory: FollowFollowerPagingStore.Factory,
     private val userRepository: UserRepository,
-    private val userDataSource: UserDataSource,
-    private val loggerFactory: Logger.Factory,
+    userDataSource: UserDataSource,
+    loggerFactory: Logger.Factory,
     @Assisted val userId: User.Id
 ) : ViewModel() {
 
@@ -83,7 +83,7 @@ class FollowFollowerViewModel @AssistedInject constructor(
         FollowFollowerUiState()
     )
 
-    fun loadInit() = viewModelScope.launch(Dispatchers.IO) {
+    fun loadInit() = viewModelScope.launch {
         launch {
             followerPagingStore.clear()
             followerPagingStore.loadPrevious()
@@ -99,7 +99,7 @@ class FollowFollowerViewModel @AssistedInject constructor(
     }
 
 
-    fun loadOld(loadType: LoadType) = viewModelScope.launch(Dispatchers.IO) {
+    fun loadOld(loadType: LoadType) = viewModelScope.launch {
         when(loadType) {
             LoadType.Follow -> {
                 followingPagingStore.loadPrevious()

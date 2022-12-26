@@ -3,7 +3,6 @@ package net.pantasystem.milktea.user.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,7 +24,7 @@ class ToggleFollowViewModel @Inject constructor(
     val errors: StateFlow<ToggleFollowErrorUiState?> = _errors
 
     fun toggleFollow(userId: User.Id){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
             toggleFollowUseCase(userId).onFailure {
                 _errors.value = ToggleFollowErrorUiState(userId, it)
