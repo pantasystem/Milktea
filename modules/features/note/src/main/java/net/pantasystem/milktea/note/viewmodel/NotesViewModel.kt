@@ -97,7 +97,7 @@ class NotesViewModel @Inject constructor(
             favoriteRepository.create(noteId).onSuccess {
                 statusMessage.event = "お気に入りに追加しました"
 
-            }.onFailure { t ->
+            }.onFailure {
                 statusMessage.event = "お気に入りにへの追加に失敗しました"
             }
         }
