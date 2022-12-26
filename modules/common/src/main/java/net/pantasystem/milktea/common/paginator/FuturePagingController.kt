@@ -3,6 +3,7 @@ package net.pantasystem.milktea.common.paginator
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 
 
 class FuturePagingController<DTO, E>(
