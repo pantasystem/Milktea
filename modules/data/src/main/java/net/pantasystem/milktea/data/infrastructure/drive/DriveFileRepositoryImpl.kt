@@ -1,9 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.drive.DeleteFileDTO
 import net.pantasystem.milktea.api.misskey.drive.ShowFile
 import net.pantasystem.milktea.api.misskey.drive.UpdateFileDTO
 import net.pantasystem.milktea.api.misskey.drive.from
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
@@ -14,7 +17,6 @@ import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.file.AppFile
 import javax.inject.Inject
-import net.pantasystem.milktea.common.runCancellableCatching
 
 
 class DriveFileRepositoryImpl @Inject constructor(
@@ -24,71 +26,83 @@ class DriveFileRepositoryImpl @Inject constructor(
     private val driveFileUploaderProvider: FileUploaderProvider,
 ) : DriveFileRepository {
     override suspend fun find(id: FileProperty.Id): FileProperty {
-        val file = driveFileDataSource.find(id).getOrNull()
-        if (file != null) {
-            return file
+        return withContext(Dispatchers.IO) {
+            val file = driveFileDataSource.find(id).getOrNull()
+            if (file != null) {
+                return@withContext file
+            }
+            val account = getAccount.get(id.accountId)
+            val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+            val response = api.showFile(ShowFile(fileId = id.fileId, i = account.token))
+                .throwIfHasError()
+            val fp = response.body()!!.toFileProperty(account)
+            driveFileDataSource.add(fp)    
+            return@withContext fp
         }
-        val account = getAccount.get(id.accountId)
-        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
-        val response = api.showFile(ShowFile(fileId = id.fileId, i = account.token))
-            .throwIfHasError()
-        val fp = response.body()!!.toFileProperty(account)
-        driveFileDataSource.add(fp)
-        return fp
     }
 
     override suspend fun toggleNsfw(id: FileProperty.Id) {
-        val account = getAccount.get(id.accountId)
-        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
-        val fileProperty = find(id)
-        val result = api.updateFile(
-            UpdateFileDTO(
-                account.token,
-                fileId = id.fileId,
-                isSensitive = !fileProperty.isSensitive,
-                name = fileProperty.name,
-                folderId = fileProperty.folderId,
-                comment = fileProperty.comment
-            )
-        ).throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(id.accountId)
+            val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+            val fileProperty = find(id)
+            val result = api.updateFile(
+                UpdateFileDTO(
+                    account.token,
+                    fileId = id.fileId,
+                    isSensitive = !fileProperty.isSensitive,
+                    name = fileProperty.name,
+                    folderId = fileProperty.folderId,
+                    comment = fileProperty.comment
+                )
+            ).throwIfHasError()
 
-        driveFileDataSource.add(result.body()!!.toFileProperty(account))
+            driveFileDataSource.add(result.body()!!.toFileProperty(account))
+        }
     }
 
     override suspend fun create(accountId: Long, file: AppFile.Local): Result<FileProperty> {
         return runCancellableCatching {
-            val property = driveFileUploaderProvider.get(getAccount.get(accountId))
-                .upload(UploadSource.LocalFile(file), true)
-                .toFileProperty(getAccount.get(accountId))
-            driveFileDataSource.add(property).getOrThrow()
-            driveFileDataSource.find(property.id).getOrThrow()
+            withContext(Dispatchers.IO) {
+                val property = driveFileUploaderProvider.get(getAccount.get(accountId))
+                    .upload(UploadSource.LocalFile(file), true)
+                    .toFileProperty(getAccount.get(accountId))
+                driveFileDataSource.add(property).getOrThrow()
+                driveFileDataSource.find(property.id).getOrThrow()
+            }
+
         }
     }
 
     override suspend fun delete(id: FileProperty.Id): Result<Unit> {
         return runCancellableCatching {
-            val account = getAccount.get(id.accountId)
-            val property = this.find(id)
-            misskeyAPIProvider.get(account).deleteFile(
-                DeleteFileDTO(i = account.token, fileId = id.fileId)
-            )
-            driveFileDataSource.remove(property)
+            withContext(Dispatchers.IO) {
+                val account = getAccount.get(id.accountId)
+                val property = find(id)
+                misskeyAPIProvider.get(account).deleteFile(
+                    DeleteFileDTO(i = account.token, fileId = id.fileId)
+                )
+                driveFileDataSource.remove(property)
+            }
         }
     }
 
     override suspend fun update(updateFileProperty: UpdateFileProperty): Result<FileProperty> {
         return runCancellableCatching {
-            val res = misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
-                .updateFile(
-                    UpdateFileDTO.from(
-                        getAccount.get(updateFileProperty.fileId.accountId).token,
-                        updateFileProperty,
-                    )
-                ).throwIfHasError()
-                .body()!!
-            val model = res.toFileProperty(getAccount.get(updateFileProperty.fileId.accountId))
-            driveFileDataSource.add(model)
-            return@runCancellableCatching model
+            withContext(Dispatchers.IO) {
+                val res = misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
+                    .updateFile(
+                        UpdateFileDTO.from(
+                            getAccount.get(updateFileProperty.fileId.accountId).token,
+                            updateFileProperty,
+                        )
+                    ).throwIfHasError()
+                    .body()!!
+                res.toFileProperty(getAccount.get(updateFileProperty.fileId.accountId)).also {
+                    driveFileDataSource.add(it)
+                }
+            }
+
         }
     }
 }
