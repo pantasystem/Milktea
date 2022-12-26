@@ -41,31 +41,33 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
-        val task = PostNoteTask(
-            createNote,
-            createNote.author,
-            loggerFactory,
-            filePropertyDataSource
-        )
-        val result = runCancellableCatching {
-            task.execute(
-                uploader.get(createNote.author)
-            ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
-        }.mapCancellableCatching {
-            misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError()
-                .body()?.createdNote
-        }.onFailure {
-            logger.error("create note error", it)
-        }
+        withContext(Dispatchers.IO) {
+            val task = PostNoteTask(
+                createNote,
+                createNote.author,
+                loggerFactory,
+                filePropertyDataSource
+            )
+            val result = runCancellableCatching {
+                task.execute(
+                    uploader.get(createNote.author)
+                ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
+            }.mapCancellableCatching {
+                misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError()
+                    .body()?.createdNote
+            }.onFailure {
+                logger.error("create note error", it)
+            }
 
-        val noteDTO = result.getOrThrow()
-        require(noteDTO != null)
-        noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
+            val noteDTO = result.getOrThrow()
+            require(noteDTO != null)
+            noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
+        }
     }
 
-    override suspend fun delete(noteId: Note.Id): Result<Unit> {
-        val account = getAccount.get(noteId.accountId)
-        return runCancellableCatching {
+    override suspend fun delete(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).delete(
                 DeleteNote(i = account.token, noteId = noteId.noteId)
             ).throwIfHasError()
@@ -73,98 +75,108 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun find(noteId: Note.Id): Result<Note> = runCancellableCatching {
-        val account = getAccount.get(noteId.accountId)
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
 
-        var note = try {
-            noteDataSource.get(noteId).getOrThrow()
-        } catch (e: NoteDeletedException) {
-            throw e
-        } catch (e: Throwable) {
-            null
-        }
-
-        if (note != null) {
-            return@runCancellableCatching note
-        }
-
-        logger.debug("request notes/show=$noteId")
-        note = try {
-            misskeyAPIProvider.get(account).showNote(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError().body()?.let { resDTO ->
-                noteDataSourceAdder.addNoteDtoToDataSource(account, resDTO)
+            var note = try {
+                noteDataSource.get(noteId).getOrThrow()
+            } catch (e: NoteDeletedException) {
+                throw e
+            } catch (e: Throwable) {
+                null
             }
-        } catch (e: APIError.NotFoundException) {
-            // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
-            noteDataSource.remove(noteId)
-            null
+
+            if (note != null) {
+                return@withContext note
+            }
+
+            logger.debug("request notes/show=$noteId")
+            note = try {
+                misskeyAPIProvider.get(account).showNote(
+                    NoteRequest(
+                        i = account.token,
+                        noteId = noteId.noteId
+                    )
+                ).throwIfHasError().body()?.let { resDTO ->
+                    noteDataSourceAdder.addNoteDtoToDataSource(account, resDTO)
+                }
+            } catch (e: APIError.NotFoundException) {
+                // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
+                noteDataSource.remove(noteId)
+                null
+            }
+            note ?: throw NoteNotFoundException(noteId)
         }
-        note ?: throw NoteNotFoundException(noteId)
     }
 
     override suspend fun findIn(noteIds: List<Note.Id>): List<Note> {
-        val notes = noteDataSource.getIn(noteIds).getOrThrow()
-        val notExistsIds = noteIds.filterNot {
-            notes.any { note -> note.id == it }
-        }
-        if (notExistsIds.isEmpty()) {
-            return notes
-        }
+        return withContext(Dispatchers.IO) {
+            val notes = noteDataSource.getIn(noteIds).getOrThrow()
+            val notExistsIds = noteIds.filterNot {
+                notes.any { note -> note.id == it }
+            }
+            if (notExistsIds.isEmpty()) {
+                return@withContext notes
+            }
 
-        val notExistsAndNoteDeletedNoteIds = notExistsIds.filterNot { noteId ->
-            noteDataSource.get(noteId).fold(
-                onSuccess = { true },
-                onFailure = {
-                    it is NoteDeletedException
-                }
-            )
-        }
+            val notExistsAndNoteDeletedNoteIds = notExistsIds.filterNot { noteId ->
+                noteDataSource.get(noteId).fold(
+                    onSuccess = { true },
+                    onFailure = {
+                        it is NoteDeletedException
+                    }
+                )
+            }
 
-        fetchIn(notExistsAndNoteDeletedNoteIds)
-        return noteDataSource.getIn(noteIds).getOrThrow()
+            fetchIn(notExistsAndNoteDeletedNoteIds)
+            noteDataSource.getIn(noteIds).getOrThrow()
+        }
     }
 
     override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCancellableCatching {
-        val account = getAccount.get(createReaction.noteId.accountId)
-        val note = find(createReaction.noteId).getOrThrow()
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(createReaction.noteId.accountId)
+            val note = find(createReaction.noteId).getOrThrow()
 
-        runCancellableCatching {
-            if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
-                    .isCaptured(createReaction.noteId.noteId)
-            ) {
-                noteDataSource.add(note.onIReacted(createReaction.reaction))
+            runCancellableCatching {
+                if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
+                        .isCaptured(createReaction.noteId.noteId)
+                ) {
+                    noteDataSource.add(note.onIReacted(createReaction.reaction))
+                }
+                true
+            }.getOrElse { e ->
+                if (e is APIError.ClientException) {
+                    return@getOrElse false
+                }
+                throw e
             }
-            true
-        }.getOrElse { e ->
-            if (e is APIError.ClientException) {
-                return@getOrElse false
-            }
-            throw e
         }
     }
 
     override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        val note = find(noteId).getOrThrow()
-        val account = getAccount.get(noteId.accountId)
-        postUnReaction(noteId)
-                && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
-                || (note.myReaction != null
-                && noteDataSource.add(note.onIUnReacted()).getOrThrow() != AddResult.Canceled))
+        withContext(Dispatchers.IO) {
+            val note = find(noteId).getOrThrow()
+            val account = getAccount.get(noteId.accountId)
+            postUnReaction(noteId)
+                    && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
+                    || (note.myReaction != null
+                    && noteDataSource.add(note.onIUnReacted()).getOrThrow() != AddResult.Canceled))
+        }
     }
 
 
     override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCancellableCatching {
-        val account = getAccount.get(noteId.accountId)
-        misskeyAPIProvider.get(account).vote(
-            Vote(
-                i = getAccount.get(noteId.accountId).token,
-                choice = choice.index,
-                noteId = noteId.noteId
-            )
-        ).throwIfHasError()
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            misskeyAPIProvider.get(account).vote(
+                Vote(
+                    i = getAccount.get(noteId.accountId).token,
+                    choice = choice.index,
+                    noteId = noteId.noteId
+                )
+            ).throwIfHasError()
+        }
     }
 
     private suspend fun postReaction(createReaction: CreateReaction): Boolean {
@@ -230,32 +242,35 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        val account = getAccount.get(noteId.accountId)
-        val dtoList = misskeyAPIProvider.get(account).children(
-            NoteRequest(
-                i = account.token,
-                noteId = noteId.noteId,
-                limit = 100,
-            )
-        ).throwIfHasError().body()!!
-        dtoList.map {
-            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            val dtoList = misskeyAPIProvider.get(account).children(
+                NoteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId,
+                    limit = 100,
+                )
+            ).throwIfHasError().body()!!
+            dtoList.map {
+                noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+            }
         }
     }
 
     override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        val account = getAccount.get(noteId.accountId)
-        val dtoList = misskeyAPIProvider.get(account).conversation(
-            NoteRequest(
-                i = account.token,
-                noteId = noteId.noteId,
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(noteId.accountId)
+            val dtoList = misskeyAPIProvider.get(account).conversation(
+                NoteRequest(
+                    i = account.token,
+                    noteId = noteId.noteId,
 
-                )
-        ).throwIfHasError().body()!!
-        dtoList.map {
-            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+                    )
+            ).throwIfHasError().body()!!
+            dtoList.map {
+                noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+            }
         }
-
     }
 
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
