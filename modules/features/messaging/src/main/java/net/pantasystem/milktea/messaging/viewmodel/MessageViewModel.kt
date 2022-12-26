@@ -73,13 +73,13 @@ class MessageViewModel @Inject constructor(
 
 
     fun loadOld() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             messagePagingStore.loadPrevious()
         }
     }
 
     fun setMessagingId(messagingId: MessagingId) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             messagePagingStore.setMessagingId(messagingId)
             messagePagingStore.clear()
             messagePagingStore.loadPrevious()
