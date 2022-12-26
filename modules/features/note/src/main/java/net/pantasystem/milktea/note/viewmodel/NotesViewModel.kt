@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,9 +8,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
-import net.pantasystem.milktea.common_android.ui.SafeUnbox
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -33,14 +32,15 @@ class NotesViewModel @Inject constructor(
     val accountStore: AccountStore,
     val draftNoteRepository: DraftNoteRepository,
     private val translationStore: NoteTranslationStore,
+    loggerFactory: Logger.Factory
 ) : ViewModel() {
-    private val TAG = "NotesViewModel"
+    private val logger by lazy {
+        loggerFactory.create("NotesViewModel")
+    }
 
     val statusMessage = EventBus<String>()
 
-
     val quoteRenoteTarget = EventBus<Note>()
-
 
     val confirmDeletionEvent = EventBus<NoteRelation>()
 
@@ -49,8 +49,6 @@ class NotesViewModel @Inject constructor(
     val confirmReportEvent = EventBus<Report>()
 
     val openNoteEditor = EventBus<DraftNote?>()
-
-
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch {
@@ -63,14 +61,15 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> = runCancellableCatching {
-        val note = noteRepository.find(noteId).getOrThrow()
-        if (note.hasContent()) {
-            note
-        } else {
-            recursiveSearchHasContentNote(note.renoteId!!).getOrThrow()
+    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> =
+        runCancellableCatching {
+            val note = noteRepository.find(noteId).getOrThrow()
+            if (note.hasContent()) {
+                note
+            } else {
+                recursiveSearchHasContentNote(note.renoteId!!).getOrThrow()
+            }
         }
-    }
 
     /**
      * リアクションを送信する
@@ -90,7 +89,6 @@ class NotesViewModel @Inject constructor(
             }
         }
     }
-
 
     fun addFavorite(noteId: Note.Id) {
         viewModelScope.launch {
@@ -127,31 +125,28 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             runCancellableCatching {
 
-                val dn = draftNoteRepository.save(note.toDraftNote())
-                    .getOrThrow()
+                val dn = draftNoteRepository.save(note.toDraftNote()).getOrThrow()
                 noteRepository.delete(note.note.id).getOrThrow()
                 dn
             }.onSuccess {
                 openNoteEditor.event = it
             }.onFailure { t ->
-                Log.e(TAG, "削除に失敗しました", t)
+                logger.error("削除に失敗しました", t)
             }
         }
 
     }
 
-
-
     fun vote(noteId: Note.Id?, poll: Poll?, choice: Poll.Choice?) {
         if (noteId == null || poll == null || choice == null) {
             return
         }
-        if (SafeUnbox.unbox(poll.canVote)) {
+        if (poll.canVote) {
             viewModelScope.launch {
                 noteRepository.vote(noteId, choice).onSuccess {
-                    Log.d(TAG, "投票に成功しました")
+                    logger.debug("投票に成功しました")
                 }.onFailure {
-                    Log.d(TAG, "投票に失敗しました")
+                    logger.error("投票に失敗しました", it)
                 }
             }
         }
@@ -162,7 +157,5 @@ class NotesViewModel @Inject constructor(
             translationStore.translate(noteId)
         }
     }
-
-
 
 }
