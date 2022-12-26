@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -78,7 +77,7 @@ class RenotesViewModel @AssistedInject constructor(
     }
 
     fun next() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 renotesPagingService.next()
             }.onFailure {
@@ -89,7 +88,7 @@ class RenotesViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 renotesPagingService.refresh()
             }.onFailure {
