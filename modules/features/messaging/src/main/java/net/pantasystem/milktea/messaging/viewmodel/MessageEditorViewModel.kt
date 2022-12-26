@@ -3,7 +3,6 @@ package net.pantasystem.milktea.messaging.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -37,7 +36,7 @@ class MessageEditorViewModel @Inject constructor(
     private val messagingId = MutableStateFlow<MessagingId?>(null)
 
     fun setFilePropertyFromId(filePropertyId: FileProperty.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _uiState.update { uiState ->
                 uiState.copy(file = filePropertyDataSource.find(filePropertyId).getOrNull())
             }
@@ -51,7 +50,7 @@ class MessageEditorViewModel @Inject constructor(
         val msgId = messagingId.value
 
         require(msgId != null)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val createMessage = CreateMessage.Factory.create(msgId, tmpText, tmpFile?.id?.fileId)
             runCancellableCatching { messageRepository.create(createMessage) }.onFailure {
                 logger.error("メッセージ作成中にエラー発生", e = it)

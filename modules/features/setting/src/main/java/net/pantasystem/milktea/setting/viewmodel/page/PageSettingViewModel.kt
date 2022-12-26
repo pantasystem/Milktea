@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
@@ -77,7 +76,7 @@ class PageSettingViewModel @Inject constructor(
             page.weight = index + 1
         }
         Log.d("PageSettingVM", "pages:$list")
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             accountStore.replaceAllPage(list).onFailure {
                 Log.e("PageSettingVM", "保存失敗", it)
             }

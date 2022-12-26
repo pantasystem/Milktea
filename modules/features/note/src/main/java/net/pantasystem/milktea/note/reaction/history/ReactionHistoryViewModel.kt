@@ -99,7 +99,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
             return
         }
         isLoading.value = true
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
             runCancellableCatching {
                 paginator.next()
