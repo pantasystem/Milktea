@@ -16,10 +16,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.gallery.viewmodel.EditType
-import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.gallery.viewmodel.EditType
+import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -57,7 +57,7 @@ class GalleryEditorFragment : Fragment() {
 
     val viewModel: GalleryEditorViewModel by viewModels()
 
-
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -118,7 +118,7 @@ class GalleryEditorFragment : Fragment() {
         if (!viewModel.validate()) {
             return
         }
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             viewModel.save()
             withContext(Dispatchers.Main) {
                 (requireActivity() as? GalleryPostsActivity)?.pop()
@@ -138,6 +138,7 @@ class GalleryEditorFragment : Fragment() {
         driveActivityResult.launch(intent)
     }
 
+    @Suppress("DEPRECATION")
     private val driveActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK && it.data != null) {

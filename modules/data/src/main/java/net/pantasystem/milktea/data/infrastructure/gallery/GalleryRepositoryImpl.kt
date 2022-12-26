@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.gallery
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import net.pantasystem.milktea.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -34,132 +32,143 @@ class GalleryRepositoryImpl @Inject constructor(
 
 
     override suspend fun create(createGalleryPost: CreateGalleryPost): GalleryPost {
-        val files = coroutineScope {
-            createGalleryPost.files.map {
-                async {
-                    when (it) {
-                        is AppFile.Remote -> it.id
-                        is AppFile.Local -> {
-                            fileUploaderProvider.get(createGalleryPost.author)
-                                .upload(UploadSource.LocalFile(it), true).let {
-                                it.toFileProperty(createGalleryPost.author).also { entity ->
-                                    filePropertyDataSource.add(entity)
-                                }
-                            }.id
+        return withContext(Dispatchers.IO) {
+            val files = coroutineScope {
+                createGalleryPost.files.map {
+                    async {
+                        when (it) {
+                            is AppFile.Remote -> it.id
+                            is AppFile.Local -> {
+                                fileUploaderProvider.get(createGalleryPost.author)
+                                    .upload(UploadSource.LocalFile(it), true).let {
+                                        it.toFileProperty(createGalleryPost.author).also { entity ->
+                                            filePropertyDataSource.add(entity)
+                                        }
+                                    }.id
+                            }
                         }
                     }
-                }
-            }.awaitAll()
+                }.awaitAll()
+            }
+
+            val created = getMisskeyAPI(createGalleryPost.author).createGallery(
+                CreateGalleryDTO(
+                    createGalleryPost.author.token,
+                    createGalleryPost.title,
+                    createGalleryPost.description,
+                    fileIds = files.map {
+                        it.fileId
+                    },
+                    isSensitive = createGalleryPost.isSensitive
+                )
+            ).throwIfHasError().body()
+            requireNotNull(created)
+
+            val gallery =
+                created.toEntity(createGalleryPost.author, filePropertyDataSource, userDataSource)
+            galleryDataSource.add(gallery)
+            gallery
         }
-
-        val created = getMisskeyAPI(createGalleryPost.author).createGallery(
-            CreateGalleryDTO(
-                createGalleryPost.author.token,
-                createGalleryPost.title,
-                createGalleryPost.description,
-                fileIds = files.map {
-                    it.fileId
-                },
-                isSensitive = createGalleryPost.isSensitive
-            )
-        ).throwIfHasError().body()
-        requireNotNull(created)
-
-        val gallery =
-            created.toEntity(createGalleryPost.author, filePropertyDataSource, userDataSource)
-        galleryDataSource.add(gallery)
-        return gallery
     }
 
     override suspend fun delete(id: GalleryPost.Id) {
-        val account = accountRepository.get(id.accountId).getOrThrow()
-        val res = getMisskeyAPI(account).deleteGallery(
-            Delete(
-                i = account.token,
-                postId = id.galleryId
-            )
-        ).throwIfHasError()
-        require(res.isSuccessful)
+        withContext(Dispatchers.IO) {
+            val account = accountRepository.get(id.accountId).getOrThrow()
+            val res = getMisskeyAPI(account).deleteGallery(
+                Delete(
+                    i = account.token,
+                    postId = id.galleryId
+                )
+            ).throwIfHasError()
+            require(res.isSuccessful)
+        }
     }
 
     override suspend fun find(id: GalleryPost.Id): GalleryPost {
-        try {
-            return galleryDataSource.find(id).getOrThrow()
-        } catch (_: GalleryNotFoundException) {
+        return withContext(Dispatchers.IO) {
+            try {
+                return@withContext galleryDataSource.find(id).getOrThrow()
+            } catch (_: GalleryNotFoundException) {
 
+            }
+            val account = accountRepository.get(id.accountId).getOrThrow()
+            val res = getMisskeyAPI(account).showGallery(
+                Show(
+                    i = account.token,
+                    postId = id.galleryId
+                )
+            ).throwIfHasError()
+            val body = res.body()
+            requireNotNull(body)
+            val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
+            galleryDataSource.add(gallery)
+            gallery
         }
-        val account = accountRepository.get(id.accountId).getOrThrow()
-        val res = getMisskeyAPI(account).showGallery(
-            Show(
-                i = account.token,
-                postId = id.galleryId
-            )
-        ).throwIfHasError()
-        val body = res.body()
-        requireNotNull(body)
-        val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
-        galleryDataSource.add(gallery)
-        return gallery
     }
 
     override suspend fun like(id: GalleryPost.Id) {
-        val gallery = find(id) as? GalleryPost.Authenticated
-            ?: throw UnauthorizedException()
-        val account = accountRepository.get(id.accountId).getOrThrow()
-        getMisskeyAPI(account).likeGallery(
-            Like(
-                i = account.token,
-                postId = id.galleryId
-            )
-        ).throwIfHasError()
-        galleryDataSource.add(gallery.copy(isLiked = true))
+        withContext(Dispatchers.IO) {
+            val gallery = find(id) as? GalleryPost.Authenticated
+                ?: throw UnauthorizedException()
+            val account = accountRepository.get(id.accountId).getOrThrow()
+            getMisskeyAPI(account).likeGallery(
+                Like(
+                    i = account.token,
+                    postId = id.galleryId
+                )
+            ).throwIfHasError()
+            galleryDataSource.add(gallery.copy(isLiked = true))
+        }
     }
 
     override suspend fun unlike(id: GalleryPost.Id) {
-        val gallery = find(id) as? GalleryPost.Authenticated
-            ?: throw UnauthorizedException()
-        val account = accountRepository.get(id.accountId).getOrThrow()
-        getMisskeyAPI(account).unlikeGallery(
-            UnLike(
-                i = account.token,
-                postId = id.galleryId
-            )
-        ).throwIfHasError()
-        galleryDataSource.add(gallery.copy(isLiked = false))
-
+        withContext(Dispatchers.IO) {
+            val gallery = find(id) as? GalleryPost.Authenticated
+                ?: throw UnauthorizedException()
+            val account = accountRepository.get(id.accountId).getOrThrow()
+            getMisskeyAPI(account).unlikeGallery(
+                UnLike(
+                    i = account.token,
+                    postId = id.galleryId
+                )
+            ).throwIfHasError()
+            galleryDataSource.add(gallery.copy(isLiked = false))
+        }
     }
 
     override suspend fun update(updateGalleryPost: UpdateGalleryPost): GalleryPost {
-        val account = accountRepository.get(updateGalleryPost.id.accountId).getOrThrow()
-        val files = coroutineScope {
-            updateGalleryPost.files.map {
-                async {
-                    when (it) {
-                        is AppFile.Remote -> it.id.fileId
-                        is AppFile.Local -> {
-                            fileUploaderProvider.get(account)
-                                .upload(UploadSource.LocalFile(it), true).also {
-                                filePropertyDataSource.add(it.toFileProperty(account))
-                            }.id
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(updateGalleryPost.id.accountId).getOrThrow()
+            val files = coroutineScope {
+                updateGalleryPost.files.map {
+                    async {
+                        when (it) {
+                            is AppFile.Remote -> it.id.fileId
+                            is AppFile.Local -> {
+                                fileUploaderProvider.get(account)
+                                    .upload(UploadSource.LocalFile(it), true).also {
+                                        filePropertyDataSource.add(it.toFileProperty(account))
+                                    }.id
+                            }
                         }
                     }
-                }
-            }.awaitAll()
+                }.awaitAll()
+            }
+            val body = getMisskeyAPI(account).updateGallery(
+                Update(
+                    i = account.token,
+                    postId = updateGalleryPost.id.galleryId,
+                    description = updateGalleryPost.description,
+                    title = updateGalleryPost.title,
+                    fileIds = files,
+                    isSensitive = updateGalleryPost.isSensitive
+                )
+            ).throwIfHasError().body()
+            requireNotNull(body)
+            val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
+            galleryDataSource.add(gallery)
+            gallery
         }
-        val body = getMisskeyAPI(account).updateGallery(
-            Update(
-                i = account.token,
-                postId = updateGalleryPost.id.galleryId,
-                description = updateGalleryPost.description,
-                title = updateGalleryPost.title,
-                fileIds = files,
-                isSensitive = updateGalleryPost.isSensitive
-            )
-        ).throwIfHasError().body()
-        requireNotNull(body)
-        val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
-        galleryDataSource.add(gallery)
-        return gallery
     }
 
     private fun getMisskeyAPI(account: Account): MisskeyAPIV1275 {

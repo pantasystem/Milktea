@@ -142,7 +142,7 @@ class FileViewModel @AssistedInject constructor(
         if (filePropertyPagingStore.isLoading) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 filePropertyPagingStore.clear()
                 filePropertyPagingStore.loadPrevious()
@@ -157,7 +157,7 @@ class FileViewModel @AssistedInject constructor(
         if (filePropertyPagingStore.isLoading) {
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             runCancellableCatching {
                 filePropertyPagingStore.loadPrevious()
             }.onFailure {
@@ -184,7 +184,7 @@ class FileViewModel @AssistedInject constructor(
     }
 
     fun toggleNsfw(id: FileProperty.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 filePropertyRepository.toggleNsfw(id)
             } catch (e: Exception) {
@@ -195,7 +195,7 @@ class FileViewModel @AssistedInject constructor(
 
 
     fun deleteFile(id: FileProperty.Id) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             filePropertyRepository.delete(id).onFailure { e ->
                 logger.info("ファイルの削除に失敗しました", e = e)
             }
@@ -203,7 +203,7 @@ class FileViewModel @AssistedInject constructor(
     }
 
     fun updateCaption(id: FileProperty.Id, newCaption: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
 
             filePropertyRepository.update(
                 filePropertyRepository.find(id)
