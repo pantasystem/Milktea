@@ -15,9 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -26,10 +24,10 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteDetailBinding
-import net.pantasystem.milktea.note.view.NoteCardActionHandler
-import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel
 import net.pantasystem.milktea.note.detail.viewmodel.provideFactory
+import net.pantasystem.milktea.note.view.NoteCardActionHandler
+import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 
 
@@ -83,6 +81,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Suppress("DEPRECATION")
     val page: Pageable.Show by lazy {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
             ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
@@ -129,11 +128,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         binding.notesView.layoutManager = LinearLayoutManager(context)
 
         binding.showInBrowser.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 val url = noteDetailViewModel.getUrl()
-                withContext(Dispatchers.Main) {
-                    showShareLink(url)
-                }
+                showShareLink(url)
             }
         }
 
