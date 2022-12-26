@@ -295,77 +295,87 @@ class UserRepositoryImpl @Inject constructor(
         userId: User.Id,
         reducer: (User.Detail) -> User.Detail
     ): Boolean {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.token))
-        res.throwIfHasError()
-        if (res.isSuccessful) {
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(userId.accountId).getOrThrow()
+            val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.token))
+            res.throwIfHasError()
+            if (res.isSuccessful) {
 
-            val updated = reducer.invoke(find(userId, true) as User.Detail)
-            userDataSource.add(updated)
+                val updated = reducer.invoke(find(userId, true) as User.Detail)
+                userDataSource.add(updated)
+            }
+            return@withContext res.isSuccessful
         }
-        return res.isSuccessful
     }
 
     override suspend fun report(report: Report): Boolean {
-        val account = accountRepository.get(report.userId.accountId).getOrThrow()
-        val api = report.userId.getMisskeyAPI()
-        val res = api.report(
-            ReportDTO(
-                i = account.token,
-                comment = report.comment,
-                userId = report.userId.id
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(report.userId.accountId).getOrThrow()
+            val api = report.userId.getMisskeyAPI()
+            val res = api.report(
+                ReportDTO(
+                    i = account.token,
+                    comment = report.comment,
+                    userId = report.userId.id
+                )
             )
-        )
-        res.throwIfHasError()
-        return res.isSuccessful
+            res.throwIfHasError()
+            res.isSuccessful
+        }
     }
 
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
-        val account = accountRepository.get(accountId).getOrThrow()
-        val request = RequestUser.from(query, account.token)
-        val res = misskeyAPIProvider.get(account).getUsers(request)
-            .throwIfHasError()
-        return res.body()?.map {
-            it.toUser(account, true)
-        }?.onEach {
-            userDataSource.add(it)
-        } ?: emptyList()
+        return withContext(Dispatchers.IO) {
+            val account = accountRepository.get(accountId).getOrThrow()
+            val request = RequestUser.from(query, account.token)
+            val res = misskeyAPIProvider.get(account).getUsers(request)
+                .throwIfHasError()
+            res.body()?.map {
+                it.toUser(account, true)
+            }?.onEach {
+                userDataSource.add(it)
+            } ?: emptyList()
+        }
     }
 
     override suspend fun sync(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
-            val account = accountRepository.get(userId.accountId)
-                .getOrThrow()
-            val user = misskeyAPIProvider.get(account)
-                .showUser(
-                    RequestUser(i = account.token, userId = userId.id, detail = true)
-                ).throwIfHasError()
-                .body()!!.toUser(account, true)
-            userDataSource.add(user)
+            withContext(Dispatchers.IO) {
+                val account = accountRepository.get(userId.accountId)
+                    .getOrThrow()
+                val user = misskeyAPIProvider.get(account)
+                    .showUser(
+                        RequestUser(i = account.token, userId = userId.id, detail = true)
+                    ).throwIfHasError()
+                    .body()!!.toUser(account, true)
+                userDataSource.add(user)
+            }
         }
     }
 
     override suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>> {
         return runCancellableCatching {
-            val accountId = userIds.map { it.accountId }.distinct().firstOrNull()
-            if (accountId == null) {
-                emptyList()
-            } else {
-                val account = accountRepository.get(accountId)
-                    .getOrThrow()
-                val users = misskeyAPIProvider.get(account)
-                    .showUsers(
-                        RequestUser(
-                            i = account.token,
-                            userIds = userIds.map { it.id },
-                            detail = true
-                        )
-                    ).throwIfHasError()
-                    .body()!!.map {
-                        it.toUser(account, true)
-                    }
-                userDataSource.addAll(users)
-                users.map { it.id }
+            withContext(Dispatchers.IO) {
+                val accountId = userIds.map { it.accountId }.distinct().firstOrNull()
+                if (accountId == null) {
+                    emptyList()
+                } else {
+                    val account = accountRepository.get(accountId)
+                        .getOrThrow()
+                    val users = misskeyAPIProvider.get(account)
+                        .showUsers(
+                            RequestUser(
+                                i = account.token,
+                                userIds = userIds.map { it.id },
+                                detail = true
+                            )
+                        ).throwIfHasError()
+                        .body()!!.map {
+                            it.toUser(account, true)
+                        }
+                    userDataSource.addAll(users)
+                    users.map { it.id }
+                }
             }
         }
     }
