@@ -13,6 +13,7 @@ import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
 import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.page.*
@@ -103,7 +104,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     private fun addPage(page: Page) {
-        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
+        val list = ArrayList<Page>(selectedPages.value)
         page.weight = list.size
         list.add(page)
         setList(list)
@@ -154,7 +155,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun removePage(page: Page) {
-        val list = ArrayList<Page>(selectedPages.value ?: emptyList())
+        val list = ArrayList<Page>(selectedPages.value)
         list.remove(page)
         setList(list)
     }

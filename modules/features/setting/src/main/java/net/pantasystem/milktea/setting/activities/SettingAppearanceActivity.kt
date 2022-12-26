@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_compose.RadioTile
 import net.pantasystem.milktea.common_compose.SwitchTile
@@ -260,6 +261,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
         openDriveActivityResult.launch(intent)
     }
 
+    @Suppress("DEPRECATION")
     private val openDriveActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val ids =

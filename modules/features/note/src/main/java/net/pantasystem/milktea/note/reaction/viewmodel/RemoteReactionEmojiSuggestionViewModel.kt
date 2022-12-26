@@ -7,10 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -59,11 +56,6 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
             StateContent.NotExist()
         )
     )
-
-    val isLoading = filteredEmojis.map {
-        it is ResultState.Loading
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
-
 
     fun setReaction(accountId: Long, reaction: String, noteId: String) {
         _reaction.value = RemoteReaction(
