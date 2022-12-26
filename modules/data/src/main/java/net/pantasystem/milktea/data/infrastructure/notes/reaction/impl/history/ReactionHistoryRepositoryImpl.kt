@@ -37,8 +37,10 @@ class ReactionHistoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sumReactions(instanceDomain: String): List<ReactionHistoryCount> {
-        return reactionHistoryDao.sumReactions(instanceDomain).map {
-            it.toReactionHistoryCount()
+        return withContext(Dispatchers.IO) {
+            reactionHistoryDao.sumReactions(instanceDomain).map {
+                it.toReactionHistoryCount()
+            }
         }
     }
 }
