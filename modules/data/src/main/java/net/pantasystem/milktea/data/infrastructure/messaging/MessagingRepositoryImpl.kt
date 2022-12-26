@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -26,21 +28,23 @@ class MessagingRepositoryImpl @Inject constructor(
         accountId: Long,
         isGroup: Boolean
     ): Result<List<MessageRelation>> = runCancellableCatching {
-        val account = getAccount.get(accountId)
-        val request = RequestMessageHistory(
-            i = account.token, group = isGroup, limit = 100
-        )
+        withContext(Dispatchers.IO) {
+            val account = getAccount.get(accountId)
+            val request = RequestMessageHistory(
+                i = account.token, group = isGroup, limit = 100
+            )
 
-        val res = misskeyAPIProvider.get(account).getMessageHistory(request)
-        res.throwIfHasError()
-        res.body()!!.map {
-            it.group?.let { groupDTO ->
-                groupDataSource.add(groupDTO.toGroup(account.accountId))
+            val res = misskeyAPIProvider.get(account).getMessageHistory(request)
+            res.throwIfHasError()
+            res.body()!!.map {
+                it.group?.let { groupDTO ->
+                    groupDataSource.add(groupDTO.toGroup(account.accountId))
+                }
+                it.recipient?.let { userDTO ->
+                    userDataSource.add(userDTO.toUser(account))
+                }
+                messageAdder.add(account, it)
             }
-            it.recipient?.let { userDTO ->
-                userDataSource.add(userDTO.toUser(account))
-            }
-            messageAdder.add(account, it)
         }
     }
 }
