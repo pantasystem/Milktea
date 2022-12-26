@@ -3,7 +3,6 @@ package net.pantasystem.milktea.common
 import kotlinx.coroutines.CancellationException
 
 inline fun <T, R> T.runCancellableCatching(block: T.() -> R): Result<R> {
-    runCatching {}
     return try {
         Result.success(block())
     } catch (e: CancellationException) {
