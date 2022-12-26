@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,7 +31,7 @@ class SendReportUseCase @Inject constructor(
                         state.userId,
                         state.comment
                     )
-                    runCatching {
+                    runCancellableCatching {
                         userRepository.report(
                             r
                         )

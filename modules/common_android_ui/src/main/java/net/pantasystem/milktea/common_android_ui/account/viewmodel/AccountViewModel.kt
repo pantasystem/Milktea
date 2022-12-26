@@ -11,6 +11,7 @@ import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -151,7 +152,7 @@ class AccountViewModel @Inject constructor(
 
     fun signOut(account: Account) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 subscriptionUnRegistration
                     .unregister(account.accountId)
             }.mapCancellableCatching {

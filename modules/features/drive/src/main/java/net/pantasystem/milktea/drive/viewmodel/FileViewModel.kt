@@ -17,6 +17,7 @@ import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.drive.DriveFileRepository
@@ -142,7 +143,7 @@ class FileViewModel @AssistedInject constructor(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 filePropertyPagingStore.clear()
                 filePropertyPagingStore.loadPrevious()
             }.onFailure {
@@ -157,7 +158,7 @@ class FileViewModel @AssistedInject constructor(
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 filePropertyPagingStore.loadPrevious()
             }.onFailure {
                 _error.value = it

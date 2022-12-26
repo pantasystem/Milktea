@@ -65,14 +65,14 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(noteId: Note.Id): Result<Unit> {
         val account = getAccount.get(noteId.accountId)
-        return runCatching {
+        return runCancellableCatching {
             misskeyAPIProvider.get(account).delete(
                 DeleteNote(i = account.token, noteId = noteId.noteId)
             ).throwIfHasError()
         }
     }
 
-    override suspend fun find(noteId: Note.Id): Result<Note> = runCatching {
+    override suspend fun find(noteId: Note.Id): Result<Note> = runCancellableCatching {
         val account = getAccount.get(noteId.accountId)
 
         var note = try {
@@ -84,7 +84,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
 
         if (note != null) {
-            return@runCatching note
+            return@runCancellableCatching note
         }
 
         logger.debug("request notes/show=$noteId")
@@ -127,11 +127,11 @@ class NoteRepositoryImpl @Inject constructor(
         return noteDataSource.getIn(noteIds).getOrThrow()
     }
 
-    override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCatching {
+    override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCancellableCatching {
         val account = getAccount.get(createReaction.noteId.accountId)
         val note = find(createReaction.noteId).getOrThrow()
 
-        runCatching {
+        runCancellableCatching {
             if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
                     .isCaptured(createReaction.noteId.noteId)
             ) {
@@ -146,7 +146,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCatching {
+    override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         val note = find(noteId).getOrThrow()
         val account = getAccount.get(noteId.accountId)
         postUnReaction(noteId)
@@ -156,7 +156,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCatching {
+    override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCancellableCatching {
         val account = getAccount.get(noteId.accountId)
         misskeyAPIProvider.get(account).vote(
             Vote(
@@ -198,7 +198,7 @@ class NoteRepositoryImpl @Inject constructor(
         val accountMap = noteIds.map {
             it.accountId
         }.distinct().mapNotNull {
-            runCatching {
+            runCancellableCatching {
                 getAccount.get(it)
             }.getOrNull()
         }.associateBy {
@@ -229,7 +229,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCatching {
+    override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         val account = getAccount.get(noteId.accountId)
         val dtoList = misskeyAPIProvider.get(account).children(
             NoteRequest(
@@ -243,7 +243,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCatching {
+    override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         val account = getAccount.get(noteId.accountId)
         val dtoList = misskeyAPIProvider.get(account).conversation(
             NoteRequest(
@@ -258,7 +258,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun sync(noteId: Note.Id): Result<Unit> = runCatching {
+    override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val account = getAccount.get(noteId.accountId)
             val note = misskeyAPIProvider.get(account).showNote(
@@ -271,7 +271,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCatching {
+    override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).createThreadMute(
@@ -283,7 +283,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCatching {
+    override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).deleteThreadMute(
@@ -295,7 +295,7 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCatching {
+    override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(

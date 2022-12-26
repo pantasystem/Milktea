@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.favorite.CreateFavorite
 import net.pantasystem.milktea.api.misskey.notes.favorite.DeleteFavorite
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AuthById
@@ -20,7 +21,7 @@ class FavoriteRepositoryImpl @Inject constructor(
 ) : FavoriteRepository {
 
     override suspend fun create(noteId: Note.Id): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             withContext(Dispatchers.IO) {
                 val token = auth.getToken(noteId.accountId)
                     ?: throw UnauthorizedException()
@@ -32,7 +33,7 @@ class FavoriteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(noteId: Note.Id): Result<Unit> {
-        return runCatching {
+        return runCancellableCatching {
             withContext(Dispatchers.IO) {
                 val token = auth.getToken(noteId.accountId)
                     ?: throw UnauthorizedException()

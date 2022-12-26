@@ -4,14 +4,15 @@ import android.content.SharedPreferences
 import android.util.Log
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.page.db.PageDAO
+import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountNotFoundException
 import net.pantasystem.milktea.model.account.AccountRegistrationFailedException
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.data.infrastructure.account.page.db.PageRecord
 import java.util.concurrent.Callable
 
 const val CURRENT_ACCOUNT_ID_KEY = "CURRENT_ACCOUNT_ID"
@@ -38,8 +39,8 @@ class RoomAccountRepository(
         }
     }
 
-    override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> = runCatching{
-        return@runCatching roomDataBase.runInTransaction(Callable<Account> {
+    override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> = runCancellableCatching{
+        return@runCancellableCatching roomDataBase.runInTransaction(Callable<Account> {
             var exAccount: Account? = null
             var isNeedDeepUpdate = isUpdatePages
 
@@ -148,7 +149,7 @@ class RoomAccountRepository(
 
     @Throws(AccountNotFoundException::class)
     override suspend fun get(accountId: Long): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             accountDao.getAccountRelation(accountId)?.toAccount()?.toAccount(encryption)
                 ?: throw AccountNotFoundException(
                     accountId
@@ -157,7 +158,7 @@ class RoomAccountRepository(
     }
 
     override suspend fun findAll(): Result<List<Account>> {
-        return runCatching {
+        return runCancellableCatching {
             accountDao.findAll().map {
                 it.toAccount().toAccount(encryption)
             }
@@ -168,7 +169,7 @@ class RoomAccountRepository(
     override suspend fun getCurrentAccount(): Result<Account> {
         val currentAccountId = sharedPreferences.getLong(CURRENT_ACCOUNT_ID_KEY, -1)
         val current = accountDao.getAccountRelation(currentAccountId)
-        return runCatching {
+        return runCancellableCatching {
             if (current == null) {
                 val first = accountDao.findAll().firstOrNull()?.toAccount()?.toAccount(encryption)
                     ?: throw AccountNotFoundException(currentAccountId)
@@ -182,7 +183,7 @@ class RoomAccountRepository(
 
 
     override suspend fun setCurrentAccount(account: Account): Result<Account> {
-        return runCatching {
+        return runCancellableCatching {
             val current = accountDao.get(account.accountId)
             val ac = if (current == null) {
                 add(account).getOrThrow()
@@ -194,7 +195,7 @@ class RoomAccountRepository(
             }.apply()
             publish(AccountRepository.Event.Updated(ac))
 
-            return@runCatching ac
+            return@runCancellableCatching ac
         }
 
     }

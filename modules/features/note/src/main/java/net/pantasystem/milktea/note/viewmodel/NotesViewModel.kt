@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.ui.SafeUnbox
 import net.pantasystem.milktea.model.notes.Note
@@ -62,7 +63,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> = runCatching {
+    private suspend fun recursiveSearchHasContentNote(noteId: Note.Id): Result<Note> = runCancellableCatching {
         val note = noteRepository.find(noteId).getOrThrow()
         if (note.hasContent()) {
             note
@@ -126,7 +127,7 @@ class NotesViewModel @Inject constructor(
 
     fun removeAndEditNote(note: NoteRelation) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
 
                 val dn = draftNoteRepository.save(note.toDraftNote())
                     .getOrThrow()

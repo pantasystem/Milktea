@@ -8,6 +8,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.R
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -46,7 +47,7 @@ class MainActivityInitialIntentHandler(
             return
         }
 
-        val shortcutType = runCatching {
+        val shortcutType = runCancellableCatching {
             intent.getStringExtra("SHORTCUT_TYPE")
                 ?.let { AppShortcutType.valueOf(it) }
         }.getOrNull()

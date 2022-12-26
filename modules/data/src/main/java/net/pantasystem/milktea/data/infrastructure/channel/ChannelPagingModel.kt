@@ -150,7 +150,7 @@ class ChannelPagingModel @AssistedInject constructor(
             }
         }
         logger.debug("loadPrevious res:${res.code()}")
-        return runCatching {
+        return runCancellableCatching {
             res.throwIfHasError().body()!!
         }
     }

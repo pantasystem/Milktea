@@ -62,7 +62,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
      * @param note 追加するノート
      * @return ノートが新たに追加されるとtrue、上書きされた場合はfalseが返されます。
      */
-    override suspend fun add(note: Note): Result<AddResult> = runCatching {
+    override suspend fun add(note: Note): Result<AddResult> = runCancellableCatching {
        createOrUpdate(note).also {
            if(it == AddResult.Created) {
                publish(NoteDataSource.Event.Created(note.id, note))
@@ -72,7 +72,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
        }
     }
 
-    override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> = runCatching {
+    override suspend fun addAll(notes: List<Note>): Result<List<AddResult>> = runCancellableCatching {
         notes.map{
             this.add(it).getOrElse {
                 AddResult.Canceled
@@ -84,7 +84,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
      * @param noteId 削除するNoteのid
      * @return 実際に削除されるとtrue、そもそも存在していなかった場合にはfalseが返されます
      */
-    override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCatching {
+    override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         suspend fun delete(noteId: Note.Id): Boolean {
             mutex.withLock{
                 val n = this.notes[noteId]
@@ -102,7 +102,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
 
     }
 
-    override suspend fun removeByUserId(userId: User.Id): Result<Int> = runCatching {
+    override suspend fun removeByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
         val result = mutex.withLock {
             notes.values.filter {
                 it.userId == userId

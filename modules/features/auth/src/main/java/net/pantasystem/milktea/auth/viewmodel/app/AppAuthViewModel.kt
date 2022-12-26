@@ -144,10 +144,10 @@ class AppAuthViewModel @Inject constructor(
 
 
     private val confirmAddAccountEventFlow = MutableSharedFlow<Long>(extraBufferCapacity = 100)
-    val finished = confirmAddAccountEventFlow.flatMapLatest {
+    private val finished = confirmAddAccountEventFlow.flatMapLatest {
         approved.filterNotNull()
     }.map {
-        runCatching {
+        runCancellableCatching {
             authService.createAccount(it)
         }.onFailure {
             logger.error("アカウント登録処理失敗", it)
@@ -192,9 +192,6 @@ class AppAuthViewModel @Inject constructor(
         )
     )
 
-    val errors = state.map {
-        it.errors
-    }
 
     init {
 
@@ -260,11 +257,6 @@ class AppAuthViewModel @Inject constructor(
             }
         }
     }
-
-    fun clearHostName() {
-        instanceDomain.value = ""
-    }
-
 
     fun auth() {
         startAuthEventFlow.tryEmit(Date().time)

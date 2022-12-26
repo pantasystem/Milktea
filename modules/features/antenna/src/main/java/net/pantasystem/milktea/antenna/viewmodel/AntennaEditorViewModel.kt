@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
@@ -39,7 +40,7 @@ class AntennaEditorViewModel @Inject constructor(
 
     private val mAntenna = MutableStateFlow<Antenna?>(null).apply {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 fetch()
             }.onFailure {
                 logger.debug("アンテナ取得エラー", e = it)
@@ -122,7 +123,7 @@ class AntennaEditorViewModel @Inject constructor(
 
     val userListList = MediatorLiveData<List<UserList>>().apply{
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 val account = getAccount().getOrThrow()
                 userListRepository.findByAccountId(account.accountId)
             }.onSuccess {
@@ -202,7 +203,7 @@ class AntennaEditorViewModel @Inject constructor(
     fun createOrUpdate(){
 
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCancellableCatching {
                 val account = getAccount().getOrThrow()
                 val antenna = mAntenna.value
                 val params = SaveAntennaParam(
@@ -299,7 +300,7 @@ class AntennaEditorViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getAccount(): Result<Account> = runCatching {
+    private suspend fun getAccount(): Result<Account> = runCancellableCatching {
         _antennaId.value?.let {
             accountRepository.get(it.accountId).getOrThrow()
         } ?: accountRepository.getCurrentAccount().getOrThrow()

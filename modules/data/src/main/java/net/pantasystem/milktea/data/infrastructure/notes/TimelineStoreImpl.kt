@@ -399,7 +399,7 @@ class FavoriteNoteTimelinePagingStoreImpl(
     }
 
     override suspend fun loadPrevious(): Result<List<Favorite>> {
-        return runCatching {
+        return runCancellableCatching {
             val ac = getAccount.invoke()
             misskeyAPIProvider.get(getAccount.invoke()).favorites(
                 NoteRequest.Builder(pageableTimeline, ac.token, limit = LIMIT)

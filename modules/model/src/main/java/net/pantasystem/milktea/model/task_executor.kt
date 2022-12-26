@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.gallery.GalleryPost
 
 /**
@@ -41,7 +42,7 @@ class TaskExecutorImpl<T>(
 
     override fun dispatch(task: ITask<T>, isLazy: Boolean): Flow<TaskState<T>> {
         return flow<TaskState<T>> {
-            runCatching {
+            runCancellableCatching {
                 emit(TaskState.Executing())
                 task.execute()
             }.onSuccess {

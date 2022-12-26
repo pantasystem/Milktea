@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
@@ -90,13 +91,13 @@ class GalleryPostsLoader (
     }
 
     override suspend fun loadFuture(): Result<List<GalleryPostDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             api(untilId = idGetter.getSinceId()).invoke().throwIfHasError().body()!!
         }
     }
 
     override suspend fun loadPrevious(): Result<List<GalleryPostDTO>> {
-        return runCatching {
+        return runCancellableCatching {
             api(untilId = idGetter.getUntilId()).invoke().throwIfHasError().body()!!
         }
     }

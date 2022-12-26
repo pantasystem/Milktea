@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notification.PushNotification
 import net.pantasystem.milktea.model.notification.toPushNotification
@@ -32,6 +33,7 @@ const val NOTIFICATION_CHANNEL_ID =
 const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifications"
 
 
+@Suppress("SameParameterValue")
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -76,7 +78,7 @@ class FCMService : FirebaseMessagingService() {
             .setGroup(GROUP_KEY_MISSKEY_NOTIFICATION)
             .setGroupSummary(true)
 
-        runCatching {
+        runCancellableCatching {
             val pendingIntentBuilder = TaskStackBuilder.create(this)
                 .addNextIntentWithParentStack(pushNotification.makeIntent())
             val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
