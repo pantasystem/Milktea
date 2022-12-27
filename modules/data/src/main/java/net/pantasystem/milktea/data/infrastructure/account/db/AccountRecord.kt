@@ -2,8 +2,8 @@ package net.pantasystem.milktea.data.infrastructure.account.db
 
 import androidx.room.*
 import net.pantasystem.milktea.common.Encryption
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Page
 import java.io.Serializable
 
@@ -47,8 +47,12 @@ data class AccountRecord(
 
     @Ignore
     fun toAccount(encryption: Encryption): Account {
-        val decryptedToken = encryption.decrypt(remoteId, encryptedToken)
-            ?: throw UnauthorizedException()
+        val decryptedToken = runCancellableCatching {
+            requireNotNull(encryption.decrypt(remoteId, encryptedToken))
+        }.getOrElse {
+            ""
+        }
+
         return Account(
             remoteId = remoteId,
             instanceDomain = instanceDomain,
