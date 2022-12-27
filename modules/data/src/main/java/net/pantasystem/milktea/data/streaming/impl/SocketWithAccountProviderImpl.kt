@@ -23,6 +23,12 @@ class SocketWithAccountProviderImpl @Inject constructor(
 
     private val accountIdWithSocket = mutableMapOf<Long, Socket>()
 
+    /**
+     * accountIdとそのTokenを管理している。
+     * ここにTokenを入れておいてTokenが更新されていないかをチェックする
+     */
+    private val accountIdWithToken = mutableMapOf<Long, String>()
+
     override fun get(accountId: Long): Socket? {
         synchronized(accountIdWithSocket) {
             return accountIdWithSocket[accountId]
@@ -32,11 +38,15 @@ class SocketWithAccountProviderImpl @Inject constructor(
     override fun get(account: Account): Socket {
         synchronized(accountIdWithSocket) {
             var socket = accountIdWithSocket[account.accountId]
-            if(socket != null){
-                logger.debug("すでにインスタンス化済み")
-                return socket
+            if (socket != null) {
+                // NOTE: tokenが異なる場合は再認証された可能性があるので、再生成を行う
+                if (account.token == accountIdWithToken[account.accountId]) {
+                    logger.debug("すでにインスタンス化済み")
+                    return socket
+                } else {
+                    socket.disconnect()
+                }
             }
-
 
             var uri = account.normalizedInstanceDomain
             if(uri.startsWith("https")) {
@@ -57,6 +67,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
                 loggerFactory = loggerFactory,
             )
             accountIdWithSocket[account.accountId] = socket
+            accountIdWithToken[account.accountId] = account.token
 
             return socket
         }
