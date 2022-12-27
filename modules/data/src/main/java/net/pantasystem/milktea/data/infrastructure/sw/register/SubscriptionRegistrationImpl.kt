@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.sw.register
 
+import android.content.Context
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -21,6 +24,7 @@ class SubscriptionRegistrationImpl(
     val auth: String,
     val publicKey: String,
     val endpointBase: String,
+    val context: Context,
 ) : SubscriptionRegistration {
     val logger = loggerFactory.create("sw/register")
 
@@ -28,32 +32,38 @@ class SubscriptionRegistrationImpl(
      * 特定のアカウントをsw/registerに登録します。
      */
     override suspend fun register(accountId: Long) : Result<SubscriptionState?> = runCancellableCatching {
-        val token = FirebaseMessaging.getInstance().token.asSuspend()
-        logger.debug("call register(accountId:$accountId)")
-        logger.debug("auth:$auth, publicKey:$publicKey")
-        val account = accountRepository.get(accountId).getOrThrow()
-        val endpoint = EndpointBuilder(
-            deviceToken = token,
-            accountId = accountId,
-            lang = lang,
-            auth = auth,
-            endpointBase = endpointBase,
-            publicKey = publicKey
-        ).build()
-        logger.debug("endpoint:${endpoint}")
+        when(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context)) {
+            ConnectionResult.SUCCESS -> {
+                val token = FirebaseMessaging.getInstance().token.asSuspend()
+                logger.debug("call register(accountId:$accountId)")
+                logger.debug("auth:$auth, publicKey:$publicKey")
+                val account = accountRepository.get(accountId).getOrThrow()
+                val endpoint = EndpointBuilder(
+                    deviceToken = token,
+                    accountId = accountId,
+                    lang = lang,
+                    auth = auth,
+                    endpointBase = endpointBase,
+                    publicKey = publicKey
+                ).build()
+                logger.debug("endpoint:${endpoint}")
 
-        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
-        val res = api.swRegister(
-            Subscription(
-                i = account.token,
-                endpoint = endpoint,
-                auth = auth,
-                publicKey = publicKey
-            )
-        )
-        res.throwIfHasError()
-        logger.debug("res code:${res.code()}, body:${res.body()}")
-        res.body()
+                val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+                val res = api.swRegister(
+                    Subscription(
+                        i = account.token,
+                        endpoint = endpoint,
+                        auth = auth,
+                        publicKey = publicKey
+                    )
+                )
+                res.throwIfHasError()
+                logger.debug("res code:${res.code()}, body:${res.body()}")
+                res.body()
+            }
+        }
+        null
+
     }
 
     /**
