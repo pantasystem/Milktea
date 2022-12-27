@@ -29,6 +29,10 @@ class TimelineErrorHandler(
                 Toast.makeText(context, R.string.auth_error, Toast.LENGTH_LONG)
                     .show()
             }
+            is APIError.ForbiddenException -> {
+                Toast.makeText(context, R.string.auth_error, Toast.LENGTH_LONG)
+                    .show()
+            }
             is APIError.IAmAIException -> {
                 Toast.makeText(context, R.string.bot_error, Toast.LENGTH_LONG)
                     .show()

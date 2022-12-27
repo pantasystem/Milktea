@@ -21,10 +21,13 @@ class ChannelAPIWithAccountProvider @Inject constructor(
         mutex.withLock {
             logger.debug("ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}")
             var channelAPI = accountWithChannelAPI[account.accountId]
-            if (channelAPI != null) {
+            val socketAPI = socketWithAccountProvider.get(account)
+
+            // Socketのインスタンスが変わっていた場合、Tokenなどに更新があった可能性があるので再生成する
+            if (channelAPI != null && channelAPI.socket == socketAPI) {
                 return channelAPI
             }
-            channelAPI = ChannelAPI(socketWithAccountProvider.get(account), loggerFactory)
+            channelAPI = ChannelAPI(socketAPI, loggerFactory)
             require(accountWithChannelAPI.put(account.accountId, channelAPI) == null)
             return channelAPI
         }
