@@ -217,6 +217,7 @@ sealed interface TimelineListItem {
 
         fun isUnauthorizedError(): Boolean {
             return throwable is APIError.AuthenticationException
+                    || throwable is APIError.ForbiddenException
                     || throwable is UnauthorizedException
         }
     }
