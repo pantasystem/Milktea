@@ -39,10 +39,21 @@ class NoteCaptureAPIAdapterImpl(
 
     private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
 
+    private val noteResourceReleaseEvent = MutableSharedFlow<Note.Id>(extraBufferCapacity = 1000)
+
     init {
         coroutineScope.launch(dispatcher) {
             noteUpdatedDispatcher.collect {
                 handleRemoteEvent(it.first, it.second)
+            }
+        }
+
+        // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
+        coroutineScope.launch(dispatcher) {
+            noteResourceReleaseEvent.filterNot {
+                isCaptured(it)
+            }.collect {
+                noteDataSource.remove(it)
             }
         }
     }
@@ -84,15 +95,23 @@ class NoteCaptureAPIAdapterImpl(
 
         awaitClose {
             // NoteCaptureの購読を解除する
-            synchronized(noteIdWithJob) {
+            val result = synchronized(noteIdWithJob) {
                 // リスナーを解除する
-                if (removeRepositoryEventListener(id, repositoryEventListener)) {
+                removeRepositoryEventListener(id, repositoryEventListener).also { result ->
+                    if (result) {
 
-                    // すべてのリスナーが解除されていればRemoteへの購読も解除する
-                    noteIdWithJob.remove(id)?.cancel() ?: run {
-                        logger.warning("購読解除しようとしたところすでに解除されていた")
+                        // すべてのリスナーが解除されていればRemoteへの購読も解除する
+                        noteIdWithJob.remove(id)?.cancel() ?: run {
+                            logger.warning("購読解除しようとしたところすでに解除されていた")
+                        }
                     }
                 }
+
+            }
+
+            // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
+            if (result) {
+                noteResourceReleaseEvent.tryEmit(id)
             }
         }
     }.shareIn(coroutineScope, replay = 1, started = SharingStarted.WhileSubscribed())
@@ -171,6 +190,12 @@ class NoteCaptureAPIAdapterImpl(
         }
 
 
+    }
+
+    private fun isCaptured(noteId: Note.Id): Boolean {
+        return synchronized(noteIdWithListeners) {
+            noteIdWithListeners[noteId].isNullOrEmpty().not()
+        }
     }
 
 
