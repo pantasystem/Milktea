@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
@@ -20,13 +18,14 @@ import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
+import net.pantasystem.milktea.model.instance.FeatureEnables
+import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
@@ -50,8 +49,8 @@ class UserDetailViewModel @AssistedInject constructor(
     private val noteRelationGetter: NoteRelationGetter,
     private val userRepository: UserRepository,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val noteRepository: NoteRepository,
+    private val featureEnables: FeatureEnables,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -134,10 +133,12 @@ class UserDetailViewModel @AssistedInject constructor(
     val tabTypes = combine(
         accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()
     ) { account, user ->
-        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
-        val isEnableGallery = api is MisskeyAPIV1275
-        val isPublicReaction =
-            api is MisskeyAPIV12 && (user.isPublicReactions || user.id == User.Id(
+        val isEnableGallery =
+            featureEnables.isEnable(account.normalizedInstanceDomain, FeatureType.Gallery)
+        val isPublicReaction = featureEnables.isEnable(
+                account.normalizedInstanceDomain,
+                FeatureType.UserReactionHistory
+            ) && (user.isPublicReactions || user.id == User.Id(
                 account.accountId, account.remoteId
             ))
         listOfNotNull(
