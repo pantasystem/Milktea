@@ -3,9 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.os.Looper
 import android.util.Log
-import androidx.emoji2.bundled.BundledEmojiCompatConfig
-import androidx.emoji2.text.EmojiCompat
-import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -13,21 +10,18 @@ import androidx.work.WorkManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
-import jp.panta.misskeyandroidclient.util.DebuggerSetupManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
+import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
 import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
@@ -69,20 +63,10 @@ class MiApplication : Application(), Configuration.Provider {
         lf.create("MiApplication")
     }
 
-    @Inject
-    internal lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
-
-    @Inject
-    internal lateinit var mSubscriptionRegistration: SubscriptionRegistration
-
-    @Inject
-    internal lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
     @Inject
     internal lateinit var clientIdRepository: ClientIdRepository
 
-    @Inject
-    internal lateinit var debuggerSetupManager: DebuggerSetupManager
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -91,7 +75,6 @@ class MiApplication : Application(), Configuration.Provider {
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
-        debuggerSetupManager.setup(this)
 
         val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         val mainThreadId = Looper.getMainLooper().thread.id
@@ -103,34 +86,8 @@ class MiApplication : Application(), Configuration.Provider {
             }
         }
 
-        EmojiCompat.init(
-            BundledEmojiCompatConfig(this@MiApplication)
-                .setReplaceAll(true)
-                .setMetadataLoadStrategy(LOAD_STRATEGY_MANUAL)
-        )
-        EmojiCompat.get().load()
-
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
-
-        mAccountRepository.addEventListener { ev ->
-            applicationScope.launch {
-                try {
-                    if (ev is AccountRepository.Event.Deleted) {
-                        mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
-                    }
-                    mAccountStore.initialize()
-                } catch (e: Exception) {
-                    logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
-                }
-            }
-        }
-
-        applicationScope.launch(Dispatchers.IO) {
-            clearDriveCacheJob.checkAndClear().onFailure {
-                logger.error("ドライブのキャッシュのクリーンアップに失敗しました", it)
-            }
-        }
 
         applicationScope.launch {
             try {
@@ -154,24 +111,7 @@ class MiApplication : Application(), Configuration.Provider {
         }.launchIn(applicationScope + Dispatchers.IO)
 
 
-        WorkManager.getInstance(this).apply {
-            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
-            enqueueUniquePeriodicWork(
-                "syncMeta",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncMetaWorker.createPeriodicWorkRequest()
-            )
-            enqueueUniquePeriodicWork(
-                "syncLoggedInUsers",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
-            )
-            enqueueUniquePeriodicWork(
-                "scheduleAuthInstancePostWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
-            )
-        }
+        enqueueWorkManagers()
 
         applicationScope.launch {
             mSettingStore.configState.map {
@@ -205,4 +145,26 @@ class MiApplication : Application(), Configuration.Provider {
             .build()
     }
 
+    private fun enqueueWorkManagers() {
+        WorkManager.getInstance(this).apply {
+            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
+            enqueue(CleanupUnusedDriveCacheWorker.createOneTimeRequest())
+            enqueueUniquePeriodicWork(
+                "syncMeta",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncMetaWorker.createPeriodicWorkRequest()
+            )
+            enqueueUniquePeriodicWork(
+                "syncLoggedInUsers",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
+            )
+            enqueueUniquePeriodicWork(
+                "scheduleAuthInstancePostWorker",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
+            )
+        }
+
+    }
 }

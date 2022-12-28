@@ -18,7 +18,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
@@ -35,13 +35,13 @@ class MainViewModel @Inject constructor(
     unreadMessages: UnReadMessages,
     loggerFactory: Logger.Factory,
     private val notificationRepository: NotificationRepository,
-    private val notificationRelationGetter: NotificationRelationGetter,
     private val channelAPIProvider: ChannelAPIWithAccountProvider,
     private val socketProvider: SocketWithAccountProvider,
     private val configRepository: LocalConfigRepository,
     private val metaRepository: MetaRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val emojiEventHandler: EmojiEventHandler,
+    private val notificationCacheAdder: NotificationCacheAdder,
     settingStore: SettingStore
 ) : ViewModel() {
     val logger by lazy {
@@ -72,7 +72,7 @@ class MainViewModel @Inject constructor(
             ac to it
         }
     }.map {
-        notificationRelationGetter.get(it.first, it.second.body)
+        notificationCacheAdder.addAndConvert(it.first, it.second.body)
     }.flowOn(Dispatchers.IO).catch { e ->
         logger.error("通知取得エラー", e = e)
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())

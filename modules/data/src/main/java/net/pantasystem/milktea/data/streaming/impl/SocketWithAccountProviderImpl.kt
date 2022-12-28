@@ -21,7 +21,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
 
     private val logger = loggerFactory.create("SocketProvider")
 
-    private val accountIdWithSocket = mutableMapOf<Long, Socket>()
+    private val accountIdWithSocket = mutableMapOf<Long, SocketImpl>()
 
     /**
      * accountIdとそのTokenを管理している。
@@ -44,7 +44,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
                     logger.debug("すでにインスタンス化済み")
                     return socket
                 } else {
-                    socket.disconnect()
+                    socket.destroy()
                 }
             }
 

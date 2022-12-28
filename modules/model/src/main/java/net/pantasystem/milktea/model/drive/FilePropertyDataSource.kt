@@ -1,9 +1,6 @@
 package net.pantasystem.milktea.model.drive
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 
@@ -25,7 +22,6 @@ data class FilePropertyDataSourceState(
 
 interface FilePropertyDataSource {
 
-    val state: StateFlow<FilePropertyDataSourceState>
 
     suspend fun add(fileProperty: FileProperty) : Result<AddResult>
 
@@ -35,6 +31,8 @@ interface FilePropertyDataSource {
 
     suspend fun find(filePropertyId: FileProperty.Id) : Result<FileProperty>
 
+    suspend fun clearUnusedCaches(): Result<Unit>
+
     suspend fun findIn(ids: List<FileProperty.Id>) : Result<List<FileProperty>> = runCancellableCatching {
         ids.mapNotNull {
             runCancellableCatching {
@@ -43,19 +41,9 @@ interface FilePropertyDataSource {
         }
     }
 
-    fun observe(id: FileProperty.Id) : Flow<FileProperty?> {
-        return state.map {
-            it.map[id]
-        }.distinctUntilChanged()
-    }
+    fun observe(id: FileProperty.Id) : Flow<FileProperty?>
 
-    fun observeIn(ids: List<FileProperty.Id>): Flow<List<FileProperty>> {
-        return state.map { state ->
-            ids.mapNotNull { id ->
-                state.map[id]
-            }
-        }
-    }
+    fun observeIn(ids: List<FileProperty.Id>): Flow<List<FileProperty>>
 
 
 }

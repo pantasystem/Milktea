@@ -5,7 +5,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
-import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository

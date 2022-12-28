@@ -35,14 +35,15 @@
 
                     >
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/open"
+                        android:text="@string/expand"
                         android:layout_gravity="center_horizontal|bottom"
                         android:id="@+id/replyAutoExpandableButton"
                         android:visibility="@{ hasReplyToNote.expanded ? View.GONE : View.VISIBLE}"
                         app:emojiCompatEnabled="false"
+                        app:cornerRadius="24dp"
                         />
                 <RelativeLayout
                         android:layout_width="match_parent"

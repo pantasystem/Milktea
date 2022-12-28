@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -16,7 +18,7 @@ import javax.inject.Inject
 class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSource {
     private var map = mapOf<FileProperty.Id, FileProperty>()
     private var _state = MutableStateFlow(FilePropertyDataSourceState(map))
-    override val state: StateFlow<FilePropertyDataSourceState> = _state
+    val state: StateFlow<FilePropertyDataSourceState> = _state
 
     private val lock = Mutex()
 
@@ -59,6 +61,25 @@ class InMemoryFilePropertyDataSource @Inject constructor(): FilePropertyDataSour
 
     }
 
+
+    override suspend fun clearUnusedCaches(): Result<Unit> {
+        lock.withLock {
+            map = emptyMap()
+        }
+        return Result.success(Unit)
+    }
+
+    override fun observe(id: FileProperty.Id): Flow<FileProperty?> {
+        return _state.map {
+            it.getOrNull(id)
+        }
+    }
+
+    override fun observeIn(ids: List<FileProperty.Id>): Flow<List<FileProperty>> {
+        return _state.map {
+            it.findIn(ids)
+        }
+    }
 
 
 

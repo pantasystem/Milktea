@@ -49,6 +49,12 @@ class SocketImpl(
     private var messageListeners = setOf<SocketMessageEventListener>()
     private var isNetworkActive = true
 
+    /**
+     * 等インスタンスを使用して接続を行う可能性が永続的にない場合はtrueになる。
+     * 主にログアウト処理が行われた際や再認証処理が行われ、インスタンスが使われなくなる可能性がある場合もtrueになる。
+     */
+    private var isDestroyed: Boolean = false
+
 
     override fun addMessageEventListener(listener: SocketMessageEventListener) {
 
@@ -96,6 +102,11 @@ class SocketImpl(
             }
             if (!isNetworkActive) {
                 logger.debug("ネットワークがアクティブではないのでキャンセル")
+                return false
+            }
+
+            if (isDestroyed) {
+                logger.debug("destroyedされているのでキャンセル")
                 return false
             }
 
@@ -193,6 +204,17 @@ class SocketImpl(
 
     override fun onNetworkInActive() {
         isNetworkActive = false
+    }
+
+    /**
+     * ログアウトや再認証によってこのインスタンスを用いて接続処理などを行わない可能性がある場合がある時に呼び出される。
+     */
+    fun destroy(): Boolean {
+        synchronized(this) {
+            messageListeners = emptySet()
+            isDestroyed = true
+        }
+        return disconnect()
     }
 
 

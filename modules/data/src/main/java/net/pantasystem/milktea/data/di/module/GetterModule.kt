@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.data.gettters.MessageAdder
-import net.pantasystem.milktea.data.gettters.MessageRelationGetterImpl
+import net.pantasystem.milktea.data.infrastructure.messaging.MessageAdder
+import net.pantasystem.milktea.data.infrastructure.messaging.MessageRelationGetterImpl
 import net.pantasystem.milktea.model.messaging.MessageRelationGetter
 import javax.inject.Singleton
 

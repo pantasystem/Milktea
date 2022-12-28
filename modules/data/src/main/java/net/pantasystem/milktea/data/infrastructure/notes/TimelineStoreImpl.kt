@@ -20,14 +20,15 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -42,6 +43,7 @@ class TimelineStoreImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
+    private val metaRepository: MetaRepository,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -49,6 +51,7 @@ class TimelineStoreImpl(
         private val noteDataSource: NoteDataSource,
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val noteRelationGetter: NoteRelationGetter,
+        private val metaRepository: MetaRepository,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -63,6 +66,7 @@ class TimelineStoreImpl(
                 misskeyAPIProvider,
                 coroutineScope,
                 noteRelationGetter,
+                metaRepository,
             )
         }
     }
@@ -86,7 +90,8 @@ class TimelineStoreImpl(
             else -> TimelinePagingStoreImpl(
                 pageableTimeline, noteAdder, getAccount, {
                     initialUntilDate
-                }, misskeyAPIProvider
+                }, misskeyAPIProvider,
+                metaRepository,
             )
         }
     }
@@ -233,6 +238,7 @@ class TimelinePagingStoreImpl(
     private val getAccount: suspend () -> Account,
     private val getInitialUntilDate: () -> Instant?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val metaRepository: MetaRepository,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
     IdGetter<Note.Id>, TimelinePagingBase {
 
@@ -307,21 +313,22 @@ class TimelinePagingStoreImpl(
 
     private suspend fun getStore(): (suspend (NoteRequest) -> Response<List<NoteDTO>?>)? {
         val account = getAccount.invoke()
+        val meta = metaRepository.find(account.normalizedInstanceDomain)
+        val api = misskeyAPIProvider.get(account, meta.getOrNull()?.getVersion())
         return try {
             when (pageableTimeline) {
-                is Pageable.GlobalTimeline -> misskeyAPIProvider.get(account)::globalTimeline
-                is Pageable.LocalTimeline -> misskeyAPIProvider.get(account)::localTimeline
-                is Pageable.HybridTimeline -> misskeyAPIProvider.get(account)::hybridTimeline
-                is Pageable.HomeTimeline -> misskeyAPIProvider.get(account)::homeTimeline
-                is Pageable.Search -> misskeyAPIProvider.get(account)::searchNote
+                is Pageable.GlobalTimeline -> api::globalTimeline
+                is Pageable.LocalTimeline -> api::localTimeline
+                is Pageable.HybridTimeline -> api::hybridTimeline
+                is Pageable.HomeTimeline -> api::homeTimeline
+                is Pageable.Search ->api::searchNote
                 is Pageable.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
-                is Pageable.UserTimeline -> misskeyAPIProvider.get(account)::userNotes
-                is Pageable.UserListTimeline -> misskeyAPIProvider.get(account)::userListTimeline
-                is Pageable.SearchByTag -> misskeyAPIProvider.get(account)::searchByTag
-                is Pageable.Featured -> misskeyAPIProvider.get(account)::featured
-                is Pageable.Mention -> misskeyAPIProvider.get(account)::mentions
+                is Pageable.UserTimeline -> api::userNotes
+                is Pageable.UserListTimeline -> api::userListTimeline
+                is Pageable.SearchByTag -> api::searchByTag
+                is Pageable.Featured -> api::featured
+                is Pageable.Mention -> api::mentions
                 is Pageable.Antenna -> {
-                    val api = misskeyAPIProvider.get(account)
                     if (api is MisskeyAPIV12) {
                         (api)::antennasNotes
                     } else {
@@ -329,7 +336,6 @@ class TimelinePagingStoreImpl(
                     }
                 }
                 is Pageable.ChannelTimeline -> {
-                    val api = misskeyAPIProvider.get(account)
                     if (api is MisskeyAPIV12) {
                         (api)::channelTimeline
                     } else {

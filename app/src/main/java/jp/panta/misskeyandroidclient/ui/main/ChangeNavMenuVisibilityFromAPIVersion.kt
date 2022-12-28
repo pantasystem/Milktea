@@ -2,20 +2,21 @@ package jp.panta.misskeyandroidclient.ui.main
 
 import com.google.android.material.navigation.NavigationView
 import jp.panta.misskeyandroidclient.R
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.instance.FeatureEnables
+import net.pantasystem.milktea.model.instance.FeatureType
 
 internal class ChangeNavMenuVisibilityFromAPIVersion(
-    private val navView: NavigationView
+    private val navView: NavigationView,
+    private val featureEnables: FeatureEnables,
 ) {
-    operator fun invoke(api: MisskeyAPI) {
+    suspend operator fun invoke(currentAccount: Account) {
+        val enableFeatures = featureEnables.enableFeatures(currentAccount.normalizedInstanceDomain)
         navView.menu.also { menu ->
-            menu.findItem(R.id.nav_antenna).isVisible = api is MisskeyAPIV12
-            menu.findItem(R.id.nav_channel).isVisible = api is MisskeyAPIV12
-            menu.findItem(R.id.nav_gallery).isVisible = api is MisskeyAPIV1275
-            menu.findItem(R.id.nav_group).isVisible = api is MisskeyAPIV11
+            menu.findItem(R.id.nav_antenna).isVisible = enableFeatures.contains(FeatureType.Antenna)
+            menu.findItem(R.id.nav_channel).isVisible = enableFeatures.contains(FeatureType.Channel)
+            menu.findItem(R.id.nav_gallery).isVisible = enableFeatures.contains(FeatureType.Gallery)
+            menu.findItem(R.id.nav_group).isVisible = enableFeatures.contains(FeatureType.Group)
         }
     }
 }

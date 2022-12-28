@@ -16,19 +16,9 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.renote.Renote
+import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
 import javax.inject.Inject
 
-interface RenotesPagingService {
-
-    interface Factory {
-        fun create(noteId: Note.Id): RenotesPagingService
-    }
-
-    val state: Flow<PageableState<List<Renote>>>
-    suspend fun next()
-    suspend fun refresh()
-    suspend fun clear()
-}
 
 class RenotesPagingServiceImpl(
     targetNoteId: Note.Id,

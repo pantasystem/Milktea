@@ -262,6 +262,8 @@ dependencies {
 
     implementation libs.hilt.work
     kapt libs.androidx.hilt.compiler
+
+    implementation libs.androidx.appstartup
 }
 
 kapt {

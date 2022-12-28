@@ -12,7 +12,8 @@ import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 
 /**
- * model層とNoteCaptureAPIをいい感じに接続する
+ * Noteの更新イベントをWebSocket経由でキャプチャーして
+ * その更新イベントをキャッシュに反映するための実装
  */
 class NoteCaptureAPIAdapterImpl(
     private val accountRepository: AccountRepository,
@@ -37,12 +38,31 @@ class NoteCaptureAPIAdapterImpl(
 
     private val noteIdWithJob = mutableMapOf<Note.Id, Job>()
 
+    /**
+     * Noteのキャプチャーによって発生したイベントのQueue。
+     * ここから順番にイベントを取り出し、キャッシュに反映させるなどをしている。
+     */
     private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
 
+    /**
+     * 使用されなくなったNoteのリソースが順番に入れられるQueue。
+     */
+    private val noteResourceReleaseEvent = MutableSharedFlow<Note.Id>(extraBufferCapacity = 1000)
+
     init {
+        // NOTE: Noteのキャプチャーによって発生したイベントのQueueであるnoteUpdatedDispatcherのイベントを順番にキャッシュに反映させている。
         coroutineScope.launch(dispatcher) {
             noteUpdatedDispatcher.collect {
                 handleRemoteEvent(it.first, it.second)
+            }
+        }
+
+        // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
+        coroutineScope.launch(dispatcher) {
+            noteResourceReleaseEvent.filterNot {
+                isCaptured(it)
+            }.collect {
+                noteDataSource.remove(it)
             }
         }
     }
@@ -60,6 +80,14 @@ class NoteCaptureAPIAdapterImpl(
 
     }
 
+    /**
+     * ノートをキャプチャーするための実装。
+     * Flowでイベントを返却し、Flowが使用されなくなると、自動的にListenerが解除される仕組みになっている。
+     * また対象のNoteが他のどこからも購読されなくなくなれば、自動的にサーバからの購読を解除する仕組みになっている。
+     * また自動的に購読を解除する際はキャッシュ上からもリソースを削除するようにしている。
+     * @param id キャプチャーするNoteのId
+     * @return channelFlowが返却される。Flowが使用されなくなりある一定の条件が満たされれば購読が解除される。
+     */
     override fun capture(id: Note.Id): Flow<NoteDataSource.Event> = channelFlow {
         val account = accountRepository.get(id.accountId).getOrThrow()
 
@@ -84,15 +112,23 @@ class NoteCaptureAPIAdapterImpl(
 
         awaitClose {
             // NoteCaptureの購読を解除する
-            synchronized(noteIdWithJob) {
+            val result = synchronized(noteIdWithJob) {
                 // リスナーを解除する
-                if (removeRepositoryEventListener(id, repositoryEventListener)) {
+                removeRepositoryEventListener(id, repositoryEventListener).also { result ->
+                    if (result) {
 
-                    // すべてのリスナーが解除されていればRemoteへの購読も解除する
-                    noteIdWithJob.remove(id)?.cancel() ?: run {
-                        logger.warning("購読解除しようとしたところすでに解除されていた")
+                        // すべてのリスナーが解除されていればRemoteへの購読も解除する
+                        noteIdWithJob.remove(id)?.cancel() ?: run {
+                            logger.warning("購読解除しようとしたところすでに解除されていた")
+                        }
                     }
                 }
+
+            }
+
+            // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
+            if (result) {
+                noteResourceReleaseEvent.tryEmit(id)
             }
         }
     }.shareIn(coroutineScope, replay = 1, started = SharingStarted.WhileSubscribed())
@@ -145,7 +181,7 @@ class NoteCaptureAPIAdapterImpl(
     }
 
     /**
-     * リポジトリを更新する
+     * イベントに応じてキャッシュを更新している。
      */
     private suspend fun handleRemoteEvent(account: Account, e: NoteUpdated.Body) {
         val noteId = Note.Id(account.accountId, e.id)
@@ -171,6 +207,12 @@ class NoteCaptureAPIAdapterImpl(
         }
 
 
+    }
+
+    private fun isCaptured(noteId: Note.Id): Boolean {
+        return synchronized(noteIdWithListeners) {
+            noteIdWithListeners[noteId].isNullOrEmpty().not()
+        }
     }
 
 

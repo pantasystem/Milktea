@@ -1,11 +1,8 @@
-package net.pantasystem.milktea.data.gettters
+package net.pantasystem.milktea.model.notes
 
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject

@@ -9,20 +9,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRelation
-import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.notes.NoteState
+import net.pantasystem.milktea.model.notes.*
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteOptionViewModel @Inject constructor(
     val accountRepository: AccountRepository,
-    val misskeyAPIProvider: MisskeyAPIProvider,
     val noteRepository: NoteRepository,
     val noteRelationGetter: NoteRelationGetter,
     val loggerFactory: Logger.Factory,

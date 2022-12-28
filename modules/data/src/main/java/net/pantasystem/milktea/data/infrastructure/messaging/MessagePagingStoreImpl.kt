@@ -17,7 +17,6 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.MessageAdder
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessagingId

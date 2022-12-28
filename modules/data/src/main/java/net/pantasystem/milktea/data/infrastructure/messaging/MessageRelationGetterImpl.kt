@@ -1,8 +1,7 @@
-package net.pantasystem.milktea.data.gettters
+package net.pantasystem.milktea.data.infrastructure.messaging
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.data.infrastructure.entities
-import net.pantasystem.milktea.data.infrastructure.messaging.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
