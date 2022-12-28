@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common.getPreferences
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.AuthImpl
 import net.pantasystem.milktea.data.infrastructure.account.ClientIdRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.account.SignOutUseCaseImpl
 import net.pantasystem.milktea.data.infrastructure.account.db.MediatorAccountRepository
 import net.pantasystem.milktea.data.infrastructure.account.db.RoomAccountRepository
 import net.pantasystem.milktea.model.account.*
@@ -58,4 +59,8 @@ abstract class AuthModule {
     @Binds
     @Singleton
     abstract fun provideGetAccount(impl: AuthImpl): GetAccount
+
+    @Binds
+    @Singleton
+    abstract fun bindSignOutUseCase(impl: SignOutUseCaseImpl): SignOutUseCase
 }
