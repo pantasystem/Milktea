@@ -3,9 +3,6 @@ package jp.panta.misskeyandroidclient
 import android.app.Application
 import android.os.Looper
 import android.util.Log
-import androidx.emoji2.bundled.BundledEmojiCompatConfig
-import androidx.emoji2.text.EmojiCompat
-import androidx.emoji2.text.EmojiCompat.LOAD_STRATEGY_MANUAL
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -20,14 +17,12 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
@@ -72,11 +67,6 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     internal lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
 
-    @Inject
-    internal lateinit var mSubscriptionRegistration: SubscriptionRegistration
-
-    @Inject
-    internal lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
     @Inject
     internal lateinit var clientIdRepository: ClientIdRepository
@@ -102,13 +92,6 @@ class MiApplication : Application(), Configuration.Provider {
                 defaultUncaughtExceptionHandler?.uncaughtException(t, e)
             }
         }
-
-        EmojiCompat.init(
-            BundledEmojiCompatConfig(this@MiApplication)
-                .setReplaceAll(true)
-                .setMetadataLoadStrategy(LOAD_STRATEGY_MANUAL)
-        )
-        EmojiCompat.get().load()
 
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
