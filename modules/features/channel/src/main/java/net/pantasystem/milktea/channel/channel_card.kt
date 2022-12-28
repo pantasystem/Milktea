@@ -43,17 +43,14 @@ fun ChannelCard(
     isPaged: Boolean,
     onAction: (ChannelCardAction) -> Unit = {},
 ) {
-    Card(
-        elevation = 4.dp,
+    Card(elevation = 4.dp,
         modifier = Modifier.padding(8.dp),
         shape = RoundedCornerShape(8.dp),
         onClick = {
             onAction.invoke(ChannelCardAction.OnClick(channel))
-        }
-    ) {
+        }) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
 
             ChannelCardHeader(channel = channel)
@@ -69,8 +66,7 @@ fun ChannelCard(
                     modifier = Modifier.weight(1f, true)
                 ) {
                     Text(
-                        channel.name,
-                        fontSize = 18.sp
+                        channel.name, fontSize = 18.sp
                     )
                     if (!channel.description.isNullOrBlank()) {
                         Text(channel.description ?: "", maxLines = 3)
@@ -119,8 +115,7 @@ private fun ChannelCardHeader(channel: Channel) {
         )
 
         ChannelCardAggregateLabel(
-            channel = channel,
-            modifier = Modifier
+            channel = channel, modifier = Modifier
                 .padding(8.dp)
                 .align(Alignment.TopEnd)
         )
@@ -130,38 +125,30 @@ private fun ChannelCardHeader(channel: Channel) {
 @Composable
 @Stable
 private fun ChannelCardActionButtons(
-    channel: Channel,
-    isPaged: Boolean,
-    onAction: (ChannelCardAction) -> Unit
+    channel: Channel, isPaged: Boolean, onAction: (ChannelCardAction) -> Unit
 ) {
     Row {
-        AddToTabButton(
-            isPaged = isPaged,
-            onPressed = {
-                onAction.invoke(
-                    ChannelCardAction.OnToggleTabButtonClicked(channel)
-                )
-            }
-        )
-        if (channel.isFollowing != null) {
-            ToggleFollowButton(
-                isFollowing = channel.isFollowing!!,
-                onChanged = { followed ->
-                    if (followed) {
-                        onAction.invoke(
-                            ChannelCardAction.OnFollowButtonClicked(
-                                channel
-                            )
-                        )
-                    } else {
-                        onAction.invoke(
-                            ChannelCardAction.OnUnFollowButtonClicked(
-                                channel
-                            )
-                        )
-                    }
-                }
+        AddToTabButton(isPaged = isPaged, onPressed = {
+            onAction.invoke(
+                ChannelCardAction.OnToggleTabButtonClicked(channel)
             )
+        })
+        if (channel.isFollowing != null) {
+            ToggleFollowButton(isFollowing = channel.isFollowing!!, onChanged = { followed ->
+                if (followed) {
+                    onAction.invoke(
+                        ChannelCardAction.OnFollowButtonClicked(
+                            channel
+                        )
+                    )
+                } else {
+                    onAction.invoke(
+                        ChannelCardAction.OnUnFollowButtonClicked(
+                            channel
+                        )
+                    )
+                }
+            })
         }
     }
 }
@@ -181,8 +168,7 @@ private fun ChannelCardAggregateLabel(modifier: Modifier = Modifier, channel: Ch
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "users count"
+                    imageVector = Icons.Default.AccountCircle, contentDescription = "users count"
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(stringResource(id = R.string.n_people, channel.usersCount))
@@ -191,8 +177,7 @@ private fun ChannelCardAggregateLabel(modifier: Modifier = Modifier, channel: Ch
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "posts count"
+                    imageVector = Icons.Default.Edit, contentDescription = "posts count"
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(stringResource(id = R.string.n_posts, channel.notesCount))
@@ -204,15 +189,20 @@ private fun ChannelCardAggregateLabel(modifier: Modifier = Modifier, channel: Ch
 @Composable
 private fun ToggleFollowButton(isFollowing: Boolean, onChanged: (Boolean) -> Unit) {
     if (isFollowing) {
-        Button(onClick = {
-            onChanged.invoke(!isFollowing)
-        }) {
+        Button(
+            onClick = {
+                onChanged.invoke(false)
+            },
+            shape = RoundedCornerShape(32.dp)
+        ) {
             Text(stringResource(id = R.string.unfollow))
         }
     } else {
-        OutlinedButton(onClick = {
-            onChanged.invoke(!isFollowing)
-        }) {
+        OutlinedButton(
+            onClick = {
+                onChanged.invoke(true)
+            }, shape = RoundedCornerShape(32.dp)
+        ) {
             Text(stringResource(id = R.string.follow))
         }
     }
@@ -255,8 +245,7 @@ fun PreviewChannelCard() {
                     usersCount = 4,
                     isFollowing = false,
                     hasUnreadNote = false
-                ),
-                isPaged = false
+                ), isPaged = false
             )
         }
         item {
@@ -273,8 +262,7 @@ fun PreviewChannelCard() {
                     usersCount = 4,
                     isFollowing = false,
                     hasUnreadNote = false
-                ),
-                isPaged = false
+                ), isPaged = false
             )
         }
     }

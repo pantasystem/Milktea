@@ -216,22 +216,38 @@ fun UserStateActionButton(
 ) {
     when (userState) {
         FollowState.PENDING_FOLLOW_REQUEST -> {
-            Button(onClick = onClick, modifier = modifier) {
+            Button(
+                onClick = onClick,
+                modifier = modifier,
+                shape = RoundedCornerShape(32.dp)
+            ) {
                 Text(stringResource(id = R.string.follow_approval_pending))
             }
         }
         FollowState.FOLLOWING -> {
-            Button(onClick = onClick, modifier = modifier) {
+            Button(
+                onClick = onClick,
+                modifier = modifier,
+                shape = RoundedCornerShape(32.dp)
+            ) {
                 Text(stringResource(id = R.string.unfollow))
             }
         }
         FollowState.UNFOLLOWING -> {
-            OutlinedButton(onClick = onClick, modifier = modifier) {
+            OutlinedButton(
+                onClick = onClick,
+                modifier = modifier,
+                shape = RoundedCornerShape(32.dp)
+            ) {
                 Text(stringResource(id = R.string.follow))
             }
         }
         FollowState.UNFOLLOWING_LOCKED -> {
-            OutlinedButton(onClick = onClick, modifier = modifier) {
+            OutlinedButton(
+                onClick = onClick,
+                modifier = modifier,
+                shape = RoundedCornerShape(32.dp)
+            ) {
                 Text(stringResource(id = R.string.request_follow_from_u))
             }
         }
