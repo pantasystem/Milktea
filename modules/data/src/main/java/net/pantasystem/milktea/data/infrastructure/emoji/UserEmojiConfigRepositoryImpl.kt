@@ -8,14 +8,14 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
-import net.pantasystem.milktea.model.emoji.EmojiUserSetting
+import net.pantasystem.milktea.model.emoji.UserEmojiConfig
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import javax.inject.Inject
 
 class UserEmojiConfigRepositoryImpl @Inject constructor(
     val reactionUserSettingDao: ReactionUserSettingDao
 ): UserEmojiConfigRepository {
-    override suspend fun saveAll(configs: List<EmojiUserSetting>): Result<Unit> = runCancellableCatching{
+    override suspend fun saveAll(configs: List<UserEmojiConfig>): Result<Unit> = runCancellableCatching{
         withContext(Dispatchers.IO) {
             reactionUserSettingDao.insertAll(configs.map {
                 ReactionUserSetting(
@@ -27,10 +27,10 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findByInstanceDomain(instanceDomain: String): List<EmojiUserSetting> {
+    override suspend fun findByInstanceDomain(instanceDomain: String): List<UserEmojiConfig> {
         return withContext(Dispatchers.IO) {
             reactionUserSettingDao.findByInstanceDomain(instanceDomain)?.map {
-                EmojiUserSetting(
+                UserEmojiConfig(
                     reaction = it.reaction,
                     instanceDomain = it.instanceDomain,
                     weight = it.weight
@@ -39,7 +39,7 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteAll(settings: List<EmojiUserSetting>): Result<Unit> = runCancellableCatching {
+    override suspend fun deleteAll(settings: List<UserEmojiConfig>): Result<Unit> = runCancellableCatching {
         reactionUserSettingDao.deleteAll(settings.map {
             ReactionUserSetting(
                 reaction = it.reaction,
@@ -49,7 +49,7 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
         })
     }
 
-    override suspend fun delete(setting: EmojiUserSetting): Result<Unit> = runCancellableCatching {
+    override suspend fun delete(setting: UserEmojiConfig): Result<Unit> = runCancellableCatching {
         withContext(Dispatchers.IO) {
             reactionUserSettingDao.delete(ReactionUserSetting(
                 reaction = setting.reaction,
@@ -59,10 +59,10 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun observeByInstanceDomain(instanceDomain: String): Flow<List<EmojiUserSetting>> {
+    override fun observeByInstanceDomain(instanceDomain: String): Flow<List<UserEmojiConfig>> {
         return reactionUserSettingDao.observeByInstanceDomain(instanceDomain).map { settings ->
             settings.map {
-                EmojiUserSetting(
+                UserEmojiConfig(
                     reaction = it.reaction,
                     instanceDomain = it.instanceDomain,
                     weight = it.weight

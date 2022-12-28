@@ -7,10 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSetting
-import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.UserEmojiConfig
+import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
@@ -23,7 +23,7 @@ class ReactionChoicesViewModel @Inject constructor(
     accountStore: AccountStore,
     private val metaRepository: MetaRepository,
     private val reactionHistoryDao: ReactionHistoryRepository,
-    private val reactionUserSettingDao: ReactionUserSettingDao,
+    private val userEmojiConfigRepository: UserEmojiConfigRepository,
 ) : ViewModel() {
 
 
@@ -41,7 +41,7 @@ class ReactionChoicesViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val userSetting =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            reactionUserSettingDao.observeByInstanceDomain(ac.normalizedInstanceDomain)
+            userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
         }
 
     // 検索時の候補
@@ -70,7 +70,7 @@ data class ReactionSelectionUiState(
     val account: Account?,
     val meta: Meta?,
     val reactionHistoryCounts: List<ReactionHistoryCount>,
-    val userSettingReactions: List<ReactionUserSetting>,
+    val userSettingReactions: List<UserEmojiConfig>,
 ) {
 
 
