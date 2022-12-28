@@ -1,6 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -110,6 +113,14 @@ class DraftNoteRepositoryImpl @Inject constructor(
                 relation.toDraftNote(relation.draftNoteDTO.accountId)
             }
         }
+    }
+
+    override fun observeByAccountId(accountId: Long): Flow<List<DraftNote>> {
+        return draftNoteDao.observeDraftNotesRelation(accountId).map { notes ->
+            notes.map {
+                it.toDraftNote(accountId)
+            }
+        }.flowOn(Dispatchers.IO)
     }
 
 

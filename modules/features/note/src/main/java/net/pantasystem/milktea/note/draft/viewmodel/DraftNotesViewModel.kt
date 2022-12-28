@@ -10,7 +10,6 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
@@ -20,7 +19,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DraftNotesViewModel @Inject constructor(
-    val draftNoteDao: DraftNoteDao,
     val accountStore: AccountStore,
     val loggerFactory: Logger.Factory,
     val draftNoteRepository: DraftNoteRepository,
@@ -37,11 +35,7 @@ class DraftNotesViewModel @Inject constructor(
     val draftNotesState: StateFlow<ResultState<List<DraftNote>>> = accountStore.state.mapNotNull {
         it.currentAccountId
     }.flatMapLatest { currentAccountId ->
-        draftNoteDao.observeDraftNotesRelation(currentAccountId).map { list ->
-            list.map { relation ->
-                relation.toDraftNote(currentAccountId)
-            }
-        }.map {
+        draftNoteRepository.observeByAccountId(currentAccountId).map {
             @Suppress("USELESS_CAST")
             ResultState.Fixed(StateContent.Exist(it)) as ResultState<List<DraftNote>>
         }
