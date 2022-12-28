@@ -390,7 +390,7 @@
 
     <string name="groups">Groups</string>
 
-    <string name="is_enable_instance_ticker">Use Instance Ticker</string>
+    <string name="is_enable_instance_ticker">Show Instance information</string>
     <string name="successfully_created_schedule_note">Successfully created a schedule post</string>
     <string name="switch_account">Switch Account</string>
     <string name="mute_thread">Mute thread</string>

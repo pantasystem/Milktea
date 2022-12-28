@@ -399,7 +399,7 @@
 <!--    <string name="n_posts">%d投稿</string>-->
 <!--    <string name="owned">私の</string>-->
     <string name="groups">グループ一覧</string>
-    <string name="is_enable_instance_ticker">Instance Tickerを使う</string>
+    <string name="is_enable_instance_ticker">インスタンス情報を表示</string>
     <string name="successfully_created_schedule_note">スケジュール投稿が正常に作成されました</string>
     <string name="account">アカウント</string>
     <string name="switch_account">アカウント切り替え</string>
