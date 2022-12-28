@@ -11,4 +11,5 @@
     <string name="parameter_error">パラメーターエラー</string>
     <string name="timeline_unauthorized_error">未認証エラー</string>
     <string name="reauthenticate">再認証する</string>
+    <string name="expand">展開</string>
 </resources>

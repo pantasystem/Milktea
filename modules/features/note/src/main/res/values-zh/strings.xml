@@ -11,4 +11,5 @@
     <string name="parameter_error">参数错误</string>
     <string name="timeline_unauthorized_error">未认证错误（Unauthorized）</string>
     <string name="reauthenticate">重新认证</string>
+    <string name="expand">展開</string>
 </resources>
