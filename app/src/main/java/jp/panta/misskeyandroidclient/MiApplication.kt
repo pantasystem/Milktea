@@ -10,7 +10,6 @@ import androidx.work.WorkManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
-import jp.panta.misskeyandroidclient.util.DebuggerSetupManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -71,8 +70,6 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     internal lateinit var clientIdRepository: ClientIdRepository
 
-    @Inject
-    internal lateinit var debuggerSetupManager: DebuggerSetupManager
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -81,7 +78,6 @@ class MiApplication : Application(), Configuration.Provider {
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
-        debuggerSetupManager.setup(this)
 
         val defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         val mainThreadId = Looper.getMainLooper().thread.id
@@ -137,24 +133,7 @@ class MiApplication : Application(), Configuration.Provider {
         }.launchIn(applicationScope + Dispatchers.IO)
 
 
-        WorkManager.getInstance(this).apply {
-            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
-            enqueueUniquePeriodicWork(
-                "syncMeta",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncMetaWorker.createPeriodicWorkRequest()
-            )
-            enqueueUniquePeriodicWork(
-                "syncLoggedInUsers",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
-            )
-            enqueueUniquePeriodicWork(
-                "scheduleAuthInstancePostWorker",
-                ExistingPeriodicWorkPolicy.REPLACE,
-                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
-            )
-        }
+        enqueueWorkManagers()
 
         applicationScope.launch {
             mSettingStore.configState.map {
@@ -188,4 +167,25 @@ class MiApplication : Application(), Configuration.Provider {
             .build()
     }
 
+    private fun enqueueWorkManagers() {
+        WorkManager.getInstance(this).apply {
+            enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
+            enqueueUniquePeriodicWork(
+                "syncMeta",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncMetaWorker.createPeriodicWorkRequest()
+            )
+            enqueueUniquePeriodicWork(
+                "syncLoggedInUsers",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncLoggedInUserInfoWorker.createPeriodicWorkRequest(),
+            )
+            enqueueUniquePeriodicWork(
+                "scheduleAuthInstancePostWorker",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                ScheduleAuthInstancesPostWorker.createPeriodicWorkRequest(),
+            )
+        }
+
+    }
 }

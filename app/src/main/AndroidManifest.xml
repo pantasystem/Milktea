@@ -38,8 +38,11 @@
             <meta-data
                     android:name="jp.panta.misskeyandroidclient.startup.EmojiCompatInitializer"
                     android:value="androidx.startup"
-
                 />
+            <meta-data
+                    android:name="jp.panta.misskeyandroidclient.startup.DebuggerSetupInitializer"
+                    android:value="androidx.startup"
+                    />
         </provider>
 
         <activity
