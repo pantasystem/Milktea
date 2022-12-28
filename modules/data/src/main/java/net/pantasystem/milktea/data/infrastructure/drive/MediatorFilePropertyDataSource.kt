@@ -8,7 +8,6 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.FilePropertyDataSourceState
 import net.pantasystem.milktea.model.drive.FilePropertyNotFoundException
 import javax.inject.Inject
 
@@ -22,9 +21,6 @@ class MediatorFilePropertyDataSource @Inject constructor(
         loggerFactory.create("MediatorFilePropertyDataSource")
     }
 
-
-    override val state: StateFlow<FilePropertyDataSourceState>
-        get() = inMemoryFilePropertyDataSource.state
 
     override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCancellableCatching {
         withContext(Dispatchers.IO) {
@@ -176,6 +172,12 @@ class MediatorFilePropertyDataSource @Inject constructor(
             return@withContext ids.mapNotNull {
                 map[it]
             }
+        }
+    }
+
+    override suspend fun clearUnusedCaches(): Result<Unit> = runCancellableCatching {
+        withContext(Dispatchers.IO) {
+            driveFileRecordDao.deleteUnUsedFiles()
         }
     }
 
