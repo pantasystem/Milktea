@@ -20,7 +20,7 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate

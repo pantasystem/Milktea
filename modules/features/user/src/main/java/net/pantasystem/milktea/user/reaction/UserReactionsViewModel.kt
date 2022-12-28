@@ -12,7 +12,7 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher

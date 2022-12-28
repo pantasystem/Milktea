@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.data.gettters.NoteRelationGetter
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter

@@ -7,6 +7,7 @@ import net.pantasystem.milktea.data.infrastructure.toNotification
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
