@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.account
 
+import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -25,7 +26,12 @@ class SignOutUseCaseImpl @Inject constructor(
         }.mapCancellableCatching {
             accountRepository.delete(account)
         }.mapCancellableCatching {
-            socketWithAccountProvider.get(account.accountId)?.disconnect()
+            val socket = socketWithAccountProvider.get(account.accountId)
+            if (socket is SocketImpl) {
+                socket.destroy()
+            } else {
+                socketWithAccountProvider.get(account.accountId)?.disconnect()
+            }
         }.mapCancellableCatching {
             accountStore.initialize()
         }

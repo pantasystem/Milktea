@@ -10,15 +10,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.mapCancellableCatching
-import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.sw.register.SubscriptionUnRegistration
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -32,9 +29,8 @@ class AccountViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
-    private val accountRepository: AccountRepository,
-    private val subscriptionUnRegistration: SubscriptionUnRegistration,
     private val metaRepository: MetaRepository,
+    private val signOutUseCase: SignOutUseCase,
 ) : ViewModel() {
 
 
@@ -152,12 +148,7 @@ class AccountViewModel @Inject constructor(
 
     fun signOut(account: Account) {
         viewModelScope.launch {
-            runCancellableCatching {
-                subscriptionUnRegistration
-                    .unregister(account.accountId)
-            }.mapCancellableCatching {
-                accountRepository.delete(account)
-            }.onFailure { e ->
+            signOutUseCase(account).onFailure { e ->
                 logger.error("ログアウト処理失敗", e)
             }
         }

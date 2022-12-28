@@ -89,19 +89,6 @@ class MiApplication : Application(), Configuration.Provider {
         val mainEventDispatcher = mainEventDispatcherFactory.create()
         channelAPIMainEventDispatcherAdapter(mainEventDispatcher)
 
-        mAccountRepository.addEventListener { ev ->
-            applicationScope.launch {
-                try {
-                    if (ev is AccountRepository.Event.Deleted) {
-                        mSocketWithAccountProvider.get(ev.accountId)?.disconnect()
-                    }
-                    mAccountStore.initialize()
-                } catch (e: Exception) {
-                    logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
-                }
-            }
-        }
-
         applicationScope.launch {
             try {
                 mAccountStore.initialize()
