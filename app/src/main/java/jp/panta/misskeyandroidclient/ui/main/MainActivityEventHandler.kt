@@ -43,14 +43,14 @@ internal class MainActivityEventHandler(
     val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
     private val configStore: SettingStore,
-    private val draftNoteService: DraftNoteService
+    private val draftNoteService: DraftNoteService,
 ) {
 
 
     fun setup() {
         // NOTE: 各バージョンに合わせMenuを制御している
-        mainViewModel.getCurrentAccountMisskeyAPI().filterNotNull().onEach { api ->
-            changeNavMenuVisibilityFromAPIVersion(api)
+        accountStore.observeCurrentAccount.filterNotNull().onEach {
+            changeNavMenuVisibilityFromAPIVersion(it)
         }.catch {
             Log.e("MainActivity", "check version error", it)
         }.launchIn(lifecycleScope)

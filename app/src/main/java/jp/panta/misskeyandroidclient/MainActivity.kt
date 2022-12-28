@@ -28,6 +28,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common.ui.ToolbarSetter
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.MainNavigation
@@ -35,7 +36,7 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
+import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.note.renote.RenoteResultHandler
 import net.pantasystem.milktea.note.renote.RenoteViewModel
@@ -74,6 +75,9 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
 
     @Inject
     lateinit var draftNoteService: DraftNoteService
+
+    @Inject
+    lateinit var featureEnables: FeatureEnables
 
     private val mainViewModel: MainViewModel by viewModels()
 
@@ -135,7 +139,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             createNoteWorkerExecutor = createNoteWorkerExecutor,
             reportViewModel = reportViewModel,
             requestPostNotificationsPermissionLauncher = requestPermissionLauncher,
-            changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView),
+            changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView, featureEnables),
             configStore = settingStore,
             draftNoteService = draftNoteService,
         ).setup()
