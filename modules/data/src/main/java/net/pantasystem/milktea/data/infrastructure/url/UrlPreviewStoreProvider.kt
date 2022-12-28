@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.url
 
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
@@ -17,7 +18,7 @@ class UrlPreviewStoreProviderImpl @Inject constructor(
     val urlPreviewDAO: UrlPreviewDAO,
     val accountStore: AccountStore,
     private val misskeyAPIServiceBuilder: MisskeyAPIServiceBuilder,
-
+    private val okHttpClientProvider: OkHttpClientProvider,
     ) : UrlPreviewStoreProvider{
 
     private val mUrlPreviewStoreInstanceBaseUrlMap = ConcurrentHashMap<String, UrlPreviewStore>()
@@ -38,7 +39,8 @@ class UrlPreviewStoreProviderImpl @Inject constructor(
                     urlPreviewDAO,
                     accountUrl,
                     accountStore.state.value.currentAccount,
-                    misskeyAPIServiceBuilder
+                    misskeyAPIServiceBuilder,
+                    okHttpClientProvider,
                 ).create()
             }
             mUrlPreviewStoreInstanceBaseUrlMap[accountUrl] = store
