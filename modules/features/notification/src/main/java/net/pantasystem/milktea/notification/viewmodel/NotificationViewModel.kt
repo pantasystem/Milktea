@@ -17,8 +17,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.NotificationCacheAdder
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository

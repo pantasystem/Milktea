@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.streaming
 
 import net.pantasystem.milktea.api_streaming.ChannelBody
-import net.pantasystem.milktea.data.gettters.NotificationCacheAdder
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
 import net.pantasystem.milktea.model.account.Account
 
 

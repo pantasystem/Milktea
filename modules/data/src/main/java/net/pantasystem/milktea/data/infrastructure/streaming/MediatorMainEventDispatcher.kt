@@ -10,9 +10,9 @@ import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
 import net.pantasystem.milktea.data.infrastructure.messaging.MessageDataSource
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -27,8 +27,8 @@ class MediatorMainEventDispatcher(val logger: Logger) {
         val messageDataSource: MessageDataSource,
         val unreadNotificationDAO: UnreadNotificationDAO,
         val userDataSource: UserDataSource,
-        val notificationRelationGetter: NotificationRelationGetter,
-        val streamingMainMessageEventDispatcher: StreamingMainMessageEventDispatcher
+        val streamingMainMessageEventDispatcher: StreamingMainMessageEventDispatcher,
+        val notificationCacheAdder: NotificationCacheAdder,
     ) {
 
         fun create(): MediatorMainEventDispatcher {
@@ -38,8 +38,8 @@ class MediatorMainEventDispatcher(val logger: Logger) {
                 )
                 .attach(
                     StreamingMainNotificationEventDispatcher(
-                        notificationRelationGetter,
-                        unreadNotificationDAO
+                        unreadNotificationDAO,
+                        notificationCacheAdder,
                     )
                 )
                 .attach(StreamingMainUserEventDispatcher(userDataSource))
