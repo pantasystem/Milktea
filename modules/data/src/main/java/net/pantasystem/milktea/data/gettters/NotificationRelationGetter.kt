@@ -13,17 +13,14 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class NotificationRelationGetter @Inject constructor(
+class NotificationCacheAdder @Inject constructor(
     private val userDataSource: UserDataSource,
     private val notificationDataSource: NotificationDataSource,
     private val noteRelationGetter: NoteRelationGetter,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val groupDataSource: GroupDataSource,
 ) {
-
-
-    suspend fun get(account: Account, notificationDTO: NotificationDTO): NotificationRelation {
+    suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO): NotificationRelation {
         val user = notificationDTO.user?.toUser(account, false)
         if (user != null) {
             userDataSource.add(user)
@@ -42,6 +39,14 @@ class NotificationRelationGetter @Inject constructor(
             noteRelation?.getOrNull()
         )
     }
+}
+
+@Singleton
+class NotificationRelationGetter @Inject constructor(
+    private val userDataSource: UserDataSource,
+    private val notificationDataSource: NotificationDataSource,
+    private val noteRelationGetter: NoteRelationGetter,
+) {
 
     suspend fun get(notificationId: Notification.Id): NotificationRelation {
         val notification = notificationDataSource.get(notificationId)

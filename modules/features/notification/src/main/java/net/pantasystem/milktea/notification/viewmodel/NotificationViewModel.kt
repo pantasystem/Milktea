@@ -17,7 +17,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.gettters.NotificationRelationGetter
+import net.pantasystem.milktea.data.gettters.NotificationCacheAdder
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
@@ -41,7 +41,7 @@ class NotificationViewModel @Inject constructor(
     private val noteTranslationStore: NoteTranslationStore,
     private val channelAPIAdapterProvider: ChannelAPIWithAccountProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val notificationRelationGetter: NotificationRelationGetter,
+    private val notificationCacheAdder: NotificationCacheAdder,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val unreadNotificationDAO: UnreadNotificationDAO,
     private val groupRepository: GroupRepository,
@@ -82,7 +82,7 @@ class NotificationViewModel @Inject constructor(
             }.filterNotNull().map {
                 ac to it
             }.map {
-                it.first to notificationRelationGetter.get(
+                it.first to notificationCacheAdder.addAndConvert(
                     it.first,
                     it.second.body
                 )
@@ -269,7 +269,7 @@ class NotificationViewModel @Inject constructor(
     }
 
     private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
-        return notificationRelationGetter.get(account, this)
+        return notificationCacheAdder.addAndConvert(account, this)
     }
 
     private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
