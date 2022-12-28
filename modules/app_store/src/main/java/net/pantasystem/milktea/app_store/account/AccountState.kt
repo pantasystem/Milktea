@@ -39,6 +39,8 @@ data class AccountState(
                 accounts.toMutableList().also { list ->
                     list.add(account)
                 }
+            }.distinctBy {
+                it.accountId
             },
             currentAccountId = if (accounts.isEmpty()) account.accountId else currentAccountId
         )
