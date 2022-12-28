@@ -16,12 +16,12 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
-import net.pantasystem.milktea.data.infrastructure.drive.ClearUnUsedDriveFileCacheJob
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
+import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
 import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
@@ -63,9 +63,6 @@ class MiApplication : Application(), Configuration.Provider {
         lf.create("MiApplication")
     }
 
-    @Inject
-    internal lateinit var clearDriveCacheJob: ClearUnUsedDriveFileCacheJob
-
 
     @Inject
     internal lateinit var clientIdRepository: ClientIdRepository
@@ -102,12 +99,6 @@ class MiApplication : Application(), Configuration.Provider {
                 } catch (e: Exception) {
                     logger.error("アカウントの更新があったのでStateを更新しようとしたところ失敗しました。", e)
                 }
-            }
-        }
-
-        applicationScope.launch(Dispatchers.IO) {
-            clearDriveCacheJob.checkAndClear().onFailure {
-                logger.error("ドライブのキャッシュのクリーンアップに失敗しました", it)
             }
         }
 
@@ -170,6 +161,7 @@ class MiApplication : Application(), Configuration.Provider {
     private fun enqueueWorkManagers() {
         WorkManager.getInstance(this).apply {
             enqueue(RegisterAllSubscriptionRegistration.createWorkRequest())
+            enqueue(CleanupUnusedDriveCacheWorker.createOneTimeRequest())
             enqueueUniquePeriodicWork(
                 "syncMeta",
                 ExistingPeriodicWorkPolicy.REPLACE,
