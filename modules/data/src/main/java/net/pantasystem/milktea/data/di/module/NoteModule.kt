@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.di.module
+package net.pantasystem.milktea.data.di.module
 
 import dagger.Binds
 import dagger.Module
@@ -13,13 +13,13 @@ import net.pantasystem.milktea.data.infrastructure.notes.draft.DraftNoteReposito
 import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
-import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingService
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
+import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
 import javax.inject.Singleton
 
 @Module
