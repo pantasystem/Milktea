@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.user.db.*
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.Acct
@@ -16,13 +17,14 @@ import javax.inject.Inject
 class MediatorUserDataSource @Inject constructor(
     private val userDao: UserDao,
     private val inMem: InMemoryUserDataSource,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
 ) : UserDataSource {
 
     val logger = loggerFactory.create("MediatorUserDataSource")
 
     override suspend fun get(userId: User.Id): Result<User> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             inMem.get(userId).getOrNull()
                 ?: (userDao.get(userId.accountId, userId.id)?.toModel()?.also {
                     inMem.add(it).getOrThrow()
@@ -31,7 +33,7 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             inMem.get(accountId, userName, host).getOrNull()
                 ?: (if (host == null) {
                     userDao.getByUserName(accountId, userName)
@@ -44,7 +46,7 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean): Result<List<User>> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val list = serverIds.distinct().chunked(100).map {
                 userDao.getInServerIds(accountId, serverIds).map {
                     it.toModel()
@@ -64,7 +66,7 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override suspend fun add(user: User): Result<AddResult> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val existsUserInMemory = inMem.get(user.id).getOrNull()
             if (existsUserInMemory == user) {
                 return@withContext AddResult.Canceled
@@ -227,7 +229,7 @@ class MediatorUserDataSource @Inject constructor(
             serverIds.mapNotNull {
                 hash[it]
             }
-        }.distinctUntilChanged().flowOn(Dispatchers.IO).catch {
+        }.distinctUntilChanged().flowOn(ioDispatcher).catch {
             logger.error("observeIn error", it)
             throw it
         }
@@ -238,7 +240,7 @@ class MediatorUserDataSource @Inject constructor(
             it?.toModel()
         }.onEach {
             inMem.add(it)
-        }.flowOn(Dispatchers.IO).distinctUntilChanged().catch {
+        }.flowOn(ioDispatcher).distinctUntilChanged().catch {
             logger.error("observe by userId error", it)
             throw it
         }
@@ -258,7 +260,7 @@ class MediatorUserDataSource @Inject constructor(
             it.toModel()
         }.onEach {
             inMem.add(it)
-        }.flowOn(Dispatchers.IO).distinctUntilChanged().catch {
+        }.flowOn(ioDispatcher).distinctUntilChanged().catch {
             logger.error("observe by acct error, acct:$acct", it)
             throw it
         }
@@ -280,7 +282,7 @@ class MediatorUserDataSource @Inject constructor(
         nextId: String?,
         host: String?,
     ): Result<List<User>> = runCancellableCatching {
-         withContext(Dispatchers.IO) {
+         withContext(ioDispatcher) {
              if (nextId == null) {
                  if (host.isNullOrBlank()) {
                      userDao.searchByNameOrUserName(
