@@ -1,12 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.notes.draft
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.from
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 class DraftNoteRepositoryImpl @Inject constructor(
     val draftNoteDao: DraftNoteDao,
-    val loggerFactory: Logger.Factory
+    val loggerFactory: Logger.Factory,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : DraftNoteRepository {
     val logger by lazy {
         loggerFactory.create("DraftNoteRepositoryImpl")
@@ -25,7 +27,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
 
     override suspend fun save(draftNote: DraftNote): Result<DraftNote> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 val id = draftNoteDao.insert(DraftNoteDTO.make(draftNote))
 
                 logger.debug("draftNoteId:$id")
@@ -94,7 +96,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(draftNoteId: Long): Result<Unit> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
 
                 val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
 
@@ -108,7 +110,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
 
     override suspend fun findOne(draftNoteId: Long): Result<DraftNote> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 val relation = draftNoteDao.findOne(draftNoteId) ?: throw NoSuchElementException()
                 relation.toDraftNote(relation.draftNoteDTO.accountId)
             }
@@ -120,7 +122,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
             notes.map {
                 it.toDraftNote(accountId)
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
     }
 
 
