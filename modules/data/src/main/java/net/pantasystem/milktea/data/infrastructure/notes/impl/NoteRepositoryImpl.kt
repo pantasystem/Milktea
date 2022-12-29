@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
@@ -32,7 +33,8 @@ class NoteRepositoryImpl @Inject constructor(
     private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val getAccount: GetAccount,
-    private val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider
+    private val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
 
     private val logger = loggerFactory.create("NoteRepositoryImpl")
@@ -41,7 +43,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val task = PostNoteTask(
                 createNote,
                 createNote.author,
@@ -66,7 +68,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(noteId: Note.Id): Result<Unit> = runCancellableCatching{
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).delete(
                 DeleteNote(i = account.token, noteId = noteId.noteId)
@@ -75,7 +77,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun find(noteId: Note.Id): Result<Note> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
 
             var note = try {
@@ -110,7 +112,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findIn(noteIds: List<Note.Id>): List<Note> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val notes = noteDataSource.getIn(noteIds).getOrThrow()
             val notExistsIds = noteIds.filterNot {
                 notes.any { note -> note.id == it }
@@ -136,7 +138,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(createReaction.noteId.accountId)
             val note = find(createReaction.noteId).getOrThrow()
 
@@ -157,7 +159,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val note = find(noteId).getOrThrow()
             val account = getAccount.get(noteId.accountId)
             postUnReaction(noteId)
@@ -169,7 +171,7 @@ class NoteRepositoryImpl @Inject constructor(
 
 
     override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).vote(
                 Vote(
@@ -244,7 +246,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             val dtoList = misskeyAPIProvider.get(account).children(
                 NoteRequest(
@@ -260,7 +262,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             val dtoList = misskeyAPIProvider.get(account).conversation(
                 NoteRequest(
@@ -276,7 +278,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             val note = misskeyAPIProvider.get(account).showNote(
                 NoteRequest(
@@ -289,7 +291,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).createThreadMute(
                 ToggleThreadMuteRequest(
@@ -301,7 +303,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account).deleteThreadMute(
                 ToggleThreadMuteRequest(
@@ -313,7 +315,7 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
                 NoteRequest(
