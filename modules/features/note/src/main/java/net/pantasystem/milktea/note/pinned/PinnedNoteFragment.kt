@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
@@ -25,6 +26,7 @@ import net.pantasystem.milktea.note.timeline.TimelineListAdapter
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @AndroidEntryPoint
 class PinnedNoteFragment : Fragment(R.layout.fragment_pinned_notes) {
@@ -92,5 +94,12 @@ class PinnedNoteFragment : Fragment(R.layout.fragment_pinned_notes) {
                 }
             }
         }
+    }
+}
+
+@Singleton
+class UserPinnedNotesFragmentFactoryImpl @Inject constructor(): UserPinnedNotesFragmentFactory {
+    override fun create(userId: User.Id): Fragment {
+        return PinnedNoteFragment.newInstance(userId)
     }
 }

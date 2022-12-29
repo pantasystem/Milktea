@@ -1,13 +1,16 @@
 package jp.panta.misskeyandroidclient.di.module
 
 import android.content.Context
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
+import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.note.pinned.UserPinnedNotesFragmentFactoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -22,4 +25,12 @@ object NoteModule {
     }
 
 
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class NoteBindModule {
+    @Binds
+    @Singleton
+    abstract fun bindUserPinnedNotesFragmentFactory(impl: UserPinnedNotesFragmentFactoryImpl): UserPinnedNotesFragmentFactory
 }
