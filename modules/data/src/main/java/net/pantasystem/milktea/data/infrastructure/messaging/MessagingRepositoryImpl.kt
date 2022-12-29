@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -21,13 +22,14 @@ class MessagingRepositoryImpl @Inject constructor(
     private val groupDataSource: GroupDataSource,
     private val userDataSource: UserDataSource,
     private val messageAdder: MessageAdder,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessagingRepository {
 
     override suspend fun findMessageSummaries(
         accountId: Long,
         isGroup: Boolean
     ): Result<List<MessageRelation>> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(accountId)
             val request = RequestMessageHistory(
                 i = account.token, group = isGroup, limit = 100
