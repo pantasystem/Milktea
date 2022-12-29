@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -24,6 +25,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -38,6 +40,9 @@ import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
@@ -140,6 +145,8 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var settingStore: SettingStore
 
+    @Inject
+    lateinit var configRepository: LocalConfigRepository
 
     @Inject
     lateinit var applyTheme: ApplyTheme
@@ -303,6 +310,16 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                configRepository.observe().distinctUntilChangedBy {
+                    it.theme
+                }.collect {
+                    applyRemoteUserStateLayoutBackgroundColor(binding, it)
+                }
+            }
+        }
+
 
     }
 
@@ -392,6 +409,16 @@ class UserDetailActivity : AppCompatActivity() {
             return
         }
         finish()
+    }
+
+    private fun applyRemoteUserStateLayoutBackgroundColor(binding: ActivityUserDetailBinding, config: Config) {
+        val typed = TypedValue()
+        if (config.theme is Theme.Bread) {
+            theme.resolveAttribute(R.attr.colorSurface, typed, true)
+        } else {
+            theme.resolveAttribute(R.attr.background, typed, true)
+        }
+        binding.remoteUserState.setBackgroundColor(typed.data)
     }
 
 
