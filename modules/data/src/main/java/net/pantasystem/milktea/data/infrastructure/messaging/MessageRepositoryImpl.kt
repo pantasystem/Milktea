@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.messaging.CreateMessage
@@ -19,11 +20,12 @@ class MessageRepositoryImpl @Inject constructor(
     val messageDataSource: MessageDataSource,
     val accountRepository: AccountRepository,
     val messageAdder: MessageAdder,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessageRepository {
 
     @Throws(IOException::class)
     override suspend fun read(messageId: Message.Id): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(messageId.accountId).getOrThrow()
             val result = misskeyAPIProvider.get(account).readMessage(
                 MessageAction(
@@ -48,7 +50,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     @Throws(IOException::class)
     override suspend fun create(createMessage: CreateMessage): Message {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(createMessage.accountId).getOrThrow()
             val i = account.token
             val action = when (createMessage) {
@@ -84,7 +86,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     @Throws(IOException::class)
     override suspend fun delete(messageId: Message.Id): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(messageId.accountId).getOrThrow()
             val result = misskeyAPIProvider.get(account).deleteMessage(
                 MessageAction(
