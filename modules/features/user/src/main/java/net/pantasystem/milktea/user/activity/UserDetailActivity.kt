@@ -37,7 +37,6 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
@@ -143,8 +142,6 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var settingStore: SettingStore
 
-    @Inject
-    lateinit var misskeyAPIProvider: MisskeyAPIProvider
 
     @Inject
     lateinit var applyTheme: ApplyTheme
