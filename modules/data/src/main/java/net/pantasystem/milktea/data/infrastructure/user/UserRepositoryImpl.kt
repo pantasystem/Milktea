@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
@@ -9,6 +10,7 @@ import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -33,6 +35,7 @@ class UserRepositoryImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val loggerFactory: Logger.Factory,
+    @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
