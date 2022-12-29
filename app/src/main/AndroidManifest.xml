@@ -99,7 +99,6 @@
             </intent-filter>
         </activity>
         <activity android:name="net.pantasystem.milktea.note.DraftNotesActivity" />
-        <activity android:name="net.pantasystem.milktea.user.activity.SortedUsersActivity" />
         <activity android:name="net.pantasystem.milktea.antenna.AntennaEditorActivity" />
         <activity android:name="net.pantasystem.milktea.antenna.AntennaListActivity" />
         <activity android:name="net.pantasystem.milktea.setting.activities.PageSettingActivity" />
