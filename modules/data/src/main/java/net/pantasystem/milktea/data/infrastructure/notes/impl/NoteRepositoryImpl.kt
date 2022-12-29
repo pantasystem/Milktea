@@ -102,7 +102,7 @@ class NoteRepositoryImpl @Inject constructor(
                 }
             } catch (e: APIError.NotFoundException) {
                 // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
-                noteDataSource.remove(noteId)
+                noteDataSource.delete(noteId)
                 null
             }
             note ?: throw NoteNotFoundException(noteId)
@@ -123,7 +123,9 @@ class NoteRepositoryImpl @Inject constructor(
                 noteDataSource.get(noteId).fold(
                     onSuccess = { true },
                     onFailure = {
-                        it is NoteDeletedException
+                        // NOTE: 削除済みとキャッシュ上からも削除済みのケースの場合はFetchしない。
+                        // NOTE: Fetchしない理由としてはうっかりバグが発生してAPIに過剰にリクエストを送信してしまう可能性があるから
+                        it is NoteDeletedException || it is NoteRemovedException
                     }
                 )
             }
@@ -232,7 +234,7 @@ class NoteRepositoryImpl @Inject constructor(
                         }
                     } catch (e: Throwable) {
                         if (e is APIError.NotFoundException) {
-                            noteDataSource.remove(noteId)
+                            noteDataSource.delete(noteId)
                         }
                         null
                     }

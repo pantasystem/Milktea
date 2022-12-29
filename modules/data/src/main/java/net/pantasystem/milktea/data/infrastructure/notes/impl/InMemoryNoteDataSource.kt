@@ -23,6 +23,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
     private val _state = MutableStateFlow(NoteDataSourceState(emptyMap()))
 
     private var deleteNoteIds = mutableSetOf<Note.Id>()
+    private var removedNoteIds = mutableSetOf<Note.Id>()
 
     override val state: StateFlow<NoteDataSourceState>
         get() = _state
@@ -46,6 +47,9 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
         mutex.withLock{
             if (deleteNoteIds.contains(noteId)) {
                 throw NoteDeletedException(noteId)
+            }
+            if (removedNoteIds.contains(noteId)) {
+                throw NoteRemovedException(noteId)
             }
             notes[noteId]
                 ?: throw NoteNotFoundException(noteId)
@@ -80,11 +84,19 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
         }
     }
 
+    override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
+        mutex.withLock{
+            val n = this.notes[noteId]
+            notes = notes - noteId
+            removedNoteIds.add(noteId)
+            n != null
+        }
+    }
     /**
      * @param noteId 削除するNoteのid
      * @return 実際に削除されるとtrue、そもそも存在していなかった場合にはfalseが返されます
      */
-    override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
+    override suspend fun delete(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         suspend fun delete(noteId: Note.Id): Boolean {
             mutex.withLock{
                 val n = this.notes[noteId]
@@ -102,18 +114,18 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
 
     }
 
-    override suspend fun removeByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
+    override suspend fun deleteByUserId(userId: User.Id): Result<Int> = runCancellableCatching {
         val result = mutex.withLock {
             notes.values.filter {
                 it.userId == userId
             }.mapNotNull {
-                if(this.remove(it.id).getOrThrow()) {
+                if(this.delete(it.id).getOrThrow()) {
                     it
                 }else null
             }
         }
         result.mapNotNull {
-            remove(it.id).getOrNull()
+            delete(it.id).getOrNull()
         }.count ()
     }
 

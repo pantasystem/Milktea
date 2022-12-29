@@ -59,6 +59,14 @@ interface NoteDataSource {
      * これを実行すると削除フラグが立ち、
      * 次からgetなどの関数にアクセスすると、NoteDeletedExceptionの例外が投げられる
      */
+    suspend fun delete(noteId: Note.Id) : Result<Boolean>
+
+    /**
+     * @param noteId 削除対象のNoteのId
+     * キャッシュ上のノートを削除する。
+     * これを実行するとキャッシュ削除フラグが立ち、
+     * 次からgetなどの関数にアクセスすると、NoteDeletedExceptionの例外が投げられる
+     */
     suspend fun remove(noteId: Note.Id) : Result<Boolean>
 
     suspend fun add(note: Note) : Result<AddResult>
@@ -70,7 +78,7 @@ interface NoteDataSource {
      * @param userId 対称のUser#id
      * @return 削除されたNote数
      */
-    suspend fun removeByUserId(userId: User.Id) : Result<Int>
+    suspend fun deleteByUserId(userId: User.Id) : Result<Int>
 
     fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>>
 

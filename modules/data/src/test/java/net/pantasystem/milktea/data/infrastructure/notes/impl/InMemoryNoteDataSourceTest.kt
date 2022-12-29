@@ -1,10 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.runBlocking
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteDeletedException
-import net.pantasystem.milktea.model.notes.NoteNotFoundException
-import net.pantasystem.milktea.model.notes.make
+import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
 import org.junit.Assert
 import org.junit.Test
@@ -15,10 +12,22 @@ class InMemoryNoteDataSourceTest {
     fun get_ThrowsNoteDeletedExceptionGiveDeletedNote(): Unit = runBlocking {
         val noteDataSource = InMemoryNoteDataSource()
         val id = Note.Id(0L, "testId")
-        noteDataSource.remove(id)
+        noteDataSource.delete(id)
         val result = noteDataSource.get(id)
         Assert.assertNotNull(result.exceptionOrNull())
         Assert.assertThrows(NoteDeletedException::class.java) {
+            result.getOrThrow()
+        }
+    }
+
+    @Test
+    fun get_ThrowsNoteRemovedExceptionGiveRemovedNote(): Unit = runBlocking {
+        val noteDataSource = InMemoryNoteDataSource()
+        val id = Note.Id(0L, "testId")
+        noteDataSource.remove(id)
+        val result = noteDataSource.get(id)
+        Assert.assertNotNull(result.exceptionOrNull())
+        Assert.assertThrows(NoteRemovedException::class.java) {
             result.getOrThrow()
         }
     }
