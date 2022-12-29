@@ -7,16 +7,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.notes.FindPinnedNoteUseCase
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelationGetter
+import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
@@ -36,12 +36,18 @@ class PinnedNotesViewModel @Inject constructor(
     val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     val noteTranslationStore: NoteTranslationStore,
     val noteRelationGetter: NoteRelationGetter,
+    val noteRepository: NoteRepository,
+    val loggerFactory: Logger.Factory,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
         const val EXTRA_ACCT = "PinnedNotesViewModel.EXTRA_ACCT"
         const val EXTRA_USER_ID = "PinnedNotesViewModel.EXTRA_USER_ID"
+    }
+
+    private val logger by lazy {
+        loggerFactory.create("PinnedNotesViewModel")
     }
 
     private val userId: User.Id? by lazy {
@@ -103,6 +109,21 @@ class PinnedNotesViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), listOf(TimelineListItem.Loading))
 
+    init {
+        viewModelScope.launch {
+            runCancellableCatching {
+                getUserId()
+            }.mapCancellableCatching {
+                userRepository.find(it, true) as User.Detail
+            }.mapCancellableCatching { user ->
+                user.pinnedNoteIds?.map {
+                    noteRepository.sync(it)
+                }
+            }.onFailure {
+                logger.error("sync note error", it)
+            }
+        }
+    }
 
     private suspend fun getUserId(): User.Id {
         if (userId != null) {
