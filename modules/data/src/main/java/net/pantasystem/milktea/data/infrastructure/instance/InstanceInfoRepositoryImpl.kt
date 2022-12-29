@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.instance
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -10,6 +10,7 @@ import net.pantasystem.milktea.api.milktea.InstanceInfoResponse
 import net.pantasystem.milktea.api.milktea.MilkteaAPIServiceBuilder
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoRecord
 import net.pantasystem.milktea.model.instance.InstanceInfo
@@ -19,12 +20,13 @@ import javax.inject.Inject
 class InstanceInfoRepositoryImpl @Inject constructor(
     private val instanceInfoDao: InstanceInfoDao,
     private val milkteaAPIServiceBuilder: MilkteaAPIServiceBuilder,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ): InstanceInfoRepository {
     private val milkteaAPIService by lazy {
         milkteaAPIServiceBuilder.build("https://milktea.pantasystem.net")
     }
     override suspend fun findAll(): Result<List<InstanceInfo>> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             instanceInfoDao.findAll().map {
                 it.toModel()
             }
@@ -32,7 +34,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sync(): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val instances = requireNotNull(milkteaAPIService.getInstances().throwIfHasError().body())
             val models = instances.map {
                 it.toModel()
@@ -45,7 +47,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findOne(id: String): Result<InstanceInfo> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             instanceInfoDao.findById(id)?.toModel()
                 ?: throw NoSuchElementException("指定されたId($id)のInstanceInfoは存在しません")
         }
@@ -56,7 +58,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
             list.map {
                 it.toModel()
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
     }
 
     override fun observeByHost(host: String): Flow<InstanceInfo?> {
@@ -66,7 +68,7 @@ class InstanceInfoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun postInstance(host: String): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             milkteaAPIService.createInstance(CreateInstanceRequest(host = host)).throwIfHasError()
         }
     }
