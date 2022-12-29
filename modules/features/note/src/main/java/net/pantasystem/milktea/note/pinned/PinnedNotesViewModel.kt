@@ -101,7 +101,7 @@ class PinnedNotesViewModel @Inject constructor(
                 })
             }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TimelineListItem.Loading)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), listOf(TimelineListItem.Loading))
 
 
     private suspend fun getUserId(): User.Id {
