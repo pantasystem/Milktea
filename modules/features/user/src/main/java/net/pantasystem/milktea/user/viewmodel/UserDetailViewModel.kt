@@ -38,7 +38,6 @@ import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.user.R
 
 class UserDetailViewModel @AssistedInject constructor(
-    private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
     private val accountStore: AccountStore,
