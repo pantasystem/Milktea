@@ -189,7 +189,7 @@ class NoteCaptureAPIAdapterImpl(
             val note = noteDataSource.get(noteId).getOrThrow()
             when (e) {
                 is NoteUpdated.Body.Deleted -> {
-                    noteDataSource.remove(noteId)
+                    noteDataSource.delete(noteId)
                 }
                 is NoteUpdated.Body.Reacted -> {
                     noteDataSource.add(note.onReacted(account, e))
