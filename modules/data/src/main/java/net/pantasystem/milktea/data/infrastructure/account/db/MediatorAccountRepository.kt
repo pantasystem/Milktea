@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.account.db
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
@@ -12,14 +12,15 @@ import net.pantasystem.milktea.model.account.AccountRepository
  * Writeは遅くなるがReadは高速化することが期待できる。
  */
 class MediatorAccountRepository(
-    private val roomAccountRepository: RoomAccountRepository
+    private val roomAccountRepository: RoomAccountRepository,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : AccountRepository {
 
     private var mAccounts: List<Account> = listOf()
 
     override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 roomAccountRepository.add(account, isUpdatePages).also {
                     mAccounts = roomAccountRepository.findAll().getOrThrow()
                 }.getOrThrow()
@@ -28,7 +29,7 @@ class MediatorAccountRepository(
     }
 
     override suspend fun delete(account: Account) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             roomAccountRepository.delete(account).also {
                 mAccounts = roomAccountRepository.findAll().getOrThrow()
             }
@@ -37,7 +38,7 @@ class MediatorAccountRepository(
 
     override suspend fun findAll(): Result<List<Account>> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 if(mAccounts.isEmpty()) {
                     mAccounts = roomAccountRepository.findAll().getOrThrow()
                 }
@@ -49,7 +50,7 @@ class MediatorAccountRepository(
 
     override suspend fun get(accountId: Long): Result<Account> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 findAll().getOrThrow().firstOrNull {
                     it.accountId == accountId
                 }?: throw AccountNotFoundException(accountId)
@@ -59,14 +60,14 @@ class MediatorAccountRepository(
     }
 
     override suspend fun getCurrentAccount(): Result<Account> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             roomAccountRepository.getCurrentAccount()
         }
     }
 
     override suspend fun setCurrentAccount(account: Account): Result<Account> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 roomAccountRepository.setCurrentAccount(account).getOrThrow().also {
                     mAccounts = findAll().getOrThrow()
                 }

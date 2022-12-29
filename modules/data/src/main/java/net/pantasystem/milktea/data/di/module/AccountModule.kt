@@ -7,8 +7,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import net.pantasystem.milktea.common.Encryption
 import net.pantasystem.milktea.common.getPreferences
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.DataBase
 import net.pantasystem.milktea.data.infrastructure.account.AuthImpl
 import net.pantasystem.milktea.data.infrastructure.account.ClientIdRepositoryImpl
@@ -26,12 +28,13 @@ object AccountModule {
     @Singleton
     fun accountRepository(
         @ApplicationContext context: Context,
+        @IODispatcher ioDispatcher: CoroutineDispatcher,
         database: DataBase,
         encryption: Encryption,
     ): AccountRepository {
         val preferences = context.getPreferences()
         val roomAccountRepository = RoomAccountRepository(database, preferences, database.accountDAO(), database.pageDAO(), encryption)
-        return MediatorAccountRepository(roomAccountRepository)
+        return MediatorAccountRepository(roomAccountRepository, ioDispatcher)
     }
 
 
