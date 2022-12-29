@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.group
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.group.*
@@ -14,10 +15,11 @@ import javax.inject.Inject
 class GroupDataSourceImpl @Inject constructor(
     private val groupDao: GroupDao,
     private val getAccount: GetAccount,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GroupDataSource {
 
     override suspend fun add(group: Group): Result<AddResult> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val record = groupDao.findOne(group.id.accountId, group.id.groupId)
             val newEntity = GroupRecord.from(group)
             if (record == null) {
@@ -50,7 +52,7 @@ class GroupDataSourceImpl @Inject constructor(
     }
 
     override suspend fun delete(groupId: Group.Id): Result<Boolean> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val exists = groupDao.findOne(groupId.accountId, groupId.groupId) != null
             groupDao.delete(groupId.accountId, groupId.groupId)
             exists
@@ -58,7 +60,7 @@ class GroupDataSourceImpl @Inject constructor(
     }
 
     override suspend fun find(groupId: Group.Id): Result<Group> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             groupDao.findOne(groupId.accountId, groupId.groupId)
                 ?.toModel()
                 ?: throw GroupNotFoundException(groupId)
@@ -80,7 +82,7 @@ class GroupDataSourceImpl @Inject constructor(
                     }
                 )
             }
-        }.distinctUntilChanged().flowOn(Dispatchers.IO)
+        }.distinctUntilChanged().flowOn(ioDispatcher)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -98,7 +100,7 @@ class GroupDataSourceImpl @Inject constructor(
                     }
                 )
             }
-        }.distinctUntilChanged().flowOn(Dispatchers.IO)
+        }.distinctUntilChanged().flowOn(ioDispatcher)
     }
 
     override fun observeOne(groupId: Group.Id): Flow<GroupWithMember> {
@@ -109,6 +111,6 @@ class GroupDataSourceImpl @Inject constructor(
                     GroupMember(User.Id(record.group.accountId, it.serverId), it.avatarUrl)
                 }
             )
-        }.filterNotNull().flowOn(Dispatchers.IO)
+        }.filterNotNull().flowOn(ioDispatcher)
     }
 }
