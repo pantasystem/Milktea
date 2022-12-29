@@ -51,10 +51,8 @@ dependencies {
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
 
-    implementation project(path: ':modules:data')
     implementation project(path: ':modules:common')
     implementation project(path: ':modules:model')
-    implementation project(path: ':modules:api')
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_resource')
     implementation project(path: ':modules:common_compose')
