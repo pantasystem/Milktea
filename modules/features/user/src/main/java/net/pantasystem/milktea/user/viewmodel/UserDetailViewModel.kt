@@ -1,17 +1,20 @@
 package net.pantasystem.milktea.user.viewmodel
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
@@ -24,9 +27,6 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
-import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -34,11 +34,9 @@ import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.user.R
 
 class UserDetailViewModel @AssistedInject constructor(
-    private val translationStore: NoteTranslationStore,
     private val deleteNicknameUseCase: DeleteNicknameUseCase,
     private val updateNicknameUseCase: UpdateNicknameUseCase,
     private val accountStore: AccountStore,
@@ -46,10 +44,7 @@ class UserDetailViewModel @AssistedInject constructor(
     private val settingStore: SettingStore,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
-    private val noteRelationGetter: NoteRelationGetter,
     private val userRepository: UserRepository,
-    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteRepository: NoteRepository,
     private val featureEnables: FeatureEnables,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
@@ -63,7 +58,6 @@ class UserDetailViewModel @AssistedInject constructor(
     companion object;
 
     private val logger = loggerFactory.create("UserDetailViewModel")
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
     private val accountWatcher = CurrentAccountWatcher(userId?.accountId, accountRepository)
 
 
@@ -86,33 +80,6 @@ class UserDetailViewModel @AssistedInject constructor(
 
     val user = userState.asLiveData()
 
-    private val pinNotesState = userState.filterNotNull().mapNotNull { user ->
-        user.pinnedNoteIds?.let {
-            noteRepository.findIn(it)
-        }
-    }
-
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val pinNotes = MediatorLiveData<List<PlaneNoteViewData>>().apply {
-        pinNotesState.map { notes ->
-            notes.mapNotNull {
-                noteRelationGetter.get(it).getOrNull()
-            }.map { note ->
-                PlaneNoteViewData(
-                    note, accountWatcher.getAccount(), noteCaptureAPIAdapter, translationStore
-                )
-            }
-        }.onEach {
-            this.postValue(it)
-        }.flatMapLatest {
-            it.map { n ->
-                n.eventFlow
-            }.merge()
-        }.catch { e ->
-            logger.warning("", e = e)
-        }.launchIn(viewModelScope + dispatcher)
-    }
 
     val isMine = combine(userState, accountStore.state) { userState, accountState ->
         userState?.id?.id == accountState.currentAccount?.remoteId
@@ -160,16 +127,6 @@ class UserDetailViewModel @AssistedInject constructor(
             "userIdかfqdnUserNameのいずれかが指定されている必要があります。"
         }
         sync()
-
-        viewModelScope.launch {
-            userState.filterNotNull().collect { user ->
-                (user.pinnedNoteIds ?: emptyList()).map {
-                    async {
-                        noteRepository.sync(it)
-                    }
-                }.awaitAll()
-            }
-        }
     }
 
 

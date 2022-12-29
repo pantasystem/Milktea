@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -24,7 +25,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -34,17 +35,18 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
+import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
-import net.pantasystem.milktea.user.PinNoteFragment
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.activity.binder.UserDetailActivityMenuBinder
 import net.pantasystem.milktea.user.databinding.ActivityUserDetailBinding
@@ -144,7 +146,7 @@ class UserDetailActivity : AppCompatActivity() {
     lateinit var settingStore: SettingStore
 
     @Inject
-    lateinit var misskeyAPIProvider: MisskeyAPIProvider
+    lateinit var configRepository: LocalConfigRepository
 
     @Inject
     lateinit var applyTheme: ApplyTheme
@@ -157,6 +159,9 @@ class UserDetailActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userListNavigation: UserListNavigation
+
+    @Inject
+    lateinit var userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -202,7 +207,7 @@ class UserDetailActivity : AppCompatActivity() {
         )
             .initViewModelListener()
 
-        val adapter = UserTimelinePagerAdapterV2(pageableFragmentFactory, this)
+        val adapter = UserTimelinePagerAdapterV2(pageableFragmentFactory, userPinnedNotesFragmentFactory,this)
         binding.userTimelinePager.adapter = adapter
 
         TabLayoutMediator(
@@ -305,6 +310,16 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                configRepository.observe().distinctUntilChangedBy {
+                    it.theme
+                }.collect {
+                    applyRemoteUserStateLayoutBackgroundColor(binding, it)
+                }
+            }
+        }
+
 
     }
 
@@ -396,6 +411,16 @@ class UserDetailActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun applyRemoteUserStateLayoutBackgroundColor(binding: ActivityUserDetailBinding, config: Config) {
+        val typed = TypedValue()
+        if (config.theme is Theme.Bread) {
+            theme.resolveAttribute(R.attr.colorSurface, typed, true)
+        } else {
+            theme.resolveAttribute(R.attr.background, typed, true)
+        }
+        binding.remoteUserState.setBackgroundColor(typed.data)
+    }
+
 
     @ExperimentalCoroutinesApi
     private fun addPageToTab() {
@@ -405,21 +430,21 @@ class UserDetailActivity : AppCompatActivity() {
 
 class UserTimelinePagerAdapterV2(
     val pageableFragmentFactory: PageableFragmentFactory,
+    val userPinnedNotesFragmentFactory: UserPinnedNotesFragmentFactory,
     activity: FragmentActivity,
 ) : FragmentStateAdapter(activity) {
 
     var tabs: List<UserDetailTabType> = emptyList()
         private set
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun createFragment(position: Int): Fragment {
         return when(val tab = tabs[position]) {
-            is UserDetailTabType.Gallery -> GalleryPostsFragment.newInstance(
+            is UserDetailTabType.Gallery -> pageableFragmentFactory.create(
+                tab.accountId,
                 Pageable.Gallery.User(tab.userId.id),
-                tab.accountId
             )
             is UserDetailTabType.Media -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, withFiles = true))
-            is UserDetailTabType.PinNote -> PinNoteFragment.newInstance(userId = tab.userId, null)
+            is UserDetailTabType.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
             is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
             is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id))
         }
