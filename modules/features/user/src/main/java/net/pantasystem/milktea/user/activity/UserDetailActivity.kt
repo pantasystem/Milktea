@@ -37,7 +37,6 @@ import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_android_ui.report.ReportDialog
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.gallery.GalleryPostsFragment
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
@@ -411,9 +410,9 @@ class UserTimelinePagerAdapterV2(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun createFragment(position: Int): Fragment {
         return when(val tab = tabs[position]) {
-            is UserDetailTabType.Gallery -> GalleryPostsFragment.newInstance(
+            is UserDetailTabType.Gallery -> pageableFragmentFactory.create(
+                tab.accountId,
                 Pageable.Gallery.User(tab.userId.id),
-                tab.accountId
             )
             is UserDetailTabType.Media -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, withFiles = true))
             is UserDetailTabType.PinNote -> PinNoteFragment.newInstance(userId = tab.userId, null)
