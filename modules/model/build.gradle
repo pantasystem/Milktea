@@ -33,7 +33,12 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
-
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 
 }
 
@@ -64,5 +69,6 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
 
-
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }

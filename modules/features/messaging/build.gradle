@@ -38,6 +38,13 @@ android {
         kotlinCompilerExtensionVersion = compose_version
 
     }
+
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -86,5 +93,6 @@ dependencies {
     implementation libs.lifecycle.livedata
 
     implementation libs.activity.ktx
-
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }

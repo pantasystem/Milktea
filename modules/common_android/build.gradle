@@ -33,6 +33,12 @@ android {
     buildFeatures {
         dataBinding true
     }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -68,5 +74,6 @@ dependencies {
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation libs.kotlin.datetime
 
-
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }

@@ -30,6 +30,12 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -56,4 +62,6 @@ dependencies {
     implementation libs.lifecycle.extenstions
     implementation libs.lifecycle.viewmodel
     implementation libs.lifecycle.livedata
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }
