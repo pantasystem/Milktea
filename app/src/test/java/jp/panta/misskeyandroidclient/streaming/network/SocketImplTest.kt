@@ -9,9 +9,10 @@ import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.StreamingEvent
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
 
 class SocketImplTest {
 
