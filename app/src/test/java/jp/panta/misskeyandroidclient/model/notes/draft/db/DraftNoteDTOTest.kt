@@ -4,8 +4,9 @@ import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDTO
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftPollDTO
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+
 
 class DraftNoteDTOTest {
 
