@@ -11,9 +11,10 @@ import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.Socket
 import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
