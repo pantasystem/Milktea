@@ -69,7 +69,12 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = compose_version
     }
-
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 
@@ -264,6 +269,9 @@ dependencies {
     kapt libs.androidx.hilt.compiler
 
     implementation libs.androidx.appstartup
+
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }
 
 kapt {

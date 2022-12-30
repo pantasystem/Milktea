@@ -3,8 +3,8 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 import kotlinx.coroutines.runBlocking
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class InMemoryNoteDataSourceTest {
 
@@ -14,8 +14,8 @@ class InMemoryNoteDataSourceTest {
         val id = Note.Id(0L, "testId")
         noteDataSource.delete(id)
         val result = noteDataSource.get(id)
-        Assert.assertNotNull(result.exceptionOrNull())
-        Assert.assertThrows(NoteDeletedException::class.java) {
+        Assertions.assertNotNull(result.exceptionOrNull())
+        Assertions.assertThrows(NoteDeletedException::class.java) {
             result.getOrThrow()
         }
     }
@@ -26,8 +26,8 @@ class InMemoryNoteDataSourceTest {
         val id = Note.Id(0L, "testId")
         noteDataSource.remove(id)
         val result = noteDataSource.get(id)
-        Assert.assertNotNull(result.exceptionOrNull())
-        Assert.assertThrows(NoteRemovedException::class.java) {
+        Assertions.assertNotNull(result.exceptionOrNull())
+        Assertions.assertThrows(NoteRemovedException::class.java) {
             result.getOrThrow()
         }
     }
@@ -37,7 +37,7 @@ class InMemoryNoteDataSourceTest {
         val noteDataSource = InMemoryNoteDataSource()
         val id = Note.Id(0L, "testId")
         val result = noteDataSource.get(id)
-        Assert.assertThrows(NoteNotFoundException::class.java) {
+        Assertions.assertThrows(NoteNotFoundException::class.java) {
             result.getOrThrow()
         }
     }
@@ -49,6 +49,6 @@ class InMemoryNoteDataSourceTest {
         val testNote = Note.make(id, User.Id(0L, "testUserId"))
         noteDataSource.add(testNote)
         val result = noteDataSource.get(id)
-        Assert.assertEquals(testNote, result.getOrThrow())
+        Assertions.assertEquals(testNote, result.getOrThrow())
     }
 }

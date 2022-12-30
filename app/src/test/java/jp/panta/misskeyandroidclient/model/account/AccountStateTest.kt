@@ -1,10 +1,10 @@
 package jp.panta.misskeyandroidclient.model.account
 
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.app_store.account.AccountState
-import org.junit.Assert.*
+import net.pantasystem.milktea.model.account.Account
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
-import org.junit.Test
 
 class AccountStateTest {
 

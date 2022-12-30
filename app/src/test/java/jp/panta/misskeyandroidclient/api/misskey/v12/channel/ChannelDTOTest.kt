@@ -4,9 +4,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.v12.channel.ChannelDTO
 import net.pantasystem.milktea.model.account.Account
-import org.junit.Assert.*
 
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+
 
 class ChannelDTOTest {
 

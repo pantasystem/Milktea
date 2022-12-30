@@ -1,8 +1,9 @@
 package jp.panta.misskeyandroidclient.model.account
 
 import net.pantasystem.milktea.model.account.Account
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class AccountTest {
 
@@ -16,7 +17,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("example.com", account.getHost())
+        Assertions.assertEquals("example.com", account.getHost())
     }
 
     @Test
@@ -28,7 +29,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("example.com", account.getHost())
+        Assertions.assertEquals("example.com", account.getHost())
     }
 
     @Test
@@ -40,7 +41,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("example.com", account.getHost())
+        Assertions.assertEquals("example.com", account.getHost())
     }
 
 
@@ -53,7 +54,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -65,7 +66,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -77,7 +78,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://example.com:8080", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com:8080", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -89,7 +90,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -101,7 +102,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://test-example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://test-example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -113,7 +114,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://test_example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://test_example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -125,7 +126,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://test_example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://test_example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -137,7 +138,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://www.example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://www.example.com", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -149,7 +150,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("http://", account.normalizedInstanceDomain)
+        Assertions.assertEquals("http://", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -161,7 +162,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("http://192.168.0.1", account.normalizedInstanceDomain)
+        Assertions.assertEquals("http://192.168.0.1", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -173,7 +174,10 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("http://[2001:db8:85a3::8a2e:370:7334]", account.normalizedInstanceDomain)
+        Assertions.assertEquals(
+            "http://[2001:db8:85a3::8a2e:370:7334]",
+            account.normalizedInstanceDomain
+        )
     }
 
     @Test
@@ -185,7 +189,10 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("ftp://[2001:db8:85a3::8a2e:370:7334]", account.normalizedInstanceDomain)
+        Assertions.assertEquals(
+            "ftp://[2001:db8:85a3::8a2e:370:7334]",
+            account.normalizedInstanceDomain
+        )
 
     }
 
@@ -198,7 +205,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
     }
 
     @Test
@@ -210,6 +217,6 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assert.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
     }
 }

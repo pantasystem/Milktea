@@ -2,8 +2,9 @@ package net.pantasystem.milktea.api.misskey.notes
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class CreateNoteTest {
 
@@ -19,7 +20,7 @@ class CreateNoteTest {
             renoteId = "renote-id"
         )
         val str = json.encodeToString(createNote)
-        Assert.assertEquals(
+        Assertions.assertEquals(
             """{"i":"test","visibility":"specified","text":"hogehoge","renoteId":"renote-id"}""",
             str
         )

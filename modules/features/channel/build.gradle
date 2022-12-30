@@ -37,6 +37,12 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = compose_version
     }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -82,5 +88,6 @@ dependencies {
     implementation libs.activity.ktx
     implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation libs.androidx.hilt.navigation.compose
-
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }

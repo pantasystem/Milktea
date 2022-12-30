@@ -2,8 +2,9 @@ package jp.panta.misskeyandroidclient.model.notes.poll
 
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.notes.poll.Poll
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 import kotlin.time.Duration.Companion.minutes
 
 class PollTest {
@@ -41,7 +42,7 @@ class PollTest {
             expiresAt = null,
             multiple = false
         )
-        Assert.assertEquals(53, poll.totalVoteCount)
+        Assertions.assertEquals(53, poll.totalVoteCount)
     }
 
     @Test
@@ -76,7 +77,7 @@ class PollTest {
             expiresAt = null,
             multiple = true
         )
-        Assert.assertTrue(poll.canVote)
+        Assertions.assertTrue(poll.canVote)
     }
 
     @Test
@@ -111,7 +112,7 @@ class PollTest {
             expiresAt = null,
             multiple = false
         )
-        Assert.assertTrue(poll.canVote)
+        Assertions.assertTrue(poll.canVote)
     }
 
     @Test
@@ -146,7 +147,7 @@ class PollTest {
             expiresAt = null,
             multiple = false
         )
-        Assert.assertFalse(poll.canVote)
+        Assertions.assertFalse(poll.canVote)
     }
 
     @Test
@@ -181,7 +182,7 @@ class PollTest {
             expiresAt = Clock.System.now() + 10.minutes,
             multiple = false
         )
-        Assert.assertTrue(poll.canVote)
+        Assertions.assertTrue(poll.canVote)
     }
     @Test
     fun canVoteWhenExpired() {
@@ -215,7 +216,7 @@ class PollTest {
             expiresAt = Clock.System.now() - 1.minutes,
             multiple = false
         )
-        Assert.assertFalse(poll.canVote)
+        Assertions.assertFalse(poll.canVote)
     }
 
     @Test
@@ -238,7 +239,7 @@ class PollTest {
             expiresAt = Clock.System.now() - 1.minutes,
             multiple = false
         )
-        Assert.assertFalse(poll.canVote)
+        Assertions.assertFalse(poll.canVote)
     }
 
     @Test
@@ -261,6 +262,6 @@ class PollTest {
             multiple = true,
             expiresAt = null
         )
-        Assert.assertFalse(poll.canVote)
+        Assertions.assertFalse(poll.canVote)
     }
 }

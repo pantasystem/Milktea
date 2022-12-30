@@ -2,8 +2,8 @@ package net.pantasystem.milktea.api.misskey.users
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.io.BufferedInputStream
 import java.io.BufferedReader
 import java.io.File
@@ -21,8 +21,8 @@ class UserDTOTest {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
         val userDTOList = json.decodeFromString<List<UserDTO>>(testData)
-        Assert.assertNotNull(userDTOList.getOrNull(0))
-        Assert.assertEquals("harunon", userDTOList[0].userName)
+        Assertions.assertNotNull(userDTOList.getOrNull(0))
+        Assertions.assertEquals("harunon", userDTOList[0].userName)
 
     }
 
@@ -37,9 +37,9 @@ class UserDTOTest {
         }
 
         val harunon = json.decodeFromString<UserDTO>(testData)
-        Assert.assertEquals("keybase", harunon.fields?.get(0)?.name)
-        Assert.assertEquals("https://keybase.io/harunon", harunon.fields?.get(0)?.value)
-        Assert.assertEquals("ぢすこ", harunon.fields?.get(1)?.name)
+        Assertions.assertEquals("keybase", harunon.fields?.get(0)?.name)
+        Assertions.assertEquals("https://keybase.io/harunon", harunon.fields?.get(0)?.value)
+        Assertions.assertEquals("ぢすこ", harunon.fields?.get(1)?.name)
 
     }
 
@@ -53,9 +53,9 @@ class UserDTOTest {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
         val harunon = json.decodeFromString<UserDTO>(testData)
-        Assert.assertEquals("keybase", harunon.fields?.get(0)?.name)
-        Assert.assertEquals("https://keybase.io/harunon", harunon.fields?.get(0)?.value)
-        Assert.assertEquals("ぢすこ", harunon.fields?.get(1)?.name)
+        Assertions.assertEquals("keybase", harunon.fields?.get(0)?.name)
+        Assertions.assertEquals("https://keybase.io/harunon", harunon.fields?.get(0)?.value)
+        Assertions.assertEquals("ぢすこ", harunon.fields?.get(1)?.name)
 
     }
 }

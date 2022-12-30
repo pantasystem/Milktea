@@ -2,8 +2,8 @@ package net.pantasystem.milktea.api.misskey.ap
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class ApResolveResultTest {
 
@@ -70,15 +70,14 @@ class ApResolveResultTest {
             ignoreUnknownKeys = true
         }
         val result: ApResolveResult = decoder.decodeFromString(json)
-        Assert.assertEquals(
+        Assertions.assertEquals(
             "ヒモを養うかきくけこ\n" +
                     "\n" +
                     "カードにゃらいくらでも使っていいよ\n" +
                     "聞いたこと無いよ、この請求書\n" +
                     "苦しいときは、私にいってね\n" +
                     "計画的にお金は使ってね\n" +
-                    "今月のお小遣い、ここにおいておくから",
-            (result as ApResolveResult.TypeNote).note.text
+                    "今月のお小遣い、ここにおいておくから", (result as ApResolveResult.TypeNote).note.text
         )
     }
 
@@ -413,6 +412,9 @@ class ApResolveResultTest {
             ignoreUnknownKeys = true
         }
         val result: ApResolveResult = decoder.decodeFromString(json)
-        Assert.assertEquals("まりふぁいあ\uD83D\uDD25", (result as ApResolveResult.TypeUser).user.name)
+        Assertions.assertEquals(
+            "まりふぁいあ\uD83D\uDD25",
+            (result as ApResolveResult.TypeUser).user.name
+        )
     }
 }

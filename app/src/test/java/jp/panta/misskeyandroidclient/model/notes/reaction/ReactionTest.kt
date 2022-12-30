@@ -1,9 +1,9 @@
 package jp.panta.misskeyandroidclient.model.notes.reaction
 
 import net.pantasystem.milktea.model.notes.reaction.Reaction
-import org.junit.Assert.*
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
-import org.junit.Test
 
 class ReactionTest {
 

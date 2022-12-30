@@ -2,8 +2,8 @@ package net.pantasystem.milktea.api.milktea
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class InstanceInfoResponseTest {
 
@@ -52,9 +52,9 @@ class InstanceInfoResponseTest {
             ignoreUnknownKeys = true
         }
         val result: List<InstanceInfoResponse> = decoder.decodeFromString(json)
-        Assert.assertEquals(4, result.size)
-        Assert.assertEquals("めいすきー", result[3].name)
-        Assert.assertEquals("https://misskey-drive.m544.net/files/969b8097-464a-467d-bd88-530058aa9c84.ico", result[3].iconUrl)
-        Assert.assertEquals(100000000L, result[3].clientMaxBodyByteSize)
+        Assertions.assertEquals(4, result.size)
+        Assertions.assertEquals("めいすきー", result[3].name)
+        Assertions.assertEquals("https://misskey-drive.m544.net/files/969b8097-464a-467d-bd88-530058aa9c84.ico", result[3].iconUrl)
+        Assertions.assertEquals(100000000L, result[3].clientMaxBodyByteSize)
     }
 }

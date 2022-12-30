@@ -5,16 +5,17 @@ import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
 import net.pantasystem.milktea.model.account.PageDefaultStringsJp
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.instance.Meta
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+
 
 class MakeDefaultPagesUseCaseTest {
 
     lateinit var makeDefaultPagesUseCase: MakeDefaultPagesUseCase
     lateinit var account: Account
 
-    @Before
+    @BeforeEach
     fun setup() {
         makeDefaultPagesUseCase = MakeDefaultPagesUseCase(
             PageDefaultStringsJp()

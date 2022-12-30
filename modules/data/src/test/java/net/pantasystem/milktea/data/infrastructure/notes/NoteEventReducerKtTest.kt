@@ -7,8 +7,9 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.make
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class NoteEventReducerKtTest {
     private val account = Account("test", "misskey.io", "Panta", Account.InstanceType.MISSKEY, "")
@@ -32,8 +33,8 @@ class NoteEventReducerKtTest {
             )
         )
 
-        Assert.assertEquals(listOf(ReactionCount(":kawaii:", 1)), result.reactionCounts)
-        Assert.assertNull(result.myReaction)
+        Assertions.assertEquals(listOf(ReactionCount(":kawaii:", 1)), result.reactionCounts)
+        Assertions.assertNull(result.myReaction)
     }
 
     @Test
@@ -55,8 +56,8 @@ class NoteEventReducerKtTest {
             )
         )
 
-        Assert.assertEquals(listOf(ReactionCount(":kawaii:", 1)), result.reactionCounts)
-        Assert.assertEquals(":kawaii:", result.myReaction)
+        Assertions.assertEquals(listOf(ReactionCount(":kawaii:", 1)), result.reactionCounts)
+        Assertions.assertEquals(":kawaii:", result.myReaction)
     }
 
     @Test
@@ -81,11 +82,11 @@ class NoteEventReducerKtTest {
             )
         )
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
             listOf(ReactionCount(":watasimo:", 1), ReactionCount(":kawaii:", 2)),
             result.reactionCounts
         )
-        Assert.assertEquals(":kawaii:", result.myReaction)
+        Assertions.assertEquals(":kawaii:", result.myReaction)
     }
 
     @Test
@@ -109,11 +110,11 @@ class NoteEventReducerKtTest {
             )
         )
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
             listOf(ReactionCount(":watasimo:", 1), ReactionCount(":kawaii:", 1)),
             result.reactionCounts
         )
-        Assert.assertEquals(":kawaii:", result.myReaction)
+        Assertions.assertEquals(":kawaii:", result.myReaction)
     }
 
     @Test
@@ -134,8 +135,8 @@ class NoteEventReducerKtTest {
                 )
             )
         )
-        Assert.assertNull(result.myReaction)
-        Assert.assertEquals(emptyList<ReactionCount>(), result.reactionCounts)
+        Assertions.assertNull(result.myReaction)
+        Assertions.assertEquals(emptyList<ReactionCount>(), result.reactionCounts)
     }
 
     @Test
@@ -157,8 +158,8 @@ class NoteEventReducerKtTest {
                 )
             )
         )
-        Assert.assertNull(result.myReaction)
-        Assert.assertEquals(emptyList<ReactionCount>(), result.reactionCounts)
+        Assertions.assertNull(result.myReaction)
+        Assertions.assertEquals(emptyList<ReactionCount>(), result.reactionCounts)
     }
 
     @Test
@@ -180,8 +181,8 @@ class NoteEventReducerKtTest {
                 )
             )
         )
-        Assert.assertEquals(":watasimo:", result.myReaction)
-        Assert.assertEquals(
+        Assertions.assertEquals(":watasimo:", result.myReaction)
+        Assertions.assertEquals(
             listOf(
                 ReactionCount(":watasimo:", 1),
             ), result.reactionCounts
@@ -212,7 +213,7 @@ class NoteEventReducerKtTest {
                 )
             )
         )
-        Assert.assertEquals(
+        Assertions.assertEquals(
             listOf(
                 Emoji(
                     name = ":kawaii:"

@@ -32,6 +32,12 @@ android {
     buildFeatures {
         dataBinding true
     }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -73,5 +79,6 @@ dependencies {
     implementation libs.hilt.work
     kapt libs.androidx.hilt.compiler
 
-
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }

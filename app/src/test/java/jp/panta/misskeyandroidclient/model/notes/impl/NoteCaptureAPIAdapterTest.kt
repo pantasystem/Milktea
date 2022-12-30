@@ -17,9 +17,10 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSo
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+
+import org.junit.jupiter.api.Test
 
 class NoteCaptureAPIAdapterTest {
 
@@ -27,7 +28,7 @@ class NoteCaptureAPIAdapterTest {
     private lateinit var accountRepository: AccountRepository
     private lateinit var noteDataSource: NoteDataSource
 
-    @Before
+    @BeforeEach
     fun setUp() {
         loggerFactory = TestLogger.Factory()
         accountRepository = TestAccountRepository()
