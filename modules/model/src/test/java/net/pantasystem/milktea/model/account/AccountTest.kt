@@ -1,7 +1,8 @@
 package net.pantasystem.milktea.model.account
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class AccountTest {
 
@@ -14,6 +15,6 @@ class AccountTest {
             token = "test",
             userName = "Panta"
         )
-        Assert.assertEquals("https://misskey.pantasystem.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://misskey.pantasystem.com", account.normalizedInstanceDomain)
     }
 }
