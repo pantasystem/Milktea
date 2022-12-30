@@ -11,17 +11,17 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSo
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.BeforeEach
 
 class InMemoryNoteDataSourceTest {
 
     private lateinit var loggerFactory: Logger.Factory
     private lateinit var account: Account
 
-    @Before
+    @BeforeEach
     fun setUp() {
         loggerFactory = TestLogger.Factory()
         account = Account(
