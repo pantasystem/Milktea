@@ -1,11 +1,14 @@
 package jp.panta.misskeyandroidclient.model.users
 
-import junit.framework.TestCase
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
-class UserTest : TestCase() {
 
+class UserTest {
+
+    @Test
     fun testGetProfileUrl() {
 
         val user = User.Simple(
@@ -35,6 +38,7 @@ class UserTest : TestCase() {
         assertEquals("https://example.com/@Panta", profileUrl)
     }
 
+    @Test
     fun testGetProfileUrlWhenRemoteHost() {
 
         val user = User.Simple(
