@@ -52,6 +52,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+                    <FrameLayout
+                            android:id="@+id/replyToViewBase"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="@{ viewModel.replyTo == null ? View.GONE : View.VISIBLE }"
+                            >
+                        <include
+                                android:id="@+id/replyToLayout"
+                                layout="@layout/item_note_editor_reply_to_note"
+                                app:note="@{ viewModel.replyTo }"
+                                />
+                    </FrameLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
