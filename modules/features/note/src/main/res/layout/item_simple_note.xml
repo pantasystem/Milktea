@@ -390,7 +390,7 @@
                 android:layout_width="@dimen/note_bottom_action_icon_size"
                 android:layout_height="@dimen/note_bottom_action_icon_size"
                 app:srcCompat="@drawable/ic_reply_black_24dp"
-                android:id="@+id/imageButton"
+                android:id="@+id/replyButton"
                 style="?android:attr/borderlessButtonStyle"
                 android:padding="@dimen/note_bottom_action_icon_padding_size"
                 android:scaleType="centerCrop"
@@ -401,25 +401,25 @@
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
                 android:layout_marginStart="8dp"
-                app:layout_constraintEnd_toStartOf="@+id/textView3"
+                app:layout_constraintEnd_toStartOf="@+id/replyCountView"
                 tools:ignore="TouchTargetSizeCheck" />
 
         <TextView
                 android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView3"
+                android:id="@+id/replyCountView"
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:singleLine="true"
                 android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
 
-                app:layout_constraintEnd_toStartOf="@+id/imageButton2"
-                app:layout_constraintStart_toEndOf="@+id/imageButton"
+                app:layout_constraintEnd_toStartOf="@+id/renoteButton"
+                app:layout_constraintStart_toEndOf="@+id/replyButton"
                 tools:text="99999999999"
-                app:layout_constraintTop_toTopOf="@id/imageButton"
-                app:layout_constraintBottom_toBottomOf="@id/imageButton"
+                app:layout_constraintTop_toTopOf="@id/replyButton"
+                app:layout_constraintBottom_toBottomOf="@id/replyButton"
                 app:emojiCompatEnabled="false"/>
 
 
@@ -427,7 +427,7 @@
                 android:layout_width="@dimen/note_bottom_action_icon_size"
                 android:layout_height="@dimen/note_bottom_action_icon_size"
                 app:srcCompat="@drawable/ic_re_note"
-                android:id="@+id/imageButton2"
+                android:id="@+id/renoteButton"
                 style="?android:attr/borderlessButtonStyle"
                 android:padding="@dimen/note_bottom_action_icon_padding_size"
                 android:scaleType="centerCrop"
@@ -436,8 +436,8 @@
                 app:clickTargetNote="@{note}"
                 app:notesViewModelForClickRenote="@{noteCardActionListener}"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:layout_constraintEnd_toStartOf="@+id/textView4"
-                app:layout_constraintStart_toEndOf="@id/textView3"
+                app:layout_constraintEnd_toStartOf="@+id/renoteCountView"
+                app:layout_constraintStart_toEndOf="@id/replyCountView"
                 android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
                 tools:ignore="TouchTargetSizeCheck" />
 
@@ -447,17 +447,17 @@
 
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView4"
+                android:id="@+id/renoteCountView"
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:singleLine="true"
 
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                app:layout_constraintEnd_toStartOf="@id/imageButton3"
-                app:layout_constraintStart_toEndOf="@id/imageButton2"
+                app:layout_constraintEnd_toStartOf="@id/toggleReactionButton"
+                app:layout_constraintStart_toEndOf="@id/renoteButton"
                 tools:text="10"
-                app:layout_constraintTop_toTopOf="@id/imageButton2"
-                app:layout_constraintBottom_toBottomOf="@id/imageButton2"
+                app:layout_constraintTop_toTopOf="@id/renoteButton"
+                app:layout_constraintBottom_toBottomOf="@id/renoteButton"
                 app:emojiCompatEnabled="false"
 
                 />
@@ -467,7 +467,7 @@
                 android:layout_height="@dimen/note_bottom_action_icon_size"
                 app:isReacted="@{note.myReaction != null}"
                 tools:srcCompat="@drawable/ic_add_black_24dp"
-                android:id="@+id/imageButton3"
+                android:id="@+id/toggleReactionButton"
                 style="?android:attr/borderlessButtonStyle"
                 android:padding="@dimen/note_bottom_action_icon_padding_size"
                 android:scaleType="centerCrop"
@@ -476,8 +476,8 @@
                 app:tint="?attr/normalIconTint"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
 
-                app:layout_constraintEnd_toStartOf="@+id/textView5"
-                app:layout_constraintStart_toEndOf="@id/textView4"
+                app:layout_constraintEnd_toStartOf="@+id/reactionCountView"
+                app:layout_constraintStart_toEndOf="@id/renoteCountView"
                 tools:ignore="TouchTargetSizeCheck" />
 
 
@@ -491,13 +491,13 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
-                android:id="@+id/textView5"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton4"
-                app:layout_constraintStart_toEndOf="@id/imageButton3"
+                android:id="@+id/reactionCountView"
+                app:layout_constraintEnd_toStartOf="@+id/noteOptionButton"
+                app:layout_constraintStart_toEndOf="@id/toggleReactionButton"
                 android:maxLines="1"
                 tools:text="10000"
-                app:layout_constraintTop_toTopOf="@id/imageButton3"
-                app:layout_constraintBottom_toBottomOf="@id/imageButton3"
+                app:layout_constraintTop_toTopOf="@id/toggleReactionButton"
+                app:layout_constraintBottom_toBottomOf="@id/toggleReactionButton"
                 app:emojiCompatEnabled="false"
                 />
 
@@ -505,7 +505,7 @@
                 android:layout_width="@dimen/note_bottom_action_icon_size"
                 android:layout_height="@dimen/note_bottom_action_icon_size"
                 app:srcCompat="@drawable/ic_more_horiz_black_24dp"
-                android:id="@+id/imageButton4"
+                android:id="@+id/noteOptionButton"
                 style="?android:attr/borderlessButtonStyle"
                 android:padding="@dimen/note_bottom_action_icon_padding_size"
                 android:scaleType="centerCrop"
