@@ -2,8 +2,9 @@ package net.pantasystem.milktea.api.misskey.notes
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class PollDTOTest {
 
@@ -49,13 +50,13 @@ class PollDTOTest {
         }"""
 
         val pollDTO: PollDTO = decoder.decodeFromString(text)
-        Assert.assertEquals(false, pollDTO.multiple)
+        Assertions.assertEquals(false, pollDTO.multiple)
 
-        Assert.assertEquals("ジューシーな高田馬場", pollDTO.choices[0].text)
-        Assert.assertEquals(true, pollDTO.choices[0].isVoted)
+        Assertions.assertEquals("ジューシーな高田馬場", pollDTO.choices[0].text)
+        Assertions.assertEquals(true, pollDTO.choices[0].isVoted)
 
-        Assert.assertEquals("偽のノーパソ", pollDTO.choices[1].text)
-        Assert.assertEquals(false, pollDTO.choices[1].isVoted)
+        Assertions.assertEquals("偽のノーパソ", pollDTO.choices[1].text)
+        Assertions.assertEquals(false, pollDTO.choices[1].isVoted)
 
     }
 
@@ -82,11 +83,11 @@ class PollDTOTest {
         """.trimIndent()
 
         val dto = decoder.decodeFromString<PollDTO>(text)
-        Assert.assertEquals(false, dto.choices[0].isVoted)
-        Assert.assertEquals(false, dto.choices[1].isVoted)
+        Assertions.assertEquals(false, dto.choices[0].isVoted)
+        Assertions.assertEquals(false, dto.choices[1].isVoted)
 
-        Assert.assertEquals("a", dto.choices[0].text)
-        Assert.assertEquals("b", dto.choices[1].text)
+        Assertions.assertEquals("a", dto.choices[0].text)
+        Assertions.assertEquals("b", dto.choices[1].text)
 
     }
 
