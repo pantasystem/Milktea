@@ -42,6 +42,12 @@ android {
         freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 
     }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -103,6 +109,8 @@ dependencies {
 
     androidTestImplementation "androidx.room:room-testing:2.4.3"
 
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.0"
 }
 
 kapt {
