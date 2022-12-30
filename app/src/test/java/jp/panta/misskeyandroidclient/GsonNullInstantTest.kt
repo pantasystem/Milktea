@@ -3,7 +3,8 @@ package jp.panta.misskeyandroidclient
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import org.junit.Test
+import org.junit.jupiter.api.Test
+
 
 class GsonNullInstantTest {
 
