@@ -2,8 +2,8 @@ package net.pantasystem.milktea.api.misskey.v10
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class RequestFollowFollowerTest {
 
@@ -21,7 +21,7 @@ class RequestFollowFollowerTest {
         )
         val strJson = encoder.encodeToString(req)
         println(strJson)
-        Assert.assertEquals("""{"i":"test","userId":"5acddf5fcd7aebd97984769a"}""", strJson)
+        Assertions.assertEquals("""{"i":"test","userId":"5acddf5fcd7aebd97984769a"}""", strJson)
 
     }
 
@@ -34,7 +34,10 @@ class RequestFollowFollowerTest {
         )
         val strJson = encoder.encodeToString(req)
         println(strJson)
-        Assert.assertEquals("""{"i":"test","userId":"5acddf5fcd7aebd97984769a","cursor":"nextId"}""", strJson)
+        Assertions.assertEquals(
+            """{"i":"test","userId":"5acddf5fcd7aebd97984769a","cursor":"nextId"}""",
+            strJson
+        )
 
     }
 }
