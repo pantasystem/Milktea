@@ -1,7 +1,8 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class AuthUserInputStateTest {
 
@@ -13,7 +14,7 @@ class AuthUserInputStateTest {
             password = "test",
             rawInputInstanceDomain = "@Panta@misskey.io"
         )
-        Assert.assertEquals("Panta", formState.username)
+        Assertions.assertEquals("Panta", formState.username)
     }
 
     @Test
@@ -24,6 +25,6 @@ class AuthUserInputStateTest {
             password = "test",
             rawInputInstanceDomain = "@Panta@misskey.io"
         )
-        Assert.assertEquals("misskey.io", formState.host)
+        Assertions.assertEquals("misskey.io", formState.host)
     }
 }
