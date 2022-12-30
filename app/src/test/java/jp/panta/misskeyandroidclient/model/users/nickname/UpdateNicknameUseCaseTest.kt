@@ -6,8 +6,9 @@ import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOn
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UserNickname
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+
 
 class UpdateNicknameUseCaseTest {
 
