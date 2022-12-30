@@ -1,7 +1,8 @@
 package net.pantasystem.milktea.common_android.mfm
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class MFMParserTest {
 
@@ -12,7 +13,7 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "misskey.io"
         )
-        Assert.assertEquals("", host)
+        Assertions.assertEquals("", host)
     }
 
     @Test
@@ -22,7 +23,7 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "misskey.pantasystem.com"
         )
-        Assert.assertEquals("@misskey.pantasystem.com", host)
+        Assertions.assertEquals("@misskey.pantasystem.com", host)
     }
 
     @Test
@@ -32,7 +33,7 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "misskey.pantasystem.com"
         )
-        Assert.assertEquals("@misskey.pantasystem.com", host)
+        Assertions.assertEquals("@misskey.pantasystem.com", host)
     }
 
     @Test
@@ -42,7 +43,7 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "misskey.io"
         )
-        Assert.assertEquals("", host)
+        Assertions.assertEquals("", host)
     }
 
     @Test
@@ -52,7 +53,7 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "misskey.io"
         )
-        Assert.assertEquals("", host)
+        Assertions.assertEquals("", host)
     }
 
 
@@ -63,14 +64,14 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "mstdn.jp"
         )
-        Assert.assertEquals("@pokemon.mastportal.info", host)
+        Assertions.assertEquals("@pokemon.mastportal.info", host)
     }
 
     @Test
     fun mentionPattern() {
         val matcher = MFMParser.mentionPattern.matcher("@Panta@pokemon.mastportal.info")
-        Assert.assertTrue(matcher.find())
-        Assert.assertEquals("@pokemon.mastportal.info", matcher.group(2))
+        Assertions.assertTrue(matcher.find())
+        Assertions.assertEquals("@pokemon.mastportal.info", matcher.group(2))
     }
 
     @Test
@@ -80,6 +81,6 @@ class MFMParserTest {
             accountHost = "misskey.io",
             userHost = "misskey.io"
         )
-        Assert.assertEquals("@misskey.pantasystem.com", host)
+        Assertions.assertEquals("@misskey.pantasystem.com", host)
     }
 }
