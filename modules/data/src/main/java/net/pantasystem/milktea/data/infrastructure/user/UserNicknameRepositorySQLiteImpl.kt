@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 import net.pantasystem.milktea.model.user.nickname.UserNicknameNotFoundException
 import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class UserNicknameRepositorySQLiteImpl @Inject constructor(
     private val userNicknameDAO: UserNicknameDAO,
     private val userNicknameRepositoryOnMemoryImpl: UserNicknameRepositoryOnMemoryImpl,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserNicknameRepository {
 
     /**
@@ -25,7 +27,7 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
     private val lock = Mutex()
 
     override suspend fun findOne(id: UserNickname.Id): UserNickname {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             if (notExistsIds.contains(id)) {
                 throw UserNicknameNotFoundException()
             }
@@ -47,7 +49,7 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
     }
 
     override suspend fun save(nickname: UserNickname) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val found =
                 userNicknameDAO.findByUserNameAndHost(nickname.id.userName, nickname.id.host)
             val dto = UserNicknameDTO(
@@ -69,7 +71,7 @@ class UserNicknameRepositorySQLiteImpl @Inject constructor(
     }
 
     override suspend fun delete(id: UserNickname.Id) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             lock.withLock {
                 notExistsIds.add(id)
             }

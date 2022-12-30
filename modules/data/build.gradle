@@ -54,6 +54,7 @@ dependencies {
     implementation project(path: ':modules:model')
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:api_streaming')
+    implementation project(path: ':modules:common_android')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core

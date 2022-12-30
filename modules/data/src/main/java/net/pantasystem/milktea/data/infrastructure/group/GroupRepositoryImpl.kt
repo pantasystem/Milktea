@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.group
 
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.groups.*
@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
@@ -24,6 +25,7 @@ class GroupRepositoryImpl @Inject constructor(
     private val groupDataSource: GroupDataSource,
     private val loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GroupRepository {
 
     private val logger: Logger by lazy {
@@ -32,7 +34,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun create(createGroup: CreateGroup): Group {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(createGroup.author).getOrThrow()
             val api = getMisskeyAPI(account)
 
@@ -50,7 +52,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncOne(groupId: Group.Id): Group {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             var group = groupDataSource.find(groupId).onFailure {
                 logger.debug("ローカルには存在しません。:${groupId}")
             }.getOrNull()
@@ -76,7 +78,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncByJoined(accountId: Long): List<Group> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             val api =
                 getMisskeyAPI(account).joinedGroups(I(account.token)).throwIfHasError()
@@ -94,7 +96,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun syncByOwned(accountId: Long): List<Group> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             val api =
                 getMisskeyAPI(account).ownedGroups(I(account.token)).throwIfHasError()
@@ -112,7 +114,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun pull(pull: Pull): Group {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             var group = syncOne(pull.groupId)
             val account = accountRepository.get(pull.groupId.accountId).getOrThrow()
             getMisskeyAPI(account).pullUser(
@@ -134,7 +136,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun transfer(transfer: Transfer): Group {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(transfer.groupId.accountId).getOrThrow()
             val body = getMisskeyAPI(account).transferGroup(
                 TransferGroupDTO(
@@ -153,7 +155,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun update(updateGroup: UpdateGroup): Group {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(updateGroup.groupId.accountId).getOrThrow()
             val body = getMisskeyAPI(account).updateGroup(
                 UpdateGroupDTO(
@@ -172,7 +174,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun invite(invite: Invite): Result<Unit> = runCancellableCatching<Unit> {
-        return@runCancellableCatching withContext(Dispatchers.IO) {
+        return@runCancellableCatching withContext(ioDispatcher) {
             val account = accountRepository.get(invite.groupId.accountId).getOrThrow()
             getMisskeyAPI(account).invite(
                 InviteUserDTO(
@@ -185,7 +187,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun accept(invitationId: InvitationId): Result<Unit> = runCancellableCatching {
-        return@runCancellableCatching withContext(Dispatchers.IO) {
+        return@runCancellableCatching withContext(ioDispatcher) {
             val account = accountRepository.get(invitationId.accountId).getOrThrow()
             getMisskeyAPI(account).acceptInvitation(
                 AcceptInvitationDTO(
@@ -197,7 +199,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun reject(invitationId: InvitationId): Result<Unit> = runCancellableCatching {
-        return@runCancellableCatching withContext(Dispatchers.IO) {
+        return@runCancellableCatching withContext(ioDispatcher) {
             val account = accountRepository.get(invitationId.accountId).getOrThrow()
             getMisskeyAPI(account).rejectInvitation(
                 RejectInvitationDTO(

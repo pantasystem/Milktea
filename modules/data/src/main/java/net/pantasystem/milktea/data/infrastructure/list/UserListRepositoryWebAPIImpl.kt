@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.list
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
@@ -13,6 +13,7 @@ import net.pantasystem.milktea.api.misskey.list.ListUserOperation
 import net.pantasystem.milktea.api.misskey.list.UpdateList
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -28,10 +29,11 @@ import javax.inject.Singleton
 class UserListRepositoryWebAPIImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val accountRepository: AccountRepository,
-    private val userListDao: UserListDao
+    private val userListDao: UserListDao,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserListRepository {
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             val api = misskeyAPIProvider.get(account)
             val body = api.userList(I(account.token))
@@ -44,7 +46,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun create(accountId: Long, name: String): UserList {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             val res = misskeyAPIProvider.get(account).createList(
                 CreateList(
@@ -59,7 +61,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun update(listId: UserList.Id, name: String) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(listId.accountId).getOrThrow()
             misskeyAPIProvider.get(account).updateList(
                 UpdateList(
@@ -75,7 +77,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         listId: UserList.Id,
         userId: User.Id
     ) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(listId.accountId).getOrThrow()
             val misskeyAPI = misskeyAPIProvider.get(account)
             misskeyAPI.pushUserToList(
@@ -92,7 +94,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
         listId: UserList.Id,
         userId: User.Id
     ) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(listId.accountId).getOrThrow()
             val misskeyAPI = misskeyAPIProvider.get(account)
             misskeyAPI.pullUserFromList(
@@ -106,7 +108,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun delete(listId: UserList.Id) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(listId.accountId).getOrThrow()
             val misskeyAPI = misskeyAPIProvider.get(account)
             misskeyAPI.deleteList(ListId(account.token, listId.userListId))
@@ -115,7 +117,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun findOne(userListId: UserList.Id): UserList {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(userListId.accountId).getOrThrow()
             val misskeyAPI = misskeyAPIProvider.get(account)
             val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
@@ -142,7 +144,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun syncByAccountId(accountId: Long): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
 
             val source = findByAccountId(accountId)
             val beforeInsertRecords = source.map { ul ->
@@ -190,7 +192,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     }
 
     override suspend fun syncOne(userListId: UserList.Id): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val source = findOne(userListId)
             upsert(source)
         }
@@ -212,7 +214,7 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
                         }
                     )
                 }
-            }.flowOn(Dispatchers.IO)
+            }.flowOn(ioDispatcher)
     }
 
     private suspend fun upsert(source: UserList) {

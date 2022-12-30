@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -14,7 +15,8 @@ import javax.inject.Inject
 class MediatorFilePropertyDataSource @Inject constructor(
     private val inMemoryFilePropertyDataSource: InMemoryFilePropertyDataSource,
     private val driveFileRecordDao: DriveFileRecordDao,
-    private val loggerFactory: Logger.Factory
+    private val loggerFactory: Logger.Factory,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FilePropertyDataSource {
 
     val logger by lazy {
@@ -23,7 +25,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
 
 
     override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val result = inMemoryFilePropertyDataSource.add(fileProperty)
             val record = runCancellableCatching {
                 driveFileRecordDao.findOne(fileProperty.id.accountId, fileProperty.id.fileId)
@@ -47,7 +49,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
     }
 
     override suspend fun addAll(list: List<FileProperty>): Result<List<AddResult>> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             if (list.isEmpty()) {
                 return@withContext emptyList()
             }
@@ -91,7 +93,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
     }
 
     override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             var result = inMemoryFilePropertyDataSource.find(filePropertyId).getOrNull()
             if (result != null) {
                 return@withContext result
@@ -106,7 +108,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
     }
 
     override suspend fun remove(fileProperty: FileProperty): Result<Boolean> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             try {
                 driveFileRecordDao.delete(fileProperty.id.accountId, fileProperty.id.fileId)
                 true
@@ -120,7 +122,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
     override fun observe(id: FileProperty.Id): Flow<FileProperty?> {
         return driveFileRecordDao.observe(id.accountId, id.fileId).distinctUntilChanged().map {
             it?.toFileProperty()
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
     }
 
     override fun observeIn(ids: List<FileProperty.Id>): Flow<List<FileProperty>> {
@@ -149,11 +151,11 @@ class MediatorFilePropertyDataSource @Inject constructor(
             }
         }.distinctUntilChanged().onEach {
             inMemoryFilePropertyDataSource.addAll(it)
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
     }
 
     override suspend fun findIn(ids: List<FileProperty.Id>): Result<List<FileProperty>> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val inMemories = inMemoryFilePropertyDataSource.findIn(ids).getOrThrow()
             if (inMemories.size == ids.size) {
                 return@withContext inMemories
@@ -176,7 +178,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
     }
 
     override suspend fun clearUnusedCaches(): Result<Unit> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             driveFileRecordDao.deleteUnUsedFiles()
         }
     }

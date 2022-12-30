@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.*
@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -33,6 +34,7 @@ class UserRepositoryImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val loggerFactory: Logger.Factory,
+    @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
@@ -41,7 +43,7 @@ class UserRepositoryImpl @Inject constructor(
         NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
 
     override suspend fun find(userId: User.Id, detail: Boolean): User =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val localResult = runCancellableCatching {
                 userDataSource.get(userId).let {
                     if (detail) {
@@ -84,7 +86,7 @@ class UserRepositoryImpl @Inject constructor(
         userName: String,
         host: String?,
         detail: Boolean
-    ): User = withContext(Dispatchers.IO) {
+    ): User = withContext(ioDispatcher) {
         val local = runCancellableCatching {
             userDataSource.get(accountId, userName, host).let {
                 if (detail) {
@@ -133,7 +135,7 @@ class UserRepositoryImpl @Inject constructor(
         userName: String,
         host: String?
     ) = runCancellableCatching<Unit> {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val ac = accountRepository.get(accountId).getOrThrow()
             val i = ac.token
             val api = misskeyAPIProvider.get(ac)
@@ -167,7 +169,7 @@ class UserRepositoryImpl @Inject constructor(
             .getOrThrow()
     }
 
-    override suspend fun mute(createMute: CreateMute): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
         val res = misskeyAPIProvider.get(account).muteUser(
             CreateMuteUserRequest(
@@ -180,25 +182,25 @@ class UserRepositoryImpl @Inject constructor(
         res.isSuccessful
     }
 
-    override suspend fun unmute(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::unmuteUser, userId) { user ->
             user.copy(isMuting = false)
         }
     }
 
-    override suspend fun block(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::blockUser, userId) { user ->
             user.copy(isBlocking = true)
         }
     }
 
-    override suspend fun unblock(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun unblock(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::unblockUser, userId) { user ->
             user.copy(isBlocking = false)
         }
     }
 
-    override suspend fun follow(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
         val req = RequestUser(userId = userId.id, i = account.token)
@@ -215,7 +217,7 @@ class UserRepositoryImpl @Inject constructor(
         res.isSuccessful
     }
 
-    override suspend fun unfollow(userId: User.Id): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun unfollow(userId: User.Id): Boolean = withContext(ioDispatcher) {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
 
@@ -239,7 +241,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun acceptFollowRequest(userId: User.Id): Boolean =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val user = find(userId, true) as User.Detail
             if (!user.hasPendingFollowRequestToYou) {
@@ -266,7 +268,7 @@ class UserRepositoryImpl @Inject constructor(
         }
 
     override suspend fun rejectFollowRequest(userId: User.Id): Boolean =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val user = find(userId, true) as User.Detail
             if (!user.hasPendingFollowRequestToYou) {
@@ -295,7 +297,7 @@ class UserRepositoryImpl @Inject constructor(
         userId: User.Id,
         reducer: (User.Detail) -> User.Detail
     ): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.token))
             res.throwIfHasError()
@@ -309,7 +311,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun report(report: Report): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(report.userId.accountId).getOrThrow()
             val api = report.userId.getMisskeyAPI()
             val res = api.report(
@@ -325,7 +327,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             val request = RequestUser.from(query, account.token)
             val res = misskeyAPIProvider.get(account).getUsers(request)
@@ -340,7 +342,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun sync(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 val account = accountRepository.get(userId.accountId)
                     .getOrThrow()
                 val user = misskeyAPIProvider.get(account)
@@ -355,7 +357,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun syncIn(userIds: List<User.Id>): Result<List<User.Id>> {
         return runCancellableCatching {
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 val accountId = userIds.map { it.accountId }.distinct().firstOrNull()
                 if (accountId == null) {
                     emptyList()

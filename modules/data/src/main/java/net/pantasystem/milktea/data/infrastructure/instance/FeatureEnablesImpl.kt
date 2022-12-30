@@ -1,7 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.instance
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
@@ -12,9 +13,10 @@ import javax.inject.Inject
 class FeatureEnablesImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val metaRepository: MetaRepository,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ): FeatureEnables {
     override suspend fun isEnable(instanceDomain: String, type: FeatureType, default: Boolean): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val meta = metaRepository.find(instanceDomain).getOrNull()?: return@withContext default
             when(type) {
                 FeatureType.Gallery -> meta.getVersion() >= Version("12.75.0")
@@ -27,7 +29,7 @@ class FeatureEnablesImpl @Inject constructor(
     }
 
     override suspend fun enableFeatures(instanceDomain: String): Set<FeatureType> {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val meta = metaRepository.find(instanceDomain).getOrNull()?: return@withContext emptySet()
             setOfNotNull(
                 if (meta.getVersion() >= Version("12.75.0")) FeatureType.Gallery else null,

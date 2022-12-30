@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.gallery
 import kotlinx.coroutines.*
 import net.pantasystem.milktea.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
@@ -27,12 +28,13 @@ class GalleryRepositoryImpl @Inject constructor(
     private val fileUploaderProvider: FileUploaderProvider,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GalleryRepository {
 
 
     override suspend fun create(createGalleryPost: CreateGalleryPost): GalleryPost {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val files = coroutineScope {
                 createGalleryPost.files.map {
                     async {
@@ -72,7 +74,7 @@ class GalleryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(id: GalleryPost.Id) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = accountRepository.get(id.accountId).getOrThrow()
             val res = getMisskeyAPI(account).deleteGallery(
                 Delete(
@@ -85,7 +87,7 @@ class GalleryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun find(id: GalleryPost.Id): GalleryPost {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             try {
                 return@withContext galleryDataSource.find(id).getOrThrow()
             } catch (_: GalleryNotFoundException) {
@@ -107,7 +109,7 @@ class GalleryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun like(id: GalleryPost.Id) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val gallery = find(id) as? GalleryPost.Authenticated
                 ?: throw UnauthorizedException()
             val account = accountRepository.get(id.accountId).getOrThrow()
@@ -122,7 +124,7 @@ class GalleryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unlike(id: GalleryPost.Id) {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val gallery = find(id) as? GalleryPost.Authenticated
                 ?: throw UnauthorizedException()
             val account = accountRepository.get(id.accountId).getOrThrow()
@@ -137,7 +139,7 @@ class GalleryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun update(updateGalleryPost: UpdateGalleryPost): GalleryPost {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val account = accountRepository.get(updateGalleryPost.id.accountId).getOrThrow()
             val files = coroutineScope {
                 updateGalleryPost.files.map {

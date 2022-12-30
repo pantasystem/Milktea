@@ -1,11 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.ap
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
 import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
@@ -20,10 +21,11 @@ class ApResolverRepositoryImpl @Inject constructor(
     private val getAccount: GetAccount,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val userDataSource: UserDataSource,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ): ApResolverRepository {
 
     override suspend fun resolve(accountId: Long, uri: String): Result<ApResolver> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val account = getAccount.get(accountId)
             val result = apiProvider.get(account).resolve(ApResolveRequest(i = account.token, uri = uri))
                 .throwIfHasError()
