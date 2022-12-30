@@ -9,8 +9,9 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.ChannelEvent
 import net.pantasystem.milktea.api_streaming.StreamingEvent
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
 
 class StreamingEventTest {
 
