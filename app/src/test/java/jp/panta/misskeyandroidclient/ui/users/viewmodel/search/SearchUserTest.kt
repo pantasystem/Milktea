@@ -1,21 +1,22 @@
 package jp.panta.misskeyandroidclient.ui.users.viewmodel.search
 
 import net.pantasystem.milktea.user.search.SearchUser
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 
 class SearchUserTest {
 
     @Test
     fun isUserName() {
         val searchUser = SearchUser("harunon", null)
-        Assert.assertTrue(searchUser.isUserName)
-        Assert.assertTrue(SearchUser("nocturne_db", null).isUserName)
+        Assertions.assertTrue(searchUser.isUserName)
+        Assertions.assertTrue(SearchUser("nocturne_db", null).isUserName)
     }
 
     @Test
     fun isUserNameGiveNotUserNameCases() {
         val searchUser = SearchUser("はるのん", null)
-        Assert.assertFalse(searchUser.isUserName)
+        Assertions.assertFalse(searchUser.isUserName)
     }
 }
