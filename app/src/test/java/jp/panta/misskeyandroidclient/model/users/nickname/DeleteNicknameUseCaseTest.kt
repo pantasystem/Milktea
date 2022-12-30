@@ -8,9 +8,9 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UserNickname
 import net.pantasystem.milktea.model.user.nickname.UserNicknameRepository
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class DeleteNicknameUseCaseTest {
 
@@ -19,7 +19,7 @@ class DeleteNicknameUseCaseTest {
     private lateinit var user: User.Simple
     private lateinit var deleteNicknameUseCase: DeleteNicknameUseCase
     private lateinit var nicknameId: UserNickname.Id
-    @Before
+    @BeforeEach
     fun setUp() {
         val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
         this.nicknameRepository = nicknameRepository
