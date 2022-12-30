@@ -1,10 +1,11 @@
 package jp.panta.misskeyandroidclient.view
 
-import net.pantasystem.milktea.common.ui.SimpleElapsedTime
-import kotlinx.datetime.Clock
-import org.junit.Test
 
-import org.junit.Before
+import kotlinx.datetime.Clock
+import net.pantasystem.milktea.common.ui.SimpleElapsedTime
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -12,7 +13,7 @@ class SimpleElapsedTimeTest {
 
     private lateinit var simple: SimpleElapsedTime
 
-    @Before
+    @BeforeEach
     fun init(){
         simple = SimpleElapsedTime{
             when(it){
@@ -33,7 +34,7 @@ class SimpleElapsedTimeTest {
 
         val instant = Clock.System.now()
 
-        assert(simple.invoke(instant) == "未来")
+        Assertions.assertEquals( "未来",simple.invoke(instant))
 
     }
 
@@ -42,7 +43,7 @@ class SimpleElapsedTimeTest {
     fun nowTest(){
 
         val nowTest = Clock.System.now().plus((-9).seconds)
-        assert(simple.invoke(nowTest) == "今")
+        Assertions.assertEquals("今", simple.invoke(nowTest))
 
     }
 /*
