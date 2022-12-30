@@ -32,6 +32,7 @@ import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecut
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import java.util.*
 import javax.inject.Inject
@@ -39,11 +40,12 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
+    planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
+    accountStore: AccountStore,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val metaRepository: MetaRepository,
     private val driveFileRepository: DriveFileRepository,
-    accountStore: AccountStore,
     private val draftNoteService: DraftNoteService,
     private val draftNoteRepository: DraftNoteRepository,
     private val noteReservationPostExecutor: NoteReservationPostExecutor,
@@ -54,6 +56,7 @@ class NoteEditorViewModel @Inject constructor(
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     private val accountRepository: AccountRepository,
     private val localConfigRepository: LocalConfigRepository,
+    private val noteRelationGetter: NoteRelationGetter,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -239,6 +242,18 @@ class NoteEditorViewModel @Inject constructor(
     val isPostAvailable = uiState.map {
         it.checkValidate(textMaxLength = maxTextLength.value, maxFileCount = maxFileCount.value)
     }.asLiveData()
+
+    private val cache = planeNoteViewDataCacheFactory.create({
+        requireNotNull(currentAccount.value)
+    }, viewModelScope)
+
+    val replyTo = replyId.map { id ->
+        noteRelationGetter.get(id ?: throw UnauthorizedException()).getOrThrow()?.let {
+            cache.get(it)
+        }
+    }.catch {
+        emit(null)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val isPost = EventBus<Boolean>()
 
