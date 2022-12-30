@@ -3,8 +3,8 @@ package jp.panta.misskeyandroidclient.api.mastodon.instance
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.instance.Instance
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class InstanceTest {
 
@@ -15,7 +15,7 @@ class InstanceTest {
             ignoreUnknownKeys = true
         }
         val instance: Instance = json.decodeFromString(str)
-        assertEquals("mastodon.social", instance.uri)
+        Assertions.assertEquals("mastodon.social", instance.uri)
 
     }
 }
