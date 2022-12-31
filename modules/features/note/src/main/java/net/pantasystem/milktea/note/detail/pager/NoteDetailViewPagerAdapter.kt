@@ -1,14 +1,13 @@
 package net.pantasystem.milktea.note.detail.pager
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 
-class NoteDetailViewPagerAdapter(activity: FragmentActivity, val factory: PageableFragmentFactory) : FragmentStateAdapter(activity) {
+class NoteDetailViewPagerAdapter(activity: Fragment, val factory: PageableFragmentFactory) : FragmentStateAdapter(activity) {
     private var _list: List<Note.Id> = emptyList()
 
     override fun createFragment(position: Int): Fragment {
