@@ -44,10 +44,10 @@ class NoteCaptureAPIAdapterImpl(
      */
     private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
 
-    /**
-     * 使用されなくなったNoteのリソースが順番に入れられるQueue。
-     */
-    private val noteResourceReleaseEvent = MutableSharedFlow<Note.Id>(extraBufferCapacity = 1000)
+//    /**
+//     * 使用されなくなったNoteのリソースが順番に入れられるQueue。
+//     */
+//    private val noteResourceReleaseEvent = MutableSharedFlow<Note.Id>(extraBufferCapacity = 1000)
 
     init {
         // NOTE: Noteのキャプチャーによって発生したイベントのQueueであるnoteUpdatedDispatcherのイベントを順番にキャッシュに反映させている。
@@ -57,14 +57,14 @@ class NoteCaptureAPIAdapterImpl(
             }
         }
 
-        // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
-        coroutineScope.launch(dispatcher) {
-            noteResourceReleaseEvent.filterNot {
-                isCaptured(it)
-            }.collect {
-                noteDataSource.remove(it)
-            }
-        }
+//        // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
+//        coroutineScope.launch(dispatcher) {
+//            noteResourceReleaseEvent.filterNot {
+//                isCaptured(it)
+//            }.collect {
+//                noteDataSource.remove(it)
+//            }
+//        }
     }
 
     override fun on(e: NoteDataSource.Event) {
@@ -112,7 +112,7 @@ class NoteCaptureAPIAdapterImpl(
 
         awaitClose {
             // NoteCaptureの購読を解除する
-            val result = synchronized(noteIdWithJob) {
+            synchronized(noteIdWithJob) {
                 // リスナーを解除する
                 removeRepositoryEventListener(id, repositoryEventListener).also { result ->
                     if (result) {
@@ -126,10 +126,10 @@ class NoteCaptureAPIAdapterImpl(
 
             }
 
-            // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
-            if (result) {
-                noteResourceReleaseEvent.tryEmit(id)
-            }
+//            // NOTE: Noteのキャプチャーが一切行われなくなった場合キャッシュ上からも削除している。
+//            if (result) {
+//                noteResourceReleaseEvent.tryEmit(id)
+//            }
         }
     }.shareIn(coroutineScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
@@ -209,11 +209,6 @@ class NoteCaptureAPIAdapterImpl(
 
     }
 
-    private fun isCaptured(noteId: Note.Id): Boolean {
-        return synchronized(noteIdWithListeners) {
-            noteIdWithListeners[noteId].isNullOrEmpty().not()
-        }
-    }
 
 
 }
