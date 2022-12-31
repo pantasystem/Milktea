@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.FilePreviewTarget
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.model.drive.DriveFileRepository
@@ -70,13 +71,18 @@ class DraftNotesFragment : Fragment() {
                 requireActivity().finish()
             }
             is DraftNotePageAction.ShowFile -> {
-                val intent = mediaNavigation.newIntent(MediaNavigationArgs.AFile(action.previewActionType.file.toFile()))
+                val intent = mediaNavigation.newIntent(
+                    MediaNavigationArgs.AFile(
+                        when (val file = action.previewActionType) {
+                            is FilePreviewTarget.Local -> file.file.toFile()
+                            is FilePreviewTarget.Remote -> file.fileProperty.toFile()
+                        }
+                    )
+                )
                 startActivity(intent)
             }
         }
     }
-
-
 
 
 }

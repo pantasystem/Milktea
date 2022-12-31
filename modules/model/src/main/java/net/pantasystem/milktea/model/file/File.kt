@@ -5,8 +5,6 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
-import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import java.io.Serializable as JSerializable
@@ -39,16 +37,6 @@ sealed interface AppFile : JSerializable {
 }
 
 
-sealed interface FileState {
-    val appFile: AppFile
-
-    data class Local(override val appFile: AppFile.Local) : FileState
-    data class Remote(
-        override val appFile: AppFile,
-        val state: Flow<ResultState<FileProperty>>,
-        val source: FileProperty?
-    ) : FileState
-}
 
 
 data class File(
@@ -81,52 +69,20 @@ data class File(
 }
 
 
-fun AppFile.toFile(): File {
-    return when (this) {
-        is AppFile.Remote -> {
-            File(
-                name = "remote file",
-                path = null,
-                type = null,
-                remoteFileId = id,
-                thumbnailUrl = null,
-                isSensitive = null,
-                folderId = null,
-                localFileId = null
-            )
-        }
-        is AppFile.Local -> {
-            File(
-                name = name,
-                path = path,
-                type = type,
-                remoteFileId = null,
-                thumbnailUrl = thumbnailUrl,
-                isSensitive = isSensitive,
-                folderId = folderId,
-                localFileId = id
-            )
-        }
-    }
+fun AppFile.Local.toFile(): File {
+    return File(
+        name = name,
+        path = path,
+        type = type,
+        remoteFileId = null,
+        thumbnailUrl = thumbnailUrl,
+        isSensitive = isSensitive,
+        folderId = folderId,
+        localFileId = id
+    )
 }
 
-fun AppFile.Companion.from(file: File): AppFile {
-    return if (file.isRemoteFile) {
-        AppFile.Remote(
-            file.remoteFileId!!
-        )
-    } else {
-        AppFile.Local(
-            folderId = file.folderId,
-            isSensitive = file.isSensitive ?: false,
-            id = file.localFileId!!,
-            name = file.name,
-            path = file.path!!,
-            thumbnailUrl = file.thumbnailUrl,
-            type = file.type!!
-        )
-    }
-}
+
 
 fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
     return when(file) {
