@@ -48,18 +48,18 @@ fun HorizontalFilePreviewList(
     }
 }
 
-sealed interface FilePreviewTarget {
+sealed interface FilePreviewSource {
     val file: AppFile
-    data class Local(override val file: AppFile.Local) : FilePreviewTarget
+    data class Local(override val file: AppFile.Local) : FilePreviewSource
     data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
-        FilePreviewTarget
+        FilePreviewSource
 }
 
 sealed interface FilePreviewActionType {
-    val target: FilePreviewTarget
-    data class Show(override val target: FilePreviewTarget) : FilePreviewActionType
-    data class Detach(override val target: FilePreviewTarget) : FilePreviewActionType
-    data class ToggleSensitive(override val target: FilePreviewTarget) : FilePreviewActionType
+    val target: FilePreviewSource
+    data class Show(override val target: FilePreviewSource) : FilePreviewActionType
+    data class Detach(override val target: FilePreviewSource) : FilePreviewActionType
+    data class ToggleSensitive(override val target: FilePreviewSource) : FilePreviewActionType
 }
 
 @Composable
@@ -69,7 +69,7 @@ fun FilePreview(
     dataSource: FilePropertyDataSource,
     onAction: (FilePreviewActionType) -> Unit,
 ) {
-    var dropDownTarget: FilePreviewTarget? by remember {
+    var dropDownTarget: FilePreviewSource? by remember {
         mutableStateOf(null)
     }
     Column {
@@ -78,7 +78,7 @@ fun FilePreview(
                 LocalFilePreview(
                     file = file,
                     onClick = {
-                        dropDownTarget = FilePreviewTarget.Local(it)
+                        dropDownTarget = FilePreviewSource.Local(it)
                     }
                 )
             }
@@ -88,7 +88,7 @@ fun FilePreview(
                     repository = repository,
                     dataSource = dataSource,
                     onClick = {
-                        dropDownTarget = FilePreviewTarget.Remote(
+                        dropDownTarget = FilePreviewSource.Remote(
                             AppFile.Remote(it.id),
                             it
                         )
@@ -100,8 +100,8 @@ fun FilePreview(
         FilePreviewActionDropDown(
             isSensitive = target != null
                     && (
-                        (target is FilePreviewTarget.Local && target.file.isSensitive)
-                        || (target is FilePreviewTarget.Remote && target.fileProperty.isSensitive)
+                        (target is FilePreviewSource.Local && target.file.isSensitive)
+                        || (target is FilePreviewSource.Remote && target.fileProperty.isSensitive)
                     ),
             expanded = dropDownTarget != null,
             onToggleSensitive = {

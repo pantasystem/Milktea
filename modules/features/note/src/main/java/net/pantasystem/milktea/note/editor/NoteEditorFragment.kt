@@ -40,7 +40,7 @@ import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
-import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.channel.Channel
@@ -303,10 +303,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         dataSource = filePropertyDataSource,
                         onShow = {
                             val file = when (it) {
-                                is FilePreviewTarget.Remote -> {
+                                is FilePreviewSource.Remote -> {
                                     it.fileProperty.toFile()
                                 }
-                                is FilePreviewTarget.Local -> {
+                                is FilePreviewSource.Local -> {
                                     it.file.toFile()
                                 }
                             }

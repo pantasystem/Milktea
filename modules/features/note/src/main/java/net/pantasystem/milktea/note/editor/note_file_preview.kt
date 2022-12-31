@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.FilePreviewActionType
-import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -23,7 +23,7 @@ fun NoteFilePreview(
     noteEditorViewModel: NoteEditorViewModel,
     fileRepository: DriveFileRepository,
     dataSource: FilePropertyDataSource,
-    onShow: (FilePreviewTarget)->Unit
+    onShow: (FilePreviewSource)->Unit
 ) {
     val uiState by noteEditorViewModel.uiState.collectAsState()
     val maxFileCount = noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
