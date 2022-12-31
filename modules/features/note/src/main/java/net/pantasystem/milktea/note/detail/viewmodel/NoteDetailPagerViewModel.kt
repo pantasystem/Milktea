@@ -50,16 +50,18 @@ class NoteDetailPagerViewModel @Inject constructor(
         savedStateHandle.get<Pageable>(EXTRA_FROM_PAGEABLE) ?: Pageable.Show(noteId)
     }
 
-    val accountWatcher = CurrentAccountWatcher(savedStateHandle[EXTRA_ACCOUNT_ID], accountRepository)
-    val timelineStore = timelineStoreFactory.create(pageable, viewModelScope) {
+    private val accountWatcher = CurrentAccountWatcher(savedStateHandle[EXTRA_ACCOUNT_ID], accountRepository)
+    private val timelineStore = timelineStoreFactory.create(pageable, viewModelScope) {
         accountWatcher.getAccount()
     }
 
     val noteIds = combine(timelineStore.timelineState, flowOf(noteId)) { state, noteId ->
         when(val content = state.content) {
-            is StateContent.Exist -> content.rawContent
+            is StateContent.Exist -> listOf(Note.Id(accountWatcher.getAccount().accountId, noteId)) + content.rawContent
             is StateContent.NotExist -> listOf(Note.Id(accountWatcher.getAccount().accountId, noteId))
-        }
+        }.distinct().sortedBy {
+            it.noteId
+        }.reversed()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
