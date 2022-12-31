@@ -52,12 +52,25 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+                    <FrameLayout
+                            android:id="@+id/replyToViewBase"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="@{ viewModel.replyTo == null ? View.GONE : View.VISIBLE }"
+                            >
+                        <include
+                                android:id="@+id/replyToLayout"
+                                layout="@layout/item_note_editor_reply_to_note"
+                                app:note="@{ viewModel.replyTo }"
+                                />
+                    </FrameLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:layout_marginBottom="16dp"
+                            android:layout_marginHorizontal="16dp"
                             android:visibility="@{ viewModel.reservationPostingAt == null ? View.GONE : View.VISIBLE }">
                         <TextView
                                 android:id="@+id/reservationLabelTextView"
@@ -143,6 +156,8 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/note_editor_toolbar"
                             android:text="@{viewModel.text}"
+                            android:minLines="6"
+                            android:background="#00000000"
                             />
 
                     <FrameLayout

@@ -378,7 +378,7 @@
                     android:orientation="horizontal">
 
                 <ImageButton
-                        android:id="@+id/imageButton"
+                        android:id="@+id/replyButton"
                         style="?android:attr/borderlessButtonStyle"
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
@@ -390,7 +390,7 @@
                         app:tint="?attr/normalIconTint" />
 
                 <TextView
-                        android:id="@+id/textView3"
+                        android:id="@+id/replyCountView"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -400,7 +400,7 @@
                         android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
 
                 <ImageButton
-                        android:id="@+id/imageButton2"
+                        android:id="@+id/renoteButton"
                         style="?android:attr/borderlessButtonStyle"
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
@@ -413,7 +413,7 @@
                         app:tint="?attr/normalIconTint" />
 
                 <TextView
-                        android:id="@+id/textView4"
+                        android:id="@+id/renoteCountView"
                         android:layout_width="50dp"
 
                         android:layout_height="wrap_content"
@@ -426,7 +426,7 @@
                         />
 
                 <ImageButton
-                        android:id="@+id/imageButton3"
+                        android:id="@+id/toggleReactionButton"
                         style="?android:attr/borderlessButtonStyle"
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"
@@ -451,7 +451,7 @@
                         />
 
                 <ImageButton
-                        android:id="@+id/imageButton4"
+                        android:id="@+id/noteOptionButton"
                         style="?android:attr/borderlessButtonStyle"
                         android:layout_width="@dimen/note_bottom_action_icon_size"
                         android:layout_height="@dimen/note_bottom_action_icon_size"

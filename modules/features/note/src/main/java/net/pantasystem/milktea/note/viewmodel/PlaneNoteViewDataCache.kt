@@ -8,14 +8,13 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteDataSource
-import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.url.UrlPreviewStore
+import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
 class PlaneNoteViewDataCache(
@@ -26,6 +25,30 @@ class PlaneNoteViewDataCache(
     private val coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
 ) {
+
+    @Singleton
+    class Factory @Inject constructor(
+        private val noteCaptureAdapter: NoteCaptureAPIAdapter,
+        private val translationStore: NoteTranslationStore,
+        private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
+        private val noteRelationGetter: NoteRelationGetter,
+    ) {
+        fun create(
+            getAccount: suspend () -> Account,
+            coroutineScope: CoroutineScope,
+        ): PlaneNoteViewDataCache {
+            return PlaneNoteViewDataCache(
+                getAccount,
+                noteCaptureAdapter,
+                translationStore,
+                {
+                    urlPreviewStoreProvider.getUrlPreviewStore(it)
+                },
+                coroutineScope,
+                noteRelationGetter
+            )
+        }
+    }
 
     private val lock = Mutex()
     private val cache = mutableMapOf<Note.Id, PlaneNoteViewData>()
