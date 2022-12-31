@@ -50,6 +50,7 @@ data class DraftLocalFile(
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "thumbnailUrl") val thumbnailUrl: String?,
     @ColumnInfo(name = "folder_id") val folderId: String?,
+    @ColumnInfo(name = "file_size") val fileSize: Long?,
     @PrimaryKey(autoGenerate = true) val localFileId: Long = 0L,
 ) {
     companion object
@@ -64,6 +65,7 @@ fun DraftLocalFile.Companion.from(draftNote: DraftNoteFile.Local): DraftLocalFil
         type = draftNote.type,
         thumbnailUrl = draftNote.thumbnailUrl,
         isSensitive = draftNote.isSensitive,
+        fileSize = draftNote.fileSize
     )
 }
 
