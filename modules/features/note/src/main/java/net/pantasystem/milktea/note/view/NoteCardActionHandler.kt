@@ -38,7 +38,7 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnOptionButtonClicked -> {
-                NoteOptionDialog.newInstance(action.note.toShowNote.note.id)
+                NoteOptionDialog.newInstance(action.note.toShowNote.note.id, fromPageable = currentPageable)
                     .show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnPollChoiceClicked -> {

@@ -4,24 +4,31 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
 import net.pantasystem.milktea.app_store.notes.TimelineStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.NoteStreaming
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class NoteDetailPagerViewModel @Inject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     accountRepository: AccountRepository,
+    noteStreaming: NoteStreaming,
+    accountStore: AccountStore,
+    loggerFactory: Logger.Factory,
 //    cacheFactory: PlaneNoteViewDataCache.Factory
     savedStateHandle: SavedStateHandle,
 ): ViewModel() {
@@ -30,6 +37,10 @@ class NoteDetailPagerViewModel @Inject constructor(
         const val EXTRA_FROM_PAGEABLE = "NoteDetailPagerViewModel.EXTRA_FROM_PAGEABLE"
         const val EXTRA_NOTE_ID = "NoteDetailPagerViewModel.EXTRA_NOTE_ID"
         const val EXTRA_ACCOUNT_ID = "NoteDetailPagerViewModel.EXTRA_ACCOUNT_ID"
+    }
+
+    private val logger by lazy {
+        loggerFactory.create("NoteDetailPagerVM")
     }
 
     private val noteId by lazy {
@@ -44,7 +55,6 @@ class NoteDetailPagerViewModel @Inject constructor(
         accountWatcher.getAccount()
     }
 
-//    val currentNote =
     val noteIds = combine(timelineStore.timelineState, flowOf(noteId)) { state, noteId ->
         when(val content = state.content) {
             is StateContent.Exist -> content.rawContent
@@ -54,6 +64,14 @@ class NoteDetailPagerViewModel @Inject constructor(
 
     init {
         load()
+
+        accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
+            noteStreaming.connect(accountWatcher::getAccount, pageable)
+        }.map {
+            timelineStore.onReceiveNote(it.id)
+        }.catch {
+            logger.error("receive not error", it)
+        }.launchIn(viewModelScope + Dispatchers.IO)
     }
 
     fun load() {
@@ -63,6 +81,7 @@ class NoteDetailPagerViewModel @Inject constructor(
                     Note.Id(accountWatcher.getAccount().accountId, noteId)
                 ))
                 timelineStore.loadPrevious()
+                timelineStore.loadFuture()
             }
 
         }

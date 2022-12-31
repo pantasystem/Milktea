@@ -26,7 +26,7 @@ import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 class NoteOptionDialog : BottomSheetDialogFragment() {
 
     companion object {
-        fun newInstance(noteId: Note.Id, fromPageable: Pageable): NoteOptionDialog {
+        fun newInstance(noteId: Note.Id, fromPageable: Pageable? = null): NoteOptionDialog {
             return NoteOptionDialog().apply {
                 arguments = Bundle().apply {
                     putSerializable(NoteOptionViewModel.NOTE_ID, noteId)

@@ -7,6 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -58,5 +59,19 @@ class NoteDetailPagerFragment : Fragment(R.layout.fragment_note_detail_pager) {
                 }
             }
         }
+
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                if (position == 0) {
+                    viewModel.loadFuture()
+                    return
+                }
+                val ids = viewModel.noteIds.value
+                if (position == ids.size - 1) {
+                    viewModel.loadPrevious()
+                }
+            }
+        })
     }
 }
