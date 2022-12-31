@@ -18,13 +18,15 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.getParentActivity
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteDetailBinding
+import net.pantasystem.milktea.note.detail.NoteDetailPagerFragment
+import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailPagerViewModel
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -39,10 +41,11 @@ class NoteDetailActivity : AppCompatActivity() {
 
         const val EXTRA_IS_MAIN_ACTIVE = "jp.panta.misskeyandroidclient.EXTRA_IS_MAIN_ACTIVE"
 
-        fun newIntent(context: Context, noteId: Note.Id): Intent {
+        fun newIntent(context: Context, noteId: Note.Id, fromPageable: Pageable? = null): Intent {
             return Intent(context, NoteDetailActivity::class.java).apply {
                 putExtra(EXTRA_NOTE_ID, noteId.noteId)
                 putExtra(EXTRA_ACCOUNT_ID, noteId.accountId)
+                putExtra(NoteDetailPagerViewModel.EXTRA_FROM_PAGEABLE, fromPageable)
             }
         }
     }
@@ -75,6 +78,7 @@ class NoteDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var setMenuTint: ApplyMenuTint
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme()
@@ -103,13 +107,12 @@ class NoteDetailActivity : AppCompatActivity() {
             settingStore
         ).initViewModelListener()
         val ft = supportFragmentManager.beginTransaction()
+
+        val fragment = NoteDetailPagerFragment.newInstance(noteId!!,
+            intent.getSerializableExtra(NoteDetailPagerViewModel.EXTRA_FROM_PAGEABLE) as? Pageable, mAccountId)
         ft.replace(
             R.id.fragment_base,
-            pageableFragmentFactory.create(
-                mAccountId, Pageable.Show(
-                    noteId!!
-                )
-            )
+            fragment
         )
         ft.commit()
 

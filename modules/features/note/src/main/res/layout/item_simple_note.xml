@@ -28,8 +28,7 @@
             android:paddingEnd="8dp"
             android:paddingTop="8dp"
 
-            app:transitionDestinationNote="@{note.toShowNote.note}"
-            app:clickedView="@{elapsedTime}"
+
             app:mainNameView="@{mainName}"
             app:subNameView="@{subName}"
             app:user="@{note.toShowNote.user}"
@@ -99,7 +98,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:textColor="?attr/colorPrimary"
-                app:emojiCompatEnabled="false" />
+                app:emojiCompatEnabled="false"
+                android:onClick="@{() -> noteCardActionListener.onNoteCardClicked(note.note.note)}"
+                />
 
         <net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout
                 android:layout_width="0dp"

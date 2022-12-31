@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.datetime.Instant
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
@@ -89,7 +89,7 @@ class TimelineStoreImpl(
             }
             else -> TimelinePagingStoreImpl(
                 pageableTimeline, noteAdder, getAccount, {
-                    initialUntilDate
+                    initialLoadQuery
                 }, misskeyAPIProvider,
                 metaRepository,
             )
@@ -100,7 +100,7 @@ class TimelineStoreImpl(
 
     var latestReceiveId: Note.Id? = null
 
-    var initialUntilDate: Instant? = null
+    var initialLoadQuery: InitialLoadQuery? = null
 
     init {
         coroutineScope.launch(Dispatchers.IO) {
@@ -142,7 +142,7 @@ class TimelineStoreImpl(
                 }
             }
             if (addedCount.getOrElse { Int.MAX_VALUE } < LIMIT) {
-                initialUntilDate = null
+                initialLoadQuery = null
             }
             latestReceiveId = null
         }
@@ -173,12 +173,13 @@ class TimelineStoreImpl(
 
     }
 
-    override suspend fun clear(initialUntilDate: Instant?) {
+    override suspend fun clear(initialLoadQuery: InitialLoadQuery?) {
         pageableStore.mutex.withLock {
-            this.initialUntilDate = initialUntilDate
+            this.initialLoadQuery = initialLoadQuery
             pageableStore.setState(PageableState.Loading.Init())
         }
     }
+
 
     override fun onReceiveNote(noteId: Note.Id) {
         willAddNoteQueue.tryEmit(noteId)
@@ -192,7 +193,7 @@ class TimelineStoreImpl(
         val store = pageableStore
         if (store is TimelinePagingStoreImpl) {
             store.mutex.withLock {
-                if (initialUntilDate != null) {
+                if (initialLoadQuery != null) {
                     return@withLock
                 }
                 val content = store.getState().content
@@ -236,7 +237,7 @@ class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
-    private val getInitialUntilDate: () -> Instant?,
+    private val getInitialLoadQuery: () -> InitialLoadQuery?,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val metaRepository: MetaRepository,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
@@ -272,9 +273,10 @@ class TimelinePagingStoreImpl(
                 pageable = pageableTimeline,
                 limit = LIMIT
             )
-            val untilDate = getInitialUntilDate.invoke()
+            val initialLoadQuery = getInitialLoadQuery.invoke()
+            val untilDate = (initialLoadQuery as? InitialLoadQuery.UntilDate)?.date
             val req = builder.build(NoteRequest.Conditions(
-                untilId = untilId,
+                untilId = untilId ?: (initialLoadQuery as? InitialLoadQuery.UntilId)?.noteId?.noteId,
                 untilDate = if (untilId == null) untilDate?.toEpochMilliseconds() else null,
             ))
             getStore()!!.invoke(req).throwIfHasError().body()!!

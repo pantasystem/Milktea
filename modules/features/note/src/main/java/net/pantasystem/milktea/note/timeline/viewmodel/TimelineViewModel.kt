@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.APIError
@@ -160,7 +161,9 @@ class TimelineViewModel @AssistedInject constructor(
     fun loadInit(initialUntilDate: Instant? = null) {
         viewModelScope.launch {
             cache.clear()
-            timelineStore.clear(initialUntilDate)
+            timelineStore.clear(initialUntilDate?.let {
+                InitialLoadQuery.UntilDate(it)
+            })
             timelineStore.loadPrevious()
             timelineStore.loadFuture()
         }

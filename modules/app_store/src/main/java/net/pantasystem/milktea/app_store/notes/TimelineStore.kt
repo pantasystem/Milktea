@@ -24,10 +24,10 @@ interface TimelineStore {
     suspend fun loadFuture(): Result<Unit>
 
     /**
-     * @param initialUntilDate コンテンツが空の状態の時にloadPreviousを呼び出した時に
+     * @param initialLoadQuery コンテンツが空の状態の時にloadPreviousを呼び出した時に
      * このパラメーターの日時以降の投稿を取りに行こうとする
      */
-    suspend fun clear(initialUntilDate: Instant? = null)
+    suspend fun clear(initialLoadQuery: InitialLoadQuery?)
 
     /**
      * Stream API経由で関連するチャンネルのノートを受信した時のハンドラー
@@ -35,4 +35,9 @@ interface TimelineStore {
     fun onReceiveNote(noteId: Note.Id)
 
     fun latestReceiveNoteId(): Note.Id?
+}
+
+sealed interface InitialLoadQuery {
+    data class UntilId(val noteId: Note.Id) : InitialLoadQuery
+    data class UntilDate(val date: Instant) : InitialLoadQuery
 }
