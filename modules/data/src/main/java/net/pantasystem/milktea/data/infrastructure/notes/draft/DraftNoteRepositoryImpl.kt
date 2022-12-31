@@ -61,6 +61,7 @@ class DraftNoteRepositoryImpl @Inject constructor(
                                         type = it.type,
                                         thumbnailUrl = it.thumbnailUrl,
                                         isSensitive = it.isSensitive,
+                                        fileSize = it.fileSize,
                                     )
                                 ),
                                 filePropertyId = null,

@@ -21,12 +21,14 @@ sealed interface AppFile : JSerializable {
         val thumbnailUrl: String?,
         val isSensitive: Boolean,
         val folderId: String?,
+        val fileSize: Long?,
         val id: Long = 0,
     ) : AppFile {
         fun isAttributeSame(file: Local): Boolean {
             return file.name == name
                     && file.path == path
                     && file.type == type
+                    && file.fileSize == fileSize
         }
     }
 
@@ -56,8 +58,6 @@ data class File(
 
     }
 
-    val isRemoteFile: Boolean
-        get() = remoteFileId != null
 
     val aboutMediaType = when {
         this.type == null -> AboutMediaType.OTHER
@@ -92,6 +92,7 @@ fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
             thumbnailUrl = file.thumbnailUrl,
             type = file.type,
             isSensitive = file.isSensitive ?: false,
+            fileSize = file.fileSize,
             folderId = file.folderId,
         )
         is DraftNoteFile.Remote -> AppFile.Remote(file.fileProperty.id)
@@ -111,13 +112,15 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
 
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
+    val fileSize = getFileSize(context)
     return AppFile.Local(
         fileName?: "name none",
         path = this.toString(),
         type  = mimeType ?: "",
         thumbnailUrl = thumbnail,
         isSensitive = false,
-        folderId = null
+        folderId = null,
+        fileSize = fileSize
     )
 }
 
@@ -131,28 +134,7 @@ fun Uri.getFileSize(context: Context): Long {
     return fileSize
 }
 
-fun Uri.toFile(context: Context): File {
-    val fileName = try{
-        context.getFileName(this)
-    }catch(e: Exception){
-        Log.d("FileUtils", "ファイル名の取得に失敗しました", e)
-        null
-    }
 
-    val mimeType = context.contentResolver.getType(this)
-
-    val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
-    val thumbnail = if(isMedia) this.toString() else null
-    return File(
-        fileName ?: "name none",
-        this.toString(),
-        type = mimeType,
-        remoteFileId = null,
-        localFileId = null,
-        thumbnailUrl = thumbnail,
-        isSensitive = null
-    )
-}
 
 private fun Context.getFileName(uri: Uri) : String{
     return when(uri.scheme){
