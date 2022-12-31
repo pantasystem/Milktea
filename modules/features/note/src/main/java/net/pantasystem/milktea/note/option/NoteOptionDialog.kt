@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.NoteDetailActivity
@@ -25,10 +26,11 @@ import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 class NoteOptionDialog : BottomSheetDialogFragment() {
 
     companion object {
-        fun newInstance(noteId: Note.Id): NoteOptionDialog {
+        fun newInstance(noteId: Note.Id, fromPageable: Pageable): NoteOptionDialog {
             return NoteOptionDialog().apply {
                 arguments = Bundle().apply {
                     putSerializable(NoteOptionViewModel.NOTE_ID, noteId)
+                    putSerializable(NoteOptionViewModel.FROM_PAGEABLE, fromPageable)
                 }
             }
         }
@@ -47,7 +49,8 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             requireActivity().startActivity(
                                 NoteDetailActivity.newIntent(
                                     requireActivity(),
-                                    noteId = it
+                                    noteId = it,
+                                    fromPageable = viewModel.fromPageable
                                 )
                             )
                             dismiss()

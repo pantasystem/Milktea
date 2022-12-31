@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.*
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class NoteOptionViewModel @Inject constructor(
 ) : ViewModel() {
     companion object {
         const val NOTE_ID = "NoteOptionViewModel.NOTE_ID"
+        const val FROM_PAGEABLE = "NoteOptionViewModel.FROM_PAGEABLE"
     }
 
     private val logger by lazy {
@@ -41,6 +43,8 @@ class NoteOptionViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         null
     )
+
+    val fromPageable: Pageable? = savedStateHandle[FROM_PAGEABLE]
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val note = noteIdFlow.filterNotNull().flatMapLatest {
