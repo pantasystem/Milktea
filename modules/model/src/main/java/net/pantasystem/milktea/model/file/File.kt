@@ -3,6 +3,7 @@ package net.pantasystem.milktea.model.file
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.ResultState
@@ -163,6 +164,17 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
         folderId = null
     )
 }
+
+fun Uri.getFileSize(context: Context): Long {
+    var fileSize: Long = -1
+    context.contentResolver.query(this, null, null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(OpenableColumns.SIZE))
+        }
+    }
+    return fileSize
+}
+
 fun Uri.toFile(context: Context): File {
     val fileName = try{
         context.getFileName(this)
