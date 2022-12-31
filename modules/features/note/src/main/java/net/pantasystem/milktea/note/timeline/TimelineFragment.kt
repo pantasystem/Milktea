@@ -161,7 +161,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 requireActivity() as AppCompatActivity,
                 notesViewModel,
                 settingStore,
-                userDetailNavigation
+                userDetailNavigation,
+                currentPageable = mPageable
             ).onAction(it)
         }
 
