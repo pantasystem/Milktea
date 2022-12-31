@@ -99,7 +99,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:textColor="?attr/colorPrimary"
                 app:emojiCompatEnabled="false"
-                android:onClick="@{() -> noteCardActionListener.onNoteCardClicked(note.toShowNote.note)}"
+                android:onClick="@{() -> noteCardActionListener.onNoteCardClicked(note.note.note)}"
                 />
 
         <net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout
