@@ -37,16 +37,14 @@ import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
-import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ResultType
-import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -125,11 +123,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     @Inject
     internal lateinit var metaRepository: MetaRepository
 
-    @Inject
-    internal lateinit var filePropertyDataSource: FilePropertyDataSource
-
-    @Inject
-    internal lateinit var filePropertyRepository: DriveFileRepository
 
     @Inject
     internal lateinit var settingStore: SettingStore
@@ -298,8 +291,6 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 MdcTheme {
                     NoteFilePreview(
                         noteEditorViewModel = noteEditorViewModel,
-                        fileRepository = filePropertyRepository,
-                        dataSource = filePropertyDataSource,
                         onShow = {
                             val file = when (it) {
                                 is FilePreviewSource.Remote -> {
