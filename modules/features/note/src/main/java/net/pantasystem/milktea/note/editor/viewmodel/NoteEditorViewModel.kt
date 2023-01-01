@@ -135,6 +135,11 @@ class NoteEditorViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val instanceInfo = currentAccount.filterNotNull().flatMapLatest {
+        instanceInfoRepository.observeByHost(it.getHost())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
         NoteEditorSavedStateKey.Visibility.name,
         null
