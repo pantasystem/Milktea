@@ -23,13 +23,14 @@ fun NoteFilePreview(
 ) {
     val uiState by noteEditorViewModel.uiState.collectAsState()
     val maxFileCount = noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
-
+    val instanceInfo by noteEditorViewModel.instanceInfo.collectAsState()
     Row (
         verticalAlignment = Alignment.CenterVertically,
     ){
         HorizontalFilePreviewList(
             files = uiState.files,
             modifier = Modifier.weight(1f),
+            allowMaxFileSize = instanceInfo?.clientMaxBodyByteSize,
             onAction = {
                 when(it) {
                     is FilePreviewActionType.ToggleSensitive -> {
