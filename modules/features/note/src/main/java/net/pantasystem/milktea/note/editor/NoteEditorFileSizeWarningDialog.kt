@@ -6,10 +6,10 @@ import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common.convertToHumanReadable
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
-import kotlin.math.pow
 
 @Suppress("DEPRECATION")
 @AndroidEntryPoint
@@ -34,10 +34,11 @@ class NoteEditorFileSizeWarningDialog : AppCompatDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val appFile = requireNotNull(requireArguments().getSerializable(EXTRA_APP_FILE_LOCAL) as AppFile.Local)
         val host = requireNotNull(requireArguments().getString(EXTRA_HOST))
+        val allowSize = requireNotNull(requireArguments().getLong(EXTRA_ALLOW_MAX_SIZE))
 
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.file_size_warning_dialog_title)
-            .setMessage(getString(R.string.file_size_warning_dialog_message, host, convertHumanFriendly(appFile.fileSize)))
+            .setMessage(getString(R.string.file_size_warning_dialog_message, host, convertHumanFriendly(allowSize)))
             .setPositiveButton(R.string.file_size_warning_dialo_positive_button) { _, _ ->
                 dismiss()
             }.setNegativeButton(R.string.file_size_warning_dialog_negative_button) { _, _ ->
@@ -50,24 +51,7 @@ class NoteEditorFileSizeWarningDialog : AppCompatDialogFragment() {
     private fun convertHumanFriendly(size: Long?): String {
         size ?: return "0B"
 
-        return if (size >= 1024.0.pow(5.0)) {
-             "${size / 1024.0.pow(5.0).toLong()}PB"
-        } else if(size >= 1024.0.pow(4.0)) {
-            "${size / 1024.0.pow(4.0).toLong()}TB"
-
-        } else if(size >= 1024.0.pow(3.0)) {
-            "${size / 1024.0.pow(3.0).toLong()}GB"
-
-        } else if(size >= 1024.0.pow(2.0)) {
-            "${size / 1024.0.pow(2.0).toLong()}MB"
-
-        } else if (size >= 1024) {
-            "${size / 1024.0.pow(1.0).toLong()}KB"
-
-        } else {
-            "${size}B"
-        }
-
+        return size.convertToHumanReadable()
 
     }
 }

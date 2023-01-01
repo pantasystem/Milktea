@@ -16,6 +16,11 @@ class ByteSizeHelperKtTest {
     }
 
     @Test
+    fun convertToHumanReadable_Give_4096() {
+        Assertions.assertEquals("4KB", 4096L.convertToHumanReadable())
+    }
+
+    @Test
     fun convertToHumanReadable_Give_1048576_Returns_1MB() {
         Assertions.assertEquals("1MB", 1048576L.convertToHumanReadable())
     }
