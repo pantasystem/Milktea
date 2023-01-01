@@ -38,7 +38,10 @@ sealed interface AppFile : JSerializable {
 
 }
 
+enum class AboutMediaType {
+    VIDEO, IMAGE, SOUND, OTHER
 
+}
 
 
 data class File(
@@ -53,10 +56,7 @@ data class File(
     val comment: String? = null,
     val blurhash: String? = null,
 ) : JSerializable {
-    enum class AboutMediaType {
-        VIDEO, IMAGE, SOUND, OTHER
 
-    }
 
 
     val aboutMediaType = when {
@@ -67,8 +67,36 @@ data class File(
         else -> AboutMediaType.OTHER
     }
 }
+sealed interface FilePreviewSource {
+    val file: AppFile
+    data class Local(override val file: AppFile.Local) : FilePreviewSource
+    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
+        FilePreviewSource
+}
 
+val FilePreviewSource.isSensitive: Boolean
+    get() = when(this) {
+        is FilePreviewSource.Local -> this.file.isSensitive
+        is FilePreviewSource.Remote -> fileProperty.isSensitive
+    }
 
+val FilePreviewSource.aboutMediaType: AboutMediaType
+    get() {
+        val type = when(this) {
+            is FilePreviewSource.Local -> {
+                this.file.type
+            }
+            is FilePreviewSource.Remote -> {
+                this.fileProperty.type
+            }
+        }
+        return when {
+            type.startsWith("image") -> AboutMediaType.IMAGE
+            type.startsWith("video") -> AboutMediaType.VIDEO
+            type.startsWith("audio") -> AboutMediaType.SOUND
+            else -> AboutMediaType.OTHER
+        }
+    }
 fun AppFile.Local.toFile(): File {
     return File(
         name = name,

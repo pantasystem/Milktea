@@ -5,58 +5,49 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.*
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Details
-import androidx.compose.material.icons.filled.HideImage
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 
 
 @Composable
 fun HorizontalFilePreviewList(
-    files: List<AppFile>,
-    repository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
+    modifier: Modifier = Modifier,
+    files: List<FilePreviewSource>,
+    allowMaxFileSize: Long? = null,
     onAction: (FilePreviewActionType) -> Unit,
-    modifier: Modifier = Modifier) {
+) {
     LazyRow(
         modifier
     ) {
         items(count = files.size) { index ->
             FilePreview(
                 file = files[index],
-                repository = repository,
-                dataSource = dataSource,
+                allowMaxFileSize = allowMaxFileSize,
                 onAction = onAction
             )
         }
     }
 }
 
-sealed interface FilePreviewSource {
-    val file: AppFile
-    data class Local(override val file: AppFile.Local) : FilePreviewSource
-    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
-        FilePreviewSource
-}
 
 sealed interface FilePreviewActionType {
     val target: FilePreviewSource
+
     data class Show(override val target: FilePreviewSource) : FilePreviewActionType
     data class Detach(override val target: FilePreviewSource) : FilePreviewActionType
     data class ToggleSensitive(override val target: FilePreviewSource) : FilePreviewActionType
@@ -64,29 +55,27 @@ sealed interface FilePreviewActionType {
 
 @Composable
 fun FilePreview(
-    file: AppFile,
-    repository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
+    file: FilePreviewSource,
+    allowMaxFileSize: Long?,
     onAction: (FilePreviewActionType) -> Unit,
 ) {
     var dropDownTarget: FilePreviewSource? by remember {
         mutableStateOf(null)
     }
     Column {
-        when(file) {
-            is AppFile.Local -> {
+        when (file) {
+            is FilePreviewSource.Local -> {
                 LocalFilePreview(
-                    file = file,
+                    file = file.file,
+                    allowMaxFileSize = allowMaxFileSize,
                     onClick = {
                         dropDownTarget = FilePreviewSource.Local(it)
                     }
                 )
             }
-            is AppFile.Remote -> {
+            is FilePreviewSource.Remote -> {
                 RemoteFilePreview(
-                    file = file,
-                    repository = repository,
-                    dataSource = dataSource,
+                    fileProperty = file.fileProperty,
                     onClick = {
                         dropDownTarget = FilePreviewSource.Remote(
                             AppFile.Remote(it.id),
@@ -100,8 +89,8 @@ fun FilePreview(
         FilePreviewActionDropDown(
             isSensitive = target != null
                     && (
-                        (target is FilePreviewSource.Local && target.file.isSensitive)
-                        || (target is FilePreviewSource.Remote && target.fileProperty.isSensitive)
+                    (target is FilePreviewSource.Local && target.file.isSensitive)
+                            || (target is FilePreviewSource.Remote && target.fileProperty.isSensitive)
                     ),
             expanded = dropDownTarget != null,
             onToggleSensitive = {
@@ -136,27 +125,43 @@ fun FilePreview(
 @Composable
 fun LocalFilePreview(
     file: AppFile.Local,
+    allowMaxFileSize: Long?,
     onClick: (AppFile.Local) -> Unit
 ) {
     val uri = Uri.parse(file.path)
-    Box (
+    Box(
         modifier = Modifier
             .size(100.dp)
             .padding(horizontal = 2.dp)
             .clickable {
                 onClick(file)
             }
-    ){
-        Box (contentAlignment = Alignment.TopEnd) {
+    ) {
+        Box {
             Image(
                 painter = rememberAsyncImagePainter(model = uri),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            if(file.isSensitive) {
-                SensitiveIcon()
+            if (file.isSensitive) {
+                SensitiveIcon(
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
             }
+
+            if (allowMaxFileSize != null && file.fileSize != null) {
+                if (allowMaxFileSize < (file.fileSize ?: 0)) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = Color.Yellow,
+                        modifier = Modifier.padding(2.dp)
+                    )
+                }
+            }
+
+
         }
 
     }
@@ -164,69 +169,35 @@ fun LocalFilePreview(
 
 @Composable
 fun RemoteFilePreview(
-    file: AppFile.Remote, repository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
+    fileProperty: FileProperty,
     onClick: (FileProperty) -> Unit
 ) {
-    var filePropertyState: ResultState<FileProperty> by remember {
-        mutableStateOf(ResultState.Loading(content = StateContent.NotExist()))
-    }
-    val fileProperty = dataSource.observe(file.id)
-        .collectAsState(null)
 
 
-    LaunchedEffect(key1 = file.id) {
-        runCancellableCatching {
-            repository.find(file.id)
-        }.onSuccess {
-            filePropertyState = ResultState.Fixed(
-                StateContent.Exist(it)
-            )
-        }.onFailure {
-            filePropertyState = ResultState.Error(
-                filePropertyState.content,
-                throwable = it
-            )
-        }
-    }
-
-
-    Box (
+    Box(
         modifier = Modifier
             .size(100.dp)
             .padding(horizontal = 2.dp)
             .clickable {
-                if (fileProperty.value != null) {
-                    onClick(fileProperty.value!!)
-                }
+                onClick(fileProperty)
             }
-    ){
-        when(filePropertyState.content) {
-            is StateContent.Exist -> {
-                val content = (filePropertyState.content as StateContent.Exist).rawContent
-                Box (contentAlignment = Alignment.TopEnd){
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            fileProperty.value?.thumbnailUrl
-                                ?: content.thumbnailUrl
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                    )
-                    if(fileProperty.value?.isSensitive?: content.isSensitive){
-                        SensitiveIcon()
-                    }
-                }
-            }
-            is StateContent.NotExist -> {
-                CircularProgressIndicator()
+    ) {
+        Box(contentAlignment = Alignment.TopEnd) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    fileProperty.thumbnailUrl
+                ),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
+            if (fileProperty.isSensitive) {
+                SensitiveIcon()
             }
         }
     }
 
 }
-
 
 
 @Composable
@@ -236,7 +207,7 @@ fun FilePreviewActionDropDown(
     onDetach: () -> Unit,
     onShow: () -> Unit,
     expanded: Boolean,
-    onDismissRequest: ()->Unit,
+    onDismissRequest: () -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -264,7 +235,7 @@ fun FilePreviewActionDropDown(
         ) {
 
             Icon(
-                if(isSensitive)
+                if (isSensitive)
                     Icons.Filled.Image
                 else
                     Icons.Filled.HideImage,
@@ -272,7 +243,7 @@ fun FilePreviewActionDropDown(
                 modifier = Modifier.size(24.dp)
             )
             Text(
-                if(isSensitive) stringResource(id = R.string.undo_nsfw) else stringResource(id = R.string.mark_as_nsfw)
+                if (isSensitive) stringResource(id = R.string.undo_nsfw) else stringResource(id = R.string.mark_as_nsfw)
             )
         }
         DropdownMenuItem(

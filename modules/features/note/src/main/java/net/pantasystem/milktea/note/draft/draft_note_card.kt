@@ -14,8 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.common_compose.FilePreviewActionType
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.note.R
 
@@ -24,8 +22,6 @@ import net.pantasystem.milktea.note.R
 fun DraftNoteCard(
     draftNote: DraftNote,
     isVisibleContent: Boolean,
-    filePropertyDataSource: FilePropertyDataSource,
-    driveFileRepository: DriveFileRepository,
     onAction: (DraftNoteCardAction) -> Unit,
 ) {
 
@@ -77,9 +73,7 @@ fun DraftNoteCard(
 
             if (draftNote.appFiles.isNotEmpty()) {
                 HorizontalFilePreviewList(
-                    files = draftNote.appFiles,
-                    repository = driveFileRepository,
-                    dataSource = filePropertyDataSource,
+                    files = draftNote.filePreviewSources,
                     onAction = {
                         onAction(DraftNoteCardAction.FileAction(draftNote, it))
                     },

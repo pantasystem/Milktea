@@ -21,6 +21,7 @@ import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
+import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
@@ -150,14 +151,14 @@ object MediaPreviewHelper {
         file: File
     ) {
         when (file.aboutMediaType) {
-            File.AboutMediaType.IMAGE, File.AboutMediaType.VIDEO -> {
+            AboutMediaType.IMAGE, AboutMediaType.VIDEO -> {
                 Glide.with(thumbnailView)
                     .load(file.thumbnailUrl)
                     .centerCrop()
                     .into(thumbnailView)
 
                 when (file.aboutMediaType) {
-                    File.AboutMediaType.IMAGE -> {
+                    AboutMediaType.IMAGE -> {
                         playButton.visibility = View.GONE
                     }
                     else -> {
@@ -171,7 +172,7 @@ object MediaPreviewHelper {
                 //thumbnailView.visibility = View.VISIBLE
 
             }
-            File.AboutMediaType.SOUND -> {
+            AboutMediaType.SOUND -> {
                 playButton.visibility = View.VISIBLE
                 Glide.with(playButton.context)
                     .load(R.drawable.ic_music_note_black_24dp)

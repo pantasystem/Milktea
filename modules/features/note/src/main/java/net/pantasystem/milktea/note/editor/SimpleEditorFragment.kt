@@ -26,12 +26,12 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
-import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -153,8 +153,6 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                 MdcTheme {
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
-                        fileRepository = fileRepository,
-                        dataSource = filePropertyDataSource,
                         onShow = {
                             val file = when (it) {
                                 is FilePreviewSource.Remote -> {

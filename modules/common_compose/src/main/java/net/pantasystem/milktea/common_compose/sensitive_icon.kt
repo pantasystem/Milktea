@@ -11,10 +11,12 @@ import androidx.compose.ui.res.stringResource
 import net.pantasystem.milktea.common.R
 
 @Composable
-fun SensitiveIcon() {
+fun SensitiveIcon(
+    modifier: Modifier = Modifier
+) {
     Icon(
         Icons.Default.HideImage,
         contentDescription = stringResource(R.string.sensitive),
-        modifier = Modifier.background(MaterialTheme.colors.secondary)
+        modifier = modifier.background(MaterialTheme.colors.secondary)
     )
 }
