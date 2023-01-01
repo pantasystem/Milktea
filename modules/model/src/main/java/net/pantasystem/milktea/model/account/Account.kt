@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.account
 
 
 import net.pantasystem.milktea.model.account.page.Page
+import net.pantasystem.milktea.model.user.Acct
 import java.io.Serializable
 import java.net.URL
 
@@ -54,15 +55,29 @@ data class Account(
         val protocol = getProtocol()
         val instanceDomain = instanceDomain.trim()
         val protocolLess = getProtocolLess()
-        if (instanceDomain.startsWith("https://")) {
-            return URL("$protocol://$protocolLess").host
+
+        val host = if (instanceDomain.startsWith("https://")) {
+            URL("$protocol://$protocolLess").host
 
         } else if (instanceDomain.startsWith("http://")) {
-            return URL("$protocol://$protocolLess").host
+            URL("$protocol://$protocolLess").host
         } else if (instanceDomain.indexOf("://") > 0) {
-            return URL("$protocol://$protocolLess").host
+            URL("$protocol://$protocolLess").host
+        } else {
+            ""
+        }
+        if (host.isBlank()) {
+            if (protocolLess.startsWith("@")){
+                val acct = Acct(protocolLess)
+                if (!acct.host.isNullOrBlank()) {
+                    return acct.host
+                }
+            }
+        } else {
+            return host
         }
         return instanceDomain
+
     }
 
     private fun getProtocol(): String {

@@ -219,4 +219,16 @@ class AccountTest {
         )
         Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
     }
+
+    @Test
+    fun getNormalizedInstanceDomain_GiveAcct() {
+        val account = Account(
+            instanceDomain = "https://@Panta@misskey.io",
+            userName = "",
+            token = "",
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
+        )
+        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceDomain)
+    }
 }
