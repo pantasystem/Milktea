@@ -3,7 +3,6 @@ package net.pantasystem.milktea.note.editor
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,7 +21,7 @@ class NoteEditorFileSizeWarningDialog : AppCompatDialogFragment() {
         private const val EXTRA_APP_FILE_LOCAL = "NoteEditorFileSizeWarningDialog.EXTRA_APP_FILE_LOCAL"
         private const val EXTRA_HOST = "NoteEditorFileSizeWarningDialog.EXTRA_HOST"
         private const val EXTRA_ALLOW_MAX_SIZE = "NoteEditorFileSizeWarningDialog.EXTRA_ALLOW_MAX_SIZE"
-        fun newInstance(host: String, allowFileMaxSize: Long, file: AppFile.Local): Fragment {
+        fun newInstance(host: String, allowFileMaxSize: Long, file: AppFile.Local): NoteEditorFileSizeWarningDialog {
             return NoteEditorFileSizeWarningDialog().apply {
                 arguments = Bundle().apply {
                     putSerializable(EXTRA_APP_FILE_LOCAL, file)
