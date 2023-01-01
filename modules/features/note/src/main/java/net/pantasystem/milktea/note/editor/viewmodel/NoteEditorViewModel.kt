@@ -82,7 +82,19 @@ class NoteEditorViewModel @Inject constructor(
         emptyList()
     )
 
-    private val filePreviewSources = files.map { files ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val driveFiles = files.flatMapLatest { files ->
+        val fileIds = files.mapNotNull {
+            it as? AppFile.Remote
+        }.map {
+            it.id
+        }
+        filePropertyDataSource.observeIn(fileIds)
+    }.catch {
+        logger.error("drive fileの取得に失敗", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val filePreviewSources = combine(files, driveFiles) { files, driveFiles ->
         files.mapNotNull { appFile ->
             when(appFile) {
                 is AppFile.Local -> {
@@ -90,11 +102,12 @@ class NoteEditorViewModel @Inject constructor(
                 }
                 is AppFile.Remote -> {
                     runCancellableCatching {
-                        driveFileRepository.find(appFile.id)
+                        driveFiles.firstOrNull {
+                            it.id == appFile.id
+                        } ?: driveFileRepository.find(appFile.id)
                     }.getOrNull()?.let {
                         FilePreviewSource.Remote(appFile, it)
                     }
-
                 }
             }
         }
