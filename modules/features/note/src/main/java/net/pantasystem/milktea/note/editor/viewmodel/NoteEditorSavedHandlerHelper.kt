@@ -2,9 +2,12 @@ package net.pantasystem.milktea.note.editor.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.PollEditingState
 import net.pantasystem.milktea.model.notes.Visibility
@@ -109,7 +112,7 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
     setText(note.formState.text)
     setCw(note.formState.cw)
     setHasCw(note.formState.hasCw)
-    setFiles(note.files)
+    setFiles(note.files.map { it.file })
     setReplyId(note.sendToState.replyId)
     setRenoteId(note.sendToState.renoteId)
     setPoll(note.poll)
@@ -122,7 +125,7 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
     )
 }
 
-fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibility?): NoteEditorUiState {
+suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibility?, fileRepository: DriveFileRepository): NoteEditorUiState {
     return NoteEditorUiState(
         formState = NoteEditorFormState(
             text = getText(),
@@ -140,7 +143,14 @@ fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibi
             draftNoteId = getDraftNoteId()
         ),
         poll = getPoll(),
-        files = getFiles(),
+        files = getFiles().mapNotNull { appFile ->
+            when(appFile) {
+                is AppFile.Local -> FilePreviewSource.Local(appFile)
+                is AppFile.Remote -> runCancellableCatching {
+                    FilePreviewSource.Remote(appFile, fileRepository.find(appFile.id))
+                }.getOrNull()
+            }
+        },
         currentAccount = account,
     )
 }
