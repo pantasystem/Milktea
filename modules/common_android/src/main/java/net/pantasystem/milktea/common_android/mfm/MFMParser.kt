@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.common_android.mfm
 
 import jp.panta.misskeyandroidclient.mfm.*
+import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.net.URLDecoder
 import java.util.regex.Matcher
@@ -447,7 +448,11 @@ object MFMParser {
                 return null
             }
             fun decodeUrl(url: String): String {
-                return URLDecoder.decode(url.replace("%20", "+"), "UTF-8")
+                return runCancellableCatching {
+                    URLDecoder.decode(url.replace("%20", "+"), "UTF-8")
+                }.getOrElse {
+                    url
+                }
             }
             return if (matcher.nullableGroup(1) == "http") {
                 Link(
