@@ -20,7 +20,7 @@ class SyncInstanceInfoWorker @AssistedInject constructor(
 
     companion object {
         fun createPeriodicWorkRequest(): PeriodicWorkRequest {
-            return PeriodicWorkRequestBuilder<ScheduleAuthInstancesPostWorker>(7, TimeUnit.DAYS)
+            return PeriodicWorkRequestBuilder<SyncInstanceInfoWorker>(7, TimeUnit.DAYS)
                 .build()
         }
     }
