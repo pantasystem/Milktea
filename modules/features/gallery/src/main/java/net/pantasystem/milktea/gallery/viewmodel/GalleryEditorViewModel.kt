@@ -16,6 +16,7 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.gallery.CreateGalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.gallery.GalleryRepository
@@ -80,7 +81,17 @@ class GalleryEditorViewModel @Inject constructor(
     val logger = loggerFactory.create("GalleryEditorVM")
 
     val pickedImages = state.map {
-        it.pickedImages
+        it.pickedImages.map { appFile ->
+            when (appFile) {
+                is AppFile.Local -> FilePreviewSource.Local(appFile)
+                is AppFile.Remote -> FilePreviewSource.Remote(
+                    appFile,
+                    fileProperty = driveFileRepository.find(appFile.id)
+                )
+            }
+        }
+    }.catch {
+        logger.error("ファイル取得失敗", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
 
@@ -100,7 +111,7 @@ class GalleryEditorViewModel @Inject constructor(
                             isSensitive = gallery.isSensitive,
                             pickedImages = files?.map { file -> file.id }?.map { fileId ->
                                 AppFile.Remote(fileId)
-                            }?: emptyList(),
+                            } ?: emptyList(),
                         )
                     }
                     is EditType.Create -> {
