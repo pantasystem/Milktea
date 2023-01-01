@@ -73,6 +73,16 @@ export class InstanceRepository {
             throw result.error;
         }
     }
+
+    updateClientBodyByteSize = async (instanceId: string, request: {size: number}) => {
+        await fetch(`/api/admin/instances/${instanceId}/update-client-max-body-size`, {
+            headers: {
+                "Authorization": `Bearer ${tokenRepository.getToken()}`
+            },
+            body: JSON.stringify(request),
+            method: "POST"
+        })
+    }
     
 }
 
