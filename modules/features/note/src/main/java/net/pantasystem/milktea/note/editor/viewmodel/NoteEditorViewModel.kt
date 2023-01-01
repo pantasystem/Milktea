@@ -23,6 +23,8 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.instance.InstanceInfo
+import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.*
@@ -57,6 +59,7 @@ class NoteEditorViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val localConfigRepository: LocalConfigRepository,
     private val noteRelationGetter: NoteRelationGetter,
+    private val instanceInfoRepository: InstanceInfoRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -255,6 +258,10 @@ class NoteEditorViewModel @Inject constructor(
         emit(null)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    private val _fileSizeInvalidEvent =
+        MutableSharedFlow<FileSizeInvalidEvent>(extraBufferCapacity = 10)
+    val fileSizeInvalidEvent = _fileSizeInvalidEvent.asSharedFlow()
+
     val isPost = EventBus<Boolean>()
 
     val showPollDatePicker = EventBus<Unit>()
@@ -368,9 +375,13 @@ class NoteEditorViewModel @Inject constructor(
         currentAccount.value?.let { account ->
             viewModelScope.launch {
                 val reservationPostingAt =
-                    savedStateHandle.getNoteEditingUiState(account, visibility.value).sendToState.schedulePostAt
+                    savedStateHandle.getNoteEditingUiState(
+                        account,
+                        visibility.value
+                    ).sendToState.schedulePostAt
                 draftNoteService.save(
-                    savedStateHandle.getNoteEditingUiState(account, visibility.value).toCreateNote(account)
+                    savedStateHandle.getNoteEditingUiState(account, visibility.value)
+                        .toCreateNote(account)
                 ).mapCancellableCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
                         createNoteWorkerExecutor.enqueue(dfNote.draftNoteId)
@@ -407,12 +418,23 @@ class NoteEditorViewModel @Inject constructor(
 
     }
 
-    fun add(file: AppFile) {
+    fun add(file: AppFile) = viewModelScope.launch {
         val files = files.value.toMutableList()
         files.add(
             file
         )
         savedStateHandle.setFiles(files)
+        val account = currentAccount.value ?: return@launch
+        val localFile = when (file) {
+            is AppFile.Local -> file
+            is AppFile.Remote -> return@launch
+        }
+        val instanceInfo = instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
+        val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
+
+        if (maxFileSize < (localFile.fileSize ?: 0)) {
+            _fileSizeInvalidEvent.tryEmit(FileSizeInvalidEvent(file, instanceInfo, account))
+        }
     }
 
 
@@ -567,3 +589,8 @@ class NoteEditorViewModel @Inject constructor(
 }
 
 data class TextWithCursorPos(val text: String?, val cursorPos: Int)
+data class FileSizeInvalidEvent(
+    val file: AppFile.Local,
+    val instanceInfo: InstanceInfo,
+    val account: Account
+)

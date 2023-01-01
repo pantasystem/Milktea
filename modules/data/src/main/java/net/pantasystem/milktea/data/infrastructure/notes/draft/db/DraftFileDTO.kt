@@ -2,8 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.notes.draft.db
 
 import androidx.room.*
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 
 @Entity(
@@ -52,6 +50,7 @@ data class DraftLocalFile(
     @ColumnInfo(name = "type") val type: String,
     @ColumnInfo(name = "thumbnailUrl") val thumbnailUrl: String?,
     @ColumnInfo(name = "folder_id") val folderId: String?,
+    @ColumnInfo(name = "file_size") val fileSize: Long?,
     @PrimaryKey(autoGenerate = true) val localFileId: Long = 0L,
 ) {
     companion object
@@ -66,6 +65,7 @@ fun DraftLocalFile.Companion.from(draftNote: DraftNoteFile.Local): DraftLocalFil
         type = draftNote.type,
         thumbnailUrl = draftNote.thumbnailUrl,
         isSensitive = draftNote.isSensitive,
+        fileSize = draftNote.fileSize
     )
 }
 
@@ -98,42 +98,4 @@ data class DraftFileDTO(
     @ColumnInfo(name = "file_id")
     var fileId: Long? = null
 
-    companion object{
-        fun make(file: File, draftNoteId: Long): DraftFileDTO{
-            return DraftFileDTO(
-                file.name,
-                file.remoteFileId?.fileId,
-                file.path,
-                file.isSensitive,
-                file.type,
-                file.thumbnailUrl,
-                draftNoteId,
-                file.folderId
-            ).apply{
-                this.fileId = file.localFileId
-            }
-        }
-    }
-
-
-
-    @Ignore
-    fun toFile(accountId: Long): File {
-        return File(
-            name,
-            filePath ?: "",
-            type,
-            remoteFileId?.let {
-                FileProperty.Id(
-                    accountId,
-                    it
-                )
-            },
-            fileId,
-            thumbnailUrl,
-            isSensitive,
-            folderId
-
-        )
-    }
 }

@@ -19,10 +19,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +37,7 @@ import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
-import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.channel.Channel
@@ -252,8 +249,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         }
         accountViewModel.showProfile.observe(viewLifecycleOwner) {
-            val intent = userDetailNavigation.newIntent(UserDetailNavigationArgs.UserId(
-                User.Id(it.accountId, it.remoteId))
+            val intent = userDetailNavigation.newIntent(
+                UserDetailNavigationArgs.UserId(
+                    User.Id(it.accountId, it.remoteId)
+                )
             )
 
             intent.putActivity(Activities.ACTIVITY_IN_APP)
@@ -303,16 +302,18 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         dataSource = filePropertyDataSource,
                         onShow = {
                             val file = when (it) {
-                                is FilePreviewTarget.Remote -> {
+                                is FilePreviewSource.Remote -> {
                                     it.fileProperty.toFile()
                                 }
-                                is FilePreviewTarget.Local -> {
+                                is FilePreviewSource.Local -> {
                                     it.file.toFile()
                                 }
                             }
-                            val intent = mediaNavigation.newIntent(MediaNavigationArgs.AFile(
-                                file
-                            ))
+                            val intent = mediaNavigation.newIntent(
+                                MediaNavigationArgs.AFile(
+                                    file
+                                )
+                            )
 
                             requireActivity().startActivity(intent)
                         }
@@ -462,6 +463,18 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
+        lifecycleScope.launch {
+            noteEditorViewModel.fileSizeInvalidEvent.collect {
+                whenStarted {
+                    NoteEditorFileSizeWarningDialog.newInstance(
+                        it.account.getHost(),
+                        it.instanceInfo.clientMaxBodyByteSize ?: 0,
+                        it.file
+                    ).show(childFragmentManager, "fileSizeInvalidDialog")
+                }
+            }
+        }
+
         if (mentions != null && savedInstanceState == null) {
             addMentionUserNames(mentions!!)
         }
@@ -591,9 +604,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             it.userId
         }
 
-        val intent = searchAndUserNavigation.newIntent(SearchAndSelectUserNavigationArgs(
-            selectedUserIds = selectedUserIds
-        ))
+        val intent = searchAndUserNavigation.newIntent(
+            SearchAndSelectUserNavigationArgs(
+                selectedUserIds = selectedUserIds
+            )
+        )
 
 
         selectUserResult.launch(intent)
@@ -667,7 +682,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 if (size > noteEditorViewModel.maxFileCount.value) {
                     logger.debug("失敗しました")
                 } else {
-                    noteEditorViewModel.add(uri.toAppFile(requireContext()))
+                    val file = uri.toAppFile(requireContext())
+                    noteEditorViewModel.add(file)
                     logger.debug("成功しました")
                 }
 

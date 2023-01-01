@@ -61,6 +61,11 @@ class InstanceInfoRepositoryImpl @Inject constructor(
         }.flowOn(ioDispatcher)
     }
 
+    override suspend fun findByHost(host: String): Result<InstanceInfo> = runCancellableCatching{
+        withContext(ioDispatcher) {
+            instanceInfoDao.findByHost(host)?.toModel() ?: throw NoSuchElementException()
+        }
+    }
     override fun observeByHost(host: String): Flow<InstanceInfo?> {
         return instanceInfoDao.observeByHost(host).map {
             it?.toModel()

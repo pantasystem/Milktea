@@ -3,9 +3,8 @@ package net.pantasystem.milktea.model.file
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
-import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import java.io.Serializable as JSerializable
@@ -22,12 +21,14 @@ sealed interface AppFile : JSerializable {
         val thumbnailUrl: String?,
         val isSensitive: Boolean,
         val folderId: String?,
+        val fileSize: Long?,
         val id: Long = 0,
     ) : AppFile {
         fun isAttributeSame(file: Local): Boolean {
             return file.name == name
                     && file.path == path
                     && file.type == type
+                    && file.fileSize == fileSize
         }
     }
 
@@ -38,16 +39,6 @@ sealed interface AppFile : JSerializable {
 }
 
 
-sealed interface FileState {
-    val appFile: AppFile
-
-    data class Local(override val appFile: AppFile.Local) : FileState
-    data class Remote(
-        override val appFile: AppFile,
-        val state: Flow<ResultState<FileProperty>>,
-        val source: FileProperty?
-    ) : FileState
-}
 
 
 data class File(
@@ -67,8 +58,6 @@ data class File(
 
     }
 
-    val isRemoteFile: Boolean
-        get() = remoteFileId != null
 
     val aboutMediaType = when {
         this.type == null -> AboutMediaType.OTHER
@@ -80,52 +69,20 @@ data class File(
 }
 
 
-fun AppFile.toFile(): File {
-    return when (this) {
-        is AppFile.Remote -> {
-            File(
-                name = "remote file",
-                path = null,
-                type = null,
-                remoteFileId = id,
-                thumbnailUrl = null,
-                isSensitive = null,
-                folderId = null,
-                localFileId = null
-            )
-        }
-        is AppFile.Local -> {
-            File(
-                name = name,
-                path = path,
-                type = type,
-                remoteFileId = null,
-                thumbnailUrl = thumbnailUrl,
-                isSensitive = isSensitive,
-                folderId = folderId,
-                localFileId = id
-            )
-        }
-    }
+fun AppFile.Local.toFile(): File {
+    return File(
+        name = name,
+        path = path,
+        type = type,
+        remoteFileId = null,
+        thumbnailUrl = thumbnailUrl,
+        isSensitive = isSensitive,
+        folderId = folderId,
+        localFileId = id
+    )
 }
 
-fun AppFile.Companion.from(file: File): AppFile {
-    return if (file.isRemoteFile) {
-        AppFile.Remote(
-            file.remoteFileId!!
-        )
-    } else {
-        AppFile.Local(
-            folderId = file.folderId,
-            isSensitive = file.isSensitive ?: false,
-            id = file.localFileId!!,
-            name = file.name,
-            path = file.path!!,
-            thumbnailUrl = file.thumbnailUrl,
-            type = file.type!!
-        )
-    }
-}
+
 
 fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
     return when(file) {
@@ -135,6 +92,7 @@ fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
             thumbnailUrl = file.thumbnailUrl,
             type = file.type,
             isSensitive = file.isSensitive ?: false,
+            fileSize = file.fileSize,
             folderId = file.folderId,
         )
         is DraftNoteFile.Remote -> AppFile.Remote(file.fileProperty.id)
@@ -154,37 +112,29 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
 
     val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
     val thumbnail = if(isMedia) this.toString() else null
+    val fileSize = getFileSize(context)
     return AppFile.Local(
         fileName?: "name none",
         path = this.toString(),
         type  = mimeType ?: "",
         thumbnailUrl = thumbnail,
         isSensitive = false,
-        folderId = null
+        folderId = null,
+        fileSize = fileSize
     )
 }
-fun Uri.toFile(context: Context): File {
-    val fileName = try{
-        context.getFileName(this)
-    }catch(e: Exception){
-        Log.d("FileUtils", "ファイル名の取得に失敗しました", e)
-        null
+
+fun Uri.getFileSize(context: Context): Long {
+    var fileSize: Long = -1
+    context.contentResolver.query(this, null, null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(OpenableColumns.SIZE))
+        }
     }
-
-    val mimeType = context.contentResolver.getType(this)
-
-    val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
-    val thumbnail = if(isMedia) this.toString() else null
-    return File(
-        fileName ?: "name none",
-        this.toString(),
-        type = mimeType,
-        remoteFileId = null,
-        localFileId = null,
-        thumbnailUrl = thumbnail,
-        isSensitive = null
-    )
+    return fileSize
 }
+
+
 
 private fun Context.getFileName(uri: Uri) : String{
     return when(uri.scheme){

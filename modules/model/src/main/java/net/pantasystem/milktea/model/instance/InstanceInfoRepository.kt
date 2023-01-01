@@ -12,6 +12,8 @@ interface InstanceInfoRepository {
 
     fun observeAll(): Flow<List<InstanceInfo>>
 
+    suspend fun findByHost(host: String): Result<InstanceInfo>
+
     fun observeByHost(host: String): Flow<InstanceInfo?>
 
     suspend fun postInstance(host: String): Result<Unit>

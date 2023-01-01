@@ -12,4 +12,8 @@
     <string name="timeline_unauthorized_error">未認証エラー</string>
     <string name="reauthenticate">再認証する</string>
     <string name="expand">展開</string>
+    <string name="file_size_warning_dialog_title">ファイルサイズの警告</string>
+    <string name="file_size_warning_dialog_message">%s$1は%s$2より大きなファイルを添付することはできません。続行しますか？</string>
+    <string name="file_size_warning_dialo_positive_button">続行</string>
+    <string name="file_size_warning_dialog_negative_button">取りやめる</string>
 </resources>

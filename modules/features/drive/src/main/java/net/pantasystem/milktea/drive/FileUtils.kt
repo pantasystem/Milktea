@@ -5,7 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.file.getFileSize
 
 fun Uri.toAppFile(context: Context): AppFile.Local {
     val fileName = try{
@@ -25,29 +25,8 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
         type  = mimeType ?: "",
         thumbnailUrl = thumbnail,
         isSensitive = false,
-        folderId = null
-    )
-}
-fun Uri.toFile(context: Context): File {
-    val fileName = try{
-        context.getFileName(this)
-    }catch(e: Exception){
-        Log.d("FileUtils", "ファイル名の取得に失敗しました", e)
-        null
-    }
-
-    val mimeType = context.contentResolver.getType(this)
-
-    val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
-    val thumbnail = if(isMedia) this.toString() else null
-    return File(
-        fileName ?: "name none",
-        this.toString(),
-        type = mimeType,
-        remoteFileId = null,
-        localFileId = null,
-        thumbnailUrl = thumbnail,
-        isSensitive = null
+        folderId = null,
+        fileSize = getFileSize(context)
     )
 }
 

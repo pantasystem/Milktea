@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_compose.FilePreviewActionType
-import net.pantasystem.milktea.common_compose.FilePreviewTarget
+import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
@@ -115,6 +115,6 @@ fun DraftNotesPage(
 
 sealed interface DraftNotePageAction {
     data class Edit(val draftNote: DraftNote) : DraftNotePageAction
-    data class ShowFile(val previewActionType: FilePreviewTarget) : DraftNotePageAction
+    data class ShowFile(val previewActionType: FilePreviewSource) : DraftNotePageAction
     object NavigateUp : DraftNotePageAction
 }

@@ -15,7 +15,6 @@ import kotlinx.coroutines.plus
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
@@ -27,11 +26,8 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
-import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -43,13 +39,10 @@ class TimelineViewModel @AssistedInject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     noteStreaming: NoteStreaming,
     accountRepository: AccountRepository,
-    noteRelationGetter: NoteRelationGetter,
     loggerFactory: Logger.Factory,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    noteTranslationStore: NoteTranslationStore,
-    private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     private val accountStore: AccountStore,
     private val wordFilterConfigRepository: WordFilterConfigRepository,
+    planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     @Assisted val account: Account?,
     @Assisted val accountId: Long? = account?.accountId,
     @Assisted val pageable: Pageable,
@@ -114,13 +107,9 @@ class TimelineViewModel @AssistedInject constructor(
 
 
     private val logger = loggerFactory.create("TimelineViewModel")
-    private val cache = PlaneNoteViewDataCache(
+    private val cache = planeNoteViewDataCacheFactory.create(
         currentAccountWatcher::getAccount,
-        noteCaptureAPIAdapter,
-        noteTranslationStore,
-        { account -> urlPreviewStoreProvider.getUrlPreviewStore(account) },
-        viewModelScope,
-        noteRelationGetter,
+        viewModelScope
     )
 
     init {

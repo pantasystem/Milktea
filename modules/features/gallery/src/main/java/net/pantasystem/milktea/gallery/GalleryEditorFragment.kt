@@ -17,14 +17,16 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.common_navigation.DriveNavigation
+import net.pantasystem.milktea.common_navigation.DriveNavigationArgs
+import net.pantasystem.milktea.common_navigation.EXTRA_SELECTED_FILE_PROPERTY_IDS
+import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.gallery.viewmodel.EditType
 import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.toAppFile
-import net.pantasystem.milktea.model.file.toFile
 import javax.inject.Inject
 
 @FlowPreview
@@ -88,13 +90,14 @@ class GalleryEditorFragment : Fragment() {
                 onSave()
             }
             is GalleryEditorPageAction.NavigateToMediaPreview -> {
-                val intent = mediaNavigation.newIntent(
-                    MediaNavigationArgs.Files(
-                        listOf(action.appFile.toFile()),
-                        0
-                    )
-                )
-                requireActivity().startActivity(intent)
+                // TODO: 修正する
+//                val intent = mediaNavigation.newIntent(
+//                    MediaNavigationArgs.Files(
+//                        listOf(action.appFile.toFile()),
+//                        0
+//                    )
+//                )
+//                requireActivity().startActivity(intent)
             }
             GalleryEditorPageAction.NavigateUp -> {
                 (requireActivity() as? GalleryPostsActivity)?.pop()
