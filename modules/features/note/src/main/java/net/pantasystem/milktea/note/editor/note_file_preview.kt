@@ -11,18 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.FilePreviewActionType
-import net.pantasystem.milktea.common_compose.FilePreviewSource
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 
 @ExperimentalCoroutinesApi
 @Composable
 fun NoteFilePreview(
     noteEditorViewModel: NoteEditorViewModel,
-    fileRepository: DriveFileRepository,
-    dataSource: FilePropertyDataSource,
     onShow: (FilePreviewSource)->Unit
 ) {
     val uiState by noteEditorViewModel.uiState.collectAsState()
@@ -33,9 +29,7 @@ fun NoteFilePreview(
     ){
         HorizontalFilePreviewList(
             files = uiState.files,
-            repository = fileRepository,
             modifier = Modifier.weight(1f),
-            dataSource = dataSource,
             onAction = {
                 when(it) {
                     is FilePreviewActionType.ToggleSensitive -> {
