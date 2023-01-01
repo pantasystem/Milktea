@@ -6,6 +6,7 @@ import AppBarLayout from "../../layout/app-bar-layout";
 import BodyLayout from "../../layout/body-layout";
 import ScrollLayout from "../../layout/scroll-layout";
 import { Instance } from "../../models/instance";
+import { InstanceClientBodySizeForm } from "./instance-client-max-body-size-form";
 
 type InstanceDetailContentProps = {
   instance: Instance
@@ -96,6 +97,7 @@ const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance})
         </div>
         <div>
           {instance.clientMaxBodyByteSize?.toString() || "未設定"}
+          <InstanceClientBodySizeForm instance={instance} />
         </div>
       </div>
     </div>
@@ -110,6 +112,8 @@ const InstanceDetailContent: React.FC<InstanceDetailContentProps> = ({instance})
   </div>
   
 }
+
+
 const InstanceDetailPage: React.FC = () => {
   const { instanceId } = useParams();
   
