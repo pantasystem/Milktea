@@ -66,8 +66,6 @@ fun GalleryEditorPage(
                     if (state.pickedImages.isNotEmpty()) {
                         PickedImagePreview(
                             viewModel = galleryEditorViewModel,
-                            repository = galleryEditorViewModel.driveFileRepository,
-                            dataSource = galleryEditorViewModel.filePropertyDataSource,
                             onShow = { file ->
                                 onAction.invoke(GalleryEditorPageAction.NavigateToMediaPreview(file.file))
                             }
