@@ -76,8 +76,7 @@ data class Account(
         } else {
             return host
         }
-        return instanceDomain
-
+        return protocolLess
     }
 
     private fun getProtocol(): String {
