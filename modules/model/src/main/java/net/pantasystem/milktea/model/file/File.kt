@@ -67,7 +67,12 @@ data class File(
         else -> AboutMediaType.OTHER
     }
 }
-
+sealed interface FilePreviewSource {
+    val file: AppFile
+    data class Local(override val file: AppFile.Local) : FilePreviewSource
+    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
+        FilePreviewSource
+}
 
 fun AppFile.Local.toFile(): File {
     return File(
