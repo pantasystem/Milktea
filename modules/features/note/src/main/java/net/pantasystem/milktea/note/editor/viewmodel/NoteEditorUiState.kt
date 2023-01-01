@@ -4,9 +4,11 @@ import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import net.pantasystem.milktea.model.user.User
 
 
@@ -34,7 +36,7 @@ data class NoteEditorUiState(
     val formState: NoteEditorFormState = NoteEditorFormState(),
     val sendToState: NoteEditorSendToState = NoteEditorSendToState(),
     val poll: PollEditingState? = null,
-    val files: List<AppFile> = emptyList(),
+    val files: List<FilePreviewSource> = emptyList(),
     val currentAccount: Account? = null,
 ) {
     val totalFilesCount: Int
@@ -85,7 +87,9 @@ fun NoteEditorUiState.toCreateNote(account: Account): CreateNote {
         text = formState.text,
         cw = if (formState.hasCw) (formState.cw ?: "") else null,
         viaMobile = false,
-        files = files,
+        files = files.map {
+            it.file
+        },
         replyId = sendToState.replyId,
         renoteId = sendToState.renoteId,
         poll = poll?.toCreatePoll(),
@@ -136,7 +140,15 @@ fun DraftNote.toNoteEditingState(): NoteEditorUiState {
             )
         },
         files = draftFiles?.map {
-            AppFile.from(it)
+            when(it) {
+                is DraftNoteFile.Local -> {
+                    FilePreviewSource.Local(AppFile.from(it) as AppFile.Local)
+                }
+                is DraftNoteFile.Remote -> {
+                    FilePreviewSource.Remote(AppFile.from(it) as AppFile.Remote, it.fileProperty)
+                }
+            }
+
         } ?: emptyList(),
 
         )
