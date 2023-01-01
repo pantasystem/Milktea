@@ -6,7 +6,6 @@ import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -186,9 +185,6 @@ sealed class MessageRelation {
         return message.userId == User.Id(account.accountId, account.remoteId)
     }
 
-    fun getFile(): File? {
-        return message.file?.toFile()
-    }
 }
 
 sealed class MessageHistoryRelation : MessageRelation() {
@@ -229,8 +225,6 @@ val MessageHistoryRelation.messagingId: MessagingId
         return message.messagingId(account)
     }
 
-val MessageHistoryRelation.isGroup: Boolean
-    get() = this is MessageHistoryRelation.Group
 
 fun MessageHistoryRelation.getTitle(isUserNameDefault: Boolean): String {
 
