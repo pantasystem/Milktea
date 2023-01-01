@@ -17,10 +17,8 @@ import androidx.compose.ui.res.stringResource
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_compose.FilePreviewActionType
-import net.pantasystem.milktea.common_compose.FilePreviewSource
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
@@ -28,8 +26,6 @@ import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 @Composable
 fun DraftNotesPage(
     viewModel: DraftNotesViewModel,
-    filePropertyDataSource: FilePropertyDataSource,
-    driveFileRepository: DriveFileRepository,
     onAction: (DraftNotePageAction) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -86,8 +82,6 @@ fun DraftNotesPage(
                                 DraftNoteCard(
                                     draftNote = item.draftNote,
                                     isVisibleContent = item.isVisibleContent,
-                                    filePropertyDataSource = filePropertyDataSource,
-                                    driveFileRepository = driveFileRepository,
                                     onAction = { action ->
                                         when (action) {
                                             is DraftNoteCardAction.DeleteDraftNote -> {

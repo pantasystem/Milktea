@@ -11,8 +11,6 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.note.NoteEditorActivity
@@ -28,12 +26,6 @@ class DraftNotesFragment : Fragment() {
     val viewModel: DraftNotesViewModel by viewModels()
 
     @Inject
-    lateinit var filePropertyDataSource: FilePropertyDataSource
-
-    @Inject
-    lateinit var driveFileRepository: DriveFileRepository
-
-    @Inject
     lateinit var mediaNavigation: MediaNavigation
 
 
@@ -47,8 +39,6 @@ class DraftNotesFragment : Fragment() {
                 MdcTheme {
                     DraftNotesPage(
                         viewModel = viewModel,
-                        filePropertyDataSource = filePropertyDataSource,
-                        driveFileRepository = driveFileRepository,
                         onAction = {
                             onAction(it)
                         }
