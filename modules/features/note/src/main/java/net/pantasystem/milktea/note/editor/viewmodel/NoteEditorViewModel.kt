@@ -23,6 +23,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -80,6 +81,24 @@ class NoteEditorViewModel @Inject constructor(
         NoteEditorSavedStateKey.PickedFiles.name,
         emptyList()
     )
+
+    private val filePreviewSources = files.map { files ->
+        files.mapNotNull { appFile ->
+            when(appFile) {
+                is AppFile.Local -> {
+                    FilePreviewSource.Local(appFile)
+                }
+                is AppFile.Remote -> {
+                    runCancellableCatching {
+                        driveFileRepository.find(appFile.id)
+                    }.getOrNull()?.let {
+                        FilePreviewSource.Remote(appFile, it)
+                    }
+
+                }
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val totalImageCount = files.map {
         it.size
@@ -229,7 +248,7 @@ class NoteEditorViewModel @Inject constructor(
     val uiState = combine(
         noteEditorFormState,
         noteEditorSendToState,
-        files,
+        filePreviewSources,
         poll,
         currentAccount,
     ) { formState, sendToState, files, poll, account ->
@@ -377,10 +396,11 @@ class NoteEditorViewModel @Inject constructor(
                 val reservationPostingAt =
                     savedStateHandle.getNoteEditingUiState(
                         account,
-                        visibility.value
+                        visibility.value,
+                        driveFileRepository
                     ).sendToState.schedulePostAt
                 draftNoteService.save(
-                    savedStateHandle.getNoteEditingUiState(account, visibility.value)
+                    savedStateHandle.getNoteEditingUiState(account, visibility.value, driveFileRepository)
                         .toCreateNote(account)
                 ).mapCancellableCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
