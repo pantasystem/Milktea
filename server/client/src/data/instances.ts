@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "../App";
 import { instanceRepository } from "../repositories/instance-repository";
 export type FilterType = "all" | "approved" | "unapproved";
 
@@ -27,3 +28,13 @@ export const useInstanceInfoQuery = ({host}: {host: string}) => {
   }});
 }
 
+export const useUpdateInstanceClietMaxBodySize = ({instanceId}: {instanceId: string}) => {
+  return useMutation({
+    mutationFn: async ({instanceId, size}:{instanceId: string, size: number}) => {
+      await instanceRepository.updateClientBodyByteSize(instanceId, {size: size})
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['getInstanceDetail', instanceId]);
+    }
+  })
+}
