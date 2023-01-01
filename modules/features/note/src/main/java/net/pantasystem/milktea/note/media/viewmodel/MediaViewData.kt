@@ -3,13 +3,14 @@ package net.pantasystem.milktea.note.media.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.isSensitive
 
-class MediaViewData(files: List<File>) {
+class MediaViewData(files: List<FilePreviewSource>) {
 
     // NOTE: サイズが変わることは決してない
     private val _files = MutableLiveData(files.map{
-        PreviewAbleFile(it, it.isSensitive ?: false)
+        PreviewAbleFile(it, it.isSensitive)
     })
     val files: LiveData<List<PreviewAbleFile>> = _files
 

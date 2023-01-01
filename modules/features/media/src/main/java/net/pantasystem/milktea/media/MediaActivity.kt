@@ -21,6 +21,7 @@ import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.databinding.ActivityMediaBinding
+import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.File
 import java.io.Serializable
 import javax.inject.Inject
@@ -157,10 +158,10 @@ class MediaActivity : AppCompatActivity() {
                 RemoteFileDownloadWorkManager.createWorkRequest(
                     name = file.name,
                     type = when (file.aboutMediaType) {
-                        File.AboutMediaType.VIDEO -> DownloadContentType.Video
-                        File.AboutMediaType.IMAGE -> DownloadContentType.Image
-                        File.AboutMediaType.SOUND -> DownloadContentType.Audio
-                        File.AboutMediaType.OTHER -> return
+                        AboutMediaType.VIDEO -> DownloadContentType.Video
+                        AboutMediaType.IMAGE -> DownloadContentType.Image
+                        AboutMediaType.SOUND -> DownloadContentType.Audio
+                        AboutMediaType.OTHER -> return
                     },
                     url = file.path ?: "",
                 )

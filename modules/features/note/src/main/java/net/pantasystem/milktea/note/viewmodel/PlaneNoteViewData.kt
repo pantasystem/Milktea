@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.file.*
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.url.UrlPreview
@@ -112,9 +112,11 @@ open class PlaneNoteViewData(
     val files = toShowNote.files?.map { fileProperty ->
         fileProperty.toFile()
     }
-    private val previewableFiles = files?.filter {
-        it.aboutMediaType == File.AboutMediaType.IMAGE || it.aboutMediaType == File.AboutMediaType.VIDEO
-    } ?: emptyList()
+    private val previewableFiles = toShowNote.files?.map {
+        FilePreviewSource.Remote(AppFile.Remote(it.id), it)
+    }?.filter {
+        it.aboutMediaType == AboutMediaType.IMAGE || it.aboutMediaType == AboutMediaType.VIDEO
+    }?: emptyList()
     val media = MediaViewData(previewableFiles)
 
     val isOnlyVisibleRenoteStatusMessage = MutableLiveData<Boolean>(false)
@@ -193,7 +195,9 @@ open class PlaneNoteViewData(
     val subNoteFiles = subNote?.files?.map {
         it.toFile()
     } ?: emptyList()
-    val subNoteMedia = MediaViewData(subNoteFiles)
+    val subNoteMedia = MediaViewData(subNote?.files?.map {
+        FilePreviewSource.Remote(AppFile.Remote(it.id), it)
+    } ?: emptyList())
 
 
     fun changeContentFolding() {
@@ -232,7 +236,7 @@ open class PlaneNoteViewData(
 
     private fun getNotMediaFiles(): List<File> {
         return files?.filterNot { fp ->
-            fp.aboutMediaType == File.AboutMediaType.IMAGE || fp.aboutMediaType == File.AboutMediaType.VIDEO
+            fp.aboutMediaType == AboutMediaType.IMAGE || fp.aboutMediaType == AboutMediaType.VIDEO
         } ?: emptyList()
     }
 
