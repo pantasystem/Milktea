@@ -14,6 +14,8 @@ data class AuthUserInputState(
     val rawInputInstanceDomain: String,
     val appName: String,
     val password: String,
+    val isPrivacyPolicyAgreement: Boolean,
+    val isTermsOfServiceAgreement: Boolean,
 ) {
     val isIdPassword: Boolean by lazy {
         userNameRegex.matches(rawInputInstanceDomain)
