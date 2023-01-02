@@ -65,21 +65,35 @@ class AppAuthViewModel @Inject constructor(
     private val instances = instanceInfoRepository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    private val isPrivacyPolicyAgreement = MutableStateFlow(false)
+    private val isTermsOfServiceAgreement = MutableStateFlow(false)
+
     private val authUserInputState = combine(
         instanceDomain,
         appName,
-        password
-    ) { domain, name, password ->
+        password,
+        isPrivacyPolicyAgreement,
+        isTermsOfServiceAgreement
+    ) { domain, name, password, privacyPolicy, termsOfService ->
         AuthUserInputState(
             instanceDomain = authService.toEnableUrl(domain),
             appName = name,
             rawInputInstanceDomain = domain,
-            password = password
+            password = password,
+            isPrivacyPolicyAgreement = privacyPolicy,
+            isTermsOfServiceAgreement = termsOfService,
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        AuthUserInputState("misskey.io", "", "Milktea", "")
+        AuthUserInputState(
+            "misskey.io",
+            "",
+            "Milktea",
+            "",
+            isTermsOfServiceAgreement = false,
+            isPrivacyPolicyAgreement = false
+        )
     )
 
     private val instanceInfo = authUserInputState.flatMapLatest {
@@ -284,6 +298,15 @@ class AppAuthViewModel @Inject constructor(
     fun onConfirmAddAccount() {
         confirmAddAccountEventFlow.tryEmit(Date().time)
     }
+
+    fun onToggleTermsOfServiceAgreement(value: Boolean) {
+        isTermsOfServiceAgreement.value = value
+    }
+
+    fun onTogglePrivacyPolicyAgreement(value: Boolean) {
+        isPrivacyPolicyAgreement.value = value
+    }
+
 
 }
 

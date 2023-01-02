@@ -19,5 +19,7 @@
     <string name="welcome">ようこそ</string>
     <string name="san">さん</string>
     <string name="open_in_webview">アプリブラウザで開く</string>
+    <string name="privacy_policy_agreeation">プライバシーポリシーに同意する</string>
+    <string name="terms_of_service_agreeation">利用規約に同意する</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.auth
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -29,6 +30,7 @@ import net.pantasystem.milktea.common_navigation.MainNavigation
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.from
+import java.util.*
 import javax.inject.Inject
 
 
@@ -122,7 +124,14 @@ class AuthorizationActivity : AppCompatActivity() {
                                 ).show()
                             }
                         }
-                    })
+                    },
+                    onShowPrivacyPolicy = {
+                        showPrivacyPolicy()
+                    },
+                    onShowTermsOfService = {
+                        showTermsOfService()
+                    }
+                )
             }
         }
 
@@ -138,6 +147,7 @@ class AuthorizationActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("MissingSuperCall")
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val authStore = CustomAuthStore.newInstance(this)
@@ -156,5 +166,47 @@ class AuthorizationActivity : AppCompatActivity() {
                 appAuthViewModel.getAccessToken(callbackMastodonCode, w4a = state)
             }
         }
+    }
+
+    private fun showPrivacyPolicy() {
+        val locale = Locale.getDefault()
+        val url = when(locale.language) {
+            Locale.CHINESE.language -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/privacy_policy_ch.md"
+            }
+            Locale.ENGLISH.language -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/privacy_policy_en.md"
+            }
+            Locale.JAPAN.language -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/privacy_policy_ja.md"
+            }
+            else -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/privacy_policy_en.md"
+            }
+        }
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(url)
+        startActivity(intent)
+    }
+
+    private fun showTermsOfService() {
+        val locale = Locale.getDefault()
+        val url = when(locale.language) {
+            Locale.CHINESE.language -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/terms_of_service_ch.md"
+            }
+            Locale.ENGLISH.language -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/terms_of_service_en.md"
+            }
+            Locale.JAPAN.language -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/terms_of_service_jp.md"
+            }
+            else -> {
+                "https://github.com/pantasystem/Milktea/blob/develop/terms_of_service_en.md"
+            }
+        }
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(url)
+        startActivity(intent)
     }
 }

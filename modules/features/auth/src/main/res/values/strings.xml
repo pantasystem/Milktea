@@ -21,5 +21,8 @@
     <string name="san">-san</string>
     <string name="open_in_webview">Open in WebView</string>
 
+    <string name="privacy_policy_agreeation">I agree to the Privacy Policy</string>
+    <string name="terms_of_service_agreeation">I agree to the Terms of service</string>
+
 
 </resources>
