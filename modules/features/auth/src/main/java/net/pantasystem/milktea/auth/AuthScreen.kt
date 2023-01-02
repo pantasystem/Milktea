@@ -21,6 +21,8 @@ fun AuthScreen(
     modifier: Modifier = Modifier,
     authViewModel: AppAuthViewModel,
     onCopyToClipboard: (String) -> Unit,
+    onShowPrivacyPolicy: () -> Unit,
+    onShowTermsOfService: () -> Unit,
 ) {
     val uiState by authViewModel.state.collectAsState()
 
@@ -81,6 +83,10 @@ fun AuthScreen(
                             authViewModel.auth()
                         },
                         clientId = uiState.clientId,
+                        onToggleTermsOfServiceAgreement = authViewModel::onToggleTermsOfServiceAgreement,
+                        onTogglePrivacyPolicyAgreement = authViewModel::onTogglePrivacyPolicyAgreement,
+                        onShowTermsOfService = onShowTermsOfService,
+                        onShowPrivacyPolicy = onShowPrivacyPolicy
                     )
                 }
                 is Authorization.Waiting4UserAuthorization -> {
