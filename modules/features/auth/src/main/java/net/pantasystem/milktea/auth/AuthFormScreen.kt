@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.auth
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +37,10 @@ fun AuthFormScreen(
     onInputAppName: (String) -> Unit,
     onInputPassword: (String) -> Unit,
     onStartAuthButtonClicked: () -> Unit,
+    onShowPrivacyPolicy: () -> Unit,
+    onShowTermsOfService: () -> Unit,
+    onTogglePrivacyPolicyAgreement: (Boolean) -> Unit,
+    onToggleTermsOfServiceAgreement: (Boolean) -> Unit,
 ) {
     Column(
         modifier
@@ -96,6 +101,38 @@ fun AuthFormScreen(
                     }
                 )
             }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextButton(
+                    onClick = onShowTermsOfService
+                ) {
+                    Text(stringResource(id = R.string.terms_of_service_agreeation))
+                }
+                Switch(
+                    checked = uiState.formState.isTermsOfServiceAgreement,
+                    onCheckedChange = onToggleTermsOfServiceAgreement
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TextButton(
+                    modifier = Modifier.clickable(onClick = onShowPrivacyPolicy),
+                    onClick = onShowPrivacyPolicy,
+                ) {
+                    Text(stringResource(id = R.string.privacy_policy_agreeation))
+                }
+                Switch(
+                    checked = uiState.formState.isPrivacyPolicyAgreement,
+                    onCheckedChange = onTogglePrivacyPolicyAgreement
+                )
+            }
             Spacer(Modifier.height(8.dp))
             if (uiState.isProgress) {
                 CircularProgressIndicator()
@@ -111,7 +148,10 @@ fun AuthFormScreen(
         ) {
             Button(
                 onClick = onStartAuthButtonClicked,
-                enabled = uiState.metaState is ResultState.Fixed && uiState.metaState.content is StateContent.Exist,
+                enabled = uiState.metaState is ResultState.Fixed
+                        && uiState.metaState.content is StateContent.Exist
+                        && uiState.formState.isPrivacyPolicyAgreement
+                        && uiState.formState.isTermsOfServiceAgreement,
                 shape = RoundedCornerShape(32.dp)
             ) {
                 Text(stringResource(R.string.start_auth))
@@ -141,11 +181,23 @@ fun Preview_AuthFormScreen() {
                 password = "",
                 clientId = "${UUID.randomUUID()}",
                 uiState = AuthUiState(
-                    formState = AuthUserInputState("", "", "", ""),
+                    formState = AuthUserInputState(
+                        "",
+                        "",
+                        "",
+                        "",
+                        isPrivacyPolicyAgreement = false,
+                        isTermsOfServiceAgreement = false
+                    ),
                     metaState = ResultState.Loading(StateContent.NotExist()),
                     stateType = Authorization.BeforeAuthentication
                 ),
-            )
+                onShowPrivacyPolicy = {},
+                onShowTermsOfService = {},
+                onTogglePrivacyPolicyAgreement = {},
+                onToggleTermsOfServiceAgreement = {},
+
+                )
         }
     }
 }
