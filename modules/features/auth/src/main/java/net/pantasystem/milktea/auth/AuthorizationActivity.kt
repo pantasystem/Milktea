@@ -122,7 +122,14 @@ class AuthorizationActivity : AppCompatActivity() {
                                 ).show()
                             }
                         }
-                    })
+                    },
+                    onShowPrivacyPolicy = {
+
+                    },
+                    onShowTermsOfService = {
+
+                    }
+                )
             }
         }
 
