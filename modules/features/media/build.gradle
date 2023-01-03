@@ -52,12 +52,16 @@ dependencies {
     implementation project(path: ':modules:common_navigation')
     implementation project(path: ':modules:common_android')
     implementation project(path: ':modules:worker')
+    implementation project(path: ':modules:api')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
 
     //ExoPlayer
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
+    implementation "com.google.android.exoplayer:exoplayer-core:2.18.2"
+    implementation "com.google.android.exoplayer:extension-okhttp:2.18.2"
+
 
     //PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'

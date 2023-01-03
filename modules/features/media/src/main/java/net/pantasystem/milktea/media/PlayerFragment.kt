@@ -7,8 +7,14 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.StyledPlayerView
+import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PlayerFragment : Fragment(R.layout.fragment_player){
 
     companion object{
@@ -35,6 +41,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
         }
     }
 
+    @Inject
+    internal lateinit var okHttpProvider: OkHttpClientProvider
+
     private var mExoPlayer: ExoPlayer? = null
     private var index: Int = 0
 
@@ -52,10 +61,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player){
             return
         }
 
-        val simpleExoPlayer = ExoPlayer.Builder(requireContext()).build()
-        view.findViewById<PlayerView>(R.id.player_view).player = simpleExoPlayer
+        val okHttpDataSourceFactory = OkHttpDataSource.Factory(okHttpProvider.get())
+        val mediaDataSource = ProgressiveMediaSource.Factory(okHttpDataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(uri))
 
-        simpleExoPlayer.setMediaItem(MediaItem.fromUri(uri))
+        val simpleExoPlayer = ExoPlayer.Builder(requireContext())
+            .build()
+        view.findViewById<StyledPlayerView>(R.id.player_view).player = simpleExoPlayer
+
+        simpleExoPlayer.setMediaSource(mediaDataSource)
         simpleExoPlayer.prepare()
         simpleExoPlayer.play()
 
