@@ -22,9 +22,7 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.databinding.ActivityMediaBinding
 import net.pantasystem.milktea.model.file.AboutMediaType
-import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.file.toFile
 import java.io.Serializable
 import javax.inject.Inject
 
