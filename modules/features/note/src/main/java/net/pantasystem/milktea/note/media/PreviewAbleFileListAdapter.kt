@@ -14,7 +14,7 @@ class PreviewAbleFileListAdapter(
 ) : ListAdapter<PreviewAbleFile, PreviewAbleFileListAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<PreviewAbleFile>() {
         override fun areContentsTheSame(oldItem: PreviewAbleFile, newItem: PreviewAbleFile): Boolean {
-            return oldItem.file == newItem.file
+            return oldItem.source == newItem.source
         }
 
         override fun areItemsTheSame(oldItem: PreviewAbleFile, newItem: PreviewAbleFile): Boolean {

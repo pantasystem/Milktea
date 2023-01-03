@@ -70,6 +70,7 @@ data class File(
 sealed interface FilePreviewSource {
     val file: AppFile
     data class Local(override val file: AppFile.Local) : FilePreviewSource {
+        override val type: String = file.type
         override val aboutMediaType: AboutMediaType = when {
             this.type.startsWith("image") -> AboutMediaType.IMAGE
             this.type.startsWith("video") -> AboutMediaType.VIDEO
@@ -77,8 +78,13 @@ sealed interface FilePreviewSource {
             else -> AboutMediaType.OTHER
         }
         override val path: String = file.path
+        override val comment: String? = null
+        override val name: String = file.name
+        override val thumbnailUrl: String? = file.thumbnailUrl
+        override val blurhash: String? = null
     }
     data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) : FilePreviewSource {
+        override val type: String = fileProperty.type
 
         override val aboutMediaType: AboutMediaType = when {
             this.type.startsWith("image") -> AboutMediaType.IMAGE
@@ -87,30 +93,21 @@ sealed interface FilePreviewSource {
             else -> AboutMediaType.OTHER
         }
         override val path: String = fileProperty.url
+        override val comment: String? = fileProperty.comment
+        override val name: String = fileProperty.name
+        override val thumbnailUrl: String? = fileProperty.thumbnailUrl
+        override val blurhash: String? = fileProperty.blurhash
     }
 
 
     val thumbnailUrl: String?
-        get() = when(this) {
-            is Local -> file.thumbnailUrl
-            is Remote -> fileProperty.thumbnailUrl
-        }
-
     val name: String
-        get() = when(this) {
-            is Local -> file.name
-            is Remote -> fileProperty.name
-        }
+    val comment: String?
 
     val type: String
-        get() = when(this) {
-            is Local -> file.type
-            is Remote -> fileProperty.type
-        }
-
     val path: String
-
     val aboutMediaType: AboutMediaType
+    val blurhash: String?
 
 }
 

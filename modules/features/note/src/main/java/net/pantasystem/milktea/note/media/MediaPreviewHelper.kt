@@ -1,4 +1,3 @@
-@file:Suppress("unused")
 
 package net.pantasystem.milktea.note.media
 
@@ -21,9 +20,8 @@ import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
-import net.pantasystem.milktea.model.file.AboutMediaType
-import net.pantasystem.milktea.model.file.File
-import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
 
@@ -51,7 +49,10 @@ object MediaPreviewHelper {
                 .mediaNavigation().newIntent(
                     MediaNavigationArgs.Files(
                         files = previewAbleFileList.map { fvd ->
-                            fvd.file
+                            when(val source = fvd.source) {
+                                is FilePreviewSource.Local -> source.file.toFile()
+                                is FilePreviewSource.Remote -> source.fileProperty.toFile()
+                            }
                         },
                         index = previewAbleFileList.indexOfFirst { f ->
                             f === previewAbleFile
@@ -76,8 +77,8 @@ object MediaPreviewHelper {
 
         val holdListener = View.OnLongClickListener {
             val context = it.context
-            val title = previewAbleFile?.file?.name
-            val altText = previewAbleFile?.file?.comment
+            val title = previewAbleFile?.source?.name
+            val altText = previewAbleFile?.source?.comment
             val alertDialog = MaterialAlertDialogBuilder(context)
             alertDialog.setTitle(title)
             alertDialog.setMessage(altText)
@@ -97,24 +98,6 @@ object MediaPreviewHelper {
         }
     }
 
-
-    @BindingAdapter("thumbnailView", "playButton", "fileViewData")
-    @JvmStatic
-    fun FrameLayout.setPreview(
-        thumbnailView: ImageView,
-        playButton: ImageButton,
-        file: File?
-    ) {
-
-        try {
-            MediaPreviewHelper.setPreview(thumbnailView, playButton, file!!)
-            this.visibility = View.VISIBLE
-
-        } catch (e: Exception) {
-            this.visibility = View.GONE
-        }
-    }
-
     @BindingAdapter("thumbnailView")
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
@@ -122,8 +105,8 @@ object MediaPreviewHelper {
         if (file.isHiding) {
             Glide.with(this)
                 .let {
-                    when (val blurhash = file.file.blurhash) {
-                        null -> it.load(file.file.thumbnailUrl)
+                    when (val blurhash = file.source.blurhash) {
+                        null -> it.load(file.source.thumbnailUrl)
                             .transform(BlurTransformation(32, 4), CenterCrop())
                         else -> it.load(
                             BlurHashSource(blurhash)
@@ -133,9 +116,9 @@ object MediaPreviewHelper {
                 .into(this)
         } else {
             Glide.with(this)
-                .load(file.file.thumbnailUrl)
+                .load(file.source.thumbnailUrl)
                 .thumbnail(GlideApp.with(this).load(
-                    file.file.blurhash?.let {
+                    file.source.blurhash?.let {
                         BlurHashSource(it)
                     }
                 ))
@@ -143,46 +126,6 @@ object MediaPreviewHelper {
                 .into(this)
         }
 
-    }
-
-    private fun setPreview(
-        thumbnailView: ImageView,
-        playButton: ImageButton,
-        file: File
-    ) {
-        when (file.aboutMediaType) {
-            AboutMediaType.IMAGE, AboutMediaType.VIDEO -> {
-                Glide.with(thumbnailView)
-                    .load(file.thumbnailUrl)
-                    .centerCrop()
-                    .into(thumbnailView)
-
-                when (file.aboutMediaType) {
-                    AboutMediaType.IMAGE -> {
-                        playButton.visibility = View.GONE
-                    }
-                    else -> {
-                        playButton.visibility = View.VISIBLE
-                        Glide.with(playButton)
-                            .load(R.drawable.ic_play_circle_outline_black_24dp)
-                            .centerInside()
-                            .into(playButton)
-                    }
-                }
-                //thumbnailView.visibility = View.VISIBLE
-
-            }
-            AboutMediaType.SOUND -> {
-                playButton.visibility = View.VISIBLE
-                Glide.with(playButton.context)
-                    .load(R.drawable.ic_music_note_black_24dp)
-                    .centerInside()
-                    .into(playButton)
-            }
-            else -> {
-                throw IllegalArgumentException("this type 知らねー:${file.type}")
-            }
-        }
     }
 
 
