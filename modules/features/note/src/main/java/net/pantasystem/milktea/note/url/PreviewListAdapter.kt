@@ -15,6 +15,8 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
+import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemFilePreviewBinding
 import net.pantasystem.milktea.note.databinding.ItemUrlPreviewBinding
@@ -57,12 +59,15 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
             binding.file = preview.file
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
-                if(preview.file.type?.startsWith("audio") == true){
+                if(preview.file.type.startsWith("audio")){
                     val activity = FragmentComponentManager.findActivity(binding.root.context)
                     if (activity is Activity) {
                         val accessor = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)
                         val intent = accessor.mediaNavigation().newIntent(MediaNavigationArgs.AFile(
-                            preview.file
+                            when(val file = preview.file) {
+                                is FilePreviewSource.Local -> file.file.toFile()
+                                is FilePreviewSource.Remote -> file.fileProperty.toFile()
+                            }
                         ))
                         context?.startActivity(intent)
                     }

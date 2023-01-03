@@ -69,9 +69,49 @@ data class File(
 }
 sealed interface FilePreviewSource {
     val file: AppFile
-    data class Local(override val file: AppFile.Local) : FilePreviewSource
-    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
-        FilePreviewSource
+    data class Local(override val file: AppFile.Local) : FilePreviewSource {
+        override val aboutMediaType: AboutMediaType = when {
+            this.type.startsWith("image") -> AboutMediaType.IMAGE
+            this.type.startsWith("video") -> AboutMediaType.VIDEO
+            this.type.startsWith("audio") -> AboutMediaType.SOUND
+            else -> AboutMediaType.OTHER
+        }
+        override val path: String = file.path
+    }
+    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) : FilePreviewSource {
+
+        override val aboutMediaType: AboutMediaType = when {
+            this.type.startsWith("image") -> AboutMediaType.IMAGE
+            this.type.startsWith("video") -> AboutMediaType.VIDEO
+            this.type.startsWith("audio") -> AboutMediaType.SOUND
+            else -> AboutMediaType.OTHER
+        }
+        override val path: String = fileProperty.url
+    }
+
+
+    val thumbnailUrl: String?
+        get() = when(this) {
+            is Local -> file.thumbnailUrl
+            is Remote -> fileProperty.thumbnailUrl
+        }
+
+    val name: String
+        get() = when(this) {
+            is Local -> file.name
+            is Remote -> fileProperty.name
+        }
+
+    val type: String
+        get() = when(this) {
+            is Local -> file.type
+            is Remote -> fileProperty.type
+        }
+
+    val path: String
+
+    val aboutMediaType: AboutMediaType
+
 }
 
 val FilePreviewSource.isSensitive: Boolean
@@ -80,23 +120,8 @@ val FilePreviewSource.isSensitive: Boolean
         is FilePreviewSource.Remote -> fileProperty.isSensitive
     }
 
-val FilePreviewSource.aboutMediaType: AboutMediaType
-    get() {
-        val type = when(this) {
-            is FilePreviewSource.Local -> {
-                this.file.type
-            }
-            is FilePreviewSource.Remote -> {
-                this.fileProperty.type
-            }
-        }
-        return when {
-            type.startsWith("image") -> AboutMediaType.IMAGE
-            type.startsWith("video") -> AboutMediaType.VIDEO
-            type.startsWith("audio") -> AboutMediaType.SOUND
-            else -> AboutMediaType.OTHER
-        }
-    }
+
+
 fun AppFile.Local.toFile(): File {
     return File(
         name = name,

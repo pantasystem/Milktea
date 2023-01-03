@@ -11,7 +11,9 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.*
+import net.pantasystem.milktea.model.file.AboutMediaType
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.url.UrlPreview
@@ -109,9 +111,6 @@ open class PlaneNoteViewData(
         it.name to it
     } ?: mapOf())
 
-    val files = toShowNote.files?.map { fileProperty ->
-        fileProperty.toFile()
-    }
     private val previewableFiles = toShowNote.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
     }?.filter {
@@ -125,20 +124,20 @@ open class PlaneNoteViewData(
     val urlPreviewList = MutableLiveData<List<UrlPreview>>()
 
     val previews = MediatorLiveData<List<Preview>>().apply {
-        val otherFiles = getNotMediaFiles().map { file ->
+        val otherFiles = toShowNote.files?.map { file ->
+            FilePreviewSource.Remote(AppFile.Remote(file.id), file)
+        }?.filterNot { fp ->
+            fp.aboutMediaType == AboutMediaType.IMAGE || fp.aboutMediaType == AboutMediaType.VIDEO
+        }?.map { file ->
             Preview.FileWrapper(file)
         }
 
         postValue(otherFiles)
-
         this.addSource(urlPreviewList) {
-
-            val list: ArrayList<Preview> = ArrayList(otherFiles)
             val urlPreviews = it?.map { url ->
                 Preview.UrlWrapper(url)
             } ?: emptyList()
-            list.addAll(urlPreviews)
-            postValue(list)
+            postValue((otherFiles ?: emptyList()) + urlPreviews)
 
         }
     }
@@ -192,9 +191,7 @@ open class PlaneNoteViewData(
     val subContentFoldingStatusMessage = Transformations.map(subContentFolding) {
         if (it) "もっと見る: ${subNoteText?.length}" else "閉じる"
     }
-    val subNoteFiles = subNote?.files?.map {
-        it.toFile()
-    } ?: emptyList()
+    val subNoteFiles = subNote?.files ?: emptyList()
     val subNoteMedia = MediaViewData(subNote?.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
     } ?: emptyList())
@@ -234,11 +231,6 @@ open class PlaneNoteViewData(
         }
     }
 
-    private fun getNotMediaFiles(): List<File> {
-        return files?.filterNot { fp ->
-            fp.aboutMediaType == AboutMediaType.IMAGE || fp.aboutMediaType == AboutMediaType.VIDEO
-        } ?: emptyList()
-    }
 
     val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
         if (it is NoteDataSource.Event.Updated) {
