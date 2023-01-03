@@ -20,8 +20,6 @@ import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
-import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
 
@@ -49,10 +47,7 @@ object MediaPreviewHelper {
                 .mediaNavigation().newIntent(
                     MediaNavigationArgs.Files(
                         files = previewAbleFileList.map { fvd ->
-                            when(val source = fvd.source) {
-                                is FilePreviewSource.Local -> source.file.toFile()
-                                is FilePreviewSource.Remote -> source.fileProperty.toFile()
-                            }
+                            fvd.source
                         },
                         index = previewAbleFileList.indexOfFirst { f ->
                             f === previewAbleFile

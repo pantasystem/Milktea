@@ -23,6 +23,8 @@ import net.pantasystem.milktea.common_navigation.MediaNavigationKeys
 import net.pantasystem.milktea.media.databinding.ActivityMediaBinding
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.toFile
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -33,11 +35,19 @@ class MediaNavigationImpl @Inject constructor(
         return when (args) {
             is MediaNavigationArgs.AFile -> {
                 val intent = Intent(activity, MediaActivity::class.java)
-                intent.putExtra(MediaNavigationKeys.EXTRA_FILE, args.file)
+                intent.putExtra(MediaNavigationKeys.EXTRA_FILE, when(val f = args.file) {
+                    is FilePreviewSource.Local -> f.file.toFile()
+                    is FilePreviewSource.Remote -> File.from(f.fileProperty)
+                })
             }
             is MediaNavigationArgs.Files -> {
                 val intent = Intent(activity, MediaActivity::class.java)
-                intent.putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(args.files))
+                intent.putExtra(MediaNavigationKeys.EXTRA_FILES, ArrayList(args.files.map {
+                    when(val f = it) {
+                        is FilePreviewSource.Local -> f.file.toFile()
+                        is FilePreviewSource.Remote -> File.from(f.fileProperty)
+                    }
+                }))
                 intent.putExtra(
                     MediaNavigationKeys.EXTRA_FILE_CURRENT_INDEX,
                     args.index

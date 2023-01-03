@@ -31,9 +31,7 @@ import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.toAppFile
-import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.User
@@ -154,17 +152,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                     NoteFilePreview(
                         noteEditorViewModel = viewModel,
                         onShow = {
-                            val file = when (it) {
-                                is FilePreviewSource.Remote -> {
-                                    it.fileProperty.toFile()
-                                }
-                                is FilePreviewSource.Local -> {
-                                    it.file.toFile()
-                                }
-                            }
-
                             val intent = mediaNavigation.newIntent(MediaNavigationArgs.Files(
-                                listOf(file),
+                                listOf(it),
                                 0
                             ))
                             requireActivity().startActivity(intent)

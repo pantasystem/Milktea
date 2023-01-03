@@ -23,9 +23,7 @@ import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.toAppFile
-import net.pantasystem.milktea.model.file.toFile
 import javax.inject.Inject
 
 @FlowPreview
@@ -91,10 +89,7 @@ class GalleryEditorFragment : Fragment() {
             is GalleryEditorPageAction.NavigateToMediaPreview -> {
                 val intent = mediaNavigation.newIntent(
                     MediaNavigationArgs.Files(
-                        listOf(when(action.file) {
-                            is FilePreviewSource.Local -> action.file.file.toFile()
-                            is FilePreviewSource.Remote -> action.file.fileProperty.toFile()
-                        }),
+                        listOf(action.file),
                         0
                     )
                 )

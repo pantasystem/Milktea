@@ -57,6 +57,25 @@ data class File(
     val blurhash: String? = null,
 ) : JSerializable {
 
+    companion object {
+        fun from(fileProperty: FileProperty): File {
+            return with(fileProperty) {
+                File(
+                    name,
+                    url,
+                    type,
+                    id,
+                    null,
+                    thumbnailUrl,
+                    isSensitive,
+                    null,
+                    comment,
+                    blurhash = blurhash,
+                )
+            }
+
+        }
+    }
 
 
     val aboutMediaType = when {
@@ -67,8 +86,10 @@ data class File(
         else -> AboutMediaType.OTHER
     }
 }
+
 sealed interface FilePreviewSource {
     val file: AppFile
+
     data class Local(override val file: AppFile.Local) : FilePreviewSource {
         override val type: String = file.type
         override val aboutMediaType: AboutMediaType = when {
@@ -83,7 +104,9 @@ sealed interface FilePreviewSource {
         override val thumbnailUrl: String? = file.thumbnailUrl
         override val blurhash: String? = null
     }
-    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) : FilePreviewSource {
+
+    data class Remote(override val file: AppFile.Remote, val fileProperty: FileProperty) :
+        FilePreviewSource {
         override val type: String = fileProperty.type
 
         override val aboutMediaType: AboutMediaType = when {
@@ -112,11 +135,10 @@ sealed interface FilePreviewSource {
 }
 
 val FilePreviewSource.isSensitive: Boolean
-    get() = when(this) {
+    get() = when (this) {
         is FilePreviewSource.Local -> this.file.isSensitive
         is FilePreviewSource.Remote -> fileProperty.isSensitive
     }
-
 
 
 fun AppFile.Local.toFile(): File {
@@ -133,9 +155,8 @@ fun AppFile.Local.toFile(): File {
 }
 
 
-
 fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
-    return when(file) {
+    return when (file) {
         is DraftNoteFile.Local -> AppFile.Local(
             name = file.name,
             path = file.filePath,
@@ -151,22 +172,22 @@ fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
 
 
 fun Uri.toAppFile(context: Context): AppFile.Local {
-    val fileName = try{
+    val fileName = try {
         context.getFileName(this)
-    }catch(e: Exception){
+    } catch (e: Exception) {
         Log.d("FileUtils", "ファイル名の取得に失敗しました", e)
         null
     }
 
     val mimeType = context.contentResolver.getType(this)
 
-    val isMedia = mimeType?.startsWith("image")?: false || mimeType?.startsWith("video")?: false
-    val thumbnail = if(isMedia) this.toString() else null
+    val isMedia = mimeType?.startsWith("image") ?: false || mimeType?.startsWith("video") ?: false
+    val thumbnail = if (isMedia) this.toString() else null
     val fileSize = getFileSize(context)
     return AppFile.Local(
-        fileName?: "name none",
+        fileName ?: "name none",
         path = this.toString(),
-        type  = mimeType ?: "",
+        type = mimeType ?: "",
         thumbnailUrl = thumbnail,
         isSensitive = false,
         folderId = null,
@@ -185,25 +206,24 @@ fun Uri.getFileSize(context: Context): Long {
 }
 
 
-
-private fun Context.getFileName(uri: Uri) : String{
-    return when(uri.scheme){
-        "content" ->{
+private fun Context.getFileName(uri: Uri): String {
+    return when (uri.scheme) {
+        "content" -> {
             this.contentResolver
-                .query(uri, arrayOf(MediaStore.MediaColumns.DISPLAY_NAME), null, null, null)?.use{
-                    if(it.moveToFirst()){
+                .query(uri, arrayOf(MediaStore.MediaColumns.DISPLAY_NAME), null, null, null)?.use {
+                    if (it.moveToFirst()) {
                         val index = it.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)
-                        if(index != -1) {
+                        if (index != -1) {
                             it.getString(index)
-                        }else{
+                        } else {
                             null
                         }
-                    }else{
+                    } else {
                         null
                     }
-                }?: throw IllegalArgumentException("ファイル名の取得に失敗しました")
+                } ?: throw IllegalArgumentException("ファイル名の取得に失敗しました")
         }
-        "file" ->{
+        "file" -> {
             java.io.File(uri.path!!).name
         }
         else -> throw IllegalArgumentException("scheme不明")
