@@ -12,7 +12,9 @@ class AuthUserInputStateTest {
             appName = "",
             instanceDomain = "https://misskey.io",
             password = "test",
-            rawInputInstanceDomain = "@Panta@misskey.io"
+            rawInputInstanceDomain = "@Panta@misskey.io",
+            isTermsOfServiceAgreement = false,
+            isPrivacyPolicyAgreement = false
         )
         Assertions.assertEquals("Panta", formState.username)
     }
@@ -23,7 +25,9 @@ class AuthUserInputStateTest {
             appName = "",
             instanceDomain = "https://misskey.io",
             password = "test",
-            rawInputInstanceDomain = "@Panta@misskey.io"
+            rawInputInstanceDomain = "@Panta@misskey.io",
+            isTermsOfServiceAgreement = false,
+            isPrivacyPolicyAgreement = false
         )
         Assertions.assertEquals("misskey.io", formState.host)
     }
