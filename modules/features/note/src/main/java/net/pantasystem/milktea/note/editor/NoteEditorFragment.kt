@@ -44,9 +44,7 @@ import net.pantasystem.milktea.model.confirm.ConfirmCommand
 import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.toAppFile
-import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
@@ -292,17 +290,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     NoteFilePreview(
                         noteEditorViewModel = noteEditorViewModel,
                         onShow = {
-                            val file = when (it) {
-                                is FilePreviewSource.Remote -> {
-                                    it.fileProperty.toFile()
-                                }
-                                is FilePreviewSource.Local -> {
-                                    it.file.toFile()
-                                }
-                            }
                             val intent = mediaNavigation.newIntent(
                                 MediaNavigationArgs.AFile(
-                                    file
+                                    it
                                 )
                             )
 

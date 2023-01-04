@@ -16,11 +16,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.gallery.viewmodel.GalleryEditorViewModel
-import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 
 sealed interface GalleryEditorPageAction {
     object NavigateUp : GalleryEditorPageAction
-    data class NavigateToMediaPreview(val appFile: AppFile) : GalleryEditorPageAction
+    data class NavigateToMediaPreview(val file: FilePreviewSource) : GalleryEditorPageAction
     object PickDriveFile : GalleryEditorPageAction
     object PickLocalFile : GalleryEditorPageAction
     object OnSave : GalleryEditorPageAction
@@ -67,7 +67,7 @@ fun GalleryEditorPage(
                         PickedImagePreview(
                             viewModel = galleryEditorViewModel,
                             onShow = { file ->
-                                onAction.invoke(GalleryEditorPageAction.NavigateToMediaPreview(file.file))
+                                onAction.invoke(GalleryEditorPageAction.NavigateToMediaPreview(file))
                             }
                         )
                     }

@@ -1,16 +1,16 @@
 package net.pantasystem.milktea.common_navigation
 
-import net.pantasystem.milktea.model.file.File
+import net.pantasystem.milktea.model.file.FilePreviewSource
 
 interface MediaNavigation : ActivityNavigation<MediaNavigationArgs>
 
 sealed interface MediaNavigationArgs {
     data class Files(
-        val files: List<File>, val index: Int
+        val files: List<FilePreviewSource>, val index: Int
     ) : MediaNavigationArgs
 
     data class AFile(
-        val file: File
+        val file: FilePreviewSource
     ) : MediaNavigationArgs
 }
 

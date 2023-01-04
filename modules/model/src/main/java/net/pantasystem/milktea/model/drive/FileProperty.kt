@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.drive
 
 import kotlinx.datetime.Instant
-import net.pantasystem.milktea.model.file.File
 import net.pantasystem.milktea.model.user.User
 
 import java.io.Serializable as JSerializable
@@ -30,23 +29,6 @@ data class FileProperty (
         val width: Float?,
         val height: Float?
     ) : JSerializable
-
-    fun toFile(): File {
-
-
-        return File(
-            name,
-            url,
-            type,
-            id,
-            null,
-            thumbnailUrl,
-            isSensitive,
-            null,
-            comment,
-            blurhash = blurhash,
-        )
-    }
 
     fun update(
         name: String = this.name,

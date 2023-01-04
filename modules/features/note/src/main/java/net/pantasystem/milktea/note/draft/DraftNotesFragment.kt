@@ -11,8 +11,6 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
-import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.file.toFile
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 import javax.inject.Inject
@@ -63,10 +61,7 @@ class DraftNotesFragment : Fragment() {
             is DraftNotePageAction.ShowFile -> {
                 val intent = mediaNavigation.newIntent(
                     MediaNavigationArgs.AFile(
-                        when (val file = action.previewActionType) {
-                            is FilePreviewSource.Local -> file.file.toFile()
-                            is FilePreviewSource.Remote -> file.fileProperty.toFile()
-                        }
+                        action.previewActionType
                     )
                 )
                 startActivity(intent)

@@ -57,7 +57,7 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
             binding.file = preview.file
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
-                if(preview.file.type?.startsWith("audio") == true){
+                if(preview.file.type.startsWith("audio")){
                     val activity = FragmentComponentManager.findActivity(binding.root.context)
                     if (activity is Activity) {
                         val accessor = EntryPointAccessors.fromActivity(activity, NavigationEntryPointForBinding::class.java)

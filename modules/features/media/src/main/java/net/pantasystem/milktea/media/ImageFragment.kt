@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.wada811.databinding.dataBinding
 import net.pantasystem.milktea.media.databinding.FragmentImageBinding
-import net.pantasystem.milktea.model.file.File
 
 class ImageFragment : Fragment(R.layout.fragment_image){
 

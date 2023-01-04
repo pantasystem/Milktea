@@ -22,8 +22,11 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.gallery.viewmodel.GalleryPostsViewModel
 import net.pantasystem.milktea.gallery.viewmodel.provideFactory
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class GalleryPostsFragment : Fragment() {
 
@@ -92,14 +95,19 @@ class GalleryPostsFragment : Fragment() {
                                     viewModel.toggleFavorite(it.galleryPost.id)
                                 }
                                 is GalleryPostCardAction.OnThumbnailClicked -> {
-                                    startActivity(mediaNavigation.newIntent(
-                                        MediaNavigationArgs.Files(
-                                            files = it.files.map { property ->
-                                                property.toFile()
-                                            },
-                                            index = it.index
+                                    startActivity(
+                                        mediaNavigation.newIntent(
+                                            MediaNavigationArgs.Files(
+                                                files = it.files.map { property ->
+                                                    FilePreviewSource.Remote(
+                                                        AppFile.Remote(property.id),
+                                                        property
+                                                    )
+                                                },
+                                                index = it.index
+                                            )
                                         )
-                                    ))
+                                    )
                                 }
                                 is GalleryPostCardAction.OnAvatarIconClicked -> {
                                     startActivity(

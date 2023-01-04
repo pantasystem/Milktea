@@ -2,6 +2,7 @@ package net.pantasystem.milktea.gallery.viewmodel
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 
 sealed class Action {
@@ -10,10 +11,11 @@ sealed class Action {
 
 class GalleryPostActionViewModel : ViewModel() {
 
-    val viewAction = MutableSharedFlow<Action>()
+    private val _viewAction = MutableSharedFlow<Action>(extraBufferCapacity = 10)
+    val viewAction = _viewAction.asSharedFlow()
 
 
     fun showEditor() {
-        viewAction.tryEmit(Action.OpenCreationEditor)
+        _viewAction.tryEmit(Action.OpenCreationEditor)
     }
 }
