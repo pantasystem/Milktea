@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.drive
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -11,8 +12,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import net.pantasystem.milktea.common_compose.drive.EditCaptionDialogLayout
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
@@ -127,46 +128,16 @@ fun EditCaptionDialog(
     }
     if (fileProperty != null) {
         Dialog(onDismissRequest = onDismiss) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colors.surface,
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        stringResource(R.string.edit_caption),
-                        fontSize = 24.sp,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = captionText,
-                        placeholder = {
-                            Text(stringResource(R.string.input_caption))
-                        },
-                        onValueChange = { text ->
-                            captionText = text
-                        }
-                    )
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        TextButton(onClick = onDismiss) {
-                            Text(stringResource(R.string.cancel))
-                        }
-                        TextButton(onClick = {
-                            onSave.invoke(fileProperty.id, captionText)
-                        }) {
-                            Text(stringResource(R.string.save))
-                        }
-                    }
-                }
-            }
+            EditCaptionDialogLayout(value = captionText, onCancelButtonClicked = onDismiss, onTextChanged = {
+                captionText = it
+            }, onSaveButtonClicked = {
+                onSave(fileProperty.id, captionText)
+            })
         }
     }
 
 }
+
 
 sealed interface FileCardDropdownMenuAction {
     object OnDismissRequest : FileCardDropdownMenuAction
