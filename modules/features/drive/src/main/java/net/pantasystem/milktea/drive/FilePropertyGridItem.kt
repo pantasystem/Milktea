@@ -68,7 +68,7 @@ fun FilePropertyGridItem(
             }
 
             if (fileViewData.fileProperty.isSensitive) {
-                SensitiveIcon()
+                SensitiveIcon(modifier = Modifier.align(Alignment.TopStart))
             }
 
             if (isSelectMode) {
