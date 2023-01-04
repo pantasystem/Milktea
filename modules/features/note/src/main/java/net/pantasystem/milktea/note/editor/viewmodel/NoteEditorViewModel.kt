@@ -21,6 +21,7 @@ import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
@@ -454,6 +455,29 @@ class NoteEditorViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun updateFileName(appFile: AppFile, name: String) {
+        when(appFile) {
+            is AppFile.Local -> {
+                savedStateHandle.setFiles(files.value.updateFileName(appFile, name))
+            }
+            is AppFile.Remote -> {
+                viewModelScope.launch {
+                    runCancellableCatching {
+                        val file = driveFileRepository.find(appFile.id)
+                        driveFileRepository.update(UpdateFileProperty(
+                            fileId = file.id,
+                            comment = file.comment,
+                            folderId = file.folderId,
+                            isSensitive = file.isSensitive,
+                            name = name
+                        ))
+                    }
+
+                }
+            }
+        }
     }
 
     fun add(file: AppFile) = viewModelScope.launch {
