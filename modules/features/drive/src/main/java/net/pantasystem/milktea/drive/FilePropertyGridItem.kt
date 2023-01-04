@@ -68,7 +68,7 @@ fun FilePropertyGridItem(
             }
 
             if (fileViewData.fileProperty.isSensitive) {
-                SensitiveIcon()
+                SensitiveIcon(modifier = Modifier.align(Alignment.TopStart))
             }
 
             if (isSelectMode) {
@@ -100,6 +100,9 @@ fun FilePropertyGridItem(
                     }
                     FileCardDropdownMenuAction.OnNsfwMenuItemClicked -> {
                         onAction(FilePropertyCardAction.OnToggleNsfw(fileViewData.fileProperty.id))
+                    }
+                    FileCardDropdownMenuAction.OnEditFileName -> {
+                        onAction(FilePropertyCardAction.OnSelectEditFileNameMenuItem(fileViewData.fileProperty))
                     }
                 }
             },

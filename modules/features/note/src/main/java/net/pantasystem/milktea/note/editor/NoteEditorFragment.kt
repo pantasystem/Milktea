@@ -51,6 +51,8 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteEditorBinding
 import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
+import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
+import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
@@ -297,6 +299,12 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                             )
 
                             requireActivity().startActivity(intent)
+                        },
+                        onEditFileCaptionSelectionClicked = {
+                            EditFileCaptionDialog.newInstance(it.file, it.comment ?: "").show(childFragmentManager, "editCaption")
+                        },
+                        onEditFileNameSelectionClicked = {
+                            EditFileNameDialog.newInstance(it.file, it.name).show(childFragmentManager, "editFileName")
                         }
                     )
                 }

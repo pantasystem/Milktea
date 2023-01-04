@@ -214,6 +214,16 @@ class FileViewModel @AssistedInject constructor(
         }
     }
 
+    fun updateFileName(id: FileProperty.Id, name: String) {
+        viewModelScope.launch {
+            filePropertyRepository.update(
+                filePropertyRepository.find(id)
+                    .update(name = name)
+            ).onFailure {
+                logger.error("update file name failed", it)
+            }
+        }
+    }
     fun openFileCardDropDownMenu(fileId: FileProperty.Id) {
         _fileCardDropDowned.value = fileId
     }

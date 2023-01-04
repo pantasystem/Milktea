@@ -26,7 +26,8 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
         thumbnailUrl = thumbnail,
         isSensitive = false,
         folderId = null,
-        fileSize = getFileSize(context)
+        fileSize = getFileSize(context),
+        comment = null,
     )
 }
 

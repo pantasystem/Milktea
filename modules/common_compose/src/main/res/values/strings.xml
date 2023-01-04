@@ -14,4 +14,6 @@
     <string name="hour_ago">HR</string>
     <string name="minute_ago">MIN</string>
     <string name="second_ago">S</string>
+    <string name="edit_file_name">Edit name</string>
+    <string name="edit_file_caption">Edit caption</string>
 </resources>

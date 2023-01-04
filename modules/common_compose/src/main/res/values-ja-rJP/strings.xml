@@ -13,4 +13,6 @@
     <string name="hour_ago">時間前</string>
     <string name="minute_ago">分前</string>
     <string name="second_ago">秒前</string>
+    <string name="edit_file_name">ファイル名を変更</string>
+    <string name="edit_file_caption">キャプションを編集</string>
 </resources>

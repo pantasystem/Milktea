@@ -72,7 +72,8 @@ class DraftNoteRelation {
                         thumbnailUrl = thumbnailUrl,
                         type = type,
                         localFileId = ref.localFileId,
-                        fileSize = fileSize
+                        fileSize = fileSize,
+                        comment = comment
                     )
                 }
 

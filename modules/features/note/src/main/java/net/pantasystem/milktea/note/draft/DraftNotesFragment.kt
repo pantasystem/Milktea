@@ -11,6 +11,10 @@ import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
+import net.pantasystem.milktea.model.file.AppFile
+import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.from
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 import javax.inject.Inject
@@ -37,36 +41,31 @@ class DraftNotesFragment : Fragment() {
                 MdcTheme {
                     DraftNotesPage(
                         viewModel = viewModel,
-                        onAction = {
-                            onAction(it)
+                        onNavigateUp = {
+                                       requireActivity().finish()
+                        },
+                        onEdit = {
+                            val intent = NoteEditorActivity.newBundle(
+                                requireContext(),
+                                draftNoteId = it.draftNoteId
+                            )
+                            requireActivity().startActivityFromFragment(this@DraftNotesFragment, intent, 300)
+                        },
+                        onShowFile = {
+                            val intent = mediaNavigation.newIntent(
+                                MediaNavigationArgs.AFile(
+                                    when(it) {
+                                        is DraftNoteFile.Local -> FilePreviewSource.Local(AppFile.from(it) as AppFile.Local)
+                                        is DraftNoteFile.Remote -> FilePreviewSource.Remote(AppFile.Remote(it.fileProperty.id), it.fileProperty)
+                                    }
+                                )
+                            )
+                            startActivity(intent)
                         }
                     )
                 }
             }
         }.rootView
-    }
-
-    private fun onAction(action: DraftNotePageAction) {
-        when (action) {
-            is DraftNotePageAction.Edit -> {
-                val intent = NoteEditorActivity.newBundle(
-                    requireContext(),
-                    draftNoteId = action.draftNote.draftNoteId
-                )
-                requireActivity().startActivityFromFragment(this, intent, 300)
-            }
-            DraftNotePageAction.NavigateUp -> {
-                requireActivity().finish()
-            }
-            is DraftNotePageAction.ShowFile -> {
-                val intent = mediaNavigation.newIntent(
-                    MediaNavigationArgs.AFile(
-                        action.previewActionType
-                    )
-                )
-                startActivity(intent)
-            }
-        }
     }
 
 

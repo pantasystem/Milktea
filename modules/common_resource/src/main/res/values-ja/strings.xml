@@ -406,4 +406,7 @@
     <string name="mute_thread">スレッドをミュート</string>
     <string name="unmute_thread">スレッドのミュートを解除</string>
 
+    <string name="edit_caption">キャプションを編集</string>
+    <string name="input_caption">キャプションを入力</string>
+
 </resources>

@@ -38,6 +38,8 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSimpleEditorBinding
+import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
+import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.editor.viewmodel.toCreateNote
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
@@ -157,6 +159,12 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
                                 0
                             ))
                             requireActivity().startActivity(intent)
+                        },
+                        onEditFileCaptionSelectionClicked = {
+                            EditFileCaptionDialog.newInstance(it.file, it.comment).show(childFragmentManager, "editFileName")
+                        },
+                        onEditFileNameSelectionClicked = {
+                            EditFileNameDialog.newInstance(it.file, it.name).show(childFragmentManager, "showEditComment")
                         }
                     )
                 }

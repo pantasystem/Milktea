@@ -406,5 +406,7 @@
 <!--    <string name="n_posts">%d篇帖文</string>-->
 <!--    <string name="owned">拥有</string>-->
 
+    <string name="edit_caption">编辑标题</string>
+    <string name="input_caption">输入标题</string>
 
 </resources>

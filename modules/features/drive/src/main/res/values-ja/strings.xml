@@ -6,9 +6,7 @@
     <string name="do_u_want_2_delete_s">%sを削除しますか？</string>
     <string name="mark_as_nsfw">閲覧注意にする</string>
     <string name="delete">削除</string>
-    <string name="edit_caption">キャプションを編集</string>
-    <string name="input_caption">キャプションを入力</string>
-    <string name="save">保存</string>
+
     <string name="drive">ドライブ</string>
     <string name="file">ファイル</string>
     <string name="folder">フォルダー</string>

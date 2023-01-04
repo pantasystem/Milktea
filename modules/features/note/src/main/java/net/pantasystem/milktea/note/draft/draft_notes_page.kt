@@ -16,44 +16,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common_compose.FilePreviewActionType
-import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 
 @Composable
 fun DraftNotesPage(
     viewModel: DraftNotesViewModel,
-    onAction: (DraftNotePageAction) -> Unit
+    onShowFile: (DraftNoteFile) -> Unit,
+    onNavigateUp: () -> Unit,
+    onEdit: (DraftNote) -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    fun onFileAction(draftNote: DraftNote, action: FilePreviewActionType) {
-        val targetFile = draftNote.draftFiles?.firstOrNull { file ->
-            AppFile.from(file) == action.target.file
-        }?: return
-        when (action) {
-            is FilePreviewActionType.Detach -> {
-
-                viewModel.detachFile(draftNote, targetFile)
-            }
-            is FilePreviewActionType.Show -> {
-                onAction(DraftNotePageAction.ShowFile(action.target))
-            }
-            is FilePreviewActionType.ToggleSensitive -> {
-                viewModel.toggleSensitive(targetFile)
-            }
-        }
-    }
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = {
-                        onAction(DraftNotePageAction.NavigateUp)
-                    }) {
+                    IconButton(onClick = onNavigateUp) {
                         Icon(Icons.Default.ArrowBack, contentDescription = null)
                     }
                 },
@@ -63,10 +43,10 @@ fun DraftNotesPage(
                 backgroundColor = MaterialTheme.colors.surface
             )
         }
-    ) {
+    ) { paddingValues ->
         Box(
             Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
@@ -88,12 +68,17 @@ fun DraftNotesPage(
                                                 viewModel.deleteDraftNote(action.draftNote)
                                             }
                                             is DraftNoteCardAction.Edit -> {
-                                                onAction(DraftNotePageAction.Edit(action.draftNote))
+                                                onEdit(action.draftNote)
                                             }
-                                            is DraftNoteCardAction.FileAction -> {
-                                                onFileAction(item.draftNote, action.fileAction)
-                                            }
+
                                         }
+                                    },
+                                    onShow = onShowFile,
+                                    onDetach = { e ->
+                                        viewModel.detachFile(item.draftNote, e)
+                                    },
+                                    onToggleSensitive = { e ->
+                                        viewModel.toggleSensitive(e)
                                     }
                                 )
                             }
@@ -105,10 +90,4 @@ fun DraftNotesPage(
 
         }
     }
-}
-
-sealed interface DraftNotePageAction {
-    data class Edit(val draftNote: DraftNote) : DraftNotePageAction
-    data class ShowFile(val previewActionType: FilePreviewSource) : DraftNotePageAction
-    object NavigateUp : DraftNotePageAction
 }

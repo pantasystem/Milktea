@@ -119,6 +119,9 @@ fun FilePropertySimpleCard(
                             FileCardDropdownMenuAction.OnNsfwMenuItemClicked -> {
                                 onAction(FilePropertyCardAction.OnToggleNsfw(file.fileProperty.id))
                             }
+                            FileCardDropdownMenuAction.OnEditFileName -> {
+                                onAction(FilePropertyCardAction.OnSelectEditFileNameMenuItem(file.fileProperty))
+                            }
                         }
                     },
                     property = file.fileProperty
@@ -142,4 +145,5 @@ sealed interface FilePropertyCardAction {
     data class OnToggleNsfw(val fileId: FileProperty.Id) : FilePropertyCardAction
     data class OnSelectDeletionMenuItem(val file: FileProperty) : FilePropertyCardAction
     data class OnSelectEditCaptionMenuItem(val file: FileProperty) : FilePropertyCardAction
+    data class OnSelectEditFileNameMenuItem(val file: FileProperty) : FilePropertyCardAction
 }

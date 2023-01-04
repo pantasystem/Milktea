@@ -1,18 +1,17 @@
 package net.pantasystem.milktea.drive
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.HideImage
-import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import net.pantasystem.milktea.common_compose.drive.EditCaptionDialogLayout
+import net.pantasystem.milktea.common_compose.drive.EditFileNameDialogLayout
 import net.pantasystem.milktea.model.drive.FileProperty
 
 @Composable
@@ -71,11 +70,22 @@ fun FileActionDropdownMenu(
             onAction(FileCardDropdownMenuAction.OnEditFileCaption)
         }) {
             Icon(
-                Icons.Default.Edit,
+                Icons.Default.Comment,
                 modifier = Modifier.size(24.dp),
                 contentDescription = stringResource(R.string.edit_caption)
             )
             Text(text = stringResource(R.string.edit_caption))
+        }
+        Divider()
+        DropdownMenuItem(onClick = {
+            onAction(FileCardDropdownMenuAction.OnEditFileName)
+        }) {
+            Icon(
+                Icons.Default.Edit,
+                modifier = Modifier.size(24.dp),
+                contentDescription = stringResource(id = R.string.edit_file_name)
+            )
+            Text(text = stringResource(id = R.string.edit_file_name))
         }
     }
 
@@ -127,50 +137,47 @@ fun EditCaptionDialog(
     }
     if (fileProperty != null) {
         Dialog(onDismissRequest = onDismiss) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colors.surface,
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        stringResource(R.string.edit_caption),
-                        fontSize = 24.sp,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(
-                        value = captionText,
-                        placeholder = {
-                            Text(stringResource(R.string.input_caption))
-                        },
-                        onValueChange = { text ->
-                            captionText = text
-                        }
-                    )
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        TextButton(onClick = onDismiss) {
-                            Text(stringResource(R.string.cancel))
-                        }
-                        TextButton(onClick = {
-                            onSave.invoke(fileProperty.id, captionText)
-                        }) {
-                            Text(stringResource(R.string.save))
-                        }
-                    }
-                }
-            }
+            EditCaptionDialogLayout(value = captionText, onCancelButtonClicked = onDismiss, onTextChanged = {
+                captionText = it
+            }, onSaveButtonClicked = {
+                onSave(fileProperty.id, captionText)
+            })
         }
     }
 
 }
+
+@Composable
+fun EditFileNameDialog(
+    fileProperty: FileProperty?,
+    onDismiss: () -> Unit,
+    onSave: (FileProperty.Id, newName: String) -> Unit
+) {
+    var nameText: String by remember(fileProperty) {
+        mutableStateOf(fileProperty?.name ?: "")
+    }
+    if (fileProperty != null) {
+        Dialog(onDismissRequest = onDismiss) {
+            EditFileNameDialogLayout(
+                value = nameText,
+                onTextChanged = {
+                    nameText = it
+                },
+                onSaveButtonClicked = {
+                    onSave(fileProperty.id, nameText)
+                },
+                onCancelButtonClicked = {
+                    onDismiss()
+                }
+            )
+        }
+
+    }}
 
 sealed interface FileCardDropdownMenuAction {
     object OnDismissRequest : FileCardDropdownMenuAction
     object OnNsfwMenuItemClicked : FileCardDropdownMenuAction
     object OnDeleteMenuItemClicked : FileCardDropdownMenuAction
     object OnEditFileCaption : FileCardDropdownMenuAction
+    object OnEditFileName : FileCardDropdownMenuAction
 }

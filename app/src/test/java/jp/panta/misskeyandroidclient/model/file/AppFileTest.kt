@@ -10,7 +10,7 @@ class AppFileTest {
 
     @Test
     fun isAttributeSame() {
-        val file1 = AppFile.Local("test", "/test/test3", "image/jpeg", null, false, null, 0)
+        val file1 = AppFile.Local("test", "/test/test3", "image/jpeg", null, false, null, 0, null)
         val file2 = file1.copy()
         assertTrue(file1.isAttributeSame(file2))
 
