@@ -49,6 +49,7 @@ dependencies {
     implementation libs.android.material.material
     implementation project(path: ':modules:model')
     implementation project(path: ':modules:common')
+    implementation project(path: ':modules:common_resource')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
