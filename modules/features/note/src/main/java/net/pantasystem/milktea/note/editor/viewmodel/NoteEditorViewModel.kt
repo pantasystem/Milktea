@@ -97,7 +97,7 @@ class NoteEditorViewModel @Inject constructor(
 
     private val filePreviewSources = combine(files, driveFiles) { files, driveFiles ->
         files.mapNotNull { appFile ->
-            when(appFile) {
+            when (appFile) {
                 is AppFile.Local -> {
                     FilePreviewSource.Local(appFile)
                 }
@@ -419,7 +419,11 @@ class NoteEditorViewModel @Inject constructor(
                         driveFileRepository
                     ).sendToState.schedulePostAt
                 draftNoteService.save(
-                    savedStateHandle.getNoteEditingUiState(account, visibility.value, driveFileRepository)
+                    savedStateHandle.getNoteEditingUiState(
+                        account,
+                        visibility.value,
+                        driveFileRepository
+                    )
                         .toCreateNote(account)
                 ).mapCancellableCatching { dfNote ->
                     if (reservationPostingAt == null || reservationPostingAt <= Clock.System.now()) {
@@ -458,7 +462,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun updateFileName(appFile: AppFile, name: String) {
-        when(appFile) {
+        when (appFile) {
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.updateFileName(appFile, name))
             }
@@ -466,13 +470,17 @@ class NoteEditorViewModel @Inject constructor(
                 viewModelScope.launch {
                     runCancellableCatching {
                         val file = driveFileRepository.find(appFile.id)
-                        driveFileRepository.update(UpdateFileProperty(
-                            fileId = file.id,
-                            comment = file.comment,
-                            folderId = file.folderId,
-                            isSensitive = file.isSensitive,
-                            name = name
-                        ))
+                        driveFileRepository.update(
+                            UpdateFileProperty(
+                                fileId = file.id,
+                                comment = file.comment,
+                                folderId = file.folderId,
+                                isSensitive = file.isSensitive,
+                                name = name
+                            )
+                        ).getOrThrow()
+                    }.onFailure {
+                        logger.error("update file name failed", it)
                     }
 
                 }
@@ -481,7 +489,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun updateFileComment(appFile: AppFile, comment: String) {
-        when(appFile) {
+        when (appFile) {
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.updateFileComment(appFile, comment))
             }
@@ -489,13 +497,17 @@ class NoteEditorViewModel @Inject constructor(
                 viewModelScope.launch {
                     runCancellableCatching {
                         val file = driveFileRepository.find(appFile.id)
-                        driveFileRepository.update(UpdateFileProperty(
-                            fileId = file.id,
-                            comment = comment,
-                            folderId = file.folderId,
-                            isSensitive = file.isSensitive,
-                            name = file.name
-                        ))
+                        driveFileRepository.update(
+                            UpdateFileProperty(
+                                fileId = file.id,
+                                comment = comment,
+                                folderId = file.folderId,
+                                isSensitive = file.isSensitive,
+                                name = file.name
+                            )
+                        ).getOrThrow()
+                    }.onFailure {
+                        logger.error("update file comment failed", it)
                     }
                 }
             }
@@ -513,7 +525,8 @@ class NoteEditorViewModel @Inject constructor(
             is AppFile.Local -> file
             is AppFile.Remote -> return@launch
         }
-        val instanceInfo = instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
+        val instanceInfo =
+            instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
         val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
 
         if (maxFileSize < (localFile.fileSize ?: 0)) {
