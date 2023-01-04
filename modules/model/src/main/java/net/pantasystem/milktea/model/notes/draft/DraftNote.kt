@@ -60,6 +60,7 @@ sealed interface DraftNoteFile {
         val folderId: String?,
         val fileSize: Long?,
         val localFileId: Long,
+        val comment: String?
     ) : DraftNoteFile {
         companion object
     }
@@ -74,7 +75,8 @@ fun DraftNoteFile.Local.Companion.from(appFile: AppFile.Local, id: Long = 0L): D
         name = appFile.name,
         thumbnailUrl = appFile.thumbnailUrl,
         fileSize = appFile.fileSize,
-        localFileId = id
+        localFileId = id,
+        comment = appFile.comment,
     )
 }
 

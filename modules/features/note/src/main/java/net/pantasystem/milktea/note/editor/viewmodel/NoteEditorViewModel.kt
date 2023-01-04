@@ -480,6 +480,28 @@ class NoteEditorViewModel @Inject constructor(
         }
     }
 
+    fun updateFileComment(appFile: AppFile, comment: String) {
+        when(appFile) {
+            is AppFile.Local -> {
+                savedStateHandle.setFiles(files.value.updateFileComment(appFile, comment))
+            }
+            is AppFile.Remote -> {
+                viewModelScope.launch {
+                    runCancellableCatching {
+                        val file = driveFileRepository.find(appFile.id)
+                        driveFileRepository.update(UpdateFileProperty(
+                            fileId = file.id,
+                            comment = comment,
+                            folderId = file.folderId,
+                            isSensitive = file.isSensitive,
+                            name = file.name
+                        ))
+                    }
+                }
+            }
+        }
+    }
+
     fun add(file: AppFile) = viewModelScope.launch {
         val files = files.value.toMutableList()
         files.add(

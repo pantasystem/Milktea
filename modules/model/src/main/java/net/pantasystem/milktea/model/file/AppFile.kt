@@ -22,6 +22,7 @@ sealed interface AppFile : JSerializable {
         val isSensitive: Boolean,
         val folderId: String?,
         val fileSize: Long?,
+        val comment: String?,
         val id: Long = 0,
     ) : AppFile {
         fun isAttributeSame(file: Local): Boolean {
@@ -29,6 +30,7 @@ sealed interface AppFile : JSerializable {
                     && file.path == path
                     && file.type == type
                     && file.fileSize == fileSize
+                    && file.comment == comment
         }
     }
 
@@ -110,6 +112,7 @@ fun AppFile.Companion.from(file: DraftNoteFile): AppFile {
             isSensitive = file.isSensitive ?: false,
             fileSize = file.fileSize,
             folderId = file.folderId,
+            comment = file.comment,
         )
         is DraftNoteFile.Remote -> AppFile.Remote(file.fileProperty.id)
     }
@@ -136,7 +139,8 @@ fun Uri.toAppFile(context: Context): AppFile.Local {
         thumbnailUrl = thumbnail,
         isSensitive = false,
         folderId = null,
-        fileSize = fileSize
+        fileSize = fileSize,
+        comment = null,
     )
 }
 
