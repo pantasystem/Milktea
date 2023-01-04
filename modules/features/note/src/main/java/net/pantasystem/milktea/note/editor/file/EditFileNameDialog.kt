@@ -3,22 +3,16 @@ package net.pantasystem.milktea.note.editor.file
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDialogFragment
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_compose.drive.EditFileNameDialogLayout
 import net.pantasystem.milktea.model.file.AppFile
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 
 @Suppress("DEPRECATION")
@@ -49,45 +43,19 @@ class EditFileNameDialog : AppCompatDialogFragment() {
                     mutableStateOf(requireArguments().getString("EXTRA_NAME") ?: "")
                 }
                 MdcTheme {
-                    Surface(
-                        shape = MaterialTheme.shapes.medium,
-                        color = MaterialTheme.colors.surface
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                stringResource(id = R.string.edit_file_name),
-                                fontSize = 24.sp,
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TextField(
-                                value = text,
-                                placeholder = {
-                                    Text(stringResource(R.string.input_caption))
-                                },
-                                onValueChange = { t ->
-                                    text = t
-                                }
-                            )
-                            Row(
-                                Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                TextButton(onClick = {
-                                    dismiss()
-                                }) {
-                                    Text(stringResource(id = R.string.cancel))
-                                }
-                                TextButton(onClick = {
-                                    noteEditorViewModel.updateFileName(appFile, text)
-                                    dismiss()
-                                }) {
-                                    Text(stringResource(id = R.string.save))
-                                }
-                            }
+                    EditFileNameDialogLayout(
+                        value = text,
+                        onTextChanged = {
+                            text = it
+                        },
+                        onSaveButtonClicked = {
+                            noteEditorViewModel.updateFileName(appFile, text)
+                            dismiss()
+                        },
+                        onCancelButtonClicked = {
+                            dismiss()
                         }
-                    }
+                    )
                 }
             }
         }
@@ -95,3 +63,4 @@ class EditFileNameDialog : AppCompatDialogFragment() {
         return dialog
     }
 }
+
