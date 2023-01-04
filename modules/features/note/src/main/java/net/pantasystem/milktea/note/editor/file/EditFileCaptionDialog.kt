@@ -20,8 +20,8 @@ import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 class EditFileCaptionDialog : AppCompatDialogFragment() {
 
     companion object {
-        fun newInstance(appFile: AppFile, comment: String?): EditFileNameDialog {
-            return EditFileNameDialog().apply {
+        fun newInstance(appFile: AppFile, comment: String?): EditFileCaptionDialog {
+            return EditFileCaptionDialog().apply {
                 arguments = Bundle().apply {
                     putSerializable("EXTRA_APP_FILE", appFile)
                     putString("EXTRA_COMMENT", comment)
@@ -37,10 +37,11 @@ class EditFileCaptionDialog : AppCompatDialogFragment() {
 
         val appFile = requireArguments().getSerializable("EXTRA_APP_FILE") as AppFile
 
+        val comment = requireArguments().getString("EXTRA_COMMENT") ?: ""
         val view = ComposeView(requireContext()).apply {
             setContent {
-                var text: String by remember {
-                    mutableStateOf(requireArguments().getString("EXTRA_COMMENT") ?: "")
+                var text: String by remember(comment) {
+                    mutableStateOf(comment)
                 }
                 MdcTheme {
                     EditCaptionDialogLayout(
