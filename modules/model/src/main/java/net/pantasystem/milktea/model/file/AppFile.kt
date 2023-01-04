@@ -57,7 +57,7 @@ sealed interface FilePreviewSource {
             else -> AboutMediaType.OTHER
         }
         override val path: String = file.path
-        override val comment: String? = null
+        override val comment: String? = file.comment
         override val name: String = file.name
         override val thumbnailUrl: String? = file.thumbnailUrl
         override val blurhash: String? = null
