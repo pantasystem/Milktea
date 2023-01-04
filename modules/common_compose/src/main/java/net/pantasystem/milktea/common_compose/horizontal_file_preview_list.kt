@@ -53,16 +53,6 @@ fun HorizontalFilePreviewList(
 }
 
 
-sealed interface FilePreviewActionType {
-    val target: FilePreviewSource
-
-    data class Show(override val target: FilePreviewSource) : FilePreviewActionType
-    data class Detach(override val target: FilePreviewSource) : FilePreviewActionType
-    data class ToggleSensitive(override val target: FilePreviewSource) : FilePreviewActionType
-
-    data class OnEditFileNameSelectionClicked(override val target: FilePreviewSource) : FilePreviewActionType
-    data class OnEditFileCommentSelectionClicked(override val target: FilePreviewSource) : FilePreviewActionType
-}
 
 @Composable
 fun FilePreview(
