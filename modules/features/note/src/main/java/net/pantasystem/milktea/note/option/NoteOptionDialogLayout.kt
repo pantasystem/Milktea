@@ -32,13 +32,16 @@ fun NoteOptionDialogLayout(
 ) {
     Surface(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth()) {
-            NormalBottomSheetDialogSelectionLayout(
-                onClick = {
-                    onShowDetailButtonClicked(requireNotNull(uiState.note?.id))
-                },
-                icon = Icons.Default.Info,
-                text = stringResource(id = R.string.show_detail)
-            )
+            if (uiState.note?.id != null) {
+                NormalBottomSheetDialogSelectionLayout(
+                    onClick = {
+                        onShowDetailButtonClicked(uiState.note.id)
+                    },
+                    icon = Icons.Default.Info,
+                    text = stringResource(id = R.string.show_detail)
+                )
+            }
+
             NormalBottomSheetDialogSelectionLayout(
                 onClick = {
                     onCopyTextButtonClicked(uiState.note)
@@ -54,56 +57,66 @@ fun NoteOptionDialogLayout(
                 text = stringResource(id = R.string.share)
             )
             Divider()
-            NormalBottomSheetDialogSelectionLayout(
-                onClick = {
-                    onTranslateButtonClicked(requireNotNull(uiState.noteId))
-                },
-                icon = Icons.Default.Translate,
-                text = stringResource(id = R.string.translate)
-            )
+            if (uiState.noteId != null) {
+                NormalBottomSheetDialogSelectionLayout(
+                    onClick = {
+                        onTranslateButtonClicked(uiState.noteId)
+                    },
+                    icon = Icons.Default.Translate,
+                    text = stringResource(id = R.string.translate)
+                )
+            }
             Divider()
             if (uiState.noteState?.isFavorited == true) {
-                NormalBottomSheetDialogSelectionLayout(
-                    onClick = {
-                        onDeleteFavoriteButtonClicked(requireNotNull(uiState.noteId))
-                    },
-                    icon = Icons.Filled.Star,
-                    text = stringResource(
-                        id = R.string.remove_favorite
+                if (uiState.noteId != null) {
+                    NormalBottomSheetDialogSelectionLayout(
+                        onClick = {
+                            onDeleteFavoriteButtonClicked(uiState.noteId)
+                        },
+                        icon = Icons.Filled.Star,
+                        text = stringResource(
+                            id = R.string.remove_favorite
+                        )
                     )
-                )
+                }
             } else {
-                NormalBottomSheetDialogSelectionLayout(
-                    onClick = {
-                        onCreateFavoriteButtonClicked(requireNotNull(uiState.noteId))
-                    },
-                    icon = Icons.Outlined.Star,
-                    text = stringResource(id = R.string.favorite)
-                )
+                if (uiState.noteId != null) {
+                    NormalBottomSheetDialogSelectionLayout(
+                        onClick = {
+                            onCreateFavoriteButtonClicked(uiState.noteId)
+                        },
+                        icon = Icons.Outlined.Star,
+                        text = stringResource(id = R.string.favorite)
+                    )
+                }
             }
 
             if (uiState.noteState == null || uiState.noteState.isMutedThread != null) {
                 if (uiState.noteState?.isMutedThread == true) {
-                    NormalBottomSheetDialogSelectionLayout(
-                        onClick = {
-                            onDeleteThreadMuteButtonClicked(requireNotNull(uiState.noteId))
-                        },
-                        icon = Icons.Default.VolumeMute,
-                        text = stringResource(
-                            id = R.string.unmute_thread
+                    if (uiState.noteId != null) {
+                        NormalBottomSheetDialogSelectionLayout(
+                            onClick = {
+                                onDeleteThreadMuteButtonClicked(uiState.noteId)
+                            },
+                            icon = Icons.Default.VolumeMute,
+                            text = stringResource(
+                                id = R.string.unmute_thread
+                            )
                         )
-                    )
+                    }
                 } else {
-                    NormalBottomSheetDialogSelectionLayout(
-                        onClick = {
-                            onCreateThreadMuteButtonClicked(requireNotNull(uiState.noteId))
-                        },
-                        icon = Icons.Default.VolumeMute,
-                        text = stringResource(
-                            id = R.string.mute_thread
-                        )
-                    )
+                    if (uiState.noteId != null) {
 
+                        NormalBottomSheetDialogSelectionLayout(
+                            onClick = {
+                                onCreateThreadMuteButtonClicked(uiState.noteId)
+                            },
+                            icon = Icons.Default.VolumeMute,
+                            text = stringResource(
+                                id = R.string.mute_thread
+                            )
+                        )
+                    }
                 }
             }
 
