@@ -12,9 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import net.pantasystem.milktea.common_compose.FilePreviewActionType
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
 import net.pantasystem.milktea.model.notes.draft.DraftNote
+import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import net.pantasystem.milktea.note.R
 
 
@@ -23,6 +23,9 @@ fun DraftNoteCard(
     draftNote: DraftNote,
     isVisibleContent: Boolean,
     onAction: (DraftNoteCardAction) -> Unit,
+    onDetach: (DraftNoteFile) -> Unit,
+    onShow: (DraftNoteFile) -> Unit,
+    onToggleSensitive: (DraftNoteFile) -> Unit,
 ) {
 
     var confirmDeleteDraftNoteId: Long? by remember {
@@ -74,9 +77,21 @@ fun DraftNoteCard(
             if (draftNote.appFiles.isNotEmpty()) {
                 HorizontalFilePreviewList(
                     files = draftNote.filePreviewSources,
-                    onAction = {
-                        onAction(DraftNoteCardAction.FileAction(draftNote, it))
+//                    onAction = {
+//                        onAction(DraftNoteCardAction.FileAction(draftNote, it))
+//                    },
+                    onDetach = {
+                        val index = draftNote.filePreviewSources.indexOf(it)
+                        onDetach(draftNote.draftFiles!![index])
                     },
+                    onShow = {
+                        val index = draftNote.filePreviewSources.indexOf(it)
+                        onShow(draftNote.draftFiles!![index])
+                    },
+                    onToggleSensitive = {
+                        val index = draftNote.filePreviewSources.indexOf(it)
+                        onToggleSensitive(draftNote.draftFiles!![index])
+                    }
                 )
             }
 
@@ -163,11 +178,6 @@ fun ConfirmDeleteDraftNoteDialog(onDismiss: () -> Unit, onConfirmed: () -> Unit)
 
 sealed interface DraftNoteCardAction {
     val draftNote: DraftNote
-
-    data class FileAction(
-        override val draftNote: DraftNote,
-        val fileAction: FilePreviewActionType
-    ) : DraftNoteCardAction
 
     data class DeleteDraftNote(override val draftNote: DraftNote) : DraftNoteCardAction
     data class Edit(override val draftNote: DraftNote) : DraftNoteCardAction
