@@ -101,6 +101,9 @@ fun FilePropertyGridItem(
                     FileCardDropdownMenuAction.OnNsfwMenuItemClicked -> {
                         onAction(FilePropertyCardAction.OnToggleNsfw(fileViewData.fileProperty.id))
                     }
+                    FileCardDropdownMenuAction.OnEditFileName -> {
+                        onAction(FilePropertyCardAction.OnSelectEditFileNameMenuItem(fileViewData.fileProperty))
+                    }
                 }
             },
             property = fileViewData.fileProperty

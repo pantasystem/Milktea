@@ -50,8 +50,11 @@ fun FilePropertyListScreen(
     }
 
 
-
     var editCaptionTargetFile: FileProperty? by remember {
+        mutableStateOf(null)
+    }
+
+    var editNameTargetFile: FileProperty? by remember {
         mutableStateOf(null)
     }
 
@@ -78,6 +81,15 @@ fun FilePropertyListScreen(
         }
     )
 
+    EditFileNameDialog(
+        fileProperty = editNameTargetFile,
+        onDismiss = { editNameTargetFile = null },
+        onSave = { id, newName ->
+            editNameTargetFile = null
+            fileViewModel.updateFileName(id, newName)
+        },
+    )
+
     val actionHandler: (FilePropertyCardAction) -> Unit = { cardAction ->
         when (cardAction) {
             is FilePropertyCardAction.OnCloseDropdownMenu -> {
@@ -97,6 +109,9 @@ fun FilePropertyListScreen(
             }
             is FilePropertyCardAction.OnSelectEditCaptionMenuItem -> {
                 editCaptionTargetFile = cardAction.file
+            }
+            is FilePropertyCardAction.OnSelectEditFileNameMenuItem -> {
+                editNameTargetFile = cardAction.file
             }
         }
     }
@@ -192,7 +207,11 @@ fun DriveFilesGridView(
         state = state
     ) {
         items(files.size) { index ->
-            FilePropertyGridItem(fileViewData = files[index], onAction = onAction, isSelectMode = isSelectMode)
+            FilePropertyGridItem(
+                fileViewData = files[index],
+                onAction = onAction,
+                isSelectMode = isSelectMode
+            )
         }
     }
 }
