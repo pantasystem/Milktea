@@ -396,4 +396,8 @@
     <string name="mute_thread">Mute thread</string>
     <string name="unmute_thread">Unmute thread</string>
 
+
+    <string name="edit_caption">Edit caption</string>
+    <string name="input_caption">Input caption</string>
+
 </resources>

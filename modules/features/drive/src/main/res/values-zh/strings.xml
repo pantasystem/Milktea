@@ -6,9 +6,7 @@
     <string name="do_u_want_2_delete_s">你确定要删除 %s 吗？</string>
     <string name="mark_as_nsfw">标记为NSFW</string>
     <string name="delete">删除</string>
-    <string name="edit_caption">编辑标题</string>
-    <string name="input_caption">输入标题</string>
-    <string name="save">保存</string>
+
     <string name="drive">网盘</string>
 
     <string name="file">文件</string>
