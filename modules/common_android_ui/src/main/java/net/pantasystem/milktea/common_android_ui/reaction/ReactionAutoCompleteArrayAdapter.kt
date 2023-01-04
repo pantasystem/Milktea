@@ -50,7 +50,7 @@ class ReactionAutoCompleteArrayAdapter(
 
     private val mFilter = object : Filter(){
         override fun performFiltering(constraint: CharSequence?): FilterResults {
-            suggestions = listOf()
+            var suggestions = listOf<String>()
 
             val text = constraint?.toString()
             if(text != null){
@@ -71,6 +71,9 @@ class ReactionAutoCompleteArrayAdapter(
 
         override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
             val resultCount = results?.count?: 0
+            suggestions = (results?.values as? List<*>?)?.mapNotNull {
+                it as? String
+            } ?: emptyList()
             if(resultCount > 0){
                 notifyDataSetChanged()
             }else{
