@@ -29,7 +29,11 @@ fun HorizontalFilePreviewList(
     modifier: Modifier = Modifier,
     files: List<FilePreviewSource>,
     allowMaxFileSize: Long? = null,
-    onAction: (FilePreviewActionType) -> Unit,
+    onShow: (FilePreviewSource) -> Unit,
+    onDetach: (FilePreviewSource) -> Unit,
+    onToggleSensitive: (FilePreviewSource) -> Unit,
+    onEditFileCaption: ((FilePreviewSource) -> Unit)? = null,
+    onEditFileName: ((FilePreviewSource) -> Unit)? = null,
 ) {
     LazyRow(
         modifier
@@ -38,7 +42,11 @@ fun HorizontalFilePreviewList(
             FilePreview(
                 file = files[index],
                 allowMaxFileSize = allowMaxFileSize,
-                onAction = onAction
+                onShow = onShow,
+                onDetach = onDetach,
+                onToggleSensitive = onToggleSensitive,
+                onEditFileName = onEditFileName,
+                onEditFileCaption = onEditFileCaption,
             )
         }
     }
@@ -51,13 +59,20 @@ sealed interface FilePreviewActionType {
     data class Show(override val target: FilePreviewSource) : FilePreviewActionType
     data class Detach(override val target: FilePreviewSource) : FilePreviewActionType
     data class ToggleSensitive(override val target: FilePreviewSource) : FilePreviewActionType
+
+    data class OnEditFileNameSelectionClicked(override val target: FilePreviewSource) : FilePreviewActionType
+    data class OnEditFileCommentSelectionClicked(override val target: FilePreviewSource) : FilePreviewActionType
 }
 
 @Composable
 fun FilePreview(
     file: FilePreviewSource,
     allowMaxFileSize: Long?,
-    onAction: (FilePreviewActionType) -> Unit,
+    onShow: (FilePreviewSource) -> Unit,
+    onDetach: (FilePreviewSource) -> Unit,
+    onToggleSensitive: (FilePreviewSource) -> Unit,
+    onEditFileCaption: ((FilePreviewSource) -> Unit)? = null,
+    onEditFileName: ((FilePreviewSource) -> Unit)? = null,
 ) {
     var dropDownTarget: FilePreviewSource? by remember {
         mutableStateOf(null)
@@ -94,28 +109,29 @@ fun FilePreview(
                     ),
             expanded = dropDownTarget != null,
             onToggleSensitive = {
-                onAction(
-                    FilePreviewActionType.ToggleSensitive(
-                        dropDownTarget!!
-                    )
-                )
+                onToggleSensitive(dropDownTarget!!)
             },
             onDetach = {
-                onAction(
-                    FilePreviewActionType.Detach(
-                        dropDownTarget!!
-                    )
-                )
+                onDetach(dropDownTarget!!)
+
             },
             onShow = {
-                onAction(
-                    FilePreviewActionType.Show(
-                        dropDownTarget!!
-                    )
-                )
+                onShow(dropDownTarget!!)
+
             },
             onDismissRequest = {
                 dropDownTarget = null
+            },
+            onEditFileCaption = onEditFileCaption?.let{
+                {
+                    it(dropDownTarget!!)
+                }
+
+            },
+            onEditFileName = onEditFileName?.let {
+                {
+                    it(dropDownTarget!!)
+                }
             }
         )
     }
@@ -208,6 +224,8 @@ fun FilePreviewActionDropDown(
     onShow: () -> Unit,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    onEditFileName: (() -> Unit)?,
+    onEditFileCaption: (() -> Unit)?,
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -262,5 +280,26 @@ fun FilePreviewActionDropDown(
             )
         }
 
+        if (onEditFileName != null) {
+            DropdownMenuItem(onClick = {
+                onEditFileName()
+                onDismissRequest()
+            }) {
+                Icon(Icons.Filled.Edit, contentDescription = stringResource(id = R.string.edit_file_name), modifier = Modifier.size(24.dp))
+                Text(stringResource(R.string.edit_file_name))
+            }
+        }
+
+        if (onEditFileCaption != null) {
+            DropdownMenuItem(
+                onClick = {
+                    onEditFileCaption()
+                    onDismissRequest()
+                }
+            ) {
+                Icon(Icons.Filled.Comment, contentDescription = stringResource(id = R.string.edit_file_caption))
+                Text(stringResource(id = R.string.edit_file_caption))
+            }
+        }
     }
 }
