@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.reaction.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.UserEmojiConfig
@@ -16,6 +18,7 @@ import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.note.R
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +27,7 @@ class ReactionChoicesViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
     private val reactionHistoryDao: ReactionHistoryRepository,
     private val userEmojiConfigRepository: UserEmojiConfigRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
 
@@ -111,6 +115,35 @@ data class ReactionSelectionUiState(
         } ?: emptyList()
     }
 
+    val categories = meta?.emojis?.filterNot {
+        it.category.isNullOrBlank()
+    }?.mapNotNull {
+        it.category
+    }?.distinct() ?: emptyList()
+
+    val segments = listOf(SegmentType.UserCustom(userSettingEmojis), SegmentType.OftenUse(frequencyUsedReactionsV2)) + categories.map {
+        SegmentType.Category(
+            it,
+            getCategoryBy(it)
+        )
+    }
+}
+
+sealed interface SegmentType {
+    val label: StringSource
+    val emojis: List<EmojiType>
+    data class Category(val name: String, override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(name)
+    }
+    data class UserCustom(override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(R.string.user)
+    }
+    data class OftenUse(override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(R.string.often_use)
+    }
 }
 
 sealed interface EmojiType {

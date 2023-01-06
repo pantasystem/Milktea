@@ -48,7 +48,7 @@
         </com.google.android.material.tabs.TabLayout>
 
 
-        <net.pantasystem.milktea.common_android.ui.BottomSheetViewPager
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reaction_choices_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

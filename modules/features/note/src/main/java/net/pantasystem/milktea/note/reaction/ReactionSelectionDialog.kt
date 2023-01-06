@@ -15,12 +15,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -30,7 +31,9 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
+import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesListAdapter
 import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesPagerAdapter
+import net.pantasystem.milktea.note.reaction.viewmodel.ReactionChoicesViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
@@ -57,6 +60,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     val notesViewModel by activityViewModels<NotesViewModel>()
 
     val viewModel: ReactionSelectionDialogViewModel by viewModels()
+
+    val reactionChoicesViewModel: ReactionChoicesViewModel by activityViewModels()
 
     private val noteId: Note.Id by lazy {
         Note.Id(
@@ -98,7 +103,8 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
             onSearchEmojiTextFieldEntered = {
                 notesViewModel.toggleReaction(noteId, it)
                 dismiss()
-            }
+            },
+            reactionChoicesViewModel = reactionChoicesViewModel,
         )
         binder.bind()
 
@@ -120,9 +126,10 @@ class ReactionSelectionDialogBinder(
     val lifecycleOwner: LifecycleOwner,
     val searchSuggestionListView: RecyclerView,
     val tabLayout: TabLayout,
-    val viewPager: ViewPager,
+    val viewPager: RecyclerView,
     val searchWordTextField: EditText,
     val viewModel: ReactionSelectionDialogViewModel,
+    val reactionChoicesViewModel: ReactionChoicesViewModel,
     val onReactionSelected: (String) -> Unit,
     val onSearchEmojiTextFieldEntered: (String) -> Unit,
 ) {
@@ -140,9 +147,22 @@ class ReactionSelectionDialogBinder(
         searchSuggestionListView.adapter = searchedReactionAdapter
         searchSuggestionListView.layoutManager = flexBoxLayoutManager
 
-        tabLayout.setupWithViewPager(viewPager)
+//        tabLayout.setupWithViewPager(viewPager)
         val adapter = ReactionChoicesPagerAdapter(fragmentManager, context)
-        viewPager.adapter = adapter
+        tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+        })
+//        viewPager.adapter = adapter
 
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -160,6 +180,21 @@ class ReactionSelectionDialogBinder(
             }
         }
 
+        val choicesAdapter = EmojiChoicesListAdapter {
+            onReactionSelected(it.toTextReaction())
+        }
+        viewPager.adapter = choicesAdapter
+        viewPager.layoutManager = LinearLayoutManager(context)
+
+        scope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                reactionChoicesViewModel.uiState.collect {
+                    choicesAdapter.submitList(it.segments)
+                }
+            }
+        }
+
+        tabLayout.selectedTabPosition
 
         searchWordTextField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
