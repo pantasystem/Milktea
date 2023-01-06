@@ -88,7 +88,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
 
         SearchHistoryRecord::class,
     ],
-    version = 30,
+    version = 31,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
