@@ -110,6 +110,7 @@ class UserDetailViewModel @AssistedInject constructor(
             ))
         listOfNotNull(
             UserDetailTabType.UserTimeline(user.id),
+            UserDetailTabType.UserTimelineWithReplies(user.id),
             UserDetailTabType.PinNote(user.id),
             UserDetailTabType.Media(user.id),
             if (isEnableGallery) UserDetailTabType.Gallery(
@@ -315,6 +316,7 @@ sealed class UserDetailTabType(
 ) {
 
     data class UserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
+    data class UserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
     data class PinNote(val userId: User.Id) : UserDetailTabType(R.string.pin)
     data class Gallery(val userId: User.Id, val accountId: Long) :
         UserDetailTabType(R.string.gallery)
