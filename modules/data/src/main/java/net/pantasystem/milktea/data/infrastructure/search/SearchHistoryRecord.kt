@@ -1,10 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.search
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
+import net.pantasystem.milktea.model.search.SearchHistory
 
 @Entity(
     indices = [Index("keyword", "accountId", unique = true), Index("accountId")],
@@ -22,4 +20,22 @@ data class SearchHistoryRecord(
     val accountId: Long,
     val keyword: String,
     @PrimaryKey(autoGenerate = true) val id: Long
-)
+) {
+
+    @Ignore
+    fun toModel(): SearchHistory {
+        return SearchHistory(
+            accountId = accountId,
+            id = id,
+            keyword = keyword
+        )
+    }
+}
+
+fun SearchHistory.toRecord(): SearchHistoryRecord {
+    return SearchHistoryRecord(
+        accountId = accountId,
+        id = id,
+        keyword = keyword
+    )
+}
