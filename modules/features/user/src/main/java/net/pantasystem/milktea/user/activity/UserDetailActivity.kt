@@ -446,7 +446,8 @@ class UserTimelinePagerAdapterV2(
             is UserDetailTabType.Media -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, withFiles = true))
             is UserDetailTabType.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
             is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
-            is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id))
+            is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, includeReplies = false))
+            is UserDetailTabType.UserTimelineWithReplies -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, includeReplies = true))
         }
 
     }
