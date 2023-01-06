@@ -37,6 +37,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterCond
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
+import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryRecord
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
@@ -83,6 +85,8 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         UserListRecord::class,
         UserListMemberIdRecord::class,
         InstanceInfoRecord::class,
+
+        SearchHistoryRecord::class,
     ],
     version = 30,
     exportSchema = true,
@@ -105,7 +109,8 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
         AutoMigration(from = 28, to = 29),
-        AutoMigration(from = 29, to = 30)
+        AutoMigration(from = 29, to = 30),
+        AutoMigration(from = 30, to = 31),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -156,4 +161,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun userListDao(): UserListDao
 
     abstract fun instanceInfoDao(): InstanceInfoDao
+
+    abstract fun searchHistoryDao(): SearchHistoryDao
 }
