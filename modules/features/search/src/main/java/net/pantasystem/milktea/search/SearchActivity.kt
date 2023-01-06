@@ -11,9 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.search.databinding.ActivitySearchBinding
@@ -23,8 +25,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
-    companion object{
-        const val EXTRA_SEARCH_WORD = "net.pantasystem.milktea.search.SearchActivity.EXTRA_SEARCH_WORD"
+    companion object {
+        const val EXTRA_SEARCH_WORD =
+            "net.pantasystem.milktea.search.SearchActivity.EXTRA_SEARCH_WORD"
     }
 
     @Inject
@@ -55,9 +58,19 @@ class SearchActivity : AppCompatActivity() {
             MdcTheme {
                 val uiState by searchViewModel.uiState.collectAsState()
 
-                SearchSuggestionsLayout(uiState = uiState, onUserSelected = ::showUserDetail, onHashtagSelected = {
-                    showSearchResult("#$it")
-                })
+                SearchSuggestionsLayout(
+                    uiState = uiState,
+                    onUserSelected = ::showUserDetail,
+                    onHashtagSelected = {
+                        showSearchResult("#$it")
+                    },
+                    onSearchHistoryClicked = {
+                        showSearchResult(it.keyword)
+                    },
+                    onDeleteSearchHistory = {
+                        searchViewModel.deleteSearchHistory(it)
+                    }
+                )
             }
         }
 
@@ -82,20 +95,20 @@ class SearchActivity : AppCompatActivity() {
         searchView.isIconifiedByDefault = false
         searchView.setOnQueryTextListener(queryTextListener)
         searchView.isIconified = false
-        searchView.setQuery(mSearchWord,false)
+        searchView.setQuery(mSearchWord, false)
 
         return super.onCreateOptionsMenu(menu)
     }
 
 
-    private val queryTextListener = object : SearchView.OnQueryTextListener{
+    private val queryTextListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String?): Boolean {
             searchViewModel.onInputKeyword(newText ?: "")
             return true
         }
 
         override fun onQueryTextSubmit(query: String?): Boolean {
-            if(!query.isNullOrBlank()){
+            if (!query.isNullOrBlank()) {
                 //search(query)
                 showSearchResult(query)
                 return true
@@ -104,17 +117,21 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    fun showSearchResult(searchWord: String){
-        val intent = Intent(this, SearchResultActivity::class.java)
-        intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)
-        startActivity(intent)
-        overridePendingTransition(0, 0)
-        finish()
+    fun showSearchResult(searchWord: String) {
+        lifecycleScope.launch {
+            val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
+            intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)
+            searchViewModel.onQueryTextSubmit(searchWord)
+            startActivity(intent)
+            overridePendingTransition(0, 0)
+            finish()
+        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            android.R.id.home ->{
+        when (item.itemId) {
+            android.R.id.home -> {
                 finish()
                 overridePendingTransition(0, 0)
             }

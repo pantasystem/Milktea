@@ -18,6 +18,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.R
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
+import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
 import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.db.UserDao
@@ -101,4 +102,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideInstanceInfoDao(db: DataBase): InstanceInfoDao = db.instanceInfoDao()
+
+    @Provides
+    @Singleton
+    fun provideSearchHistoryDao(db: DataBase): SearchHistoryDao = db.searchHistoryDao()
 }
