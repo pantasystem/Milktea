@@ -8,10 +8,8 @@ import android.widget.SearchView
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
@@ -20,8 +18,6 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.search.databinding.ActivitySearchBinding
 import net.pantasystem.milktea.user.activity.UserDetailActivity
-import net.pantasystem.milktea.user.compose.SimpleUserListView
-import net.pantasystem.milktea.user.search.SearchUserViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,9 +35,9 @@ class SearchActivity : AppCompatActivity() {
 
     private var mSearchWord: String? = null
 
-    private val mSearchUserViewModel: SearchUserViewModel by viewModels()
-
     private val binding: ActivitySearchBinding by dataBinding()
+
+    private val searchViewModel: SearchViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,12 +53,11 @@ class SearchActivity : AppCompatActivity() {
 
         findViewById<ComposeView>(R.id.composeBase).setContent {
             MdcTheme {
-                val users by mSearchUserViewModel.users.collectAsState()
-                SimpleUserListView(
-                    users = users,
-                    onSelected = ::showUserDetail,
-                    modifier = Modifier.fillMaxSize()
-                )
+                val uiState by searchViewModel.uiState.collectAsState()
+
+                SearchSuggestionsLayout(uiState = uiState, onUserSelected = ::showUserDetail, onHashtagSelected = {
+                    showSearchResult("#$it")
+                })
             }
         }
 
@@ -73,7 +68,7 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    fun showUserDetail(user: User) {
+    private fun showUserDetail(user: User) {
         startActivity(UserDetailActivity.newInstance(this, user.id))
     }
 
@@ -95,7 +90,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val queryTextListener = object : SearchView.OnQueryTextListener{
         override fun onQueryTextChange(newText: String?): Boolean {
-            mSearchUserViewModel.setUserName(newText?: "")
+            searchViewModel.onInputKeyword(newText ?: "")
             return true
         }
 
