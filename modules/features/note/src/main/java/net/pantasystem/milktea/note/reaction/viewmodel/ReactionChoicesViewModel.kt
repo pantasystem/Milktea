@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.reaction.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +26,6 @@ class ReactionChoicesViewModel @Inject constructor(
     private val metaRepository: MetaRepository,
     private val reactionHistoryDao: ReactionHistoryRepository,
     private val userEmojiConfigRepository: UserEmojiConfigRepository,
-    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
 
@@ -48,15 +46,20 @@ class ReactionChoicesViewModel @Inject constructor(
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
         }
 
+    val searchWord = MutableStateFlow("")
+
+
     // 検索時の候補
     val uiState =
         combine(
+            searchWord,
             meta,
             accountStore.observeCurrentAccount,
             reactionCount,
             userSetting
-        ) { meta, ac, counts, settings ->
+        ) { word, meta, ac, counts, settings ->
             ReactionSelectionUiState(
+                keyword = word,
                 account = ac,
                 meta = meta,
                 reactionHistoryCounts = counts,
@@ -65,7 +68,7 @@ class ReactionChoicesViewModel @Inject constructor(
         }.stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            ReactionSelectionUiState(null, null, emptyList(), emptyList())
+            ReactionSelectionUiState("",null, null, emptyList(), emptyList())
         )
 
     val tabLabels = uiState.map { uiState ->
@@ -77,12 +80,14 @@ class ReactionChoicesViewModel @Inject constructor(
 }
 
 data class ReactionSelectionUiState(
+    val keyword: String,
     val account: Account?,
     val meta: Meta?,
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<UserEmojiConfig>,
 ) {
 
+    val isSearchMode = keyword.isNotBlank()
 
     val frequencyUsedReactionsV2: List<EmojiType> by lazy {
         reactionHistoryCounts.map {
@@ -133,6 +138,10 @@ data class ReactionSelectionUiState(
             getCategoryBy(it)
         )
     }
+
+    val searchFilteredEmojis = meta?.emojis?.filterEmojiBy(keyword)?.map {
+        EmojiType.CustomEmoji(it)
+    } ?: emptyList()
 }
 
 sealed interface SegmentType {
