@@ -55,7 +55,7 @@ class SearchActivity : AppCompatActivity() {
             MdcTheme {
                 val uiState by searchViewModel.uiState.collectAsState()
 
-                SearchResultLayout(uiState = uiState, onUserSelected = ::showUserDetail, onHashtagSelected = {
+                SearchSuggestionsLayout(uiState = uiState, onUserSelected = ::showUserDetail, onHashtagSelected = {
                     showSearchResult("#$it")
                 })
             }

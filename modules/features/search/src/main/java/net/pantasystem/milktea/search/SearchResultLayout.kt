@@ -18,7 +18,7 @@ import net.pantasystem.milktea.user.compose.ItemSimpleUserCard
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchResultLayout(
+fun SearchSuggestionsLayout(
     modifier: Modifier = Modifier,
     uiState: SearchUiState,
     onUserSelected: (User) -> Unit,
