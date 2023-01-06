@@ -193,7 +193,6 @@ class ReactionSelectionDialogBinder(
             }
         }
 
-        tabLayout.selectedTabPosition
 
         searchWordTextField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
