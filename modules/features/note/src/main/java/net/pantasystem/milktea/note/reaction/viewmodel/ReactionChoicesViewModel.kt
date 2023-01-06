@@ -210,3 +210,13 @@ fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType?
         }
     }
 }
+
+fun List<Emoji>.filterEmojiBy(word: String): List<Emoji> {
+    val w = word.replace(":", "")
+    return filter { emoji ->
+        emoji.name.contains(w)
+                || emoji.aliases?.any { alias ->
+            alias.startsWith(w)
+        } ?: false
+    }
+}
