@@ -8,6 +8,7 @@ import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
+import net.pantasystem.milktea.api.misskey.hashtag.SearchHashtagRequest
 import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
@@ -259,4 +260,7 @@ interface MisskeyAPI {
 
     @POST("api/notes/thread-muting/delete")
     suspend fun deleteThreadMute(@Body req: ToggleThreadMuteRequest) : Response<Unit>
+
+    @POST("api/hashtags/search")
+    suspend fun searchHashtag(@Body req: SearchHashtagRequest) : Response<List<String>>
 }
