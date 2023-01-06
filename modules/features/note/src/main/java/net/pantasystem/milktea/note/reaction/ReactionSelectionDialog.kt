@@ -21,7 +21,6 @@ import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -32,7 +31,6 @@ import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesListAdapter
-import net.pantasystem.milktea.note.reaction.choices.ReactionChoicesPagerAdapter
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionChoicesViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
@@ -147,21 +145,12 @@ class ReactionSelectionDialogBinder(
         searchSuggestionListView.adapter = searchedReactionAdapter
         searchSuggestionListView.layoutManager = flexBoxLayoutManager
 
+        val layoutManager = LinearLayoutManager(context)
+
 //        tabLayout.setupWithViewPager(viewPager)
-        val adapter = ReactionChoicesPagerAdapter(fragmentManager, context)
-        tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
-            override fun onTabReselected(tab: TabLayout.Tab?) {
+//        val adapter = ReactionChoicesPagerAdapter(fragmentManager, context)
 
-            }
 
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-
-            }
-        })
 //        viewPager.adapter = adapter
 
         scope.launch {
@@ -171,25 +160,42 @@ class ReactionSelectionDialogBinder(
                 }
             }
         }
-
-        scope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.categories.collect { categories ->
-                    adapter.setList(categories.toList())
-                }
-            }
-        }
+//
+//        scope.launch {
+//            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//                viewModel.categories.collect { categories ->
+//                    adapter.setList(categories.toList())
+//                }
+//            }
+//        }
 
         val choicesAdapter = EmojiChoicesListAdapter {
             onReactionSelected(it.toTextReaction())
         }
         viewPager.adapter = choicesAdapter
-        viewPager.layoutManager = LinearLayoutManager(context)
+
+        viewPager.layoutManager = layoutManager
+
 
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 reactionChoicesViewModel.uiState.collect {
                     choicesAdapter.submitList(it.segments)
+                }
+            }
+        }
+
+        scope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                reactionChoicesViewModel.tabLabels.collect {
+                    tabLayout.removeAllTabs()
+                    it.map {
+                        tabLayout.newTab().apply {
+                            text = it.getString(context)
+                        }
+                    }.forEach {
+                        tabLayout.addTab(it)
+                    }
                 }
             }
         }
@@ -203,6 +209,17 @@ class ReactionSelectionDialogBinder(
             }
             return@setOnEditorActionListener false
         }
+
+        viewPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                if (tabLayout.tabCount > firstVisibleItemPosition) {
+                    tabLayout.getTabAt(firstVisibleItemPosition)?.select()
+                }
+            }
+        })
+
     }
 }
-

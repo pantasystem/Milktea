@@ -68,6 +68,12 @@ class ReactionChoicesViewModel @Inject constructor(
             ReactionSelectionUiState(null, null, emptyList(), emptyList())
         )
 
+    val tabLabels = uiState.map { uiState ->
+        uiState.segments.map {
+            it.label
+        }
+    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
 }
 
 data class ReactionSelectionUiState(
