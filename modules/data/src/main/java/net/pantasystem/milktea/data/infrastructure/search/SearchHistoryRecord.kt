@@ -5,6 +5,7 @@ import net.pantasystem.milktea.data.infrastructure.account.db.AccountRecord
 import net.pantasystem.milktea.model.search.SearchHistory
 
 @Entity(
+    tableName = "search_histories",
     indices = [Index("keyword", "accountId", unique = true), Index("accountId")],
     foreignKeys = [
         ForeignKey(
