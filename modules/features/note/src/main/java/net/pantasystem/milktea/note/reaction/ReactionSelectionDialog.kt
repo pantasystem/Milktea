@@ -10,7 +10,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -34,7 +33,6 @@ import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesListAdapter
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionChoicesViewModel
-import net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel
 import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -59,7 +57,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
     val notesViewModel by activityViewModels<NotesViewModel>()
 
-    val viewModel: ReactionSelectionDialogViewModel by viewModels()
+//    val viewModel: ReactionSelectionDialogViewModel by viewModels()
 
     private val reactionChoicesViewModel: ReactionChoicesViewModel by activityViewModels()
 
@@ -83,7 +81,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = DialogSelectReactionBinding.bind(view)
-        binding.reactionSelectionViewModel = viewModel
+        binding.reactionSelectionViewModel = reactionChoicesViewModel
         binding.lifecycleOwner = this
 
         val binder = ReactionSelectionDialogBinder(
@@ -95,7 +93,6 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
             tabLayout = binding.reactionChoicesTab,
             recyclerView = binding.reactionChoicesViewPager,
             searchWordTextField = binding.searchReactionEditText,
-            viewModel = viewModel,
             onReactionSelected = {
                 notesViewModel.toggleReaction(noteId, it)
                 dismiss()
@@ -128,7 +125,6 @@ class ReactionSelectionDialogBinder(
     val tabLayout: TabLayout,
     val recyclerView: RecyclerView,
     val searchWordTextField: EditText,
-    val viewModel: ReactionSelectionDialogViewModel,
     val reactionChoicesViewModel: ReactionChoicesViewModel,
     val onReactionSelected: (String) -> Unit,
     val onSearchEmojiTextFieldEntered: (String) -> Unit,
@@ -149,14 +145,6 @@ class ReactionSelectionDialogBinder(
 
         val layoutManager = LinearLayoutManager(context)
 
-        scope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.filteredEmojis.collect {
-                    searchedReactionAdapter.submitList(it)
-                }
-            }
-        }
-
         val choicesAdapter = EmojiChoicesListAdapter {
             onReactionSelected(it.toTextReaction())
         }
@@ -169,6 +157,7 @@ class ReactionSelectionDialogBinder(
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 reactionChoicesViewModel.uiState.collect {
                     choicesAdapter.submitList(it.segments)
+                    searchedReactionAdapter.submitList(it.searchFilteredEmojis)
                 }
             }
         }
@@ -196,7 +185,7 @@ class ReactionSelectionDialogBinder(
 
         searchWordTextField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
-                onSearchEmojiTextFieldEntered(viewModel.searchWord.value)
+                onSearchEmojiTextFieldEntered(reactionChoicesViewModel.searchWord.value)
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
