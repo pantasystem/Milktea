@@ -57,6 +57,7 @@
     <!--    <string name="create_folder">Create folder</string>-->
     <string name="add_account">Add account</string>
     <string name="post">Post</string>
+    <string name="notes_and_replies">Notes and replies</string>
     <string name="please_speak">What\'s on your mind?</string>
     <string name="open">Open</string>
     <string name="multiple_answer">Multiple answers</string>
