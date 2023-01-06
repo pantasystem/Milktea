@@ -116,4 +116,11 @@ class DatabaseMigrationTest {
         helper.createDatabase(testDb, 11)
         helper.runMigrationsAndValidate(testDb, 30, true)
     }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate11To31() {
+        helper.createDatabase(testDb, 11)
+        helper.runMigrationsAndValidate(testDb, 31, true)
+    }
 }
