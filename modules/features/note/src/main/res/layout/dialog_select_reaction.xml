@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="reactionSelectionViewModel"
-                type="net.pantasystem.milktea.note.reaction.viewmodel.ReactionSelectionDialogViewModel" />
+                type="net.pantasystem.milktea.note.reaction.viewmodel.ReactionChoicesViewModel" />
         <import type="android.view.View" />
     </data>
     <RelativeLayout
@@ -41,19 +41,19 @@
                 android:elevation="0dp"
                 android:layout_below="@id/searchReactionInputLayout"
                 style="@style/Widget.MaterialComponents.Toolbar.Surface"
-                android:visibility="@{ reactionSelectionViewModel.isSearchMode ? View.GONE : View.VISIBLE }"
+                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
                 >
 
 
         </com.google.android.material.tabs.TabLayout>
 
 
-        <net.pantasystem.milktea.common_android.ui.BottomSheetViewPager
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reaction_choices_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/reaction_choices_tab"
-                android:visibility="@{ reactionSelectionViewModel.isSearchMode ? View.GONE : View.VISIBLE }"
+                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
                 />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/reaction_choices_tab"
-                android:visibility="@{ reactionSelectionViewModel.isSearchMode ? View.VISIBLE : View.GONE }"
+                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
                 />
     </RelativeLayout>
 </layout>

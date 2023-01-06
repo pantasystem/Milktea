@@ -19,9 +19,27 @@ sealed class StringSource {
             val formatArgs = formatArgs.map { if (it is StringSource) it.getString(context) else it }.toTypedArray()
             return context.getString(textRes, *formatArgs)
         }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as FormatResource
+
+            if (textRes != other.textRes) return false
+            if (!formatArgs.contentEquals(other.formatArgs)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = textRes
+            result = 31 * result + formatArgs.contentHashCode()
+            return result
+        }
     }
 
-    private class StringSourceList(private val list: List<StringSource>) : StringSource() {
+    private data class StringSourceList(private val list: List<StringSource>) : StringSource() {
         override fun getString(context: Context): String = list.joinToString(separator = "") { it.getString(context) }
     }
 

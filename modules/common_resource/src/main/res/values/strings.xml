@@ -400,5 +400,6 @@
 
     <string name="edit_caption">Edit caption</string>
     <string name="input_caption">Input caption</string>
+    <string name="other">Other</string>
 
 </resources>

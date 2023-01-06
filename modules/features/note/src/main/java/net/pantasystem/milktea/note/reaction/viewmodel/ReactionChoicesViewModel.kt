@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.UserEmojiConfig
@@ -16,6 +17,7 @@ import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
+import net.pantasystem.milktea.note.R
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,15 +46,20 @@ class ReactionChoicesViewModel @Inject constructor(
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
         }
 
+    val searchWord = MutableStateFlow("")
+
+
     // 検索時の候補
     val uiState =
         combine(
+            searchWord,
             meta,
             accountStore.observeCurrentAccount,
             reactionCount,
             userSetting
-        ) { meta, ac, counts, settings ->
+        ) { word, meta, ac, counts, settings ->
             ReactionSelectionUiState(
+                keyword = word,
                 account = ac,
                 meta = meta,
                 reactionHistoryCounts = counts,
@@ -61,20 +68,28 @@ class ReactionChoicesViewModel @Inject constructor(
         }.stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            ReactionSelectionUiState(null, null, emptyList(), emptyList())
+            ReactionSelectionUiState("",null, null, emptyList(), emptyList())
         )
+
+    val tabLabels = uiState.map { uiState ->
+        uiState.segments.map {
+            it.label
+        }
+    }.distinctUntilChanged().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 }
 
 data class ReactionSelectionUiState(
+    val keyword: String,
     val account: Account?,
     val meta: Meta?,
     val reactionHistoryCounts: List<ReactionHistoryCount>,
     val userSettingReactions: List<UserEmojiConfig>,
 ) {
 
+    val isSearchMode = keyword.isNotBlank()
 
-    val frequencyUsedReactionsV2: List<EmojiType> by lazy {
+    private val frequencyUsedReactionsV2: List<EmojiType> by lazy {
         reactionHistoryCounts.map {
             it.reaction
         }.mapNotNull { reaction ->
@@ -91,7 +106,7 @@ data class ReactionSelectionUiState(
     }
 
 
-    val userSettingEmojis: List<EmojiType> by lazy {
+    private val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
             EmojiType.from(meta?.emojis, setting.reaction)
         }.ifEmpty {
@@ -101,8 +116,13 @@ data class ReactionSelectionUiState(
         }
     }
 
+    private val otherEmojis = meta?.emojis?.filter {
+        it.category == null
+    }?.map {
+        EmojiType.CustomEmoji(it)
+    }
 
-    fun getCategoryBy(category: String): List<EmojiType> {
+    private fun getCategoryBy(category: String): List<EmojiType> {
         return meta?.emojis?.filter {
             it.category == category
 
@@ -111,6 +131,49 @@ data class ReactionSelectionUiState(
         } ?: emptyList()
     }
 
+    private val categories = meta?.emojis?.filterNot {
+        it.category.isNullOrBlank()
+    }?.mapNotNull {
+        it.category
+    }?.distinct() ?: emptyList()
+
+    val segments = listOfNotNull(
+        SegmentType.UserCustom(userSettingEmojis),
+        SegmentType.OftenUse(frequencyUsedReactionsV2),
+        otherEmojis?.let {
+            SegmentType.OtherCategory(it)
+        }
+    ) + categories.map {
+        SegmentType.Category(
+            it,
+            getCategoryBy(it)
+        )
+    }
+
+    val searchFilteredEmojis = meta?.emojis?.filterEmojiBy(keyword)?.map {
+        EmojiType.CustomEmoji(it)
+    } ?: emptyList()
+}
+
+sealed interface SegmentType {
+    val label: StringSource
+    val emojis: List<EmojiType>
+    data class Category(val name: String, override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(name)
+    }
+    data class UserCustom(override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(R.string.user)
+    }
+    data class OftenUse(override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(R.string.often_use)
+    }
+    data class OtherCategory(override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(R.string.other)
+    }
 }
 
 sealed interface EmojiType {
@@ -160,5 +223,15 @@ fun EmojiType.Companion.from(emojis: List<Emoji>?, reaction: String): EmojiType?
         }?.let {
             EmojiType.CustomEmoji(it)
         }
+    }
+}
+
+fun List<Emoji>.filterEmojiBy(word: String): List<Emoji> {
+    val w = word.replace(":", "")
+    return filter { emoji ->
+        emoji.name.contains(w)
+                || emoji.aliases?.any { alias ->
+            alias.startsWith(w)
+        } ?: false
     }
 }

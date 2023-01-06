@@ -409,5 +409,6 @@
     <string name="edit_caption">キャプションを編集</string>
     <string name="input_caption">キャプションを入力</string>
     <string name="notes_and_replies">投稿と返信</string>
+    <string name="other">その他</string>
 
 </resources>
