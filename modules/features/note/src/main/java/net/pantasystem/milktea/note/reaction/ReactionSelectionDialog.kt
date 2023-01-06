@@ -17,12 +17,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ahmadhamwi.tabsync.TabbedListMediator
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.model.notes.Note
@@ -59,7 +61,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
     val viewModel: ReactionSelectionDialogViewModel by viewModels()
 
-    val reactionChoicesViewModel: ReactionChoicesViewModel by activityViewModels()
+    private val reactionChoicesViewModel: ReactionChoicesViewModel by activityViewModels()
 
     private val noteId: Note.Id by lazy {
         Note.Id(
@@ -91,7 +93,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
             lifecycleOwner = viewLifecycleOwner,
             searchSuggestionListView = binding.searchSuggestionsView,
             tabLayout = binding.reactionChoicesTab,
-            viewPager = binding.reactionChoicesViewPager,
+            recyclerView = binding.reactionChoicesViewPager,
             searchWordTextField = binding.searchReactionEditText,
             viewModel = viewModel,
             onReactionSelected = {
@@ -124,7 +126,7 @@ class ReactionSelectionDialogBinder(
     val lifecycleOwner: LifecycleOwner,
     val searchSuggestionListView: RecyclerView,
     val tabLayout: TabLayout,
-    val viewPager: RecyclerView,
+    val recyclerView: RecyclerView,
     val searchWordTextField: EditText,
     val viewModel: ReactionSelectionDialogViewModel,
     val reactionChoicesViewModel: ReactionChoicesViewModel,
@@ -147,12 +149,6 @@ class ReactionSelectionDialogBinder(
 
         val layoutManager = LinearLayoutManager(context)
 
-//        tabLayout.setupWithViewPager(viewPager)
-//        val adapter = ReactionChoicesPagerAdapter(fragmentManager, context)
-
-
-//        viewPager.adapter = adapter
-
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.filteredEmojis.collect {
@@ -160,21 +156,13 @@ class ReactionSelectionDialogBinder(
                 }
             }
         }
-//
-//        scope.launch {
-//            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-//                viewModel.categories.collect { categories ->
-//                    adapter.setList(categories.toList())
-//                }
-//            }
-//        }
 
         val choicesAdapter = EmojiChoicesListAdapter {
             onReactionSelected(it.toTextReaction())
         }
-        viewPager.adapter = choicesAdapter
+        recyclerView.adapter = choicesAdapter
 
-        viewPager.layoutManager = layoutManager
+        recyclerView.layoutManager = layoutManager
 
 
         scope.launch {
@@ -185,17 +173,22 @@ class ReactionSelectionDialogBinder(
             }
         }
 
+        var tabbedListMediator: TabbedListMediator? = null
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                reactionChoicesViewModel.tabLabels.collect {
+                reactionChoicesViewModel.tabLabels.filterNot {
+                    it.isEmpty()
+                }.collect {
                     tabLayout.removeAllTabs()
                     it.map {
-                        tabLayout.newTab().apply {
+                        val tab = tabLayout.newTab().apply {
                             text = it.getString(context)
                         }
-                    }.forEach {
-                        tabLayout.addTab(it)
+                        tabLayout.addTab(tab)
                     }
+                    tabbedListMediator?.detach()
+                    tabbedListMediator = TabbedListMediator(recyclerView, tabLayout, it.indices.toList())
+                    tabbedListMediator?.attach()
                 }
             }
         }
@@ -209,17 +202,6 @@ class ReactionSelectionDialogBinder(
             }
             return@setOnEditorActionListener false
         }
-
-        viewPager.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                if (tabLayout.tabCount > firstVisibleItemPosition) {
-                    tabLayout.getTabAt(firstVisibleItemPosition)?.select()
-                }
-            }
-        })
 
     }
 }

@@ -116,4 +116,6 @@ dependencies {
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
+
+    implementation 'io.github.ahmad-hamwi:tabsync:1.0.1'
 }
