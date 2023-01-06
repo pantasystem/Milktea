@@ -16,6 +16,7 @@ import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -31,6 +32,7 @@ class AccountViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val metaRepository: MetaRepository,
     private val signOutUseCase: SignOutUseCase,
+    private val syncMetaExecutor: SyncMetaExecutor,
 ) : ViewModel() {
 
 
@@ -118,6 +120,7 @@ class AccountViewModel @Inject constructor(
     fun setSwitchTargetConnectionInstance(account: Account) {
         viewModelScope.launch {
             accountStore.setCurrent(account)
+            syncMetaExecutor(account.normalizedInstanceDomain)
         }
     }
 
