@@ -409,5 +409,6 @@
     <string name="edit_caption">编辑标题</string>
     <string name="input_caption">输入标题</string>
     <string name="notes_and_replies">帖子和回复</string>
+    <string name="other">其他</string>
 
 </resources>

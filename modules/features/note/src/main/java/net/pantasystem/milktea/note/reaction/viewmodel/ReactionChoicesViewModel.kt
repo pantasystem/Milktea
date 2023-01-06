@@ -89,7 +89,7 @@ data class ReactionSelectionUiState(
 
     val isSearchMode = keyword.isNotBlank()
 
-    val frequencyUsedReactionsV2: List<EmojiType> by lazy {
+    private val frequencyUsedReactionsV2: List<EmojiType> by lazy {
         reactionHistoryCounts.map {
             it.reaction
         }.mapNotNull { reaction ->
@@ -106,7 +106,7 @@ data class ReactionSelectionUiState(
     }
 
 
-    val userSettingEmojis: List<EmojiType> by lazy {
+    private val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
             EmojiType.from(meta?.emojis, setting.reaction)
         }.ifEmpty {
@@ -116,8 +116,13 @@ data class ReactionSelectionUiState(
         }
     }
 
+    private val otherEmojis = meta?.emojis?.filter {
+        it.category == null
+    }?.map {
+        EmojiType.CustomEmoji(it)
+    }
 
-    fun getCategoryBy(category: String): List<EmojiType> {
+    private fun getCategoryBy(category: String): List<EmojiType> {
         return meta?.emojis?.filter {
             it.category == category
 
@@ -126,13 +131,19 @@ data class ReactionSelectionUiState(
         } ?: emptyList()
     }
 
-    val categories = meta?.emojis?.filterNot {
+    private val categories = meta?.emojis?.filterNot {
         it.category.isNullOrBlank()
     }?.mapNotNull {
         it.category
     }?.distinct() ?: emptyList()
 
-    val segments = listOf(SegmentType.UserCustom(userSettingEmojis), SegmentType.OftenUse(frequencyUsedReactionsV2)) + categories.map {
+    val segments = listOfNotNull(
+        SegmentType.UserCustom(userSettingEmojis),
+        SegmentType.OftenUse(frequencyUsedReactionsV2),
+        otherEmojis?.let {
+            SegmentType.OtherCategory(it)
+        }
+    ) + categories.map {
         SegmentType.Category(
             it,
             getCategoryBy(it)
@@ -158,6 +169,10 @@ sealed interface SegmentType {
     data class OftenUse(override val emojis: List<EmojiType>) : SegmentType {
         override val label: StringSource
             get() = StringSource.invoke(R.string.often_use)
+    }
+    data class OtherCategory(override val emojis: List<EmojiType>) : SegmentType {
+        override val label: StringSource
+            get() = StringSource.invoke(R.string.other)
     }
 }
 
