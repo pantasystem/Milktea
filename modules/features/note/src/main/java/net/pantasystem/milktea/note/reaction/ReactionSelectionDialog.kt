@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -59,7 +60,7 @@ class ReactionSelectionDialog : BottomSheetDialogFragment(),
 
 //    val viewModel: ReactionSelectionDialogViewModel by viewModels()
 
-    private val reactionChoicesViewModel: ReactionChoicesViewModel by activityViewModels()
+    private val reactionChoicesViewModel: ReactionChoicesViewModel by viewModels()
 
     private val noteId: Note.Id by lazy {
         Note.Id(
