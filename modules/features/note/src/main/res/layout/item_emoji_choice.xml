@@ -3,9 +3,10 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <FrameLayout
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="8dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:padding="4dp"
+            android:layout_margin="4dp"
             >
         <ImageView
                 android:id="@+id/reactionImagePreview"
@@ -21,6 +22,7 @@
                 tools:text="😇"
                 tools:visibility="visible"
                 android:gravity="center"
+                android:textSize="20sp"
                 android:textColor="?android:textColorPrimary"
                 />
     </FrameLayout>
