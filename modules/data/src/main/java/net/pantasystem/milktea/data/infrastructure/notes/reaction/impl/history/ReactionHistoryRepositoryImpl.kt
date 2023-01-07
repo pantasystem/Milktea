@@ -30,17 +30,17 @@ class ReactionHistoryRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun observeSumReactions(instanceDomain: String): Flow<List<ReactionHistoryCount>> {
-        return reactionHistoryDao.observeSumReactions(instanceDomain).map { list ->
+    override fun observeSumReactions(instanceDomain: String, limit: Int): Flow<List<ReactionHistoryCount>> {
+        return reactionHistoryDao.observeSumReactions(instanceDomain, limit).map { list ->
             list.map {
                 it.toReactionHistoryCount()
             }
         }
     }
 
-    override suspend fun sumReactions(instanceDomain: String): List<ReactionHistoryCount> {
+    override suspend fun sumReactions(instanceDomain: String, limit: Int): List<ReactionHistoryCount> {
         return withContext(ioDispatcher) {
-            reactionHistoryDao.sumReactions(instanceDomain).map {
+            reactionHistoryDao.sumReactions(instanceDomain, limit).map {
                 it.toReactionHistoryCount()
             }
         }
