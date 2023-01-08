@@ -401,5 +401,6 @@
     <string name="edit_caption">Edit caption</string>
     <string name="input_caption">Input caption</string>
     <string name="other">Other</string>
+    <string name="recently_used">Recently used</string>
 
 </resources>

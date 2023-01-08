@@ -410,5 +410,6 @@
     <string name="input_caption">输入标题</string>
     <string name="notes_and_replies">帖子和回复</string>
     <string name="other">其他</string>
+    <string name="recently_used">最近使用</string>
 
 </resources>
