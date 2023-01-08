@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.Flow
 interface ReactionHistoryDao{
 
     @Query("select * from reaction_history")
-    fun findAll() : List<ReactionHistoryRecord>?
+    suspend fun findAll() : List<ReactionHistoryRecord>?
 
     @Query("select reaction, count(reaction) as reaction_count from reaction_history where instance_domain=:instanceDomain group by reaction order by reaction_count desc limit :limit")
-    fun sumReactions(instanceDomain: String, limit: Int) : List<ReactionHistoryCountRecord>
+    suspend fun sumReactions(instanceDomain: String, limit: Int) : List<ReactionHistoryCountRecord>
 
     @Query("select reaction, count(reaction) as reaction_count from reaction_history where instance_domain=:instanceDomain group by reaction order by reaction_count desc limit :limit")
     fun observeSumReactions(instanceDomain: String, limit: Int) : Flow<List<ReactionHistoryCountRecord>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(reactionHistory: ReactionHistoryRecord)
+    suspend fun insert(reactionHistory: ReactionHistoryRecord)
 }
 
