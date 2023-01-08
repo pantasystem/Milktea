@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -44,5 +46,17 @@ class ReactionHistoryRepositoryImpl @Inject constructor(
                 it.toReactionHistoryCount()
             }
         }
+    }
+
+    override fun observeRecentlyUsedBy(instanceDomain: String, limit: Int): Flow<List<ReactionHistory>> {
+        return reactionHistoryDao.observeRecentlyUsed(instanceDomain, limit).map { records ->
+            records.map { history ->
+                ReactionHistory(
+                    instanceDomain = history.instanceDomain,
+                    reaction = history.reaction,
+                    id = history.id
+                )
+            }
+        }.flowOn(Dispatchers.IO)
     }
 }
