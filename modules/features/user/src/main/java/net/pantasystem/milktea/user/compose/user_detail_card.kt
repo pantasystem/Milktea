@@ -41,6 +41,7 @@ sealed interface UserDetailCardAction {
 fun UserDetailCard(
     userDetail: User.Detail,
     isUserNameMain: Boolean,
+    accountHost: String?,
     onAction: (UserDetailCardAction) -> Unit,
 ) {
     Card(
@@ -127,6 +128,9 @@ fun UserDetailCard(
                 text = if (isUserNameMain) userDetail.displayUserName else userDetail.displayName,
                 fontWeight = FontWeight.Bold,
                 emojis = userDetail.emojis,
+                parsedResult = if (isUserNameMain) null else userDetail.parsedResult,
+                accountHost = accountHost,
+                sourceHost = userDetail.host,
                 modifier = Modifier
                     .constrainAs(mainNameRef) {
                         start.linkTo(avatarIconRef.end, margin = 4.dp)
@@ -137,6 +141,9 @@ fun UserDetailCard(
                 text = if (!isUserNameMain) userDetail.displayUserName else userDetail.displayName,
                 fontWeight = FontWeight.Bold,
                 emojis = userDetail.emojis,
+                parsedResult = if(isUserNameMain) userDetail.parsedResult else null,
+                accountHost = accountHost,
+                sourceHost = userDetail.host,
                 modifier = Modifier
                     .constrainAs(subNameRef) {
                         start.linkTo(avatarIconRef.end, margin = 4.dp)
@@ -149,6 +156,8 @@ fun UserDetailCard(
                 maxLines = 5,
                 textAlign = TextAlign.Start,
                 emojis = userDetail.emojis,
+                accountHost = accountHost,
+                sourceHost = userDetail.host,
                 modifier = Modifier
                     .padding(start = 8.dp, end = 8.dp)
                     .constrainAs(descriptionRef) {
@@ -273,5 +282,6 @@ fun Preview_UserDetail() {
             isFollower = true,
         ),
         isUserNameMain = true,
+        accountHost = "misskey.io"
     ) {}
 }
