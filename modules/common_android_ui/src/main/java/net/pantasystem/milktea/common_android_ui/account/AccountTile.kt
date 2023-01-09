@@ -73,7 +73,9 @@ fun AccountTile(
                         CustomEmojiText(
                             text = account.user.name ?: "", emojis = account.user.emojis,
                             fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            accountHost = account.account.getHost(),
+                            sourceHost = account.user.host,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                     }

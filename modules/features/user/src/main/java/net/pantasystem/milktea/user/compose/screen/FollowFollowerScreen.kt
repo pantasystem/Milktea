@@ -205,6 +205,9 @@ private fun FollowFollowerTopBar(
                     CustomEmojiText(
                         text = uiState.user.displayName,
                         emojis = uiState.user.emojis,
+                        sourceHost = uiState.user.host,
+                        accountHost = uiState.accountHost,
+                        parsedResult = uiState.user.parsedResult,
                         fontSize = 18.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
