@@ -33,6 +33,7 @@ fun MessageScreen(
 
     val messages by messageViewModel.messages.collectAsState()
     val scrollState = rememberLazyListState()
+    val account by messageViewModel.account.collectAsState()
 
     val title by messageViewModel.title.observeAsState()
 
@@ -69,6 +70,7 @@ fun MessageScreen(
             Messages(
                 messageState = messages,
                 scrollState = scrollState,
+                accountHost = account?.getHost(),
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f),
@@ -87,6 +89,7 @@ fun MessageScreen(
 fun Messages(
     modifier: Modifier = Modifier,
     messageState: PageableState<List<MessageRelation>>,
+    accountHost: String?,
     scrollState: LazyListState,
     onLoad: () -> Unit
 ) {
@@ -113,11 +116,12 @@ fun Messages(
 
                     Box(Modifier.padding(4.dp)) {
                         if (message.isMine()) {
-                            SelfMessageBubble(message = message.message)
+                            SelfMessageBubble(message = message.message, accountHost = accountHost)
                         } else {
                             RecipientMessageBubble(
                                 user = message.user,
-                                message = message.message
+                                message = message.message,
+                                accountHost = accountHost,
                             )
                         }
                     }

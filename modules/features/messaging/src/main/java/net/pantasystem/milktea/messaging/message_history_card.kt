@@ -72,7 +72,10 @@ fun MessageHistoryCard(
                             emojis = history.partner.emojis,
                             maxLines = 1,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            accountHost = history.account.getHost(),
+                            sourceHost = history.partner.host,
+                            parsedResult = if (isUserNameDefault) null else history.partner.parsedResult
                         )
                     }
                     is MessageHistoryRelation.Group -> {
