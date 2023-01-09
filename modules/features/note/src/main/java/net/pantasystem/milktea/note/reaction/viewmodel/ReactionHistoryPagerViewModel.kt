@@ -10,11 +10,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
+import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,6 +27,8 @@ class ReactionHistoryPagerViewModel @Inject constructor(
     val noteRepository: NoteRepository,
     val adapter: NoteCaptureAPIAdapter,
     val noteDataSource: NoteDataSource,
+    val userRepository: UserRepository,
+    val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -50,8 +56,15 @@ class ReactionHistoryPagerViewModel @Inject constructor(
         }
     }.shareIn(viewModelScope, SharingStarted.Eagerly)
 
-    val uiState = combine(note, types) { note, types ->
-        ReactionHistoryPagerUiState(note, types)
+    private val account = noteId.filterNotNull().map {
+        accountRepository.get(it.accountId).getOrNull()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val author = note.filterNotNull().map {
+        userRepository.find(it.userId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val uiState = combine(note, account, author, types) { note, ac, author, types ->
+        ReactionHistoryPagerUiState(note, ac, author,types)
     }.stateIn(viewModelScope, SharingStarted.Lazily, ReactionHistoryPagerUiState())
 
     init {
@@ -78,5 +91,7 @@ class ReactionHistoryPagerViewModel @Inject constructor(
 
 data class ReactionHistoryPagerUiState(
     val note: Note? = null,
+    val account: Account? = null,
+    val noteAuthor: User? = null,
     val types: List<ReactionHistoryRequest> = emptyList()
 )
