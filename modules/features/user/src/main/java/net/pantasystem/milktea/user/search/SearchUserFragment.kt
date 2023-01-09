@@ -55,11 +55,13 @@ class SearchUserFragment : Fragment() {
                 MdcTheme {
                     val users by viewModel.users.collectAsState()
                     val state by viewModel.searchState.collectAsState()
+                    val account by viewModel.currentAccount.collectAsState()
 
                     UserDetailCardList(
                         pageableState = state,
                         users = users,
                         isUserNameMain = false,
+                        accountHost = account?.getHost(),
                         onAction = ::onAction
                     )
                 }
