@@ -24,6 +24,7 @@ import net.pantasystem.milktea.model.user.User
 fun SimpleUserListView(
     modifier: Modifier = Modifier,
     users: List<User>,
+    accountHost: String?,
     onSelected: (User) -> Unit,
     selectedUserIds: Set<User.Id> = emptySet(),
 ) {
@@ -32,7 +33,8 @@ fun SimpleUserListView(
             ItemSimpleUserCard(
                 user = users[index],
                 onSelected = onSelected,
-                isSelected = selectedUserIds.contains(users[index].id)
+                isSelected = selectedUserIds.contains(users[index].id),
+                accountHost = accountHost,
             )
         }
     }
@@ -43,6 +45,7 @@ fun SimpleUserListView(
 @Composable
 fun ItemSimpleUserCard(
     user: User,
+    accountHost: String?,
     onSelected: (User) -> Unit,
     isSelected: Boolean = false,
 ) {
@@ -71,7 +74,7 @@ fun ItemSimpleUserCard(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Column {
-                CustomEmojiText(text = user.displayName, emojis = user.emojis)
+                CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = accountHost)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = user.displayUserName)
             }
@@ -96,5 +99,5 @@ fun PreviewItemSimpleUser() {
         isSameHost = true,
         instance = null,
         avatarBlurhash = null,
-    ), onSelected = {})
+    ), onSelected = {}, accountHost = "misskey.io")
 }
