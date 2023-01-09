@@ -17,7 +17,7 @@ object V13EmojiUrlResolver {
         tagName: String,
         emojiHost: String?,
     ): String {
-        if (emojiHost == null) {
+        if (emojiHost == null || emojiHost == accountHost) {
             return "https://$accountHost/emoji/${tagName}.webp"
         }
         return "https://$accountHost/emoji/${tagName}@${emojiHost}.webp"
