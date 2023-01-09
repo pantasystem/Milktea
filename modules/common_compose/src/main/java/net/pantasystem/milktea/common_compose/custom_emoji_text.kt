@@ -30,7 +30,7 @@ fun CustomEmojiText(
     modifier: Modifier = Modifier,
     text: String,
     emojis: List<Emoji>,
-    accountHost: String? = null,
+    accountHost: String?,
     sourceHost: String? = null,
     parsedResult: CustomEmojiParsedResult? = null,
     fontSize: TextUnit = 14.sp,
