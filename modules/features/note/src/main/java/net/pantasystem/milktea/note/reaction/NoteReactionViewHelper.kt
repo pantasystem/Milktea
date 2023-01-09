@@ -45,12 +45,10 @@ object NoteReactionViewHelper {
 
         val textReaction = LegacyReaction.reactionMap[reaction] ?: reaction
         val meta = cache.get(note.account.normalizedInstanceDomain)
-        val metaEmojis = meta?.emojis ?: emptyList()
 
         val r = Reaction(textReaction)
-        var emoji = note.emojiMap[textReaction.replace(":", "")] ?: meta?.emojisMap?.get(r.getName()) ?: metaEmojis.firstOrNull {
-            textReaction.replace(":", "") == it.name || r.getName() == it.name
-        }
+        var emoji = note.emojiMap[textReaction.replace(":", "")]
+            ?: meta?.emojisMap?.get(r.getName())
 
         val version = meta?.getVersion()
         if (r.isCustomEmojiFormat() && emoji == null && version != null && version >= Version("13")) {
