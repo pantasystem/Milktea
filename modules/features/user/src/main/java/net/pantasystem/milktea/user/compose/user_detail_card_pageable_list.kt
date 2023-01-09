@@ -38,6 +38,7 @@ fun UserDetailCardPageableList(
     pageableState: PageableState<List<User.Id>>,
     users: List<User.Detail>,
     isUserNameMain: Boolean,
+    accountHost: String?,
     onAction: (UserDetailCardPageableListAction) -> Unit,
 ) {
     val scrollController = rememberLazyListState()
@@ -68,6 +69,7 @@ fun UserDetailCardPageableList(
                             onAction = {
                                 onAction(UserDetailCardPageableListAction.CardAction(it))
                             },
+                            accountHost = accountHost,
                         )
                     }
                     item {
