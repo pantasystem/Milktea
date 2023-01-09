@@ -19,42 +19,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
+import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
-import java.util.regex.Pattern
-
-data class EmojiPos(
-    val emoji: Emoji,
-    val start: Int,
-    val end: Int
-)
-
-fun String.findCustomEmojiInText(emojis: List<Emoji>): List<EmojiPos> {
-
-    val pattern = StringBuilder(":(").also { patternBuilder ->
-        emojis.forEachIndexed { index, emoji ->
-            patternBuilder.append(Pattern.quote(emoji.name))
-            if (emojis.size - 1 != index) {
-                patternBuilder.append("|")
-            }
-        }
-        patternBuilder.append("):")
-    }.toString()
-
-    val regex =  Regex(pattern)
-    return regex.findAll(this).mapNotNull { result ->
-        val matchedText = this.substring(result.range.first + 1, result.range.last)
-        emojis.firstOrNull {
-            it.name == matchedText
-        }?.let {
-            EmojiPos(
-                it,
-                result.range.first,
-                result.range.last + 1,
-            )
-        }
-    }.toList()
-
-}
 
 
 @Composable
@@ -63,6 +30,9 @@ fun CustomEmojiText(
     modifier: Modifier = Modifier,
     text: String,
     emojis: List<Emoji>,
+    accountHost: String? = null,
+    sourceHost: String? = null,
+    parsedResult: CustomEmojiParsedResult? = null,
     fontSize: TextUnit = 14.sp,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
@@ -72,36 +42,47 @@ fun CustomEmojiText(
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
 
-    val matches = remember(text, emojis) {
-        text.findCustomEmojiInText(emojis)
+
+    val result = remember(text, emojis, accountHost, sourceHost) {
+        parsedResult ?: CustomEmojiParser.parse(
+            sourceHost = sourceHost,
+            emojis = emojis,
+            text = text
+        )
     }
+
 
     val annotatedText = buildAnnotatedString {
         var pos = 0
 
-        for (m in matches) {
-            if (pos != m.start) {
-                append(text.substring(pos, m.start))
+        for (r in result.emojis) {
+            if (pos != r.start) {
+                append(result.text.substring(pos, r.start))
             }
-            appendInlineContent(m.emoji.name, text.substring(m.start, m.end))
-            pos = m.end
+            appendInlineContent(r.result.tag, text.substring(r.start, r.end))
+            pos = r.end
         }
         if (pos != text.length && text.isNotBlank()) {
             append(text.substring(pos, text.length))
         }
+
     }
 
-    val inlineContents = emojis.associate { emoji ->
-        emoji.name to InlineTextContent(
+    val inlineContents = result.emojis.associate { emojiPos ->
+        emojiPos.result.tag to InlineTextContent(
             Placeholder(
                 width = fontSize,
                 height = fontSize,
                 placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
             )
         ) {
-            Image(painter = rememberAsyncImagePainter(model = emoji.url), contentDescription = null)
+            Image(
+                painter = rememberAsyncImagePainter(model = emojiPos.result.getUrl(accountHost)),
+                contentDescription = null
+            )
         }
     }
+
     Text(
         annotatedText,
         inlineContent = inlineContents,
