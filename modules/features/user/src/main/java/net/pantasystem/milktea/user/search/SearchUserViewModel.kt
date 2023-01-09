@@ -19,7 +19,6 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 
 
-
 @HiltViewModel
 class SearchUserViewModel @Inject constructor(
     accountStore: AccountStore,
@@ -39,7 +38,11 @@ class SearchUserViewModel @Inject constructor(
         .flatMapLatest { account ->
             searchUserRequests.flatMapLatest { query ->
                 suspend {
-                    userRepository.syncByUserName(account.accountId, query.getNameOrUserName(), host = query.getHost()).getOrThrow()
+                    userRepository.syncByUserName(
+                        account.accountId,
+                        query.getNameOrUserName(),
+                        host = query.getHost()
+                    ).getOrThrow()
                 }.asLoadingStateFlow().map {
                     SyncRemoteResult.from(account, query, it)
                 }
@@ -69,15 +72,17 @@ class SearchUserViewModel @Inject constructor(
         )
     )
 
+    private val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val uiState = combine(searchState, searchUserRequests) { state, request ->
-        SearchUserUiState(request, state)
+    val uiState = combine(searchState, searchUserRequests, account) { state, request, a ->
+        SearchUserUiState(request, state, a)
     }.stateIn(
         viewModelScope,
         SharingStarted.Lazily,
         SearchUserUiState(
             SearchUser("", null),
-            ResultState.Loading(StateContent.NotExist())
+            ResultState.Loading(StateContent.NotExist()),
+            account = null
         )
     )
 
@@ -95,6 +100,11 @@ class SearchUserViewModel @Inject constructor(
         logger.error("observe error", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    val currentAccount = accountStore.observeCurrentAccount.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null
+    )
 
     fun setUserName(text: String) {
         searchUserRequests.update {
@@ -145,6 +155,7 @@ data class SearchUser(
 data class SearchUserUiState(
     val query: SearchUser,
     val result: ResultState<List<User.Id>>,
+    val account: Account?,
 )
 
 data class SyncRemoteResult(
