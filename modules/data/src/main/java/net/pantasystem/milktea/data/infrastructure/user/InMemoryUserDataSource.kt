@@ -6,6 +6,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.AddResult
+import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
@@ -202,9 +203,7 @@ data class UsersState(
     }
 
     fun get(accountId: Long, fqdnUserName: String): User? {
-        val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
-        val userName = userNameAndHost[0]
-        val host = userNameAndHost.getOrNull(1)
-        return get(userName, host, accountId)
+        val acct = Acct(fqdnUserName)
+        return get(acct.userName, acct.host, accountId)
     }
 }
