@@ -45,7 +45,8 @@ fun SearchAndSelectUserScreen(
                 onSelected = { selectedUserViewModel.toggleSelectUser(it) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
+                    .fillMaxHeight(),
+                accountHost = uiState.account?.getHost()
             )
         }
     ) {
@@ -139,7 +140,8 @@ fun SearchAndSelectUserScreen(
                     onSelected = {
                         selectedUserViewModel.toggleSelectUser(it)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    accountHost = uiState.account?.getHost(),
                 )
 
 
