@@ -95,6 +95,8 @@ class ExploreViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Lazily, ExploreUiState(emptyList()))
 
 
+    val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     fun setExplores(list: List<ExploreItem>) {
         findUsers.update {
             list
