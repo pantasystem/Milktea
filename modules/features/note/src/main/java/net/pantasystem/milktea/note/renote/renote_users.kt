@@ -38,6 +38,7 @@ fun RenoteUsersScreen(
 ) {
 
     val myId by renotesViewModel.myId.collectAsState()
+    val account by renotesViewModel.account.collectAsState()
 
     val renotes: PageableState<List<NoteRelation>> by renotesViewModel.renotes.asLiveData()
         .observeAsState(
@@ -69,7 +70,8 @@ fun RenoteUsersScreen(
             },
             modifier = Modifier.fillMaxSize(),
             onScrollState = onScrollState,
-            myId = myId
+            myId = myId,
+            accountHost = account?.getHost(),
         )
     } else {
         Column(
@@ -100,6 +102,7 @@ fun RenoteUsersScreen(
 fun RenoteUserList(
     notes: List<NoteRelation>,
     myId: User.Id?,
+    accountHost: String?,
     onAction: (ItemRenoteAction) -> Unit,
     onBottomReached: () -> Unit,
     onScrollState: (Boolean) -> Unit,
@@ -139,7 +142,8 @@ fun RenoteUserList(
             ItemRenoteUser(
                 note = notes[pos],
                 onAction = onAction,
-                myId = myId
+                myId = myId,
+                accountHost = accountHost,
             )
         }
     }
