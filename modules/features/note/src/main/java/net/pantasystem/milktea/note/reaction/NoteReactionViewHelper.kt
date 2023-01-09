@@ -9,6 +9,8 @@ import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android_ui.BindingProvider
+import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -45,9 +47,19 @@ object NoteReactionViewHelper {
         val metaEmojis = meta?.emojis ?: emptyList()
 
         val r = Reaction(textReaction)
-        val emoji = note.emojiMap[textReaction.replace(":", "")] ?: meta?.emojisMap?.get(r.getName()) ?: metaEmojis.firstOrNull {
+        var emoji = note.emojiMap[textReaction.replace(":", "")] ?: meta?.emojisMap?.get(r.getName()) ?: metaEmojis.firstOrNull {
             textReaction.replace(":", "") == it.name || r.getName() == it.name
         }
+
+        val version = meta?.getVersion()
+        if (r.isCustomEmojiFormat() && emoji == null && version != null && version >= Version("13")) {
+            emoji = Emoji(
+                name = r.getName() ?: "",
+                uri = "https://${note.account.getHost()}/emoji/${textReaction.replace(":", "")}.webp",
+                url = "https://${note.account.getHost()}/emoji/${textReaction.replace(":", "")}.webp"
+            )
+        }
+
 
         if (emoji == null) {
             reactionImageTypeView.visibility = View.GONE
