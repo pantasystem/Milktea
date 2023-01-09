@@ -27,6 +27,7 @@ import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
+import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
 import net.pantasystem.milktea.model.drive.Directory
 import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.instance.Meta
@@ -263,4 +264,7 @@ interface MisskeyAPI {
 
     @POST("api/hashtags/search")
     suspend fun searchHashtag(@Body req: SearchHashtagRequest) : Response<List<String>>
+
+    @POST("api/emojis")
+    suspend fun getEmojis(@Body req: EmptyRequest) : Response<EmojisResponse>
 }
