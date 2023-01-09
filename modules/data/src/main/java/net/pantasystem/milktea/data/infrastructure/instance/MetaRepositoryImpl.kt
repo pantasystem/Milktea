@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.EmptyRequest
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -74,8 +75,8 @@ class MetaRepositoryImpl @Inject constructor(
                 emojis = runCancellableCatching {
                     fetchEmojis(instanceDomain)?.map {
                         it.copy(
-                            url = "$instanceDomain/emoji/${it.name}.webp",
-                            uri = "$instanceDomain/emoji/${it.name}.webp"
+                            url = V13EmojiUrlResolver.resolve(it, instanceDomain),
+                            uri = V13EmojiUrlResolver.resolve(it, instanceDomain),
                         )
                     }
                 }.getOrNull()

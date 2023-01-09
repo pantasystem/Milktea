@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Version
@@ -55,8 +56,8 @@ object NoteReactionViewHelper {
         if (r.isCustomEmojiFormat() && emoji == null && version != null && version >= Version("13")) {
             emoji = Emoji(
                 name = r.getName() ?: "",
-                uri = "https://${note.account.getHost()}/emoji/${textReaction.replace(":", "")}.webp",
-                url = "https://${note.account.getHost()}/emoji/${textReaction.replace(":", "")}.webp"
+                uri = V13EmojiUrlResolver.resolve(r, note.account),
+                url = V13EmojiUrlResolver.resolve(r, note.account),
             )
         }
 

@@ -2,6 +2,7 @@ package net.pantasystem.milktea.common_android.mfm
 
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.net.URLDecoder
 import java.util.regex.Matcher
@@ -395,7 +396,7 @@ object MFMParser {
                 if (userHost.isNullOrBlank() ||  accountHost == userHost) {
                     return null
                 }
-                val url = "https://$accountHost/emoji/${tagName}@${userHost}.webp"
+                val url = V13EmojiUrlResolver.resolve(accountHost, tagName, userHost)
                 emoji = Emoji(
                     name = tagName,
                     url = url,
