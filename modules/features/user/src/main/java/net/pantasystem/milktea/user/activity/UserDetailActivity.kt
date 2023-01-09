@@ -9,16 +9,14 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
@@ -207,7 +205,11 @@ class UserDetailActivity : AppCompatActivity() {
         )
             .initViewModelListener()
 
-        val adapter = UserTimelinePagerAdapterV2(pageableFragmentFactory, userPinnedNotesFragmentFactory,this)
+        val adapter = UserTimelinePagerAdapterV2(
+            pageableFragmentFactory,
+            userPinnedNotesFragmentFactory,
+            this
+        )
         binding.userTimelinePager.adapter = adapter
 
         TabLayoutMediator(
@@ -216,7 +218,7 @@ class UserDetailActivity : AppCompatActivity() {
         ) { tab, position ->
             tab.text = getString(adapter.tabs[position].title)
         }.attach()
-        
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mViewModel.tabTypes.collect { tabs ->
@@ -320,9 +322,20 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            mViewModel.errors.collect {
+                withResumed {
+                    Toast.makeText(
+                        this@UserDetailActivity,
+                        getString(R.string.error_s, it),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
 
     }
-
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -411,7 +424,10 @@ class UserDetailActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun applyRemoteUserStateLayoutBackgroundColor(binding: ActivityUserDetailBinding, config: Config) {
+    private fun applyRemoteUserStateLayoutBackgroundColor(
+        binding: ActivityUserDetailBinding,
+        config: Config
+    ) {
         val typed = TypedValue()
         if (config.theme is Theme.Bread) {
             theme.resolveAttribute(R.attr.colorSurface, typed, true)
@@ -438,16 +454,31 @@ class UserTimelinePagerAdapterV2(
         private set
 
     override fun createFragment(position: Int): Fragment {
-        return when(val tab = tabs[position]) {
+        return when (val tab = tabs[position]) {
             is UserDetailTabType.Gallery -> pageableFragmentFactory.create(
                 tab.accountId,
                 Pageable.Gallery.User(tab.userId.id),
             )
-            is UserDetailTabType.Media -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, withFiles = true))
+            is UserDetailTabType.Media -> pageableFragmentFactory.create(
+                Pageable.UserTimeline(
+                    tab.userId.id,
+                    withFiles = true
+                )
+            )
             is UserDetailTabType.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
             is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
-            is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, includeReplies = false))
-            is UserDetailTabType.UserTimelineWithReplies -> pageableFragmentFactory.create(Pageable.UserTimeline(tab.userId.id, includeReplies = true))
+            is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(
+                Pageable.UserTimeline(
+                    tab.userId.id,
+                    includeReplies = false
+                )
+            )
+            is UserDetailTabType.UserTimelineWithReplies -> pageableFragmentFactory.create(
+                Pageable.UserTimeline(
+                    tab.userId.id,
+                    includeReplies = true
+                )
+            )
         }
 
     }

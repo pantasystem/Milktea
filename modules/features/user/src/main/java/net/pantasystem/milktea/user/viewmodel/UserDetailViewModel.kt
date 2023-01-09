@@ -60,6 +60,9 @@ class UserDetailViewModel @AssistedInject constructor(
     private val logger = loggerFactory.create("UserDetailViewModel")
     private val accountWatcher = CurrentAccountWatcher(userId?.accountId, accountRepository)
 
+    private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
+    val errors = _errors.asSharedFlow()
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userState = when {
@@ -76,6 +79,8 @@ class UserDetailViewModel @AssistedInject constructor(
         }
     }.mapNotNull {
         it as? User.Detail
+    }.catch {
+        logger.error("observe user error", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = userState.asLiveData()
