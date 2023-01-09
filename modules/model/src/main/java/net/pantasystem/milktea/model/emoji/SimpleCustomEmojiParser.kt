@@ -65,8 +65,10 @@ data class CustomEmojiParsedResult(
 )
 
 sealed interface EmojiResolvedType {
-    data class Resolved(val emoji: Emoji, val sourceHost: String) : EmojiResolvedType
-    data class UnResolved(val tag: String, val sourceHost: String) : EmojiResolvedType
+    data class Resolved(val emoji: Emoji, val sourceHost: String) : EmojiResolvedType {
+        override val tag: String = emoji.name
+    }
+    data class UnResolved(override val tag: String, val sourceHost: String) : EmojiResolvedType
 
     fun getUrl(accountHost: String?): String? {
         return when(this) {
@@ -79,6 +81,8 @@ sealed interface EmojiResolvedType {
             }
         }
     }
+
+    val tag: String
 
 
 }
