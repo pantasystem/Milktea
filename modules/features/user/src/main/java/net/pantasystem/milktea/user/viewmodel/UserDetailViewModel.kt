@@ -60,6 +60,9 @@ class UserDetailViewModel @AssistedInject constructor(
     private val logger = loggerFactory.create("UserDetailViewModel")
     private val accountWatcher = CurrentAccountWatcher(userId?.accountId, accountRepository)
 
+    private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 100)
+    val errors = _errors.asSharedFlow()
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userState = when {
@@ -76,6 +79,9 @@ class UserDetailViewModel @AssistedInject constructor(
         }
     }.mapNotNull {
         it as? User.Detail
+    }.catch {
+        logger.error("observe user error", it)
+        _errors.tryEmit(it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = userState.asLiveData()
@@ -131,7 +137,7 @@ class UserDetailViewModel @AssistedInject constructor(
     }
 
 
-    fun sync() {
+    private fun sync() {
         viewModelScope.launch {
             runCancellableCatching {
                 getUserId()
@@ -139,6 +145,7 @@ class UserDetailViewModel @AssistedInject constructor(
                 userRepository.sync(userId).getOrThrow()
             }.onFailure {
                 logger.error("user sync error", it)
+                _errors.tryEmit(it)
             }
         }
     }
@@ -157,6 +164,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute failed", e = it)
+                    _errors.tryEmit(it)
                 }
             }
 
@@ -179,6 +187,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
+                    _errors.tryEmit(it)
                 }
             }
         }
@@ -192,6 +201,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
+                    _errors.tryEmit(it)
                 }
             }
         }
@@ -205,6 +215,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     userRepository.sync(it.id)
                 }.onFailure {
                     logger.error("block failed", it)
+                    _errors.tryEmit(it)
                 }
             }
         }
@@ -218,6 +229,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.info("unblock failed", e = it)
+                    _errors.tryEmit(it)
                 }
             }
         }
@@ -232,6 +244,7 @@ class UserDetailViewModel @AssistedInject constructor(
                 logger.debug("ニックネーム更新処理成功")
             }.onFailure {
                 logger.error("ニックネーム更新処理失敗", e = it)
+                _errors.tryEmit(it)
             }
         }
     }
@@ -245,6 +258,7 @@ class UserDetailViewModel @AssistedInject constructor(
                 logger.debug("ニックネーム削除処理成功")
             }.onFailure {
                 logger.error("ニックネーム削除失敗", e = it)
+                _errors.tryEmit(it)
             }
         }
     }
@@ -267,6 +281,7 @@ class UserDetailViewModel @AssistedInject constructor(
                 }
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
+                _errors.tryEmit(it)
             }
         }
     }

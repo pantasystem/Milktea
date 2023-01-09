@@ -244,4 +244,15 @@ class AccountTest {
         Assertions.assertEquals("https://misskey.io", account.normalizedInstanceDomain)
     }
 
+    @Test
+    fun getGetHost_GiveSubdomainCase1() {
+        val account = Account(
+            remoteId = "",
+            instanceDomain = "https://mk.iaia.moe",
+            userName = "",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = ""
+        )
+        Assertions.assertEquals("mk.iaia.moe", account.getHost())
+    }
 }

@@ -247,9 +247,7 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override fun observe(accountId: Long, acct: String): Flow<User> {
-        val (userName, host) = Acct(acct).let {
-            it.userName to it.host
-        }
+        val (userName, host) = Acct(acct)
         return userDao.let {
             if(host == null) {
                 it.observeByUserName(accountId, userName).filterNotNull()
