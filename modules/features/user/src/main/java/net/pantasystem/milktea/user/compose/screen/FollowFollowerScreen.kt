@@ -157,6 +157,7 @@ private fun Pager(
                     pageableState = uiState.followUsersState,
                     users = uiState.followUsers,
                     isUserNameMain = false,
+                    accountHost = uiState.accountHost,
                     onAction = { action ->
                         onAction(LoadType.Follow, action)
                     }
@@ -167,6 +168,7 @@ private fun Pager(
                     pageableState = uiState.followerUsersState,
                     users = uiState.followerUsers,
                     isUserNameMain = false,
+                    accountHost = uiState.accountHost,
                     onAction = { action ->
                         onAction(LoadType.Follower, action)
                     }
