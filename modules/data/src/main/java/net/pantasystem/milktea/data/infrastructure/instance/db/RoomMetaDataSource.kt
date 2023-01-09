@@ -14,12 +14,19 @@ class RoomMetaDataSource(
 
     override suspend fun add(meta: Meta): Meta {
         return database.runInTransaction<Meta>{
-            metaDAO.delete(MetaDTO(meta))
-            metaDAO.insert(MetaDTO(meta))
+            val isExists = metaDAO.findByInstanceDomain(meta.uri) != null
+            if (isExists) {
+                metaDAO.update(MetaDTO(meta))
+            } else {
+                metaDAO.delete(MetaDTO(meta))
+                metaDAO.insert(MetaDTO(meta))
+            }
+
             val emojiDTOList = meta.emojis?.map{
                 EmojiDTO(it, meta.uri)
             }
             if(emojiDTOList != null){
+                metaDAO.deleteEmojisBy(meta.uri)
                 metaDAO.insertAll(emojiDTOList)
             }
             meta.emojis?.map { emoji ->
