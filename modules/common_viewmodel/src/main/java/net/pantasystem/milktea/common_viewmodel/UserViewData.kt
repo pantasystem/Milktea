@@ -2,14 +2,14 @@ package net.pantasystem.milktea.common_viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -23,6 +23,7 @@ open class UserViewData(
     val accountId: Long,
     val userDataSource: UserDataSource,
     val userRepository: UserRepository,
+    val accountRepository: AccountRepository,
     val logger: Logger,
     coroutineScope: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -32,6 +33,7 @@ open class UserViewData(
     class Factory @Inject constructor(
         val userRepository: UserRepository,
         val userDataSource: UserDataSource,
+        val accountRepository: AccountRepository,
         val logger: Logger.Factory,
     ) {
 
@@ -47,6 +49,7 @@ open class UserViewData(
                 userId,
                 userDataSource,
                 userRepository,
+                accountRepository,
                 l,
                 coroutineScope,
                 dispatcher,
@@ -67,6 +70,7 @@ open class UserViewData(
                 accountId,
                 userDataSource,
                 userRepository,
+                accountRepository,
                 l,
                 coroutineScope,
                 dispatcher
@@ -82,13 +86,13 @@ open class UserViewData(
                 user,
                 userDataSource,
                 userRepository,
+                accountRepository,
                 l,
                 coroutineScope,
                 dispatcher,
             )
         }
     }
-
 
 
     val user: LiveData<User.Detail?> = if (userId != null) {
@@ -100,10 +104,16 @@ open class UserViewData(
         it as? User.Detail
     }.asLiveData()
 
+    @OptIn(FlowPreview::class)
+    val account: LiveData<Account?> = suspend {
+        accountRepository.get(accountId).getOrNull()
+    }.asFlow().asLiveData()
+
     constructor(
         user: User,
         userDataSource: UserDataSource,
         userRepository: UserRepository,
+        accountRepository: AccountRepository,
         logger: Logger,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -111,6 +121,7 @@ open class UserViewData(
         user.id,
         userDataSource,
         userRepository,
+        accountRepository,
         logger,
         coroutineScope = coroutineScope,
         dispatcher = dispatcher
@@ -122,6 +133,7 @@ open class UserViewData(
         accountId: Long,
         userDataSource: UserDataSource,
         userRepository: UserRepository,
+        accountRepository: AccountRepository,
         logger: Logger,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -132,6 +144,7 @@ open class UserViewData(
         accountId,
         userDataSource,
         userRepository,
+        accountRepository = accountRepository,
         logger,
         coroutineScope,
         dispatcher
@@ -141,10 +154,22 @@ open class UserViewData(
         userId: User.Id,
         userDataSource: UserDataSource,
         userRepository: UserRepository,
+        accountRepository: AccountRepository,
         logger: Logger,
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher = Dispatchers.IO
-    ) : this(userId, null, null, userId.accountId, userDataSource, userRepository, logger, coroutineScope, dispatcher)
+    ) : this(
+        userId,
+        null,
+        null,
+        userId.accountId,
+        userDataSource,
+        userRepository,
+        accountRepository = accountRepository,
+        logger,
+        coroutineScope,
+        dispatcher
+    )
 
     init {
 
