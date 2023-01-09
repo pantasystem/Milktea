@@ -11,6 +11,7 @@ import net.pantasystem.milktea.model.user.User
 fun RemovableSimpleUserCardList(
     modifier: Modifier,
     users: List<User>,
+    accountHost: String?,
     onSelectUser: (User) -> Unit,
     onDeleteButtonClicked: (User) -> Unit,
 ) {
@@ -18,6 +19,7 @@ fun RemovableSimpleUserCardList(
         items(users) { user ->
             RemovableSimpleUserCard(
                 user = user,
+                accountHost = accountHost,
                 onSelected = { u ->
                     onSelectUser(u)
                 },
