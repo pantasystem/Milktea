@@ -3,7 +3,6 @@ package net.pantasystem.milktea.common_android.ui.text
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.View
-import com.bumptech.glide.Glide
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.util.regex.Pattern
@@ -22,19 +21,11 @@ class CustomEmojiDecorator {
             while (matcher.find()) {
                 val span: EmojiSpan<*>
 
-                if (emoji.isSvg()) {
-                    span = DrawableEmojiSpan(emojiAdapter)
-
-                    GlideApp.with(view.context)
-                        .load(emoji.url ?: emoji.url)
-                        .into(span.target)
-                } else {
-                    span = DrawableEmojiSpan(emojiAdapter)
-                    Glide.with(view)
-                        .asDrawable()
-                        .load(emoji.url)
-                        .into(span.target)
-                }
+                span = DrawableEmojiSpan(emojiAdapter)
+                GlideApp.with(view)
+                    .asDrawable()
+                    .load(emoji.url)
+                    .into(span.target)
                 builder.setSpan(span, matcher.start(), matcher.end(), 0)
             }
         }

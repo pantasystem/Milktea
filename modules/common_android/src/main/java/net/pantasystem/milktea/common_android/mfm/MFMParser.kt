@@ -24,6 +24,7 @@ object MFMParser {
     private val spaceCRLFPattern = Pattern.compile("""\s""")
     private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
 
+
     fun parse(
         text: String?,
         emojis: List<Emoji>? = emptyList(),
@@ -378,13 +379,30 @@ object MFMParser {
         }
 
         private fun parseEmoji(): EmojiElement? {
-            val matcher = emojiPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            val subStr = sourceText.substring(position, parent.insideEnd)
+            val matcher = emojiPattern.matcher(subStr)
+
             if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight) {
                 return null
             }
+
             val tagName = matcher.group(1) ?: return null
-            val emoji: Emoji = emojiNameMap[tagName]
-                ?: return null
+
+            var emoji: Emoji? = emojiNameMap[tagName]
+
+            // NOTE: v13の絵文字周りの改悪対応
+            if (emoji == null) {
+                if (userHost.isNullOrBlank() ||  accountHost == userHost) {
+                    return null
+                }
+                val url = "https://$accountHost/emoji/${tagName}@${userHost}.webp"
+                emoji = Emoji(
+                    name = tagName,
+                    url = url,
+                    uri = url,
+                    host = userHost,
+                )
+            }
 
             return EmojiElement(
                 emoji,
