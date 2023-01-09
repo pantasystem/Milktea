@@ -30,6 +30,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="?attr/actionBarSize"
                         app:user="@{userViewModel.user}"
+                        app:account="@{userViewModel.account}"
                         app:mainNameView="@{mainName}"
                         app:subNameView="@{subName}"
                         >
