@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.*
-import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.R
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
@@ -105,21 +104,12 @@ object MFMDecorator {
             textView.get()?.let{ textView ->
                 //val emojiSpan = EmojiSpan(textView)
                 val emojiSpan: EmojiSpan<*>
-                if(emojiElement.emoji.isSvg()){
-                    //emojiSpan = BitmapEmojiSpan(emojiAdapter)
-                    emojiSpan = DrawableEmojiSpan(emojiAdapter)
-
-                    GlideApp.with(textView.context)
-                        .load(emojiElement.emoji.url?: emojiElement.emoji.url)
-                        .into(emojiSpan.target)
-                }else{
-                    emojiSpan = DrawableEmojiSpan(emojiAdapter)
-                    Glide.with(textView)
-                        .asDrawable()
-                        .load(emojiElement.emoji.url)
-                        .override(textView.textSize.toInt())
-                        .into(emojiSpan.target)
-                }
+                emojiSpan = DrawableEmojiSpan(emojiAdapter)
+                Glide.with(textView)
+                    .asDrawable()
+                    .load(emojiElement.emoji.url)
+                    .override(textView.textSize.toInt())
+                    .into(emojiSpan.target)
                 spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
 
             }

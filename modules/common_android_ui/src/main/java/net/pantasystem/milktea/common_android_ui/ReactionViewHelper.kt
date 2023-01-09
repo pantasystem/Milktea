@@ -52,13 +52,6 @@ object ReactionViewHelper {
             .into(this)
     }
 
-    /*private var emojiHandler: Handler? = null
-    private val emojiThread = Thread{
-        Looper.prepare()
-        emojiHandler = Handler()
-
-        Looper.loop()
-    }.run()*/
 
     private fun setReaction(
         context: Context,

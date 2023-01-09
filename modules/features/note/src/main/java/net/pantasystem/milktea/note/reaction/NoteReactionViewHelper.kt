@@ -10,6 +10,7 @@ import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 object NoteReactionViewHelper {
@@ -40,9 +41,12 @@ object NoteReactionViewHelper {
         val cache = entryPoint.metaRepository()
 
         val textReaction = LegacyReaction.reactionMap[reaction] ?: reaction
-        val metaEmojis = cache.get(note.account.normalizedInstanceDomain)?.emojis ?: emptyList()
-        val emoji = note.emojiMap[textReaction.replace(":", "")] ?: metaEmojis.firstOrNull {
-            textReaction.replace(":", "") == it.name
+        val meta = cache.get(note.account.normalizedInstanceDomain)
+        val metaEmojis = meta?.emojis ?: emptyList()
+
+        val r = Reaction(textReaction)
+        val emoji = note.emojiMap[textReaction.replace(":", "")] ?: meta?.emojisMap?.get(r.getName()) ?: metaEmojis.firstOrNull {
+            textReaction.replace(":", "") == it.name || r.getName() == it.name
         }
 
         if (emoji == null) {
@@ -53,21 +57,10 @@ object NoteReactionViewHelper {
             reactionImageTypeView.visibility = View.VISIBLE
             reactionTextTypeView.visibility = View.GONE
 
-            if (emoji.type?.contains("svg") == true || emoji.url?.contains("svg") == true || emoji.uri?.contains(
-                    "svg"
-                ) == true
-            ) {
-
-                GlideApp.with(context)
-                    .load(emoji.url ?: emoji.uri)
-                    .fitCenter()
-                    .into(reactionImageTypeView)
-            } else {
-                GlideApp.with(reactionImageTypeView.context)
-                    .load(emoji.url ?: emoji.uri)
-                    .fitCenter()
-                    .into(reactionImageTypeView)
-            }
+            GlideApp.with(reactionImageTypeView.context)
+                .load(emoji.url ?: emoji.uri)
+                .fitCenter()
+                .into(reactionImageTypeView)
         }
 
     }
