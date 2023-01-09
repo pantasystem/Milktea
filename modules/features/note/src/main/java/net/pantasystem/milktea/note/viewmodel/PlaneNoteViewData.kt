@@ -25,7 +25,8 @@ open class PlaneNoteViewData(
     val note: NoteRelation,
     val account: Account,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteTranslationStore: NoteTranslationStore
+    private val noteTranslationStore: NoteTranslationStore,
+    private val instanceEmojis: List<Emoji>,
 ) : NoteViewData {
 
 
@@ -80,7 +81,7 @@ open class PlaneNoteViewData(
 
     val cw = toShowNote.note.cw
     val cwNode = MFMParser.parse(
-        toShowNote.note.cw, toShowNote.note.emojis,
+        toShowNote.note.cw, (toShowNote.note.emojis ?: emptyList()) + instanceEmojis,
         userHost = toShowNote.user
             .host,
         accountHost = account.getHost()
@@ -96,7 +97,7 @@ open class PlaneNoteViewData(
 
 
     val textNode = MFMParser.parse(
-        toShowNote.note.text, toShowNote.note.emojis,
+        toShowNote.note.text, (toShowNote.note.emojis ?: emptyList()) + instanceEmojis,
         userHost = toShowNote.user
             .host,
         accountHost = account.getHost()
@@ -173,7 +174,7 @@ open class PlaneNoteViewData(
     private val subNoteText = subNote?.note?.text
     val subNoteTextNode = MFMParser.parse(
         subNote?.note?.text,
-        subNote?.note?.emojis,
+        (subNote?.note?.emojis ?: emptyList()) + instanceEmojis,
         accountHost = account.getHost(),
         userHost = subNote?.user?.host
     )
@@ -181,7 +182,7 @@ open class PlaneNoteViewData(
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(
         subNote?.note?.cw,
-        subNote?.note?.emojis,
+        (subNote?.note?.emojis?: emptyList()) + instanceEmojis,
         accountHost = account.getHost(),
         userHost = subNote?.user?.host
     )
@@ -221,7 +222,7 @@ open class PlaneNoteViewData(
         emojiMap.putAll(note.emojis?.map {
             it.name to it
         } ?: emptyList())
-        emojis = emojiMap.values.toList()
+        emojis = emojiMap.values.toList() + instanceEmojis
         renoteCount.postValue(note.renoteCount)
 
         myReaction.postValue(note.myReaction)

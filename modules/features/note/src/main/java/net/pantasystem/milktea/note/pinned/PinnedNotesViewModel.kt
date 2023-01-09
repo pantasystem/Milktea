@@ -17,7 +17,6 @@ import net.pantasystem.milktea.model.notes.FindPinnedNoteUseCase
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notes.NoteRepository
-import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -33,11 +32,11 @@ class PinnedNotesViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     val userDataSource: UserDataSource,
     val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    val urlPreviewStoreProvider: UrlPreviewStoreProvider,
     val noteTranslationStore: NoteTranslationStore,
     val noteRelationGetter: NoteRelationGetter,
     val noteRepository: NoteRepository,
     val loggerFactory: Logger.Factory,
+    planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -69,15 +68,7 @@ class PinnedNotesViewModel @Inject constructor(
 
     private val accountWatcher = CurrentAccountWatcher(currentAccountId = accountId, accountRepository)
 
-    private val cache = PlaneNoteViewDataCache({ accountWatcher.getAccount() },
-        noteCaptureAPIAdapter,
-        noteTranslationStore,
-        {
-            urlPreviewStoreProvider.getUrlPreviewStore(accountWatcher.getAccount())
-        },
-        viewModelScope,
-        noteRelationGetter
-    )
+    private val cache = planeNoteViewDataCacheFactory.create(accountWatcher::getAccount, viewModelScope)
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val notes = suspend {

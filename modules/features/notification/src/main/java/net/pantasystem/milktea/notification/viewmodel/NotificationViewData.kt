@@ -3,6 +3,7 @@ package net.pantasystem.milktea.notification.viewmodel
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
@@ -13,7 +14,8 @@ class NotificationViewData(
     val notification: NotificationRelation,
     account: Account,
     noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    translationStore: NoteTranslationStore
+    translationStore: NoteTranslationStore,
+    instanceEmojis: List<Emoji>,
 ) {
     enum class Type(val default: String) {
         FOLLOW("follow"),
@@ -37,7 +39,8 @@ class NotificationViewData(
             notification.note!!,
             account,
             noteCaptureAPIAdapter,
-            translationStore
+            translationStore,
+            instanceEmojis
         ) else null
 
     val type: Type = when (notification.notification) {
