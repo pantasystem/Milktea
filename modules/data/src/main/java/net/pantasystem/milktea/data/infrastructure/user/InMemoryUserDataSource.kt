@@ -9,7 +9,6 @@ import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
-import net.pantasystem.milktea.model.user.UsersState
 import javax.inject.Inject
 
 class InMemoryUserDataSource @Inject constructor() : UserDataSource {
@@ -183,5 +182,29 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         _state.value = _state.value.copy(
             usersMap = userMap
         )
+    }
+}
+
+data class UsersState(
+    val usersMap: Map<User.Id, User> = emptyMap()
+) {
+
+    fun get(userId: User.Id?): User? {
+        return usersMap[userId]
+    }
+
+    fun get(userName: String, host: String? = null, accountId: Long? = null): User? {
+        return usersMap.values.filter {
+            accountId == null || accountId == it.id.accountId
+        }.firstOrNull {
+            it.userName == userName && it.host == host
+        }
+    }
+
+    fun get(accountId: Long, fqdnUserName: String): User? {
+        val userNameAndHost = fqdnUserName.split("@").filter { it.isNotBlank() }
+        val userName = userNameAndHost[0]
+        val host = userNameAndHost.getOrNull(1)
+        return get(userName, host, accountId)
     }
 }
