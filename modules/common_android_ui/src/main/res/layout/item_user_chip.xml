@@ -20,6 +20,7 @@
             app:mainNameView="@{mainName}"
             app:subNameView="@{null}"
             app:user="@{userViewData.user}"
+            app:account="@{userViewData.account}"
             >
         <ImageView
                 android:layout_width="25dp"

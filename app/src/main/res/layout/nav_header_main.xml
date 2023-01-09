@@ -28,6 +28,7 @@
                 app:user="@{accountViewModel.user}"
                 app:mainNameView="@{mainName}"
                 app:subNameView="@{subName}"
+                app:account="@{accountViewModel.uiState.currentAccount}"
 
                 >
 

@@ -46,6 +46,7 @@
                 app:mainNameView="@{mainName}"
                 app:subNameView="@{subName}"
                 app:user="@{note.toShowNote.user}"
+                app:account="@{note.account}"
 
                 app:foldingNote="@{note}"
                 app:foldingButton="@{contentFoldingButton}"
@@ -230,7 +231,8 @@
                         android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                         app:mainNameView="@{subNoteMainName}"
                         app:subNameView="@{subNoteSubName}"
-                        app:user="@{note.subNote.user}">
+                        app:user="@{note.subNote.user}"
+                        app:account="@{note.account}">
 
                     <ImageView
                             android:id="@+id/subAvatarIcon"

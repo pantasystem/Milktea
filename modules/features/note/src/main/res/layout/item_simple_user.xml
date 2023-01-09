@@ -8,6 +8,9 @@
                 name="user"
                 type="net.pantasystem.milktea.model.user.User" />
 
+        <variable
+                name="account"
+                type="net.pantasystem.milktea.model.account.Account" />
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
     <androidx.cardview.widget.CardView android:layout_width="match_parent"
@@ -21,6 +24,7 @@
                 android:layout_width="match_parent" android:layout_height="match_parent"
                 android:padding="8dp"
                 user="@{user}"
+                account="@{account}"
                 mainNameView="@{nameMain}"
                 subNameView="@{nameSub}">
             <ImageView

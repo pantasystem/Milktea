@@ -30,7 +30,7 @@
             app:mainNameView="@{mainName}"
             app:subNameView="@{subName}"
             app:user="@{note.toShowNote.user}"
-
+            app:account="@{note.account}"
             app:foldingNote="@{note}"
             app:foldingButton="@{contentFoldingButton}"
             app:cw="@{cw}"
@@ -255,6 +255,7 @@
                             app:subNameView="@{subNoteSubName}"
                             app:mainNameView="@{subNoteMainName}"
                             app:user="@{note.subNote.user}"
+                            app:account="@{note.account}"
                             android:layout_marginTop="4dp">
 
                         <ImageView
