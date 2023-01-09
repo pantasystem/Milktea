@@ -22,6 +22,7 @@ import net.pantasystem.milktea.model.user.User
 @Composable
 fun RemovableSimpleUserCard(
     user: User,
+    accountHost: String?,
     onSelected: (User) -> Unit,
     onDeleteButtonClicked: (User) -> Unit,
 ) {
@@ -57,7 +58,13 @@ fun RemovableSimpleUserCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Column {
-                    CustomEmojiText(text = user.displayName, emojis = user.emojis)
+                    CustomEmojiText(
+                        text = user.displayName,
+                        emojis = user.emojis,
+                        sourceHost = user.host,
+                        accountHost = accountHost,
+                        parsedResult = user.parsedResult,
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = user.displayUserName)
                 }
