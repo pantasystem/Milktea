@@ -96,6 +96,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
 
                 val users by mUserListDetailViewModel.users.collectAsState()
                 val isAddedTab by mUserListDetailViewModel.isAddedToTab.collectAsState()
+                val account by mUserListDetailViewModel.account.collectAsState()
 
                 UserListDetailScreen(
                     listId = listId,
@@ -107,6 +108,7 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                     },
                     fragmentManager = supportFragmentManager,
                     pageableFragmentFactory = pageableFragmentFactory,
+                    accountHost = account?.getHost(),
                     onToggleButtonClicked = {
                         mUserListDetailViewModel.toggleAddToTab()
                     },
