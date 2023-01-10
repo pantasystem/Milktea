@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 interface AccountRepository{
 
@@ -55,6 +56,8 @@ fun AccountRepository.listenEvent(): Flow<AccountRepository.Event> {
 fun AccountRepository.watchCurrentAccount() : Flow<Account> {
     return this.listenEvent().map {
         this.getCurrentAccount().getOrThrow()
+    }.onStart {
+        emit(getCurrentAccount().getOrThrow())
     }
 }
 
@@ -62,5 +65,7 @@ fun AccountRepository.watchCurrentAccount() : Flow<Account> {
 fun AccountRepository.watchAccount(accountId: Long) : Flow<Account> {
     return this.listenEvent().map {
         this.get(accountId).getOrThrow()
+    }.onStart {
+        emit(get(accountId).getOrThrow())
     }
 }

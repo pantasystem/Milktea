@@ -50,4 +50,8 @@ data class Meta(
             it.name == emoji.getName()
         } == true
     }
+
+    val emojisMap = emojis?.associateBy {
+        it.name
+    } ?: emptyMap()
 }

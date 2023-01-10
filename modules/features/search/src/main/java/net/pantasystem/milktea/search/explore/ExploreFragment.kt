@@ -27,11 +27,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.user.query.*
+import net.pantasystem.milktea.search.R
 import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCard
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
-import net.pantasystem.milktea.search.R
 
 @AndroidEntryPoint
 class ExploreFragment : Fragment() {
@@ -60,6 +60,8 @@ class ExploreFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val uiState by exploreViewModel.uiState.collectAsState()
+                val account by exploreViewModel.account.collectAsState()
+
                 MdcTheme {
                     LazyColumn(
                         modifier = Modifier
@@ -85,6 +87,7 @@ class ExploreFragment : Fragment() {
                                         UserDetailCard(
                                             userDetail = content.rawContent[i],
                                             isUserNameMain = false,
+                                            accountHost = account?.getHost(),
                                             onAction = ::onAction
                                         )
                                     }

@@ -42,7 +42,8 @@ fun RenoteTargetAccountRowList(
                 },
                 username = it.user.displayName,
                 emojis = it.user.emojis,
-                isEnable = it.isEnable
+                isEnable = it.isEnable,
+                accountHost = it.user.host,
             )
         }
     }
@@ -56,6 +57,7 @@ fun SelectableAvatarOnlyAccount(
     username: String,
     avatarUrl: String,
     emojis: List<Emoji>,
+    accountHost: String?,
     onClick: () -> Unit,
 ) {
     Column(
@@ -104,7 +106,7 @@ fun SelectableAvatarOnlyAccount(
 
 
         }
-        CustomEmojiText(text = username, emojis = emojis, maxLines = 1, fontSize = 8.sp)
+        CustomEmojiText(text = username, emojis = emojis, maxLines = 1, fontSize = 8.sp, accountHost = accountHost, sourceHost = accountHost)
     }
 
 }
@@ -119,5 +121,6 @@ fun PreviewSelectableAvatarOnlyAccount() {
         username = "@harunon",
         emojis = emptyList(),
         isEnable = true,
+        accountHost = "misskey.io"
     )
 }

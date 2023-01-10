@@ -14,11 +14,6 @@ data class Emoji(
     val aliases: List<String>? = null
 
 ): Serializable{
-    fun isSvg(): Boolean{
-        return uri?.contains("svg") == true
-                || url?.contains("svg") == true
-                || type?.contains("svg") == true
-    }
 
     constructor(name: String) : this(null, name, null, null, null, null, null)
 }

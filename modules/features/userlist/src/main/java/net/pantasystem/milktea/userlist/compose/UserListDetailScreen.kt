@@ -30,6 +30,7 @@ fun UserListDetailScreen(
     listId: UserList.Id,
     userList: UserList?,
     users: List<User>,
+    accountHost: String?,
     isAddedTab: Boolean,
     onNavigateUp: () -> Unit,
     fragmentManager: FragmentManager,
@@ -137,7 +138,8 @@ fun UserListDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         users = users,
                         onSelectUser = onSelectUser,
-                        onDeleteButtonClicked = onDeleteUserButtonClicked
+                        onDeleteButtonClicked = onDeleteUserButtonClicked,
+                        accountHost = accountHost,
                     )
 
                 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.url.UrlPreviewStore
@@ -24,6 +25,7 @@ class PlaneNoteViewDataCache(
     private val GetUrlPreviewStore: suspend (Account) -> UrlPreviewStore?,
     private val coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
+    private val metaRepository: MetaRepository,
 ) {
 
     @Singleton
@@ -32,6 +34,7 @@ class PlaneNoteViewDataCache(
         private val translationStore: NoteTranslationStore,
         private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
         private val noteRelationGetter: NoteRelationGetter,
+        private val metaRepository: MetaRepository,
     ) {
         fun create(
             getAccount: suspend () -> Account,
@@ -45,7 +48,8 @@ class PlaneNoteViewDataCache(
                     urlPreviewStoreProvider.getUrlPreviewStore(it)
                 },
                 coroutineScope,
-                noteRelationGetter
+                noteRelationGetter,
+                metaRepository
             )
         }
     }
@@ -138,19 +142,22 @@ class PlaneNoteViewDataCache(
     }
 
     private suspend fun createViewData(relation: NoteRelation): PlaneNoteViewData {
+        val account = getAccount()
         return if (relation.reply == null) {
             PlaneNoteViewData(
                 relation,
-                getAccount(),
+                account,
                 noteCaptureAdapter,
-                translationStore
+                translationStore,
+                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
             )
         } else {
             HasReplyToNoteViewData(
                 relation,
-                getAccount(),
+                account,
                 noteCaptureAdapter,
-                translationStore
+                translationStore,
+                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
             )
         }.also {
             it.captureNotes()

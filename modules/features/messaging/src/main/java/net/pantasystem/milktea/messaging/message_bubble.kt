@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.user.make
 @Stable
 fun SelfMessageBubble(
     message: Message,
+    accountHost: String?,
 ) {
 
     Row(
@@ -51,6 +52,8 @@ fun SelfMessageBubble(
                         CustomEmojiText(
                             text = message.text ?: "",
                             emojis = message.emojis,
+                            accountHost = accountHost,
+                            sourceHost = accountHost,
                             fontSize = 16.sp
                         )
                     }
@@ -75,6 +78,7 @@ fun SelfMessageBubble(
 fun RecipientMessageBubble(
     user: User,
     message: Message,
+    accountHost: String?
 ) {
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -85,7 +89,9 @@ fun RecipientMessageBubble(
             CustomEmojiText(
                 text = user.displayName,
                 emojis = user.emojis,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                accountHost = accountHost,
+                sourceHost = user.host,
             )
             Surface(
                 shape = RoundedCornerShape(4.dp, 20.dp, 20.dp, 20.dp),
@@ -96,7 +102,7 @@ fun RecipientMessageBubble(
                     Modifier.padding(8.dp)
                 ) {
                     if (message.text != null) {
-                        CustomEmojiText(text = message.text ?: "", emojis = message.emojis)
+                        CustomEmojiText(text = message.text ?: "", emojis = message.emojis, accountHost = accountHost, sourceHost = user.host)
                     }
                     if (message.file != null) {
                         Image(
@@ -140,7 +146,8 @@ fun PreviewMessageBubble() {
                 recipientId = User.Id(0L, ""),
                 userId = User.Id(0L, ""),
                 text = "testtesttest"
-            )
+            ),
+            accountHost = null,
         )
         RecipientMessageBubble(
             User.Simple.make(User.Id(0L, ""), "harunon"),
@@ -149,7 +156,8 @@ fun PreviewMessageBubble() {
                 recipientId = User.Id(0L, ""),
                 userId = User.Id(0L, ""),
                 text = "testtesttest"
-            )
+            ),
+            accountHost = null,
         )
     }
 }

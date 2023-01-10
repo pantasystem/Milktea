@@ -23,6 +23,7 @@ import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.group.GroupRepository
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notification.GroupInvitedNotification
 import net.pantasystem.milktea.model.notification.Notification
@@ -45,6 +46,7 @@ class NotificationViewModel @Inject constructor(
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val unreadNotificationDAO: UnreadNotificationDAO,
     private val groupRepository: GroupRepository,
+    private val metaRepository: MetaRepository,
 ) : ViewModel() {
 
 
@@ -95,6 +97,7 @@ class NotificationViewModel @Inject constructor(
                 account,
                 noteCaptureAPIAdapter,
                 noteTranslationStore,
+                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
             )
         }.catch { e ->
             logger.warning("ストーリミング受信中にエラー発生", e = e)
@@ -288,7 +291,8 @@ class NotificationViewModel @Inject constructor(
                 it,
                 account,
                 noteCaptureAPIAdapter,
-                noteTranslationStore
+                noteTranslationStore,
+                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
             )
         }
     }

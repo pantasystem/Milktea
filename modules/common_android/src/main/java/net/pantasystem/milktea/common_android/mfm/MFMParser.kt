@@ -2,6 +2,7 @@ package net.pantasystem.milktea.common_android.mfm
 
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.net.URLDecoder
 import java.util.regex.Matcher
@@ -23,6 +24,7 @@ object MFMParser {
         Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
     private val spaceCRLFPattern = Pattern.compile("""\s""")
     private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
+
 
     fun parse(
         text: String?,
@@ -378,13 +380,30 @@ object MFMParser {
         }
 
         private fun parseEmoji(): EmojiElement? {
-            val matcher = emojiPattern.matcher(sourceText.substring(position, parent.insideEnd))
+            val subStr = sourceText.substring(position, parent.insideEnd)
+            val matcher = emojiPattern.matcher(subStr)
+
             if (!matcher.find() || parent.elementType.elementClass.weight <= ElementType.EMOJI.elementClass.weight) {
                 return null
             }
+
             val tagName = matcher.group(1) ?: return null
-            val emoji: Emoji = emojiNameMap[tagName]
-                ?: return null
+
+            var emoji: Emoji? = emojiNameMap[tagName]
+
+            // NOTE: v13の絵文字周りの改悪対応
+            if (emoji == null) {
+                if (userHost.isNullOrBlank() ||  accountHost == userHost) {
+                    return null
+                }
+                val url = V13EmojiUrlResolver.resolve(accountHost, tagName, userHost)
+                emoji = Emoji(
+                    name = tagName,
+                    url = url,
+                    uri = url,
+                    host = userHost,
+                )
+            }
 
             return EmojiElement(
                 emoji,

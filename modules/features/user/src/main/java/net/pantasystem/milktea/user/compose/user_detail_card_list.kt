@@ -33,6 +33,7 @@ sealed interface UserDetailCardListAction {
 fun UserDetailCardList(
     pageableState: ResultState<List<User.Id>>,
     users: List<User.Detail>,
+    accountHost: String?,
     isUserNameMain: Boolean,
     onAction: (UserDetailCardListAction) -> Unit,
 ) {
@@ -56,6 +57,7 @@ fun UserDetailCardList(
                             onAction = {
                                 onAction(UserDetailCardListAction.CardAction(it))
                             },
+                            accountHost = accountHost,
                         )
                     }
                 }

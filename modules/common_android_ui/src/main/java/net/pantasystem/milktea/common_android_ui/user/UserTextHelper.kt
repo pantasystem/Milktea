@@ -5,19 +5,25 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
+import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.common_android_ui.DecorateTextHelper
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
-
 
 object UserTextHelper {
 
     @JvmStatic
-    @BindingAdapter("mainNameView", "subNameView", "user")
-    fun View.setUserInfo(mainNameView: TextView?, subNameView: TextView?, user: User?) {
+    @BindingAdapter("mainNameView", "subNameView", "user", "account")
+    fun View.setUserInfo(
+        mainNameView: TextView?,
+        subNameView: TextView?,
+        user: User?,
+        account: Account?
+    ) {
         user ?: return
         val isUserNameDefault = EntryPointAccessors.fromApplication(
             this.context.applicationContext,
-            net.pantasystem.milktea.common_android_ui.BindingProvider::class.java
+            BindingProvider::class.java
         )
             .settingStore()
             .isUserNameDefault
@@ -32,7 +38,11 @@ object UserTextHelper {
         }
         name?.let {
             DecorateTextHelper.stopDrawableAnimations(it)
-            name.text = CustomEmojiDecorator().decorate(user.emojis, user.displayName, name)
+            name.text = CustomEmojiDecorator().decorate(
+                accountHost = account?.getHost(),
+                result = user.parsedResult,
+                name
+            )
         }
         userName?.let {
             userName.text = user.displayUserName

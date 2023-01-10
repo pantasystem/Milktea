@@ -85,6 +85,8 @@ class UserDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val user = userState.asLiveData()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val account = accountWatcher.account.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
     val isMine = combine(userState, accountStore.state) { userState, accountState ->

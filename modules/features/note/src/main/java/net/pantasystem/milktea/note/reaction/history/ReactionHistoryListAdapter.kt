@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.R
@@ -71,7 +72,7 @@ class ReactionHistoryListAdapter(
                 (holder as ReactionHistoryViewHolder.HeaderView).onBind(item.emojiType)
             }
             is ReactionHistoryListType.ItemUser -> {
-                (holder as ReactionHistoryViewHolder.UserView).onBind(item.user)
+                (holder as ReactionHistoryViewHolder.UserView).onBind(item.user, item.account)
             }
             ReactionHistoryListType.Loading -> {
                 // 何もしない
@@ -109,8 +110,9 @@ sealed class ReactionHistoryViewHolder(view: View) : RecyclerView.ViewHolder(vie
     class LoadingView(view: View) : ReactionHistoryViewHolder(view)
     class UserView(val binding: ItemSimpleUserBinding, val lifecycleOwner: LifecycleOwner) :
         ReactionHistoryViewHolder(binding.root) {
-        fun onBind(user: User) {
+        fun onBind(user: User, account: Account?) {
             binding.user = user
+            binding.account = account
             binding.lifecycleOwner = lifecycleOwner
             binding.executePendingBindings()
         }

@@ -54,6 +54,8 @@ class RenotesViewModel @AssistedInject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     private val _errors = MutableStateFlow<Throwable?>(null)
 
     init {

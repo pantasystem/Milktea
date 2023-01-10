@@ -150,6 +150,8 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
                 if (textView != null) {
                     val spanned = CustomEmojiDecorator().decorate(
+                        accountHost = uiState.account?.getHost(),
+                        sourceHost = uiState.noteAuthor?.host,
                         uiState.note.emojis,
                         types[i].type ?: "",
                         textView,

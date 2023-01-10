@@ -8,15 +8,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
-import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -24,14 +20,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserReactionsViewModel @Inject constructor(
-    private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
-    noteRelationGetter: NoteRelationGetter,
-    noteTranslationStore: NoteTranslationStore,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     accountRepository: AccountRepository,
     private val userDataSource: UserDataSource,
     storeFactory: UserReactionPagingStore.Factory,
     loggerFactory: Logger.Factory,
+    planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     //    private val _userId = MutableStateFlow<User.Id?>(null)
@@ -53,14 +46,7 @@ class UserReactionsViewModel @Inject constructor(
         currentAccountId = null
     )
 
-    private val cache = PlaneNoteViewDataCache(
-        currentAccountWatcher::getAccount,
-        noteCaptureAPIAdapter,
-        noteTranslationStore,
-        { account -> urlPreviewStoreProvider.getUrlPreviewStore(account) },
-        viewModelScope,
-        noteRelationGetter,
-    )
+    private val cache = planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
 
 
     private val store = storeFactory.create(userId)

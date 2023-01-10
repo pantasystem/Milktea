@@ -7,6 +7,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -68,6 +69,11 @@ class UserListDetailViewModel @AssistedInject constructor(
     val users = userListRepository.observeOne(listId).filterNotNull().flatMapLatest {
         userDataSource.observeIn(listId.accountId, it.userList.userIds.map { userId -> userId.id })
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    @OptIn(FlowPreview::class)
+    val account = suspend {
+        accountRepository.get(listId.accountId).getOrNull()
+    }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val logger = loggerFactory.create("UserListDetailViewModel")
 

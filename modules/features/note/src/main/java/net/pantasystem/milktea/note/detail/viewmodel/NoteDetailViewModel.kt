@@ -14,8 +14,8 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
@@ -25,8 +25,9 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val noteRelationGetter: NoteRelationGetter,
     private val noteRepository: NoteRepository,
     private val noteTranslationStore: NoteTranslationStore,
-    private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
+    val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
+    planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -40,14 +41,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     private val currentAccountWatcher: CurrentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
 
-    private val cache = PlaneNoteViewDataCache(
-        currentAccountWatcher::getAccount,
-        noteCaptureAdapter,
-        noteTranslationStore,
-        { account -> urlPreviewStoreProvider.getUrlPreviewStore(account) },
-        viewModelScope,
-        noteRelationGetter
-    )
+    private val cache = planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val note = suspend {
@@ -93,14 +87,12 @@ class NoteDetailViewModel @AssistedInject constructor(
         notes.map { note ->
             when(note) {
                 is NoteType.Children -> {
-                    val children = note.nextChildren.map {
-                        cache.get(it)
-                    }
                     NoteConversationViewData(
-                        note.note, children,
+                        note.note,
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList()
                     ).also {
                         it.capture()
                         cache.put(it)
@@ -120,6 +112,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList()
                     ).also {
                         it.capture()
                         cache.put(it)

@@ -157,6 +157,7 @@ private fun Pager(
                     pageableState = uiState.followUsersState,
                     users = uiState.followUsers,
                     isUserNameMain = false,
+                    accountHost = uiState.accountHost,
                     onAction = { action ->
                         onAction(LoadType.Follow, action)
                     }
@@ -167,6 +168,7 @@ private fun Pager(
                     pageableState = uiState.followerUsersState,
                     users = uiState.followerUsers,
                     isUserNameMain = false,
+                    accountHost = uiState.accountHost,
                     onAction = { action ->
                         onAction(LoadType.Follower, action)
                     }
@@ -205,6 +207,9 @@ private fun FollowFollowerTopBar(
                     CustomEmojiText(
                         text = uiState.user.displayName,
                         emojis = uiState.user.emojis,
+                        sourceHost = uiState.user.host,
+                        accountHost = uiState.accountHost,
+                        parsedResult = uiState.user.parsedResult,
                         fontSize = 18.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

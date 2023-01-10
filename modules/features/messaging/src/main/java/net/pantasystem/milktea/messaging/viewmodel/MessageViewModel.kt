@@ -56,6 +56,12 @@ class MessageViewModel @Inject constructor(
 
     val title: LiveData<String> = MutableLiveData("")
 
+    val account = accountStore.observeCurrentAccount.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null
+    )
+
     init {
         @OptIn(ExperimentalCoroutinesApi::class)
         viewModelScope.launch(Dispatchers.IO) {

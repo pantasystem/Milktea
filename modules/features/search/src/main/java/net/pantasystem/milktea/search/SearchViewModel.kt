@@ -91,20 +91,40 @@ class SearchViewModel @Inject constructor(
         logger.error("fetch search histories failed", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    private val states = combine(hashtagResult, searchUserResult) { h, s ->
+        States(
+            hashtagsState = h,
+            searchUserState = s,
+        )
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), States(
+            searchUserState = searchUserResult.value,
+            hashtagsState = hashtagResult.value,
+        )
+    )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val account = currentAccountWatcher.account.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null
+    )
+
     val uiState = combine(
         keyword,
-        hashtagResult,
-        searchUserResult,
+        states,
         searchHistories,
+        account,
         users
-    ) { keyword, hashtags, searchUserResult, histories, users ->
+    ) { keyword, states, histories, a, users ->
         SearchUiState(
             keyword,
-            (hashtags.content as? StateContent.Exist)?.rawContent ?: emptyList(),
+            (states.hashtagsState.content as? StateContent.Exist)?.rawContent ?: emptyList(),
             users,
             histories,
-            searchUserResult,
-            hashtags,
+            searchUserState = states.searchUserState,
+            hashtagsState = states.hashtagsState,
+            accountHost = a?.getHost()
         )
     }.stateIn(
         viewModelScope,
@@ -115,7 +135,8 @@ class SearchViewModel @Inject constructor(
             emptyList(),
             emptyList(),
             searchUserResult.value,
-            hashtagResult.value
+            hashtagResult.value,
+            null
         )
     )
 
@@ -128,10 +149,12 @@ class SearchViewModel @Inject constructor(
             return
         }
         runCancellableCatching {
-            searchHistoryRepository.add(SearchHistory(
-                accountId = currentAccountWatcher.getAccount().accountId,
-                keyword = word,
-            )).getOrThrow()
+            searchHistoryRepository.add(
+                SearchHistory(
+                    accountId = currentAccountWatcher.getAccount().accountId,
+                    keyword = word,
+                )
+            ).getOrThrow()
         }.onFailure {
             logger.error("検索履歴の保存に失敗", it)
         }
@@ -150,7 +173,13 @@ data class SearchUiState(
     val users: List<User>,
     val history: List<SearchHistory>,
     val searchUserState: ResultState<List<User>>,
-    val hashtagsState: ResultState<List<String>>
+    val hashtagsState: ResultState<List<String>>,
+    val accountHost: String?,
+)
+
+private data class States(
+    val searchUserState: ResultState<List<User>>,
+    val hashtagsState: ResultState<List<String>>,
 )
 
 private fun String.isHashTagFormat(): Boolean {

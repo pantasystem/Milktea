@@ -7,6 +7,8 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.Entity
 import net.pantasystem.milktea.model.EntityId
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
+import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.nickname.UserNickname
@@ -29,6 +31,7 @@ sealed interface User : Entity {
     val isSameHost: Boolean
     val instance: InstanceInfo?
     val avatarBlurhash: String?
+    val parsedResult: CustomEmojiParsedResult
 
 
     data class Id(
@@ -50,7 +53,14 @@ sealed interface User : Entity {
         override val instance: InstanceInfo?,
         override val avatarBlurhash: String?
     ) : User {
-        companion object
+        companion object;
+        override val parsedResult: CustomEmojiParsedResult = try {
+            CustomEmojiParser.parse(sourceHost = host, emojis, displayName)
+        } catch (e: Throwable) {
+            CustomEmojiParsedResult(displayName, emptyList())
+        }
+
+
     }
 
     data class Detail(
@@ -110,7 +120,15 @@ sealed interface User : Entity {
         fun getRemoteProfileUrl(account: Account): String {
             return url ?: getProfileUrl(account)
         }
+
+        override val parsedResult: CustomEmojiParsedResult = try {
+            CustomEmojiParser.parse(sourceHost = host, emojis, displayName)
+        } catch (e: Throwable) {
+            CustomEmojiParsedResult(displayName, emptyList())
+        }
     }
+
+
 
     data class InstanceInfo(
         val faviconUrl: String?,

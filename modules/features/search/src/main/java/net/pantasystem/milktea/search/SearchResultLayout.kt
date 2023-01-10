@@ -49,7 +49,7 @@ fun SearchSuggestionsLayout(
             }
         }
         items(uiState.users) { user ->
-            ItemSimpleUserCard(user = user, onSelected = onUserSelected)
+            ItemSimpleUserCard(user = user, onSelected = onUserSelected, accountHost = uiState.accountHost)
         }
     }
 }

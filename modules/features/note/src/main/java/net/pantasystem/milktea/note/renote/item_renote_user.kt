@@ -32,6 +32,7 @@ import net.pantasystem.milktea.model.user.User
 fun ItemRenoteUser(
     note: NoteRelation,
     myId: User.Id?,
+    accountHost: String?,
     onAction: (ItemRenoteAction) -> Unit,
     isUserNameDefault: Boolean = false
 ) {
@@ -75,13 +76,19 @@ fun ItemRenoteUser(
                         CustomEmojiText(
                             text = note.user.displayName,
                             emojis = note.user.emojis,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            parsedResult = note.user.parsedResult,
+                            accountHost = accountHost,
+                            sourceHost = note.user.host,
                         )
                     }
                     if(isUserNameDefault){
                         CustomEmojiText(
                             text = note.user.displayName,
                             emojis = note.user.emojis,
+                            accountHost = accountHost,
+                            sourceHost = note.user.host,
+                            parsedResult = note.user.parsedResult,
                         )
                     }else{
                         Text(text = note.user.displayUserName)
