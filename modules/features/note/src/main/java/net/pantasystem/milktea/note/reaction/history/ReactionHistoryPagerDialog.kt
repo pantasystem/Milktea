@@ -140,6 +140,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
     }
 
     private fun setCustomEmojiSpanIntoTabs(uiState: ReactionHistoryPagerUiState) {
+
         if (uiState.note != null) {
             val types = uiState.types
             for (i in 1 until types.size) {
@@ -155,6 +156,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
                         uiState.note.emojis,
                         types[i].type ?: "",
                         textView,
+                        isOverV13 = true, // NOTE: カスタム絵文字前提として処理してしまっても問題ない
                     )
 
                     tab.text = SpannableStringBuilder(spanned).apply {
