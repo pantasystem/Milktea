@@ -6,7 +6,6 @@ import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android_ui.BindingProvider
-import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -55,16 +54,12 @@ object StatusMessageHelper {
         if (isUserNameDefault) {
             this.text = message
         } else {
-            val meta = entrypoint.metaRepository().get(statusMessageTargetViewNote.account.normalizedInstanceDomain)
             this.text = CustomEmojiDecorator().decorate(
                 statusMessageTargetViewNote.account.getHost(),
                 note.user.host,
                 note.user.emojis,
                 message,
                 this,
-                isOverV13 = meta?.let {
-                    it.getVersion() >= Version("13.0.0")
-                } ?: false
             )
         }
     }

@@ -22,6 +22,8 @@ import coil.compose.rememberAsyncImagePainter
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.emoji.EmojiResolvedType
+import net.pantasystem.milktea.model.instance.HostWithVersion
 
 
 @Composable
@@ -48,7 +50,13 @@ fun CustomEmojiText(
             sourceHost = sourceHost,
             emojis = emojis,
             text = text
-        )
+        ).let { result ->
+            result.copy(
+                emojis = result.emojis.filter {
+                    HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
+                }
+            )
+        }
     }
 
 
