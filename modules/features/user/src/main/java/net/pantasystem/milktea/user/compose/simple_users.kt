@@ -74,7 +74,13 @@ fun ItemSimpleUserCard(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Column {
-                CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = accountHost)
+                CustomEmojiText(
+                    text = user.displayName,
+                    emojis = user.emojis,
+                    accountHost = accountHost,
+                    sourceHost = user.host,
+                    parsedResult = user.parsedResult,
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(text = user.displayUserName)
             }
@@ -99,5 +105,6 @@ fun PreviewItemSimpleUser() {
         isSameHost = true,
         instance = null,
         avatarBlurhash = null,
-    ), onSelected = {}, accountHost = "misskey.io")
+    ), onSelected = {}, accountHost = "misskey.io"
+    )
 }
