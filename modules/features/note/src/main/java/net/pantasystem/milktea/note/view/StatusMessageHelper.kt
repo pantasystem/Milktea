@@ -16,11 +16,12 @@ object StatusMessageHelper {
     @JvmStatic
     @BindingAdapter("statusMessageTargetViewNote")
     fun TextView.setStatusMessage(statusMessageTargetViewNote: PlaneNoteViewData) {
-        val settingStore = EntryPointAccessors.fromApplication(
+        val entrypoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
             BindingProvider::class.java
         )
-            .settingStore()
+        val settingStore = entrypoint.settingStore()
+
         val isUserNameDefault = settingStore.isUserNameDefault
         val note = statusMessageTargetViewNote.note
         val name = if (isUserNameDefault) {
@@ -58,7 +59,7 @@ object StatusMessageHelper {
                 note.user.host,
                 note.user.emojis,
                 message,
-                this
+                this,
             )
         }
     }

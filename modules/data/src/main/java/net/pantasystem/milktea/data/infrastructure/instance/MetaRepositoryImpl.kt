@@ -11,10 +11,8 @@ import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaDataSource
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.instance.RequestMeta
+import net.pantasystem.milktea.model.instance.*
+import java.net.URL
 import javax.inject.Inject
 
 class MetaRepositoryImpl @Inject constructor(
@@ -30,6 +28,7 @@ class MetaRepositoryImpl @Inject constructor(
             metaDataSource.add(meta)
             metaCache.put(meta.uri, meta)
             misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
+            HostWithVersion.put(URL(meta.uri).host, meta.getVersion())
         }
     }
 
@@ -48,6 +47,7 @@ class MetaRepositoryImpl @Inject constructor(
             }.also { meta ->
                 metaCache.put(meta.uri, meta)
                 misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
+                HostWithVersion.put(URL(meta.uri).host, meta.getVersion())
             }
         }
 
@@ -62,6 +62,7 @@ class MetaRepositoryImpl @Inject constructor(
             if (meta != null) {
                 metaCache.put(instanceDomain, meta)
                 misskeyAPIProvider.applyVersion(instanceDomain, meta.getVersion())
+                HostWithVersion.put(URL(meta.uri).host, meta.getVersion())
             }
         }
     }
