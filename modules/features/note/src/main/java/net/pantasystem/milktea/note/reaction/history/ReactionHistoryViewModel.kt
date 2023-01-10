@@ -6,13 +6,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
@@ -62,7 +60,12 @@ class ReactionHistoryViewModel @AssistedInject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     private val paginator = paginatorFactory.create(ReactionHistoryRequest(noteId, type))
 
-    val uiState = combine(emojis, note, isLoading, histories) { emojis, note, loading, histories ->
+    @OptIn(FlowPreview::class)
+    private val account = suspend {
+        accountRepository.get(noteId.accountId).getOrNull()
+    }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val uiState = combine(emojis, note, isLoading, histories, account) { emojis, note, loading, histories, a ->
         ReactionHistoryUiState(
             items = listOfNotNull(
                 type?.let { type ->
@@ -71,7 +74,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
                     }
                 }
             ) + histories.map {
-                ReactionHistoryListType.ItemUser(it.user)
+                ReactionHistoryListType.ItemUser(it.user, account = a)
             } + listOfNotNull(
                 if (loading) {
                     ReactionHistoryListType.Loading
@@ -124,7 +127,7 @@ fun ReactionHistoryViewModel.Companion.provideViewModel(
 }
 
 sealed interface ReactionHistoryListType {
-    data class ItemUser(val user: User) : ReactionHistoryListType
+    data class ItemUser(val user: User, val account: Account?) : ReactionHistoryListType
     data class Header(val emojiType: EmojiType) : ReactionHistoryListType
     object Loading : ReactionHistoryListType
 }
