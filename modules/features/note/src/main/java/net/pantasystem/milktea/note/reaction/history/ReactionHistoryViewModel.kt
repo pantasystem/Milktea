@@ -10,8 +10,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -20,6 +22,7 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.note.reaction.viewmodel.EmojiType
 import net.pantasystem.milktea.note.reaction.viewmodel.from
 
@@ -31,6 +34,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
     val metaRepository: MetaRepository,
     val accountRepository: AccountRepository,
     val noteRepository: NoteRepository,
+    val userRepository: UserRepository,
     @Assisted val noteId: Note.Id,
     @Assisted val type: String?
 ) : ViewModel() {
@@ -44,8 +48,8 @@ class ReactionHistoryViewModel @AssistedInject constructor(
 
     val logger = loggerFactory.create("ReactionHistoryVM")
 
-    val isLoading = MutableStateFlow(false)
-    val histories = MutableStateFlow<List<ReactionHistory>>(emptyList())
+    private val isLoading = MutableStateFlow(false)
+    private val histories = MutableStateFlow<List<ReactionHistory>>(emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val emojis = flowOf(noteId).mapNotNull {
@@ -65,11 +69,43 @@ class ReactionHistoryViewModel @AssistedInject constructor(
         accountRepository.get(noteId.accountId).getOrNull()
     }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val uiState = combine(emojis, note, isLoading, histories, account) { emojis, note, loading, histories, a ->
+    private val noteAuthor = note.filterNotNull().map {
+        userRepository.find(it.userId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val noteInfo = combine(note, noteAuthor) { n, author ->
+        NoteInfo(
+            note = n,
+            user = author,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteInfo())
+    val uiState = combine(
+        noteInfo,
+        emojis,
+        isLoading,
+        histories,
+        account,
+    ) { noteInfo, emojis, loading, histories, a ->
         ReactionHistoryUiState(
             items = listOfNotNull(
                 type?.let { type ->
-                    EmojiType.from(emojis + (note?.emojis ?: emptyList()), type)?.let {
+                    EmojiType.from(emojis + (noteInfo.note?.emojis ?: emptyList()), type)
+                        ?: EmojiType.CustomEmoji(
+                            Emoji(
+                                name = type,
+                                url = V13EmojiUrlResolver.resolve(
+                                    accountHost = a?.getHost(),
+                                    emojiHost = noteInfo.user?.host,
+                                    tagName = type
+                                ),
+                                uri = V13EmojiUrlResolver.resolve(
+                                    accountHost = a?.getHost(),
+                                    emojiHost = noteInfo.user?.host,
+                                    tagName = type
+                                )
+                            )
+                        )
+                    EmojiType.from(emojis + (noteInfo.note?.emojis ?: emptyList()), type)?.let {
                         ReactionHistoryListType.Header(it)
                     }
                 }
@@ -136,3 +172,9 @@ data class ReactionHistoryUiState(
     val items: List<ReactionHistoryListType> = emptyList(),
 
     )
+
+
+private data class NoteInfo(
+    val note: Note? = null,
+    val user: User? = null
+)
