@@ -48,7 +48,9 @@ class EmojiChoicesAdapter(
             is EmojiType.CustomEmoji -> {
                 GlideApp.with(holder.binding.reactionImagePreview)
                     .load(item.emoji.url ?: item.emoji.uri)
-                    .centerCrop()
+                        // FIXME: リダイレクトが発生する場合にcenterCropを使用すると不具合が発生する
+                        // https://github.com/bumptech/glide/issues/4652
+//                    .centerCrop()
                     .into(holder.binding.reactionImagePreview)
                 holder.binding.reactionStringPreview.isVisible = false
                 holder.binding.reactionImagePreview.isVisible = true

@@ -12,7 +12,9 @@ object EmojiHelper{
     fun ImageView.setEmojiImage(customEmoji: Emoji){
         GlideApp.with(this.context)
             .load(customEmoji.url?: customEmoji.uri)
-            .centerCrop()
+                // FIXME: リダイレクトが発生する場合にcenterCropを使用すると不具合が発生する
+                // https://github.com/bumptech/glide/issues/4652
+//            .centerCrop()
             .into(this)
     }
 }
