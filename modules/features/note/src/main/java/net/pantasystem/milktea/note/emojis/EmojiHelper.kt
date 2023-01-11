@@ -12,8 +12,7 @@ object EmojiHelper{
     fun ImageView.setEmojiImage(customEmoji: Emoji){
         GlideApp.with(this.context)
             .load(customEmoji.url?: customEmoji.uri)
-                // FIXME: リダイレクトが発生する場合にcenterCropを使用すると不具合が発生する
-                // https://github.com/bumptech/glide/issues/4652
+                // FIXME: webpの場合うまく表示できなくなる
 //            .centerCrop()
             .into(this)
     }

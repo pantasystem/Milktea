@@ -70,7 +70,8 @@ object NoteReactionViewHelper {
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
-                .fitCenter()
+                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
+//                .fitCenter()
                 .into(reactionImageTypeView)
         }
 
