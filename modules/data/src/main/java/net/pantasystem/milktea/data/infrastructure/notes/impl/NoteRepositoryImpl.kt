@@ -326,7 +326,10 @@ class NoteRepositoryImpl @Inject constructor(
                 NoteState(
                     isFavorited = it.isFavorited,
                     isMutedThread = it.isMutedThread,
-                    isWatching = it.isWatching
+                    isWatching = when(val watching = it.isWatching) {
+                        null -> NoteState.Watching.None
+                        else -> NoteState.Watching.Some(watching)
+                    }
                 )
             }
         }
