@@ -43,8 +43,8 @@ dependencyResolutionManagement {
             bundle('lifecycle', ['lifecycle-extenstions', 'lifecycle-viewmodel'])
 
 
-            library('glide-glide', 'com.github.bumptech.glide:glide:4.12.0')
-            library('glide-compiler', 'com.github.bumptech.glide:compiler:4.13.2')
+            library('glide-glide', 'com.github.bumptech.glide:glide:4.14.2')
+            library('glide-compiler', 'com.github.bumptech.glide:compiler:4.14.2')
             library('accompanist-glide', 'com.google.accompanist:accompanist-glide:0.14.0')
             library('animation-apng', 'com.github.penfeizhou.android.animation:apng:2.23.0')
 
