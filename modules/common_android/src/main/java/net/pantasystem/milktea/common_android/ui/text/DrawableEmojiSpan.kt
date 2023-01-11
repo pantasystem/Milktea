@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.common_android.ui.text
 
 
+import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -46,7 +48,13 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
                     resource.start()
                 }
                 else -> {
-                    adapter.update()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        if (resource is AnimatedImageDrawable) {
+                            resource.start()
+                        }
+                    } else {
+                        adapter.update()
+                    }
                 }
             }
         }

@@ -48,7 +48,8 @@ class EmojiChoicesAdapter(
             is EmojiType.CustomEmoji -> {
                 GlideApp.with(holder.binding.reactionImagePreview)
                     .load(item.emoji.url ?: item.emoji.uri)
-                    .centerCrop()
+                        // FIXME: webpの場合うまく表示できなくなる
+//                    .centerCrop()
                     .into(holder.binding.reactionImagePreview)
                 holder.binding.reactionStringPreview.isVisible = false
                 holder.binding.reactionImagePreview.isVisible = true

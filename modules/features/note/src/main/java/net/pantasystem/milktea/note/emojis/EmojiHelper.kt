@@ -12,7 +12,8 @@ object EmojiHelper{
     fun ImageView.setEmojiImage(customEmoji: Emoji){
         GlideApp.with(this.context)
             .load(customEmoji.url?: customEmoji.uri)
-            .centerCrop()
+                // FIXME: webpの場合うまく表示できなくなる
+//            .centerCrop()
             .into(this)
     }
 }

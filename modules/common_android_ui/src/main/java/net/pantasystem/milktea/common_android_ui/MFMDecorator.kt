@@ -11,10 +11,10 @@ import android.text.style.*
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import com.bumptech.glide.Glide
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.*
+import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.R
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
@@ -105,8 +105,7 @@ object MFMDecorator {
                 //val emojiSpan = EmojiSpan(textView)
                 val emojiSpan: EmojiSpan<*>
                 emojiSpan = DrawableEmojiSpan(emojiAdapter)
-                Glide.with(textView)
-                    .asDrawable()
+                GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
                     .override(textView.textSize.toInt())
                     .into(emojiSpan.target)
