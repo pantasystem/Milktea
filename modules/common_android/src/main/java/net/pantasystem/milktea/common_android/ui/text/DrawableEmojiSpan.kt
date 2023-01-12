@@ -51,6 +51,8 @@ class DrawableEmojiSpan(adapter: EmojiAdapter) : EmojiSpan<Drawable>(adapter){
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         if (resource is AnimatedImageDrawable) {
                             resource.start()
+                        } else {
+                            adapter.update()
                         }
                     } else {
                         adapter.update()
