@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.text.LevenshteinDistance
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -190,6 +191,8 @@ data class ReactionSelectionUiState(
 
     val searchFilteredEmojis = meta?.emojis?.filterEmojiBy(keyword)?.map {
         EmojiType.CustomEmoji(it)
+    }?.sortedBy {
+        LevenshteinDistance(it.emoji.name, keyword)
     } ?: emptyList()
 }
 
