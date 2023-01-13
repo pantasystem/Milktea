@@ -62,7 +62,7 @@
                 tools:text="名前aio"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="@dimen/note_avatar_icon_right_margin_size"
                 app:layout_constraintEnd_toStartOf="@id/elapsedTime"
                 app:layout_constraintHorizontal_bias="0"
                 />
@@ -135,7 +135,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/note_avatar_icon_right_margin_size"
 
                     >
 

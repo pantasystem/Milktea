@@ -5,4 +5,7 @@
 
     <dimen name="note_horizontal_padding_size">16dp</dimen>
     <dimen name="note_top_padding_size">12dp</dimen>
+
+    <!-- avatarIconと右側の領域の間のマージン -->
+    <dimen name="note_avatar_icon_right_margin_size">8dp</dimen>
 </resources>
