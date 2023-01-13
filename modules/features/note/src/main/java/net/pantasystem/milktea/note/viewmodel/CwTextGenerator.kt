@@ -26,11 +26,15 @@ object CwTextGenerator {
                 StringSource(R.string.poll)
             },
         )
-        val result = buttonText.reduceIndexed { index, acc, stringSource ->
-            acc + if (index > 0) {
-                StringSource("/") + stringSource
-            } else {
-                stringSource
+        val result = if (buttonText.isEmpty()) {
+            StringSource("")
+        } else {
+            buttonText.reduceIndexed { index, acc, stringSource ->
+                acc + if (index > 0) {
+                    StringSource("/") + stringSource
+                } else {
+                    stringSource
+                }
             }
         }
 
