@@ -330,7 +330,8 @@
                                 tools:text="展開する"
                                 android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
                                 android:textColor="?attr/colorAccent"
-                                android:text="@{SafeUnbox.unboxString(note.subContentFoldingStatusMessage)}"
+                                stringSource="@{note.subContentFoldingStatusMessage}"
+
                                 app:layout_constraintTop_toBottomOf="@id/subCw"
                                 app:layout_constraintStart_toStartOf="parent"
 
