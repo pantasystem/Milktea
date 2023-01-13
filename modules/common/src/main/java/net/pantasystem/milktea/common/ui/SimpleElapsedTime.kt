@@ -16,9 +16,9 @@ sealed interface TimeUnit {
 
 object SimpleElapsedTime {
 
-    operator fun invoke(date: Instant): TimeUnit {
+    operator fun invoke(date: Instant, now: Instant? = null): TimeUnit {
         val epoch = date.toEpochMilliseconds()
-        val nowEpoch = Clock.System.now().toEpochMilliseconds()
+        val nowEpoch = (now ?: Clock.System.now()).toEpochMilliseconds()
 
         return when (val elapsedMilliTime = nowEpoch - epoch) {
             in Long.MIN_VALUE until 5 * 1000 -> {
