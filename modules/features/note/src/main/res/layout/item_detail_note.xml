@@ -59,9 +59,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@{SafeUnbox.unboxString(note.statusMessage)}"
-                    android:visibility="@{note.statusMessage == null ? View.GONE : View.VISIBLE}"
-                    tools:text="パン太さんができました" />
+                    statusMessageTargetViewNote="@{note}"
+                     tools:text="パン太さんができました" />
 
             <ImageView
                     android:id="@+id/avatarIcon"
