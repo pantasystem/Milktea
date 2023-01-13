@@ -303,7 +303,7 @@
     <string name="refresh">刷新</string>
 
     <string name="long_text">由于太长已为你自动折叠（长度：%d）</string>
-    <string name="show_more">显示更多（长度：%d）</string>
+    <string name="show_more">显示更多（%s）</string>
     <string name="hide">隐藏</string>
     <string name="text_length_limit">文本长度限制</string>
     <string name="returns_limit">换行限制（自动折叠帖子）</string>
