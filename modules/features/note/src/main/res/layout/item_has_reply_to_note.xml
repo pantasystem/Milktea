@@ -59,8 +59,8 @@
                         >
                     <ImageView
                             android:id="@+id/replyToAvatarIcon"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="@dimen/avatar_icon_size"
+                            android:layout_height="@dimen/avatar_icon_size"
                             app:circleIcon="@{hasReplyToNote.replyTo.avatarUrl}"
                             android:layout_marginEnd="8dp"
                             tools:ignore="ContentDescription"

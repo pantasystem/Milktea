@@ -41,8 +41,8 @@
 
         <ImageView
                 android:id="@+id/avatarIcon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/avatar_icon_size"
+                android:layout_height="@dimen/avatar_icon_size"
                 app:circleIcon='@{note.avatarUrl}'
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
                 android:contentDescription="@string/avataricon"

@@ -8,4 +8,7 @@
 
     <!-- avatarIconと右側の領域の間のマージン -->
     <dimen name="note_avatar_icon_right_margin_size">8dp</dimen>
+
+    <dimen name="avatar_icon_size">50dp</dimen>
+
 </resources>
