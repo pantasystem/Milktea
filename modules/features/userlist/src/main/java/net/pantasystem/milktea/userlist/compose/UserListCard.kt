@@ -43,7 +43,10 @@ fun UserListCard(userList: UserListBindingModel, onAction: (UserListCardAction) 
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(
+                    vertical = 12.dp,
+                    horizontal = 16.dp
+                )
         ) {
             Column(
                 Modifier
