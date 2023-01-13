@@ -1,10 +1,15 @@
 package net.pantasystem.milktea.common_android.ui.text
 
+import android.text.SpannableStringBuilder
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.ui.SimpleElapsedTime
+import net.pantasystem.milktea.common_android.R
+import net.pantasystem.milktea.model.notes.Visibility
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +31,8 @@ object DateFormatHelper {
         this.text = sdf.format(date)
     }
 
+
+
     @BindingAdapter("elapsedTime")
     @JvmStatic
     fun TextView.setElapsedTime(elapsedTime: Instant?) {
@@ -35,6 +42,37 @@ object DateFormatHelper {
                 elapsedTime ?: Clock.System.now()
             )
         ).getString(context)
+    }
+
+    @BindingAdapter("elapsedTime", "visibility")
+    @JvmStatic
+    fun TextView.setElapsedTimeAndVisibility(elapsedTime: Instant?, visibility: Visibility?) {
+        val visibilityIcon = when(visibility ?: Visibility.Public(false)) {
+            is Visibility.Followers -> R.drawable.ic_lock_black_24dp
+            is Visibility.Home -> R.drawable.ic_home_black_24dp
+            is Visibility.Public -> null
+            is Visibility.Specified -> R.drawable.ic_email_black_24dp
+        }
+        val text = GetElapsedTimeStringSource(
+            SimpleElapsedTime(
+                elapsedTime ?: Clock.System.now()
+            )
+        ).getString(context)
+
+        this.text = if (visibilityIcon == null) {
+            text
+        } else {
+            val target = "$text visibility"
+            SpannableStringBuilder(target).apply {
+                val drawable = ContextCompat.getDrawable(context, visibilityIcon)
+                drawable?.setTint(currentTextColor)
+                val span = DrawableEmojiSpan(EmojiAdapter(this@setElapsedTimeAndVisibility))
+                setSpan(span, text.length + 1, target.length,0)
+                GlideApp.with(this@setElapsedTimeAndVisibility)
+                    .load(drawable)
+                    .into(span.target)
+            }
+        }
     }
 
     @BindingAdapter("createdAt")

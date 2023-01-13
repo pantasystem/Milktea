@@ -92,6 +92,8 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 elapsedTime="@{note.toShowNote.note.createdAt}"
+                visibility="@{note.toShowNote.note.visibility}"
+
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
