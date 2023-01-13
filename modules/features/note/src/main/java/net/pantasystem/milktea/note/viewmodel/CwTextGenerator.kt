@@ -19,7 +19,9 @@ object CwTextGenerator {
             textSize?.let {
                 StringSource(R.string.char_count, it)
             },
-            fileSize?.let {
+            fileSize?.takeIf {
+                it > 0
+            }?.let {
                 StringSource(R.string.file_count, it)
             },
             note.note.poll?.let {
