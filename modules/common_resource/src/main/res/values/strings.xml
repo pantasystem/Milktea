@@ -305,7 +305,7 @@
     <string name="refresh">Refresh</string>
 
     <string name="long_text">Collapsed automatically because it is too long(size:%d)</string>
-    <string name="show_more">Show more(size:%d)</string>
+    <string name="show_more">Show more(%s)</string>
     <string name="hide">Hide</string>
 
     <string name="text_length_limit">Text length limit</string>
@@ -402,5 +402,8 @@
     <string name="input_caption">Input caption</string>
     <string name="other">Other</string>
     <string name="recently_used">Recently used</string>
+    <string name="char_count">%1$d characters</string>
+    <string name="file_count">%1$d file(s)</string>
+    <string name="poll">poll</string>
 
 </resources>

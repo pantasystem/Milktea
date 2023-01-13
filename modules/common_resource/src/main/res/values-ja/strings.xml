@@ -411,5 +411,8 @@
     <string name="notes_and_replies">投稿と返信</string>
     <string name="other">その他</string>
     <string name="recently_used">最近使った</string>
+    <string name="char_count">%1$d文字</string>
+    <string name="file_count">%1$dファイル</string>
+    <string name="poll">投票</string>
 
 </resources>

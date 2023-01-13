@@ -411,5 +411,8 @@
     <string name="notes_and_replies">帖子和回复</string>
     <string name="other">其他</string>
     <string name="recently_used">最近使用</string>
+    <string name="char_count">%1$d个字符</string>
+    <string name="file_count">%1$d 个文件</string>
+    <string name="poll">投票</string>
 
 </resources>
