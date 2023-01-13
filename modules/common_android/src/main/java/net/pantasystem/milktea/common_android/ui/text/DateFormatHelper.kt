@@ -31,7 +31,7 @@ object DateFormatHelper {
     fun TextView.setElapsedTime(elapsedTime: Instant?) {
 
         this.text = GetElapsedTimeStringSource(
-            SimpleElapsedTime.invoke(
+            SimpleElapsedTime(
                 elapsedTime ?: Clock.System.now()
             )
         ).getString(context)
