@@ -310,7 +310,7 @@
     <string name="refresh">リフレッシュ</string>
 
     <string name="long_text">長すぎるため自動的に折りたたまれました(%d文字)</string>
-    <string name="show_more">もっと見る(%d文字)</string>
+    <string name="show_more">もっと見る(%s)</string>
     <string name="hide">隠す</string>
 
     <string name="auto_note_folding">ノートの自動折り畳み</string>
