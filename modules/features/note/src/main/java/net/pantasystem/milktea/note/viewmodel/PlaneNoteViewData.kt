@@ -189,8 +189,9 @@ open class PlaneNoteViewData(
 
     //true　折り畳み
     val subContentFolding = MutableLiveData(subCw != null)
-    val subContentFoldingStatusMessage = Transformations.map(subContentFolding) {
-        if (it) "もっと見る: ${subNoteText?.length}" else "閉じる"
+
+    val subContentFoldingStatusMessage = Transformations.map(subContentFolding) { isFolding ->
+        CwTextGenerator(subNote, isFolding)
     }
     val subNoteFiles = subNote?.files ?: emptyList()
     val subNoteMedia = MediaViewData(subNote?.files?.map {
