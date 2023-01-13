@@ -42,7 +42,10 @@ fun MessageHistoryCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(
+                horizontal = 16.dp,
+                vertical = 12.dp
+            ),
         ) {
             Image(
                 rememberAsyncImagePainter(history.thumbnailUrl),
@@ -62,7 +65,7 @@ fun MessageHistoryCard(
                     }
             )
 
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             Column {
                 when (history) {

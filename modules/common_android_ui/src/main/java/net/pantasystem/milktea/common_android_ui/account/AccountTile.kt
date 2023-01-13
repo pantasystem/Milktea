@@ -43,7 +43,7 @@ fun AccountTile(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    vertical = 8.dp,
+                    vertical = 12.dp,
                     horizontal = 16.dp
                 ),
         ) {

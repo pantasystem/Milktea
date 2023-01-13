@@ -62,13 +62,13 @@ fun ItemSimpleUserCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(vertical = 12.dp, horizontal = 16.dp),
         ) {
             Image(
                 painter = rememberAsyncImagePainter(user.avatarUrl),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(50.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )

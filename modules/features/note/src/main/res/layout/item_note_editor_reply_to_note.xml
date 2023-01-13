@@ -21,9 +21,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="8dp"
+            android:paddingHorizontal="@dimen/note_horizontal_padding_size"
+            android:paddingTop="@dimen/note_top_padding_size"
 
             app:transitionDestinationNote="@{note.toShowNote.note}"
             app:clickedView="@{elapsedTime}"
@@ -39,8 +38,8 @@
 
         <ImageView
                 android:id="@+id/avatarIcon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/note_avatar_icon_size"
+                android:layout_height="@dimen/note_avatar_icon_size"
                 app:circleIcon='@{note.avatarUrl}'
                 tools:srcCompat="@android:drawable/sym_def_app_icon"
                 android:contentDescription="@string/avataricon"
@@ -60,7 +59,7 @@
                 tools:text="名前aio"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="@dimen/note_avatar_icon_right_margin_size"
                 app:layout_constraintEnd_toStartOf="@id/elapsedTime"
                 app:layout_constraintHorizontal_bias="0"
                 />
@@ -131,7 +130,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/note_avatar_icon_right_margin_size"
 
                     >
 

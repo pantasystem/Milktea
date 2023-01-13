@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.notes.draft.DraftNote
@@ -21,7 +22,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 
 @Composable
-fun DraftNotesPage(
+fun DraftNotesScreen(
     viewModel: DraftNotesViewModel,
     onShowFile: (DraftNoteFile) -> Unit,
     onNavigateUp: () -> Unit,
@@ -40,7 +41,8 @@ fun DraftNotesPage(
                 title = {
                     Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.draft_notes))
                 },
-                backgroundColor = MaterialTheme.colors.surface
+                backgroundColor = MaterialTheme.colors.surface,
+                elevation = 0.dp
             )
         }
     ) { paddingValues ->

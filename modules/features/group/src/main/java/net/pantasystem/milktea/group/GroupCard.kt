@@ -34,7 +34,10 @@ fun GroupCard(group: GroupWithMember, onClick: () -> Unit) {
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
+                .padding(
+                    vertical = 12.dp,
+                    horizontal = 16.dp
+                )
         ) {
             Text(group.group.name, fontSize = 18.sp)
             Spacer(modifier = Modifier.height(2.dp))
