@@ -138,7 +138,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginBottom="5dp"
                     android:onClick="@{()-> note.changeContentFolding() }"
-                    android:text="@{note.contentFoldingStatusMessage}"
+                    stringSource="@{note.contentFoldingStatusMessage}"
                     android:textColor="?attr/colorAccent"
                     android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
                     tools:text="展開する" />

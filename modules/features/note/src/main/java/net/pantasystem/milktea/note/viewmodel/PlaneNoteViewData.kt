@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AboutMediaType
@@ -66,8 +67,8 @@ open class PlaneNoteViewData(
     val text = toShowNote.note.text
 
     val contentFolding = MutableLiveData(cw != null)
-    val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding) {
-        if (it) "もっと見る: ${text?.length}文字" else "隠す"
+    val contentFoldingStatusMessage: LiveData<StringSource> = Transformations.map(contentFolding) {
+        CwTextGenerator(toShowNote, it)
     }
 
 

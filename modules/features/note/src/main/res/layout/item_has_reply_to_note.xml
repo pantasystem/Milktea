@@ -111,7 +111,7 @@
                             tools:text="展開する"
                             android:visibility='@{hasReplyToNote.replyTo.cw == null ? View.GONE : View.VISIBLE }'
                             android:textColor="?attr/colorAccent"
-                            android:text="@{hasReplyToNote.replyTo.contentFoldingStatusMessage}"
+                            stringSource="@{hasReplyToNote.replyTo.contentFoldingStatusMessage}"
                             android:onClick="@{()-> hasReplyToNote.replyTo.changeContentFolding() }"
                             />
                     <RelativeLayout
