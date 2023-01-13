@@ -190,12 +190,15 @@
 
     <string name="future">未来</string>
     <string name="now">今</string>
-    <string name="year_ago">年前</string>
-    <string name="month_ago">ヶ月前</string>
-    <string name="date_ago">日前</string>
-    <string name="hour_ago">時間前</string>
-    <string name="minute_ago">分前</string>
-    <string name="second_ago">秒前</string>
+
+
+
+    <string name="time_with_year_ago">%s年前</string>
+    <string name="time_with_month_ago">%sヶ月前</string>
+    <string name="time_with_date_ago">%s日前</string>
+    <string name="time_with_hour_ago">%s時間前</string>
+    <string name="time_with_minute_ago">%s分前</string>
+    <string name="time_with_second_ago">%s秒前</string>
 
     <string name="select_file">ファイル選択</string>
 
@@ -411,5 +414,8 @@
     <string name="notes_and_replies">投稿と返信</string>
     <string name="other">その他</string>
     <string name="recently_used">最近使った</string>
+    <string name="char_count">%1$d文字</string>
+    <string name="file_count">%1$dファイル</string>
+    <string name="poll">投票</string>
 
 </resources>

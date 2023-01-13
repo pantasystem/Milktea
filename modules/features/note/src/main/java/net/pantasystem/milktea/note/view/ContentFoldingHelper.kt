@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.viewmodel.CwTextGenerator
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 object ContentFoldingHelper {
@@ -19,19 +19,16 @@ object ContentFoldingHelper {
         val isVisible = foldingNote?.cw != null && foldingNote.cw.isNotBlank()
         cw?.isVisible = isVisible
 
-
         val folding = isFolding ?: false
-
 
         if (foldingNote?.cw == null) {
             foldingButton?.visibility = View.GONE
         } else {
+            val buttonText = CwTextGenerator(foldingNote.toShowNote, folding)
+
             foldingButton?.visibility = View.VISIBLE
-            if (folding) {
-                foldingButton?.text = context.getString(R.string.show_more, foldingNote.text?.codePointCount(0, foldingNote.text.length))
-            } else {
-                foldingButton?.text = context.getString(R.string.hide)
-            }
+
+            foldingButton?.text = buttonText.getString(context)
         }
 
         foldingContent?.visibility = if (folding) {

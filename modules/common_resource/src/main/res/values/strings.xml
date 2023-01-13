@@ -189,12 +189,14 @@
 
     <string name="future">Future</string>
     <string name="now">Now</string>
-    <string name="year_ago">YR</string>
-    <string name="month_ago">MOS</string>
-    <string name="date_ago">D</string>
-    <string name="hour_ago">HR</string>
-    <string name="minute_ago">MIN</string>
-    <string name="second_ago">S</string>
+
+
+    <string name="time_with_year_ago">%sYR</string>
+    <string name="time_with_month_ago">%sMOS</string>
+    <string name="time_with_date_ago">%sD</string>
+    <string name="time_with_hour_ago">%sHR</string>
+    <string name="time_with_minute_ago">%sMIN</string>
+    <string name="time_with_second_ago">%sS</string>
 
     <string name="select_file">Select file</string>
 
@@ -305,7 +307,7 @@
     <string name="refresh">Refresh</string>
 
     <string name="long_text">Collapsed automatically because it is too long(size:%d)</string>
-    <string name="show_more">Show more(size:%d)</string>
+    <string name="show_more">Show more(%s)</string>
     <string name="hide">Hide</string>
 
     <string name="text_length_limit">Text length limit</string>
@@ -402,5 +404,8 @@
     <string name="input_caption">Input caption</string>
     <string name="other">Other</string>
     <string name="recently_used">Recently used</string>
+    <string name="char_count">%1$d characters</string>
+    <string name="file_count">%1$d file(s)</string>
+    <string name="poll">poll</string>
 
 </resources>

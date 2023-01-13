@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AboutMediaType
@@ -29,12 +30,7 @@ open class PlaneNoteViewData(
     private val instanceEmojis: List<Emoji>,
 ) : NoteViewData {
 
-
     val id = note.note.id
-
-    override fun getRequestId(): String {
-        return id.noteId
-    }
 
     val toShowNote: NoteRelation
         get() {
@@ -48,26 +44,6 @@ open class PlaneNoteViewData(
 
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
-    val statusMessage: String?
-        get() {
-            if (note.reply != null) {
-                //reply
-                return "${note.user.displayUserName}が返信しました"
-            } else if (note.note.renoteId == null && (note.note.text != null || note.files != null)) {
-                //Note
-                return null
-            } else if (note.note.renoteId != null && note.note.text == null && note.files.isNullOrEmpty()) {
-                //reNote
-                return "${note.user.displayUserName}がリノートしました"
-
-            } else if (note.note.renoteId != null && (note.note.text != null || note.files != null)) {
-                //quote
-                //"${note.user.name}が引用リノートしました"
-                return null
-            } else {
-                return null
-            }
-        }
 
     val userId: User.Id
         get() = toShowNote.user.id
@@ -91,8 +67,8 @@ open class PlaneNoteViewData(
     val text = toShowNote.note.text
 
     val contentFolding = MutableLiveData(cw != null)
-    val contentFoldingStatusMessage: LiveData<String> = Transformations.map(contentFolding) {
-        if (it) "もっと見る: ${text?.length}文字" else "隠す"
+    val contentFoldingStatusMessage: LiveData<StringSource> = Transformations.map(contentFolding) {
+        CwTextGenerator(toShowNote, it)
     }
 
 
@@ -146,8 +122,7 @@ open class PlaneNoteViewData(
     //var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
     val replyCount = MutableLiveData(toShowNote.note.repliesCount)
 
-    val reNoteCount: String?
-        get() = if (toShowNote.note.renoteCount > 0) toShowNote.note.renoteCount.toString() else null
+
     val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
 
     val canRenote =
@@ -171,7 +146,6 @@ open class PlaneNoteViewData(
     val subNote: NoteRelation? = toShowNote.renote
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
-    private val subNoteText = subNote?.note?.text
     val subNoteTextNode = MFMParser.parse(
         subNote?.note?.text,
         (subNote?.note?.emojis ?: emptyList()) + instanceEmojis,
@@ -189,8 +163,9 @@ open class PlaneNoteViewData(
 
     //true　折り畳み
     val subContentFolding = MutableLiveData(subCw != null)
-    val subContentFoldingStatusMessage = Transformations.map(subContentFolding) {
-        if (it) "もっと見る: ${subNoteText?.length}" else "閉じる"
+
+    val subContentFoldingStatusMessage = Transformations.map(subContentFolding) { isFolding ->
+        CwTextGenerator(subNote, isFolding)
     }
     val subNoteFiles = subNote?.files ?: emptyList()
     val subNoteMedia = MediaViewData(subNote?.files?.map {

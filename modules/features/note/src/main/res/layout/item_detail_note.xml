@@ -59,9 +59,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@{SafeUnbox.unboxString(note.statusMessage)}"
-                    android:visibility="@{note.statusMessage == null ? View.GONE : View.VISIBLE}"
-                    tools:text="パン太さんができました" />
+                    statusMessageTargetViewNote="@{note}"
+                     tools:text="パン太さんができました" />
 
             <ImageView
                     android:id="@+id/avatarIcon"
@@ -139,7 +138,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginBottom="5dp"
                     android:onClick="@{()-> note.changeContentFolding() }"
-                    android:text="@{note.contentFoldingStatusMessage}"
+                    stringSource="@{note.contentFoldingStatusMessage}"
                     android:textColor="?attr/colorAccent"
                     android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
                     tools:text="展開する" />
@@ -282,7 +281,7 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginBottom="5dp"
                             android:onClick="@{()-> note.changeSubContentFolding() }"
-                            android:text="@{note.subContentFoldingStatusMessage}"
+                            stringSource="@{note.subContentFoldingStatusMessage}"
                             android:textColor="?attr/colorAccent"
                             android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
                             tools:text="展開する"

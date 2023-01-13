@@ -89,6 +89,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 elapsedTime="@{note.toShowNote.note.createdAt}"
+                visibility="@{note.toShowNote.note.visibility}"
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
                 tools:text="16分前"
@@ -325,7 +326,7 @@
                                 tools:text="展開する"
                                 android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
                                 android:textColor="?attr/colorAccent"
-                                android:text="@{SafeUnbox.unboxString(note.subContentFoldingStatusMessage)}"
+                                stringSource="@{note.subContentFoldingStatusMessage}"
                                 app:layout_constraintTop_toBottomOf="@id/subCw"
                                 app:layout_constraintStart_toStartOf="parent"
 

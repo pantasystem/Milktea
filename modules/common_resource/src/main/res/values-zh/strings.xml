@@ -188,12 +188,12 @@
 
     <string name="future">未来</string>
     <string name="now">现在</string>
-    <string name="year_ago">年</string>
-    <string name="month_ago">月</string>
-    <string name="date_ago">日</string>
-    <string name="hour_ago">时</string>
-    <string name="minute_ago">分</string>
-    <string name="second_ago">秒</string>
+    <string name="time_with_year_ago">%s年</string>
+    <string name="time_with_month_ago">%s月</string>
+    <string name="time_with_date_ago">%s日</string>
+    <string name="time_with_hour_ago">%s时</string>
+    <string name="time_with_minute_ago">%s分</string>
+    <string name="time_with_second_ago">%s秒</string>
 
     <string name="select_file">选择文件</string>
 
@@ -411,5 +411,8 @@
     <string name="notes_and_replies">帖子和回复</string>
     <string name="other">其他</string>
     <string name="recently_used">最近使用</string>
+    <string name="char_count">%1$d个字符</string>
+    <string name="file_count">%1$d 个文件</string>
+    <string name="poll">投票</string>
 
 </resources>
