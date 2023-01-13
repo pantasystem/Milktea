@@ -39,7 +39,7 @@ class DraftNotesFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 MdcTheme {
-                    DraftNotesPage(
+                    DraftNotesScreen(
                         viewModel = viewModel,
                         onNavigateUp = {
                                        requireActivity().finish()
