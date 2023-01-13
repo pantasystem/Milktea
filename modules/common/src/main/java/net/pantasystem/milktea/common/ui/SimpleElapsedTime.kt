@@ -3,60 +3,57 @@ package net.pantasystem.milktea.common.ui
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
-class SimpleElapsedTime(val getString: (TimeUnit)-> String) {
+sealed interface TimeUnit {
+    data class Year(val value: Long) : TimeUnit
+    data class Month(val value: Long) : TimeUnit
+    data class Day(val value: Long) : TimeUnit
+    data class Hour(val value: Long) : TimeUnit
+    data class Minute(val value: Long) : TimeUnit
+    data class Second(val value: Long) : TimeUnit
+    object Now : TimeUnit
+    object Future : TimeUnit
+}
 
-    enum class TimeUnit{
-        YEAR, MONTH, DATE,
-        HOUR, MINUTE, SECOND, FUTURE, NOW
-    }
+object SimpleElapsedTime {
 
-    // 送られてくる時間はUS
-    operator fun invoke(date: Instant): String{
-
+    operator fun invoke(date: Instant): TimeUnit {
         val epoch = date.toEpochMilliseconds()
         val nowEpoch = Clock.System.now().toEpochMilliseconds()
 
-
-        return when(val elapsedMilliTime = nowEpoch - epoch){
-            in Long.MIN_VALUE until 5 * 1000 ->{
+        return when (val elapsedMilliTime = nowEpoch - epoch) {
+            in Long.MIN_VALUE until 5 * 1000 -> {
                 // 5秒未満
-                getString.invoke(TimeUnit.FUTURE)
+                TimeUnit.Future
             }
-            in 5 * 1000 until 10 * 1000 ->{
+            in 5 * 1000 until 10 * 1000 -> {
                 // 5秒以上 10秒未満
-                getString.invoke(TimeUnit.NOW)
+                TimeUnit.Now
             }
-            in 10 * 1000 until 6 * 10 * 1000 ->{
+            in 10 * 1000 until 6 * 10 * 1000 -> {
                 // 10秒以上 1分未満
-                (elapsedMilliTime / 1000).toString() + getString.invoke(TimeUnit.SECOND)
+                TimeUnit.Second(elapsedMilliTime / 1000)
             }
-            in 6 * 10 * 1000 until 60 * (6 * 10 * 1000) ->{
+            in 6 * 10 * 1000 until 60 * (6 * 10 * 1000) -> {
                 // 1分以上 60分未満
-                (elapsedMilliTime / (6 * 10 * 1000)).toString() + getString.invoke(TimeUnit.MINUTE)
+                TimeUnit.Minute(elapsedMilliTime / (6 * 10 * 1000))
             }
-            in 1 * (60 * (6 * 10 * 1000)) until 24 * (60 * (6 * 10 * 1000)) ->{
+            in 1 * (60 * (6 * 10 * 1000)) until 24 * (60 * (6 * 10 * 1000)) -> {
                 // 1時間以上 24時間未満
-                (elapsedMilliTime / (1 * (60 * (6 * 10 * 1000)))).toString() + getString.invoke(
-                    TimeUnit.HOUR
-                )
+                TimeUnit.Hour(elapsedMilliTime / (1 * (60 * (6 * 10 * 1000))))
+
             }
-            in 1 * (24 * (60 * (6 * 10 * 1000))) until 30 * (24 * (60 * (6 * 10 * 1000L))) ->{
+            in 1 * (24 * (60 * (6 * 10 * 1000))) until 30 * (24 * (60 * (6 * 10 * 1000L))) -> {
                 // 1日以上 30日未満
-                (elapsedMilliTime / (1 * (24 * (60 * (6 * 10 * 1000))))).toString() + getString.invoke(
-                    TimeUnit.DATE
-                )
+                TimeUnit.Day(elapsedMilliTime / (1 * (24 * (60 * (6 * 10 * 1000)))))
+
             }
-            in 30 * (24 * (60 * (6 * 10 * 1000L))) until  365 * (24 * (60 * (6 * 10 * 1000L))) ->{
+            in 30 * (24 * (60 * (6 * 10 * 1000L))) until 365 * (24 * (60 * (6 * 10 * 1000L))) -> {
                 // 30日以上 365未満
-                (elapsedMilliTime / (30 * (24 * (60 * (6 * 10 * 1000L))))).toString() + getString.invoke(
-                    TimeUnit.MONTH
-                )
+                TimeUnit.Month(elapsedMilliTime / (30 * (24 * (60 * (6 * 10 * 1000L)))))
             }
-            else ->{
+            else -> {
                 // 365日以上
-                (elapsedMilliTime / (365 * (24 * (60 * (6 * 10 * 1000L))))).toString() + getString.invoke(
-                    TimeUnit.YEAR
-                )
+                TimeUnit.Year(elapsedMilliTime / (365 * (24 * (60 * (6 * 10 * 1000L)))))
             }
         }
     }
