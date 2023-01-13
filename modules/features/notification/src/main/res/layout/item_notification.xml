@@ -32,7 +32,10 @@
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:paddingHorizontal="@dimen/notification_horizontal_padding_size"
+                    android:paddingTop="@dimen/notification_top_padding_size"
+                    android:paddingBottom="@dimen/notification_bottom_padding_size"
+
                     app:notificationStatusView="@{notificationStatus}"
                     app:notificationReactionImageView="@{reactionImage}"
                     app:notificationReactionStringView="@{reactionString}"

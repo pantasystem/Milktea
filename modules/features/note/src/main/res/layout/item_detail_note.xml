@@ -39,9 +39,9 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="8dp"
+                android:paddingHorizontal="@dimen/note_horizontal_padding_size"
+                android:paddingTop="@dimen/note_top_padding_size"
+
                 android:paddingBottom="5dp"
                 app:mainNameView="@{mainName}"
                 app:subNameView="@{subName}"

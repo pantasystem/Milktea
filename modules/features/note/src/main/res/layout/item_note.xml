@@ -33,9 +33,9 @@
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:id="@+id/textView2"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingTop="8dp"
+                    android:paddingHorizontal="@dimen/note_horizontal_padding_size"
+                    android:paddingTop="@dimen/note_top_padding_size"
+
                     android:onClick="@{()-> noteCardActionListener.onUserClicked(note.note.user)}"
                     app:statusMessageTargetViewNote="@{note}"
             />

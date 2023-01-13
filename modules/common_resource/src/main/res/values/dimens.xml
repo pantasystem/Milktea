@@ -9,4 +9,11 @@
     <dimen name="dialog_title_font_size">24sp</dimen>
     <dimen name="note_bottom_action_icon_size">40dp</dimen>
     <dimen name="note_bottom_action_icon_padding_size">8dp</dimen>
+
+    <dimen name="note_horizontal_padding_size">16dp</dimen>
+    <dimen name="note_top_padding_size">12dp</dimen>
+
+    <dimen name="notification_horizontal_padding_size">16dp</dimen>
+    <dimen name="notification_top_padding_size">12dp</dimen>
+    <dimen name="notification_bottom_padding_size">8dp</dimen>
 </resources>
