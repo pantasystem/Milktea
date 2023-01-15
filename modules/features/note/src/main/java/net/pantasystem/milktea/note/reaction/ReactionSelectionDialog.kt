@@ -34,7 +34,7 @@ import net.pantasystem.milktea.note.databinding.DialogSelectReactionBinding
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesListAdapter
 import net.pantasystem.milktea.note.reaction.viewmodel.ReactionChoicesViewModel
-import net.pantasystem.milktea.note.reaction.viewmodel.toTextReaction
+import net.pantasystem.milktea.note.toTextReaction
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
 

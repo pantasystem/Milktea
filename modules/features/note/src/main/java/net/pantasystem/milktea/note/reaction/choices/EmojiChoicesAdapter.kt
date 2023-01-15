@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemEmojiChoiceBinding
-import net.pantasystem.milktea.note.reaction.viewmodel.EmojiType
 
 
 class EmojiChoicesAdapter(

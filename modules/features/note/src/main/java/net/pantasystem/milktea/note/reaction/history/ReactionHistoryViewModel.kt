@@ -23,8 +23,8 @@ import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryPaginator
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryRequest
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.note.reaction.viewmodel.EmojiType
-import net.pantasystem.milktea.note.reaction.viewmodel.from
+import net.pantasystem.milktea.note.EmojiType
+import net.pantasystem.milktea.note.from
 
 
 class ReactionHistoryViewModel @AssistedInject constructor(
