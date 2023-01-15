@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+                name="reactionSelectionViewModel"
+                type="net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel" />
+        <import type="android.view.View" />
+    </data>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchReactionInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                >
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:text="@={reactionSelectionViewModel.searchWord}"
+                    android:textSize="12sp"
+                    android:id="@+id/searchReactionEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_custom_emojis"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:imeOptions="actionSend" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.tabs.TabLayout
+                android:id="@+id/reaction_choices_tab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabMode="scrollable"
+                app:tabTextColor="?attr/normalIconTint"
+                android:elevation="0dp"
+                android:layout_below="@id/searchReactionInputLayout"
+                style="@style/Widget.MaterialComponents.Toolbar.Surface"
+                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                >
+
+
+        </com.google.android.material.tabs.TabLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reaction_choices_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/reaction_choices_tab"
+                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/searchSuggestionsView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/reaction_choices_tab"
+                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
+                />
+    </RelativeLayout>
+</layout>
