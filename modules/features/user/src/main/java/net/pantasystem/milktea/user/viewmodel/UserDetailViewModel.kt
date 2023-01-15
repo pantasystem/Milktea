@@ -86,7 +86,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
     val user = userState.asLiveData()
     @OptIn(ExperimentalCoroutinesApi::class)
-    val account = accountWatcher.account.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val account = accountWatcher.account.catch {
+        logger.error("Accountの取得に失敗", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
     val isMine = combine(userState, accountStore.state) { userState, accountState ->
@@ -126,6 +128,8 @@ class UserDetailViewModel @AssistedInject constructor(
             ) else null,
             if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
         )
+    }.catch {
+        logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val showFollowers = EventBus<User?>()
