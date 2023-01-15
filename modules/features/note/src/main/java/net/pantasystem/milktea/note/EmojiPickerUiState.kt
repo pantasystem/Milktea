@@ -1,8 +1,6 @@
-package net.pantasystem.milktea.note.reaction.viewmodel
+package net.pantasystem.milktea.note
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -19,18 +17,15 @@ import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryCount
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
-import net.pantasystem.milktea.note.R
-import javax.inject.Inject
 
-@HiltViewModel
-class ReactionChoicesViewModel @Inject constructor(
+
+class EmojiPickerUiStateService(
     accountStore: AccountStore,
     private val metaRepository: MetaRepository,
-    private val reactionHistoryDao: ReactionHistoryRepository,
+    private val reactionHistoryRepository: ReactionHistoryRepository,
     private val userEmojiConfigRepository: UserEmojiConfigRepository,
-) : ViewModel() {
-
-
+    coroutineScope: CoroutineScope,
+) {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val meta = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
         metaRepository.observe(ac.normalizedInstanceDomain)
@@ -39,7 +34,7 @@ class ReactionChoicesViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val reactionCount =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            reactionHistoryDao.observeSumReactions(ac.normalizedInstanceDomain)
+            reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceDomain)
         }.flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,7 +49,7 @@ class ReactionChoicesViewModel @Inject constructor(
             counts,
         )
     }.stateIn(
-        viewModelScope,
+        coroutineScope,
         SharingStarted.WhileSubscribed(5_000),
         Reactions(emptyList(), emptyList())
     )
@@ -62,7 +57,7 @@ class ReactionChoicesViewModel @Inject constructor(
     private val baseInfo = combine(accountStore.observeCurrentAccount, meta) { account, meta ->
         BaseInfo(account, meta)
     }.stateIn(
-        viewModelScope,
+        coroutineScope,
         SharingStarted.WhileSubscribed(5_000),
         BaseInfo(null, null)
     )
@@ -70,20 +65,20 @@ class ReactionChoicesViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val recentlyUsedReactions =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            reactionHistoryDao.observeRecentlyUsedBy(it.normalizedInstanceDomain, limit = 20)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+            reactionHistoryRepository.observeRecentlyUsedBy(it.normalizedInstanceDomain, limit = 20)
+        }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val searchWord = MutableStateFlow("")
 
 
     // 検索時の候補
-    val uiState = combine(
+    val uiState: StateFlow<EmojiPickerUiState> = combine(
         searchWord,
         baseInfo,
         reactions,
         recentlyUsedReactions
     ) { word, (ac, meta), (settings, counts), recentlyUsed ->
-        ReactionSelectionUiState(
+        EmojiPickerUiState(
             keyword = word,
             account = ac,
             meta = meta,
@@ -92,9 +87,9 @@ class ReactionChoicesViewModel @Inject constructor(
             recentlyUsedReactions = recentlyUsed
         )
     }.stateIn(
-        viewModelScope,
+        coroutineScope,
         SharingStarted.Eagerly,
-        ReactionSelectionUiState(
+        EmojiPickerUiState(
             "",
             null, null,
             emptyList(),
@@ -108,11 +103,10 @@ class ReactionChoicesViewModel @Inject constructor(
             it.label
         }
     }.distinctUntilChanged()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
+        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 }
 
-data class ReactionSelectionUiState(
+data class EmojiPickerUiState(
     val keyword: String,
     val account: Account?,
     val meta: Meta?,

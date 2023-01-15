@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
+import net.pantasystem.milktea.note.EmojiType
+import net.pantasystem.milktea.note.SegmentType
 import net.pantasystem.milktea.note.databinding.ItemCategoryWithListBinding
-import net.pantasystem.milktea.note.reaction.viewmodel.EmojiType
-import net.pantasystem.milktea.note.reaction.viewmodel.SegmentType
 
 class EmojiChoicesListAdapter(
     val onEmojiSelected: (EmojiType) -> Unit,
