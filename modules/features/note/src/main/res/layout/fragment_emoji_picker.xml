@@ -3,7 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
-                name="reactionSelectionViewModel"
+                name="emojiPickerViewModel"
                 type="net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel" />
         <import type="android.view.View" />
     </data>
@@ -22,7 +22,7 @@
                 >
 
             <com.google.android.material.textfield.TextInputEditText
-                    android:text="@={reactionSelectionViewModel.searchWord}"
+                    android:text="@={emojiPickerViewModel.searchWord}"
                     android:textSize="12sp"
                     android:id="@+id/searchReactionEditText"
                     android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                 android:elevation="0dp"
                 android:layout_below="@id/searchReactionInputLayout"
                 style="@style/Widget.MaterialComponents.Toolbar.Surface"
-                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
                 >
 
 
@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/reaction_choices_tab"
-                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
                 />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/reaction_choices_tab"
-                android:visibility="@{ reactionSelectionViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
+                android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
                 />
     </RelativeLayout>
 </layout>

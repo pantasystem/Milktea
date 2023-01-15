@@ -45,7 +45,7 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.reactionSelectionViewModel = emojiPickerViewModel
+        binding.emojiPickerViewModel = emojiPickerViewModel
         val binder = EmojiSelectionBinder(
             context = requireContext(),
             scope = lifecycleScope,
