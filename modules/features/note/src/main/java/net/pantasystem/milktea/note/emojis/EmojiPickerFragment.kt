@@ -44,7 +44,8 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.reactionSelectionViewModel = emojiPickerViewModel
         val binder = EmojiSelectionBinder(
             context = requireContext(),
             scope = lifecycleScope,
@@ -60,7 +61,7 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
             onSearchEmojiTextFieldEntered = {
                 onSelect(it)
             },
-            reactionChoicesViewModel = emojiPickerViewModel,
+            emojiPickerViewModel = emojiPickerViewModel,
         )
         binder.bind()
 
@@ -91,7 +92,7 @@ class EmojiSelectionBinder(
     val tabLayout: TabLayout,
     val recyclerView: RecyclerView,
     val searchWordTextField: EditText,
-    val reactionChoicesViewModel: EmojiPickerViewModel,
+    val emojiPickerViewModel: EmojiPickerViewModel,
     val onReactionSelected: (String) -> Unit,
     val onSearchEmojiTextFieldEntered: (String) -> Unit,
 ) {
@@ -121,7 +122,7 @@ class EmojiSelectionBinder(
 
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                reactionChoicesViewModel.uiState.collect {
+                emojiPickerViewModel.uiState.collect {
                     choicesAdapter.submitList(it.segments)
                     searchedReactionAdapter.submitList(it.searchFilteredEmojis)
                 }
@@ -131,7 +132,7 @@ class EmojiSelectionBinder(
         var tabbedListMediator: TabbedListMediator? = null
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                reactionChoicesViewModel.tabLabels.filterNot {
+                emojiPickerViewModel.tabLabels.filterNot {
                     it.isEmpty()
                 }.collect {
                     tabLayout.removeAllTabs()
@@ -152,7 +153,7 @@ class EmojiSelectionBinder(
 
         searchWordTextField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
-                onSearchEmojiTextFieldEntered(reactionChoicesViewModel.searchWord.value)
+                onSearchEmojiTextFieldEntered(emojiPickerViewModel.searchWord.value)
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
