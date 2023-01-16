@@ -53,7 +53,7 @@ dependencyResolutionManagement {
             library('appcompat-appcompat', 'androidx.appcompat:appcompat:1.6.0-rc01')
             library('android-material-material', 'com.google.android.material:material:1.6.1')
             library('androidx-core-ktx', 'androidx.core:core-ktx:1.9.0')
-            library('fragment-ktx', 'androidx.fragment:fragment-ktx:1.5.2')
+            library('fragment-ktx', 'androidx.fragment:fragment-ktx:1.5.5')
             library('activity-ktx', 'androidx.activity:activity-ktx:1.5.0')
 
             def emoji2_version = "1.2.0"
