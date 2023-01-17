@@ -84,7 +84,6 @@ object ReactionViewHelper {
                 //Log.d("ReactionViewHelper", "カスタム絵文字を発見した: ${emoji}")
                 GlideApp.with(reactionImageView.context)
                     .load(emoji.url ?: emoji.uri)
-                    .centerCrop()
                     .into(reactionImageView)
                 reactionImageView.visibility = View.VISIBLE
                 reactionStringView.visibility = View.GONE
@@ -92,7 +91,7 @@ object ReactionViewHelper {
             } else {
                 Log.d("ReactionViewHelper", "emoji not found")
                 reactionImageView.visibility = View.GONE
-                reactionStringView.visibility = View.GONE
+                reactionStringView.visibility = View.VISIBLE
             }
 
         }
