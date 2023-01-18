@@ -17,7 +17,7 @@ data class TootEmojiDTO(
     val visibleInPicker: Boolean = true
 ) {
 
-    fun toEmoji(host: String): Emoji {
+    fun toEmoji(): Emoji {
         return Emoji(
             name = shortcode,
             url = url,
