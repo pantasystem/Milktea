@@ -46,7 +46,7 @@ data class MastodonAccountDTO (
 
 
     ) {
-    fun toModel(account: Account): User {
+    fun toModel(account: Account, related: User.Related? = null): User {
         return User.Detail(
             User.Id(account.accountId, this.id),
             userName = username,
@@ -84,7 +84,25 @@ data class MastodonAccountDTO (
                 isPublicReactions = false,
                 description = note,
             ),
-            related = null,
+            related = related,
         )
     }
 }
+
+
+@Serializable
+data class MastodonAccountRelationshipDTO(
+    val id: String,
+    val following: Boolean,
+    @SerialName("showing_reblogs") val showingReblogs: Boolean? = null,
+    val notifying: Boolean? = null,
+    @SerialName("followed_by") val followedBy: Boolean,
+    val blocking: Boolean,
+    @SerialName("blocked_by") val blockedBy: Boolean,
+    val muting: Boolean,
+    @SerialName("muting_notifications") val mutingNotifications: Boolean,
+    val requested: Boolean,
+    @SerialName("domain_blocking") val domainBlocking: Boolean,
+    val endorsed: Boolean,
+    val note: String,
+)

@@ -31,6 +31,7 @@ class UserRepositoryImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val loggerFactory: Logger.Factory,
+    val userApiAdapter: UserApiAdapter,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
@@ -52,23 +53,11 @@ class UserRepositoryImpl @Inject constructor(
                 return@withContext it
             }
 
-            val account = accountRepository.get(userId.accountId).getOrThrow()
             if (localResult.getOrNull() == null) {
-                val res = misskeyAPIProvider.get(account).showUser(
-                    RequestUser(
-                        i = account.token,
-                        userId = userId.id,
-                        detail = true
-                    )
-                )
-                res.throwIfHasError()
-                res.body()?.let {
-                    val user = it.toUser(account, true)
-
-                    val result = userDataSource.add(user)
-                    logger.debug("add result: $result")
-                    return@withContext userDataSource.get(userId).getOrThrow()
-                }
+                val user = userApiAdapter.show(userId, detail)
+                val result = userDataSource.add(user)
+                logger.debug("add result: $result")
+                return@withContext userDataSource.get(userId).getOrThrow()
             }
 
             throw UserNotFoundException(userId)
@@ -357,13 +346,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun sync(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
             withContext(ioDispatcher) {
-                val account = accountRepository.get(userId.accountId)
-                    .getOrThrow()
-                val user = misskeyAPIProvider.get(account)
-                    .showUser(
-                        RequestUser(i = account.token, userId = userId.id, detail = true)
-                    ).throwIfHasError()
-                    .body()!!.toUser(account, true)
+                val user = userApiAdapter.show(userId, true)
                 userDataSource.add(user)
             }
         }
