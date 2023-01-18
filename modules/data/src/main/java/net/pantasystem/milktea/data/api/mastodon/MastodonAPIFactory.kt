@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.MastodonAPI
+import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -11,7 +12,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MastodonAPIFactory @Inject constructor(){
+class MastodonAPIFactory @Inject constructor(
+    val okHttpProvider: OkHttpClientProvider,
+){
 
     val json = Json { ignoreUnknownKeys = true }
 
@@ -22,7 +25,7 @@ class MastodonAPIFactory @Inject constructor(){
         val okHttp = if (token == null) {
             sharedOkHttp
         } else {
-            OkHttpClient.Builder()
+            okHttpProvider.get().newBuilder()
                 .addInterceptor {
                     val request = it.request()
                     val newReq = request.newBuilder()
