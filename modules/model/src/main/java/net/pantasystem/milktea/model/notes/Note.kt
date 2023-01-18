@@ -44,8 +44,6 @@ data class Note(
 
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
-    val promotionId: String? = null,
-    val featuredId: String? = null,
 ) : Entity {
     data class Id(
         val accountId: Long,
@@ -110,7 +108,7 @@ sealed class NoteRelation : JSerializable {
         override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
-        override val files: List<FileProperty>?
+        override val files: List<FileProperty>?,
     ) : NoteRelation()
 
 

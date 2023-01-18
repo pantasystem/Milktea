@@ -188,8 +188,6 @@ fun NoteDTO.toNote(account: Account): Note {
         channelId = this.channelId?.let {
             Channel.Id(account.accountId, it)
         },
-        promotionId = promotionId,
-        featuredId = tmpFeaturedId,
     )
 }
 
