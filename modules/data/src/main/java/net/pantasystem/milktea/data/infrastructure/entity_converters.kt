@@ -187,7 +187,7 @@ fun NoteDTO.toNote(account: Account): Note {
         myReaction = this.myReaction,
         channelId = this.channelId?.let {
             Channel.Id(account.accountId, it)
-        }
+        },
     )
 }
 

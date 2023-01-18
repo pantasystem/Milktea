@@ -22,12 +22,6 @@ object NoteStatusMessageTextGenerator {
             note.note.isRenote() && !note.note.hasContent() -> {
                 StringSource(R.string.renoted_by, name)
             }
-            note is NoteRelation.Featured -> {
-                StringSource(R.string.featured)
-            }
-            note is NoteRelation.Promotion -> {
-                StringSource(R.string.promotion)
-            }
 
             else -> null
         }

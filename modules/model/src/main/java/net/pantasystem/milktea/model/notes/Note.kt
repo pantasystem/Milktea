@@ -108,26 +108,10 @@ sealed class NoteRelation : JSerializable {
         override val user: User,
         override val renote: NoteRelation?,
         override val reply: NoteRelation?,
-        override val files: List<FileProperty>?
+        override val files: List<FileProperty>?,
     ) : NoteRelation()
 
-    data class Featured(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-        val featuredId: String
-    ) : NoteRelation()
 
-    data class Promotion(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-        val promotionId: String
-    ) : NoteRelation()
 }
 
 fun Note.Companion.make(

@@ -300,7 +300,9 @@ class TimelinePagingStoreImpl(
     }
 
     override suspend fun convertAll(list: List<NoteDTO>): List<Note.Id> {
-        return list.map {
+        return list.filter {
+            it.promotionId == null || it.tmpFeaturedId == null
+        }.map {
             noteAdder.addNoteDtoToDataSource(getAccount.invoke(), it).id
         }
     }
