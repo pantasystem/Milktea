@@ -2,7 +2,6 @@ package net.pantasystem.milktea.model.notes
 
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 
 interface NoteRepository {
 
@@ -13,10 +12,6 @@ interface NoteRepository {
     suspend fun find(noteId: Note.Id): Result<Note>
 
     suspend fun findIn(noteIds: List<Note.Id>): List<Note>
-
-    suspend fun reaction(createReaction: CreateReaction): Result<Boolean>
-
-    suspend fun unreaction(noteId: Note.Id): Result<Boolean>
 
     suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit>
 

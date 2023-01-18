@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.api.misskey.notes.CreateReactionDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
@@ -10,17 +9,12 @@ import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
-import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.notes.onIReacted
-import net.pantasystem.milktea.data.infrastructure.notes.onIUnReacted
-import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.poll.Vote
-import net.pantasystem.milktea.model.notes.reaction.CreateReaction
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 
@@ -33,7 +27,6 @@ class NoteRepositoryImpl @Inject constructor(
     private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val getAccount: GetAccount,
-    private val noteCaptureAPIProvider: NoteCaptureAPIWithAccountProvider,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
 
@@ -137,38 +130,6 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun reaction(createReaction: CreateReaction): Result<Boolean> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val account = getAccount.get(createReaction.noteId.accountId)
-            val note = find(createReaction.noteId).getOrThrow()
-
-            runCancellableCatching {
-                if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
-                        .isCaptured(createReaction.noteId.noteId)
-                ) {
-                    noteDataSource.add(note.onIReacted(createReaction.reaction))
-                }
-                true
-            }.getOrElse { e ->
-                if (e is APIError.ClientException) {
-                    return@getOrElse false
-                }
-                throw e
-            }
-        }
-    }
-
-    override suspend fun unreaction(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val note = find(noteId).getOrThrow()
-            val account = getAccount.get(noteId.accountId)
-            postUnReaction(noteId)
-                    && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
-                    || (note.myReaction != null
-                    && noteDataSource.add(note.onIUnReacted()).getOrThrow() != AddResult.Canceled))
-        }
-    }
-
 
     override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
@@ -183,32 +144,8 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun postReaction(createReaction: CreateReaction): Boolean {
-        val account = getAccount.get(createReaction.noteId.accountId)
-        val res = misskeyAPIProvider.get(account).createReaction(
-            CreateReactionDTO(
-                i = account.token,
-                noteId = createReaction.noteId.noteId,
-                reaction = createReaction.reaction
-            )
-        )
-        res.throwIfHasError()
-        return res.isSuccessful
-    }
 
-    private suspend fun postUnReaction(noteId: Note.Id): Boolean {
-        val note = find(noteId).getOrThrow()
-        val account = getAccount.get(noteId.accountId)
-        val res = misskeyAPIProvider.get(account).deleteReaction(
-            DeleteNote(
-                noteId = note.id.noteId,
-                i = account.token
-            )
-        )
-        res.throwIfHasError()
-        return res.isSuccessful
 
-    }
 
     private suspend fun fetchIn(noteIds: List<Note.Id>) {
         val accountMap = noteIds.map {
