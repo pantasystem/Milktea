@@ -77,7 +77,7 @@ sealed interface User : Entity {
         override val isSameHost: Boolean,
         override val instance: InstanceInfo?,
         val info: Info,
-        val related: Related,
+        val related: Related?,
     ) : User {
         companion object
 
@@ -85,12 +85,12 @@ sealed interface User : Entity {
 
         val followState: FollowState
             get() {
-                if (related.isFollowing) {
+                if (related?.isFollowing == true) {
                     return FollowState.FOLLOWING
                 }
 
                 if (info.isLocked) {
-                    return if (related.hasPendingFollowRequestFromYou) {
+                    return if (related?.hasPendingFollowRequestFromYou == true) {
                         FollowState.PENDING_FOLLOW_REQUEST
                     } else {
                         FollowState.UNFOLLOWING_LOCKED

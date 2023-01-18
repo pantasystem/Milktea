@@ -15,8 +15,10 @@ abstract class UserDao {
     abstract suspend fun insertPinnedNoteIds(ids: List<PinnedNoteIdRecord>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(detail: UserDetailedStateRecord): Long
-    
+    abstract suspend fun insert(info: UserInfoStateRecord): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insert(related: UserRelatedStateRecord): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertEmojis(emojis: List<UserEmojiRecord>): List<Long>
@@ -39,8 +41,12 @@ abstract class UserDao {
     @Update
     abstract suspend fun update(user: UserRecord)
 
+
     @Update
-    abstract suspend fun update(user: UserDetailedStateRecord)
+    abstract suspend fun update(info: UserInfoStateRecord)
+
+    @Update
+    abstract suspend fun update(related: UserRelatedStateRecord)
 
     @Query(
         """

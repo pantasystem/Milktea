@@ -46,6 +46,62 @@ data class UserRecord(
 )
 
 @Entity(
+    tableName = "user_info_state",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index("userId", unique = true),
+    ]
+)
+data class UserInfoStateRecord(
+    val description: String?,
+    val followersCount: Int?,
+    val followingCount: Int?,
+    val hostLower: String?,
+    val notesCount: Int?,
+    val bannerUrl: String?,
+    val url: String?,
+    val isLocked: Boolean,
+    val birthday: LocalDate?,
+    val createdAt: Instant?,
+    val updatedAt: Instant?,
+    val publicReactions: Boolean?,
+    @PrimaryKey(autoGenerate = false) val userId: Long
+)
+
+@Entity(
+    tableName = "user_related_state",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["id"],
+            childColumns = ["userId"],
+            entity = UserRecord::class,
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index("userId", unique = true),
+    ]
+)
+data class UserRelatedStateRecord(
+    val isFollowing: Boolean,
+    val isFollower: Boolean,
+    val isBlocking: Boolean,
+    val isMuting: Boolean,
+    val hasPendingFollowRequestFromYou: Boolean,
+    val hasPendingFollowRequestToYou: Boolean,
+    @PrimaryKey(autoGenerate = false) val userId: Long
+)
+
+@Entity(
     tableName = "user_detailed_state",
     foreignKeys = [
         ForeignKey(
@@ -266,11 +322,20 @@ data class UserRelated(
         entityColumn = "userId"
     )
     val emojis: List<UserEmojiRecord>,
+
+
     @Relation(
         parentColumn = "id",
         entityColumn = "userId"
     )
-    val detail: UserDetailedStateRecord?,
+    val info: UserInfoStateRecord?,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val related: UserRelatedStateRecord?,
+
     @Relation(
         parentColumn = "id",
         entityColumn = "userId"
@@ -301,7 +366,7 @@ data class UserRelated(
                 themeColor = it.themeColor
             )
         }
-        if (detail == null) {
+        if (info == null) {
             return User.Simple(
                 id = User.Id(
                     user.accountId,
@@ -350,34 +415,38 @@ data class UserRelated(
                 },
                 instance = instanceInfo,
                 avatarBlurhash = user.avatarBlurhash,
-                info = User.Info(
-                    bannerUrl = detail.bannerUrl,
-                    description = detail.description,
-                    followingCount = detail.followingCount,
-                    followersCount = detail.followersCount,
-                    isLocked = detail.isLocked,
-                    hostLower = detail.hostLower,
-                    notesCount = detail.notesCount,
-                    pinnedNoteIds = pinnedNoteIds.map {
-                        Note.Id(user.accountId, it.noteId)
-                    },
-                    url = detail.url,
-                    birthday = detail.birthday,
-                    createdAt = detail.createdAt,
-                    updatedAt = detail.updatedAt,
-                    fields = fields?.map {
-                        User.Field(it.name, it.value)
-                    } ?: emptyList(),
-                    isPublicReactions = detail.publicReactions ?: false,
-                ),
-                related = User.Related(
-                    isFollowing = detail.isFollowing,
-                    isFollower = detail.isFollower,
-                    isBlocking = detail.isBlocking,
-                    isMuting = detail.isMuting,
-                    hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
-                    hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
-                )
+                info = info.let { info ->
+                    User.Info(
+                        bannerUrl = info.bannerUrl,
+                        description = info.description,
+                        followingCount = info.followingCount,
+                        followersCount = info.followersCount,
+                        isLocked = info.isLocked,
+                        hostLower = info.hostLower,
+                        notesCount = info.notesCount,
+                        pinnedNoteIds = pinnedNoteIds.map {
+                            Note.Id(user.accountId, it.noteId)
+                        },
+                        url = info.url,
+                        birthday = info.birthday,
+                        createdAt = info.createdAt,
+                        updatedAt = info.updatedAt,
+                        fields = fields?.map {
+                            User.Field(it.name, it.value)
+                        } ?: emptyList(),
+                        isPublicReactions = info.publicReactions ?: false,
+                    )
+                },
+                related = related?.let { related ->
+                    User.Related(
+                        isFollowing = related.isFollowing,
+                        isFollower = related.isFollower,
+                        isBlocking = related.isBlocking,
+                        isMuting = related.isMuting,
+                        hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
+                        hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                    )
+                }
             )
         }
     }
