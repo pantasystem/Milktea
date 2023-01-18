@@ -7,15 +7,15 @@ import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 @kotlinx.serialization.Serializable
 data class TootPollDTO(
     val id: String,
-    @SerialName("expires_at") val expiresAt: Instant?,
+    @SerialName("expires_at") val expiresAt: Instant? = null,
     val expired: Boolean,
     val multiple: Boolean,
     @SerialName("votes_count") val votesCount: Int,
     @SerialName("voters_count") val votersCount: Int,
     val options: List<Option>,
     val emojis: List<TootEmojiDTO>,
-    val voted: Boolean?,
-    val ownVotes: Boolean?,
+    val voted: Boolean? = null,
+    val ownVotes: Boolean? = null,
 ) {
 
     @kotlinx.serialization.Serializable
