@@ -1,24 +1,13 @@
 package net.pantasystem.milktea.common_android_ui.account.page
 
 import android.content.Context
-import android.widget.TextView
-import androidx.databinding.BindingAdapter
 import net.pantasystem.milktea.common_android_ui.R
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.model.account.page.PageType.*
 
 
 object PageTypeHelper{
-
-    @JvmStatic
-    @BindingAdapter("pageType")
-    fun TextView.setTextFromPageType(type: PageType?){
-        type?: return
-        this.text = nameByPageType(context, type)
-
-
-
-    }
+    
 
     fun nameByPageType(context: Context, pageType: PageType): String{
 
@@ -44,6 +33,11 @@ object PageTypeHelper{
             MY_GALLERY_POSTS -> context.getString(R.string.my_posts) + String.format("(%s)", context.getString(R.string.gallery))
             I_LIKED_GALLERY_POSTS -> context.getString(R.string.my_liking) + String.format("(%s)", context.getString(R.string.gallery))
             CHANNEL_TIMELINE -> context.getString(R.string.channel)
+            MASTODON_LOCAL_TIMELINE -> context.getString(R.string.local_timeline)
+            MASTODON_PUBLIC_TIMELINE -> context.getString(R.string.global_timeline)
+            MASTODON_HOME_TIMELINE -> context.getString(R.string.home_timeline)
+            MASTODON_HASHTAG_TIMELINE -> context.getString(R.string.tag)
+            MASTODON_LIST_TIMELINE -> context.getString(R.string.list)
         }
     }
 }
