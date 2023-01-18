@@ -289,7 +289,7 @@ data class UserRelated(
     )
     val fields: List<UserProfileFieldRecord>?
 
-): HasUserModel {
+) : HasUserModel {
     override fun toModel(): User {
         val instanceInfo = instance?.let {
             User.InstanceInfo(
@@ -348,31 +348,33 @@ data class UserRelated(
                         name = user.nickname
                     )
                 },
-                bannerUrl = detail.bannerUrl,
-                description = detail.description,
-                followingCount = detail.followingCount,
-                followersCount = detail.followersCount,
-                isFollowing = detail.isFollowing,
-                isFollower = detail.isFollower,
-                isBlocking = detail.isBlocking,
-                isLocked = detail.isLocked,
-                isMuting = detail.isMuting,
-                hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
-                hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
-                hostLower = detail.hostLower,
-                notesCount = detail.notesCount,
-                pinnedNoteIds = pinnedNoteIds.map {
-                    Note.Id(user.accountId, it.noteId)
-                },
-                url = detail.url,
+                related = User.Related(
+                    bannerUrl = detail.bannerUrl,
+                    description = detail.description,
+                    followingCount = detail.followingCount,
+                    followersCount = detail.followersCount,
+                    isFollowing = detail.isFollowing,
+                    isFollower = detail.isFollower,
+                    isBlocking = detail.isBlocking,
+                    isLocked = detail.isLocked,
+                    isMuting = detail.isMuting,
+                    hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
+                    hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
+                    hostLower = detail.hostLower,
+                    notesCount = detail.notesCount,
+                    pinnedNoteIds = pinnedNoteIds.map {
+                        Note.Id(user.accountId, it.noteId)
+                    },
+                    url = detail.url,
+                    birthday = detail.birthday,
+                    createdAt = detail.createdAt,
+                    updatedAt = detail.updatedAt,
+                    fields = fields?.map {
+                        User.Field(it.name, it.value)
+                    } ?: emptyList(),
+                    isPublicReactions = detail.publicReactions ?: false,
+                ),
                 instance = instanceInfo,
-                birthday = detail.birthday,
-                createdAt = detail.createdAt,
-                updatedAt = detail.updatedAt,
-                fields = fields?.map {
-                    User.Field(it.name, it.value)
-                } ?: emptyList(),
-                isPublicReactions = detail.publicReactions ?: false,
                 avatarBlurhash = user.avatarBlurhash,
             )
         }

@@ -184,19 +184,29 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::unmuteUser, userId) { user ->
-            user.copy(isMuting = false)
+            user.copy(
+                related = user.related.copy(
+                    isMuting = false
+                )
+            )
         }
     }
 
     override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::blockUser, userId) { user ->
-            user.copy(isBlocking = true)
+            user.copy(
+                related = user.related.copy(
+                    isBlocking = true
+                )
+            )
         }
     }
 
     override suspend fun unblock(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::unblockUser, userId) { user ->
-            user.copy(isBlocking = false)
+            user.copy(
+                related = user.related.copy(isBlocking = false)
+            )
         }
     }
 
@@ -209,8 +219,10 @@ class UserRepositoryImpl @Inject constructor(
         res.throwIfHasError()
         if (res.isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(
-                isFollowing = if (user.isLocked) user.isFollowing else true,
-                hasPendingFollowRequestFromYou = if (user.isLocked) true else user.hasPendingFollowRequestFromYou
+                related = user.related.copy(
+                    isFollowing = if (user.related.isLocked) user.related.isFollowing else true,
+                    hasPendingFollowRequestFromYou = if (user.related.isLocked) true else user.related.hasPendingFollowRequestFromYou
+                )
             )
             userDataSource.add(updated)
         }
@@ -222,7 +234,7 @@ class UserRepositoryImpl @Inject constructor(
         val user = find(userId, true) as User.Detail
 
 
-        val res = if (user.isLocked) {
+        val res = if (user.related.isLocked) {
             misskeyAPIProvider.get(account)
                 .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.token))
         } else {
@@ -232,8 +244,10 @@ class UserRepositoryImpl @Inject constructor(
         res.throwIfHasError()
         if (res.isSuccessful) {
             val updated = user.copy(
-                isFollowing = if (user.isLocked) user.isFollowing else false,
-                hasPendingFollowRequestFromYou = if (user.isLocked) false else user.hasPendingFollowRequestFromYou
+                related = user.related.copy(
+                    isFollowing = if (user.related.isLocked) user.related.isFollowing else false,
+                    hasPendingFollowRequestFromYou = if (user.related.isLocked) false else user.related.hasPendingFollowRequestFromYou
+                )
             )
             userDataSource.add(updated)
         }
@@ -244,7 +258,7 @@ class UserRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val user = find(userId, true) as User.Detail
-            if (!user.hasPendingFollowRequestToYou) {
+            if (!user.related.hasPendingFollowRequestToYou) {
                 return@withContext false
             }
             val res = misskeyAPIProvider.get(account)
@@ -258,8 +272,10 @@ class UserRepositoryImpl @Inject constructor(
             if (res.isSuccessful) {
                 userDataSource.add(
                     user.copy(
-                        hasPendingFollowRequestToYou = false,
-                        isFollower = true
+                        related = user.related.copy(
+                            hasPendingFollowRequestToYou = false,
+                            isFollower = true
+                        )
                     )
                 )
             }
@@ -271,7 +287,7 @@ class UserRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val user = find(userId, true) as User.Detail
-            if (!user.hasPendingFollowRequestToYou) {
+            if (!user.related.hasPendingFollowRequestToYou) {
                 return@withContext false
             }
             val res = misskeyAPIProvider.get(account).rejectFollowRequest(
@@ -284,8 +300,10 @@ class UserRepositoryImpl @Inject constructor(
             if (res.isSuccessful) {
                 userDataSource.add(
                     user.copy(
-                        hasPendingFollowRequestToYou = false,
-                        isFollower = false
+                        related = user.related.copy(
+                            hasPendingFollowRequestToYou = false,
+                            isFollower = false
+                        )
                     )
                 )
             }

@@ -70,7 +70,7 @@
                             android:id="@+id/headerView"
                             android:layout_width="match_parent"
                             android:layout_height="140dp"
-                            app:headerImageUrl="@{userViewModel.user.bannerUrl}"
+                            app:headerImageUrl="@{userViewModel.user.related.bannerUrl}"
                             tools:ignore="ContentDescription"
                             app:layout_constraintTop_toBottomOf="@id/remoteUserState"
                             app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +86,7 @@
                             app:layout_constraintStart_toStartOf="@id/headerView"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="8dp"
-                            android:visibility="@{userViewModel.user.follower ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{userViewModel.user.related.follower ? View.VISIBLE : View.GONE}"
                             android:background="@drawable/shape_follower_state_background"
                             android:padding="4dp"
                             android:textColor="@android:color/white"
@@ -187,12 +187,12 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_alignStart="@id/avatarIcon"
-                            app:sourceText="@{userViewModel.user.description}"
+                            app:sourceText="@{userViewModel.user.related.description}"
                             app:emojis="@{userViewModel.user.emojis}"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
                             android:layout_marginEnd="16dp"
                             android:layout_marginTop="8dp"
-                            android:visibility="@{userViewModel.user.description == null ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{userViewModel.user.related.description == null ? View.GONE : View.VISIBLE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@id/subName"
                             android:layout_marginStart="16dp"
@@ -229,7 +229,7 @@
                             android:layout_marginHorizontal="16dp"
 
                             app:drawableLeftCompat="@drawable/ic_baseline_calendar_month_24"
-                            android:visibility="@{ userViewModel.user.createdAt == null ? View.GONE : View.VISIBLE }"
+                            android:visibility="@{ userViewModel.user.related.createdAt == null ? View.GONE : View.VISIBLE }"
                             stringSource="@{userViewModel.registrationDate}"
                             app:drawableTint="?attr/normalIconTint" />
 
@@ -243,7 +243,7 @@
                             android:layout_marginHorizontal="16dp"
                             tools:listitem="@layout/item_user_profile_field"
                             tools:itemCount="4"
-                            android:visibility="@{userViewModel.userState.fields.empty ? View.GONE : View.VISIBLE }"
+                            android:visibility="@{userViewModel.userState.related.fields.empty ? View.GONE : View.VISIBLE }"
                             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         />
                     <LinearLayout
@@ -265,7 +265,7 @@
                                 android:layout_height="wrap_content"
                                 tools:text="500"
                                 android:layout_marginEnd="4dp"
-                                android:text="@{Integer.toString(userViewModel.user.notesCount)}"
+                                android:text="@{Integer.toString(userViewModel.user.related.notesCount)}"
                                 />
                         <TextView
                                 android:layout_width="wrap_content"
@@ -277,7 +277,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="4dp"
                                 tools:text="20"
-                                android:text="@{Integer.toString(userViewModel.user.followingCount)}"
+                                android:text="@{Integer.toString(userViewModel.user.related.followingCount)}"
                                 android:onClick="@{()-> userViewModel.showFollows()}"
                                 />
                         <TextView
@@ -291,7 +291,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="40"
-                                android:text="@{Integer.toString(userViewModel.user.followersCount)}"
+                                android:text="@{Integer.toString(userViewModel.user.related.followersCount)}"
                                 android:layout_marginEnd="4dp"
                                 android:onClick="@{()-> userViewModel.showFollowers()}"
                                 />

@@ -96,13 +96,13 @@ class UserDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val birthday = userState.map {
-        it?.birthday
+        it?.related?.birthday
     }.filterNotNull().map {
         StringSource(R.string.birthday, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val registrationDate = userState.map {
-        it?.createdAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
+        it?.related?.createdAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
     }.filterNotNull().map {
         StringSource(R.string.registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -115,7 +115,7 @@ class UserDetailViewModel @AssistedInject constructor(
         val isPublicReaction = featureEnables.isEnable(
                 account.normalizedInstanceDomain,
                 FeatureType.UserReactionHistory
-            ) && (user.isPublicReactions || user.id == User.Id(
+            ) && (user.related.isPublicReactions || user.id == User.Id(
                 account.accountId, account.remoteId
             ))
         listOfNotNull(
@@ -162,7 +162,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCancellableCatching {
                     val user = userRepository.find(it.id) as User.Detail
-                    if (user.isFollowing || user.hasPendingFollowRequestFromYou) {
+                    if (user.related.isFollowing || user.related.hasPendingFollowRequestFromYou) {
                         userRepository.unfollow(user.id)
                     } else {
                         userRepository.follow(user.id)

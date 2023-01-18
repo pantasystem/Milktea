@@ -26,10 +26,10 @@ class UserDetailActivityMenuBinder(
         val unblock = menu.findItem(R.id.unblock)
         val unmute = menu.findItem(R.id.unmute)
         val report = menu.findItem(R.id.report_user)
-        mute?.isVisible = !(state?.isMuting ?: false)
-        block?.isVisible = !(state?.isBlocking ?: false)
-        unblock?.isVisible = (state?.isBlocking ?: false)
-        unmute?.isVisible = (state?.isMuting ?: false)
+        mute?.isVisible = !(state?.related?.isMuting ?: false)
+        block?.isVisible = !(state?.related?.isBlocking ?: false)
+        unblock?.isVisible = (state?.related?.isBlocking ?: false)
+        unmute?.isVisible = (state?.related?.isMuting ?: false)
         if (userDetailViewModel.isMine.value) {
             block?.isVisible = false
             mute?.isVisible = false

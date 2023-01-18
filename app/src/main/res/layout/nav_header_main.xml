@@ -15,8 +15,8 @@
         <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                headerImageUrl="@{accountViewModel.user.bannerUrl}"
-                />
+                headerImageUrl="@{accountViewModel.user.related.bannerUrl}"
+                tools:ignore="ContentDescription" />
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/nav_header_height"
@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/subName"
                     tools:text="114"
-                    android:text="@{ Integer.toString(accountViewModel.user.followingCount) }"
+                    android:text="@{ Integer.toString(accountViewModel.user.related.followingCount) }"
                     android:layout_marginEnd="3dp"
                     android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                     />
@@ -103,7 +103,7 @@
                     android:layout_toEndOf="@id/following"
                     tools:text="514"
                     android:layout_marginEnd="3dp"
-                    android:text="@{ Integer.toString(accountViewModel.user.followersCount) }"
+                    android:text="@{ Integer.toString(accountViewModel.user.related.followersCount) }"
                     android:onClick="@{()-> accountViewModel.showFollowers(accountViewModel.user.id) }"
                     />
             <TextView

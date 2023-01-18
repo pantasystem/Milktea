@@ -69,7 +69,7 @@ fun UserDetailCard(
             ) = createRefs()
 
             Image(
-                painter = rememberAsyncImagePainter(userDetail.bannerUrl),
+                painter = rememberAsyncImagePainter(userDetail.related.bannerUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -83,7 +83,7 @@ fun UserDetailCard(
                     }
             )
 
-            if (userDetail.isFollower) {
+            if (userDetail.related.isFollower) {
                 Text(
                     text = stringResource(id = R.string.follower),
                     color = Color.White,
@@ -152,7 +152,7 @@ fun UserDetailCard(
             )
 
             CustomEmojiText(
-                text = userDetail.description ?: "",
+                text = userDetail.related.description ?: "",
                 maxLines = 5,
                 textAlign = TextAlign.Start,
                 emojis = userDetail.emojis,
@@ -179,7 +179,7 @@ fun UserDetailCard(
                     }
             ) {
                 Text(
-                    "${userDetail.notesCount ?: 0} ${stringResource(id = R.string.post)}",
+                    "${userDetail.related.notesCount ?: 0} ${stringResource(id = R.string.post)}",
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(2.dp)
@@ -189,7 +189,7 @@ fun UserDetailCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    "${userDetail.followingCount ?: 0} ${stringResource(id = R.string.following)}",
+                    "${userDetail.related.followingCount ?: 0} ${stringResource(id = R.string.following)}",
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(2.dp)
@@ -200,7 +200,7 @@ fun UserDetailCard(
 
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    "${userDetail.followersCount ?: 0} ${stringResource(id = R.string.follower)}",
+                    "${userDetail.related.followersCount ?: 0} ${stringResource(id = R.string.follower)}",
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(2.dp)

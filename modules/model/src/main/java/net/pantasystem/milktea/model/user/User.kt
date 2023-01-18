@@ -74,6 +74,43 @@ sealed interface User : Entity {
         override val host: String,
         override val nickname: UserNickname?,
         override val avatarBlurhash: String?,
+        override val isSameHost: Boolean,
+        override val instance: InstanceInfo?,
+        val related: Related
+    ) : User {
+        companion object
+
+        val isRemoteUser: Boolean = !isSameHost
+
+        val followState: FollowState
+            get() {
+                if (related.isFollowing) {
+                    return FollowState.FOLLOWING
+                }
+
+                if (related.isLocked) {
+                    return if (related.hasPendingFollowRequestFromYou) {
+                        FollowState.PENDING_FOLLOW_REQUEST
+                    } else {
+                        FollowState.UNFOLLOWING_LOCKED
+                    }
+                }
+
+                return FollowState.UNFOLLOWING
+            }
+
+        fun getRemoteProfileUrl(account: Account): String {
+            return related.url ?: getProfileUrl(account)
+        }
+
+        override val parsedResult: CustomEmojiParsedResult = try {
+            CustomEmojiParser.parse(sourceHost = host, emojis, displayName)
+        } catch (e: Throwable) {
+            CustomEmojiParsedResult(displayName, emptyList())
+        }
+    }
+
+    data class Related(
         val description: String?,
         val followersCount: Int?,
         val followingCount: Int?,
@@ -89,45 +126,12 @@ sealed interface User : Entity {
         val hasPendingFollowRequestFromYou: Boolean,
         val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
-        override val isSameHost: Boolean,
-        override val instance: InstanceInfo?,
         val birthday: LocalDate?,
         val fields: List<Field>,
         val createdAt: Instant?,
         val updatedAt: Instant?,
         val isPublicReactions: Boolean,
-    ) : User {
-        companion object
-
-        val isRemoteUser: Boolean = !isSameHost
-
-        val followState: FollowState
-            get() {
-                if (isFollowing) {
-                    return FollowState.FOLLOWING
-                }
-
-                if (isLocked) {
-                    return if (hasPendingFollowRequestFromYou) {
-                        FollowState.PENDING_FOLLOW_REQUEST
-                    } else {
-                        FollowState.UNFOLLOWING_LOCKED
-                    }
-                }
-
-                return FollowState.UNFOLLOWING
-            }
-        fun getRemoteProfileUrl(account: Account): String {
-            return url ?: getProfileUrl(account)
-        }
-
-        override val parsedResult: CustomEmojiParsedResult = try {
-            CustomEmojiParser.parse(sourceHost = host, emojis, displayName)
-        } catch (e: Throwable) {
-            CustomEmojiParsedResult(displayName, emptyList())
-        }
-    }
-
+    )
 
 
     data class InstanceInfo(
@@ -241,7 +245,7 @@ fun User.Detail.Companion.make(
     updatedAt: Instant? = null,
     isPublicReactions: Boolean = false,
     avatarBlurhash: String? = null,
-    ): User.Detail {
+): User.Detail {
     return User.Detail(
         id,
         userName,
@@ -253,27 +257,29 @@ fun User.Detail.Companion.make(
         host ?: "",
         nickname,
         avatarBlurhash,
-        description,
-        followersCount,
-        followingCount,
-        hostLower,
-        notesCount,
-        pinnedNoteIds,
-        bannerUrl,
-        url,
-        isFollowing,
-        isFollower,
-        isBlocking,
-        isMuting,
-        hasPendingFollowRequestFromYou,
-        hasPendingFollowRequestToYou,
-        isLocked,
-        isSameHost,
-        instance,
-        birthday,
-        fields ?: emptyList(),
-        createdAt,
-        updatedAt,
-        isPublicReactions = isPublicReactions,
+        instance = instance,
+        isSameHost = isSameHost,
+        related = User.Related(
+            description = description,
+            followersCount = followersCount,
+            followingCount = followingCount,
+            hostLower = hostLower,
+            notesCount = notesCount,
+            pinnedNoteIds = pinnedNoteIds,
+            bannerUrl = bannerUrl,
+            url = url,
+            isFollowing = isFollowing,
+            isFollower = isFollower,
+            isBlocking = isBlocking,
+            isMuting = isMuting,
+            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou,
+            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou,
+            isLocked = isLocked,
+            birthday = birthday,
+            fields = fields ?: emptyList(),
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            isPublicReactions = isPublicReactions
+        )
     )
 }

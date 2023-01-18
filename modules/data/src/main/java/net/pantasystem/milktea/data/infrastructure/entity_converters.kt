@@ -346,35 +346,37 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             isCat = this.isCat,
             name = this.name,
             userName = this.userName,
-            bannerUrl = this.bannerUrl,
-            description = this.description,
-            followersCount = this.followersCount,
-            followingCount = this.followingCount,
             host = this.host ?: account.getHost(),
-            url = this.url,
-            hostLower = this.hostLower,
-            notesCount = this.notesCount,
-            pinnedNoteIds = this.pinnedNoteIds?.map {
-                Note.Id(account.accountId, it)
-            },
-            isFollowing = this.isFollowing ?: false,
-            isFollower = this.isFollowed ?: false,
-            isBlocking = this.isBlocking ?: false,
-            isMuting = this.isMuted ?: false,
-            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
-            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
-            isLocked = isLocked ?: false,
             nickname = null,
             isSameHost = host == null,
             instance = instanceInfo,
-            birthday = birthday,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            fields = fields?.map {
-                User.Field(it.name, it.value)
-            }?: emptyList(),
-            isPublicReactions = publicReactions ?: false,
-            avatarBlurhash = avatarBlurhash
+            avatarBlurhash = avatarBlurhash,
+            related = User.Related(
+                bannerUrl = this.bannerUrl,
+                description = this.description,
+                followersCount = this.followersCount,
+                followingCount = this.followingCount,
+                url = this.url,
+                hostLower = this.hostLower,
+                notesCount = this.notesCount,
+                pinnedNoteIds = this.pinnedNoteIds?.map {
+                    Note.Id(account.accountId, it)
+                },
+                isFollowing = this.isFollowing ?: false,
+                isFollower = this.isFollowed ?: false,
+                isBlocking = this.isBlocking ?: false,
+                isMuting = this.isMuted ?: false,
+                hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
+                hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
+                isLocked = isLocked ?: false,
+                birthday = birthday,
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+                fields = fields?.map {
+                    User.Field(it.name, it.value)
+                }?: emptyList(),
+                isPublicReactions = publicReactions ?: false,
+            ),
         )
     } else {
         return User.Simple(
