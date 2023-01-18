@@ -19,6 +19,7 @@ interface CheckEmoji {
 @Singleton
 class ToggleReactionUseCase @Inject constructor(
     private val noteRepository: NoteRepository,
+    private val reactionRepository: ReactionRepository,
     private val reactionHistoryRepository: ReactionHistoryRepository,
     private val getAccount: GetAccount,
     private val metaRepository: MetaRepository,
@@ -42,16 +43,16 @@ class ToggleReactionUseCase @Inject constructor(
                 }
             val note = noteRepository.find(noteId).getOrThrow()
             if (note.myReaction.isNullOrBlank()) {
-                if (noteRepository.reaction(CreateReaction(noteId, sendReaction)).getOrThrow()) {
+                if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
                     reactionHistoryRepository.create(ReactionHistory(sendReaction, account.normalizedInstanceDomain))
                 }
             } else if (note.myReaction != sendReaction) {
-                noteRepository.unreaction(noteId).getOrThrow()
-                if (noteRepository.reaction(CreateReaction(noteId, sendReaction)).getOrThrow()) {
+                reactionRepository.delete(noteId).getOrThrow()
+                if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
                     reactionHistoryRepository.create(ReactionHistory(sendReaction, account.normalizedInstanceDomain))
                 }
             } else {
-                noteRepository.unreaction(noteId).getOrThrow()
+                reactionRepository.delete(noteId).getOrThrow()
             }
         }
     }
