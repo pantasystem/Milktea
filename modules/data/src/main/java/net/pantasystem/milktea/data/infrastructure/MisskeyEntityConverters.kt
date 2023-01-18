@@ -155,6 +155,7 @@ fun PollDTO?.toPoll(): Poll? {
     }
 }
 
+
 fun NoteDTO.toNote(account: Account): Note {
     val visibility = Visibility(this.visibility?: "public", isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
         User.Id(account.accountId, id)
@@ -188,6 +189,7 @@ fun NoteDTO.toNote(account: Account): Note {
         channelId = this.channelId?.let {
             Channel.Id(account.accountId, it)
         },
+        type = Note.Type.Misskey,
     )
 }
 
@@ -197,6 +199,7 @@ fun NoteDTO.toNoteAndUser(account: Account): Pair<Note, User> {
     val user = this.user.toUser(account,false)
     return note to user
 }
+
 
 fun NotificationDTO.toNotification(account: Account): Notification {
     val id = Notification.Id(account.accountId, this.id)
