@@ -4,7 +4,7 @@ import net.pantasystem.milktea.model.notes.Note
 
 interface ReactionRepository {
 
-    suspend fun create(createReaction: CreateReaction): Result<Unit>
-    suspend fun delete(noteId: Note.Id): Result<Unit>
+    suspend fun create(createReaction: CreateReaction): Result<Boolean>
+    suspend fun delete(noteId: Note.Id): Result<Boolean>
 
 }
