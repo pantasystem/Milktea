@@ -8,10 +8,10 @@ import java.io.Serializable as JSerializable
 data class FileProperty (
     val id: Id,
     val name: String,
-    val createdAt: Instant,
+    val createdAt: Instant?,
     val type: String,
-    val md5: String,
-    val size: Int,
+    val md5: String?,
+    val size: Int?,
     val userId: User.Id? = null,
     val folderId: String? = null,
     val comment: String? = null,
@@ -31,7 +31,7 @@ data class FileProperty (
     ) : JSerializable
 
     fun update(
-        name: String = this.name,
+        name: String = requireNotNull(this.name),
         comment: String? = this.comment,
         isSensitive: Boolean = this.isSensitive,
         folderId: String? = this.folderId,
