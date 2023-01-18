@@ -49,4 +49,31 @@ class UserApiAdapter @Inject constructor(
             }
         }
     }
+
+    suspend fun follow(userId: User.Id): Boolean {
+        val account = accountRepository.get(userId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).followUser(
+                    RequestUser(userId = userId.id, i = account.token)
+                )
+            }
+            Account.InstanceType.MASTODON -> {
+                mastodonAPIProvider.get(account).follow(userId.id)
+            }
+        }.throwIfHasError().isSuccessful
+    }
+
+    suspend fun unfollow(userId: User.Id): Boolean {
+        val account = accountRepository.get(userId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> misskeyAPIProvider.get(account)
+                .unFollowUser(RequestUser(userId = userId.id, i = account.token))
+                .throwIfHasError()
+                .isSuccessful
+            Account.InstanceType.MASTODON -> mastodonAPIProvider.get(account).unfollow(userId.id)
+                .throwIfHasError()
+                .isSuccessful
+        }
+    }
 }

@@ -190,13 +190,9 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
-        val req = RequestUser(userId = userId.id, i = account.token)
-        logger.debug("follow req:$req")
-        val res = misskeyAPIProvider.get(account).followUser(req)
-        res.throwIfHasError()
-        if (res.isSuccessful) {
+        val isSuccessful = userApiAdapter.follow(userId)
+        if (isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(
                 related = (if (user.info.isLocked) user.related?.isFollowing else true)?.let {
                     (if (user.info.isLocked) true else user.related?.hasPendingFollowRequestFromYou)?.let { it1 ->
@@ -209,23 +205,21 @@ class UserRepositoryImpl @Inject constructor(
             )
             userDataSource.add(updated)
         }
-        res.isSuccessful
+        isSuccessful
     }
 
     override suspend fun unfollow(userId: User.Id): Boolean = withContext(ioDispatcher) {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
-
-
-        val res = if (user.info.isLocked) {
+        val isSuccessful = if (user.info.isLocked) {
             misskeyAPIProvider.get(account)
                 .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.token))
+                .throwIfHasError()
+                .isSuccessful
         } else {
-            misskeyAPIProvider.get(account)
-                .unFollowUser(RequestUser(userId = userId.id, i = account.token))
+            userApiAdapter.unfollow(userId)
         }
-        res.throwIfHasError()
-        if (res.isSuccessful) {
+        if (isSuccessful) {
             val updated = user.copy(
                 related = user.related?.let{
                     it.copy(
@@ -236,7 +230,7 @@ class UserRepositoryImpl @Inject constructor(
             )
             userDataSource.add(updated)
         }
-        res.isSuccessful
+        isSuccessful
     }
 
     override suspend fun acceptFollowRequest(userId: User.Id): Boolean =
