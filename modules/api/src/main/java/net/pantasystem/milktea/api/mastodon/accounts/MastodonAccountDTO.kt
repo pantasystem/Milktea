@@ -47,7 +47,7 @@ data class MastodonAccountDTO (
 
     ) {
     fun toModel(account: Account): User {
-        return User.Simple(
+        return User.Detail(
             User.Id(account.accountId, this.id),
             userName = username,
             name = displayName,
@@ -68,6 +68,23 @@ data class MastodonAccountDTO (
                     || acct.split("@").getOrNull(1) == account.getHost(),
             instance = null,
             avatarBlurhash = null,
+            info = User.Info(
+                followersCount = followersCount,
+                followingCount = followingCount,
+                notesCount = statusesCount,
+                hostLower = null,
+                pinnedNoteIds = null,
+                bannerUrl = header,
+                url = url,
+                isLocked = locked,
+                birthday = null,
+                fields = emptyList(),
+                createdAt = createdAt,
+                updatedAt = null,
+                isPublicReactions = false,
+                description = note,
+            ),
+            related = null,
         )
     }
 }
