@@ -31,8 +31,12 @@ class ToggleReactionUseCaseTest {
             onBlocking {
                 find(targetNote.id).getOrThrow()
             } doReturn targetNote
+
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
             onBlocking {
-                unreaction(targetNote.id).getOrThrow()
+                delete(targetNote.id).getOrThrow()
             } doReturn true
         }
 
@@ -74,14 +78,15 @@ class ToggleReactionUseCaseTest {
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
             reactionHistoryRepository = reactionHistoryDao,
-            checkEmoji = checkEmoji
+            checkEmoji = checkEmoji,
+            reactionRepository = reactionRepository,
         )
         runBlocking {
             useCase(targetNote.id, ":kawaii:").getOrThrow()
         }
 
-        verifyBlocking(noteRepository) {
-            unreaction(targetNote.id)
+        verifyBlocking(reactionRepository) {
+            delete(targetNote.id)
         }
     }
 
@@ -98,11 +103,15 @@ class ToggleReactionUseCaseTest {
             onBlocking {
                 find(targetNote.id).getOrThrow()
             } doReturn targetNote
+
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
             onBlocking {
-                unreaction(targetNote.id).getOrThrow()
+                delete(targetNote.id).getOrThrow()
             } doReturn true
             onBlocking {
-                reaction(createReactionDTO).getOrThrow()
+                create(createReactionDTO).getOrThrow()
             } doReturn true
         }
 
@@ -144,15 +153,16 @@ class ToggleReactionUseCaseTest {
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
             reactionHistoryRepository = reactionHistoryDao,
-            checkEmoji = checkEmoji
+            checkEmoji = checkEmoji,
+            reactionRepository = reactionRepository,
         )
         runBlocking {
             useCase(targetNote.id, ":wakaranai:").getOrThrow()
         }
 
-        verifyBlocking(noteRepository) {
-            unreaction(targetNote.id)
-            reaction(createReactionDTO)
+        verifyBlocking(reactionRepository) {
+            delete(targetNote.id)
+            create(createReactionDTO)
         }
 
         verifyBlocking(reactionHistoryDao) {
@@ -172,12 +182,16 @@ class ToggleReactionUseCaseTest {
         val createReactionDTO = CreateReaction(targetNote.id, ":kawaii:")
 
         val noteRepository = mock<NoteRepository> {
-            onBlocking {
-                reaction(createReactionDTO).getOrThrow()
-            } doReturn true
+
             onBlocking {
                 find(targetNote.id).getOrThrow()
             } doReturn targetNote
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
+            onBlocking {
+                create(createReactionDTO).getOrThrow()
+            } doReturn true
         }
 
         val meta = Meta(
@@ -216,14 +230,15 @@ class ToggleReactionUseCaseTest {
             noteRepository = noteRepository,
             metaRepository = fetchMeta,
             reactionHistoryRepository = reactionHistoryDao,
-            checkEmoji = checkEmoji
+            checkEmoji = checkEmoji,
+            reactionRepository = reactionRepository,
         )
 
         runBlocking {
             useCase(targetNote.id, ":kawaii:").getOrThrow()
         }
-        verifyBlocking(noteRepository) {
-            reaction(createReactionDTO)
+        verifyBlocking(reactionRepository) {
+            create(createReactionDTO)
         }
 
         verifyBlocking(reactionHistoryDao) {
@@ -241,11 +256,14 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                reaction(createReactionDTO).getOrThrow()
-            } doReturn true
-            onBlocking {
                 find(targetNote.id).getOrThrow()
             } doReturn targetNote
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
+            onBlocking {
+                create(createReactionDTO).getOrThrow()
+            } doReturn true
         }
 
         val meta = Meta(uri = "https://misskey.io",)
@@ -278,14 +296,15 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     checkEmoji(any())
                 } doReturn false
-            }
+            },
+            reactionRepository = reactionRepository,
         )
 
         runBlocking {
             useCase(targetNote.id, "unknown").getOrThrow()
         }
-        verifyBlocking(noteRepository) {
-            reaction(createReactionDTO)
+        verifyBlocking(reactionRepository) {
+            create(createReactionDTO)
         }
 
         verifyBlocking(reactionHistoryDao) {
@@ -301,12 +320,16 @@ class ToggleReactionUseCaseTest {
         val createReactionDTO = CreateReaction(targetNote.id, "🥺")
 
         val noteRepository = mock<NoteRepository> {
-            onBlocking {
-                reaction(createReactionDTO).getOrThrow()
-            } doReturn true
+
             onBlocking {
                 find(targetNote.id).getOrThrow()
             } doReturn targetNote
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
+            onBlocking {
+                create(createReactionDTO).getOrThrow()
+            } doReturn true
         }
 
         val meta = Meta(uri = "https://misskey.io",)
@@ -339,14 +362,15 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     checkEmoji(any())
                 } doReturn true
-            }
+            },
+            reactionRepository = reactionRepository,
         )
 
         runBlocking {
             useCase(targetNote.id, "🥺").getOrThrow()
         }
-        verifyBlocking(noteRepository) {
-            reaction(createReactionDTO)
+        verifyBlocking(reactionRepository) {
+            create(createReactionDTO)
         }
 
         verifyBlocking(reactionHistoryDao) {
@@ -364,11 +388,14 @@ class ToggleReactionUseCaseTest {
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
-                reaction(createReactionDTO).getOrThrow()
-            } doReturn true
-            onBlocking {
                 find(targetNote.id).getOrThrow()
             } doReturn targetNote
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
+            onBlocking {
+                create(createReactionDTO).getOrThrow()
+            } doReturn true
         }
 
         val meta = Meta(uri = "https://misskey.io",)
@@ -401,14 +428,15 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     checkEmoji(any())
                 } doReturn true
-            }
+            },
+            reactionRepository = reactionRepository,
         )
 
         runBlocking {
             useCase(targetNote.id, "like").getOrThrow()
         }
-        verifyBlocking(noteRepository) {
-            reaction(createReactionDTO)
+        verifyBlocking(reactionRepository) {
+            create(createReactionDTO)
         }
 
         verifyBlocking(reactionHistoryDao) {
