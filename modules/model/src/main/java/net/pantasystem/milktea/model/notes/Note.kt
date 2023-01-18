@@ -44,6 +44,8 @@ data class Note(
 
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
+    val promotionId: String? = null,
+    val featuredId: String? = null,
 ) : Entity {
     data class Id(
         val accountId: Long,
@@ -111,23 +113,7 @@ sealed class NoteRelation : JSerializable {
         override val files: List<FileProperty>?
     ) : NoteRelation()
 
-    data class Featured(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-        val featuredId: String
-    ) : NoteRelation()
 
-    data class Promotion(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-        val promotionId: String
-    ) : NoteRelation()
 }
 
 fun Note.Companion.make(
