@@ -11,11 +11,9 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
@@ -29,7 +27,6 @@ import javax.inject.Inject
 @Suppress("BlockingMethodInNonBlockingContext")
 class UserRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
-    val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
@@ -39,8 +36,6 @@ class UserRepositoryImpl @Inject constructor(
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
     }
-    private val noteDataSourceAdder =
-        NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
 
     override suspend fun find(userId: User.Id, detail: Boolean): User =
         withContext(ioDispatcher) {
@@ -69,9 +64,7 @@ class UserRepositoryImpl @Inject constructor(
                 res.throwIfHasError()
                 res.body()?.let {
                     val user = it.toUser(account, true)
-                    it.pinnedNotes?.forEach { dto ->
-                        noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
-                    }
+
                     val result = userDataSource.add(user)
                     logger.debug("add result: $result")
                     return@withContext userDataSource.get(userId).getOrThrow()
@@ -113,9 +106,6 @@ class UserRepositoryImpl @Inject constructor(
         res.throwIfHasError()
 
         res.body()?.let {
-            it.pinnedNotes?.forEach { dto ->
-                noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
-            }
             val user = it.toUser(account, detail)
             userDataSource.add(user)
             return@withContext userDataSource.get(user.id).getOrThrow()
