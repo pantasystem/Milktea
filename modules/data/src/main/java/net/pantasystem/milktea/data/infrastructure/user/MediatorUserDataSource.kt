@@ -23,32 +23,51 @@ class MediatorUserDataSource @Inject constructor(
 
     val logger = loggerFactory.create("MediatorUserDataSource")
 
-    override suspend fun get(userId: User.Id): Result<User> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            inMem.get(userId).getOrNull()
-                ?: (userDao.get(userId.accountId, userId.id)?.toModel()?.also {
-                    inMem.add(it).getOrThrow()
-                } ?: throw UserNotFoundException(userId))
+    override suspend fun get(userId: User.Id, isSimple: Boolean): Result<User> =
+        runCancellableCatching {
+            withContext(ioDispatcher) {
+                inMem.get(userId).getOrNull()
+                    ?: (if (isSimple) {
+                        userDao.getSimple(userId.accountId, userId.id)
+                    } else {
+                        userDao.get(userId.accountId, userId.id)
+                    }?.toModel()?.also {
+                        inMem.add(it).getOrThrow()
+                    } ?: throw UserNotFoundException(userId))
+            }
         }
-    }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            inMem.get(accountId, userName, host).getOrNull()
-                ?: (if (host == null) {
-                    userDao.getByUserName(accountId, userName)
-                } else {
-                    userDao.getByUserName(accountId, userName, host)
-                })?.toModel()?.also {
-                    inMem.add(it).getOrThrow()
-                } ?: throw UserNotFoundException(userName = userName, host = host, userId = null)
+    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> =
+        runCancellableCatching {
+            withContext(ioDispatcher) {
+                inMem.get(accountId, userName, host).getOrNull()
+                    ?: (if (host == null) {
+                        userDao.getByUserName(accountId, userName)
+                    } else {
+                        userDao.getByUserName(accountId, userName, host)
+                    })?.toModel()?.also {
+                        inMem.add(it).getOrThrow()
+                    } ?: throw UserNotFoundException(
+                        userName = userName,
+                        host = host,
+                        userId = null
+                    )
+            }
         }
-    }
 
-    override suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean): Result<List<User>> = runCancellableCatching {
+    override suspend fun getIn(
+        accountId: Long,
+        serverIds: List<String>,
+        keepInOrder: Boolean,
+        isSimple: Boolean
+    ): Result<List<User>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val list = serverIds.distinct().chunked(100).map {
-                userDao.getInServerIds(accountId, serverIds).map {
+                if (isSimple) {
+                    userDao.getSimplesInServerIds(accountId, serverIds)
+                } else {
+                    userDao.getInServerIds(accountId, serverIds)
+                }.map {
                     it.toModel()
                 }
             }.flatten().also {
@@ -196,13 +215,14 @@ class MediatorUserDataSource @Inject constructor(
 
     }
 
-    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCancellableCatching {
-        users.map {
-            add(it).getOrElse {
-                AddResult.Canceled
+    override suspend fun addAll(users: List<User>): Result<List<AddResult>> =
+        runCancellableCatching {
+            users.map {
+                add(it).getOrElse {
+                    AddResult.Canceled
+                }
             }
         }
-    }
 
     override suspend fun remove(user: User): Result<Boolean> = runCancellableCatching {
         runCancellableCatching {
@@ -249,7 +269,7 @@ class MediatorUserDataSource @Inject constructor(
     override fun observe(accountId: Long, acct: String): Flow<User> {
         val (userName, host) = Acct(acct)
         return userDao.let {
-            if(host == null) {
+            if (host == null) {
                 it.observeByUserName(accountId, userName).filterNotNull()
             } else {
                 it.observeByUserName(accountId, userName, host).filterNotNull()
@@ -272,7 +292,6 @@ class MediatorUserDataSource @Inject constructor(
     }
 
 
-
     override suspend fun searchByNameOrUserName(
         accountId: Long,
         keyword: String,
@@ -280,49 +299,49 @@ class MediatorUserDataSource @Inject constructor(
         nextId: String?,
         host: String?,
     ): Result<List<User>> = runCancellableCatching {
-         withContext(ioDispatcher) {
-             if (nextId == null) {
-                 if (host.isNullOrBlank()) {
-                     userDao.searchByNameOrUserName(
-                         accountId = accountId,
-                         word = "$keyword%",
-                         limit = limit,
-                     )
-                 } else {
-                     logger.debug("searchByNameOrUserName accountId:$accountId, keyword:$keyword, nextId:$nextId, host:$host")
-                     userDao.searchByNameOrUserNameWithHost(
-                         accountId = accountId,
-                         word = "$keyword%",
-                         limit = limit,
-                         host = "$host%"
-                     )
-                 }
+        withContext(ioDispatcher) {
+            if (nextId == null) {
+                if (host.isNullOrBlank()) {
+                    userDao.searchByNameOrUserName(
+                        accountId = accountId,
+                        word = "$keyword%",
+                        limit = limit,
+                    )
+                } else {
+                    logger.debug("searchByNameOrUserName accountId:$accountId, keyword:$keyword, nextId:$nextId, host:$host")
+                    userDao.searchByNameOrUserNameWithHost(
+                        accountId = accountId,
+                        word = "$keyword%",
+                        limit = limit,
+                        host = "$host%"
+                    )
+                }
 
-             } else {
-                 if (host.isNullOrBlank()) {
-                     userDao.searchByNameOrUserName(
-                         accountId = accountId,
-                         word = "$keyword%",
-                         limit = limit,
-                         nextId = nextId
-                     )
-                 } else {
-                     userDao.searchByNameOrUserNameWithHost(
-                         accountId = accountId,
-                         word = "$keyword%",
-                         limit = limit,
-                         nextId = nextId,
-                         host = "$host%"
-                     )
-                 }
+            } else {
+                if (host.isNullOrBlank()) {
+                    userDao.searchByNameOrUserName(
+                        accountId = accountId,
+                        word = "$keyword%",
+                        limit = limit,
+                        nextId = nextId
+                    )
+                } else {
+                    userDao.searchByNameOrUserNameWithHost(
+                        accountId = accountId,
+                        word = "$keyword%",
+                        limit = limit,
+                        nextId = nextId,
+                        host = "$host%"
+                    )
+                }
 
-             }.map {
-                 it.toModel()
-             }.also {
-                 inMem.addAll(it)
-             }
+            }.map {
+                it.toModel()
+            }.also {
+                inMem.addAll(it)
+            }
 
-         }
+        }
     }
 
 }

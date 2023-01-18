@@ -23,8 +23,6 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         get() = _state
 
 
-
-
     override suspend fun add(user: User): Result<AddResult> = runCancellableCatching {
         return@runCancellableCatching createOrUpdate(user).also {
             publish()
@@ -32,21 +30,28 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
 
     }
 
-    override suspend fun addAll(users: List<User>): Result<List<AddResult>> = runCancellableCatching {
-        users.map {
-            add(it).getOrElse {
-                AddResult.Canceled
+    override suspend fun addAll(users: List<User>): Result<List<AddResult>> =
+        runCancellableCatching {
+            users.map {
+                add(it).getOrElse {
+                    AddResult.Canceled
+                }
             }
         }
-    }
 
-    override suspend fun get(userId: User.Id): Result<User> = runCancellableCatching {
-        usersLock.withLock {
-            userMap[userId]
-        } ?: throw UserNotFoundException(userId)
-    }
+    override suspend fun get(userId: User.Id, isSimple: Boolean): Result<User> =
+        runCancellableCatching {
+            usersLock.withLock {
+                userMap[userId]
+            } ?: throw UserNotFoundException(userId)
+        }
 
-    override suspend fun getIn(accountId: Long, serverIds: List<String>, keepInOrder: Boolean): Result<List<User>> {
+    override suspend fun getIn(
+        accountId: Long,
+        serverIds: List<String>,
+        keepInOrder: Boolean,
+        isSimple: Boolean
+    ): Result<List<User>> {
         val userIds = serverIds.map {
             User.Id(accountId, it)
         }
@@ -57,17 +62,18 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         })
     }
 
-    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> = runCancellableCatching {
-        usersLock.withLock {
-            userMap.filterKeys {
-                it.accountId == accountId
-            }.map {
-                it.value
-            }.firstOrNull {
-                it.userName == userName && (it.host == host || host.isNullOrBlank())
-            } ?: throw UserNotFoundException(null)
+    override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> =
+        runCancellableCatching {
+            usersLock.withLock {
+                userMap.filterKeys {
+                    it.accountId == accountId
+                }.map {
+                    it.value
+                }.firstOrNull {
+                    it.userName == userName && (it.host == host || host.isNullOrBlank())
+                } ?: throw UserNotFoundException(null)
+            }
         }
-    }
 
     override suspend fun remove(user: User): Result<Boolean> = runCancellableCatching {
         usersLock.withLock {
