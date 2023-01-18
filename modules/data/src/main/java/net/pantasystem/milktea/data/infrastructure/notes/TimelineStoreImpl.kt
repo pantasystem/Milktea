@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -19,6 +20,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -44,6 +46,7 @@ class TimelineStoreImpl(
     coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
     private val metaRepository: MetaRepository,
+    private val mastodonAPIProvider: MastodonAPIProvider,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -52,6 +55,7 @@ class TimelineStoreImpl(
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val noteRelationGetter: NoteRelationGetter,
         private val metaRepository: MetaRepository,
+        private val mastodonAPIProvider: MastodonAPIProvider,
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -67,6 +71,7 @@ class TimelineStoreImpl(
                 coroutineScope,
                 noteRelationGetter,
                 metaRepository,
+                mastodonAPIProvider,
             )
         }
     }
@@ -87,10 +92,20 @@ class TimelineStoreImpl(
                     pageableTimeline, noteAdder, getAccount, misskeyAPIProvider
                 )
             }
+            is Pageable.Mastodon -> {
+                MastodonTimelineStorePagingStoreImpl(
+                    pageableTimeline = pageableTimeline,
+                    mastodonAPIProvider = mastodonAPIProvider,
+                    getAccount,
+                    noteAdder
+                )
+            }
             else -> TimelinePagingStoreImpl(
-                pageableTimeline, noteAdder, getAccount, {
+                pageableTimeline, noteAdder, getAccount,
+                {
                     initialLoadQuery
-                }, misskeyAPIProvider,
+                },
+                misskeyAPIProvider,
                 metaRepository,
             )
         }
@@ -140,6 +155,14 @@ class TimelineStoreImpl(
                         store,
                     ).loadFuture()
                 }
+                is MastodonTimelineStorePagingStoreImpl -> {
+                    FuturePagingController(
+                        store,
+                        store,
+                        store,
+                        store,
+                    ).loadFuture()
+                }
             }
             if (addedCount.getOrElse { Int.MAX_VALUE } < LIMIT) {
                 initialLoadQuery = null
@@ -160,6 +183,14 @@ class TimelineStoreImpl(
                     ).loadPrevious()
                 }
                 is FavoriteNoteTimelinePagingStoreImpl -> {
+                    PreviousPagingController(
+                        store,
+                        store,
+                        store,
+                        store,
+                    ).loadPrevious()
+                }
+                is MastodonTimelineStorePagingStoreImpl -> {
                     PreviousPagingController(
                         store,
                         store,
@@ -275,10 +306,13 @@ class TimelinePagingStoreImpl(
             )
             val initialLoadQuery = getInitialLoadQuery.invoke()
             val untilDate = (initialLoadQuery as? InitialLoadQuery.UntilDate)?.date
-            val req = builder.build(NoteRequest.Conditions(
-                untilId = untilId ?: (initialLoadQuery as? InitialLoadQuery.UntilId)?.noteId?.noteId,
-                untilDate = if (untilId == null) untilDate?.toEpochMilliseconds() else null,
-            ))
+            val req = builder.build(
+                NoteRequest.Conditions(
+                    untilId = untilId
+                        ?: (initialLoadQuery as? InitialLoadQuery.UntilId)?.noteId?.noteId,
+                    untilDate = if (untilId == null) untilDate?.toEpochMilliseconds() else null,
+                )
+            )
             getStore()!!.invoke(req).throwIfHasError().body()!!
         }
     }
@@ -325,7 +359,7 @@ class TimelinePagingStoreImpl(
                 is Pageable.LocalTimeline -> api::localTimeline
                 is Pageable.HybridTimeline -> api::hybridTimeline
                 is Pageable.HomeTimeline -> api::homeTimeline
-                is Pageable.Search ->api::searchNote
+                is Pageable.Search -> api::searchNote
                 is Pageable.Favorite -> throw IllegalArgumentException("use FavoriteNotePagingStore.kt")
                 is Pageable.UserTimeline -> api::userNotes
                 is Pageable.UserListTimeline -> api::userListTimeline
@@ -429,3 +463,70 @@ class FavoriteNoteTimelinePagingStoreImpl(
 }
 
 
+class MastodonTimelineStorePagingStoreImpl(
+    val pageableTimeline: Pageable.Mastodon,
+    val mastodonAPIProvider: MastodonAPIProvider,
+    val getAccount: suspend () -> Account,
+    val noteAdder: NoteDataSourceAdder,
+) : EntityConverter<TootStatusDTO, Note.Id>, PreviousLoader<TootStatusDTO>, FutureLoader<TootStatusDTO>,
+    IdGetter<Note.Id>, StateLocker, TimelinePagingBase {
+
+    private val _state =
+        MutableStateFlow<PageableState<List<Note.Id>>>(PageableState.Loading.Init())
+    override val state: Flow<PageableState<List<Note.Id>>>
+        get() = _state
+    override val mutex: Mutex = Mutex()
+
+    override suspend fun convertAll(list: List<TootStatusDTO>): List<Note.Id> {
+        val account = getAccount()
+        return list.map {
+            noteAdder.addTootStatusDtoIntoDataSource(account, it).id
+        }
+    }
+
+    override suspend fun loadFuture(): Result<List<TootStatusDTO>> = runCancellableCatching {
+        val api = mastodonAPIProvider.get(getAccount())
+        when(pageableTimeline) {
+            is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(pageableTimeline.hashtag, minId = getSinceId()?.noteId)
+            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(minId = getSinceId()?.noteId)
+            is Pageable.Mastodon.ListTimeline -> api.getListTimeline(minId = getSinceId()?.noteId, listId = pageableTimeline.listId)
+            is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(local = true, minId = getSinceId()?.noteId)
+            is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(minId = getSinceId()?.noteId)
+        }.throwIfHasError().body()!!
+    }
+
+    override suspend fun getSinceId(): Note.Id? {
+        return (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
+            it.noteId
+        }
+    }
+
+    override suspend fun getUntilId(): Note.Id? {
+        return (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
+            it.noteId
+        }
+    }
+
+    override fun setState(state: PageableState<List<Note.Id>>) {
+        _state.value = state
+    }
+
+    override fun getState(): PageableState<List<Note.Id>> {
+        return _state.value
+    }
+
+
+
+    override suspend fun loadPrevious(): Result<List<TootStatusDTO>> = runCancellableCatching {
+        val api = mastodonAPIProvider.get(getAccount())
+        when(pageableTimeline) {
+            is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(pageableTimeline.hashtag, maxId = getUntilId()?.noteId)
+            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(maxId = getUntilId()?.noteId)
+            is Pageable.Mastodon.ListTimeline -> api.getListTimeline(maxId = getUntilId()?.noteId, listId = pageableTimeline.listId)
+            is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(local = true, maxId = getUntilId()?.noteId)
+            is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(maxId = getUntilId()?.noteId)
+        }.throwIfHasError().body()!!
+    }
+
+
+}
