@@ -27,8 +27,9 @@ sealed interface UploadSource {
 class FileUploadFailedException(
     val file: AppFile,
     val throwable: Throwable?,
-    statusCode: Int?
-) : IllegalStateException("ファイルアップロードに失敗: file:$file, statusCode:$statusCode", throwable)
+    statusCode: Int?,
+    errorMessage: String?,
+) : IllegalStateException("ファイルアップロードに失敗: file:$file, statusCode:$statusCode, message:$errorMessage", throwable)
 
 interface FileUploaderProvider {
     fun create(account: Account): FileUploader

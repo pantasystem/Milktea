@@ -76,14 +76,16 @@ class OkHttpDriveFileUploader(
                 throw FileUploadFailedException(
                     AppFile.Remote(fileProperty.id),
                     null,
-                    response.code
+                    response.code,
+                    response.body?.string()
                 )
             }
         } catch (e: Throwable) {
             throw FileUploadFailedException(
                 AppFile.Remote(fileProperty.id),
                 e,
-                null
+                null,
+                null,
             )
         }
 
@@ -129,16 +131,18 @@ class OkHttpDriveFileUploader(
             if (code in 200 until 300) {
                 json.decodeFromString<FilePropertyDTO>(response.body!!.string())
             } else {
-                Log.d("OkHttpConnection", "code: $code, error${response.body?.string()}")
+                val resBody = response.body?.string()
+                Log.d("OkHttpConnection", "code: $code, error$resBody")
                 throw FileUploadFailedException(
                     file,
                     null,
-                    code
+                    code,
+                    resBody,
                 )
             }
         } catch (e: Exception) {
             Log.w("OkHttpConnection", "post file error", e)
-            throw FileUploadFailedException(file, e, null)
+            throw FileUploadFailedException(file, e, null, null)
         }
     }
 
