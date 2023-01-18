@@ -48,7 +48,7 @@ data class MastodonAccountDTO (
     ) {
     fun toModel(account: Account): User {
         return User.Simple(
-            User.Id(account.accountId, account.remoteId),
+            User.Id(account.accountId, this.id),
             userName = username,
             name = displayName,
             avatarUrl = avatar,
