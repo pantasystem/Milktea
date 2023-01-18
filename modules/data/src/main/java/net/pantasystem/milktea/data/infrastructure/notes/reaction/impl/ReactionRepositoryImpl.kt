@@ -30,7 +30,7 @@ class ReactionRepositoryImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ): ReactionRepository {
 
-    override suspend fun create(createReaction: CreateReaction): Result<Unit> = runCancellableCatching {
+    override suspend fun create(createReaction: CreateReaction): Result<Boolean> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(createReaction.noteId.accountId)
             val note = noteRepository.find(createReaction.noteId).getOrThrow()
@@ -51,7 +51,7 @@ class ReactionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun delete(noteId: Note.Id): Result<Unit> = runCancellableCatching {
+    override suspend fun delete(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         withContext(ioDispatcher) {
             val note = noteRepository.find(noteId).getOrThrow()
             val account = getAccount.get(noteId.accountId)
