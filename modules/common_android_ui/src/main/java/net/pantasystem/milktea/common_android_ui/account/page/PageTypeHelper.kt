@@ -7,7 +7,7 @@ import net.pantasystem.milktea.model.account.page.PageType.*
 
 
 object PageTypeHelper{
-    
+
 
     fun nameByPageType(context: Context, pageType: PageType): String{
 
