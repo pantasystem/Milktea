@@ -351,7 +351,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             isSameHost = host == null,
             instance = instanceInfo,
             avatarBlurhash = avatarBlurhash,
-            related = User.Related(
+            info = User.Info(
                 bannerUrl = this.bannerUrl,
                 description = this.description,
                 followersCount = this.followersCount,
@@ -362,12 +362,6 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
                 pinnedNoteIds = this.pinnedNoteIds?.map {
                     Note.Id(account.accountId, it)
                 },
-                isFollowing = this.isFollowing ?: false,
-                isFollower = this.isFollowed ?: false,
-                isBlocking = this.isBlocking ?: false,
-                isMuting = this.isMuted ?: false,
-                hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
-                hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
                 isLocked = isLocked ?: false,
                 birthday = birthday,
                 createdAt = createdAt,
@@ -377,6 +371,14 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
                 }?: emptyList(),
                 isPublicReactions = publicReactions ?: false,
             ),
+            related = User.Related(
+                isFollowing = this.isFollowing ?: false,
+                isFollower = this.isFollowed ?: false,
+                isBlocking = this.isBlocking ?: false,
+                isMuting = this.isMuted ?: false,
+                hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
+                hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
+            )
         )
     } else {
         return User.Simple(

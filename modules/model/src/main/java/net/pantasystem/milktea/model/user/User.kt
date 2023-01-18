@@ -76,7 +76,8 @@ sealed interface User : Entity {
         override val avatarBlurhash: String?,
         override val isSameHost: Boolean,
         override val instance: InstanceInfo?,
-        val related: Related
+        val info: Info,
+        val related: Related,
     ) : User {
         companion object
 
@@ -88,7 +89,7 @@ sealed interface User : Entity {
                     return FollowState.FOLLOWING
                 }
 
-                if (related.isLocked) {
+                if (info.isLocked) {
                     return if (related.hasPendingFollowRequestFromYou) {
                         FollowState.PENDING_FOLLOW_REQUEST
                     } else {
@@ -100,7 +101,7 @@ sealed interface User : Entity {
             }
 
         fun getRemoteProfileUrl(account: Account): String {
-            return related.url ?: getProfileUrl(account)
+            return info.url ?: getProfileUrl(account)
         }
 
         override val parsedResult: CustomEmojiParsedResult = try {
@@ -110,7 +111,7 @@ sealed interface User : Entity {
         }
     }
 
-    data class Related(
+    data class Info(
         val description: String?,
         val followersCount: Int?,
         val followingCount: Int?,
@@ -119,12 +120,6 @@ sealed interface User : Entity {
         val pinnedNoteIds: List<Note.Id>?,
         val bannerUrl: String?,
         val url: String?,
-        val isFollowing: Boolean,
-        val isFollower: Boolean,
-        val isBlocking: Boolean,
-        val isMuting: Boolean,
-        val hasPendingFollowRequestFromYou: Boolean,
-        val hasPendingFollowRequestToYou: Boolean,
         val isLocked: Boolean,
         val birthday: LocalDate?,
         val fields: List<Field>,
@@ -133,6 +128,14 @@ sealed interface User : Entity {
         val isPublicReactions: Boolean,
     )
 
+    data class Related(
+        val isFollowing: Boolean,
+        val isFollower: Boolean,
+        val isBlocking: Boolean,
+        val isMuting: Boolean,
+        val hasPendingFollowRequestFromYou: Boolean,
+        val hasPendingFollowRequestToYou: Boolean,
+    )
 
     data class InstanceInfo(
         val faviconUrl: String?,
@@ -259,7 +262,7 @@ fun User.Detail.Companion.make(
         avatarBlurhash,
         instance = instance,
         isSameHost = isSameHost,
-        related = User.Related(
+        info = User.Info(
             description = description,
             followersCount = followersCount,
             followingCount = followingCount,
@@ -268,18 +271,20 @@ fun User.Detail.Companion.make(
             pinnedNoteIds = pinnedNoteIds,
             bannerUrl = bannerUrl,
             url = url,
-            isFollowing = isFollowing,
-            isFollower = isFollower,
-            isBlocking = isBlocking,
-            isMuting = isMuting,
-            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou,
-            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou,
             isLocked = isLocked,
             birthday = birthday,
             fields = fields ?: emptyList(),
             createdAt = createdAt,
             updatedAt = updatedAt,
             isPublicReactions = isPublicReactions
+        ),
+        related = User.Related(
+            isFollowing = isFollowing,
+            isFollower = isFollower,
+            isBlocking = isBlocking,
+            isMuting = isMuting,
+            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou,
+            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou,
         )
     )
 }

@@ -348,18 +348,14 @@ data class UserRelated(
                         name = user.nickname
                     )
                 },
-                related = User.Related(
+                instance = instanceInfo,
+                avatarBlurhash = user.avatarBlurhash,
+                info = User.Info(
                     bannerUrl = detail.bannerUrl,
                     description = detail.description,
                     followingCount = detail.followingCount,
                     followersCount = detail.followersCount,
-                    isFollowing = detail.isFollowing,
-                    isFollower = detail.isFollower,
-                    isBlocking = detail.isBlocking,
                     isLocked = detail.isLocked,
-                    isMuting = detail.isMuting,
-                    hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
-                    hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
                     hostLower = detail.hostLower,
                     notesCount = detail.notesCount,
                     pinnedNoteIds = pinnedNoteIds.map {
@@ -374,8 +370,14 @@ data class UserRelated(
                     } ?: emptyList(),
                     isPublicReactions = detail.publicReactions ?: false,
                 ),
-                instance = instanceInfo,
-                avatarBlurhash = user.avatarBlurhash,
+                related = User.Related(
+                    isFollowing = detail.isFollowing,
+                    isFollower = detail.isFollower,
+                    isBlocking = detail.isBlocking,
+                    isMuting = detail.isMuting,
+                    hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
+                    hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
+                )
             )
         }
     }

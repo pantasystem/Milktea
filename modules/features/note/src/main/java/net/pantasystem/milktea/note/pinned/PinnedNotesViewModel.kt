@@ -107,7 +107,7 @@ class PinnedNotesViewModel @Inject constructor(
             }.mapCancellableCatching {
                 userRepository.find(it, true) as User.Detail
             }.mapCancellableCatching { user ->
-                user.related.pinnedNoteIds?.map {
+                user.info.pinnedNoteIds?.map {
                     noteRepository.sync(it)
                 }
             }.onFailure {

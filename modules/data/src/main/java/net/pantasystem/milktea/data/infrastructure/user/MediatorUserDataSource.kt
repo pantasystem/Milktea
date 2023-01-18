@@ -143,48 +143,48 @@ class MediatorUserDataSource @Inject constructor(
                     if (user is User.Detail) {
                         userDao.insert(
                             UserDetailedStateRecord(
-                                bannerUrl = user.related.bannerUrl,
+                                bannerUrl = user.info.bannerUrl,
                                 isMuting = user.related.isMuting,
                                 isBlocking = user.related.isBlocking,
-                                isLocked = user.related.isLocked,
+                                isLocked = user.info.isLocked,
                                 isFollower = user.related.isFollower,
                                 isFollowing = user.related.isFollowing,
-                                description = user.related.description,
-                                followersCount = user.related.followersCount,
-                                followingCount = user.related.followingCount,
+                                description = user.info.description,
+                                followersCount = user.info.followersCount,
+                                followingCount = user.info.followingCount,
                                 hasPendingFollowRequestToYou = user.related.hasPendingFollowRequestToYou,
                                 hasPendingFollowRequestFromYou = user.related.hasPendingFollowRequestFromYou,
-                                hostLower = user.related.hostLower,
-                                notesCount = user.related.notesCount,
-                                url = user.related.url,
+                                hostLower = user.info.hostLower,
+                                notesCount = user.info.notesCount,
+                                url = user.info.url,
                                 userId = dbId,
-                                birthday = user.related.birthday,
-                                createdAt = user.related.createdAt,
-                                updatedAt = user.related.updatedAt,
-                                publicReactions = user.related.isPublicReactions
-                            )
+                                birthday = user.info.birthday,
+                                createdAt = user.info.createdAt,
+                                updatedAt = user.info.updatedAt,
+                                publicReactions = user.info.isPublicReactions
+                            ),
                         )
 
                         // NOTE: 更新の必要性を判定
-                        if ((record?.toModel() as? User.Detail?)?.related?.pinnedNoteIds?.toSet() != user.related.pinnedNoteIds?.toSet()) {
+                        if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
                             // NOTE: 更新系の場合は一度削除する
                             if (record != null) {
                                 userDao.detachAllPinnedNoteIds(dbId)
                             }
 
-                            if (!user.related.pinnedNoteIds.isNullOrEmpty()) {
-                                userDao.insertPinnedNoteIds(user.related.pinnedNoteIds!!.map {
+                            if (!user.info.pinnedNoteIds.isNullOrEmpty()) {
+                                userDao.insertPinnedNoteIds(user.info.pinnedNoteIds!!.map {
                                     PinnedNoteIdRecord(it.noteId, userId = dbId, 0L)
                                 })
                             }
 
                         }
-                        if ((record?.toModel() as? User.Detail?)?.related?.fields?.toSet() != user.related.fields.toSet()) {
+                        if ((record?.toModel() as? User.Detail?)?.info?.fields?.toSet() != user.info.fields.toSet()) {
                             if (record != null) {
                                 userDao.detachUserFields(dbId)
                             }
-                            if (user.related.fields.isNotEmpty()) {
-                                userDao.insertUserProfileFields(user.related.fields.map {
+                            if (user.info.fields.isNotEmpty()) {
+                                userDao.insertUserProfileFields(user.info.fields.map {
                                     UserProfileFieldRecord(it.name, it.value, dbId)
                                 })
                             }

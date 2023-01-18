@@ -69,7 +69,7 @@ fun UserDetailCard(
             ) = createRefs()
 
             Image(
-                painter = rememberAsyncImagePainter(userDetail.related.bannerUrl),
+                painter = rememberAsyncImagePainter(userDetail.info.bannerUrl),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -152,7 +152,7 @@ fun UserDetailCard(
             )
 
             CustomEmojiText(
-                text = userDetail.related.description ?: "",
+                text = userDetail.info.description ?: "",
                 maxLines = 5,
                 textAlign = TextAlign.Start,
                 emojis = userDetail.emojis,
@@ -179,7 +179,7 @@ fun UserDetailCard(
                     }
             ) {
                 Text(
-                    "${userDetail.related.notesCount ?: 0} ${stringResource(id = R.string.post)}",
+                    "${userDetail.info.notesCount ?: 0} ${stringResource(id = R.string.post)}",
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(2.dp)
@@ -189,7 +189,7 @@ fun UserDetailCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    "${userDetail.related.followingCount ?: 0} ${stringResource(id = R.string.following)}",
+                    "${userDetail.info.followingCount ?: 0} ${stringResource(id = R.string.following)}",
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(2.dp)
@@ -200,7 +200,7 @@ fun UserDetailCard(
 
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    "${userDetail.related.followersCount ?: 0} ${stringResource(id = R.string.follower)}",
+                    "${userDetail.info.followersCount ?: 0} ${stringResource(id = R.string.follower)}",
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(2.dp)
