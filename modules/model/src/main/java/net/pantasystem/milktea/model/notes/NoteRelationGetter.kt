@@ -19,8 +19,6 @@ class NoteRelationGetter @Inject constructor(
     suspend fun get(
         noteId: Note.Id,
         deep: Boolean = true,
-        featuredId: String? = null,
-        promotionId: String? = null,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
     ): Result<NoteRelation?> {
@@ -32,8 +30,6 @@ class NoteRelationGetter @Inject constructor(
             get(
                 it,
                 deep,
-                featuredId = featuredId,
-                promotionId = promotionId,
                 usersMap = usersMap,
                 notesMap = notesMap
             ).getOrThrow()
@@ -57,8 +53,6 @@ class NoteRelationGetter @Inject constructor(
             get(
                 it,
                 true,
-                featuredId = null,
-                promotionId = null,
                 usersMap = users,
                 notesMap = noteMap
             ).getOrNull()
@@ -68,18 +62,14 @@ class NoteRelationGetter @Inject constructor(
     suspend fun get(
         accountId: Long,
         noteId: String,
-        featuredId: String? = null,
-        promotionId: String? = null
     ): Result<NoteRelation?> {
-        return get(Note.Id(accountId, noteId), featuredId = featuredId, promotionId = promotionId)
+        return get(Note.Id(accountId, noteId))
     }
 
 
     suspend fun get(
         note: Note,
         deep: Boolean = true,
-        featuredId: String? = null,
-        promotionId: String? = null,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
     ): Result<NoteRelation> {
@@ -99,27 +89,6 @@ class NoteRelationGetter @Inject constructor(
                 }
             } else null
 
-            if (featuredId != null) {
-                return@runCancellableCatching NoteRelation.Featured(
-                    note,
-                    user,
-                    renote?.getOrNull(),
-                    reply?.getOrNull(),
-                    note.fileIds?.let { filePropertyDataSource.findIn(it).getOrNull() },
-                    featuredId
-                )
-            }
-
-            if (promotionId != null) {
-                return@runCancellableCatching NoteRelation.Promotion(
-                    note,
-                    user,
-                    renote?.getOrNull(),
-                    reply?.getOrNull(),
-                    note.fileIds?.let { filePropertyDataSource.findIn(it).getOrNull() },
-                    promotionId
-                )
-            }
             return@runCancellableCatching NoteRelation.Normal(
                 note = note,
                 user = user,
