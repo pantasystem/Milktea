@@ -9,6 +9,7 @@ interface PageDefaultStrings {
     val homeTimeline: String
     val hybridThrowable: String
     val globalTimeline: String
+    val localTimeline: String
 }
 
 
@@ -19,6 +20,9 @@ class PageDefaultStringsJp : PageDefaultStrings {
         get() = "ホーム"
     override val hybridThrowable: String
         get() = "ソーシャル"
+
+    override val localTimeline: String
+        get() = "ローカル"
 }
 
 class MakeDefaultPagesUseCase(
@@ -26,20 +30,32 @@ class MakeDefaultPagesUseCase(
 ) : UseCase {
 
     operator fun invoke(account: Account, meta: Meta?) : List<Page> {
-        val isGlobalEnabled = !(meta?.disableGlobalTimeline ?: false)
-        val isLocalEnabled = !(meta?.disableLocalTimeline ?: false)
-        val defaultPages = ArrayList<Page>()
-        defaultPages.add(PageableTemplate(account).homeTimeline(pageDefaultStrings.homeTimeline))
-        if (isLocalEnabled) {
-            defaultPages.add(PageableTemplate(account).hybridTimeline(pageDefaultStrings.hybridThrowable))
-        }
-        if (isGlobalEnabled) {
-            defaultPages.add(PageableTemplate(account).globalTimeline(pageDefaultStrings.globalTimeline))
-        }
-        return defaultPages.mapIndexed { index, page ->
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                val isGlobalEnabled = !(meta?.disableGlobalTimeline ?: false)
+                val isLocalEnabled = !(meta?.disableLocalTimeline ?: false)
+                val defaultPages = ArrayList<Page>()
+                defaultPages.add(PageableTemplate(account).homeTimeline(pageDefaultStrings.homeTimeline))
+                if (isLocalEnabled) {
+                    defaultPages.add(PageableTemplate(account).hybridTimeline(pageDefaultStrings.hybridThrowable))
+                }
+                if (isGlobalEnabled) {
+                    defaultPages.add(PageableTemplate(account).globalTimeline(pageDefaultStrings.globalTimeline))
+                }
+                defaultPages
+            }
+            Account.InstanceType.MASTODON -> {
+                listOf(
+                    PageableTemplate(account).mastodonHomeTimeline(pageDefaultStrings.homeTimeline),
+                    PageableTemplate(account).mastodonLocalTimeline(pageDefaultStrings.localTimeline),
+                    PageableTemplate(account).mastodonPublicTimeline(pageDefaultStrings.globalTimeline),
+                )
+            }
+        }.mapIndexed { index, page ->
             page.also {
                 page.weight = index
             }
         }
+
     }
 }

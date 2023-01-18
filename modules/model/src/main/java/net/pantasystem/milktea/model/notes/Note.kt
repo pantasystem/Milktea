@@ -44,11 +44,16 @@ data class Note(
 
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
+    val type: Type,
 ) : Entity {
     data class Id(
         val accountId: Long,
         val noteId: String
     ) : EntityId
+
+    enum class Type {
+        Misskey, Mastodon,
+    }
 
     companion object;
 
@@ -137,6 +142,7 @@ fun Note.Companion.make(
     myReaction: String? = null,
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
+    type: Note.Type = Note.Type.Misskey,
 ): Note {
     return Note(
         id = id,
@@ -161,5 +167,6 @@ fun Note.Companion.make(
         myReaction = myReaction,
         app = app,
         channelId = channelId,
+        type = type
     )
 }

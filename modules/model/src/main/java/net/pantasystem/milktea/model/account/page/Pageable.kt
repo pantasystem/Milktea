@@ -5,13 +5,13 @@ import java.io.Serializable
 /**
  * Global, Local, Hybrid, Home, UserList, Mention, Show, SearchByTag, Featured, Notification, UserTimeline, Search, Antenna
  */
-sealed class Pageable : Serializable{
+sealed class Pageable : Serializable {
 
     data class GlobalTimeline(
 
         var withFiles: Boolean? = null
 
-    ):  Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate {
         override fun toParams(): PageParams {
             return PageParams(withFiles = withFiles, type = PageType.GLOBAL)
         }
@@ -42,7 +42,8 @@ sealed class Pageable : Serializable{
                 withFiles = withFiles,
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes,
-                includeRenotedMyRenotes = includeRenotedMyRenotes)
+                includeRenotedMyRenotes = includeRenotedMyRenotes
+            )
         }
     }
 
@@ -118,7 +119,7 @@ sealed class Pageable : Serializable{
 
         val noteId: String
 
-    ) :  Pageable(){
+    ) : Pageable() {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.DETAIL,
@@ -151,7 +152,7 @@ sealed class Pageable : Serializable{
 
         val offset: Int?
 
-    ) : Pageable(){
+    ) : Pageable() {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.FEATURED,
@@ -165,7 +166,7 @@ sealed class Pageable : Serializable{
         var following: Boolean? = null,
         var markAsRead: Boolean? = null
 
-    ) :  Pageable(), SincePaginate, UntilPaginate {
+    ) : Pageable(), SincePaginate, UntilPaginate {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.NOTIFICATION,
@@ -268,9 +269,61 @@ sealed class Pageable : Serializable{
         }
     }
 
+    sealed class Mastodon : Pageable() {
+        data class PublicTimeline(
+            val isOnlyMedia: Boolean? = null
+        ) : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_PUBLIC_TIMELINE,
+                    withFiles = isOnlyMedia
+                )
+            }
+        }
+
+        data class LocalTimeline(
+            val isOnlyMedia: Boolean? = null
+        ) : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_LOCAL_TIMELINE,
+                    withFiles = isOnlyMedia,
+                )
+            }
+        }
+
+        data class HashTagTimeline(val hashtag: String, val isOnlyMedia: Boolean? = null) :
+            Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_HASHTAG_TIMELINE,
+                    tag = hashtag,
+                    withFiles = isOnlyMedia
+                )
+            }
+        }
+
+        data class ListTimeline(val listId: String) : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_LIST_TIMELINE,
+                    listId = listId,
+                )
+            }
+        }
+
+        object HomeTimeline : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_HOME_TIMELINE,
+                )
+            }
+        }
+
+    }
 
 
-    abstract fun toParams() : PageParams
+    abstract fun toParams(): PageParams
 
 
 }

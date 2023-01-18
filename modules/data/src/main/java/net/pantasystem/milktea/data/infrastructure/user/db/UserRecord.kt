@@ -204,6 +204,61 @@ data class UserView(
     val avatarBlurhash: String?
 )
 
+interface HasUserModel {
+    fun toModel(): User
+}
+
+data class UserSimpleRelated(
+    @Embedded val user: UserView,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val emojis: List<UserEmojiRecord>,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "userId"
+    )
+    val instance: UserInstanceInfoRecord?,
+) : HasUserModel {
+    override fun toModel(): User.Simple {
+        val instanceInfo = instance?.let {
+            User.InstanceInfo(
+                faviconUrl = it.faviconUrl,
+                iconUrl = it.iconUrl,
+                name = it.name,
+                softwareName = it.softwareName,
+                softwareVersion = it.softwareVersion,
+                themeColor = it.themeColor
+            )
+        }
+        return User.Simple(
+            id = User.Id(
+                user.accountId,
+                user.serverId,
+            ),
+            userName = user.userName,
+            avatarUrl = user.avatarUrl,
+            emojis = emojis.map {
+                it.toModel()
+            },
+            host = user.host,
+            isBot = user.isBot,
+            isCat = user.isCat,
+            isSameHost = user.isSameHost,
+            name = user.name,
+            nickname = user.nickname?.let {
+                UserNickname(
+                    id = UserNickname.Id(user.userName, user.host),
+                    name = user.nickname
+                )
+            },
+            instance = instanceInfo,
+            avatarBlurhash = user.avatarBlurhash,
+        )
+    }
+}
+
 data class UserRelated(
     @Embedded val user: UserView,
     @Relation(
@@ -234,8 +289,8 @@ data class UserRelated(
     )
     val fields: List<UserProfileFieldRecord>?
 
-) {
-    fun toModel(): User {
+) : HasUserModel {
+    override fun toModel(): User {
         val instanceInfo = instance?.let {
             User.InstanceInfo(
                 faviconUrl = it.faviconUrl,
@@ -293,32 +348,36 @@ data class UserRelated(
                         name = user.nickname
                     )
                 },
-                bannerUrl = detail.bannerUrl,
-                description = detail.description,
-                followingCount = detail.followingCount,
-                followersCount = detail.followersCount,
-                isFollowing = detail.isFollowing,
-                isFollower = detail.isFollower,
-                isBlocking = detail.isBlocking,
-                isLocked = detail.isLocked,
-                isMuting = detail.isMuting,
-                hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
-                hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
-                hostLower = detail.hostLower,
-                notesCount = detail.notesCount,
-                pinnedNoteIds = pinnedNoteIds.map {
-                    Note.Id(user.accountId, it.noteId)
-                },
-                url = detail.url,
                 instance = instanceInfo,
-                birthday = detail.birthday,
-                createdAt = detail.createdAt,
-                updatedAt = detail.updatedAt,
-                fields = fields?.map {
-                    User.Field(it.name, it.value)
-                } ?: emptyList(),
-                isPublicReactions = detail.publicReactions ?: false,
                 avatarBlurhash = user.avatarBlurhash,
+                info = User.Info(
+                    bannerUrl = detail.bannerUrl,
+                    description = detail.description,
+                    followingCount = detail.followingCount,
+                    followersCount = detail.followersCount,
+                    isLocked = detail.isLocked,
+                    hostLower = detail.hostLower,
+                    notesCount = detail.notesCount,
+                    pinnedNoteIds = pinnedNoteIds.map {
+                        Note.Id(user.accountId, it.noteId)
+                    },
+                    url = detail.url,
+                    birthday = detail.birthday,
+                    createdAt = detail.createdAt,
+                    updatedAt = detail.updatedAt,
+                    fields = fields?.map {
+                        User.Field(it.name, it.value)
+                    } ?: emptyList(),
+                    isPublicReactions = detail.publicReactions ?: false,
+                ),
+                related = User.Related(
+                    isFollowing = detail.isFollowing,
+                    isFollower = detail.isFollower,
+                    isBlocking = detail.isBlocking,
+                    isMuting = detail.isMuting,
+                    hasPendingFollowRequestFromYou = detail.hasPendingFollowRequestFromYou,
+                    hasPendingFollowRequestToYou = detail.hasPendingFollowRequestToYou,
+                )
             )
         }
     }

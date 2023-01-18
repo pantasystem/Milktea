@@ -27,5 +27,6 @@ fun generateEmptyNote(): Note {
         app = null,
         channelId = null,
         fileIds = null,
+        type = Note.Type.Misskey,
     )
 }

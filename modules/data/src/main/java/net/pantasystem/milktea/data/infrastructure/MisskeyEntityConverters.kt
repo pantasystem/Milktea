@@ -155,6 +155,7 @@ fun PollDTO?.toPoll(): Poll? {
     }
 }
 
+
 fun NoteDTO.toNote(account: Account): Note {
     val visibility = Visibility(this.visibility?: "public", isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
         User.Id(account.accountId, id)
@@ -188,6 +189,7 @@ fun NoteDTO.toNote(account: Account): Note {
         channelId = this.channelId?.let {
             Channel.Id(account.accountId, it)
         },
+        type = Note.Type.Misskey,
     )
 }
 
@@ -197,6 +199,7 @@ fun NoteDTO.toNoteAndUser(account: Account): Pair<Note, User> {
     val user = this.user.toUser(account,false)
     return note to user
 }
+
 
 fun NotificationDTO.toNotification(account: Account): Notification {
     val id = Notification.Id(account.accountId, this.id)
@@ -346,35 +349,39 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
             isCat = this.isCat,
             name = this.name,
             userName = this.userName,
-            bannerUrl = this.bannerUrl,
-            description = this.description,
-            followersCount = this.followersCount,
-            followingCount = this.followingCount,
             host = this.host ?: account.getHost(),
-            url = this.url,
-            hostLower = this.hostLower,
-            notesCount = this.notesCount,
-            pinnedNoteIds = this.pinnedNoteIds?.map {
-                Note.Id(account.accountId, it)
-            },
-            isFollowing = this.isFollowing ?: false,
-            isFollower = this.isFollowed ?: false,
-            isBlocking = this.isBlocking ?: false,
-            isMuting = this.isMuted ?: false,
-            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
-            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
-            isLocked = isLocked ?: false,
             nickname = null,
             isSameHost = host == null,
             instance = instanceInfo,
-            birthday = birthday,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            fields = fields?.map {
-                User.Field(it.name, it.value)
-            }?: emptyList(),
-            isPublicReactions = publicReactions ?: false,
-            avatarBlurhash = avatarBlurhash
+            avatarBlurhash = avatarBlurhash,
+            info = User.Info(
+                bannerUrl = this.bannerUrl,
+                description = this.description,
+                followersCount = this.followersCount,
+                followingCount = this.followingCount,
+                url = this.url,
+                hostLower = this.hostLower,
+                notesCount = this.notesCount,
+                pinnedNoteIds = this.pinnedNoteIds?.map {
+                    Note.Id(account.accountId, it)
+                },
+                isLocked = isLocked ?: false,
+                birthday = birthday,
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+                fields = fields?.map {
+                    User.Field(it.name, it.value)
+                }?: emptyList(),
+                isPublicReactions = publicReactions ?: false,
+            ),
+            related = User.Related(
+                isFollowing = this.isFollowing ?: false,
+                isFollower = this.isFollowed ?: false,
+                isBlocking = this.isBlocking ?: false,
+                isMuting = this.isMuted ?: false,
+                hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
+                hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
+            )
         )
     } else {
         return User.Simple(

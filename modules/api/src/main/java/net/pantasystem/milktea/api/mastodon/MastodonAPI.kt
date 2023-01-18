@@ -7,11 +7,9 @@ import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
+import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import retrofit2.Response
-import retrofit2.http.Body
-
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface MastodonAPI {
 
@@ -30,4 +28,36 @@ interface MastodonAPI {
 
     @GET("api/v1/accounts/verify_credentials")
     suspend fun verifyCredentials(): Response<MastodonAccountDTO>
+
+    @GET("api/v1/timelines/public")
+    suspend fun getPublicTimeline(
+        @Query("local") local: Boolean = false,
+        @Query("remote") remote: Boolean = false,
+        @Query("only_media") onlyMedia: Boolean = false,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int = 20,
+    ): Response<List<TootStatusDTO>>
+
+    @GET("api/v1/timelines/tag/{tag}")
+    suspend fun getHashtagTimeline(
+        @Path("tag") tag: String,
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null
+    ): Response<List<TootStatusDTO>>
+
+    @GET("api/v1/timelines/home")
+    suspend fun getHomeTimeline(
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null
+    ): Response<List<TootStatusDTO>>
+
+    @GET("api/v1/timelines/list/{listId}")
+    suspend fun getListTimeline(
+        @Path("listId") listId: String,
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null
+    ): Response<List<TootStatusDTO>>
+
 }

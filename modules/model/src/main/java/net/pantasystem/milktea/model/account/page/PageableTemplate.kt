@@ -53,6 +53,33 @@ class PageableTemplate(val account: Account?) {
     fun antenna(antenna: Antenna): Page {
         return Page(antenna.id.accountId, antenna.name, 0, Pageable.Antenna(antenna.id.antennaId))
     }
+
+    fun mastodonPublicTimeline(title: String): Page {
+        return Page(
+            account?.accountId ?: -1,
+            title,
+            0,
+            Pageable.Mastodon.PublicTimeline()
+        )
+    }
+
+    fun mastodonLocalTimeline(title: String): Page {
+        return Page(
+            account?.accountId ?: -1,
+            title,
+            0,
+            Pageable.Mastodon.LocalTimeline(),
+        )
+    }
+
+    fun mastodonHomeTimeline(title: String): Page {
+        return Page(
+            account?.accountId ?: -1,
+            title,
+            0,
+            Pageable.Mastodon.HomeTimeline
+        )
+    }
 }
 
 fun Account.newPage(pageable: Pageable, name: String): Page {

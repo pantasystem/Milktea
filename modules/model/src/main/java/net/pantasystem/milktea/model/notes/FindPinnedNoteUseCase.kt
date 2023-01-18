@@ -15,6 +15,6 @@ class FindPinnedNoteUseCase @Inject constructor(
 
     suspend operator fun invoke(userId: User.Id): Result<List<Note>> = runCancellableCatching{
         val detailedUser = userRepository.find(userId, true) as User.Detail
-         noteRepository.findIn(detailedUser.pinnedNoteIds ?: emptyList())
+         noteRepository.findIn(detailedUser.info.pinnedNoteIds ?: emptyList())
     }
 }

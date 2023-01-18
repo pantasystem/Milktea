@@ -74,28 +74,10 @@ sealed interface User : Entity {
         override val host: String,
         override val nickname: UserNickname?,
         override val avatarBlurhash: String?,
-        val description: String?,
-        val followersCount: Int?,
-        val followingCount: Int?,
-        val hostLower: String?,
-        val notesCount: Int?,
-        val pinnedNoteIds: List<Note.Id>?,
-        val bannerUrl: String?,
-        val url: String?,
-        val isFollowing: Boolean,
-        val isFollower: Boolean,
-        val isBlocking: Boolean,
-        val isMuting: Boolean,
-        val hasPendingFollowRequestFromYou: Boolean,
-        val hasPendingFollowRequestToYou: Boolean,
-        val isLocked: Boolean,
         override val isSameHost: Boolean,
         override val instance: InstanceInfo?,
-        val birthday: LocalDate?,
-        val fields: List<Field>,
-        val createdAt: Instant?,
-        val updatedAt: Instant?,
-        val isPublicReactions: Boolean,
+        val info: Info,
+        val related: Related,
     ) : User {
         companion object
 
@@ -103,12 +85,12 @@ sealed interface User : Entity {
 
         val followState: FollowState
             get() {
-                if (isFollowing) {
+                if (related.isFollowing) {
                     return FollowState.FOLLOWING
                 }
 
-                if (isLocked) {
-                    return if (hasPendingFollowRequestFromYou) {
+                if (info.isLocked) {
+                    return if (related.hasPendingFollowRequestFromYou) {
                         FollowState.PENDING_FOLLOW_REQUEST
                     } else {
                         FollowState.UNFOLLOWING_LOCKED
@@ -117,8 +99,9 @@ sealed interface User : Entity {
 
                 return FollowState.UNFOLLOWING
             }
+
         fun getRemoteProfileUrl(account: Account): String {
-            return url ?: getProfileUrl(account)
+            return info.url ?: getProfileUrl(account)
         }
 
         override val parsedResult: CustomEmojiParsedResult = try {
@@ -128,7 +111,31 @@ sealed interface User : Entity {
         }
     }
 
+    data class Info(
+        val description: String?,
+        val followersCount: Int?,
+        val followingCount: Int?,
+        val hostLower: String?,
+        val notesCount: Int?,
+        val pinnedNoteIds: List<Note.Id>?,
+        val bannerUrl: String?,
+        val url: String?,
+        val isLocked: Boolean,
+        val birthday: LocalDate?,
+        val fields: List<Field>,
+        val createdAt: Instant?,
+        val updatedAt: Instant?,
+        val isPublicReactions: Boolean,
+    )
 
+    data class Related(
+        val isFollowing: Boolean,
+        val isFollower: Boolean,
+        val isBlocking: Boolean,
+        val isMuting: Boolean,
+        val hasPendingFollowRequestFromYou: Boolean,
+        val hasPendingFollowRequestToYou: Boolean,
+    )
 
     data class InstanceInfo(
         val faviconUrl: String?,
@@ -241,7 +248,7 @@ fun User.Detail.Companion.make(
     updatedAt: Instant? = null,
     isPublicReactions: Boolean = false,
     avatarBlurhash: String? = null,
-    ): User.Detail {
+): User.Detail {
     return User.Detail(
         id,
         userName,
@@ -253,27 +260,31 @@ fun User.Detail.Companion.make(
         host ?: "",
         nickname,
         avatarBlurhash,
-        description,
-        followersCount,
-        followingCount,
-        hostLower,
-        notesCount,
-        pinnedNoteIds,
-        bannerUrl,
-        url,
-        isFollowing,
-        isFollower,
-        isBlocking,
-        isMuting,
-        hasPendingFollowRequestFromYou,
-        hasPendingFollowRequestToYou,
-        isLocked,
-        isSameHost,
-        instance,
-        birthday,
-        fields ?: emptyList(),
-        createdAt,
-        updatedAt,
-        isPublicReactions = isPublicReactions,
+        instance = instance,
+        isSameHost = isSameHost,
+        info = User.Info(
+            description = description,
+            followersCount = followersCount,
+            followingCount = followingCount,
+            hostLower = hostLower,
+            notesCount = notesCount,
+            pinnedNoteIds = pinnedNoteIds,
+            bannerUrl = bannerUrl,
+            url = url,
+            isLocked = isLocked,
+            birthday = birthday,
+            fields = fields ?: emptyList(),
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            isPublicReactions = isPublicReactions
+        ),
+        related = User.Related(
+            isFollowing = isFollowing,
+            isFollower = isFollower,
+            isBlocking = isBlocking,
+            isMuting = isMuting,
+            hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou,
+            hasPendingFollowRequestToYou = hasPendingFollowRequestToYou,
+        )
     )
 }

@@ -44,7 +44,7 @@ class NoteRelationGetter @Inject constructor(
             it.accountId
         }
         val users = acIdAndUserIdMap.map { list ->
-            userDataSource.getIn(list.key, list.value.map { it.id }).getOrElse { emptyList() }
+            userDataSource.getIn(list.key, list.value.map { it.id }, isSimple = true).getOrElse { emptyList() }
         }.flatten().associateBy {
             it.id
         }
@@ -75,7 +75,7 @@ class NoteRelationGetter @Inject constructor(
     ): Result<NoteRelation> {
         return runCancellableCatching {
             val user = usersMap.getOrElse(note.userId) {
-                userDataSource.get(note.userId).getOrThrow()
+                userDataSource.get(note.userId, isSimple = true).getOrThrow()
             }
 
             val renote = if (deep) {

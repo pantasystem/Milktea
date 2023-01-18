@@ -2,12 +2,12 @@ package net.pantasystem.milktea.model.account.page
 
 
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import net.pantasystem.milktea.model.account.page.PageType.*
 import java.io.Serializable
-import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class PageParams (
+data class PageParams(
     val type: PageType = HOME,
     val withFiles: Boolean? = null,
     var excludeNsfw: Boolean? = null,
@@ -30,15 +30,15 @@ data class PageParams (
     var host: String? = null,
     val antennaId: String? = null,
     val channelId: String? = null,
-) : Serializable, Parcelable{
+) : Serializable, Parcelable {
 
 
     // * Global, Local, Hybrid, Home, UserList, Mention, Show, SearchByTag, Featured, Notification, UserTimeline, Search, Antenna
     @Throws(IllegalStateException::class)
     fun toPageable(): Pageable {
-        try{
-            return when(this.type){
-                HOME->{
+        try {
+            return when (this.type) {
+                HOME -> {
                     Pageable.HomeTimeline(
                         withFiles = withFiles,
                         includeLocalRenotes = includeLocalRenotes,
@@ -46,13 +46,13 @@ data class PageParams (
                         includeRenotedMyRenotes = includeRenotedMyRenotes
                     )
                 }
-                LOCAL->{
+                LOCAL -> {
                     Pageable.LocalTimeline(
                         withFiles = withFiles,
                         excludeNsfw = excludeNsfw
                     )
                 }
-                SOCIAL->{
+                SOCIAL -> {
                     Pageable.HybridTimeline(
                         withFiles = withFiles,
                         includeRenotedMyRenotes = includeRenotedMyRenotes,
@@ -60,19 +60,19 @@ data class PageParams (
                         includeLocalRenotes = includeLocalRenotes
                     )
                 }
-                GLOBAL->{
+                GLOBAL -> {
                     Pageable.GlobalTimeline(
                         withFiles = withFiles
                     )
                 }
-                SEARCH->{
+                SEARCH -> {
                     Pageable.Search(
                         query = query!!,
                         host = host,
                         userId = userId
                     )
                 }
-                SEARCH_HASH->{
+                SEARCH_HASH -> {
                     Pageable.SearchByTag(
                         tag = tag!!,
                         reply = reply,
@@ -81,7 +81,7 @@ data class PageParams (
                         poll = poll
                     )
                 }
-                USER->{
+                USER -> {
                     Pageable.UserTimeline(
                         userId = userId!!,
                         includeMyRenotes = includeMyRenotes,
@@ -89,18 +89,18 @@ data class PageParams (
                         withFiles = withFiles
                     )
                 }
-                FAVORITE->{
+                FAVORITE -> {
                     Pageable.Favorite
                 }
-                FEATURED->{
+                FEATURED -> {
                     Pageable.Featured(offset = offset)
                 }
-                DETAIL->{
+                DETAIL -> {
                     Pageable.Show(
                         noteId = noteId!!
                     )
                 }
-                USER_LIST->{
+                USER_LIST -> {
                     Pageable.UserListTimeline(
                         listId = listId!!,
                         withFiles = withFiles,
@@ -109,18 +109,18 @@ data class PageParams (
                         includeRenotedMyRenotes = includeRenotedMyRenotes
                     )
                 }
-                MENTION->{
+                MENTION -> {
                     Pageable.Mention(
                         following = following,
                         visibility = visibility
                     )
                 }
-                ANTENNA->{
+                ANTENNA -> {
                     Pageable.Antenna(
                         antennaId = antennaId!!
                     )
                 }
-                NOTIFICATION->{
+                NOTIFICATION -> {
                     Pageable.Notification(
                         following = following,
                         markAsRead = markAsRead
@@ -148,8 +148,32 @@ data class PageParams (
                 CHANNEL_TIMELINE -> {
                     Pageable.ChannelTimeline(channelId!!)
                 }
+                MASTODON_LOCAL_TIMELINE -> {
+                    Pageable.Mastodon.LocalTimeline(
+                        isOnlyMedia = withFiles
+                    )
+                }
+                MASTODON_PUBLIC_TIMELINE -> {
+                    Pageable.Mastodon.PublicTimeline(
+                        isOnlyMedia = withFiles,
+                    )
+                }
+                MASTODON_HOME_TIMELINE -> {
+                    Pageable.Mastodon.HomeTimeline
+                }
+                MASTODON_HASHTAG_TIMELINE -> {
+                    Pageable.Mastodon.HashTagTimeline(
+                        requireNotNull(tag),
+                        isOnlyMedia = withFiles,
+                    )
+                }
+                MASTODON_LIST_TIMELINE -> {
+                    Pageable.Mastodon.ListTimeline(
+                        listId = requireNotNull(listId),
+                    )
+                }
             }
-        }catch(e: NullPointerException){
+        } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")
         }
 

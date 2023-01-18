@@ -125,9 +125,10 @@ class AppAuthViewModel @Inject constructor(
             when (val meta = it.meta.content) {
                 is StateContent.Exist -> {
                     val instanceBase = when (val info = meta.rawContent) {
-                        is InstanceType.Mastodon -> info.instance.uri
+                        is InstanceType.Mastodon -> "https://${info.instance.uri}"
                         is InstanceType.Misskey -> info.instance.uri
                     }
+                    logger.debug("instanceBaseUrl: $instanceBase")
                     authService.createWaiting4Approval(
                         instanceBase,
                         authService.createApp(

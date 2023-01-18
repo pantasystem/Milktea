@@ -71,6 +71,7 @@ sealed interface FilePreviewSource {
             this.type.startsWith("image") -> AboutMediaType.IMAGE
             this.type.startsWith("video") -> AboutMediaType.VIDEO
             this.type.startsWith("audio") -> AboutMediaType.SOUND
+            this.type == "gifv" -> AboutMediaType.VIDEO
             else -> AboutMediaType.OTHER
         }
         override val path: String = fileProperty.url

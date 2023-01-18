@@ -7,15 +7,20 @@ import net.pantasystem.milktea.model.AddResult
 interface UserDataSource {
 
 
-    suspend fun get(userId: User.Id): Result<User>
+    /**
+     * @param isSimple できるだけシンプルな構造のデータを取得する様にする。
+     */
+    suspend fun get(userId: User.Id, isSimple: Boolean = false): Result<User>
 
     /**
      * @param keepInOrder 指定したserverIdsの順番と同じように揃える場合はtrueを指定します。
+     * @param isSimple できるだけシンプルな構造のデータを取得する様にする。
      */
     suspend fun getIn(
         accountId: Long,
         serverIds: List<String>,
-        keepInOrder: Boolean = false
+        keepInOrder: Boolean = false,
+        isSimple: Boolean = false,
     ): Result<List<User>>
 
     suspend fun get(accountId: Long, userName: String, host: String?): Result<User>

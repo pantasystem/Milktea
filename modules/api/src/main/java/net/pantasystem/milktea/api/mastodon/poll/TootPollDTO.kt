@@ -15,7 +15,7 @@ data class TootPollDTO(
     val options: List<Option>,
     val emojis: List<TootEmojiDTO>,
     val voted: Boolean? = null,
-    val ownVotes: Boolean? = null,
+    val ownVotes: List<Int>? = null,
 ) {
 
     @kotlinx.serialization.Serializable

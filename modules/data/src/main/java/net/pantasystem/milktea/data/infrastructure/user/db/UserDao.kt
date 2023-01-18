@@ -74,6 +74,12 @@ abstract class UserDao {
         select * from user_view where accountId = :accountId and serverId = :serverId
     """)
     @Transaction
+    abstract suspend fun getSimple(accountId: Long, serverId: String): UserSimpleRelated?
+
+    @Query("""
+        select * from user_view where accountId = :accountId and serverId = :serverId
+    """)
+    @Transaction
     abstract fun observe(accountId: Long, serverId: String): Flow<UserRelated?>
 
     @Query("""
@@ -112,6 +118,12 @@ abstract class UserDao {
     """)
     @Transaction
     abstract suspend fun getInServerIds(accountId: Long, serverIds: List<String>): List<UserRelated>
+
+    @Query("""
+        select * from user_view where accountId = :accountId and serverId in (:serverIds)
+    """)
+    @Transaction
+    abstract suspend fun getSimplesInServerIds(accountId: Long, serverIds: List<String>): List<UserSimpleRelated>
 
     @Query("""
         delete from user where accountId = :accountId and serverId = :serverId

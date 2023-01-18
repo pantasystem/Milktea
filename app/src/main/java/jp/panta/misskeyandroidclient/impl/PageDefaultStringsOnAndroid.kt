@@ -12,4 +12,6 @@ class PageDefaultStringsOnAndroid(val context: Context) :
         get() = context.getString(R.string.home_timeline)
     override val hybridThrowable: String
         get() = context.getString(R.string.hybrid_timeline)
+    override val localTimeline: String
+        get() = context.getString(R.string.local_timeline)
 }

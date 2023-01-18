@@ -23,6 +23,11 @@ enum class PageType(val defaultName: String){
     MY_GALLERY_POSTS("MyGalleryPosts"),
     I_LIKED_GALLERY_POSTS("ILikedGalleryPosts"),
     CHANNEL_TIMELINE("Channel"),
+    MASTODON_LOCAL_TIMELINE("MastodonLocalTimeline"),
+    MASTODON_PUBLIC_TIMELINE("MastodonPublicTimeline"),
+    MASTODON_HOME_TIMELINE("MastodonHomeTimeline"),
+    MASTODON_HASHTAG_TIMELINE("MastodonHashtagTimeline"),
+    MASTODON_LIST_TIMELINE("MastodonListTimeline"),
     //USER_PINは別
 }
 

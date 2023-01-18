@@ -305,7 +305,7 @@ class UserDetailActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 mViewModel.userState.mapNotNull {
-                    it?.fields
+                    it?.info?.fields
                 }.collect {
                     userFieldsAdapter.submitList(it)
                 }
