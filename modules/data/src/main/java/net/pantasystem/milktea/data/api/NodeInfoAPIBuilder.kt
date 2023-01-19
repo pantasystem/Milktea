@@ -19,12 +19,12 @@ class NodeInfoAPIBuilder @Inject constructor(
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun build(nodeInfoUrl: String): NodeInfoAPI {
+    fun build(): NodeInfoAPI {
         val okHttp = okHttpClientProvider.get()
         return Retrofit.Builder()
-            .baseUrl(nodeInfoUrl)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(okHttp)
+            .baseUrl("https://example.com/") // NOTE: 任意のURLを指定しないと怒られる
             .build()
             .create(NodeInfoAPI::class.java)
     }

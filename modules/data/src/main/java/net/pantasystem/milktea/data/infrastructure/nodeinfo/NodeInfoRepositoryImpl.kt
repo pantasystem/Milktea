@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.nodeinfo
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -78,13 +79,19 @@ class NodeInfoRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetch(host: String): NodeInfoDTO? {
-        val nodeInfoUrl = nodeInfoAPIBuilder.buildWellKnown("https://$host")
-            .getWellKnownNodeInfo()
-            .throwIfHasError()
-            .body()?.links?.firstOrNull {
-                it.rel.contains("2.0")
-            }?.href ?: "https://$host/nodeinfo/2.0"
-        return nodeInfoAPIBuilder.build(nodeInfoUrl).getNodeInfo().throwIfHasError().body()
+        try {
+            val nodeInfoUrl = nodeInfoAPIBuilder.buildWellKnown("https://$host")
+                .getWellKnownNodeInfo()
+                .throwIfHasError()
+                .body()?.links?.firstOrNull {
+                    it.rel.contains("2.0")
+                }?.href ?: "https://$host/nodeinfo/2.0"
+            Log.d("NodeInfoRepositoryImpl", "nodeInfoUrl:$nodeInfoUrl")
+            return nodeInfoAPIBuilder.build().getNodeInfo(nodeInfoUrl).throwIfHasError().body()
+        } catch(e: Throwable) {
+            Log.e("NodeInfoRepositoryImpl", "error", e)
+            throw e
+        }
     }
 
 }
