@@ -13,6 +13,7 @@ import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.list.UserListDao
+import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.usercustom.ReactionUserSettingDao
@@ -106,4 +107,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideSearchHistoryDao(db: DataBase): SearchHistoryDao = db.searchHistoryDao()
+
+    @Provides
+    @Singleton
+    fun provideNodeInfoDao(db: DataBase): NodeInfoDao = db.nodeInfoDao()
 }
