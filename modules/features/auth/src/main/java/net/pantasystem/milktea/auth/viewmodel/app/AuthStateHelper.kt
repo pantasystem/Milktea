@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
+import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
@@ -24,10 +25,14 @@ import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
+import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.sw.register.SubscriptionRegistration
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
+import java.net.URL
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -42,6 +47,7 @@ class AuthStateHelper @Inject constructor(
     val accountStore: AccountStore,
     val subscriptionRegistration: SubscriptionRegistration,
     val userDataSource: UserDataSource,
+    val nodeInfoRepository: NodeInfoRepository,
     ) {
     private val urlPattern =
         Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
@@ -121,13 +127,21 @@ class AuthStateHelper @Inject constructor(
 
     suspend fun getMeta(url: String): InstanceType {
         if (urlPattern.matcher(url).find()) {
-            val misskey = withContext(Dispatchers.IO) {
-                metaRepository.find(url).onFailure {
-                    Log.e("AppAuthViewModel", "fetch meta error", it)
-                }.getOrNull()
+            val nodeInfo = nodeInfoRepository.find(URL(url).host).getOrNull()
+
+            val misskey: Meta?
+            val mastodon: Instance?
+
+            suspend fun fetchMeta(): Meta? {
+                return withContext(Dispatchers.IO) {
+                    metaRepository.find(url).onFailure {
+                        Log.e("AppAuthViewModel", "fetch meta error", it)
+                    }.getOrNull()
+                }
             }
-            val mastodon =
-                withContext(Dispatchers.IO) {
+
+            suspend fun fetchInstance(): Instance? {
+                return withContext(Dispatchers.IO) {
                     if (!BuildConfig.DEBUG) {
                         return@withContext null
                     }
@@ -136,6 +150,26 @@ class AuthStateHelper @Inject constructor(
                             .getInstance()
                     }.getOrNull()
                 }
+            }
+            when(nodeInfo?.type) {
+                is NodeInfo.SoftwareType.Mastodon -> {
+                    mastodon = fetchInstance()
+                    misskey = null
+                }
+                is NodeInfo.SoftwareType.Misskey -> {
+                    misskey = fetchMeta()
+                    mastodon = null
+                }
+                else -> {
+                    misskey = fetchMeta()
+                    mastodon = if (misskey == null) {
+                        fetchInstance()
+                    } else {
+                        null
+                    }
+                }
+            }
+
             if (misskey != null) {
                 return InstanceType.Misskey(misskey)
             }

@@ -26,6 +26,8 @@ import net.pantasystem.milktea.data.infrastructure.list.UserListDao
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.list.UserListMemberView
 import net.pantasystem.milktea.data.infrastructure.list.UserListRecord
+import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
+import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoRecord
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.*
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryRecord
@@ -89,8 +91,9 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         SearchHistoryRecord::class,
         UserInfoStateRecord::class,
         UserRelatedStateRecord::class,
+        NodeInfoRecord::class,
     ],
-    version = 33,
+    version = 34,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -114,7 +117,8 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 29, to = 30),
         AutoMigration(from = 30, to = 31),
         AutoMigration(from = 31, to = 32),
-        AutoMigration(from = 32, to = 33)
+        AutoMigration(from = 32, to = 33),
+        AutoMigration(from = 33, to = 34),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -167,4 +171,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun instanceInfoDao(): InstanceInfoDao
 
     abstract fun searchHistoryDao(): SearchHistoryDao
+
+    abstract fun nodeInfoDao(): NodeInfoDao
 }
