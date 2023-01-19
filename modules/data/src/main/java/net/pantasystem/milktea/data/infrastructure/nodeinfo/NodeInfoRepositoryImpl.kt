@@ -61,6 +61,16 @@ class NodeInfoRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun syncAll(): Result<Unit> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            nodeInfoDao.findAll().map {
+                sync(it.host)
+            }.forEach {
+                it.getOrThrow()
+            }
+        }
+    }
+
     override suspend fun sync(host: String): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val nodeInfo = requireNotNull(fetch(host)).toModel(host)

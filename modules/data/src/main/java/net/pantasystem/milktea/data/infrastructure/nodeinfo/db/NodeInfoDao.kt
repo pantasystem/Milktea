@@ -20,4 +20,7 @@ interface NodeInfoDao {
 
     @Query("select * from nodeinfo where host = :host limit 1")
     suspend fun find(host: String): NodeInfoRecord?
+
+    @Query("select * from nodeinfo")
+    suspend fun findAll(): List<NodeInfoRecord>
 }
