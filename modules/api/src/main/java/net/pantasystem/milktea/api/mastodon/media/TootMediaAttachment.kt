@@ -8,7 +8,7 @@ data class TootMediaAttachment(
     val type: String,
     val url: String,
     @SerialName("preview_url") val previewUrl: String,
-    @SerialName("remote_url") val remoteUrl: String,
+    @SerialName("remote_url") val remoteUrl: String? = null,
     val description: String? = null,
     val blurhash: String? = null,
 

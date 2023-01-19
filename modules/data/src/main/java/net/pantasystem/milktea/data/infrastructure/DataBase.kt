@@ -87,8 +87,10 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         InstanceInfoRecord::class,
 
         SearchHistoryRecord::class,
+        UserInfoStateRecord::class,
+        UserRelatedStateRecord::class,
     ],
-    version = 32,
+    version = 33,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -112,6 +114,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 29, to = 30),
         AutoMigration(from = 30, to = 31),
         AutoMigration(from = 31, to = 32),
+        AutoMigration(from = 32, to = 33)
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )

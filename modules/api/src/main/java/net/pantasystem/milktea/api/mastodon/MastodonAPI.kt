@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.api.mastodon
 
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.apps.AccessToken
 import net.pantasystem.milktea.api.mastodon.apps.App
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
@@ -59,5 +60,17 @@ interface MastodonAPI {
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null
     ): Response<List<TootStatusDTO>>
+
+    @GET("api/v1/accounts/{accountId}")
+    suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
+
+    @GET("api/v1/accounts/relationships")
+    suspend fun getAccountRelationships(@Query("id") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
+
+    @POST("api/v1/accounts/{accountId}/follow")
+    suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
+    @POST("api/v1/accounts/{accountId}/unfollow")
+    suspend fun unfollow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
 }

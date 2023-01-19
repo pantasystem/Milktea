@@ -123,4 +123,19 @@ class DatabaseMigrationTest {
         helper.createDatabase(testDb, 11)
         helper.runMigrationsAndValidate(testDb, 31, true)
     }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate11To32() {
+        helper.createDatabase(testDb, 11)
+        helper.runMigrationsAndValidate(testDb, 32, true)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate11To33() {
+        helper.createDatabase(testDb, 11)
+        helper.runMigrationsAndValidate(testDb, 33, true)
+    }
+
 }

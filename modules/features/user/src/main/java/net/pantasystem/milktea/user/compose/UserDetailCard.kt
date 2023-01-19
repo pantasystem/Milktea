@@ -83,7 +83,7 @@ fun UserDetailCard(
                     }
             )
 
-            if (userDetail.related.isFollower) {
+            if (userDetail.related?.isFollower == true) {
                 Text(
                     text = stringResource(id = R.string.follower),
                     color = Color.White,

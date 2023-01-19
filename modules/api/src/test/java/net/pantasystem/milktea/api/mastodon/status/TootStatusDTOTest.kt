@@ -131,5 +131,17 @@ class TootStatusDTOTest {
         json.decodeFromString<List<TootStatusDTO>>(text)
     }
 
+    @Test
+    fun decodeMstdnJpTimeline() {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        val file = File(javaClass.classLoader!!.getResource("toot_mstdn_jp_public_timeline.json").file)
+        val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
+            it.readLines().reduce { acc, s -> acc + s }.trimIndent()
+        }
+
+        json.decodeFromString<List<TootStatusDTO>>(text)
+    }
 
 }

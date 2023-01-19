@@ -13,7 +13,7 @@ class ToggleFollowUseCase @Inject constructor(
     suspend operator fun invoke(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
             val state = userRepository.find(userId, true) as User.Detail
-            if (state.related.isFollowing) {
+            if (state.related?.isFollowing == true) {
                 userRepository.unfollow(userId)
             } else {
                 userRepository.follow(userId)

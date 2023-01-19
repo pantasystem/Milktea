@@ -11,11 +11,9 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
@@ -29,18 +27,16 @@ import javax.inject.Inject
 @Suppress("BlockingMethodInNonBlockingContext")
 class UserRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
-    val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val loggerFactory: Logger.Factory,
+    val userApiAdapter: UserApiAdapter,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
         loggerFactory.create("UserRepositoryImpl")
     }
-    private val noteDataSourceAdder =
-        NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
 
     override suspend fun find(userId: User.Id, detail: Boolean): User =
         withContext(ioDispatcher) {
@@ -57,25 +53,11 @@ class UserRepositoryImpl @Inject constructor(
                 return@withContext it
             }
 
-            val account = accountRepository.get(userId.accountId).getOrThrow()
             if (localResult.getOrNull() == null) {
-                val res = misskeyAPIProvider.get(account).showUser(
-                    RequestUser(
-                        i = account.token,
-                        userId = userId.id,
-                        detail = true
-                    )
-                )
-                res.throwIfHasError()
-                res.body()?.let {
-                    val user = it.toUser(account, true)
-                    it.pinnedNotes?.forEach { dto ->
-                        noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
-                    }
-                    val result = userDataSource.add(user)
-                    logger.debug("add result: $result")
-                    return@withContext userDataSource.get(userId).getOrThrow()
-                }
+                val user = userApiAdapter.show(userId, detail)
+                val result = userDataSource.add(user)
+                logger.debug("add result: $result")
+                return@withContext userDataSource.get(userId).getOrThrow()
             }
 
             throw UserNotFoundException(userId)
@@ -113,9 +95,6 @@ class UserRepositoryImpl @Inject constructor(
         res.throwIfHasError()
 
         res.body()?.let {
-            it.pinnedNotes?.forEach { dto ->
-                noteDataSourceAdder.addNoteDtoToDataSource(account, dto)
-            }
             val user = it.toUser(account, detail)
             userDataSource.add(user)
             return@withContext userDataSource.get(user.id).getOrThrow()
@@ -185,7 +164,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::unmuteUser, userId) { user ->
             user.copy(
-                related = user.related.copy(
+                related = user.related?.copy(
                     isMuting = false
                 )
             )
@@ -195,7 +174,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::blockUser, userId) { user ->
             user.copy(
-                related = user.related.copy(
+                related = user.related?.copy(
                     isBlocking = true
                 )
             )
@@ -205,60 +184,60 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun unblock(userId: User.Id): Boolean = withContext(ioDispatcher) {
         action(userId.getMisskeyAPI()::unblockUser, userId) { user ->
             user.copy(
-                related = user.related.copy(isBlocking = false)
+                related = user.related?.copy(isBlocking = false)
             )
         }
     }
 
     override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
-        val req = RequestUser(userId = userId.id, i = account.token)
-        logger.debug("follow req:$req")
-        val res = misskeyAPIProvider.get(account).followUser(req)
-        res.throwIfHasError()
-        if (res.isSuccessful) {
+        val isSuccessful = userApiAdapter.follow(userId)
+        if (isSuccessful) {
             val updated = (find(userId, true) as User.Detail).copy(
-                related = user.related.copy(
-                    isFollowing = if (user.info.isLocked) user.related.isFollowing else true,
-                    hasPendingFollowRequestFromYou = if (user.info.isLocked) true else user.related.hasPendingFollowRequestFromYou
-                )
+                related = (if (user.info.isLocked) user.related?.isFollowing else true)?.let {
+                    (if (user.info.isLocked) true else user.related?.hasPendingFollowRequestFromYou)?.let { it1 ->
+                        user.related?.copy(
+                            isFollowing = it,
+                            hasPendingFollowRequestFromYou = it1
+                        )
+                    }
+                }
             )
             userDataSource.add(updated)
         }
-        res.isSuccessful
+        isSuccessful
     }
 
     override suspend fun unfollow(userId: User.Id): Boolean = withContext(ioDispatcher) {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         val user = find(userId, true) as User.Detail
-
-
-        val res = if (user.info.isLocked) {
+        val isSuccessful = if (user.info.isLocked) {
             misskeyAPIProvider.get(account)
                 .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.token))
+                .throwIfHasError()
+                .isSuccessful
         } else {
-            misskeyAPIProvider.get(account)
-                .unFollowUser(RequestUser(userId = userId.id, i = account.token))
+            userApiAdapter.unfollow(userId)
         }
-        res.throwIfHasError()
-        if (res.isSuccessful) {
+        if (isSuccessful) {
             val updated = user.copy(
-                related = user.related.copy(
-                    isFollowing = if (user.info.isLocked) user.related.isFollowing else false,
-                    hasPendingFollowRequestFromYou = if (user.info.isLocked) false else user.related.hasPendingFollowRequestFromYou
-                )
+                related = user.related?.let{
+                    it.copy(
+                        isFollowing = if (user.info.isLocked) it.isFollowing else false,
+                        hasPendingFollowRequestFromYou = if (user.info.isLocked) false else it.hasPendingFollowRequestFromYou
+                    )
+                }
             )
             userDataSource.add(updated)
         }
-        res.isSuccessful
+        isSuccessful
     }
 
     override suspend fun acceptFollowRequest(userId: User.Id): Boolean =
         withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val user = find(userId, true) as User.Detail
-            if (!user.related.hasPendingFollowRequestToYou) {
+            if (user.related?.hasPendingFollowRequestToYou != true) {
                 return@withContext false
             }
             val res = misskeyAPIProvider.get(account)
@@ -272,7 +251,7 @@ class UserRepositoryImpl @Inject constructor(
             if (res.isSuccessful) {
                 userDataSource.add(
                     user.copy(
-                        related = user.related.copy(
+                        related = user.related?.copy(
                             hasPendingFollowRequestToYou = false,
                             isFollower = true
                         )
@@ -287,7 +266,7 @@ class UserRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val user = find(userId, true) as User.Detail
-            if (!user.related.hasPendingFollowRequestToYou) {
+            if (user.related?.hasPendingFollowRequestToYou != true) {
                 return@withContext false
             }
             val res = misskeyAPIProvider.get(account).rejectFollowRequest(
@@ -300,7 +279,7 @@ class UserRepositoryImpl @Inject constructor(
             if (res.isSuccessful) {
                 userDataSource.add(
                     user.copy(
-                        related = user.related.copy(
+                        related = user.related?.copy(
                             hasPendingFollowRequestToYou = false,
                             isFollower = false
                         )
@@ -361,13 +340,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun sync(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
             withContext(ioDispatcher) {
-                val account = accountRepository.get(userId.accountId)
-                    .getOrThrow()
-                val user = misskeyAPIProvider.get(account)
-                    .showUser(
-                        RequestUser(i = account.token, userId = userId.id, detail = true)
-                    ).throwIfHasError()
-                    .body()!!.toUser(account, true)
+                val user = userApiAdapter.show(userId, true)
                 userDataSource.add(user)
             }
         }

@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.streaming.impl
 
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.network.MastodonSocketImpl
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
@@ -21,7 +22,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
 
     private val logger = loggerFactory.create("SocketProvider")
 
-    private val accountIdWithSocket = mutableMapOf<Long, SocketImpl>()
+    private val accountIdWithSocket = mutableMapOf<Long, Socket>()
 
     /**
      * accountIdとそのTokenを管理している。
@@ -44,7 +45,10 @@ class SocketWithAccountProviderImpl @Inject constructor(
                     logger.debug("すでにインスタンス化済み")
                     return socket
                 } else {
-                    socket.destroy()
+                    if (socket is SocketImpl) {
+                        socket.destroy()
+
+                    }
                 }
             }
 
@@ -61,11 +65,14 @@ class SocketWithAccountProviderImpl @Inject constructor(
             }
             //logger.debug("url:$uri")
 
-            socket = SocketImpl(
-                url = uri,
-                okHttpClientProvider = okHttpClientProvider,
-                loggerFactory = loggerFactory,
-            )
+            socket = when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> SocketImpl(
+                    url = uri,
+                    okHttpClientProvider = okHttpClientProvider,
+                    loggerFactory = loggerFactory,
+                )
+                Account.InstanceType.MASTODON -> MastodonSocketImpl()
+            }
             accountIdWithSocket[account.accountId] = socket
             accountIdWithToken[account.accountId] = account.token
 

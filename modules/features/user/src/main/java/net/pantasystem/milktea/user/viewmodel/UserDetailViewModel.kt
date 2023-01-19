@@ -162,7 +162,7 @@ class UserDetailViewModel @AssistedInject constructor(
             userState.value?.let {
                 runCancellableCatching {
                     val user = userRepository.find(it.id) as User.Detail
-                    if (user.related.isFollowing || user.related.hasPendingFollowRequestFromYou) {
+                    if (user.related?.isFollowing == true || user.related?.hasPendingFollowRequestFromYou == true) {
                         userRepository.unfollow(user.id)
                     } else {
                         userRepository.follow(user.id)

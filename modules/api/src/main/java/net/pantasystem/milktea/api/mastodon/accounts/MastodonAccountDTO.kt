@@ -46,8 +46,8 @@ data class MastodonAccountDTO (
 
 
     ) {
-    fun toModel(account: Account): User {
-        return User.Simple(
+    fun toModel(account: Account, related: User.Related? = null): User {
+        return User.Detail(
             User.Id(account.accountId, this.id),
             userName = username,
             name = displayName,
@@ -68,6 +68,41 @@ data class MastodonAccountDTO (
                     || acct.split("@").getOrNull(1) == account.getHost(),
             instance = null,
             avatarBlurhash = null,
+            info = User.Info(
+                followersCount = followersCount,
+                followingCount = followingCount,
+                notesCount = statusesCount,
+                hostLower = null,
+                pinnedNoteIds = null,
+                bannerUrl = header,
+                url = url,
+                isLocked = locked,
+                birthday = null,
+                fields = emptyList(),
+                createdAt = createdAt,
+                updatedAt = null,
+                isPublicReactions = false,
+                description = note,
+            ),
+            related = related,
         )
     }
 }
+
+
+@Serializable
+data class MastodonAccountRelationshipDTO(
+    val id: String,
+    val following: Boolean,
+    @SerialName("showing_reblogs") val showingReblogs: Boolean? = null,
+    val notifying: Boolean? = null,
+    @SerialName("followed_by") val followedBy: Boolean,
+    val blocking: Boolean,
+    @SerialName("blocked_by") val blockedBy: Boolean,
+    val muting: Boolean,
+    @SerialName("muting_notifications") val mutingNotifications: Boolean,
+    val requested: Boolean,
+    @SerialName("domain_blocking") val domainBlocking: Boolean,
+    val endorsed: Boolean,
+    val note: String,
+)

@@ -142,18 +142,15 @@ class MediatorUserDataSource @Inject constructor(
 
                     if (user is User.Detail) {
                         userDao.insert(
-                            UserDetailedStateRecord(
+                            UserInfoStateRecord(
                                 bannerUrl = user.info.bannerUrl,
-                                isMuting = user.related.isMuting,
-                                isBlocking = user.related.isBlocking,
+
                                 isLocked = user.info.isLocked,
-                                isFollower = user.related.isFollower,
-                                isFollowing = user.related.isFollowing,
+
                                 description = user.info.description,
                                 followersCount = user.info.followersCount,
                                 followingCount = user.info.followingCount,
-                                hasPendingFollowRequestToYou = user.related.hasPendingFollowRequestToYou,
-                                hasPendingFollowRequestFromYou = user.related.hasPendingFollowRequestFromYou,
+
                                 hostLower = user.info.hostLower,
                                 notesCount = user.info.notesCount,
                                 url = user.info.url,
@@ -162,8 +159,25 @@ class MediatorUserDataSource @Inject constructor(
                                 createdAt = user.info.createdAt,
                                 updatedAt = user.info.updatedAt,
                                 publicReactions = user.info.isPublicReactions
-                            ),
+                            )
                         )
+                        when (val related = user.related) {
+                            null -> {}
+                            else -> {
+                                userDao.insert(
+                                    UserRelatedStateRecord(
+                                        isMuting = related.isMuting,
+                                        isBlocking = related.isBlocking,
+                                        isFollower = related.isFollower,
+                                        isFollowing = related.isFollowing,
+                                        hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                                        hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
+                                        userId = dbId,
+                                    )
+                                )
+                            }
+                        }
+
 
                         // NOTE: 更新の必要性を判定
                         if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {

@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure
 
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -103,4 +104,15 @@ fun TootStatusDTO.pickEntities(account: Account, notes: MutableList<Note>, users
         }
     )
     this.reblog?.pickEntities(account, notes, users, files)
+}
+
+fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
+    return User.Related(
+        isFollower = followedBy,
+        isFollowing = following,
+        isBlocking = blocking,
+        hasPendingFollowRequestFromYou = requested,
+        isMuting = muting,
+        hasPendingFollowRequestToYou = false,
+    )
 }
