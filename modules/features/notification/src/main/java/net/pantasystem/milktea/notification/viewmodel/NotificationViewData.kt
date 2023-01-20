@@ -71,6 +71,10 @@ class NotificationViewData(
         StringSource(R.string.notification_group_invited_message, it.group.name)
     }
 
+    val followRequestMessageSource: StringSource? = (notification.notification as? ReceiveFollowRequestNotification?)?.let {
+        StringSource(R.string.follow_requested_by, name ?: "")
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
