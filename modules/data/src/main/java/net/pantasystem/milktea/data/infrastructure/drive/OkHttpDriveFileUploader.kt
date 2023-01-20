@@ -1,9 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.drive
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
@@ -18,6 +21,7 @@ import okio.source
 import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
+
 
 object OkHttpDriveFileUploaderConstants {
     const val i = "i"
@@ -67,7 +71,8 @@ class OkHttpDriveFileUploader(
             val requestBody = requestBodyBuilder.build()
 
             val request =
-                Request.Builder().url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
+                Request.Builder()
+                    .url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
@@ -124,7 +129,8 @@ class OkHttpDriveFileUploader(
             val requestBody = requestBodyBuilder.build()
 
             val request =
-                Request.Builder().url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
+                Request.Builder()
+                    .url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code
@@ -165,7 +171,6 @@ class OkHttpDriveFileUploader(
     }
 
 
-
 }
 
 private class UriRequestBody(
@@ -177,26 +182,66 @@ private class UriRequestBody(
         return type?.toMediaType()
     }
 
-    override fun contentLength(): Long {
-        return context.contentResolver.query(
-            uri,
-            arrayOf(MediaStore.MediaColumns.SIZE),
-            null,
-            null,
-            null
-        )?.use {
-            return@use if (it.moveToFirst()) {
-                it.getLong(0)
-            } else {
-                null
-            }
-        } ?: throw IllegalArgumentException("ファイルサイズの取得に失敗しました")
-    }
 
     override fun writeTo(sink: BufferedSink) {
         context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            sink.writeAll(inputStream.source())
+
+            val type = context.contentResolver.getType(uri)
+            if (type?.startsWith("image") == true
+                && (type.split("/").getOrNull(1)?.let {
+                    it == "jpeg" || it == "jpg"
+                } == true)
+            ) {
+
+                val bitmap =
+                    rotateImageIfRequired(BitmapFactory.decodeStream(inputStream), uri)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, sink.outputStream())
+
+            } else {
+                sink.writeAll(inputStream.source())
+            }
         }
+    }
+
+    /**
+     * 与えられたBitmapを元ファイルのExif情報を元に回転させる処理
+     */
+    private fun rotateImageIfRequired(bitmap: Bitmap, uri: Uri): Bitmap {
+        context.contentResolver.openFileDescriptor(uri, "r").use {
+            val fileDescriptor = it!!.fileDescriptor
+            val exif = ExifInterface(fileDescriptor)
+
+            Log.d(
+                "OkHttpFileUploader", "回転情報: ${
+                    exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL
+                    )
+                }"
+            )
+            return when (exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90)
+                ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180)
+                ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270)
+                else -> bitmap
+            }
+        }
+
+
+    }
+
+    /**
+     * 回転状態に基づきBitmapを回転させる
+     */
+    private fun rotateImage(bitmap: Bitmap, degree: Int): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degree.toFloat())
+        val rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        bitmap.recycle()
+        return rotated
     }
 }
 
