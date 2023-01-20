@@ -11,8 +11,11 @@ class StreamingAPIProvider @Inject constructor() {
 
     private var accountAndStreamingAPIs = mutableMapOf<Long, StreamingAPI>()
 
-    fun get(account: Account): StreamingAPI {
+    fun get(account: Account): StreamingAPI? {
         synchronized(this) {
+            if (account.instanceType == Account.InstanceType.MISSKEY) {
+                return null
+            }
             var streaming = accountAndStreamingAPIs[account.accountId]
             if (streaming != null) {
                 return streaming
