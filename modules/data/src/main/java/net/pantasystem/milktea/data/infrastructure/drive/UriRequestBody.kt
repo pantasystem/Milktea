@@ -36,6 +36,7 @@ internal class UriRequestBody(
                 val bitmap =
                     rotateImageIfRequired(BitmapFactory.decodeStream(inputStream), uri)
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, sink.outputStream())
+                bitmap.recycle()
 
             } else {
                 sink.writeAll(inputStream.source())
