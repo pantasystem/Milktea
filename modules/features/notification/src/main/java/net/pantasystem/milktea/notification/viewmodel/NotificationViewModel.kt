@@ -9,8 +9,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
-import net.pantasystem.milktea.api_streaming.ChannelBody
-import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
@@ -19,16 +17,12 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
-import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
-import net.pantasystem.milktea.model.notification.GroupInvitedNotification
-import net.pantasystem.milktea.model.notification.Notification
-import net.pantasystem.milktea.model.notification.NotificationRelation
-import net.pantasystem.milktea.model.notification.ReceiveFollowRequestNotification
+import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
@@ -40,13 +34,13 @@ class NotificationViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
     private val noteTranslationStore: NoteTranslationStore,
-    private val channelAPIAdapterProvider: ChannelAPIWithAccountProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val notificationCacheAdder: NotificationCacheAdder,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val unreadNotificationDAO: UnreadNotificationDAO,
     private val groupRepository: GroupRepository,
     private val metaRepository: MetaRepository,
+    private val notificationStreaming: NotificationStreaming,
 ) : ViewModel() {
 
 
@@ -79,15 +73,10 @@ class NotificationViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            channelAPIAdapterProvider.get(ac).connect(ChannelAPI.Type.Main).map {
-                it as? ChannelBody.Main.Notification
-            }.filterNotNull().map {
-                ac to it
+            notificationStreaming.connect {
+                ac
             }.map {
-                it.first to notificationCacheAdder.addAndConvert(
-                    it.first,
-                    it.second.body
-                )
+                ac to it
             }
         }.map { accountAndNotificationRelation ->
             val notificationRelation = accountAndNotificationRelation.second
