@@ -86,8 +86,10 @@ class ChannelAPIMainEventDispatcherAdapter @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(mainDispatcher: MediatorMainEventDispatcher) {
-        accountStore.state.map { it.currentAccount }.filterNotNull().flatMapLatest { ac ->
-            channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map { body ->
+        accountStore.state.map { it.currentAccount }.filterNotNull().filter {
+            it.instanceType == Account.InstanceType.MISSKEY
+        }.flatMapLatest { ac ->
+            requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Main).map { body ->
                 ac to body
             }
         }.mapNotNull {

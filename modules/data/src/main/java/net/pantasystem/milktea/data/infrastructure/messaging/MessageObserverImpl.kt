@@ -42,8 +42,10 @@ class MessageObserverImpl @Inject constructor(
                 is MessagingId.Group -> messagingId.groupId.accountId
             }
             emit(accountRepository.get(accountId).getOrNull())
-        }.filterNotNull().flatMapLatest { ac ->
-            channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map{
+        }.filterNotNull().filter {
+            it.instanceType == Account.InstanceType.MISSKEY
+        }.flatMapLatest { ac ->
+            requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Main).map{
                 (it as? ChannelBody.Main.MessagingMessage)?.body
             }.filterNotNull().map {
                 messageAdder.add(ac, it)
@@ -60,7 +62,7 @@ class MessageObserverImpl @Inject constructor(
     override fun observeAccountMessages(ac: Account): Flow<Message>{
         return suspend {
             channelAPIProvider.get(ac)
-        }.asFlow().flatMapLatest {
+        }.asFlow().filterNotNull().flatMapLatest {
             it.connect(ChannelAPI.Type.Main)
         }.map{
             (it as? ChannelBody.Main.MessagingMessage)?.body

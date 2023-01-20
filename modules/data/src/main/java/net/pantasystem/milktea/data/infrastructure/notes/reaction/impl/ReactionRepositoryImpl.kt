@@ -36,8 +36,8 @@ class ReactionRepositoryImpl @Inject constructor(
             val note = noteRepository.find(createReaction.noteId).getOrThrow()
 
             runCancellableCatching {
-                if (postReaction(createReaction) && !noteCaptureAPIProvider.get(account)
-                        .isCaptured(createReaction.noteId.noteId)
+                if (postReaction(createReaction) && noteCaptureAPIProvider.get(account)
+                        ?.isCaptured(createReaction.noteId.noteId) == false
                 ) {
                     noteDataSource.add(note.onIReacted(createReaction.reaction))
                 }
@@ -56,7 +56,7 @@ class ReactionRepositoryImpl @Inject constructor(
             val note = noteRepository.find(noteId).getOrThrow()
             val account = getAccount.get(noteId.accountId)
             postUnReaction(noteId)
-                    && (noteCaptureAPIProvider.get(account).isCaptured(noteId.noteId)
+                    && (noteCaptureAPIProvider.get(account)?.isCaptured(noteId.noteId) == true
                     || (note.myReaction != null
                     && noteDataSource.add(note.onIUnReacted()).getOrThrow() != AddResult.Canceled))
         }

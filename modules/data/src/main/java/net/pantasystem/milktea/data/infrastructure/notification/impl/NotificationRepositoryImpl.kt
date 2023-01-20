@@ -25,7 +25,7 @@ class NotificationRepositoryImpl @Inject constructor(
     override suspend fun read(notificationId: Notification.Id) {
         runCancellableCatching {
             val account = accountRepository.get(notificationId.accountId).getOrThrow()
-            socketProvider.get(account).send(
+            socketProvider.get(account)?.send(
                 Send.ReadNotification(
                     Send.ReadNotification.Body(notificationId.notificationId)).toJson())
             notificationDataSource.add(notificationDataSource.get(notificationId).getOrThrow().read())

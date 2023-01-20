@@ -98,15 +98,23 @@ class NoteCaptureAPIAdapterImpl(
         synchronized(noteIdWithJob) {
             if (addRepositoryEventListener(id, repositoryEventListener)) {
                 logger.debug("未登録だったのでRemoteに対して購読を開始する")
-                val job = noteCaptureAPIWithAccountProvider.get(account)
-                    .capture(id.noteId)
-                    .catch { e ->
-                        logger.error("ノート更新イベント受信中にエラー発生", e = e)
+                when (account.instanceType) {
+                    Account.InstanceType.MISSKEY -> {
+                        val job = requireNotNull(noteCaptureAPIWithAccountProvider.get(account))
+                            .capture(id.noteId)
+                            .catch { e ->
+                                logger.error("ノート更新イベント受信中にエラー発生", e = e)
+                            }
+                            .onEach {
+                                noteUpdatedDispatcher.emit(account to it)
+                            }.launchIn(coroutineScope)
+                        noteIdWithJob[id] = job
                     }
-                    .onEach {
-                        noteUpdatedDispatcher.emit(account to it)
-                    }.launchIn(coroutineScope)
-                noteIdWithJob[id] = job
+                    Account.InstanceType.MASTODON -> {
+
+                    }
+                }
+
             }
         }
 

@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.streaming.impl
 
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api_streaming.Socket
-import net.pantasystem.milktea.api_streaming.network.MastodonSocketImpl
 import net.pantasystem.milktea.api_streaming.network.SocketImpl
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
@@ -36,7 +35,10 @@ class SocketWithAccountProviderImpl @Inject constructor(
         }
     }
 
-    override fun get(account: Account): Socket {
+    override fun get(account: Account): Socket? {
+        if (account.instanceType == Account.InstanceType.MASTODON) {
+            return null
+        }
         synchronized(accountIdWithSocket) {
             var socket = accountIdWithSocket[account.accountId]
             if (socket != null) {
@@ -65,14 +67,11 @@ class SocketWithAccountProviderImpl @Inject constructor(
             }
             //logger.debug("url:$uri")
 
-            socket = when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> SocketImpl(
-                    url = uri,
-                    okHttpClientProvider = okHttpClientProvider,
-                    loggerFactory = loggerFactory,
-                )
-                Account.InstanceType.MASTODON -> MastodonSocketImpl()
-            }
+            socket = SocketImpl(
+                url = uri,
+                okHttpClientProvider = okHttpClientProvider,
+                loggerFactory = loggerFactory,
+            )
             accountIdWithSocket[account.accountId] = socket
             accountIdWithToken[account.accountId] = account.token
 

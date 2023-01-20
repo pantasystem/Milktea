@@ -33,31 +33,31 @@ class NoteStreamingImpl @Inject constructor(
         }.flatMapLatest { ac ->
             when (pageable) {
                 is Pageable.GlobalTimeline -> {
-                    channelAPIProvider.get(ac).connect(ChannelAPI.Type.Global)
+                    requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Global)
                 }
                 is Pageable.HybridTimeline -> {
-                    channelAPIProvider.get(ac).connect(ChannelAPI.Type.Hybrid)
+                    requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Hybrid)
                 }
                 is Pageable.LocalTimeline -> {
-                    channelAPIProvider.get(ac).connect(ChannelAPI.Type.Local)
+                    requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Local)
                 }
                 is Pageable.HomeTimeline -> {
-                    channelAPIProvider.get(ac).connect(ChannelAPI.Type.Home)
+                    requireNotNull(channelAPIProvider.get(ac)).connect(ChannelAPI.Type.Home)
                 }
                 is Pageable.UserListTimeline -> {
-                    channelAPIProvider.get(ac)
+                    requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.UserList(userListId = pageable.listId))
                 }
                 is Pageable.Antenna -> {
-                    channelAPIProvider.get(ac)
+                    requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.Antenna(antennaId = pageable.antennaId))
                 }
                 is Pageable.UserTimeline -> {
-                    channelAPIProvider.get(ac)
+                    requireNotNull(channelAPIProvider.get(ac))
                         .connectUserTimeline(pageable.userId)
                 }
                 is Pageable.ChannelTimeline -> {
-                    channelAPIProvider.get(ac)
+                    requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.Channel(channelId = pageable.channelId))
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
