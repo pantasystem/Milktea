@@ -206,11 +206,7 @@ class NotificationViewModel @Inject constructor(
                 runCancellableCatching {
                     userRepository.acceptFollowRequest(notification.userId)
                 }.onSuccess {
-                    if (it) {
-                        notifications = notifications.filterNot { n ->
-                            n.id == notification.id
-                        }
-                    }
+                    loadInit()
                 }.onFailure {
                     logger.error("acceptFollowRequest error:$it")
                     _error.tryEmit(it)
@@ -226,11 +222,7 @@ class NotificationViewModel @Inject constructor(
                 runCancellableCatching {
                     userRepository.rejectFollowRequest(notification.userId)
                 }.onSuccess {
-                    if (it) {
-                        notifications = notifications.filterNot { n ->
-                            n.id == notification.id
-                        }
-                    }
+                    loadInit()
                 }.onFailure {
                     logger.error("rejectFollowRequest error:$it")
                     _error.tryEmit(it)
