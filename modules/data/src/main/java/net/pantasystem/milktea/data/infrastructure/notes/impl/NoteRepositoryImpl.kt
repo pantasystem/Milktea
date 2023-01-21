@@ -7,9 +7,11 @@ import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.notes.*
@@ -26,6 +28,7 @@ class NoteRepositoryImpl @Inject constructor(
     val filePropertyDataSource: FilePropertyDataSource,
     private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val mastodonAPIProvider: MastodonAPIProvider,
     val getAccount: GetAccount,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
@@ -57,6 +60,44 @@ class NoteRepositoryImpl @Inject constructor(
             val noteDTO = result.getOrThrow()
             require(noteDTO != null)
             noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
+        }
+    }
+
+    override suspend fun renote(noteId: Note.Id): Result<Note> = runCancellableCatching{
+        withContext(ioDispatcher) {
+            val account = getAccount.get(noteId.accountId)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val n = find(noteId).getOrThrow()
+                    create(CreateNote(
+                        author = account, renoteId = noteId,
+                        text = null,
+                        visibility = n.visibility
+                    )).getOrThrow()
+                }
+                Account.InstanceType.MASTODON -> {
+                    val toot = mastodonAPIProvider.get(account).reblog(noteId.noteId)
+                        .throwIfHasError()
+                        .body()
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, requireNotNull(toot))
+                }
+            }
+        }
+    }
+
+    override suspend fun unrenote(noteId: Note.Id): Result<Unit> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            val account = getAccount.get(noteId.accountId)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> delete(noteId).getOrThrow()
+                Account.InstanceType.MASTODON -> {
+                    val res = mastodonAPIProvider.get(account).unreblog(noteId.noteId)
+                        .throwIfHasError()
+                        .body()
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, requireNotNull(res))
+                }
+
+            }
         }
     }
 

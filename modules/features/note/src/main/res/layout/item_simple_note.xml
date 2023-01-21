@@ -431,7 +431,7 @@
                 android:padding="@dimen/note_bottom_action_icon_padding_size"
                 android:scaleType="centerCrop"
                 android:contentDescription="@string/renote"
-                app:tint="?attr/normalIconTint"
+                renoteButtonColor="@{note.currentNote}"
                 app:clickTargetNote="@{note}"
                 app:notesViewModelForClickRenote="@{noteCardActionListener}"
                 app:layout_constraintTop_toBottomOf="@id/reaction_view"
