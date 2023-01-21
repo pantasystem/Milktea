@@ -67,14 +67,19 @@ class NoteCardActionHandler(
                 }
             }
             is NoteCardAction.OnReactionClicked -> {
-                if (!Reaction(action.reaction).isLocal()) {
-                    RemoteReactionEmojiSuggestionDialog.newInstance(
-                        accountId = action.note.id.accountId,
-                        noteId = action.note.toShowNote.note.id.noteId,
-                        reaction = action.reaction
-                    ).show(activity.supportFragmentManager, "")
-                    return
+
+                // NOTE: MisskeyだとLocalの以外のカスタム絵文字はリアクションとして送信できない
+                if (action.note.toShowNote.note.type is Note.Type.Misskey) {
+                    if (!Reaction(action.reaction).isLocal()) {
+                        RemoteReactionEmojiSuggestionDialog.newInstance(
+                            accountId = action.note.id.accountId,
+                            noteId = action.note.toShowNote.note.id.noteId,
+                            reaction = action.reaction
+                        ).show(activity.supportFragmentManager, "")
+                        return
+                    }
                 }
+
                 notesViewModel.postReaction(action.note, action.reaction)
             }
             is NoteCardAction.OnReactionLongClicked -> {
