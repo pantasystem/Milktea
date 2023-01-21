@@ -14,16 +14,16 @@ import net.pantasystem.milktea.model.user.User
 fun TootPollDTO?.toPoll(): Poll? {
     return this?.let { dto ->
         Poll(
-            multiple = dto.multiple,
+            multiple = dto.multiple ?: false,
             expiresAt = dto.expiresAt,
             choices = dto.options.mapIndexed { index, value ->
                 Poll.Choice(
                     index = index,
                     text = value.title,
-                    isVoted = (!dto.multiple && dto.voted == true) || dto.ownVotes?.firstOrNull {
+                    isVoted = (!(dto.multiple ?: false) && dto.voted == true) || dto.ownVotes?.firstOrNull {
                         it == index
                     } != null,
-                    votes = dto.votesCount
+                    votes = dto.votesCount ?: 0
                 )
             }
         )

@@ -197,27 +197,29 @@ class StreamingAPIImpl(
                 return
             }
 
+            try {
+                val event = when(type) {
+                    "update" -> {
+                        Event.Update(decoder.decodeFromString(data))
+                    }
+                    "notification" -> {
+                        Event.Notification(data)
+                    }
+                    "delete" -> {
+                        Event.Delete(data)
+                    }
+                    else -> {
+                        return
+                    }
+                }
 
+                listeners.map {
+                    it.handler(event)
+                }
 
-            val event = when(type) {
-                "update" -> {
-                    Event.Update(decoder.decodeFromString(data))
-                }
-                "notification" -> {
-                    Event.Notification(data)
-                }
-                "delete" -> {
-                    Event.Delete(data)
-                }
-                else -> {
-                    return
-                }
+            } catch (e: Exception) {
+                logger.error("onEvent", e)
             }
-
-            listeners.map {
-                it.handler(event)
-            }
-
         }
     }
 
