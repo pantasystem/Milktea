@@ -16,6 +16,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccou
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -69,7 +70,15 @@ class NoteCaptureAPIAdapterTest {
                 userId = "hoge",
                 user = UserDTO("hoge", "hogeName")
             )
-            val note = dto.toNote(account)
+            val note = dto.toNote(
+                account, NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = ""
+                    )
+
+                )
+            )
             noteDataSource.add(
                 note
             )
@@ -77,8 +86,11 @@ class NoteCaptureAPIAdapterTest {
             var counter = 1
             noteDataSource.addEventListener {
                 if (it.noteId == note.id) {
-                    assertEquals(1, (it as NoteDataSource.Event.Updated).note.reactionCounts[0].count)
-                    counter ++
+                    assertEquals(
+                        1,
+                        (it as NoteDataSource.Event.Updated).note.reactionCounts[0].count
+                    )
+                    counter++
                 }
             }
 
