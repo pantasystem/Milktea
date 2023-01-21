@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.drive
 
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -11,13 +10,14 @@ import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.AppFile
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okio.BufferedSink
-import okio.source
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
+
 
 object OkHttpDriveFileUploaderConstants {
     const val i = "i"
@@ -67,7 +67,8 @@ class OkHttpDriveFileUploader(
             val requestBody = requestBodyBuilder.build()
 
             val request =
-                Request.Builder().url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
+                Request.Builder()
+                    .url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
@@ -124,7 +125,8 @@ class OkHttpDriveFileUploader(
             val requestBody = requestBodyBuilder.build()
 
             val request =
-                Request.Builder().url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
+                Request.Builder()
+                    .url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code
@@ -165,52 +167,6 @@ class OkHttpDriveFileUploader(
     }
 
 
-
 }
 
-private class UriRequestBody(
-    val uri: Uri,
-    val context: Context,
-) : RequestBody() {
-    override fun contentType(): MediaType? {
-        val type = context.contentResolver.getType(uri)
-        return type?.toMediaType()
-    }
 
-    override fun contentLength(): Long {
-        return context.contentResolver.query(
-            uri,
-            arrayOf(MediaStore.MediaColumns.SIZE),
-            null,
-            null,
-            null
-        )?.use {
-            return@use if (it.moveToFirst()) {
-                it.getLong(0)
-            } else {
-                null
-            }
-        } ?: throw IllegalArgumentException("ファイルサイズの取得に失敗しました")
-    }
-
-    override fun writeTo(sink: BufferedSink) {
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            sink.writeAll(inputStream.source())
-        }
-    }
-}
-
-private class InputStreamRequestBody(
-    val type: String,
-    val inputStream: InputStream,
-) : RequestBody() {
-    override fun contentType(): MediaType {
-        return type.toMediaType()
-    }
-
-    override fun writeTo(sink: BufferedSink) {
-        inputStream.source().use {
-            sink.writeAll(it)
-        }
-    }
-}
