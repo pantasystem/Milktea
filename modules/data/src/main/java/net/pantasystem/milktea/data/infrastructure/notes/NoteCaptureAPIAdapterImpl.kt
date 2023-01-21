@@ -4,7 +4,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api_streaming.NoteUpdated
+import net.pantasystem.milktea.api_streaming.mastodon.Event
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
@@ -19,6 +21,8 @@ class NoteCaptureAPIAdapterImpl(
     private val accountRepository: AccountRepository,
     private val noteDataSource: NoteDataSource,
     private val noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
+    private val streamingAPIProvider: StreamingAPIProvider,
+    private val noteDataSourceAdder: NoteDataSourceAdder,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -39,6 +43,11 @@ class NoteCaptureAPIAdapterImpl(
     private val noteIdWithJob = mutableMapOf<Note.Id, Job>()
 
     /**
+     * mastodonのStreaming APIから流れてきたEventがここに入る
+     */
+    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>()
+
+    /**
      * Noteのキャプチャーによって発生したイベントのQueue。
      * ここから順番にイベントを取り出し、キャッシュに反映させるなどをしている。
      */
@@ -54,6 +63,12 @@ class NoteCaptureAPIAdapterImpl(
         coroutineScope.launch(dispatcher) {
             noteUpdatedDispatcher.collect {
                 handleRemoteEvent(it.first, it.second)
+            }
+        }
+
+        coroutineScope.launch(dispatcher) {
+            streamingEventDispatcher.collect {
+                handleMastodonRemoteEvent(it.first, it.second)
             }
         }
 
@@ -111,7 +126,12 @@ class NoteCaptureAPIAdapterImpl(
                         noteIdWithJob[id] = job
                     }
                     Account.InstanceType.MASTODON -> {
-
+                        val job = requireNotNull(streamingAPIProvider.get(account)).connectUser().catch { e ->
+                            logger.error("ノート更新イベント受信中にエラー発生", e = e)
+                        }.onEach {
+                            streamingEventDispatcher.tryEmit(account to it)
+                        }.launchIn(coroutineScope)
+                        noteIdWithJob[id] = job
                     }
                 }
 
@@ -217,6 +237,20 @@ class NoteCaptureAPIAdapterImpl(
 
     }
 
-
+    private suspend fun handleMastodonRemoteEvent(account: Account, e: Event) {
+        try {
+            when(e) {
+                is Event.Delete -> {
+                    noteDataSource.remove(Note.Id(account.accountId, e.id))
+                }
+                is Event.Notification -> {}
+                is Event.Update -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, e.status)
+                }
+            }
+        } catch (e: Exception) {
+            logger.warning("更新対称のノートが存在しませんでした", e = e)
+        }
+    }
 
 }

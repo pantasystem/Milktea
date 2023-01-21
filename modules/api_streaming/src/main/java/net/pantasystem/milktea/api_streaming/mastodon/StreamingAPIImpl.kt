@@ -122,7 +122,7 @@ class StreamingAPIImpl(
             val listeners = listenersMap[connectType] ?: mutableSetOf()
             listenersMap[connectType] = (listeners + listener)
         }
-        logger.debug("接続数: ${listenersMap[connectType]?.size}")
+        logger.debug("接続数:${connections.size} ハンドラー数:${listenersMap[connectType]?.size}")
 
         connect(connectType)
 
@@ -145,8 +145,10 @@ class StreamingAPIImpl(
                     ).build(),
                     SseEventHandler(connectType)
                 ).request()
+                logger.debug("接続開始")
                 okHttpClient.newCall(request)
             } else {
+                logger.debug("接続済みのためキャンセル")
                 null
             }
         }
@@ -193,8 +195,11 @@ class StreamingAPIImpl(
             }
 
             if (listeners.isNullOrEmpty()) {
-                logger.debug("ignore message connectType:$connectType type:$type, data:$data")
-                return
+                synchronized(listenersMap) {
+                    connections.remove(connectType)?.cancel()
+                    logger.debug("ignore message connectType:$connectType type:$type, data:$data")
+                    return
+                }
             }
 
             try {
@@ -233,9 +238,13 @@ class StreamingAPIImpl(
                     it.remove(this)
                     listenersMap[connectType] = it
                 }
+                logger.debug("Listener#接続数:${connections.size} ハンドラー数:${listenersMap[connectType]?.size}")
                 if (listenersMap[connectType].isNullOrEmpty()) {
                     connections.remove(connectType)?.cancel()
+                    logger.debug("Listener#接続解除 接続数:${connections.size} ハンドラー数:${listenersMap[connectType]?.size}")
                 }
+                logger.debug("Listener#接続数:${connections.size} ハンドラー数:${listenersMap[connectType]?.size}")
+
             }
         }
     }
