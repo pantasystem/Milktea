@@ -61,6 +61,12 @@ interface MastodonAPI {
         @Query("max_id") maxId: String? = null
     ): Response<List<TootStatusDTO>>
 
+    @POST("api/v1/statuses/{statusId}/reblog")
+    suspend fun reblog(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unreblog")
+    suspend fun unreblog(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
     @GET("api/v1/accounts/{accountId}")
     suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
 
