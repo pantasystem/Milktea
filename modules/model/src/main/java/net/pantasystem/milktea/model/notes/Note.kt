@@ -52,7 +52,6 @@ data class Note(
     ) : EntityId
 
 
-
     sealed interface Type {
         object Misskey : Type
         data class Mastodon(
@@ -104,11 +103,15 @@ data class Note(
      * 入っていることになるので厳密なチェックは行わない。
      */
     fun canRenote(userId: User.Id): Boolean {
-        return id.accountId == userId.accountId
-                && (visibility is Visibility.Public
-                || visibility is Visibility.Home
-                || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
-                )
+        return when (type) {
+            is Type.Mastodon -> type.reblogged == null || !type.reblogged
+            Type.Misskey -> id.accountId == userId.accountId
+                    && (visibility is Visibility.Public
+                    || visibility is Visibility.Home
+                    || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
+                    )
+        }
+
     }
 }
 
