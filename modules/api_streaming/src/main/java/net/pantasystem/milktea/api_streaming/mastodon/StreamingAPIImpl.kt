@@ -136,7 +136,7 @@ class StreamingAPIImpl(
                             is ConnectType.UserList -> "https://$host/api/v1/streaming/list/${connectType.listId}"
                         }
                     ).build(),
-                    SseEventHandler(ConnectType.LocalPublic)
+                    SseEventHandler(connectType)
                 ).request()
                 okHttpClient.newCall(request)
             } else {
@@ -194,7 +194,6 @@ class StreamingAPIImpl(
                 return
             }
 
-            logger.debug("onEvent type:$type, data:$data")
 
 
             val event = when(type) {
