@@ -71,6 +71,10 @@ data class Note(
      * 引用リノートであるか
      */
     fun isQuote(): Boolean {
+        // NOTE: mastodonには引用が存在しない
+        if (isMastodon) {
+            return false
+        }
         return isRenote() && hasContent()
     }
 
@@ -90,6 +94,9 @@ data class Note(
      * ファイル、投票、テキストなどのコンテンツを持っているか
      */
     fun hasContent(): Boolean {
+        if (isMastodon && isRenote()) {
+            return false
+        }
         return text != null || !fileIds.isNullOrEmpty() || poll != null
     }
 
