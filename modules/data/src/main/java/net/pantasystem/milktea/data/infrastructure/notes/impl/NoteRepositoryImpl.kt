@@ -29,14 +29,13 @@ class NoteRepositoryImpl @Inject constructor(
     private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val mastodonAPIProvider: MastodonAPIProvider,
+    val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
 
     private val logger = loggerFactory.create("NoteRepositoryImpl")
-    private val noteDataSourceAdder: NoteDataSourceAdder by lazy {
-        NoteDataSourceAdder(userDataSource, noteDataSource, filePropertyDataSource)
-    }
+
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {

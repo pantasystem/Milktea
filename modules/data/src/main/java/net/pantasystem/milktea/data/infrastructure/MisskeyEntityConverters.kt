@@ -17,6 +17,7 @@ import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.InvitationId
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.messaging.Message
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -93,7 +94,7 @@ fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
     return message to list
 }
 
-fun NoteDTO.toEntities(account: Account): NoteRelationEntities {
+fun NoteDTO.toEntities(account: Account, nodeInfo: NodeInfo?): NoteRelationEntities {
     val dtoList = mutableListOf<NoteDTO>()
     dtoList.add(this)
 
@@ -106,12 +107,12 @@ fun NoteDTO.toEntities(account: Account): NoteRelationEntities {
         dtoList.add(reNote!!)
     }
 
-    val note = this.toNote(account)
+    val note = this.toNote(account, nodeInfo)
     val users = mutableListOf<User>()
     val notes = mutableListOf<Note>()
     val files = mutableListOf<FileProperty>()
 
-    pickEntities(account, notes, users, files)
+    pickEntities(account, notes, users, files, nodeInfo)
     return NoteRelationEntities(
         note = note,
         notes = notes,
@@ -120,8 +121,8 @@ fun NoteDTO.toEntities(account: Account): NoteRelationEntities {
     )
 }
 
-private fun NoteDTO.pickEntities(account: Account, notes: MutableList<Note>, users: MutableList<User>, files: MutableList<FileProperty>) {
-    val (note, user) = this.toNoteAndUser(account)
+private fun NoteDTO.pickEntities(account: Account, notes: MutableList<Note>, users: MutableList<User>, files: MutableList<FileProperty>, nodeInfo: NodeInfo?) {
+    val (note, user) = this.toNoteAndUser(account, nodeInfo)
     notes.add(note)
     users.add(user)
     files.addAll(
@@ -130,11 +131,11 @@ private fun NoteDTO.pickEntities(account: Account, notes: MutableList<Note>, use
         }?: emptyList()
     )
     if(this.reply != null) {
-        this.reply!!.pickEntities(account, notes, users, files)
+        this.reply!!.pickEntities(account, notes, users, files, nodeInfo)
     }
 
     if(this.reNote != null) {
-        this.reNote!!.pickEntities(account, notes, users, files)
+        this.reNote!!.pickEntities(account, notes, users, files, nodeInfo)
     }
 }
 
@@ -156,7 +157,7 @@ fun PollDTO?.toPoll(): Poll? {
 }
 
 
-fun NoteDTO.toNote(account: Account): Note {
+fun NoteDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
     val visibility = Visibility(this.visibility?: "public", isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
         User.Id(account.accountId, id)
     }?: emptyList())
@@ -190,18 +191,19 @@ fun NoteDTO.toNote(account: Account): Note {
             Channel.Id(account.accountId, it)
         },
         type = Note.Type.Misskey,
+        nodeInfo = nodeInfo,
     )
 }
 
 
-fun NoteDTO.toNoteAndUser(account: Account): Pair<Note, User> {
-    val note = this.toNote(account)
+fun NoteDTO.toNoteAndUser(account: Account, nodeInfo: NodeInfo?): Pair<Note, User> {
+    val note = this.toNote(account, nodeInfo)
     val user = this.user.toUser(account,false)
     return note to user
 }
 
 
-fun NotificationDTO.toNotification(account: Account): Notification {
+fun NotificationDTO.toNotification(account: Account, nodeInfo: NodeInfo?): Notification {
     val id = Notification.Id(account.accountId, this.id)
     return when (this.type) {
         "follow" -> {
@@ -273,7 +275,7 @@ fun NotificationDTO.toNotification(account: Account): Notification {
                 "想定しないデータ=$this"
             }
             require(note != null)
-            val n = note!!.toNote(account)
+            val n = note!!.toNote(account, nodeInfo)
             ReactionNotification(
                 id,
                 createdAt,
