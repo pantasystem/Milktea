@@ -410,6 +410,7 @@
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/ic_re_note"
+                        renoteButtonColor="@{note.currentNote}"
                         android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
                         app:tint="?attr/normalIconTint" />
 

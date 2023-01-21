@@ -27,8 +27,8 @@ object RenoteButtonHelper {
 
     @JvmStatic
     @BindingAdapter("renoteButtonColor")
-    fun ImageButton.setRenoteButtonIconFromState(planeNoteViewData: PlaneNoteViewData?) {
-        planeNoteViewData ?: return
+    fun ImageButton.setRenoteButtonIconFromState(note: Note?) {
+        note ?: return
         val theme = context.theme
         val typedValue = TypedValue()
         theme.resolveAttribute(R.attr.normalIconTint, typedValue, true)
@@ -37,7 +37,7 @@ object RenoteButtonHelper {
         theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
         val primaryColor = typedValue.data
 
-        when(val type = planeNoteViewData.toShowNote.note.type) {
+        when(val type = note.type) {
             is Note.Type.Mastodon -> {
                 if (type.reblogged == true) {
                     this.imageTintList = ColorStateList.valueOf(primaryColor)
