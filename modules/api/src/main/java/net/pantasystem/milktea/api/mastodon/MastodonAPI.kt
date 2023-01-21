@@ -30,6 +30,9 @@ interface MastodonAPI {
     @GET("api/v1/accounts/verify_credentials")
     suspend fun verifyCredentials(): Response<MastodonAccountDTO>
 
+    /**
+     * @param visibilities fedibirdの独自パラメータ
+     */
     @GET("api/v1/timelines/public")
     suspend fun getPublicTimeline(
         @Query("local") local: Boolean = false,
@@ -39,6 +42,7 @@ interface MastodonAPI {
         @Query("since_id") sinceId: String? = null,
         @Query("min_id") minId: String? = null,
         @Query("limit") limit: Int = 20,
+        @Query("visibilities") visibilities: List<String>? = null,
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/tag/{tag}")
@@ -48,17 +52,21 @@ interface MastodonAPI {
         @Query("max_id") maxId: String? = null
     ): Response<List<TootStatusDTO>>
 
+    /**
+     * @param visibilities fedibirdの独自パラメータ
+     */
     @GET("api/v1/timelines/home")
     suspend fun getHomeTimeline(
         @Query("min_id") minId: String? = null,
-        @Query("max_id") maxId: String? = null
+        @Query("max_id") maxId: String? = null,
+        @Query("visibilities") visibilities: List<String>? = null
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/list/{listId}")
     suspend fun getListTimeline(
         @Path("listId") listId: String,
         @Query("min_id") minId: String? = null,
-        @Query("max_id") maxId: String? = null
+        @Query("max_id") maxId: String? = null,
     ): Response<List<TootStatusDTO>>
 
     @POST("api/v1/statuses/{statusId}/reblog")
@@ -79,4 +87,9 @@ interface MastodonAPI {
     @POST("api/v1/accounts/{accountId}/unfollow")
     suspend fun unfollow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
+    @PUT("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
+    suspend fun reaction(@Path("statusId") statusId: String, @Path("emoji") emoji: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/emoji_unreaction")
+    suspend fun unreaction(@Path("statusId") statusId: String): Response<TootStatusDTO>
 }

@@ -9,6 +9,24 @@ data class Reaction(val reaction: String) {
         return reaction.replace(":", "").split("@").getOrNull(0)
     }
 
+    fun getHost(): String? {
+        val host = reaction.replace(":", "").split("@").getOrNull(1)
+        if (host == ".") {
+            return null
+        }
+        return host
+    }
+
+    fun getNameAndHost(): String {
+        val text = getName() ?: reaction
+        val host = getHost()
+        return if (host == null || host == ".") {
+            text
+        } else {
+            "$text@$host"
+        }
+    }
+
     /**
      * フォーマットがカスタム絵文字のものであるか判定する
      */

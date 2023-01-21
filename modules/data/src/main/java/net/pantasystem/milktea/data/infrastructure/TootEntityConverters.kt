@@ -6,6 +6,7 @@ import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -47,7 +48,7 @@ fun TootMediaAttachment.toFileProperty(account: Account): FileProperty {
     )
 }
 
-fun TootStatusDTO.toNote(account: Account): Note {
+fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
     return Note(
         id = Note.Id(account.accountId, id),
         text = this.content,
@@ -94,16 +95,17 @@ fun TootStatusDTO.toNote(account: Account): Note {
             bookmarked = bookmarked,
             muted = muted
         ),
+        nodeInfo = nodeInfo,
     )
 }
 
-fun TootStatusDTO.toEntities(account: Account): NoteRelationEntities {
+fun TootStatusDTO.toEntities(account: Account, nodeInfo: NodeInfo?): NoteRelationEntities {
     val users = mutableListOf<User>()
     val notes = mutableListOf<Note>()
     val files = mutableListOf<FileProperty>()
-    pickEntities(account, notes, users, files)
+    pickEntities(account, notes, users, files, nodeInfo)
     return NoteRelationEntities(
-        note = toNote(account),
+        note = toNote(account, nodeInfo),
         files = files,
         users = users,
         notes = notes,
@@ -114,9 +116,10 @@ fun TootStatusDTO.pickEntities(
     account: Account,
     notes: MutableList<Note>,
     users: MutableList<User>,
-    files: MutableList<FileProperty>
+    files: MutableList<FileProperty>,
+    nodeInfo: NodeInfo?
 ) {
-    val (note, user) = toNote(account) to this.account.toModel(account)
+    val (note, user) = toNote(account, nodeInfo) to this.account.toModel(account)
     notes.add(note)
     users.add(user)
     files.addAll(
@@ -124,7 +127,7 @@ fun TootStatusDTO.pickEntities(
             it.toFileProperty(account)
         }
     )
-    this.reblog?.pickEntities(account, notes, users, files)
+    this.reblog?.pickEntities(account, notes, users, files, nodeInfo)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {

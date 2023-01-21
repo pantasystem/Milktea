@@ -11,10 +11,11 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSo
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class InMemoryNoteDataSourceTest {
 
@@ -45,7 +46,15 @@ class InMemoryNoteDataSourceTest {
             userId = "hoge",
             user = UserDTO("hoge", "hogeName")
         )
-        val note = dto.toNote(account)
+        val note = dto.toNote(
+            account, NodeInfo(
+                host = "", version = "", software = NodeInfo.Software(
+                    name = "misskey",
+                    version = ""
+                )
+
+            )
+        )
         runBlocking {
             val result = noteDataSource.add(
                 note
@@ -76,12 +85,28 @@ class InMemoryNoteDataSourceTest {
             userId = "hoge",
             user = UserDTO("hoge", "hogeName")
         )
-        val note = dto.toNote(account)
+        val note = dto.toNote(
+            account, NodeInfo(
+                host = "", version = "", software = NodeInfo.Software(
+                    name = "misskey",
+                    version = ""
+                )
+
+            )
+        )
         noteDataSource.add(
             note
         )
 
-        val dtoParsed = dto.toNote(account)
+        val dtoParsed = dto.toNote(
+            account, NodeInfo(
+                host = "", version = "", software = NodeInfo.Software(
+                    name = "misskey",
+                    version = ""
+                )
+
+            )
+        )
         assertEquals(AddResult.Updated, noteDataSource.add(dtoParsed).getOrThrow())
 
         assertTrue(dtoParsed === noteDataSource.get(dtoParsed.id).getOrThrow())
