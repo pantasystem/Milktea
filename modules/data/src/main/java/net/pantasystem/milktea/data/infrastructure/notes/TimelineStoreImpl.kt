@@ -27,6 +27,8 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.SincePaginate
 import net.pantasystem.milktea.model.account.page.UntilPaginate
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
@@ -47,6 +49,7 @@ class TimelineStoreImpl(
     private val noteRelationGetter: NoteRelationGetter,
     private val metaRepository: MetaRepository,
     private val mastodonAPIProvider: MastodonAPIProvider,
+    private val nodeInfoRepository: NodeInfoRepository,
 ) : TimelineStore {
 
     class Factory @Inject constructor(
@@ -56,6 +59,7 @@ class TimelineStoreImpl(
         private val noteRelationGetter: NoteRelationGetter,
         private val metaRepository: MetaRepository,
         private val mastodonAPIProvider: MastodonAPIProvider,
+        private val nodeInfoRepository: NodeInfoRepository
     ) : TimelineStore.Factory {
         override fun create(
             pageable: Pageable,
@@ -72,6 +76,7 @@ class TimelineStoreImpl(
                 noteRelationGetter,
                 metaRepository,
                 mastodonAPIProvider,
+                nodeInfoRepository = nodeInfoRepository
             )
         }
     }
@@ -97,7 +102,8 @@ class TimelineStoreImpl(
                     pageableTimeline = pageableTimeline,
                     mastodonAPIProvider = mastodonAPIProvider,
                     getAccount,
-                    noteAdder
+                    noteAdder,
+                    nodeInfoRepository
                 )
             }
             else -> TimelinePagingStoreImpl(
@@ -470,7 +476,9 @@ class MastodonTimelineStorePagingStoreImpl(
     val mastodonAPIProvider: MastodonAPIProvider,
     val getAccount: suspend () -> Account,
     val noteAdder: NoteDataSourceAdder,
-) : EntityConverter<TootStatusDTO, Note.Id>, PreviousLoader<TootStatusDTO>, FutureLoader<TootStatusDTO>,
+    val nodeInfoRepository: NodeInfoRepository,
+) : EntityConverter<TootStatusDTO, Note.Id>, PreviousLoader<TootStatusDTO>,
+    FutureLoader<TootStatusDTO>,
     IdGetter<Note.Id>, StateLocker, TimelinePagingBase, StreamingReceivableStore {
 
     private val _state =
@@ -488,12 +496,29 @@ class MastodonTimelineStorePagingStoreImpl(
 
     override suspend fun loadFuture(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
-        when(pageableTimeline) {
-            is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(pageableTimeline.hashtag, minId = getSinceId()?.noteId)
-            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(minId = getSinceId()?.noteId)
-            is Pageable.Mastodon.ListTimeline -> api.getListTimeline(minId = getSinceId()?.noteId, listId = pageableTimeline.listId)
-            is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(local = true, minId = getSinceId()?.noteId)
-            is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(minId = getSinceId()?.noteId)
+
+        when (pageableTimeline) {
+            is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
+                pageableTimeline.hashtag,
+                minId = getSinceId()?.noteId
+            )
+            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
+                minId = getSinceId()?.noteId,
+                visibilities = getVisibilitiesParameter(getAccount())
+            )
+            is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
+                minId = getSinceId()?.noteId,
+                listId = pageableTimeline.listId,
+            )
+            is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
+                local = true,
+                minId = getSinceId()?.noteId,
+                visibilities = getVisibilitiesParameter(getAccount())
+            )
+            is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
+                minId = getSinceId()?.noteId,
+                visibilities = getVisibilitiesParameter(getAccount())
+            )
         }.throwIfHasError().body()!!
     }
 
@@ -518,17 +543,41 @@ class MastodonTimelineStorePagingStoreImpl(
     }
 
 
-
     override suspend fun loadPrevious(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
-        when(pageableTimeline) {
-            is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(pageableTimeline.hashtag, maxId = getUntilId()?.noteId)
-            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(maxId = getUntilId()?.noteId)
-            is Pageable.Mastodon.ListTimeline -> api.getListTimeline(maxId = getUntilId()?.noteId, listId = pageableTimeline.listId)
-            is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(local = true, maxId = getUntilId()?.noteId)
-            is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(maxId = getUntilId()?.noteId)
+        when (pageableTimeline) {
+            is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
+                pageableTimeline.hashtag,
+                maxId = getUntilId()?.noteId
+            )
+            Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
+                maxId = getUntilId()?.noteId,
+                visibilities = getVisibilitiesParameter(getAccount())
+            )
+            is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
+                maxId = getUntilId()?.noteId,
+                listId = pageableTimeline.listId,
+
+                )
+            is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
+                local = true,
+                maxId = getUntilId()?.noteId,
+                visibilities = getVisibilitiesParameter(getAccount())
+            )
+            is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
+                maxId = getUntilId()?.noteId,
+                visibilities = getVisibilitiesParameter(getAccount())
+            )
         }.throwIfHasError().body()!!
     }
 
+    private suspend fun getVisibilitiesParameter(account: Account): List<String>? {
+        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull() ?: return null
+        return if (nodeInfo.type is NodeInfo.SoftwareType.Mastodon.Fedibird) {
+            listOf("public", "unlisted", "private", "limited", "direct", "personal")
+        } else {
+            null
+        }
+    }
 
 }
