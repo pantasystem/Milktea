@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.api_streaming.mastodon
 
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -57,7 +59,7 @@ class StreamingAPIImpl(
             awaitClose {
                 listener.close()
             }
-        }
+        }.buffer(capacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     }
 
     override fun connectPublic(): Flow<TootStatusDTO> {
@@ -70,7 +72,7 @@ class StreamingAPIImpl(
             awaitClose {
                 listener.close()
             }
-        }
+        }.buffer(capacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     }
 
@@ -84,7 +86,7 @@ class StreamingAPIImpl(
             awaitClose {
                 listener.close()
             }
-        }
+        }.buffer(capacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     }
 
@@ -98,7 +100,7 @@ class StreamingAPIImpl(
             awaitClose {
                 listener.close()
             }
-        }
+        }.buffer(capacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     }
 
@@ -110,7 +112,7 @@ class StreamingAPIImpl(
             awaitClose {
                 listener.close()
             }
-        }
+        }.buffer(capacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     }
 
 
@@ -118,8 +120,9 @@ class StreamingAPIImpl(
         val listener = Listener(connectType, handler)
         synchronized(listenersMap) {
             val listeners = listenersMap[connectType] ?: mutableSetOf()
-            listenersMap[connectType] = listeners + listener
+            listenersMap[connectType] = (listeners + listener)
         }
+        logger.debug("接続数: ${listenersMap[connectType]?.size}")
 
         val call = synchronized(listenersMap) {
             if (connections[connectType] == null) {
@@ -170,6 +173,7 @@ class StreamingAPIImpl(
 
         override fun onOpen(eventSource: EventSource, response: Response) {
             super.onOpen(eventSource, response)
+            logger.debug("onOpen")
             synchronized(listenersMap) {
                 if (connections[connectType] != null) {
                     connections[connectType]?.cancel()
@@ -185,11 +189,17 @@ class StreamingAPIImpl(
                 listenersMap[connectType]
             }
 
-            listeners ?: return
+            if (listeners.isNullOrEmpty()) {
+                logger.debug("ignore message connectType:$connectType type:$type, data:$data")
+                return
+            }
+
+            logger.debug("onEvent type:$type, data:$data")
+
 
             val event = when(type) {
                 "update" -> {
-                    Event.Update(decoder.decodeFromString<TootStatusDTO>(data))
+                    Event.Update(decoder.decodeFromString(data))
                 }
                 "notification" -> {
                     Event.Notification(data)
