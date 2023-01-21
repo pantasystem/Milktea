@@ -124,6 +124,13 @@ class StreamingAPIImpl(
         }
         logger.debug("接続数: ${listenersMap[connectType]?.size}")
 
+        connect(connectType)
+
+        return listener
+
+    }
+
+    private fun connect(connectType: ConnectType) {
         val call = synchronized(listenersMap) {
             if (connections[connectType] == null) {
                 val request = EventSources.createFactory(okHttpClient).newEventSource(
@@ -149,8 +156,6 @@ class StreamingAPIImpl(
 
             override fun onResponse(call: Call, response: Response) = Unit
         })
-        return listener
-
     }
 
     private inner class SseEventHandler(val connectType: ConnectType) : EventSourceListener() {
@@ -165,10 +170,8 @@ class StreamingAPIImpl(
         override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
             super.onFailure(eventSource, t, response)
 
-            synchronized(listenersMap) {
-                connections.remove(connectType)
-            }
-
+            Thread.sleep(3000)
+            connect(connectType)
         }
 
         override fun onOpen(eventSource: EventSource, response: Response) {
