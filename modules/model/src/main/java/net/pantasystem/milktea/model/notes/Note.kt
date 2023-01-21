@@ -104,7 +104,7 @@ data class Note(
      */
     fun canRenote(userId: User.Id): Boolean {
         return when (type) {
-            is Type.Mastodon -> type.reblogged == null || !type.reblogged
+            is Type.Mastodon -> true
             Type.Misskey -> id.accountId == userId.accountId
                     && (visibility is Visibility.Public
                     || visibility is Visibility.Home
