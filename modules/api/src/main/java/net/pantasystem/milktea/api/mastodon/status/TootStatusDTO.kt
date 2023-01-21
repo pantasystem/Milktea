@@ -72,9 +72,9 @@ data class TootStatusDTO(
 
         val reaction = if (isCustomEmoji) {
             if (domain == null) {
-                ":$name@.:"
+                "$name@."
             } else {
-                ":$name@$domain:"
+                "$name@$domain"
             }
         } else {
             name
@@ -86,9 +86,9 @@ data class TootStatusDTO(
             }
             return Emoji(
                 name = if (domain == null) {
-                    ":$name@.:"
+                    "$name@."
                 } else {
-                    ":$name@$domain:"
+                    "$name@$domain"
                 },
                 url = url,
                 host = domain,

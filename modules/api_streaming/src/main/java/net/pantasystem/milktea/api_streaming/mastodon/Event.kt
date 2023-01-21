@@ -50,9 +50,9 @@ data class EmojiReaction(
 
         return Emoji(
             name = if (domain == null) {
-                ":$name@.:"
+                "$name@."
             } else {
-                ":$name@$domain:"
+                "$name@$domain"
             },
             url = url,
             host = domain,
