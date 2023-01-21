@@ -73,4 +73,9 @@ interface MastodonAPI {
     @POST("api/v1/accounts/{accountId}/unfollow")
     suspend fun unfollow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
+    @PUT("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
+    suspend fun reaction(@Path("statusId") statusId: String, @Path("emoji") emoji: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/emoji_unreactions")
+    suspend fun unreaction(@Path("statusId") statusId: String): Response<TootStatusDTO>
 }
