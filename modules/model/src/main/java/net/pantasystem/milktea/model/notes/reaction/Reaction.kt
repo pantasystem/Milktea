@@ -10,16 +10,17 @@ data class Reaction(val reaction: String) {
     }
 
     fun getHost(): String? {
-        return reaction.replace(":", "").split("@").getOrNull(1)
+        val host = reaction.replace(":", "").split("@").getOrNull(1)
+        if (host == ".") {
+            return null
+        }
+        return host
     }
 
     fun getNameAndHost(): String {
-        if (!isCustomEmojiFormat()) {
-            return reaction
-        }
         val text = getName() ?: reaction
         val host = getHost()
-        return if (host == null) {
+        return if (host == null || host == ".") {
             text
         } else {
             "$text@$host"
