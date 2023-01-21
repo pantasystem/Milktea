@@ -136,16 +136,16 @@ class StreamingAPIImpl(
                 val request = EventSources.createFactory(okHttpClient).newEventSource(
                     Request.Builder().url(
                         when(connectType) {
-                            is ConnectType.Hashtag -> "https://$host/api/v1/streaming/hashtag/${connectType.tag}"
+                            is ConnectType.Hashtag ->  "https://$host/api/v1/streaming/hashtag/${connectType.tag}"
                             ConnectType.LocalPublic -> "https://$host/api/v1/streaming/public/local"
-                            ConnectType.Public -> "https://$host/api/v1/streaming/public"
-                            ConnectType.User -> "https://$host/api/v1/streaming/user"
+                            ConnectType.Public ->      "https://$host/api/v1/streaming/public"
+                            ConnectType.User ->        "https://$host/api/v1/streaming/user"
                             is ConnectType.UserList -> "https://$host/api/v1/streaming/list/${connectType.listId}"
                         }
                     ).build(),
                     SseEventHandler(connectType)
                 ).request()
-                logger.debug("接続開始")
+                logger.debug("接続開始 connections:${connections.size}, listeners:${listenersMap[connectType]?.size}")
                 okHttpClient.newCall(request)
             } else {
                 logger.debug("接続済みのためキャンセル")
@@ -171,8 +171,9 @@ class StreamingAPIImpl(
 
         override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
             super.onFailure(eventSource, t, response)
+            logger.error("接続に失敗: $connectType", t)
 
-            Thread.sleep(3000)
+            Thread.sleep(10000)
             connect(connectType)
         }
 
@@ -196,8 +197,10 @@ class StreamingAPIImpl(
 
             if (listeners.isNullOrEmpty()) {
                 synchronized(listenersMap) {
-                    connections.remove(connectType)?.cancel()
-                    logger.debug("ignore message connectType:$connectType type:$type, data:$data")
+                    if (listenersMap[connectType].isNullOrEmpty()) {
+                        connections.remove(connectType)?.cancel()
+                        logger.debug("ignore message connectType:$connectType type:$type, data:$data")
+                    }
                     return
                 }
             }
@@ -213,7 +216,12 @@ class StreamingAPIImpl(
                     "delete" -> {
                         Event.Delete(data)
                     }
+                    "emoji_reaction" -> {
+                        logger.debug("emoji_reaction")
+                        Event.Reaction(decoder.decodeFromString(data))
+                    }
                     else -> {
+                        logger.debug("unknown event $type, data:$data")
                         return
                     }
                 }

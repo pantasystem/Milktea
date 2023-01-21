@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
 import net.pantasystem.milktea.api_streaming.NoteUpdated
+import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -48,6 +49,34 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
         reactionCounts = list,
         myReaction = if(e.body.userId == account.remoteId) e.body.reaction else this.myReaction,
         emojis = emojis?.distinct()
+    )
+}
+
+fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
+    val reactionCount = ReactionCount(e.reaction, e.count)
+    val hasItem = reactionCounts.any {
+        it.reaction == e.reaction
+    }
+    var list = reactionCounts.map { count ->
+        if (count.reaction == e.reaction) {
+            reactionCount
+        } else {
+            count
+        }
+    }
+
+    if (!hasItem) {
+        list = list + reactionCount
+    }
+
+    val emojis = when(val emoji = e.toEmoji()) {
+        null -> this.emojis
+        else -> (this.emojis ?: emptyList()) + emoji
+    }
+    return this.copy(
+        reactionCounts = list,
+        myReaction = e.myReaction(account.remoteId),
+        emojis = emojis
     )
 }
 

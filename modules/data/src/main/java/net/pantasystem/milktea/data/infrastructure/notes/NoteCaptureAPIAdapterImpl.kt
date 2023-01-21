@@ -247,6 +247,11 @@ class NoteCaptureAPIAdapterImpl(
                 is Event.Update -> {
                     noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, e.status)
                 }
+                is Event.Reaction -> {
+                    val noteId = Note.Id(account.accountId, e.reaction.statusId)
+                    val note = noteDataSource.get(noteId).getOrThrow()
+                    noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+                }
             }
         } catch (e: Exception) {
             logger.warning("更新対称のノートが存在しませんでした", e = e)
