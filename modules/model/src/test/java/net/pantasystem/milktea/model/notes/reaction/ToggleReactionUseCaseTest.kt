@@ -533,4 +533,90 @@ class ToggleReactionUseCaseTest {
             create(ReactionHistory("\uD83D\uDE06", "https://misskey.io"))
         }
     }
+
+    @Test
+    fun giveRemoteEmojiWhenFedibird() {
+        val targetNote = generateEmptyNote().copy(
+            text = "test",
+            id = Note.Id(accountId = 0L, "testId")
+        )
+        val createReactionDTO = CreateReaction(targetNote.id, "kawaii@misskey.io")
+
+        val noteRepository = mock<NoteRepository> {
+
+            onBlocking {
+                find(targetNote.id).getOrThrow()
+            } doReturn targetNote
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
+            onBlocking {
+                create(createReactionDTO).getOrThrow()
+            } doReturn true
+        }
+
+        val meta = Meta(
+            uri = "https://misskey.io",
+            emojis = listOf()
+        )
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
+        val account = Account(
+            "testId",
+            "https://fedibird.com",
+            instanceType = Account.InstanceType.MASTODON,
+            token = "test",
+            userName = "test",
+            accountId = 0L,
+            pages = emptyList(),
+        )
+        val getAccount = mock<GetAccount> {
+            onBlocking {
+                get(any())
+            } doReturn account
+        }
+        val fetchMeta = mock<MetaRepository> {
+            onBlocking {
+                find(account.normalizedInstanceDomain)
+            } doReturn Result.success(meta)
+        }
+        val checkEmoji = mock<CheckEmoji> {
+            onBlocking {
+                checkEmoji(any())
+            } doReturn true
+        }
+
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "fedibird",
+                        version = "v3.3"
+                    )
+                )
+            )
+        }
+
+        val useCase = ToggleReactionUseCase(
+            getAccount = getAccount,
+            noteRepository = noteRepository,
+            metaRepository = fetchMeta,
+            reactionHistoryRepository = reactionHistoryDao,
+            checkEmoji = checkEmoji,
+            reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository,
+        )
+
+        runBlocking {
+            useCase(targetNote.id, "kawaii@misskey.io").getOrThrow()
+        }
+        verifyBlocking(reactionRepository) {
+            create(createReactionDTO)
+        }
+
+        verifyBlocking(reactionHistoryDao) {
+            create(ReactionHistory("kawaii@misskey.io", "https://fedibird.com"))
+        }
+    }
 }
