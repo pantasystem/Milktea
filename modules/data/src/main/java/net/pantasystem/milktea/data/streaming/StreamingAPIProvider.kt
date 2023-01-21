@@ -5,7 +5,6 @@ import net.pantasystem.milktea.api_streaming.mastodon.StreamingAPI
 import net.pantasystem.milktea.api_streaming.mastodon.StreamingAPIImpl
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.Account
-import okhttp3.OkHttpClient
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,7 +29,7 @@ class StreamingAPIProvider @Inject constructor(
             streaming = StreamingAPIImpl(
                 host = account.getHost(),
                 token = account.token,
-                okHttpClient = OkHttpClient.Builder().addInterceptor {
+                okHttpClient = okHttpClientProvider.create().newBuilder().addInterceptor {
                     val request = it.request()
                     val newReq = request.newBuilder()
                         .header("Authorization", "Bearer ${account.token}")

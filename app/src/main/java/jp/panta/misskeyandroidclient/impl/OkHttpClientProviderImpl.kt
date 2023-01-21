@@ -22,4 +22,8 @@ class OkHttpClientProviderImpl @Inject constructor(): OkHttpClientProvider {
     override fun get(): OkHttpClient {
         return client
     }
+
+    override fun create(): OkHttpClient {
+        return OkHttpClient()
+    }
 }
