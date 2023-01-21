@@ -41,6 +41,8 @@ open class PlaneNoteViewData(
             }
         }
 
+    private val _currentNote = MutableLiveData(toShowNote.note)
+    val currentNote: LiveData<Note> = _currentNote
 
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
@@ -125,8 +127,9 @@ open class PlaneNoteViewData(
 
     val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
 
-    val canRenote =
-        toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
+    val canRenote = Transformations.map(currentNote) {
+        it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
+    }
 
     val reactionCounts = MutableLiveData(toShowNote.note.reactionCounts)
 
@@ -205,6 +208,7 @@ open class PlaneNoteViewData(
         note.poll?.let {
             poll.postValue(it)
         }
+        _currentNote.postValue(note)
     }
 
 

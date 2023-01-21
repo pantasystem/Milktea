@@ -51,11 +51,21 @@ data class Note(
         val noteId: String
     ) : EntityId
 
-    enum class Type {
-        Misskey, Mastodon,
+
+    sealed interface Type {
+        object Misskey : Type
+        data class Mastodon(
+            val reblogged: Boolean?,
+            val favorited: Boolean?,
+            val bookmarked: Boolean?,
+            val muted: Boolean?,
+        ) : Type
     }
 
     companion object;
+
+    val isMastodon: Boolean = type is Type.Mastodon
+    val isMisskey: Boolean = type is Type.Misskey
 
     /**
      * 引用リノートであるか
@@ -93,11 +103,15 @@ data class Note(
      * 入っていることになるので厳密なチェックは行わない。
      */
     fun canRenote(userId: User.Id): Boolean {
-        return id.accountId == userId.accountId
-                && (visibility is Visibility.Public
-                || visibility is Visibility.Home
-                || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
-                )
+        return when (type) {
+            is Type.Mastodon -> true
+            Type.Misskey -> id.accountId == userId.accountId
+                    && (visibility is Visibility.Public
+                    || visibility is Visibility.Home
+                    || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
+                    )
+        }
+
     }
 }
 

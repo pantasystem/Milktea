@@ -9,6 +9,10 @@ interface NoteRepository {
 
     suspend fun create(createNote: CreateNote): Result<Note>
 
+    suspend fun renote(noteId: Note.Id): Result<Note>
+
+    suspend fun unrenote(noteId: Note.Id): Result<Unit>
+
     suspend fun find(noteId: Note.Id): Result<Note>
 
     suspend fun findIn(noteIds: List<Note.Id>): List<Note>
