@@ -43,6 +43,7 @@ class StreamingAPIImpl(
     private val listenersMap = mutableMapOf<ConnectType, Set<Listener>>()
 
     private val connections = mutableMapOf<ConnectType, EventSource>()
+    private val isWaitingConnections = mutableSetOf<ConnectType>()
 
     private val logger by lazy {
         loggerFactory.create("StreamingAPIImpl")
@@ -132,7 +133,8 @@ class StreamingAPIImpl(
 
     private fun connect(connectType: ConnectType) {
         val call = synchronized(listenersMap) {
-            if (connections[connectType] == null) {
+            if (connections[connectType] == null && !isWaitingConnections.contains(connectType)) {
+                isWaitingConnections.add(connectType)
                 val request = EventSources.createFactory(okHttpClient).newEventSource(
                     Request.Builder().url(
                         when(connectType) {
@@ -166,6 +168,7 @@ class StreamingAPIImpl(
 
             synchronized(listenersMap) {
                 listenersMap.remove(connectType)
+                isWaitingConnections.remove(connectType)
             }
         }
 
@@ -173,6 +176,10 @@ class StreamingAPIImpl(
             super.onFailure(eventSource, t, response)
             logger.error("接続に失敗: $connectType", t)
 
+            synchronized(listenersMap) {
+                connections.remove(connectType)
+                isWaitingConnections.remove(connectType)
+            }
             Thread.sleep(10000)
             connect(connectType)
         }
@@ -184,6 +191,7 @@ class StreamingAPIImpl(
                 if (connections[connectType] != null) {
                     connections[connectType]?.cancel()
                 }
+                isWaitingConnections.remove(connectType)
                 connections[connectType] = eventSource
             }
         }
