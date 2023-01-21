@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.common.Logger
 import okhttp3.*
 import okhttp3.sse.EventSource
 import okhttp3.sse.EventSourceListener
@@ -16,6 +17,7 @@ class StreamingAPIImpl(
     val host: String,
     val token: String,
     val okHttpClient: OkHttpClient,
+    val loggerFactory: Logger.Factory,
 ) : StreamingAPI {
 
 
@@ -39,6 +41,10 @@ class StreamingAPIImpl(
     private val listenersMap = mutableMapOf<ConnectType, Set<Listener>>()
 
     private val connections = mutableMapOf<ConnectType, EventSource>()
+
+    private val logger by lazy {
+        loggerFactory.create("StreamingAPIImpl")
+    }
 
 
     override fun connectLocalPublic(): Flow<TootStatusDTO> {
@@ -119,7 +125,13 @@ class StreamingAPIImpl(
             if (connections[connectType] == null) {
                 val request = EventSources.createFactory(okHttpClient).newEventSource(
                     Request.Builder().url(
-                        "https://$host/api/v1/streaming/public/local"
+                        when(connectType) {
+                            is ConnectType.Hashtag -> "https://$host/api/v1/streaming/hashtag/${connectType.tag}"
+                            ConnectType.LocalPublic -> "https://$host/api/v1/streaming/public/local"
+                            ConnectType.Public -> "https://$host/api/v1/streaming/public"
+                            ConnectType.User -> "https://$host/api/v1/streaming/user"
+                            is ConnectType.UserList -> "https://$host/api/v1/streaming/list/${connectType.listId}"
+                        }
                     ).build(),
                     SseEventHandler(ConnectType.LocalPublic)
                 ).request()
