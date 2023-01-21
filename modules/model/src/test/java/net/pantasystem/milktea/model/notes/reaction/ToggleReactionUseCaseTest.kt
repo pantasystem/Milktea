@@ -459,7 +459,7 @@ class ToggleReactionUseCaseTest {
             text = "test",
             id = Note.Id(accountId = 0L, "testId")
         )
-        val createReactionDTO = CreateReaction(targetNote.id, "👍")
+        val createReactionDTO = CreateReaction(targetNote.id, "\uD83D\uDE06")
 
         val noteRepository = mock<NoteRepository> {
             onBlocking {
@@ -523,14 +523,14 @@ class ToggleReactionUseCaseTest {
         )
 
         runBlocking {
-            useCase(targetNote.id, "like").getOrThrow()
+            useCase(targetNote.id, "laugh").getOrThrow()
         }
         verifyBlocking(reactionRepository) {
             create(createReactionDTO)
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("👍", "https://misskey.io"))
+            create(ReactionHistory("\uD83D\uDE06", "https://misskey.io"))
         }
     }
 }
