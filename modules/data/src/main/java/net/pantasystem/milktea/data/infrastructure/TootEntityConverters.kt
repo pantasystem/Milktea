@@ -9,6 +9,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 
 fun TootPollDTO?.toPoll(): Poll? {
@@ -20,7 +21,8 @@ fun TootPollDTO?.toPoll(): Poll? {
                 Poll.Choice(
                     index = index,
                     text = value.title,
-                    isVoted = (!(dto.multiple ?: false) && dto.voted == true) || dto.ownVotes?.firstOrNull {
+                    isVoted = (!(dto.multiple
+                        ?: false) && dto.voted == true) || dto.ownVotes?.firstOrNull {
                         it == index
                     } != null,
                     votes = dto.votesCount ?: 0
@@ -53,8 +55,8 @@ fun TootStatusDTO.toNote(account: Account): Note {
             sensitive
         },
         userId = User.Id(account.accountId, this.account.id),
-        replyId = this.inReplyToId?.let{ Note.Id(account.accountId, this.inReplyToId!!) },
-        renoteId = this.reblog?.id?.let{ Note.Id(account.accountId, this.reblog?.id!!) },
+        replyId = this.inReplyToId?.let { Note.Id(account.accountId, this.inReplyToId!!) },
+        renoteId = this.reblog?.id?.let { Note.Id(account.accountId, this.reblog?.id!!) },
         viaMobile = null,
 
         // TODO: 正しいVisibilityを得るようにする
@@ -62,15 +64,24 @@ fun TootStatusDTO.toNote(account: Account): Note {
         localOnly = null,
         emojis = emojis.map {
             it.toEmoji()
-        },
+        } + (emojiReactions?.mapNotNull {
+            it.getEmoji()
+        } ?: emptyList()),
         app = null,
-        reactionCounts = emptyList(),
+        reactionCounts = emojiReactions?.map {
+            ReactionCount(
+                reaction = it.reaction,
+                count = it.count
+            )
+        } ?: emptyList(),
         repliesCount = repliesCount,
         renoteCount = reblogsCount,
         uri = this.uri,
         url = this.url,
         visibleUserIds = emptyList(),
-        myReaction = null,
+        myReaction = emojiReactions?.firstOrNull {
+            it.myReaction() != null
+        }?.myReaction(),
         channelId = null,
         createdAt = createdAt,
         fileIds = mediaAttachments.map {
@@ -94,7 +105,12 @@ fun TootStatusDTO.toEntities(account: Account): NoteRelationEntities {
     )
 }
 
-fun TootStatusDTO.pickEntities(account: Account, notes: MutableList<Note>, users: MutableList<User>, files: MutableList<FileProperty>) {
+fun TootStatusDTO.pickEntities(
+    account: Account,
+    notes: MutableList<Note>,
+    users: MutableList<User>,
+    files: MutableList<FileProperty>
+) {
     val (note, user) = toNote(account) to this.account.toModel(account)
     notes.add(note)
     users.add(user)
