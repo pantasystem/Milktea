@@ -6,6 +6,8 @@ import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.generateEmptyNote
@@ -73,6 +75,19 @@ class ToggleReactionUseCaseTest {
             } doReturn true
         }
 
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "v13.0.0"
+                    )
+                )
+            )
+        }
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
@@ -80,6 +95,7 @@ class ToggleReactionUseCaseTest {
             reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = checkEmoji,
             reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository,
         )
         runBlocking {
             useCase(targetNote.id, ":kawaii:").getOrThrow()
@@ -148,6 +164,19 @@ class ToggleReactionUseCaseTest {
             } doReturn true
         }
 
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "v13.0.0"
+                    )
+                )
+            )
+        }
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
@@ -155,6 +184,7 @@ class ToggleReactionUseCaseTest {
             reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = checkEmoji,
             reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository,
         )
         runBlocking {
             useCase(targetNote.id, ":wakaranai:").getOrThrow()
@@ -225,6 +255,20 @@ class ToggleReactionUseCaseTest {
                 checkEmoji(any())
             } doReturn true
         }
+
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "v13.0.0"
+                    )
+                )
+            )
+        }
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
@@ -232,6 +276,7 @@ class ToggleReactionUseCaseTest {
             reactionHistoryRepository = reactionHistoryDao,
             checkEmoji = checkEmoji,
             reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository,
         )
 
         runBlocking {
@@ -287,6 +332,20 @@ class ToggleReactionUseCaseTest {
                 find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
+
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "v13.0.0"
+                    )
+                )
+            )
+        }
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
@@ -298,6 +357,7 @@ class ToggleReactionUseCaseTest {
                 } doReturn false
             },
             reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository
         )
 
         runBlocking {
@@ -353,6 +413,20 @@ class ToggleReactionUseCaseTest {
                 find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
+
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "v13.0.0"
+                    )
+                )
+            )
+        }
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
@@ -364,6 +438,7 @@ class ToggleReactionUseCaseTest {
                 } doReturn true
             },
             reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository,
         )
 
         runBlocking {
@@ -419,6 +494,20 @@ class ToggleReactionUseCaseTest {
                 find(account.normalizedInstanceDomain)
             } doReturn Result.success(meta)
         }
+
+        val nodeInfoRepository: NodeInfoRepository = mock() {
+            onBlocking {
+                find(any())
+            } doReturn Result.success(
+                NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = "v13.0.0"
+                    )
+                )
+            )
+        }
+
         val useCase = ToggleReactionUseCase(
             getAccount = getAccount,
             noteRepository = noteRepository,
@@ -430,6 +519,7 @@ class ToggleReactionUseCaseTest {
                 } doReturn true
             },
             reactionRepository = reactionRepository,
+            nodeInfoRepository = nodeInfoRepository
         )
 
         runBlocking {
