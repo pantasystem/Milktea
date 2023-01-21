@@ -32,6 +32,7 @@
 
             myReaction="@{note.myReaction}"
             reactionBackground="@{reaction}"
+            nodeInfo="@{note.toShowNote.note.nodeInfo}"
 
 
             >

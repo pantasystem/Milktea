@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.reaction
 import android.annotation.SuppressLint
 import android.widget.LinearLayout
 import androidx.databinding.BindingAdapter
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
@@ -11,15 +12,19 @@ object ReactionHelper {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @JvmStatic
-    @BindingAdapter("myReaction", "reactionBackground")
-    fun LinearLayout.setBackground(myReaction: String?, reaction: ReactionCount){
+    @BindingAdapter("myReaction", "reactionBackground", "nodeInfo")
+    fun LinearLayout.setBackground(myReaction: String?, reaction: ReactionCount, nodeInfo: NodeInfo?){
 
-        if(!Reaction(reaction.reaction).isLocal()) {
-            this.background = context.resources.getDrawable(R.drawable.shape_normal_reaction_backgruond, context.theme).apply {
-                alpha = 75
+        // NOTE: Misskeyはローカルに存在するカスタム絵文字しかリアクションすることができない
+        if (nodeInfo?.type is NodeInfo.SoftwareType.Misskey) {
+            if(!Reaction(reaction.reaction).isLocal()) {
+                this.background = context.resources.getDrawable(R.drawable.shape_normal_reaction_backgruond, context.theme).apply {
+                    alpha = 75
+                }
+                return
             }
-            return
         }
+
         if(myReaction != null && myReaction == reaction.reaction){
             this.background = context.resources.getDrawable(R.drawable.shape_selected_reaction_background, context.theme)
         }else{
