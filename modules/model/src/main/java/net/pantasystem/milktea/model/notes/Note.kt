@@ -51,11 +51,22 @@ data class Note(
         val noteId: String
     ) : EntityId
 
-    enum class Type {
-        Misskey, Mastodon,
+
+
+    sealed interface Type {
+        object Misskey : Type
+        data class Mastodon(
+            val reblogged: Boolean?,
+            val favorited: Boolean?,
+            val bookmarked: Boolean?,
+            val muted: Boolean?,
+        ) : Type
     }
 
     companion object;
+
+    val isMastodon: Boolean = type is Type.Mastodon
+    val isMisskey: Boolean = type is Type.Misskey
 
     /**
      * 引用リノートであるか

@@ -88,7 +88,12 @@ fun TootStatusDTO.toNote(account: Account): Note {
             FileProperty.Id(account.accountId, it.id)
         },
         poll = poll.toPoll(),
-        type = Note.Type.Mastodon,
+        type = Note.Type.Mastodon(
+            favorited = favorited,
+            reblogged = reblogged,
+            bookmarked = bookmarked,
+            muted = muted
+        ),
     )
 }
 
