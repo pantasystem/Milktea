@@ -17,11 +17,12 @@ class ChannelAPIWithAccountProvider @Inject constructor(
     private val logger = loggerFactory.create("ChannelAPIWithAccountProvider")
     private val mutex = Mutex()
 
-    suspend fun get(account: Account): ChannelAPI {
+    suspend fun get(account: Account): ChannelAPI? {
         mutex.withLock {
             logger.debug("ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}")
             var channelAPI = accountWithChannelAPI[account.accountId]
             val socketAPI = socketWithAccountProvider.get(account)
+                ?: return null
 
             // Socketのインスタンスが変わっていた場合、Tokenなどに更新があった可能性があるので再生成する
             if (channelAPI != null && channelAPI.socket == socketAPI) {

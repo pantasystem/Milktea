@@ -8,24 +8,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
-import net.pantasystem.milktea.api_streaming.ChannelBody
-import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
-import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
-import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
-import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.emoji.EmojiEventHandler
-import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.messaging.UnReadMessages
 import net.pantasystem.milktea.model.notification.NotificationRepository
+import net.pantasystem.milktea.model.notification.NotificationStreaming
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import javax.inject.Inject
 
@@ -35,13 +26,9 @@ class MainViewModel @Inject constructor(
     unreadMessages: UnReadMessages,
     loggerFactory: Logger.Factory,
     private val notificationRepository: NotificationRepository,
-    private val channelAPIProvider: ChannelAPIWithAccountProvider,
-    private val socketProvider: SocketWithAccountProvider,
     private val configRepository: LocalConfigRepository,
-    private val metaRepository: MetaRepository,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val emojiEventHandler: EmojiEventHandler,
-    private val notificationCacheAdder: NotificationCacheAdder,
+    private val notificationStreaming: NotificationStreaming,
     settingStore: SettingStore
 ) : ViewModel() {
     val logger by lazy {
@@ -66,13 +53,7 @@ class MainViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val newNotifications = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-        channelAPIProvider.get(ac).connect(ChannelAPI.Type.Main).map { body ->
-            body as? ChannelBody.Main.Notification
-        }.filterNotNull().map {
-            ac to it
-        }
-    }.map {
-        notificationCacheAdder.addAndConvert(it.first, it.second.body)
+        notificationStreaming.connect { ac }
     }.flowOn(Dispatchers.IO).catch { e ->
         logger.error("通知取得エラー", e = e)
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
@@ -93,13 +74,6 @@ class MainViewModel @Inject constructor(
         !config.isConfirmedPostNotification
     }.distinctUntilChanged().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val currentAccountSocketStateEvent =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            socketProvider.get(it).stateEvent()
-        }.filter { BuildConfig.DEBUG }.catch { e ->
-            logger.error("WebSocket　状態取得エラー", e)
-        }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
 
     val state: StateFlow<MainUiState> = combine(
@@ -135,16 +109,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun getCurrentAccountMisskeyAPI(): Flow<MisskeyAPI?> {
-        return accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceDomain)
-        }.map {
-            it?.let {
-                misskeyAPIProvider.get(it.uri, it.getVersion())
-            }
-        }
-    }
 
     fun onPushNotificationConfirmed() {
         viewModelScope.launch {

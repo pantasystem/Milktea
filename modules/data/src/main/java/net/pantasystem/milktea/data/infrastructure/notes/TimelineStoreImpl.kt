@@ -222,7 +222,7 @@ class TimelineStoreImpl(
 
     private suspend fun appendStreamEventNote(noteId: Note.Id) {
         val store = pageableStore
-        if (store is TimelinePagingStoreImpl) {
+        if (store is StreamingReceivableStore) {
             store.mutex.withLock {
                 if (initialLoadQuery != null) {
                     return@withLock
@@ -264,6 +264,8 @@ class TimelineStoreImpl(
 
 sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
 
+interface StreamingReceivableStore : StateLocker
+
 class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
@@ -272,7 +274,7 @@ class TimelinePagingStoreImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val metaRepository: MetaRepository,
 ) : EntityConverter<NoteDTO, Note.Id>, PreviousLoader<NoteDTO>, FutureLoader<NoteDTO>,
-    IdGetter<Note.Id>, TimelinePagingBase {
+    IdGetter<Note.Id>, TimelinePagingBase, StreamingReceivableStore {
 
     private val _state =
         MutableStateFlow<PageableState<List<Note.Id>>>(PageableState.Loading.Init())
@@ -469,7 +471,7 @@ class MastodonTimelineStorePagingStoreImpl(
     val getAccount: suspend () -> Account,
     val noteAdder: NoteDataSourceAdder,
 ) : EntityConverter<TootStatusDTO, Note.Id>, PreviousLoader<TootStatusDTO>, FutureLoader<TootStatusDTO>,
-    IdGetter<Note.Id>, StateLocker, TimelinePagingBase {
+    IdGetter<Note.Id>, StateLocker, TimelinePagingBase, StreamingReceivableStore {
 
     private val _state =
         MutableStateFlow<PageableState<List<Note.Id>>>(PageableState.Loading.Init())

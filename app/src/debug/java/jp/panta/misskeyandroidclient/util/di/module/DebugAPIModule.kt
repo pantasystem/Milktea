@@ -28,6 +28,12 @@ object DebugAPIModule {
             override fun get(): OkHttpClient {
                 return client
             }
+
+            override fun create(): OkHttpClient {
+                val newBuilder = okHttpClientProvider.create().newBuilder()
+                flipperSetupManager.applyNetworkFlipperPlugin(newBuilder)
+                return newBuilder.build()
+            }
         }
     }
 }

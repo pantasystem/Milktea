@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.account.Account
 import javax.inject.Inject
 
 interface NoteCaptureAPIWithAccountProvider {
-    fun get(account: Account): NoteCaptureAPI
+    fun get(account: Account): NoteCaptureAPI?
 }
 /**
  * NoteCaptureAPIのインスタンスをAccountに基づきいい感じに取得や生成をできるようにする。
@@ -24,7 +24,7 @@ class NoteCaptureAPIWithAccountProviderImpl @Inject constructor(
     private val accountIdWithNoteCaptureAPI = mutableMapOf<Long, NoteCaptureAPI>()
     private val lock = Mutex()
 
-    override fun get(account: Account) : NoteCaptureAPI = runBlocking{
+    override fun get(account: Account) : NoteCaptureAPI? = runBlocking{
         lock.withLock {
             var channelAPI = accountIdWithNoteCaptureAPI[account.accountId]
             if(channelAPI != null) {
@@ -32,6 +32,7 @@ class NoteCaptureAPIWithAccountProviderImpl @Inject constructor(
             }
 
             val socket = socketWithAccountProvider.get(account)
+                ?: return@runBlocking null
             channelAPI =
                 NoteCaptureAPIImpl(socket, loggerFactory)
             accountIdWithNoteCaptureAPI[account.accountId] = channelAPI

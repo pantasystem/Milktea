@@ -14,7 +14,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
-import jp.panta.misskeyandroidclient.ui.strings_helper.webSocketStateMessageScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -59,17 +58,6 @@ internal class MainActivityEventHandler(
         mainViewModel.state.onEach { uiState ->
             ShowBottomNavigationBadgeDelegate(binding.appBarMain.bottomNavigation)(uiState)
         }.launchIn(lifecycleScope)
-
-
-        lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mainViewModel.currentAccountSocketStateEvent.collect {
-                    activity.webSocketStateMessageScope {
-                        it.showToastMessage()
-                    }
-                }
-            }
-        }
 
         collectLatestNotifications()
         collectCrashlyticsCollectionState()

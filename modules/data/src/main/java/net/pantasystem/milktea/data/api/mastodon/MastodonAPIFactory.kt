@@ -18,11 +18,22 @@ class MastodonAPIFactory @Inject constructor(
 
     val json = Json { ignoreUnknownKeys = true }
 
-    private val sharedOkHttp = OkHttpClient()
+    private val sharedOkHttp = okHttpProvider.get()
 
     @OptIn(ExperimentalSerializationApi::class)
     fun build(baseURL: String, token: String?): MastodonAPI {
-        val okHttp = if (token == null) {
+        val okHttp = getOkHttp(token)
+        return Retrofit.Builder()
+            .baseUrl(baseURL)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(okHttp)
+            .build()
+            .create(MastodonAPI::class.java)
+
+    }
+
+    private fun getOkHttp(token: String?): OkHttpClient {
+        return if (token == null) {
             sharedOkHttp
         } else {
             okHttpProvider.get().newBuilder()
@@ -34,13 +45,6 @@ class MastodonAPIFactory @Inject constructor(
                     it.proceed(newReq)
                 }.build()
         }
-        return Retrofit.Builder()
-            .baseUrl(baseURL)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(okHttp)
-            .build()
-            .create(MastodonAPI::class.java)
-
     }
 
 

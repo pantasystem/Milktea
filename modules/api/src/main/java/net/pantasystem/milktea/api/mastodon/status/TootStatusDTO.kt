@@ -6,6 +6,7 @@ import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.model.emoji.Emoji
 
 @kotlinx.serialization.Serializable
 data class TootStatusDTO(
@@ -39,7 +40,7 @@ data class TootStatusDTO(
     val bookmarked: Boolean? = null,
     val pinned: Boolean? = null,
     val filtered: Boolean? = null,
-
+    @SerialName("emoji_reactions") val emojiReactions: List<EmojiReactionCount>? = null
 ) {
     @kotlinx.serialization.Serializable
     data class Mention(
@@ -54,4 +55,50 @@ data class TootStatusDTO(
         val name: String,
         val url: String,
     )
+
+
+    @kotlinx.serialization.Serializable
+    data class EmojiReactionCount(
+        val name: String,
+        val count: Int,
+        @SerialName("account_ids") val accountIds: List<String>,
+        val me: Boolean,
+
+        val url: String? = null,
+        val domain: String?  = null,
+        @SerialName("static_url") val staticUrl: String? = null,
+    ) {
+        val isCustomEmoji = url != null || staticUrl != null
+
+        val reaction = if (isCustomEmoji) {
+            if (domain == null) {
+                "$name@."
+            } else {
+                "$name@$domain"
+            }
+        } else {
+            name
+        }
+        
+        fun getEmoji(): Emoji? {
+            if (!isCustomEmoji) {
+                return null
+            }
+            return Emoji(
+                name = if (domain == null) {
+                    "$name@."
+                } else {
+                    "$name@$domain"
+                },
+                url = url,
+                host = domain,
+            )
+        }
+
+        fun myReaction(): String? {
+            return reaction.takeIf {
+                me
+            }
+        }
+    }
 }

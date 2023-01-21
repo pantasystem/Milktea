@@ -25,6 +25,7 @@ const val WRITE_TIMEOUT_S = 30L
 
 interface OkHttpClientProvider {
     fun get(): OkHttpClient
+    fun create(): OkHttpClient
 }
 
 class DefaultOkHttpClientProvider : OkHttpClientProvider {
@@ -35,6 +36,14 @@ class DefaultOkHttpClientProvider : OkHttpClientProvider {
     .build()
     override fun get(): OkHttpClient {
         return client
+    }
+
+    override fun create(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(CONNECTION_TIMEOUT_S, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
+            .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS)
+            .build()
     }
 }
 @OptIn(ExperimentalSerializationApi::class)

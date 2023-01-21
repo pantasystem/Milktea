@@ -5,7 +5,7 @@ import net.pantasystem.milktea.model.account.Account
 
 interface SocketWithAccountProvider {
 
-    fun get(account: Account) : Socket
+    fun get(account: Account) : Socket?
 
     fun get(accountId: Long) : Socket?
 

@@ -12,13 +12,17 @@ import net.pantasystem.milktea.data.infrastructure.emoji.EmojiEventHandlerImpl
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationStreamingImpl
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
+import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.data.streaming.impl.SocketWithAccountProviderImpl
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.EmojiEventHandler
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notification.NotificationStreaming
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -40,6 +44,10 @@ abstract class SocketBindsModule {
     @Binds
     @Singleton
     abstract fun bindEmojiEventHandler(impl: EmojiEventHandlerImpl): EmojiEventHandler
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationStreaming(impl: NotificationStreamingImpl): NotificationStreaming
 }
 
 
@@ -66,6 +74,8 @@ object SocketModule {
         loggerFactory: Logger.Factory,
         noteCaptureAPIWithAccountProvider: NoteCaptureAPIWithAccountProvider,
         noteDataSource: NoteDataSource,
+        noteDataSourceAdder: NoteDataSourceAdder,
+        streamingAPIProvider: StreamingAPIProvider,
     ): NoteCaptureAPIAdapter {
         return NoteCaptureAPIAdapterImpl(
             accountRepository = accountRepository,
@@ -73,7 +83,9 @@ object SocketModule {
             loggerFactory = loggerFactory,
             noteCaptureAPIWithAccountProvider = noteCaptureAPIWithAccountProvider,
             noteDataSource = noteDataSource,
-            dispatcher = Dispatchers.IO
+            dispatcher = Dispatchers.IO,
+            noteDataSourceAdder = noteDataSourceAdder,
+            streamingAPIProvider = streamingAPIProvider,
         )
     }
 }

@@ -137,13 +137,17 @@ class TimelineViewModel @AssistedInject constructor(
 
     fun loadNew() {
         viewModelScope.launch {
-            timelineStore.loadFuture()
+            timelineStore.loadFuture().onFailure {
+                logger.error("load future timeline failed", it)
+            }
         }
     }
 
     fun loadOld() {
         viewModelScope.launch {
-            timelineStore.loadPrevious()
+            timelineStore.loadPrevious().onFailure {
+                logger.error("load previous timeline failed", it)
+            }
         }
     }
 
@@ -153,8 +157,12 @@ class TimelineViewModel @AssistedInject constructor(
             timelineStore.clear(initialUntilDate?.let {
                 InitialLoadQuery.UntilDate(it)
             })
-            timelineStore.loadPrevious()
-            timelineStore.loadFuture()
+            timelineStore.loadPrevious().onFailure {
+                logger.error("load initial timeline failed", it)
+            }
+            timelineStore.loadFuture().onFailure {
+                logger.error("load initial timeline failed", it)
+            }
         }
     }
 

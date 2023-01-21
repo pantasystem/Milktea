@@ -62,6 +62,9 @@ dependencies {
     implementation libs.kotlin.datetime
 
     testImplementation libs.junit.jupiter.api
+
+    implementation libs.okhttp.sse
+
     testRuntimeOnly libs.junit.jupiter.engine
 
 }
