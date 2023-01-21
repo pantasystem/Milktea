@@ -5,6 +5,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.setting.ReactionPickerType
 import net.pantasystem.milktea.note.NoteDetailActivity
@@ -83,10 +84,17 @@ class NoteCardActionHandler(
                 ).show(activity.supportFragmentManager, "")
             }
             is NoteCardAction.OnRenoteButtonClicked -> {
-                RenoteBottomSheetDialog.newInstance(
-                    action.note.note.note.id,
-                    action.note.isRenotedByMe
-                ).show(activity.supportFragmentManager, "")
+                when(action.note.note.note.type) {
+                    is Note.Type.Mastodon -> {
+                        notesViewModel.toggleReblog(action.note.toShowNote.note.id)
+                    }
+                    Note.Type.Misskey -> {
+                        RenoteBottomSheetDialog.newInstance(
+                            action.note.note.note.id,
+                            action.note.isRenotedByMe
+                        ).show(activity.supportFragmentManager, "")
+                    }
+                }
             }
             is NoteCardAction.OnRenoteButtonLongClicked -> {
                 RenotesBottomSheetDialog.newInstance(action.note.toShowNote.note.id)
