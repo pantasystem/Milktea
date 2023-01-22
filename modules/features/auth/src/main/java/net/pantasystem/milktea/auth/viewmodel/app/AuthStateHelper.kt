@@ -174,6 +174,9 @@ class AuthStateHelper @Inject constructor(
                 return InstanceType.Misskey(misskey)
             }
             if (mastodon != null) {
+                if (!BuildConfig.DEBUG) {
+                    throw IllegalArgumentException("Mastodon does not support.")
+                }
                 return InstanceType.Mastodon(mastodon)
             }
             throw IllegalArgumentException()
