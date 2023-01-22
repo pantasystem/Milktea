@@ -151,25 +151,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
         runCancellableCatching {
-            val user = find(createMute.userId) as? User.Detail
-            val updated = when(val result = userApiAdapter.muteUser(createMute)) {
-                is MuteUserResult.Mastodon -> {
-                    user?.copy(
-                        related = result.relationship.toUserRelated()
+            updateCacheFrom(createMute.userId, userApiAdapter.muteUser(createMute)) {
+                it.copy(
+                    related = it.related?.copy(
+                        isMuting = true
                     )
-                }
-                MuteUserResult.Misskey -> {
-                    (userDataSource.get(createMute.userId).getOrThrow() as? User.Detail)?.let {
-                        it.copy(
-                            related = it.related?.copy(
-                                isMuting = true
-                            )
-                        )
-                    }
-                }
-            }
-            if (updated != null) {
-                userDataSource.add(updated)
+                )
             }
         }.onFailure {
             logger.error("ユーザーのミュートに失敗", it)
@@ -178,22 +165,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
         runCancellableCatching {
-            val user = find(userId) as? User.Detail
-            when(val result = userApiAdapter.unmuteUser(userId)) {
-                is MuteUserResult.Mastodon -> {
-                    user?.copy(
-                        related = result.relationship.toUserRelated()
+            updateCacheFrom(userId, userApiAdapter.unmuteUser(userId)) {
+                it.copy(
+                    related = it.related?.copy(
+                        isMuting = false
                     )
-                }
-                MuteUserResult.Misskey -> {
-                    user?.copy(
-                        related = user.related?.copy(
-                            isMuting = false
-                        )
-                    )
-                }
-            }?.let {
-                userDataSource.add(it)
+                )
             }
         }.onFailure {
             logger.error("unmute failed", it)
@@ -335,6 +312,21 @@ class UserRepositoryImpl @Inject constructor(
             }
             return@withContext res.isSuccessful
         }
+    }
+
+    private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
+        val user = find(userId, true) as User.Detail
+        val updated = when(result) {
+            is UserActionResult.Mastodon -> {
+                user.copy(
+                    related = result.relationship.toUserRelated()
+                )
+            }
+            UserActionResult.Misskey -> {
+                reducer(user)
+            }
+        }
+        userDataSource.add(updated)
     }
 
     override suspend fun report(report: Report): Boolean {
