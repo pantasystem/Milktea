@@ -2,6 +2,7 @@ package net.pantasystem.milktea.api.mastodon
 
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
+import net.pantasystem.milktea.api.mastodon.accounts.MuteAccountRequest
 import net.pantasystem.milktea.api.mastodon.apps.AccessToken
 import net.pantasystem.milktea.api.mastodon.apps.App
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
@@ -107,5 +108,13 @@ interface MastodonAPI {
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null
     ): Response<List<TootStatusDTO>>
+
+    @POST("api/v1/accounts/{accountId}/mute")
+    suspend fun muteAccount(@Path("accountId") accountId: String, @Body body: MuteAccountRequest): Response<MastodonAccountRelationshipDTO>
+
+    @POST("api/v1/accounts/{accountId}/unmute")
+    suspend fun unmuteAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
+
 
 }
