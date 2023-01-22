@@ -483,6 +483,7 @@
                     favoriteButtonIcon="@{note.currentNote}"
 
                     tools:ignore="TouchTargetSizeCheck"
+                    android:onClick="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
                     />
             <TextView
                     android:id="@+id/mastodonFavoriteCountView"

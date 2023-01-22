@@ -55,6 +55,10 @@ class NoteCardActionListenerAdapter(
         }
     }
 
+    fun onFavoriteButtonClicked(note: Note) {
+        onAction(NoteCardAction.OnFavoriteButtonClicked(note))
+    }
+
 }
 
 
@@ -71,4 +75,5 @@ sealed interface NoteCardAction {
     data class OnRenoteButtonLongClicked(val note: PlaneNoteViewData) : NoteCardAction
     data class OnNoteCardClicked(val note: Note) : NoteCardAction
     data class OnUserClicked(val user: User) : NoteCardAction
+    data class OnFavoriteButtonClicked(val note: Note) : NoteCardAction
 }
