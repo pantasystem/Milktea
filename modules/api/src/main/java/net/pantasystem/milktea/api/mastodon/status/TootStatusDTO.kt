@@ -62,7 +62,7 @@ data class TootStatusDTO(
         val name: String,
         val count: Int,
         @SerialName("account_ids") val accountIds: List<String>,
-        val me: Boolean,
+        val me: Boolean? = null,
 
         val url: String? = null,
         val domain: String?  = null,
@@ -97,7 +97,7 @@ data class TootStatusDTO(
 
         fun myReaction(): String? {
             return reaction.takeIf {
-                me
+                me == true
             }
         }
     }
