@@ -86,7 +86,7 @@ class TimelineStoreImpl(
         when (pageableTimeline) {
             is Pageable.Favorite -> {
                 FavoriteNoteTimelinePagingStoreImpl(
-                    pageableTimeline, noteAdder, getAccount, misskeyAPIProvider
+                    pageableTimeline, noteAdder, getAccount, misskeyAPIProvider, mastodonAPIProvider
                 )
             }
             is Pageable.Mastodon -> {

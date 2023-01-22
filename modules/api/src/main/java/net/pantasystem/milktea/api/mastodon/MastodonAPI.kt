@@ -88,7 +88,10 @@ interface MastodonAPI {
     suspend fun unfollow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
     @PUT("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
-    suspend fun reaction(@Path("statusId") statusId: String, @Path("emoji") emoji: String): Response<TootStatusDTO>
+    suspend fun reaction(
+        @Path("statusId") statusId: String,
+        @Path("emoji") emoji: String
+    ): Response<TootStatusDTO>
 
     @POST("api/v1/statuses/{statusId}/emoji_unreaction")
     suspend fun unreaction(@Path("statusId") statusId: String): Response<TootStatusDTO>
@@ -98,5 +101,11 @@ interface MastodonAPI {
 
     @POST("api/v1/statuses/{statusId}/unfavourite")
     suspend fun unfavouriteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @GET("api/v1/favourites")
+    suspend fun getFavouriteStatuses(
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null
+    ): Response<List<TootStatusDTO>>
 
 }
