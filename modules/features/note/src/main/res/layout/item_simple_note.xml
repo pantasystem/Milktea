@@ -470,19 +470,19 @@
                     app:emojiCompatEnabled="false"
                     />
             <ImageButton
+                    android:id="@+id/toggleMastodonFavouriteButton"
                     android:layout_width="@dimen/note_bottom_action_icon_size"
                     android:layout_height="@dimen/note_bottom_action_icon_size"
                     tools:srcCompat="@drawable/ic_star_black_24dp"
                     android:src="@drawable/ic_star_black_24dp"
-                    android:id="@+id/toggleMastodonFavouriteButton"
                     style="?android:attr/borderlessButtonStyle"
                     android:padding="@dimen/note_bottom_action_icon_padding_size"
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/reaction"
                     app:tint="?attr/normalIconTint"
+                    favoriteButtonIcon="@{note.currentNote}"
 
                     tools:ignore="TouchTargetSizeCheck"
-                    android:visibility='@{note.currentNote.mastodon ? View.VISIBLE : View.GONE }'
                     />
             <TextView
                     android:id="@+id/mastodonFavoriteCountView"
