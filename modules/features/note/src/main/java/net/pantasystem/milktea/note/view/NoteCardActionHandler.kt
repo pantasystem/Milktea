@@ -119,6 +119,9 @@ class NoteCardActionHandler(
                     intent
                 )
             }
+            is NoteCardAction.OnFavoriteButtonClicked -> {
+                notesViewModel.onToggleFavoriteUseCase(action.note)
+            }
         }
     }
 }

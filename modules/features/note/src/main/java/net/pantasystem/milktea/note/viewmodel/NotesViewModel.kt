@@ -19,6 +19,7 @@ import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
+import net.pantasystem.milktea.model.notes.favorite.ToggleFavoriteUseCase
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.user.report.Report
@@ -33,6 +34,7 @@ class NotesViewModel @Inject constructor(
     val accountStore: AccountStore,
     val draftNoteRepository: DraftNoteRepository,
     private val translationStore: NoteTranslationStore,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
@@ -167,6 +169,14 @@ class NotesViewModel @Inject constructor(
                         return@launch
                     }
                 }
+            }
+        }
+    }
+
+    fun onToggleFavoriteUseCase(note: Note) {
+        viewModelScope.launch {
+            toggleFavoriteUseCase(note.id).onFailure {
+                logger.error("favoriteに失敗", it)
             }
         }
     }

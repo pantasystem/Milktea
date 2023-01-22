@@ -127,6 +127,10 @@ open class PlaneNoteViewData(
 
     val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
 
+    val favoriteCount = Transformations.map(currentNote) {
+        (it.type as? Note.Type.Mastodon?)?.favoriteCount
+    }
+
     val canRenote = Transformations.map(currentNote) {
         it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
     }

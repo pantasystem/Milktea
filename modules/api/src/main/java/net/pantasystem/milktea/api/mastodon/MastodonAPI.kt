@@ -92,4 +92,11 @@ interface MastodonAPI {
 
     @POST("api/v1/statuses/{statusId}/emoji_unreaction")
     suspend fun unreaction(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/favourite")
+    suspend fun favouriteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unfavourite")
+    suspend fun unfavouriteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
 }

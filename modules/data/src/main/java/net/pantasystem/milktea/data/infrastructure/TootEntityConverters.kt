@@ -90,10 +90,11 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         },
         poll = poll.toPoll(),
         type = Note.Type.Mastodon(
-            favorited = favorited,
+            favorited = favourited,
             reblogged = reblogged,
             bookmarked = bookmarked,
-            muted = muted
+            muted = muted,
+            favoriteCount = favouritesCount,
         ),
         nodeInfo = nodeInfo,
     )
