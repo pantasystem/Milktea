@@ -7,7 +7,7 @@ import net.pantasystem.milktea.api.mastodon.report.MstReportDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 
 @kotlinx.serialization.Serializable
-data class TootNotificationDTO(
+data class MstNotificationDTO(
     val id: String,
     val type: NotificationType,
     @SerialName("created_at") val createdAt: Instant,

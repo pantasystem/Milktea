@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
+import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import retrofit2.Response
 import retrofit2.http.*
@@ -121,6 +122,17 @@ interface MastodonAPI {
     @POST("api/v1/accounts/{accountId}/unblock")
     suspend fun unblockAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
+
+    @GET("api/v1/notifications")
+    suspend fun getNotifications(
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("types") types: List<MstNotificationDTO.NotificationType>? = null,
+        @Query("exclude_types") excludeTypes: List<MstNotificationDTO.NotificationType>? = null,
+        @Query("account_id") accountId: String? = null,
+    ): Response<MstNotificationDTO>
 
 
 }
