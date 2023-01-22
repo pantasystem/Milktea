@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
@@ -21,7 +22,6 @@ import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 import net.pantasystem.milktea.model.user.report.Report
-import retrofit2.Response
 import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -149,44 +149,58 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
-        val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
-        val res = misskeyAPIProvider.get(account).muteUser(
-            CreateMuteUserRequest(
-                i = account.token,
-                userId = createMute.userId.id,
-                expiresAt = createMute.expiresAt?.toEpochMilliseconds()
-            )
-        ).throwIfHasError()
-        userDataSource.add(userDataSource.get(createMute.userId).getOrThrow()).getOrThrow()
-        res.isSuccessful
+        runCancellableCatching {
+            updateCacheFrom(createMute.userId, userApiAdapter.muteUser(createMute)) {
+                it.copy(
+                    related = it.related?.copy(
+                        isMuting = true
+                    )
+                )
+            }
+        }.onFailure {
+            logger.error("ユーザーのミュートに失敗", it)
+        }.isSuccess
     }
 
     override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        action(userId.getMisskeyAPI()::unmuteUser, userId) { user ->
-            user.copy(
-                related = user.related?.copy(
-                    isMuting = false
+        runCancellableCatching {
+            updateCacheFrom(userId, userApiAdapter.unmuteUser(userId)) {
+                it.copy(
+                    related = it.related?.copy(
+                        isMuting = false
+                    )
                 )
-            )
-        }
+            }
+        }.onFailure {
+            logger.error("unmute failed", it)
+        }.isSuccess
+
     }
 
     override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        action(userId.getMisskeyAPI()::blockUser, userId) { user ->
-            user.copy(
-                related = user.related?.copy(
-                    isBlocking = true
+        runCancellableCatching {
+            updateCacheFrom(userId, userApiAdapter.blockUser(userId)) { user ->
+                user.copy(
+                    related = user.related?.copy(
+                        isBlocking = true
+                    )
                 )
-            )
-        }
+            }
+        }.onFailure {
+            logger.error("block failed", it)
+        }.isSuccess
     }
 
     override suspend fun unblock(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        action(userId.getMisskeyAPI()::unblockUser, userId) { user ->
-            user.copy(
-                related = user.related?.copy(isBlocking = false)
-            )
-        }
+        runCancellableCatching {
+            updateCacheFrom(userId, userApiAdapter.unblockUser(userId)) { user ->
+                user.copy(
+                    related = user.related?.copy(isBlocking = false)
+                )
+            }
+        }.onFailure {
+            logger.error("unblock failed", it)
+        }.isSuccess
     }
 
     override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
@@ -289,22 +303,19 @@ class UserRepositoryImpl @Inject constructor(
             return@withContext res.isSuccessful
         }
 
-    private suspend fun action(
-        requestAPI: suspend (RequestUser) -> Response<Unit>,
-        userId: User.Id,
-        reducer: (User.Detail) -> User.Detail
-    ): Boolean {
-        return withContext(ioDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.token))
-            res.throwIfHasError()
-            if (res.isSuccessful) {
-
-                val updated = reducer.invoke(find(userId, true) as User.Detail)
-                userDataSource.add(updated)
+    private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
+        val user = find(userId, true) as User.Detail
+        val updated = when(result) {
+            is UserActionResult.Mastodon -> {
+                user.copy(
+                    related = result.relationship.toUserRelated()
+                )
             }
-            return@withContext res.isSuccessful
+            UserActionResult.Misskey -> {
+                reducer(user)
+            }
         }
+        userDataSource.add(updated)
     }
 
     override suspend fun report(report: Report): Boolean {
