@@ -23,12 +23,11 @@ class StreamingAPIImpl(
 ) : StreamingAPI {
 
 
-
     private sealed interface ConnectType {
         object LocalPublic : ConnectType
         object Public : ConnectType
         data class Hashtag(val tag: String) : ConnectType
-        data class UserList(val listId: String): ConnectType
+        data class UserList(val listId: String) : ConnectType
         object User : ConnectType
     }
 
@@ -133,15 +132,18 @@ class StreamingAPIImpl(
 
     private fun connect(connectType: ConnectType) {
         val call = synchronized(listenersMap) {
-            if (connections[connectType] == null && !isWaitingConnections.contains(connectType)) {
+            if (connections[connectType] == null
+                && !isWaitingConnections.contains(connectType)
+                && !listenersMap[connectType].isNullOrEmpty()
+            ) {
                 isWaitingConnections.add(connectType)
                 val request = EventSources.createFactory(okHttpClient).newEventSource(
                     Request.Builder().url(
-                        when(connectType) {
-                            is ConnectType.Hashtag ->  "https://$host/api/v1/streaming/hashtag/${connectType.tag}"
+                        when (connectType) {
+                            is ConnectType.Hashtag -> "https://$host/api/v1/streaming/hashtag/${connectType.tag}"
                             ConnectType.LocalPublic -> "https://$host/api/v1/streaming/public/local"
-                            ConnectType.Public ->      "https://$host/api/v1/streaming/public"
-                            ConnectType.User ->        "https://$host/api/v1/streaming/user"
+                            ConnectType.Public -> "https://$host/api/v1/streaming/public"
+                            ConnectType.User -> "https://$host/api/v1/streaming/user"
                             is ConnectType.UserList -> "https://$host/api/v1/streaming/list/${connectType.listId}"
                         }
                     ).build(),
@@ -155,7 +157,7 @@ class StreamingAPIImpl(
             }
         }
 
-        call?.enqueue(object : Callback{
+        call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 logger.error("onFailure", e)
 
@@ -221,7 +223,7 @@ class StreamingAPIImpl(
             }
 
             try {
-                val event = when(type) {
+                val event = when (type) {
                     "update" -> {
                         Event.Update(decoder.decodeFromString(data))
                     }
