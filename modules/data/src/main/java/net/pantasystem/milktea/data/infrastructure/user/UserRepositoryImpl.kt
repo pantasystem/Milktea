@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
@@ -150,13 +151,26 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
         runCancellableCatching {
-            when(userApiAdapter.muteUser(createMute)) {
+            val user = userDataSource.get(createMute.userId).getOrThrow() as? User.Detail
+            val updated = when(val result = userApiAdapter.muteUser(createMute)) {
                 is MuteUserResult.Mastodon -> {
-                    find(createMute.userId, true)
+                    user?.copy(
+                        related = result.relationship.toUserRelated()
+                    )
                 }
-                MuteUserResult.Misskey -> Unit
+                MuteUserResult.Misskey -> {
+                    (userDataSource.get(createMute.userId).getOrThrow() as? User.Detail)?.let {
+                        it.copy(
+                            related = it.related?.copy(
+                                isMuting = true
+                            )
+                        )
+                    }
+                }
             }
-
+            if (updated != null) {
+                userDataSource.add(updated)
+            }
         }.onFailure {
             logger.error("ユーザーのミュートに失敗", it)
         }.isSuccess
