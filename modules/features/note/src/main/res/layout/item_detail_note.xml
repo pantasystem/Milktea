@@ -426,6 +426,37 @@
                         android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                         />
+                <ImageButton
+                        android:id="@+id/toggleMastodonFavouriteButton"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
+                        tools:srcCompat="@drawable/ic_star_black_24dp"
+                        android:src="@drawable/ic_star_black_24dp"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="@string/reaction"
+                        app:tint="?attr/normalIconTint"
+                        favoriteButtonIcon="@{note.currentNote}"
+
+                        tools:ignore="TouchTargetSizeCheck"
+                        android:onClick="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
+                        />
+                <TextView
+                        android:id="@+id/mastodonFavoriteCountView"
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.favoriteCount))}'
+                        android:visibility='@{note.currentNote.mastodon ? (note.favoriteCount == null || note.favoriteCount == 0 ? View.INVISIBLE : View.VISIBLE ) : View.GONE }'
+
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:maxLines="1"
+
+                        tools:text="10"
+                        app:emojiCompatEnabled="false"
+                        />
+
 
                 <ImageButton
                         android:id="@+id/toggleReactionButton"
@@ -438,6 +469,7 @@
                         android:scaleType="centerCrop"
                         app:isReacted="@{note.myReaction != null}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
+                        android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"
                         app:tint="?attr/normalIconTint" />
 
                 <TextView
@@ -448,7 +480,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
-                        android:visibility="@{SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE}"
+                        android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
 
                         />
 
