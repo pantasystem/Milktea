@@ -151,7 +151,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
         runCancellableCatching {
-            val user = userDataSource.get(createMute.userId).getOrThrow() as? User.Detail
+            val user = find(createMute.userId) as? User.Detail
             val updated = when(val result = userApiAdapter.muteUser(createMute)) {
                 is MuteUserResult.Mastodon -> {
                     user?.copy(
@@ -177,13 +177,28 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        action(userId.getMisskeyAPI()::unmuteUser, userId) { user ->
-            user.copy(
-                related = user.related?.copy(
-                    isMuting = false
-                )
-            )
-        }
+        runCancellableCatching {
+            val user = find(userId) as? User.Detail
+            when(val result = userApiAdapter.unmuteUser(userId)) {
+                is MuteUserResult.Mastodon -> {
+                    user?.copy(
+                        related = result.relationship.toUserRelated()
+                    )
+                }
+                MuteUserResult.Misskey -> {
+                    user?.copy(
+                        related = user.related?.copy(
+                            isMuting = false
+                        )
+                    )
+                }
+            }?.let {
+                userDataSource.add(it)
+            }
+        }.onFailure {
+            logger.error("unmute failed", it)
+        }.isSuccess
+
     }
 
     override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
