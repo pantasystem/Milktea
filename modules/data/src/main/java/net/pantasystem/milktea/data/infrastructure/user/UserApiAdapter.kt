@@ -112,9 +112,30 @@ class UserApiAdapter @Inject constructor(
             }
         }
     }
+
+    suspend fun unmuteUser(userId: User.Id): UnMuteResult {
+        val account = accountRepository.get(userId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).unmuteUser(RequestUser(
+                    i = account.token,
+                    userId = userId.id,
+                )).throwIfHasError()
+                MuteUserResult.Misskey
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = mastodonAPIProvider.get(account).unmuteAccount(userId.id)
+                    .throwIfHasError()
+                    .body()
+                MuteUserResult.Mastodon(requireNotNull(body))
+            }
+        }
+    }
 }
 
 sealed interface MuteUserResult {
     object Misskey : MuteUserResult
     data class Mastodon(val relationship: MastodonAccountRelationshipDTO) : MuteUserResult
 }
+
+typealias UnMuteResult = MuteUserResult
