@@ -61,6 +61,7 @@ data class Note(
             val favorited: Boolean?,
             val bookmarked: Boolean?,
             val muted: Boolean?,
+            val favoriteCount: Int?,
         ) : Type
     }
 
@@ -68,6 +69,8 @@ data class Note(
 
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
+
+    val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
 
     /**
      * 引用リノートであるか
