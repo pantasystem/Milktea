@@ -1,5 +1,7 @@
 package jp.panta.misskeyandroidclient.mfm
 
+import net.pantasystem.milktea.common_android.mfm.ElementType
+
 class Root(
     val sourceText: String
 ) : Node(0, sourceText.length, 0, sourceText.length, ElementType.ROOT){
