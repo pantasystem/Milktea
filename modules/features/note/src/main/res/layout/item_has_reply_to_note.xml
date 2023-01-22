@@ -127,7 +127,7 @@
                                 android:textSize="15sp"
                                 tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                                 android:visibility='@{hasReplyToNote.replyTo.text == null ? View.GONE : View.VISIBLE}'
-                                app:textNode="@{hasReplyToNote.replyTo.textNode}"
+                                textTypeSource="@{hasReplyToNote.replyTo.textNode}"
                                 />
 
                     </RelativeLayout>

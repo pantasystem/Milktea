@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common_android.getTextType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
@@ -74,12 +75,7 @@ open class PlaneNoteViewData(
     }
 
 
-    val textNode = MFMParser.parse(
-        toShowNote.note.text, (toShowNote.note.emojis ?: emptyList()) + instanceEmojis,
-        userHost = toShowNote.user
-            .host,
-        accountHost = account.getHost()
-    )
+    val textNode = getTextType(account, toShowNote, instanceEmojis)
 
     val translateState: LiveData<ResultState<Translation?>?> =
         this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
@@ -94,7 +90,7 @@ open class PlaneNoteViewData(
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
     }?.filter {
         it.aboutMediaType == AboutMediaType.IMAGE || it.aboutMediaType == AboutMediaType.VIDEO
-    }?: emptyList()
+    } ?: emptyList()
     val media = MediaViewData(previewableFiles)
 
     val isOnlyVisibleRenoteStatusMessage = MutableLiveData<Boolean>(false)
@@ -153,17 +149,14 @@ open class PlaneNoteViewData(
     val subNote: NoteRelation? = toShowNote.renote
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
-    val subNoteTextNode = MFMParser.parse(
-        subNote?.note?.text,
-        (subNote?.note?.emojis ?: emptyList()) + instanceEmojis,
-        accountHost = account.getHost(),
-        userHost = subNote?.user?.host
-    )
+    val subNoteTextNode = subNote?.let {
+        getTextType(account, it, instanceEmojis)
+    }
 
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(
         subNote?.note?.cw,
-        (subNote?.note?.emojis?: emptyList()) + instanceEmojis,
+        (subNote?.note?.emojis ?: emptyList()) + instanceEmojis,
         accountHost = account.getHost(),
         userHost = subNote?.user?.host
     )
@@ -241,3 +234,4 @@ open class PlaneNoteViewData(
     }
 
 }
+
