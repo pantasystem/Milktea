@@ -115,6 +115,12 @@ interface MastodonAPI {
     @POST("api/v1/accounts/{accountId}/unmute")
     suspend fun unmuteAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
+    @POST("api/v1/accounts/{accountId}/block")
+    suspend fun blockAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
+    @POST("api/v1/accounts/{accountId/unblock")
+    suspend fun unblockAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
 
 
 }
