@@ -22,7 +22,6 @@ import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 import net.pantasystem.milktea.model.user.report.Report
-import retrofit2.Response
 import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -179,21 +178,29 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        action(userId.getMisskeyAPI()::blockUser, userId) { user ->
-            user.copy(
-                related = user.related?.copy(
-                    isBlocking = true
+        runCancellableCatching {
+            updateCacheFrom(userId, userApiAdapter.blockUser(userId)) { user ->
+                user.copy(
+                    related = user.related?.copy(
+                        isBlocking = true
+                    )
                 )
-            )
-        }
+            }
+        }.onFailure {
+            logger.error("block failed", it)
+        }.isSuccess
     }
 
     override suspend fun unblock(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        action(userId.getMisskeyAPI()::unblockUser, userId) { user ->
-            user.copy(
-                related = user.related?.copy(isBlocking = false)
-            )
-        }
+        runCancellableCatching {
+            updateCacheFrom(userId, userApiAdapter.unblockUser(userId)) { user ->
+                user.copy(
+                    related = user.related?.copy(isBlocking = false)
+                )
+            }
+        }.onFailure {
+            logger.error("unblock failed", it)
+        }.isSuccess
     }
 
     override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
@@ -295,24 +302,6 @@ class UserRepositoryImpl @Inject constructor(
             }
             return@withContext res.isSuccessful
         }
-
-    private suspend fun action(
-        requestAPI: suspend (RequestUser) -> Response<Unit>,
-        userId: User.Id,
-        reducer: (User.Detail) -> User.Detail
-    ): Boolean {
-        return withContext(ioDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val res = requestAPI.invoke(RequestUser(userId = userId.id, i = account.token))
-            res.throwIfHasError()
-            if (res.isSuccessful) {
-
-                val updated = reducer.invoke(find(userId, true) as User.Detail)
-                userDataSource.add(updated)
-            }
-            return@withContext res.isSuccessful
-        }
-    }
 
     private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
         val user = find(userId, true) as User.Detail

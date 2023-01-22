@@ -82,7 +82,7 @@ class UserApiAdapter @Inject constructor(
         }
     }
 
-    suspend fun muteUser(createMute: CreateMute): MuteUserResult {
+    suspend fun muteUser(createMute: CreateMute): UserActionResult {
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
         return when(account.instanceType) {
             Account.InstanceType.MISSKEY -> {
@@ -96,7 +96,7 @@ class UserApiAdapter @Inject constructor(
                         expiresAt = createMute.expiresAt?.toEpochMilliseconds()
                     )
                 ).throwIfHasError()
-                MuteUserResult.Misskey
+                UserActionResult.Misskey
             }
             Account.InstanceType.MASTODON -> {
                 val body = mastodonAPIProvider.get(account).muteAccount(
@@ -108,7 +108,7 @@ class UserApiAdapter @Inject constructor(
                         notifications = createMute.notifications ?: true
                     )
                 ).throwIfHasError().body()
-                MuteUserResult.Mastodon(requireNotNull(body))
+                UserActionResult.Mastodon(requireNotNull(body))
             }
         }
     }
@@ -121,21 +121,65 @@ class UserApiAdapter @Inject constructor(
                     i = account.token,
                     userId = userId.id,
                 )).throwIfHasError()
-                MuteUserResult.Misskey
+                UserActionResult.Misskey
             }
             Account.InstanceType.MASTODON -> {
                 val body = mastodonAPIProvider.get(account).unmuteAccount(userId.id)
                     .throwIfHasError()
                     .body()
-                MuteUserResult.Mastodon(requireNotNull(body))
+                UserActionResult.Mastodon(requireNotNull(body))
+            }
+        }
+    }
+
+    suspend fun blockUser(userId: User.Id): BlockUserResult {
+        val account = accountRepository.get(userId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).blockUser(RequestUser(
+                    i = account.token,
+                    userId = userId.id,
+                ))
+                    .throwIfHasError()
+                UserActionResult.Misskey
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = mastodonAPIProvider.get(account).blockAccount(userId.id)
+                    .throwIfHasError()
+                    .body()
+                UserActionResult.Mastodon(requireNotNull(body))
+            }
+        }
+    }
+
+    suspend fun unblockUser(userId: User.Id): UnBlockUserResult {
+        val account = accountRepository.get(userId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).unblockUser(RequestUser(
+                    i = account.token,
+                    userId = userId.id,
+                ))
+                    .throwIfHasError()
+                UserActionResult.Misskey
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = mastodonAPIProvider.get(account).unblockAccount(userId.id)
+                    .throwIfHasError()
+                    .body()
+                UserActionResult.Mastodon(requireNotNull(body))
             }
         }
     }
 }
 
-sealed interface MuteUserResult {
-    object Misskey : MuteUserResult
-    data class Mastodon(val relationship: MastodonAccountRelationshipDTO) : MuteUserResult
+sealed interface UserActionResult {
+    object Misskey : UserActionResult
+    data class Mastodon(val relationship: MastodonAccountRelationshipDTO) : UserActionResult
 }
 
-typealias UnMuteResult = MuteUserResult
+typealias UnMuteResult = UserActionResult
+
+typealias BlockUserResult = UserActionResult
+
+typealias UnBlockUserResult = UserActionResult
