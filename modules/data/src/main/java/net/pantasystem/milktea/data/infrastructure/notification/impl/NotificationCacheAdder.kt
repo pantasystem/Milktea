@@ -1,10 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
+import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
+import net.pantasystem.milktea.data.infrastructure.*
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.toGroup
-import net.pantasystem.milktea.data.infrastructure.toNotification
-import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -42,6 +41,21 @@ class NotificationCacheAdder @Inject constructor(
             notification,
             user,
             noteRelation?.getOrNull()
+        )
+    }
+
+    suspend fun addConvert(account: Account, mstNotificationDTO: MstNotificationDTO): NotificationRelation {
+        val user = mstNotificationDTO.account.toModel(account)
+        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
+        val noteRelation = mstNotificationDTO.status?.toNote(account, nodeInfo)?.let {
+            noteRelationGetter.get(it)
+        }
+        val notification = mstNotificationDTO.toModel(account, isRead = true)
+        notificationDataSource.add(notification)
+        return NotificationRelation(
+            notification = notification,
+            user = user,
+            note = noteRelation?.getOrNull(),
         )
     }
 }
