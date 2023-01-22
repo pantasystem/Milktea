@@ -40,9 +40,6 @@ class DefaultOkHttpClientProvider : OkHttpClientProvider {
 
     override fun create(): OkHttpClient {
         return OkHttpClient.Builder()
-            .connectTimeout(CONNECTION_TIMEOUT_S, TimeUnit.SECONDS)
-            .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
-            .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS)
             .build()
     }
 }

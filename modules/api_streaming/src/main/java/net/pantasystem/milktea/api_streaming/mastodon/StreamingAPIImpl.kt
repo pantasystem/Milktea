@@ -156,9 +156,14 @@ class StreamingAPIImpl(
         }
 
         call?.enqueue(object : Callback{
-            override fun onFailure(call: Call, e: IOException) = Unit
+            override fun onFailure(call: Call, e: IOException) {
+                logger.error("onFailure", e)
 
-            override fun onResponse(call: Call, response: Response) = Unit
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                logger.debug("onResponse, status:${response.code}")
+            }
         })
     }
 
@@ -181,7 +186,9 @@ class StreamingAPIImpl(
                 isWaitingConnections.remove(connectType)
             }
             Thread.sleep(10000)
-            connect(connectType)
+            if (response?.code != 404) {
+                connect(connectType)
+            }
         }
 
         override fun onOpen(eventSource: EventSource, response: Response) {
@@ -206,7 +213,7 @@ class StreamingAPIImpl(
             if (listeners.isNullOrEmpty()) {
                 synchronized(listenersMap) {
                     if (listenersMap[connectType].isNullOrEmpty()) {
-                        connections.remove(connectType)?.cancel()
+                        (connections.remove(connectType) ?: eventSource).cancel()
                         logger.debug("ignore message connectType:$connectType type:$type, data:$data")
                     }
                     return
