@@ -149,16 +149,17 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
-        val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
-        val res = misskeyAPIProvider.get(account).muteUser(
-            CreateMuteUserRequest(
-                i = account.token,
-                userId = createMute.userId.id,
-                expiresAt = createMute.expiresAt?.toEpochMilliseconds()
-            )
-        ).throwIfHasError()
-        userDataSource.add(userDataSource.get(createMute.userId).getOrThrow()).getOrThrow()
-        res.isSuccessful
+        runCancellableCatching {
+            when(userApiAdapter.muteUser(createMute)) {
+                is MuteUserResult.Mastodon -> {
+                    find(createMute.userId, true)
+                }
+                MuteUserResult.Misskey -> Unit
+            }
+
+        }.onFailure {
+            logger.error("ユーザーのミュートに失敗", it)
+        }.isSuccess
     }
 
     override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
