@@ -63,6 +63,11 @@ class FavoriteNoteTimelinePagingStoreImpl(
         if (mastodonSinceId != null) {
             return mastodonSinceId
         }
+
+        if (getAccount().instanceType == Account.InstanceType.MASTODON) {
+            return null
+        }
+
         return (getState().content as? StateContent.Exist)?.rawContent?.firstOrNull()?.let {
             favoriteIdAndNoteIdMap[it]
         }
@@ -71,6 +76,9 @@ class FavoriteNoteTimelinePagingStoreImpl(
     override suspend fun getUntilId(): String? {
         if (mastodonUntilId != null) {
             return mastodonUntilId
+        }
+        if (getAccount().instanceType == Account.InstanceType.MASTODON) {
+            return null
         }
         return (getState().content as? StateContent.Exist)?.rawContent?.lastOrNull()?.let {
             favoriteIdAndNoteIdMap[it]
@@ -90,10 +98,14 @@ class FavoriteNoteTimelinePagingStoreImpl(
                     }
                 }
                 Account.InstanceType.MASTODON -> {
+                    // NOTE: ページが末端であるかをチェックしている
+                    if (getSinceId() == null && !isEmpty()) {
+                        return@runCancellableCatching emptyList()
+                    }
+
                     val res = mastodonAPIProvider.get(getAccount()).getFavouriteStatuses(
                         minId = getSinceId()
                     )
-
                     val linkHeader = res.headers()["link"]
                     mastodonSinceId = MastodonLinkHeaderDecoder(linkHeader).getMinId()
                     res.throwIfHasError().body()!!.map {
@@ -117,6 +129,11 @@ class FavoriteNoteTimelinePagingStoreImpl(
                     }
                 }
                 Account.InstanceType.MASTODON -> {
+                    // NOTE: ページが末端であるかをチェックしている
+                    if (getUntilId() == null && !isEmpty()) {
+                        return@runCancellableCatching emptyList()
+                    }
+
                     val res = mastodonAPIProvider.get(getAccount()).getFavouriteStatuses(
                         maxId = getUntilId()
                     )
@@ -138,6 +155,13 @@ class FavoriteNoteTimelinePagingStoreImpl(
 
     override fun setState(state: PageableState<List<Note.Id>>) {
         _state.value = state
+    }
+
+    private fun isEmpty(): Boolean {
+        return when(val content = _state.value.content) {
+            is StateContent.Exist -> content.rawContent.isEmpty()
+            is StateContent.NotExist -> true
+        }
     }
 }
 
