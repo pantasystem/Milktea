@@ -67,27 +67,29 @@ fun NoteOptionDialogLayout(
                 )
             }
             Divider()
-            if (uiState.noteState?.isFavorited == true) {
-                if (uiState.noteId != null) {
-                    NormalBottomSheetDialogSelectionLayout(
-                        onClick = {
-                            onDeleteFavoriteButtonClicked(uiState.noteId)
-                        },
-                        icon = Icons.Filled.Star,
-                        text = stringResource(
-                            id = R.string.remove_favorite
+            if (uiState.note?.isMisskey == true) {
+                if (uiState.noteState?.isFavorited == true) {
+                    if (uiState.noteId != null) {
+                        NormalBottomSheetDialogSelectionLayout(
+                            onClick = {
+                                onDeleteFavoriteButtonClicked(uiState.noteId)
+                            },
+                            icon = Icons.Filled.Star,
+                            text = stringResource(
+                                id = R.string.remove_favorite
+                            )
                         )
-                    )
-                }
-            } else {
-                if (uiState.noteId != null) {
-                    NormalBottomSheetDialogSelectionLayout(
-                        onClick = {
-                            onCreateFavoriteButtonClicked(uiState.noteId)
-                        },
-                        icon = Icons.Outlined.Star,
-                        text = stringResource(id = R.string.favorite)
-                    )
+                    }
+                } else {
+                    if (uiState.noteId != null) {
+                        NormalBottomSheetDialogSelectionLayout(
+                            onClick = {
+                                onCreateFavoriteButtonClicked(uiState.noteId)
+                            },
+                            icon = Icons.Outlined.Star,
+                            text = stringResource(id = R.string.favorite)
+                        )
+                    }
                 }
             }
 
