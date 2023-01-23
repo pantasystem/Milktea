@@ -151,10 +151,6 @@ object MFMDecorator {
                             val t = this@Visitor.textView.get()
                             if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == root.sourceText) {
                                 if (retryCounter < 100) {
-                                    Log.d(
-                                        "MFMDecorator",
-                                        "リソースの読み取りに失敗したので排除する textView exists:${this@Visitor.textView.get() != null}, ${t.text}"
-                                    )
                                     t.text = decorate(
                                         t,
                                         node = root,
