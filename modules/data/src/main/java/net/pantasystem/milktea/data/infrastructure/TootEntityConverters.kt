@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -147,4 +148,21 @@ fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
         isMuting = muting,
         hasPendingFollowRequestToYou = false,
     )
+}
+
+fun Visibility(type: StatusVisibilityType, circleId: String? = null, visibilityEx: String? = null,): Visibility {
+    return when(type) {
+        StatusVisibilityType.Private -> {
+            when(visibilityEx) {
+                "limited" -> Visibility.Limited(circleId)
+                else -> Visibility.Followers(false)
+            }
+        }
+        StatusVisibilityType.Unlisted -> Visibility.Home(false)
+        StatusVisibilityType.Public -> Visibility.Public(false)
+        StatusVisibilityType.Direct -> when(visibilityEx) {
+            "personal" -> Visibility.Personal
+            else -> Visibility.Specified(emptyList())
+        }
+    }
 }

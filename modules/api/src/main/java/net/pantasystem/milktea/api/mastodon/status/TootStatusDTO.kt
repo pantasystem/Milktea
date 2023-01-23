@@ -16,7 +16,7 @@ data class TootStatusDTO(
     @SerialName("created_at") val createdAt: Instant,
     val account: MastodonAccountDTO,
     val content: String,
-    val visibility: String,
+    val visibility: StatusVisibilityType,
     val sensitive: Boolean,
     @SerialName("spoiler_text") val spoilerText: String,
     @SerialName("media_attachments") val mediaAttachments: List<TootMediaAttachment>,
@@ -121,4 +121,12 @@ data class TootStatusDTO(
             }
         }
     }
+}
+
+@kotlinx.serialization.Serializable
+enum class StatusVisibilityType {
+    @SerialName("private") Private,
+    @SerialName("unlisted") Unlisted,
+    @SerialName("public") Public,
+    @SerialName("direct") Direct
 }
