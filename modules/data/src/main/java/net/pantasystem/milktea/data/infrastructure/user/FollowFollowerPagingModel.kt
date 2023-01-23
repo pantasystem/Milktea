@@ -330,6 +330,10 @@ class V10Loader(
 ) : PreviousLoader<FollowFollowerResponseItemType> {
     override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> {
         val api = misskeyAPIProvider.get(account) as MisskeyAPIV10
+        when(type) {
+            is RequestType.Follower -> TODO()
+            is RequestType.Following -> TODO()
+        }
         TODO("Not yet implemented")
     }
 }
@@ -340,10 +344,23 @@ class DefaultLoader(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val idGetter: IdGetter<String>,
 ) : PreviousLoader<FollowFollowerResponseItemType> {
-    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> {
+    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> = runCancellableCatching{
         val api = misskeyAPIProvider.get(account) as MisskeyAPIV11
-
-        TODO("Not yet implemented")
+        val func = when(type) {
+            is RequestType.Follower -> api::followers
+            is RequestType.Following -> api::following
+        }
+        val body = func(RequestUser(
+            i = account.token,
+            userId = type.userId.id,
+            untilId = idGetter.getUntilId()
+        )).throwIfHasError().body()
+        requireNotNull(body).map {
+            FollowFollowerResponseItemType.Default(
+                userDTO = requireNotNull(it.followee ?: it.follower),
+                nextId = body.last().id
+            )
+        }
     }
 }
 
