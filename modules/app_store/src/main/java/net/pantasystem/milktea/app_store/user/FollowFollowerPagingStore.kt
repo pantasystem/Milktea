@@ -38,7 +38,7 @@ interface FollowFollowerPagingStore {
 
     val type: RequestType
 
-    val state: StateFlow<PageableState<List<User.Id>>>
+    val state: Flow<PageableState<List<User.Id>>>
     val users: Flow<List<User.Detail>>
 
     suspend fun loadPrevious()

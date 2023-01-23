@@ -6,11 +6,8 @@ import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
@@ -171,23 +168,3 @@ sealed interface FavoriteType {
     data class Mastodon(val status: TootStatusDTO) : FavoriteType
 }
 
-/**
- * Mastodonの場合次のページネーションのIdがLinkヘッダーに含まれる形で帰ってくるので
- * そのヘッダーから正規表現でmax_idとmin_idを取得するようにしている
- */
-class MastodonLinkHeaderDecoder(private val headerText: String?) {
-
-    private val maxIdPattern = "max_id=(\\d+)".toRegex()
-    private val minIdPattern = "min_id=(\\d+)".toRegex()
-
-    fun getMaxId(): String? {
-        headerText ?: return null
-        return maxIdPattern.find(headerText)?.groupValues?.getOrNull(1)
-    }
-
-    fun getMinId(): String? {
-        headerText ?: return null
-        return minIdPattern.find(headerText)?.groupValues?.getOrNull(1)
-    }
-
-}
