@@ -2,6 +2,7 @@ package net.pantasystem.milktea.api.mastodon.status
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.BufferedInputStream
 import java.io.BufferedReader
@@ -143,5 +144,23 @@ class TootStatusDTOTest {
 
         json.decodeFromString<List<TootStatusDTO>>(text)
     }
+
+    @Test
+    fun decode_GiveFedibirdHasQuoteTimeline() {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        val file = File(javaClass.classLoader!!.getResource("toot_fedibird_com_home_has_quote_timeline.json").file)
+        val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
+            it.readLines().reduce { acc, s -> acc + s }.trimIndent()
+        }
+
+        val decoded = json.decodeFromString<List<TootStatusDTO>>(text)
+        Assertions.assertNull(decoded[0].quote)
+        Assertions.assertNotNull(decoded[1].quote)
+        Assertions.assertNull(decoded[2].quote)
+
+    }
+
 
 }
