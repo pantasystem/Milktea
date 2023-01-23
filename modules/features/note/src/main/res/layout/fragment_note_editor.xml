@@ -11,6 +11,7 @@
                 type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel" />
         <import type="android.view.View"/>
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.model.instance.FeatureType" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -209,7 +210,8 @@
                     android:adjustViewBounds="true"
                     tools:ignore="ContentDescription"
                     android:layout_margin="4dp"
-                    app:tint="?attr/normalIconTint" />
+                    app:tint="?attr/normalIconTint"
+                    android:visibility="@{ viewModel.enableFeatures.contains(FeatureType.Drive) ? View.VISIBLE : View.GONE }"/>
 
             <ImageButton
                     android:id="@+id/makePoll"

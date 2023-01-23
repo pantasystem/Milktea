@@ -25,10 +25,7 @@ import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.instance.InstanceInfo
-import net.pantasystem.milktea.model.instance.InstanceInfoRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.instance.Version
+import net.pantasystem.milktea.model.instance.*
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
@@ -60,6 +57,7 @@ class NoteEditorViewModel @Inject constructor(
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     private val accountRepository: AccountRepository,
     private val localConfigRepository: LocalConfigRepository,
+    private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
     private val instanceInfoRepository: InstanceInfoRepository,
     private val savedStateHandle: SavedStateHandle,
@@ -138,6 +136,10 @@ class NoteEditorViewModel @Inject constructor(
             initialValue = 1500
         )
 
+
+    val enableFeatures = currentAccount.filterNotNull().map {
+        featureEnables.enableFeatures(it.normalizedInstanceDomain)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
     val maxFileCount = currentAccount.filterNotNull().mapNotNull {
         metaRepository.get(it.normalizedInstanceDomain)?.getVersion()
