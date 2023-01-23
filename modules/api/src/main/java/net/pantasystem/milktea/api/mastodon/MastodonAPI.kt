@@ -110,7 +110,10 @@ interface MastodonAPI {
     ): Response<List<TootStatusDTO>>
 
     @POST("api/v1/accounts/{accountId}/mute")
-    suspend fun muteAccount(@Path("accountId") accountId: String, @Body body: MuteAccountRequest): Response<MastodonAccountRelationshipDTO>
+    suspend fun muteAccount(
+        @Path("accountId") accountId: String,
+        @Body body: MuteAccountRequest
+    ): Response<MastodonAccountRelationshipDTO>
 
     @POST("api/v1/accounts/{accountId}/unmute")
     suspend fun unmuteAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
@@ -121,6 +124,21 @@ interface MastodonAPI {
     @POST("api/v1/accounts/{accountId}/unblock")
     suspend fun unblockAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
+    @GET("api/v1/accounts/{accountId}/followers")
+    suspend fun getFollowers(
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("limit") limit: Int = 40
+    ): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/accounts/{accountId}/following")
+    suspend fun getFollowing(
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("limit") limit: Int = 40
+    ): Response<MastodonAccountDTO>
 
 
 }
