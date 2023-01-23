@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="custom_app_name">アプリケーション名</string>
+    <string name="app_name">Milktea</string>
+    <string name="successfully_created_the_app">アプリの作成に成功した</string>
+    <string name="warning_s">警告:%s</string>
+    <string name="error_s">エラー %s</string>
+    <string name="continue_auth">Continue</string>
+    <string name="copied_to_clipboard">クリップボードにコピーしました</string>
+    <string name="instance_domain">インスタンスドメイン</string>
+    <string name="https">https://</string>
+    <string name="auth">認証</string>
+    <string name="waiting_4_u_to_approve">あなたが認可するのを待っています</string>
+    <string name="i_have_approved">私は認可をしました</string>
+    <string name="waiting_4_approval">認可されるのを待っています。</string>
+    <string name="authentication_url">認証URL</string>
+    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする
+    </string>
+    <string name="welcome">ようこそ</string>
+    <string name="san">さん</string>
+    <string name="open_in_webview">アプリブラウザで開く</string>
+    <string name="privacy_policy_agreeation">プライバシーポリシーに同意する</string>
+    <string name="terms_of_service_agreeation">利用規約に同意する</string>
+
+</resources>

@@ -1,0 +1,119 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+}
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
+        sourceSets {
+            debug.assets.srcDirs += files("$projectDir/schemas".toString())
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+
+    }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
+}
+
+dependencies {
+
+    implementation libs.androidx.core.ktx
+    implementation libs.appcompat.appcompat
+    implementation libs.android.material.material
+    implementation project(path: ':modules:common')
+    implementation project(path: ':modules:api')
+    implementation project(path: ':modules:model')
+    implementation project(path: ':modules:app_store')
+    implementation project(path: ':modules:api_streaming')
+    implementation project(path: ':modules:common_android')
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.espresso.core
+
+
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:$room_version"
+
+    // optional - Test helpers
+    testImplementation "androidx.room:room-testing:$room_version"
+
+    // hilt
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+
+    // For instrumentation tests
+    androidTestImplementation  libs.hilt.android.testing
+    kaptAndroidTest libs.hilt.compiler
+
+    // For local unit tests
+    testImplementation libs.hilt.android.testing
+    kaptTest libs.hilt.compiler
+    implementation libs.kotlin.datetime
+
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+
+    //Kotlin coroutines用ライブラリ(async, await)
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+
+    implementation libs.okhttp3.logging.inspector
+
+
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    implementation platform('com.google.firebase:firebase-bom:30.5.0')
+    implementation 'com.google.firebase:firebase-messaging'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+
+    androidTestImplementation "androidx.room:room-testing:2.4.3"
+
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
+    implementation "androidx.exifinterface:exifinterface:1.3.5"
+}
+
+kapt {
+    correctErrorTypes true
+}

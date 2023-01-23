@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        >
+    <data>
+        <variable name="note" type="net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData"/>
+        <import type="android.view.View"/>
+
+
+
+
+        <import type="net.pantasystem.milktea.note.R"/>
+
+        <variable
+                name="noteCardActionListener"
+                type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardUseCompatPadding="false"
+            app:cardCornerRadius="0dp"
+            android:layout_marginTop="0.5dp"
+            android:elevation="0dp"
+            setCardViewSurfaceColor="@{null}"
+    >
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+        >
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:id="@+id/textView2"
+                    android:paddingHorizontal="@dimen/note_horizontal_padding_size"
+                    android:paddingTop="@dimen/note_top_padding_size"
+
+                    android:onClick="@{()-> noteCardActionListener.onUserClicked(note.note.user)}"
+                    app:statusMessageTargetViewNote="@{note}"
+            />
+            <include
+                    android:id="@+id/simpleNote"
+                    layout="@layout/item_simple_note"
+                    app:note="@{note}"
+                    app:noteCardActionListener="@{noteCardActionListener}"
+                    android:visibility="@{note.isOnlyVisibleRenoteStatusMessage ? View.GONE : View.VISIBLE }"
+                    />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>

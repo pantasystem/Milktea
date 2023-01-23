@@ -1,34 +1,44 @@
 package jp.panta.misskeyandroidclient.model.users
 
-import jp.panta.misskeyandroidclient.model.account.Account
-import junit.framework.TestCase
+import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.user.User
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
-class UserTest : TestCase() {
 
+class UserTest {
+
+    @Test
     fun testGetProfileUrl() {
 
         val user = User.Simple(
             id = User.Id(0, "id"),
             avatarUrl = "",
             emojis = emptyList(),
-            host = null,
+            host = "",
             isBot = false,
             isCat = false,
             name = "Panta",
             userName = "Panta",
-            nickname = null
+            nickname = null,
+            isSameHost = true,
+            instance = null,
+            avatarBlurhash = null,
         )
 
         val profileUrl = user.getProfileUrl(
             Account(
                 instanceDomain = "https://example.com",
-                encryptedToken = "",
+                token = "",
                 remoteId = "",
-                userName = ""
-            ))
+                userName = "",
+                instanceType = Account.InstanceType.MISSKEY
+            )
+        )
         assertEquals("https://example.com/@Panta", profileUrl)
     }
 
+    @Test
     fun testGetProfileUrlWhenRemoteHost() {
 
         val user = User.Simple(
@@ -40,15 +50,21 @@ class UserTest : TestCase() {
             isCat = false,
             name = "Panta",
             userName = "Panta",
-            nickname = null
+            nickname = null,
+            isSameHost = false,
+            instance = null,
+            avatarBlurhash = null,
         )
 
-        val profileUrl = user.getProfileUrl(Account(
-            instanceDomain = "https://example.com",
-            encryptedToken = "",
-            remoteId = "",
-            userName = ""
-        ))
+        val profileUrl = user.getProfileUrl(
+            Account(
+                instanceDomain = "https://example.com",
+                token = "",
+                remoteId = "",
+                userName = "",
+                instanceType = Account.InstanceType.MISSKEY
+            )
+        )
         assertEquals("https://example.com/@Panta@misskey.io", profileUrl)
     }
 }

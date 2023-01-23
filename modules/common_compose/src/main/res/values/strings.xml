@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="show">Show</string>
+    <string name="undo_nsfw">Undo NSFW</string>
+    <string name="mark_as_nsfw">Mark as NSFW</string>
+    <string name="remove_attachment">Remove attachment</string>
+
+
+    <string name="future">Future</string>
+    <string name="now">Now</string>
+    <string name="year_ago">YR</string>
+    <string name="month_ago">MOS</string>
+    <string name="date_ago">D</string>
+    <string name="hour_ago">HR</string>
+    <string name="minute_ago">MIN</string>
+    <string name="second_ago">S</string>
+    <string name="edit_file_name">Edit name</string>
+    <string name="edit_file_caption">Edit caption</string>
+</resources>

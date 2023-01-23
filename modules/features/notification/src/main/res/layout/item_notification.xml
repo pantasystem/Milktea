@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="notification" type="net.pantasystem.milktea.notification.viewmodel.NotificationViewData"/>
+
+        <import type="net.pantasystem.milktea.notification.viewmodel.NotificationViewData" />
+        <import type="android.view.View"/>
+
+        <import type="net.pantasystem.milktea.common_resource.R"/>
+
+        <variable
+                name="notificationViewModel"
+                type="net.pantasystem.milktea.notification.viewmodel.NotificationViewModel" />
+        <variable
+                name="noteCardActionListener"
+                type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0.1dp"
+            app:setCardViewSurfaceColor="@{null}"
+
+            >
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/notification_horizontal_padding_size"
+                    android:paddingTop="@dimen/notification_top_padding_size"
+                    android:paddingBottom="@dimen/notification_bottom_padding_size"
+
+                    app:notificationStatusView="@{notificationStatus}"
+                    app:notificationReactionImageView="@{reactionImage}"
+                    app:notificationReactionStringView="@{reactionString}"
+                    app:notificationType="@{notification.statusType}"
+                    app:notificationReaction="@{notification.reaction}"
+                    app:notification="@{notification}"
+                    android:orientation="horizontal"
+
+                    >
+
+                <ImageView
+                        android:id="@+id/notificationStatus"
+                        android:layout_width="37dp"
+                        android:layout_height="37dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="8dp"
+                        tools:srcCompat="@drawable/ic_follow"
+                        tools:ignore="ContentDescription"
+                        app:tint="?attr/normalIconTint" />
+
+                <ImageView
+                        android:id="@+id/reactionImage"
+                        android:layout_width="37dp"
+                        android:layout_height="37dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="8dp"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
+
+                        tools:ignore="ContentDescription" />
+                <TextView
+                        android:id="@+id/reactionString"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        tools:text="😇"
+                        android:textSize="24sp"
+                    />
+
+
+                <ImageView
+                        android:id="@+id/imageView5"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="5dp"
+                        app:circleIcon="@{notification.avatarIconUrl}"
+                        android:onClick="@{()-> noteCardActionListener.onUserClicked(notification.user)}"
+                        android:visibility="@{ notification.user == null ? View.GONE : View.VISIBLE }"
+                        tools:ignore="ContentDescription" />
+
+
+
+                <TextView
+                        android:id="@+id/notificationStatusMessage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        notificationTitle="@{ notification.notification }"
+                        tools:text="name"
+                        android:layout_weight="1"/>
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="16min"
+                        android:singleLine="true"
+                        elapsedTime="@{notification.notification.notification.createdAt}"
+                        android:layout_gravity="center"/>
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/follow_request"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="8dp"
+                    android:visibility="@{notification.type == NotificationViewData.Type.RECEIVE_FOLLOW_REQUEST ? View.VISIBLE : View.GONE}"
+                    >
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        stringSource="@{ notification.followRequestMessageSource }"
+                        android:layout_weight="1"
+                        />
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reject"
+                        android:layout_marginEnd="4dp"
+                        android:onClick="@{()-> notificationViewModel.rejectFollowRequest(notification.notification.notification) }"
+
+                        />
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/accept"
+                        android:onClick="@{()-> notificationViewModel.acceptFollowRequest(notification.notification.notification) }"
+                        />
+            </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/group_invited"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="8dp"
+                    android:visibility="@{notification.type == NotificationViewData.Type.GROUP_INVITED ? View.VISIBLE : View.GONE}"
+                    >
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        stringSource="@{notification.groupInvitedMessageSource}"
+                        android:layout_weight="1"
+
+                        />
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reject"
+                        android:layout_marginEnd="4dp"
+                        android:onClick="@{()-> notificationViewModel.rejectGroupInvitation(notification.notification.notification) }"
+
+                        />
+                <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/accept"
+                        android:onClick="@{()-> notificationViewModel.acceptGroupInvitation(notification.notification.notification) }"
+                        />
+            </LinearLayout>
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout_height="100dp"
+                    android:visibility="@{notification.noteViewData == null ? View.GONE : View.VISIBLE}"
+                    >
+                <include android:id="@+id/simpleNote"
+                        layout="@layout/item_simple_note"
+                        app:note="@{notification.noteViewData}"
+                        app:noteCardActionListener="@{noteCardActionListener}"
+                        />
+            </FrameLayout>
+            <TextView
+                    android:id="@+id/unknown_notification_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:visibility='@{notification.statusType == "unknown" ? View.VISIBLE : View.GONE }'
+                    notification="@{notification.notification.notification}"
+                    />
+
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+
+</layout>

@@ -6,7 +6,7 @@
 
         <variable
                 name="accountViewModel"
-                type="jp.panta.misskeyandroidclient.ui.account.viewmodel.AccountViewModel" />
+                type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel" />
     </data>
     <FrameLayout
             android:layout_width="match_parent"
@@ -15,8 +15,8 @@
         <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                headerImageUrl="@{accountViewModel.user.bannerUrl}"
-                />
+                headerImageUrl="@{accountViewModel.user.info.bannerUrl}"
+                tools:ignore="ContentDescription" />
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/nav_header_height"
@@ -28,6 +28,7 @@
                 app:user="@{accountViewModel.user}"
                 app:mainNameView="@{mainName}"
                 app:subNameView="@{subName}"
+                app:account="@{accountViewModel.uiState.currentAccount}"
 
                 >
 
@@ -54,7 +55,7 @@
                     tools:ignore="ContentDescription" />
 
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/mainName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -63,7 +64,7 @@
                     tools:text="mainName"
                     />
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/subName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,18 +73,18 @@
 
                     tools:text="name" />
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/following_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/subName"
                     tools:text="114"
-                    android:text="@{ Integer.toString(accountViewModel.user.followingCount) }"
+                    android:text="@{ Integer.toString(accountViewModel.user.info.followingCount) }"
                     android:layout_marginEnd="3dp"
                     android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                     />
 
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/following"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +95,7 @@
                     android:layout_marginEnd="12dp"
                     android:onClick="@{()-> accountViewModel.showFollowings(accountViewModel.user.id) }"
                     />
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:id="@+id/follower_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -102,10 +103,10 @@
                     android:layout_toEndOf="@id/following"
                     tools:text="514"
                     android:layout_marginEnd="3dp"
-                    android:text="@{ Integer.toString(accountViewModel.user.followersCount) }"
+                    android:text="@{ Integer.toString(accountViewModel.user.info.followersCount) }"
                     android:onClick="@{()-> accountViewModel.showFollowers(accountViewModel.user.id) }"
                     />
-            <androidx.emoji.widget.EmojiTextView
+            <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toEndOf="@id/follower_count"

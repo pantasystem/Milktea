@@ -1,18 +1,20 @@
 package jp.panta.misskeyandroidclient.streaming.channel
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.streaming.ChannelBody
-import jp.panta.misskeyandroidclient.streaming.Socket
-import jp.panta.misskeyandroidclient.streaming.network.SocketImpl
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import okhttp3.OkHttpClient
-import org.junit.Assert
-import org.junit.Test
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.channel.ChannelAPI
+import net.pantasystem.milktea.api_streaming.network.SocketImpl
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
-import org.junit.Assert.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -23,13 +25,14 @@ class ChannelAPITest {
     fun connect(): Unit = runBlocking {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient,logger)
+        val socket =
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         socket.blockingConnect()
 
         var count = 0
         launch {
-            ChannelAPI(socket, logger).connect(ChannelAPI.Type.Global).collect {
+            ChannelAPI(socket, logger)
+                .connect(ChannelAPI.Type.Global).collect {
                 println(it)
                 assertTrue(it is ChannelBody.ReceiveNote)
                 count ++
@@ -47,8 +50,8 @@ class ChannelAPITest {
     fun testDisconnect() {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, logger)
+        val socket =
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 

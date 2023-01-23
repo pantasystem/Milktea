@@ -1,0 +1,2574 @@
+{
+  "maintainer": {
+    "name": "",
+    "url": "mailto:m@m544.net",
+    "repository_url": "https://github.com/mei23/misskey/tree/mei-m544",
+    "email": ""
+  },
+  "version": "10.102.584-m544",
+  "name": "めいすきー",
+  "uri": "https://misskey.m544.net",
+  "description": "お淑やかなめいめいさん推しのためのめいめい邸ガレージなのだわ。招待コードが欲しい人間は管理人に聞いてなのだわ。ローカルタイムラインのない <a href=\"https://meisskey.one\"  target=\"_blank\" rel=\"noopener\">meisskey.one</a> もあるのだわ。",
+  "langs": [],
+  "machine": "meisskey",
+  "os": "linux",
+  "arch": "x64",
+  "node": "v16.16.0",
+  "cpu": {
+    "model": "Intel Xeon Processor (Cascadelake)",
+    "cores": 4
+  },
+  "announcements": [
+    {
+      "title": "めいすきーについて",
+      "text": "<a target=_blank href=https://mei23.github.io/misskey_m544_net>めいすきーについて</a> / \n<a target=_blank href=https://misskey.m544.net/notes/717cefadcfe84dd16460ba5f>アイコンの設定方法</a> / \n<a target=_blank href=https://misskey.m544.net/docs/ja-JP/search-box>検索について</a> / \n<a target=_blank href=https://misskey.m544.net/docs/ja-JP/visibilities>公開範囲について</a> /\n<a target=_blank href=https://misskey.m544.net/mfm-cheat-sheet>文字装飾</a>"
+    }
+  ],
+  "disableRegistration": true,
+  "disableLocalTimeline": false,
+  "enableEmojiReaction": true,
+  "driveCapacityPerLocalUserMb": 100000,
+  "driveCapacityPerRemoteUserMb": 128,
+  "cacheRemoteFiles": false,
+  "enableRecaptcha": true,
+  "recaptchaSiteKey": "6LcEZVIUAAAAAFWCFAR9WK8zDY-GewLl7oOsexTp",
+  "swPublickey": "BG0ZvVjw1LKSVupQoVgQK3RF7Q2txYxdwsJGXI-fh9iTbhUM2uj3uvP2ok8ooIEx5MEYFOu14lLMh38sZkfW_nw",
+  "mascotImageUrl": "",
+  "bannerUrl": "https://misskey-drive.m544.net/files/f648b567-9b8a-49d2-b561-17ae1df2837f.jpg",
+  "iconUrl": "https://misskey-drive.m544.net/files/969b8097-464a-467d-bd88-530058aa9c84.ico",
+  "maxNoteTextLength": 3001,
+  "emojis": [
+    {
+      "aliases": [],
+      "name": "agooglehearts",
+      "url": "https://misskey-drive2.m544.net/m544/wiq9ala0rzshugnungggaljt.apng"
+    },
+    {
+      "aliases": [],
+      "name": "blank",
+      "category": null,
+      "url": "https://misskey-drive.m544.net/files/7a699fd6-ea02-45cc-b849-b6ac466b8e04.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsignya",
+      "url": "https://misskey-drive2.m544.net/m544/j7pkhm6xznuvdb5chi5mwxit.png"
+    },
+    {
+      "aliases": [],
+      "name": "boomerang",
+      "category": null,
+      "url": "https://misskey-drive.m544.net/files/0f35cacc-cdb5-468c-b2b6-afc0c5c98848.png"
+    },
+    {
+      "aliases": [],
+      "name": "chikuwa",
+      "url": "https://misskey-drive2.m544.net/m544/kfuqtxbhf28tp94vu7zqsndm.png"
+    },
+    {
+      "aliases": [],
+      "name": "erait",
+      "url": "https://misskey-drive2.m544.net/m544/s7y8a8ra9ynecaj85ljjl6oh.png"
+    },
+    {
+      "aliases": [],
+      "name": "gomamayo",
+      "url": "https://misskey-drive2.m544.net/m544/m3ho7hr9gngy3ftfxd1gq274.png"
+    },
+    {
+      "aliases": [],
+      "name": "hinokinobou",
+      "category": null,
+      "url": "https://misskey-drive2.m544.net/m544/xiruqlo5qa8cvbtzje6jb88e.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "ifilter_misetehoshii",
+      "url": "https://misskey-drive2.m544.net/m544/rbyl6501d6lnno857ofxrd8i.png"
+    },
+    {
+      "aliases": [],
+      "name": "koishi_smug",
+      "category": null,
+      "url": "https://misskey-drive2.m544.net/m544/icgnkmlfv0t8gpnd818uwmpq.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [
+        "お淑やかなドール"
+      ],
+      "name": "mei23",
+      "category": null,
+      "url": "https://misskey-drive.m544.net/files/f1baef28-ca68-41d2-9275-1f02642a7168.png"
+    },
+    {
+      "aliases": [],
+      "name": "na",
+      "category": null,
+      "url": "https://misskey-drive.m544.net/files/c382d93c-5bfc-4643-ad13-e28c3a7b43a5.png"
+    },
+    {
+      "aliases": [],
+      "name": "pyonpyon",
+      "category": null,
+      "url": "https://misskey-drive.m544.net/files/c63559a9-ab39-42a2-a801-39fd99a4efd6.png"
+    },
+    {
+      "aliases": [],
+      "name": "rec",
+      "url": "https://misskey-drive2.m544.net/m544/4ph3nfmzzui6dl61mn4lompr.png"
+    },
+    {
+      "aliases": [],
+      "name": "suggoku_suki",
+      "url": "https://misskey-drive2.m544.net/m544/17ghqqlx9jrdczm9xyelf1pr.png"
+    },
+    {
+      "aliases": [],
+      "name": "wakaru",
+      "url": "https://misskey-drive2.m544.net/m544/dxfc6tkt0wecri33pxdrlnc3.png"
+    },
+    {
+      "aliases": [],
+      "name": "wifi_spot",
+      "category": null,
+      "url": "https://misskey-drive2.m544.net/m544/mssiw2ovdg9oyxn8ipoppooz.png"
+    },
+    {
+      "aliases": [],
+      "name": "yabaiwayo",
+      "url": "https://misskey-drive2.m544.net/m544/5bhgfd08wfzvujh7axfc3lsv.png"
+    },
+    {
+      "aliases": [],
+      "name": "ie_button",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/c4hckxuj4lgnpfj6i3s72xwf.apng"
+    },
+    {
+      "aliases": [],
+      "name": "kamattehoshii",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/9t1vb0rpp7r9rvwbexle8og7.png"
+    },
+    {
+      "aliases": [],
+      "name": "katorisenkou",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/spfwwwxbafaz7erpkgb5lcrz.png"
+    },
+    {
+      "aliases": [],
+      "name": "kosyudenwa",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/dyxzb6mysxfr82gbjt8tjn52.png"
+    },
+    {
+      "aliases": [],
+      "name": "mine",
+      "category": "",
+      "url": "https://misskey-drive.m544.net/files/d55e8525-f956-4391-ad05-a076551469a4.png"
+    },
+    {
+      "aliases": [],
+      "name": "mizuno_haitta_pet_bottle",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/v76qwhydy92x57d6xmrkp4ig.png"
+    },
+    {
+      "aliases": [],
+      "name": "nazo",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/ct2dg3dywzakfi0royu1fvhd.png"
+    },
+    {
+      "aliases": [],
+      "name": "pluto",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/lmwdlxfquvksq1qd4hpt8x15.png"
+    },
+    {
+      "aliases": [],
+      "name": "saisenbako",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/uq2r0wz1vshra2zvz1cbcvph.png"
+    },
+    {
+      "aliases": [],
+      "name": "tarai",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/zby5fy9zdm2hyve435xhy8mc.png"
+    },
+    {
+      "aliases": [],
+      "name": "venus",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/k2suz4eqc1b9x4irqobm50li.png"
+    },
+    {
+      "aliases": [],
+      "name": "w017",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/weno70pfe0hoqxrh0yvwadx6.png"
+    },
+    {
+      "aliases": [],
+      "name": "wakaranaiwakaranaiwakaru",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/mgwcexyghuz6m8fthbx4pd5b.png"
+    },
+    {
+      "aliases": [],
+      "name": "wakaranaiwakaru",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/5g6j5zv3vohhy70ve4k3syk9.png"
+    },
+    {
+      "aliases": [],
+      "name": "wasabi",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/uzox6wpe0sixu4rgd21ot4rg.png"
+    },
+    {
+      "aliases": [],
+      "name": "wontfix",
+      "category": "",
+      "url": "https://misskey-drive2.m544.net/m544/zxiqx4xmj67i8qrtynfnvi1f.png"
+    },
+    {
+      "aliases": [],
+      "name": "ablobdundundun",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/fcjxe6qcxayh3g8unrias8fa.gif",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "ablobkeyboard",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/gckikrufrr4jjfr4ubpf2b1l.gif"
+    },
+    {
+      "aliases": [],
+      "name": "ablobwobwork",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/0fjmc4wv985b21il238z3vfa.gif"
+    },
+    {
+      "aliases": [],
+      "name": "blob0w0",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/xf9i8prc8fwusnoibrz5d5qj.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blob3c",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/oit4svrdhmogafzrxjmtusv5.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobamused",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/huvj47gk56hvvyy2uy2ulppz.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobangel",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/uwgx1ewofh29aq6til78ch5n.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobartist",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/oc9ct6zmw28286bwodeodl5n.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobaww",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/088is6c814uyf3uyzvytil5j.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobblush",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/7uyp5b44bsv50pgsa48panl7.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobboo",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/okxaoaaa4tza8ti8ppw3mwv0.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobbounce",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/y9nltb1e2ysz7l6md80jp96x.apng",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobbowing",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/eqjllgd1u7wl02i0u8uyo2iq.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcamera",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/v3g5r2wty4t0pr9ltot0vslw.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcheer",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/65vf92d08ped9bvt2hl6joxz.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcheerbounce",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ihs1vlxzo8lromd5gdzi0wug.apng",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcheerful",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/emcytp44uhq0y96kpmwn8gfn.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcheerful2",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/6fgzm1dviyh0rynqtjexjskr.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcmereyou",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/gva2g3eoxh0ff4vdadxqok59.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcocoa",
+      "category": "blob",
+      "url": "https://misskey-drive.m544.net/files/tk4ts1lt55umwih4hvhquolo.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcouncil",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/1yr57s63y824c0lf3ctsuz0i.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcouple",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/l6t80ymzcg3ms8yir1zuo9o3.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobdancer",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/voxfe34jjn377g6vzr4vj7b4.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobdoctor",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/kq3pji3vn5nir7uv6l3c1nw7.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobexpressionless",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/p4c3vd7pb8cboiw157jlicq6.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobeyesdown",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lo07oz6o9e91gcx9pn4zrjez.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobeyesup",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/40l7rkbtgsxup6x1yeo4ovcw.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobfacemask",
+      "category": "blob",
+      "url": "https://misskey-drive.m544.net/files/2budcn95tn0hxza4a00hnnuu.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobfacepalm",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/fzkia0altfc7smph0vrg9hhs.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobfearful",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/yxz4ksytlspe3vvu0sbnaepw.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobfingerguns",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lmj3tq1zp30y2d1fo37392sq.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobgamer",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/wtf49ge55gu9p2qxvmkcrvqh.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobgift",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/rros9nriv1qi5afwrotyfhx0.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobgo",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lq5xxfuqdmdiqyji3ff3c71c.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobgoodmorning",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/pwq5s42u9b6652j53n3vmnws.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobheadphones",
+      "category": "blob",
+      "url": "https://misskey-drive.m544.net/files/o1tels16jhg524wgisx71w5r.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobhearteyes",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ongxton93q0fkke9kx3247p5.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobhero",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/r1pp4kp5cshfqmo1fb40i433.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobhighfive",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/0merr3m21naxztfhriybi1gq.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobhug",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/pik1lq0c1bntl42awuyds38z.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobhug2",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/os7b4qszqpc2y3m4550zdbee.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobimfine",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/8euba9ypskqd38ocm1glbjrk.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobinlove",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/7n80wwn7ulzizj3rd02ieg7z.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobkiss",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/0tl36281joiqcw0dolonqzn4.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobkissblush",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/cs9swn65bphbr9k07p6oylsf.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobkissheart",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/92e6uf858tqw69jthhx6jw4f.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "bloblamp",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/rardggsetflma9ys173z9we9.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "bloblul",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/xcgclx70898czdxpl2lpedcy.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobmaracas",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/utal084sif6uwpgfdpe4qpfq.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobmeltsob",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ntpntp2rrb1t79i5fv2uclqe.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobmeltsoblove",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/294ef4d4ml60ws1v3oe9ljx2.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobmindblown",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/f4ns5mcgcz8nq5y450kytyf5.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobmorning",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/sk2vzy882g3y7m6sz9bj5q4e.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobnervous",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/kzkepj2b5wiqvbvvk3rpdkxe.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobneutral",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/86cremomao3gb5lknj5fx2ym.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobnight",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/jym9kac0qtp1rz2xzrrx88ru.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobno",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/cn2yq3af817muj7vzdihnts5.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobnom",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/2d9wctubos9cbx78ghrhbzdj.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobnomchristmas",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ifay2csaixep94v3nepo2p9a.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobnomcookie",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/vximrec5mtipwtxupr4w41eg.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobnomglobal1",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/vplcdse1dgeysju5mpl077bd.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobnomouth",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/sfqhs0btlfym3yhdmhdbpihy.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobok",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/4yxgm0bcc7upu5x7hkfehrex.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobooh",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/t7f49yvp5ov5ljwzostalefp.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobopenmouth",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/03meazo0ojfetztle5vq5v7m.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobpain",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/hfh0o1lleu4z7wzdje7o4qrl.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobpan",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/0pyjii3fv6enw0p2j8z3lxhc.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobpanic",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/bhcirk5oj1i4afpbgc2km231.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobpartlysunny",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/88py5b8v905nf2vo80klpvq9.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobparty",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/a7cggxkjvpk7pp2tm0fwr5ia.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobpats",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ya2crwcosxrmugamtcfhfd4o.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobpeek",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/46scwd9x8det6enminro87fl.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobpensive",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lgip1naz8a24zorjhx7xrgdu.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobpleading",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/02z5k12qxp40km7kep9atvvl.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobpoll",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ek29nw3pu4x8hu40jhf5j4mh.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobpopcorn",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/fip04ohh3zuh5ai3cicah0gb.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobpopsicle",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/iwohmk6qxjtgyr3rfjwp4u3w.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobpout",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lv6z7h0xrblzd9kppr80jfb6.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobpray",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ku7o8gimwervrwdzhqecpjvm.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobreach",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/b2h9yuanjljapedx3ciyf25i.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobrollingeyes",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/pnl56o1ep09wtjto9kqukzd8.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobsad",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/d9o5nxqn8jsq07i4h3rjlds8.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobsadpats",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/upq3rsrydmieqn64bgwmqo6l.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobsadrain",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/uw01r2i5kswb4zqgv0wo4zb6.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsanta",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/x3ncvdsfysm437t41v2a1frl.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobscarf",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/e7q2mqe83zbdwarrbepsqbfs.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobscream",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/sdxagoqcki6clz3b4llpnt4w.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobshh",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/w6pg3xq8tjtyfzht95abowet.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsick",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ors5dskmn4w61hs6tyhby082.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsip",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/asorj3d88tkl4e7z4bjihbln.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobsleeping",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/qgkuu7agyb0ix2cvjipu4q7b.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobsmile",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/dgcjivfrky1dyvb2kx1020c0.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsmilehappyeyes",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/ihydh1rbqbq8shxsf5fxqj6v.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobsmilesweat",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lh788fwz0rmv9e2x7dzud2yi.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsmiletear",
+      "category": "blob",
+      "url": "https://misskey-drive.m544.net/files/nwroqweapobkn6qi2651ee7h.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsmiley",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/xg3yw8jv0f96kf8vhc9auq2x.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsmirk",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/3vikwl4kl9zzoq3o6foiqdpc.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsneezing",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/d2fbagwzfg6386yiodex0gbr.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsnuggle",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/uedbbvrjxoxddzxgbx2ylowj.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobsob",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/p9m33ltnwyo9752q1wdpgttn.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobspam",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/r4majpyuoc48mpcbk5ppaeks.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobstarstruck",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/t1qg8vl70g4uyl36rszjhrug.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobstop",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/de51pnlkg2tbsylyrh9u1mpd.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobstudent",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/5zzzpqq4lxgzkpvrwf7ryd1j.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobthanks",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/sq8y3sn96zmc720dc4bzhhok.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobthinking",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/wyx54knfop04g8741qhyxhm3.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobthumbsdown",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/r40p6o0ggrvkbydiayc9vegn.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobthumbsup",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/u1enlwk5qjfatymc15e0nfhz.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobthump",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/8kftcxp7iap250rv3xe2k0x5.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobtoofast",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/6qocjkf9q27gvw32yukrk7ar.apng",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobtorch",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/88al4mab67zat67jic07nx01.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobweary",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/o9oyipa4pufj6c317nr80shg.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobwink",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/66dnorm4owl7qhbcai942bq8.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobwitch",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/s7jw5e6wl90gw1mucykwytb4.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobwizard",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/5delu7funm1h0mjwc2ef66ex.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobwoozy",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/isnuf7aqp7ys61vnwoxeg328.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobyawn",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/0yw7s66wiitnwqdpyeqpb9za.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobyes",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/wldqy7ujw9zhdzqkc3c8aflk.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobyum",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/lccjv26cqn9z9im529y152if.png"
+    },
+    {
+      "aliases": [],
+      "name": "pumpkin_owo",
+      "category": "blob",
+      "url": "https://misskey-drive2.m544.net/m544/7gabzxbbinseat9jf4nxn5e5.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "ablobcatattentionreverse",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/us2y9gmih3tolt4m6t14ttao.apng",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "ablobcatcoffee",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/r91cgvn4h7d2od376yid4ofw.apng",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "ablobcatreachflip",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/hmn50j42fcdiw0yhabfjt0b0.apng"
+    },
+    {
+      "aliases": [],
+      "name": "ablobcatsnowjoy",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/o2z0z6wfgbb2eznlivhlpnh6.gif"
+    },
+    {
+      "aliases": [],
+      "name": "ablobcatsweatsip",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/3s1pw6pepmd2kisk5645wqvb.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcat",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/pf48xsa2ill6dyfebcncw9s2.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcat3c",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/aupdvfdjgxyr218yzgcqixbb.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcat_banban2",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/394z7066fnjrzbzhfall5o82.apng",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcataco",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/6x7om0lna99qo47o663r6gy9.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatangry",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/rb85xd39iej0ao795gh6b6jg.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatanime",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/6fhx2n2j9iuddpej6gq81sy1.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatartist",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/1exl5vplgc9ksrts1orf6327.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcataww",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/60yropaxcyzfnltageqranmk.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatbath",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/eppxrs9gltjarq9gldpzxi5m.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatblush",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/pmktbw8cujcv4umq1m2tsjsh.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatbounce",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/dxm4x5cn4me6ay5kx6mzu2dr.gif",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatbreadpeek",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/7oety7ehdsty2nib0br0zm7x.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatcandycanenom",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/hcszu2f61u75x1uu711csw5i.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatcoffee",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/rutjfiq1ep4d84c4zsqf879v.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatcomfy",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/is97jb5h4vesn7ugaaa8d6m8.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatcooljazz",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/5dt125bi5lo01jvqqshpg3dj.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatcouple",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/w70hi457lgbsx4m4a5skngfz.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatcry",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/zcj6iwsig8iw4c9r29cegarn.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatdead",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/k7f9w8x4du12nrpdy8lbah1t.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatdefecit",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/zu549hz2pn1ukjsdyhed8ex8.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatdroolreach",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/7uvpft4cgpo701o22lx8o6cv.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcateyes",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/bmw9p0lm9u7v6p29qg41p5a1.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcateyesblush",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/qxrc4mkocf666yfakdz2zaxo.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatfingerguns",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/l19oa1v1lmb6o9qd9fqh7bao.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatfishnom",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/h8f0crekkbv8htmuk5i2yaya.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatgamer",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/33po5wq73ed3i5wzs7q0vsym.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatghostdead",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/090d6lv0i1j5b3d73hzqugjz.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatghostreach",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/qeugy9pc9q90am9ug971oky5.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatgiggle",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/goar7j3ba6ebuwname9opzko.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatgooglyshrug",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/1slpzhoj014x7g8pif4l2gxa.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcathappy",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/r1dfgv6k6tjqf6cf1p913lqv.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatheart",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/ohdls6n8mmuvcj08dgc62c01.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcathearteyes",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/ybxc8hmz0rkc7f98tx4zinft.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcathighfive",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/hcq511sfixle7021bop7duq7.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatindelight",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/4974i8rmml3hmexj98na9uxe.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatknifemeh",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/mprugzkk452nn1eg7vzwrqto.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatlaugh",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/8lrqwg8geeutrccwuw2vk0q7.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatlove",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/wfawy1gbh80gsdf6vn7rihqc.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatmelt",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/g6rfzpu3kku09oy78wgdmiuh.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatmeltthumbsup",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/d2xmyud6ucsr1ymzwmh0li8r.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatmorning",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/ppcd4fv9ozhi61qaaamddqiv.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatnom",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/isg3ur3dsu2869zr0e1iemg7.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatnotlikethis",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/t2jmxpwjymwv2qeipo4bmtkh.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatnuu",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/dzkm152l6oup00966l8lsick.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatowoevil",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/8412dnp5rz78q5b7wjjaeg7r.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpan",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/zp7mq0nsi3wbingpfiqbfxwc.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpat",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/kl1rieo0lugs8kuqvmfvk3eq.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpeek",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/jfm3ayx71ypu8fr1vk011e0g.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpizza",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/aj37bl3lvxr1kw04o0whenjm.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpleading",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/h4v7i82ovpdcof9ccise6kjj.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpopcorn",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/ga55hmzc2bajeuueozreg40q.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatpumpkin",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/dexvo50tqyyp63r9vt1xlkwk.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatreach",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/fnoyudvg01zh1sr1l3ax9hw3.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatread",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/gpg7n7kzlfede2u651odrjcm.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsad",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/a7cbntsup0skxrrctx4lxjyu.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsadpats",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/pqf8mhgzdrb9qm6m0qtg4tj0.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsadreach",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/7zx7nfvn11tuse17lgk55o06.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatscared",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/wt8g4noqxva1kawlyix4mt15.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatshy",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/f4v5vdmhmjh1nuh6j4krbply.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsick",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/ris1681zwu3chd281j6gad5h.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsip",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/d86mkip9mk8o8r6mdkawsp0f.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsleep",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/zs4d0254igenw163l6f96dei.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsleep3",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/8rsy525nn8rhhsagvp4qyvb1.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsmug",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/rxn8o96zceyoj203unyj4y68.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsneezing",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/t1qc74q12fqrdkgxs0kiunzn.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsnuggle",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/o9cc2lk1ju0ulyzalwfbnnw1.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsurprised",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/99qlgqsnigg8xj5sazi6buti.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsweat",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/5ayhkwjk51dl6vmy1k7cphs7.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatsweats",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/zfdn0gy7po1lpkpfeg54crtn.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatthink",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/r4ksn3pwmt0gtoftalljqedv.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatthinkowo",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/k53mdu4pdr6uqoodp1ihse6q.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatthirst",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/o25x8v6iq71w43lyq3tia701.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatthumbsdown",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/a9l4vk2mbfjq4nd37qjbizxb.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatthx",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/71h8b0d33mcsiviyqdtyiv82.png"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatwave",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/1a4ox3hc0h781adhng2292ml.png",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatwitch",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/d7khloywy5o70i2ytlkmfsfz.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "blobcatyandere",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/sncy6emojii6ye4nc4owybz0.png"
+    },
+    {
+      "aliases": [],
+      "name": "meow3cSmirk",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/y6fa8vjzrur34i20exqjcjvq.png",
+      "direction": "left"
+    },
+    {
+      "aliases": [],
+      "name": "meowhuggies",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/re4hrijv5rfs2ezjfxvuybjq.png"
+    },
+    {
+      "aliases": [],
+      "name": "meowpraise",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/bqt7hpyp35jphwfvnb1wei0z.png"
+    },
+    {
+      "aliases": [],
+      "name": "meowshh",
+      "category": "blobcat",
+      "url": "https://misskey-drive2.m544.net/m544/85lqabaw2rr09acqcgk77739.png"
+    },
+    {
+      "aliases": [],
+      "name": "abunsmile",
+      "category": "bun",
+      "url": "https://misskey-drive2.m544.net/m544/b9bjrgd0opbdt1iuoao76yrv.apng",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "bun",
+      "category": "bun",
+      "url": "https://misskey-drive2.m544.net/m544/3ma0llhcn6dgexb98vkddmgx.apng",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "bunlove",
+      "category": "bun",
+      "url": "https://misskey-drive2.m544.net/m544/j3ghovg1n95cdfpurxsdtve0.apng",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "bunsmile",
+      "category": "bun",
+      "url": "https://misskey-drive2.m544.net/m544/2cm8do0njjpijqj1dlvwqpru.apng",
+      "direction": "right"
+    },
+    {
+      "aliases": [],
+      "name": "neko_cats_eye",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/156t0hw9snv6mpkhkpp0m6do.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_cats_eye_blue",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/jhvbwm2gat1o1cbznxsa8hjj.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_closing_eyes",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/xbjar2kp7splrpnrwn3pbpqi.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_cry",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/qsi69qggrugmj5hosnpm2ygp.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_fish",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/buri6nn3rq1xt8hh3fdcdsot.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_frowning",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/o43io30zv5emvz5swozqejuj.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_ghost",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/r4ctdvxazmfvj3i5aauvew7o.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_ghost2",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/ep0pw6eky881wcijiuast34j.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_ghost3",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/2hze9dd3x7k4ksoa1rihcgc0.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_ghost4",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/j9uryajh4idq1408wa27ytzo.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_ghost5",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/mfef9qe28dacy1t8jwkeyfa5.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_glasses",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/k4iqngdvadzwjydp6gs75ej8.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_glasses2",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/1dssad3uzhgimscm30cn6c1r.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_glasses3",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/fb24c7uw17ales8pl4b9g8af.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_glasses4",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/a2zzgukqzqmehy8vg3aw6p7e.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_gray",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/qx0wmd612kenrx8a1tx5p3gd.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_neutral",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/96y211nex7vzfm7ubdfwb8gq.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_nyaan",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/xpaw7ix0ox2jgnyarc7fvx4n.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_oinari",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/ktt89w8tvxtwqjcdea74zs2h.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_relax",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/ilfajs3h6xo0g19kn7f7z16g.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_roling_eyes",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/ufbminosxjwpexde2w5kl56h.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_roling_eyes2",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/xjpj69akpt2wzuzp9r4t05oa.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_sad",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/khqf70kuy8d101re3lzkueei.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_siam",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/arljq5mlxsmyn7e236piam7z.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_sidelong",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/5attjdmpln29omzmmqv3czpm.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_smiley",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/eayu6tsxp8qzy2ajacyz2nvo.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_smirk",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/bv6i8ds2alvi62bzt7n1spv3.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_star_eyes",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/13ieasfl1tp9aynxzibz8kpw.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_sunglasses",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/7imx6nyo2d8rgvh6359eza3n.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_surprised",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/xp8w8lfh5f3fopxfnz2x6cfy.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_sweat",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/z7wh9f6im7gypy5m6bn4kxyg.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_thinking",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/mrrxl1bbyppi4wzysmmn74xz.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_thinking2",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/me1lwctp6jth9rhvw52tw07k.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_tired",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/17q1h3lozu35gel45xpchk1z.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_tired2",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/mwmhbwffww1vsggep57dc5ut.png"
+    },
+    {
+      "aliases": [],
+      "name": "neko_xd",
+      "category": "neko",
+      "url": "https://misskey-drive2.m544.net/m544/6a4c3rj7702zygsmsn591r8d.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_a",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/qzeq0tol6tuzi6mlhfn7zri2.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_a2",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/arknkzkdbvbflic1y406773n.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_biku",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/qxthrklkq0ri2s1nx12lmuvu.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_biku2",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/d6ka9i443welhoose9c65j4e.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_haahaa",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/1q5wquhbylp9elk8h18ci2d4.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_heko",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/xggwzsujfexlp80wctnd1yrg.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_kyun",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/vb6phj5zalkrxk3zyll9qarb.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_ltu",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/gtkr8jjwb47k8fcsvyt4idsq.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_n",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/asygwpssuiyb1tfo37qb29t8.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_n2",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/w9abr7840wg3vocya6a6lub1.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_n3",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/ei336daq9xvu0dzx8oxt789b.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_o",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/nvbg24e5ppgyw82zpo32ynms.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_suri",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/94exbo3h07gxv4xnb7g96n0i.png"
+    },
+    {
+      "aliases": [],
+      "name": "eti_ziwa",
+      "category": "えっち",
+      "url": "https://misskey-drive2.m544.net/m544/tqc1yxmqpzpw3oez9kitdpb5.png"
+    },
+    {
+      "aliases": [],
+      "name": "be007",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/p91c9abtjgehqontfqhe3nax.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be016",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/axk724vp3l16lorvogonijce.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be023",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/3o4eueafixmavdj9qzld7r4w.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be030",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/k5j3bjv2jzo5qlstf6axqlk5.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be031",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/np54sfgpvnuplgqhw4v3tf05.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be032",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/jxxmomchbuuz6pz6itchl291.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be033",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/5uv6ew78hdzdcpukuav7308p.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be034",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/8lv99ksn1nke6142uxveeney.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be035",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/xzkr61skrmhe5qwrd2nih5u4.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be036",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/8td9l4o0t7t3j6z5il39lpwe.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be037",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/z7lkniag1y3w8x94zbrpilsu.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be038",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/y8pzha8takruycmxsplil3or.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be039",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/02v77npqu6815ehcgk76qci8.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be040",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/4bqkm3nc1h773q6b5ynvnya6.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be041",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/524aqxn2gfjdwolwid9ukwx0.apng"
+    },
+    {
+      "aliases": [],
+      "name": "be042",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/gvy27g7fqsdj987u6sd5kafa.apng"
+    },
+    {
+      "aliases": [],
+      "name": "kaenbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeam",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/m91tx29yaesjh0d2x2en5mch.apng"
+    },
+    {
+      "aliases": [],
+      "name": "rose01",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/1g3bvh3t67gvbft7kxif6j3w.apng"
+    },
+    {
+      "aliases": [],
+      "name": "rose02",
+      "category": "エフェクト",
+      "url": "https://misskey-drive2.m544.net/m544/x8o68m3q6g9rg6jdn02zbgf8.apng"
+    },
+    {
+      "aliases": [],
+      "name": "nicoru",
+      "category": "サービス",
+      "url": "https://misskey-drive.m544.net/files/be3c7ae6-0137-4751-9054-5e6ff5c771d7.png"
+    },
+    {
+      "aliases": [],
+      "name": "nicoru270",
+      "category": "サービス",
+      "url": "https://misskey-drive.m544.net/files/7d1836b4-cd1d-4754-913d-bc76f79546d7.png"
+    },
+    {
+      "aliases": [],
+      "name": "tohyotalk",
+      "category": "サービス",
+      "url": "https://misskey-drive2.m544.net/m544/cm76sc4vabnxeqs14mb83c0z.png"
+    },
+    {
+      "aliases": [],
+      "name": "twitter",
+      "category": "サービス",
+      "url": "https://misskey-drive.m544.net/files/63fd1429-6ea9-408e-94d3-a7196a5c0930.png"
+    },
+    {
+      "aliases": [],
+      "name": "youtube",
+      "category": "サービス",
+      "url": "https://misskey-drive.m544.net/files/b8b8903b-ad74-4029-b44d-2fa114438598.png"
+    },
+    {
+      "aliases": [],
+      "name": "cero_a",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/db0b2289-0a3e-4c99-a5f8-ee6f1cdf676f.png"
+    },
+    {
+      "aliases": [],
+      "name": "cero_b",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/5e6d5b0c-053f-41ad-9553-80ad9e5cfd20.png"
+    },
+    {
+      "aliases": [],
+      "name": "cero_c",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/644b4085-7435-43e1-bd1d-387f208efba4.png"
+    },
+    {
+      "aliases": [],
+      "name": "cero_d",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/90011317-71f7-43c9-9b93-d938b9b34ce4.png"
+    },
+    {
+      "aliases": [],
+      "name": "cero_z",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/de3808f0-f01b-477a-aad7-e0f99d8e7b57.png"
+    },
+    {
+      "aliases": [],
+      "name": "cerox_kyoiku",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/534a1afc-da2d-443c-8db9-d5fe6aa035e2.png"
+    },
+    {
+      "aliases": [],
+      "name": "cerox_tekigo",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/9201b9be-b617-4bdf-b039-f7182145e94d.png"
+    },
+    {
+      "aliases": [],
+      "name": "cerox_yotei",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/85a99a24-4ec4-4a07-bedb-ec40bd61346b.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy1_love",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/8fbaeb41-e3fb-4e0c-82ca-b8147033d4e9.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy2_sexual",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/160282f3-f0f4-4c7c-9169-7935945e6690.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy3_violence",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/5b06ca00-7b8b-45ff-bce8-44f900501935.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy4_horror",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/27f21b45-55bd-4e04-bfd2-c613aab864b9.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy5_drinking",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/e8086428-a5f2-4560-88a2-726efa48d3cb.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy6_gambling",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/d374aafc-c635-440b-9e7c-a0c044757b9c.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy7_crime",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/6cfc8548-96d7-4464-b137-4a50f01741e1.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy8_drugs",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/f5412977-3ce9-4b39-8c75-44dbc774b718.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroy9_language",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/e1af9fc7-90d9-44cf-9b4f-56457e9fd258.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroz_0",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/92dabe0c-84a4-4377-97aa-7044f3bece5d.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroz_12",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/4065c001-e852-413b-8d40-2c89fc457f11.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroz_15",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/1fc5b7b2-d807-4d34-be75-625a8fbab452.png"
+    },
+    {
+      "aliases": [],
+      "name": "ceroz_18",
+      "category": "レーティング",
+      "url": "https://misskey-drive.m544.net/files/19988447-a973-4f6e-8a9a-4947f56ef430.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_battle",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/1cc7c135-0523-4a13-9198-53bfdbcdc322.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_bread",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/e8f69949-ba0d-49a9-ba90-277456c136ed.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_bubuu",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/ffef3d33-91f6-44a8-bfc2-42fe36bedeeb.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_calc",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/30639419-74b7-4a3a-b9cf-b804b580aa6c.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_encount",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/0f0e0d75-8ccc-4956-832c-b4d119bb5c62.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_get",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/03693f1b-57cc-4cc8-925e-730115dc1f9b.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_kirakira",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/b849c116-6e27-42f7-a768-c988a68dbcef.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_niku",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/38df460c-5c8e-4660-b192-09a32fb5e0f0.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_pinpon",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/63520602-449a-4229-ae41-0332bcc351ae.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_player",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/aaa97899-3a56-4dae-a065-682efa7116a1.png"
+    },
+    {
+      "aliases": [
+        "stat_sake"
+      ],
+      "name": "stat_sake",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/fd066c3a-4ef2-4aec-bbfd-3e6d5558cd0d.png"
+    },
+    {
+      "aliases": [
+        "stat_sing"
+      ],
+      "name": "stat_sing",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/d70b1cbd-91e4-4569-b964-3cf914630d2c.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_star",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/e94ab98b-697d-48fe-9afb-c943f24301cc.png"
+    },
+    {
+      "aliases": [
+        "stat_sweets"
+      ],
+      "name": "stat_sweets",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/f4cadacd-c618-483a-b690-17d3e4a5ce05.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_target",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/aea5e854-3279-4c79-a8f1-757e4ac16560.png"
+    },
+    {
+      "aliases": [
+        "stat_tea"
+      ],
+      "name": "stat_tea",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/465fb749-9dd6-48ce-8574-3279850eb294.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_tere",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/3ccf3de2-6e92-4c52-a4d6-b04885e77369.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_unko",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/05582799-b722-406a-a52e-4ade9b2fcb84.png"
+    },
+    {
+      "aliases": [],
+      "name": "stat_zzz",
+      "category": "吹き出し",
+      "url": "https://misskey-drive.m544.net/files/1f959ec7-94cb-4350-8825-66d2f28b919c.png"
+    },
+    {
+      "aliases": [],
+      "name": "chiba",
+      "category": "地域",
+      "url": "https://misskey-drive.m544.net/files/8bgq4pl5isrkvgf5cf2msvhu.png"
+    },
+    {
+      "aliases": [],
+      "name": "hokkaidou",
+      "category": "地域",
+      "url": "https://misskey-drive.m544.net/files/3fe0487e-f5a8-46f5-9df9-2dfd53252473.png"
+    },
+    {
+      "aliases": [],
+      "name": "kanneiyahataseitetsusyo",
+      "category": "地域",
+      "url": "https://misskey-drive2.m544.net/m544/88yrd8q0qwa7fjkebhhi3n4e.png"
+    },
+    {
+      "aliases": [],
+      "name": "okinawa",
+      "category": "地域",
+      "url": "https://misskey-drive.m544.net/files/3e62cd97-c510-461b-a67a-65f03ddecf50.png"
+    },
+    {
+      "aliases": [],
+      "name": "air_conditioner",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/e0cdc792-c9f0-49ad-b8ea-e7818f3b28e2.png"
+    },
+    {
+      "aliases": [],
+      "name": "circulator",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/c3592f2c-4871-4541-9be7-b050ebf9c2ba.png"
+    },
+    {
+      "aliases": [],
+      "name": "fan_desk",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/64ebd7e2-6a59-4691-9be6-4da49dd3b8dc.png"
+    },
+    {
+      "aliases": [],
+      "name": "fan_no_blades",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/8524d782-b027-4a63-b3d5-2c9068176820.png"
+    },
+    {
+      "aliases": [],
+      "name": "fan_wall",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/3d37af72-7997-4d52-b7bc-15d7d8ef91ad.png"
+    },
+    {
+      "aliases": [],
+      "name": "halogen_heater",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/45f681d3-acc4-4de1-a838-339120842f2c.png"
+    },
+    {
+      "aliases": [],
+      "name": "kankisen",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/408f4fc0-6067-4a98-8d22-cd5aff00cad0.png"
+    },
+    {
+      "aliases": [],
+      "name": "reizouko_b",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/fe74f98e-5eb9-46d3-a6d0-b314749027c9.png"
+    },
+    {
+      "aliases": [],
+      "name": "shitsugaiki",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/0e855e63-e2eb-4be3-80e1-6b5abc3f4891.png"
+    },
+    {
+      "aliases": [],
+      "name": "stove",
+      "category": "家電",
+      "url": "https://misskey-drive.m544.net/files/64ffda37-599a-425d-a599-7d4357229c06.png"
+    },
+    {
+      "aliases": [],
+      "name": "dpr",
+      "category": "旗",
+      "url": "https://misskey-drive2.m544.net/m544/yqu436flkydml62j60e7hqqs.png"
+    },
+    {
+      "aliases": [],
+      "name": "lpr",
+      "category": "旗",
+      "url": "https://misskey-drive2.m544.net/m544/qxx8rzx8pc5bf9yrq3s7mdo5.png"
+    },
+    {
+      "aliases": [],
+      "name": "moldavian_ssr",
+      "category": "旗",
+      "url": "https://misskey-drive2.m544.net/m544/0w10v4t0mw01ti6wmtyj3zav.png"
+    },
+    {
+      "aliases": [],
+      "name": "su",
+      "category": "旗",
+      "url": "https://misskey-drive.m544.net/files/t4e9yaxiz3j9z3w5kr179uty.svg"
+    },
+    {
+      "aliases": [],
+      "name": "long1",
+      "category": "旧",
+      "url": "https://misskey-drive.m544.net/files/52033582-e9dd-4599-a0f3-7c403012885f.png"
+    },
+    {
+      "aliases": [],
+      "name": "cymbal",
+      "category": "楽器",
+      "url": "https://misskey-drive.m544.net/files/c1e4434a-dc94-4815-a85d-50857679b8aa.png"
+    },
+    {
+      "aliases": [],
+      "name": "gakki_case",
+      "category": "楽器",
+      "url": "https://misskey-drive.m544.net/files/88c80017-7a18-4274-ac58-a48e1d4106d4.png"
+    },
+    {
+      "aliases": [],
+      "name": "vuvuzela",
+      "category": "楽器",
+      "url": "https://misskey-drive.m544.net/files/ad25ebf7-16c6-4f03-82b8-c93c9b79d180.png"
+    },
+    {
+      "aliases": [],
+      "name": "aneton",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/5ql6aw6hky0ldavn1zttmn86.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "bron",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/y52u2f3ny3r16ovpy561c0v2.png"
+    },
+    {
+      "aliases": [],
+      "name": "bron_box",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/qt9d7wj3y56am7osrmv61nng.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "bron_caution",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/afoi8e18lrr5c47nweb5ocei.png"
+    },
+    {
+      "aliases": [],
+      "name": "contac",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/a5w6q6g3r8eaiei9i2sqd9hj.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "dan",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/ea5nugllfcgjznswgaq4c1gr.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "g_pub",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/q77tlv23popdsgq8ciynvh6j.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "medi",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/usd473zn58htbzya4kx9sfap.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "restamin",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/tz7oz9agupkqkrp5jjgr0q1h.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "smoca",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/soopf8iq17p6yf7z9c6jquul.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "tonin",
+      "category": "濫用等のおそれのある医薬品",
+      "url": "https://misskey-drive2.m544.net/m544/j4jd3ke3wmr6myxnhvx8se2v.jpg"
+    },
+    {
+      "aliases": [],
+      "name": "beer_blacklabel",
+      "category": "食べ物",
+      "url": "https://misskey-drive2.m544.net/m544/iawye47qvud25c3meil92rc6.png"
+    },
+    {
+      "aliases": [],
+      "name": "beer_nodogoshinama",
+      "category": "食べ物",
+      "url": "https://misskey-drive2.m544.net/m544/i152iohvm4292er4w4eg2bul.png"
+    },
+    {
+      "aliases": [],
+      "name": "soup",
+      "category": "食べ物",
+      "url": "https://misskey-drive.m544.net/files/1a0abb06-167d-4d3e-89de-1d6caf7241d4.png"
+    },
+    {
+      "aliases": [],
+      "name": "yuzu",
+      "category": "食べ物",
+      "url": "https://misskey-drive.m544.net/files/4481099d-ad82-457a-a76c-efe774840071.svg"
+    },
+    {
+      "aliases": [],
+      "name": "kaenbeamp",
+      "category": "🀉",
+      "url": "https://misskey-drive2.m544.net/m544/ndbk807t6fo8lwl7u46y5r5j.webp"
+    }
+  ],
+  "enableEmail": true,
+  "enableTwitterIntegration": false,
+  "enableGithubIntegration": true,
+  "enableDiscordIntegration": true,
+  "enableServiceWorker": true,
+  "proxyAccountName": "ghost",
+  "features": {
+    "registration": false,
+    "localTimeLine": true,
+    "globalTimeLine": true,
+    "elasticsearch": false,
+    "recaptcha": true,
+    "objectStorage": true,
+    "twitter": false,
+    "github": true,
+    "discord": true,
+    "serviceWorker": true
+  }
+}

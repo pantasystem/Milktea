@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "488937418039",
+    "project_id": "milktea-38a76",
+    "storage_bucket": "milktea-38a76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488937418039:android:e7eff50ab73cb4560f3eb2",
+        "android_client_info": {
+          "package_name": "jp.panta.misskeyandroidclient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488937418039-7a3aos75ncb4u8l5dpsbn6u2t6i7gj1a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jp.panta.misskeyandroidclient",
+            "certificate_hash": "305007c09b8c6d454c4aac5c88dfa92362c5ce88"
+          }
+        },
+        {
+          "client_id": "488937418039-ohoqu72vcf056djpqlitem3jch0cdjgb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jp.panta.misskeyandroidclient",
+            "certificate_hash": "a0829916db5a5dd7f72264ea3a0550e6ae57b012"
+          }
+        },
+        {
+          "client_id": "488937418039-qvdak1q6k7n67e0jvi4lc19gtkjvhbnh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "jp.panta.misskeyandroidclient",
+            "certificate_hash": "2defef4045b7a3626f4441ee74b61746e5048e46"
+          }
+        },
+        {
+          "client_id": "488937418039-8utt6eghs42mg99lsc3eepb279pu9d1c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGbZBLasgeDN9cziJnlaV1kBxSScWVYYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488937418039-8utt6eghs42mg99lsc3eepb279pu9d1c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

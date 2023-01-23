@@ -1,0 +1,7 @@
+<resources>
+    <string name="download">下载</string>
+    <string name="start_downloading_placeholder">开始下载 %s</string>
+    <string name="success_download_file_message">下载成功</string>
+    <string name="failed_download_file_message">下载失败</string>
+
+</resources>

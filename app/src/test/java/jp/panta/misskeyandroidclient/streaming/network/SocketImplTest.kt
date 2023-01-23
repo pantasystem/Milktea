@@ -1,17 +1,18 @@
 package jp.panta.misskeyandroidclient.streaming.network
 
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.model.streaming.stateEvent
-import jp.panta.misskeyandroidclient.streaming.Socket
-import jp.panta.misskeyandroidclient.streaming.StreamingEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
-import org.junit.Assert.*
-import org.junit.Test
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.StreamingEvent
+import net.pantasystem.milktea.api_streaming.network.SocketImpl
+import net.pantasystem.milktea.data.infrastructure.streaming.stateEvent
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
 
 class SocketImplTest {
 
@@ -19,8 +20,7 @@ class SocketImplTest {
     fun testBlockingConnect() {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, logger)
+        val socket = SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
         runBlocking {
             socket.blockingConnect()
             assertEquals(socket.state(), Socket.State.Connected)
@@ -33,8 +33,7 @@ class SocketImplTest {
 
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, logger)
+        val socket = SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
 
         runBlocking {
 
@@ -55,8 +54,8 @@ class SocketImplTest {
     fun testRemoveMessageListener() {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val okHttpClient = OkHttpClient()
-        val socket = SocketImpl(wssURL, okHttpClient, logger)
+        val socket =
+            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
 
         runBlocking {
 

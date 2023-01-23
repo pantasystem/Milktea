@@ -4,11 +4,17 @@
         package="jp.panta.misskeyandroidclient">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
             android:name=".MiApplication"
@@ -19,14 +25,50 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <provider
+                android:name="androidx.startup.InitializationProvider"
+                android:authorities="${applicationId}.androidx-startup"
+                android:exported="false"
+                tools:node="merge">
+            <!-- If you are using androidx.startup to initialize other components -->
+            <meta-data
+                    android:name="androidx.work.WorkManagerInitializer"
+                    android:value="androidx.startup"
+                    tools:node="remove" />
+            <meta-data
+                    android:name="jp.panta.misskeyandroidclient.startup.EmojiCompatInitializer"
+                    android:value="androidx.startup"
+                />
+            <meta-data
+                    android:name="jp.panta.misskeyandroidclient.startup.DebuggerSetupInitializer"
+                    android:value="androidx.startup"
+                    />
+        </provider>
+
+        <activity
+                android:name="net.pantasystem.milktea.setting.activities.SecuritySettingActivity"
+                android:exported="false" />
+        <activity
+                android:name="net.pantasystem.milktea.channel.ChannelActivity"
+                android:exported="false" />
+
         <receiver
                 android:name=".AlarmNotePostReceiver"
                 android:enabled="true"
-                android:exported="true"></receiver>
+                android:exported="false" />
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@drawable/ic_launcher_foreground" />
+        <meta-data
+                android:name="firebase_crashlytics_collection_enabled"
+                android:value="false" />
+        <meta-data
+                android:name="firebase_analytics_collection_enabled"
+                android:value="false" />
+
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+
 
         <service
                 android:name=".FCMService"
@@ -37,10 +79,13 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".GalleryPostsActivity" />
         <activity
-                android:name=".AuthorizationActivity"
+                android:name="net.pantasystem.milktea.gallery.GalleryPostsActivity"
+                android:windowSoftInputMode="adjustResize" />
+        <activity
+                android:name="net.pantasystem.milktea.auth.AuthorizationActivity"
                 android:exported="true"
+                android:windowSoftInputMode="adjustResize"
                 android:launchMode="singleInstance">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
@@ -53,30 +98,29 @@
                         android:scheme="misskey" />
             </intent-filter>
         </activity>
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.UrlPreviewSourceSettingActivity" />
-        <activity android:name=".DraftNotesActivity" />
-        <activity android:name=".SortedHashTagsActivity" />
-        <activity android:name=".SortedUsersActivity" />
-        <activity android:name=".AntennaEditorActivity" />
-        <activity android:name=".AntennaListActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.PageSettingActivity" />
-        <activity android:name=".MessagingListActivity" />
-        <activity android:name=".NotificationsActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.ReactionSettingActivity" />
+        <activity android:name="net.pantasystem.milktea.note.DraftNotesActivity" />
+        <activity android:name="net.pantasystem.milktea.antenna.AntennaEditorActivity" />
+        <activity android:name="net.pantasystem.milktea.antenna.AntennaListActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.PageSettingActivity" />
+        <activity android:name="net.pantasystem.milktea.messaging.MessagingListActivity" />
+        <activity android:name="net.pantasystem.milktea.notification.NotificationsActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.ReactionSettingActivity" />
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
                 android:theme="@style/LicensePageTheme" />
         <activity
                 android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
                 android:theme="@style/LicensePageTheme" />
-        <activity android:name=".SearchAndSelectUserActivity" />
-        <activity android:name=".UserListDetailActivity" />
-        <activity android:name=".ListListActivity" />
-        <activity android:name=".FavoriteActivity" />
-        <activity android:name=".FollowFollowerActivity" />
-        <activity android:name=".SearchActivity" />
         <activity
-                android:name=".SearchResultActivity"
+                android:name="net.pantasystem.milktea.user.activity.SearchAndSelectUserActivity"
+                android:windowSoftInputMode="adjustResize" />
+        <activity android:name="net.pantasystem.milktea.userlist.UserListDetailActivity" />
+        <activity android:name="net.pantasystem.milktea.userlist.ListListActivity" />
+        <activity android:name="net.pantasystem.milktea.favorite.FavoriteActivity" />
+        <activity android:name="net.pantasystem.milktea.user.activity.FollowFollowerActivity" />
+        <activity android:name="net.pantasystem.milktea.search.SearchActivity" />
+        <activity
+                android:name="net.pantasystem.milktea.search.SearchResultActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -89,19 +133,15 @@
             </intent-filter>
         </activity>
 
-        <service
-                android:name=".NotificationService"
-                android:enabled="true"
-                android:exported="false" />
 
-        <activity android:name=".MediaActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.SettingAppearanceActivity" />
-        <activity android:name="jp.panta.misskeyandroidclient.ui.settings.activities.SettingMovementActivity" />
+        <activity android:name="net.pantasystem.milktea.media.MediaActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.SettingAppearanceActivity" />
+        <activity android:name="net.pantasystem.milktea.setting.activities.SettingMovementActivity" />
         <activity
-                android:name=".SettingsActivity"
+                android:name="net.pantasystem.milktea.setting.activities.SettingsActivity"
                 android:label="@string/title_activity_settings" />
         <activity
-                android:name=".UserDetailActivity"
+                android:name="net.pantasystem.milktea.user.activity.UserDetailActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -125,7 +165,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".NoteDetailActivity"
+                android:name="net.pantasystem.milktea.note.NoteDetailActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -139,35 +179,42 @@
                         android:scheme="https" />
             </intent-filter>
         </activity>
-
-        <service
-                android:name=".PostNoteService"
-                android:exported="false" />
-
-        <activity android:name=".MessageActivity" />
-        <activity android:name=".DriveActivity" />
         <activity
-                android:name=".NoteEditorActivity"
+                android:name="net.pantasystem.milktea.messaging.MessageActivity"
+                android:windowSoftInputMode="adjustResize" />
+        <activity android:name="net.pantasystem.milktea.drive.DriveActivity" />
+        <activity
+                android:name="net.pantasystem.milktea.note.NoteEditorActivity"
                 android:exported="true"
                 android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:label="@string/app_name"
                 android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data android:name="android.app.shortcuts"
+                    android:resource="@xml/shortcuts" />
         </activity>
     </application>
 

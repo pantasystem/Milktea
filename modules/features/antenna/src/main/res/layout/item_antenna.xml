@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+        <variable
+                name="antenna"
+                type="net.pantasystem.milktea.model.antenna.Antenna" />
+        <variable
+                name="antennaListViewModel"
+                type="net.pantasystem.milktea.antenna.viewmodel.AntennaListViewModel" />
+    </data>
+    <androidx.cardview.widget.CardView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="8dp"
+            android:layout_margin="8dp">
+        <RelativeLayout
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:padding="8dp"
+                >
+            <TextView
+                    android:id="@+id/antennaNameInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="かわいいどうぶつたち"
+                    android:textSize="20sp"
+                    android:text="@{SafeUnbox.unbox(antenna.name)}"
+                    android:layout_marginEnd="8dp"
+                    android:onClick="@{ ()-> antennaListViewModel.openAntennasTimeline(antenna) }"
+                    />
+
+            <ImageButton
+                    android:id="@+id/addToTabButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    tools:srcCompat="@drawable/ic_add_to_tab_24px"
+                    app:srcCompat="@drawable/ic_add_black_24dp"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:contentDescription="@string/add_to_tab"
+                    android:layout_below="@id/antennaNameInputLayout"
+                    android:onClick="@{ ()-> antennaListViewModel.toggleTab(antenna) }"
+                    app:pagedAntennaIds="@{antennaListViewModel.pagedAntennaIds}"
+                    app:targetAntenna="@{antenna}"
+                    app:tint="?attr/normalIconTint" />
+
+            <ImageButton
+                    android:id="@+id/removeAntennaButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/ic_delete_black_24dp"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:contentDescription="@string/add_to_tab"
+                    android:layout_below="@id/antennaNameInputLayout"
+                    android:layout_toStartOf="@id/editAntennaButton"
+                    android:onClick="@{ ()-> antennaListViewModel.confirmDeletionAntenna(antenna) }"
+                    app:tint="?attr/normalIconTint" />
+
+            <ImageButton
+                    android:id="@+id/editAntennaButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:srcCompat="@drawable/ic_edit_black_24dp"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:contentDescription="@string/add_to_tab"
+                    android:layout_below="@id/antennaNameInputLayout"
+                    android:layout_alignParentEnd="true"
+                    android:onClick="@{ ()-> antennaListViewModel.editAntenna(antenna) }"
+                    app:tint="?attr/normalIconTint" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>

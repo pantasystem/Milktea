@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="group_name">Group name</string>
+    <string name="create_group">Create group</string>
+    <string name="edit_group">Edit group</string>
+
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sensitive">敏感内容</string>
+
+    <string name="future">未来</string>
+    <string name="now">现在</string>
+    <string name="year_ago">年</string>
+    <string name="month_ago">月</string>
+    <string name="date_ago">日</string>
+    <string name="hour_ago">时</string>
+    <string name="minute_ago">分</string>
+    <string name="second_ago">秒</string>
+</resources>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <import type="net.pantasystem.milktea.note.R"/>
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox"/>
+        <variable name="hasReplyToNote" type="net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData"/>
+        <variable
+                name="noteCardActionListener"
+                type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0.5dp"
+            app:cardUseCompatPadding="false"
+            app:cardCornerRadius="0dp"
+            android:elevation="0dp"
+            app:setCardViewSurfaceColor="@{null}"
+
+            >
+        <LinearLayout
+                android:orientation="vertical" android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout
+                    android:id="@+id/replyAutoCollapsingLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    targetButton="@{replyAutoExpandableButton}"
+                    onExpandedChanged="@{hasReplyToNote::expandReplyNote}"
+                    overflowExpanded="@{hasReplyToNote.replyExpanded}"
+                    app:expandableButton="@id/replyAutoExpandableButton"
+
+                    >
+
+                <com.google.android.material.button.MaterialButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/expand"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:id="@+id/replyAutoExpandableButton"
+                        android:visibility="@{ hasReplyToNote.expanded ? View.GONE : View.VISIBLE}"
+                        app:emojiCompatEnabled="false"
+                        app:cornerRadius="24dp"
+                        />
+                <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/note_horizontal_padding_size"
+                        android:paddingTop="@dimen/note_top_padding_size"
+                        android:paddingBottom="5dp"
+
+                        app:mainNameView="@{replyToUserName}"
+                        app:subNameView="@{replyToName}"
+                        app:user="@{hasReplyToNote.replyTo.toShowNote.user}"
+                        app:account="@{hasReplyToNote.account}"
+                        >
+                    <ImageView
+                            android:id="@+id/replyToAvatarIcon"
+                            android:layout_width="@dimen/note_avatar_icon_size"
+                            android:layout_height="@dimen/note_avatar_icon_size"
+                            app:circleIcon="@{hasReplyToNote.replyTo.avatarUrl}"
+                            android:layout_marginEnd="8dp"
+                            tools:ignore="ContentDescription"
+                            app:transitionDestinationUser="@{hasReplyToNote.replyTo.toShowNote.user}"
+                            />
+
+                    <TextView
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/replyToAvatarIcon"
+                            android:id="@+id/replyToUserName"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            tools:text="userName"
+
+                            android:layout_marginEnd="8dp"
+                            />
+                    <TextView
+                            android:id="@+id/replyToName"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/replyToUserName"
+                            android:textStyle="italic"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textSize="15sp"
+                            />
+
+                    <TextView
+                            android:id="@+id/replyToCw"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="cwcwcwwcwcw"
+                            android:text="@{hasReplyToNote.replyTo.cw}"
+                            android:layout_toEndOf="@+id/replyToAvatarIcon"
+                            android:layout_below="@+id/replyToUserName"
+                            android:visibility='@{hasReplyToNote.replyTo.cw == null ? View.GONE : View.VISIBLE}'
+                            />
+
+
+                    <TextView
+                            android:id="@+id/replyToContentFoldingButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/replyToUserName"
+                            android:layout_toEndOf="@+id/replyToCw"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginBottom="5dp"
+                            tools:text="展開する"
+                            android:visibility='@{hasReplyToNote.replyTo.cw == null ? View.GONE : View.VISIBLE }'
+                            android:textColor="?attr/colorAccent"
+                            stringSource="@{hasReplyToNote.replyTo.contentFoldingStatusMessage}"
+                            android:onClick="@{()-> hasReplyToNote.replyTo.changeContentFolding() }"
+                            />
+                    <RelativeLayout
+                            android:id="@+id/replyToContentMain"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/replyToContentFoldingButton"
+                            android:layout_toEndOf="@id/replyToAvatarIcon"
+                            android:visibility="@{SafeUnbox.unbox(hasReplyToNote.replyTo.contentFolding) ? View.GONE : View.VISIBLE }"
+                            >
+                        <TextView
+                                android:id="@id/text"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:textSize="15sp"
+                                tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
+                                android:visibility='@{hasReplyToNote.replyTo.text == null ? View.GONE : View.VISIBLE}'
+                                textTypeSource="@{hasReplyToNote.replyTo.textNode}"
+                                />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+            </net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout>
+
+            <include layout="@layout/item_simple_note"
+                    app:note="@{hasReplyToNote}"
+                    android:id="@+id/simpleNote"
+                    app:noteCardActionListener="@{noteCardActionListener}"
+                    />
+
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>

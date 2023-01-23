@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="?attr/colorSurface"
+
+        >
+
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_expand_more_black_24dp"
+            android:layout_gravity="center"
+            tools:ignore="ContentDescription"
+            app:tint="?attr/normalIconTint" />
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/accounts_view"
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <Button
+            android:id="@+id/add_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_account"
+            />
+
+</LinearLayout>

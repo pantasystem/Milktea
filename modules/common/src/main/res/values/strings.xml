@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sensitive">Sensitive</string>
+
+    <string name="future">Future</string>
+    <string name="now">Now</string>
+    <string name="year_ago">YR</string>
+    <string name="month_ago">MOS</string>
+    <string name="date_ago">D</string>
+    <string name="hour_ago">HR</string>
+    <string name="minute_ago">MIN</string>
+    <string name="second_ago">S</string>
+</resources>

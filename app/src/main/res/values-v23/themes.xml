@@ -20,8 +20,7 @@
         <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
         <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
 
-        <item name="colorNoteActionButtonTint">@color/colorItemNotSelected</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="normalIconTint">@color/colorItemNotSelected</item>
         <item name="colorMessageSelf">#808EDD</item>
         <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
 
@@ -33,10 +32,9 @@
 
 
 
-        <item name="android:navigationBarColor">@color/navigationColor</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
 
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
 
 
 
@@ -57,7 +55,7 @@
 
         <item name="colorSurface">#1E1E1E</item>
 
-        <item name="colorNoteActionButtonTint">@color/colorDarkTextColor</item>
+        <item name="normalIconTint">@color/colorDarkTextColor</item>
         <item name="actionBarSize">53dp</item>
 
         <item name="colorNormalReactionCounterBackground">#3A3A3A</item>
@@ -68,9 +66,8 @@
         <item name="colorSeparator">@color/colorSeparatorDark</item>
 
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:navigationBarColor">@color/navigationDarkColor</item>
+        <item name="android:navigationBarColor">#1E1E1E</item>
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
-        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
         <item name="colorDotTabSelected">@color/colorDarkAccent</item>
         <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
 

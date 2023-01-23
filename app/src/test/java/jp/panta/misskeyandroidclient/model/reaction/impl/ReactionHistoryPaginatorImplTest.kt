@@ -1,7 +1,7 @@
 package jp.panta.misskeyandroidclient.model.reaction.impl
 
-//import jp.panta.misskeyandroidclient.api.MisskeyAPIProvider
-//import jp.panta.misskeyandroidclient.api.notes.reaction.RequestReactionHistoryDTO
+//import net.pantasystem.milktea.api.misskey.MisskeyAPIProvider
+//import net.pantasystem.milktea.data.api.misskey.RequestReactionHistoryDTO
 //import jp.panta.misskeyandroidclient.logger.TestLogger
 //import jp.panta.misskeyandroidclient.model.account.Account
 //import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
@@ -81,7 +81,7 @@ package jp.panta.misskeyandroidclient.model.reaction.impl
 //    @Test
 //    fun testLoad(): Unit = runBlocking{
 //
-//        val account = accountRepository.getCurrentAccount()
+//        val account = accountRepository.getCurrentAccount().getOrThrow()
 //        val req = ReactionHistoryRequest(Note.Id(account.accountId, "7zzafqsm9a"), null)
 //        val paginator = reactionHistoryPaginatorFactory.create(req)
 //        dataSource.addAllListener = {
@@ -95,7 +95,7 @@ package jp.panta.misskeyandroidclient.model.reaction.impl
 //    @Test
 //    fun testPaginate(): Unit = runBlocking {
 //        val noteId = "7zzafqsm9a"
-//        val account = accountRepository.getCurrentAccount()
+//        val account = accountRepository.getCurrentAccount().getOrThrow()
 //        val req = ReactionHistoryRequest(Note.Id(account.accountId, noteId), null)
 //        val paginator = reactionHistoryPaginatorFactory.create(req)
 //

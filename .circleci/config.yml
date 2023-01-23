@@ -1,0 +1,93 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@1.0.3
+
+jobs:
+  build-and-test:
+    executor:
+      name: android/android-machine
+
+    steps:
+      - checkout
+
+      - run:
+          name: generate secret.properties and write server url
+          command:
+            echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./secret.properties
+      - run:
+          name: generate secret.properties and write public key
+          command: echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+      - run:
+          name: generate secret.properties and write auth
+          command: echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
+
+      - android/run-tests:
+          test-command: ./gradlew lint testDebug --continue
+
+      - android/start-emulator-and-run-tests:
+          test-command: ./gradlew connectedDebugAndroidTest
+          system-image: system-images;android-25;google_apis;x86
+
+      - run:
+          name: Assemble release build
+          command: |
+            ./gradlew assembleRelease
+
+  release-and-publish:
+    executor:
+      name: android/android-machine
+
+    steps:
+      - checkout
+
+      - run:
+          name: generate secret.properties and write server url
+          command:
+            echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" > ./secret.properties
+      - run:
+          name: generate secret.properties and write public key
+          command: echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+      - run:
+          name: generate secret.properties and write auth
+          command: echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
+      - run:
+          name: export KEYSTORE path
+          command:
+            echo 'export KEYSTORE=$(pwd)/release.jks' >> $BASH_ENV
+      - run:
+          name: decode jks file
+          command:
+            echo "$KEYSTORE_BASE_64" | base64 --decode --ignore-garbage > $KEYSTORE
+
+      - run:
+          name: Export version code
+          command: echo 'export ORG_GRADLE_PROJECT_VERSION_CODE="$CIRCLE_BUILD_NUM"' >> $BASH_ENV
+      - run:
+          name: Export version name
+          command: echo 'export ORG_GRADLE_PROJECT_VERSION_NAME="$CIRCLE_TAG"' >> $BASH_ENV
+      - run:
+          name: Assemble release build and publish
+          command: |
+            ./gradlew publishBundle \
+              -Pandroid.injected.signing.store.file=$KEYSTORE \
+              -Pandroid.injected.signing.store.password=$STORE_PASSWORD \
+              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+              -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+
+
+workflows:
+  sample:
+    jobs:
+      - build-and-test
+  ci-and-deploy:
+    jobs:
+      - release-and-publish:
+          filters:
+            tags:
+              only: /v.*/
+            branches:
+              ignore: /.*/
+
+
+

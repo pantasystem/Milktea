@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+                name="childrenViewData"
+                type="net.pantasystem.milktea.note.detail.viewmodel.NoteConversationViewData" />
+        <variable
+                name="noteDetailViewModel"
+                type="net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel" />
+        <variable
+                name="noteCardActionListener"
+                type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+    </data>
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            app:cardUseCompatPadding="false"
+            app:cardCornerRadius="0dp"
+            android:layout_marginTop="0.5dp"
+            android:elevation="0dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+
+            >
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout_height="100dp"
+                    >
+                <include
+                        android:id="@+id/childNote"
+                        layout="@layout/item_simple_note"
+                        app:note="@{childrenViewData}"
+                        app:noteCardActionListener="@{noteCardActionListener}"
+                        />
+
+            </FrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/conversation_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+
+            <TextView
+                    android:id="@+id/show_reply"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:layout_margin="4dp"
+                    android:textColor="?attr/colorAccent"
+                    android:text="@string/show_reply"
+                    android:visibility="@{SafeUnbox.unboxBool(childrenViewData.hasConversation) ? View.GONE : View.VISIBLE}"
+                    android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(childrenViewData.toShowNote.note)}"
+                    />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>

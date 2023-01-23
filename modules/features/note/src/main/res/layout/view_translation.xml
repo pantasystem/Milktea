@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <variable
+                name="translationState"
+                type="net.pantasystem.milktea.common.ResultState&lt;net.pantasystem.milktea.model.notes.Translation>" />
+        <variable
+                name="emojis"
+                type="List&lt;net.pantasystem.milktea.model.emoji.Emoji>" />
+        <import type="android.view.View" />
+        <import type="net.pantasystem.milktea.common.ResultState" />
+        <import type="net.pantasystem.milktea.model.notes.Translation" />
+        <import type="net.pantasystem.milktea.common.StateContent"/>
+        <import type="java.util.List" />
+        <import type="net.pantasystem.milktea.model.emoji.Emoji" />
+    </data>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/shape_rounded_square_line"
+            translationState="@{translationState}">
+        <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{ translationState instanceof ResultState.Loading ? View.VISIBLE : View.GONE}"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                translationState="@{translationState}"
+                emojis="@{emojis}"
+                />
+    </FrameLayout>
+</layout>

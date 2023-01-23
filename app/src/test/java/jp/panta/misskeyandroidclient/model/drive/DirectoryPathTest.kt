@@ -1,9 +1,13 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import junit.framework.TestCase
 
-class DirectoryPathTest : TestCase() {
+import net.pantasystem.milktea.model.drive.Directory
+import net.pantasystem.milktea.model.drive.DirectoryPath
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
+class DirectoryPathTest {
+    @Test
     fun testPush() {
         val root = Directory(
             "root",
@@ -28,6 +32,7 @@ class DirectoryPathTest : TestCase() {
 
     }
 
+    @Test
     fun testPop() {
         val root = Directory(
             "root",
@@ -57,6 +62,7 @@ class DirectoryPathTest : TestCase() {
         assertEquals("sub1", directoryPath.path.last().id)
     }
 
+    @Test
     fun testPopUntil() {
         val root = Directory(
             "root",
@@ -82,6 +88,8 @@ class DirectoryPathTest : TestCase() {
         assertEquals(dir.id, directoryPath.path.last().id)
     }
 
+
+    @Test
     fun testClear() {
         val root = Directory(
             "root",

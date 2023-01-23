@@ -1,12 +1,5 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import jp.panta.misskeyandroidclient.api.MisskeyAPI
-import jp.panta.misskeyandroidclient.api.MisskeyAPIServiceBuilder
-import jp.panta.misskeyandroidclient.api.users.RequestUser
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
-
 class GetUsersTest {
 
 //    private lateinit var misskeyAPI: MisskeyAPI
@@ -29,7 +22,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -48,7 +41,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -69,7 +62,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -89,7 +82,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -109,7 +102,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //
 //        })
 //        Assert.assertNotEquals(list, null)
@@ -128,7 +121,7 @@ class GetUsersTest {
 //        Assert.assertEquals(true, res.code() in 200 until 300)
 //        val list = res.body()
 //        println(list?.map{
-//            it.getDisplayName() + "\n"
+//            it.displayName + "\n"
 //        })
 //        Assert.assertNotEquals(list, null)
 //    }

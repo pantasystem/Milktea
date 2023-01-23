@@ -1,0 +1,40 @@
+
+version: "3"
+services:
+  api:
+    build: .
+    tty: true
+    ports:
+      - "3001:8080"
+    volumes:
+      - "./api:/go/src/app"
+
+  psql:
+    container_name: "psql"
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: dbuser
+      POSTGRES_DB: database
+    ports:
+      - "5433:5432"
+  proxy:
+    container_name: "proxy"
+    image: nginx:latest
+    ports:
+      - "3000:80"
+    volumes:
+      - ./docker/nginx/config/default.conf:/etc/nginx/conf.d/default.conf
+    tty: true
+    restart: always
+  client:
+    container_name: "client"
+    build: ./docker/client
+    tty: true
+    ports:
+      - "3002:3000"
+    volumes:
+      - type: bind
+        source: ./client
+        target: /usr/src/app

@@ -1,14 +1,17 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.users.UserDTO
 import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert.*
-import org.junit.Test
-import java.util.*
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api_streaming.ChannelBody
+import net.pantasystem.milktea.api_streaming.ChannelEvent
+import net.pantasystem.milktea.api_streaming.StreamingEvent
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+
 
 class StreamingEventTest {
 
@@ -69,7 +72,13 @@ class StreamingEventTest {
 
 
         )
-        val se: StreamingEvent = ChannelEvent(ChannelBody.ReceiveNote(id = "hoge", body = noteDTO))
+        val se: StreamingEvent =
+            ChannelEvent(
+                ChannelBody.ReceiveNote(
+                    id = "hoge",
+                    body = noteDTO
+                )
+            )
         println(Json.encodeToString(se))
         assertTrue(true)
     }
@@ -113,11 +122,11 @@ class StreamingEventTest {
 
     @Test
     fun testDecodePollVoteNotification() {
-
-        val json = """{"type":"channel","body":{"id":"1","type":"notification","body":{"id":"8ikt10uewe","createdAt":"2021-02-22T23:57:54.950Z","type":"pollVote","isRead":false,"userId":"88wqchigvf","user":{"id":"88wqchigvf","name":"Lily","username":"Lily","host":null,"avatarUrl":"https://s3.arkjp.net/misskey/thumbnail-e833da1c-c1ca-47cc-b845-05000621341d.jpg","avatarBlurhash":"yPNI{oIn?|aK:Rxa#U00X-~DXR=zMx${'$'}+5PIAO;ozo}%goL^,xGRPi{nPoLjF-B%MwLn*sCR5R*aKnixts:a{aykCM{aKs;ofo3ozni","avatarColor":null,"emojis":[]},"note":{"id":"8iksycgnyx","createdAt":"2021-02-22T23:55:50.039Z","userId":"7roinhytrr","user":{"id":"7roinhytrr","name":"パン太","username":"Panta","host":null,"avatarUrl":"https://s3.arkjp.net/misskey/thumbnail-76a33500-270f-4acb-8b59-a033bb9e9593.jpg","avatarBlurhash":"yROpPl00AKk?9Gx]E3?^M|IVNfTJW=tRo}xuV@t7x]ofoL%2M{ENX9ozS2R*bcjFnhV[WXays.xtaeWXnhs.aeWVRkjYfkWAR*ofj?","avatarColor":null,"emojis":[]},"text":"test","cw":null,"visibility":"public","renoteCount":0,"repliesCount":0,"reactions":{},"emojis":[],"fileIds":[],"files":[],"replyId":null,"renoteId":null,"poll":{"multiple":false,"expiresAt":null,"choices":[{"text":"t1","votes":0,"isVoted":false},{"text":"t2","votes":1,"isVoted":false},{"text":"t3","votes":1,"isVoted":false}]}},"choice":1}}}"""
-        val s: StreamingEvent =  Json {
+        val j = Json {
             ignoreUnknownKeys = true
-        }.decodeFromString(json)
+        }
+        val json = """{"type":"channel","body":{"id":"1","type":"notification","body":{"id":"8ikt10uewe","createdAt":"2021-02-22T23:57:54.950Z","type":"pollVote","isRead":false,"userId":"88wqchigvf","user":{"id":"88wqchigvf","name":"Lily","username":"Lily","host":null,"avatarUrl":"https://s3.arkjp.net/misskey/thumbnail-e833da1c-c1ca-47cc-b845-05000621341d.jpg","avatarBlurhash":"yPNI{oIn?|aK:Rxa#U00X-~DXR=zMx${'$'}+5PIAO;ozo}%goL^,xGRPi{nPoLjF-B%MwLn*sCR5R*aKnixts:a{aykCM{aKs;ofo3ozni","avatarColor":null,"emojis":[]},"note":{"id":"8iksycgnyx","createdAt":"2021-02-22T23:55:50.039Z","userId":"7roinhytrr","user":{"id":"7roinhytrr","name":"パン太","username":"Panta","host":null,"avatarUrl":"https://s3.arkjp.net/misskey/thumbnail-76a33500-270f-4acb-8b59-a033bb9e9593.jpg","avatarBlurhash":"yROpPl00AKk?9Gx]E3?^M|IVNfTJW=tRo}xuV@t7x]ofoL%2M{ENX9ozS2R*bcjFnhV[WXays.xtaeWXnhs.aeWVRkjYfkWAR*ofj?","avatarColor":null,"emojis":[]},"text":"test","cw":null,"visibility":"public","renoteCount":0,"repliesCount":0,"reactions":{},"emojis":[],"fileIds":[],"files":[],"replyId":null,"renoteId":null,"poll":{"multiple":false,"expiresAt":null,"choices":[{"text":"t1","votes":0,"isVoted":false},{"text":"t2","votes":1,"isVoted":false},{"text":"t3","votes":1,"isVoted":false}]}},"choice":1}}}"""
+        val s: StreamingEvent =  j.decodeFromString(json)
         println(s)
         assertTrue(s is ChannelEvent && s.body is ChannelBody.Main.Notification)
     }

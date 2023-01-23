@@ -1,0 +1,47 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+            android:shortcutId="notification"
+            android:enabled="true"
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:shortcutShortLabel="@string/notification"
+            android:shortcutLongLabel="@string/notification"
+            >
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="jp.panta.misskeyandroidclient"
+                android:targetClass="jp.panta.misskeyandroidclient.MainActivity" >
+            <extra android:name="SHORTCUT_TYPE" android:value="TYPE_OPEN_NOTIFICATION"/>
+        </intent>
+
+    </shortcut>
+    <shortcut
+            android:shortcutId="messaging"
+            android:enabled="true"
+            android:icon="@drawable/ic_message_black_24dp"
+            android:shortcutShortLabel="@string/message"
+            android:shortcutLongLabel="@string/message"
+        >
+        <intent android:action="android.intent.action.VIEW"
+            android:targetPackage="jp.panta.misskeyandroidclient"
+            android:targetClass="jp.panta.misskeyandroidclient.MainActivity"
+            >
+            <extra android:name="SHORTCUT_TYPE" android:value="TYPE_OPEN_MESSAGING" />
+        </intent>
+    </shortcut>
+    <shortcut
+            android:shortcutId="edit_note"
+            android:enabled="true"
+            android:icon="@drawable/ic_edit_black_24dp"
+            android:shortcutShortLabel="@string/edit_note"
+            android:shortcutLongLabel="@string/edit_note"
+    >
+        <intent android:action="android.intent.action.EDIT"
+                android:targetPackage="jp.panta.misskeyandroidclient"
+                android:targetClass="jp.panta.misskeyandroidclient.MainActivity"
+                >
+            <extra android:name="SHORTCUT_TYPE" android:value="TYPE_EDIT_NOTE" />
+        </intent>
+
+    </shortcut>
+
+</shortcuts>

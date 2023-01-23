@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="net.pantasystem.milktea.setting">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <activity
+                android:name=".activities.AccountSettingActivity"
+                android:exported="false">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="" />
+        </activity>
+        <activity
+                android:name=".activities.ImportReactionFromWebViewActivity"
+                android:exported="false">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="" />
+        </activity>
+        <activity
+                android:name=".activities.ClientWordFilterSettingActivity"
+                android:exported="false" />
+    </application>
+
+</manifest>

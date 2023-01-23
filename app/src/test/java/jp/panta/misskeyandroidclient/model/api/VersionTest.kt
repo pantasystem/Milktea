@@ -1,6 +1,8 @@
 package jp.panta.misskeyandroidclient.model.api
 
-import org.junit.Test
+import net.pantasystem.milktea.model.instance.Version
+import org.junit.jupiter.api.Test
+
 
 class VersionTest{
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="show">展示</string>
+    <string name="undo_nsfw">取消NSFW标签</string>
+    <string name="mark_as_nsfw">将内容标记为NSFW</string>
+    <string name="remove_attachment">删除附件</string>
+
+    <string name="future">未来</string>
+    <string name="now">现在</string>
+    <string name="year_ago">年</string>
+    <string name="month_ago">月</string>
+    <string name="date_ago">日</string>
+    <string name="hour_ago">时</string>
+    <string name="minute_ago">分</string>
+    <string name="second_ago">秒</string>
+    <string name="edit_file_name">重新命名文件</string>
+    <string name="edit_file_caption">编辑标题</string>
+</resources>

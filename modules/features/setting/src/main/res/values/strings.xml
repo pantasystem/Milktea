@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="client_word_mute">Client Word mute</string>
+    <string name="client_word_mute_format_description">Delimiting with a space results in an AND specification, and delimiting with a line break results in an OR specification. \nSlashes around the keyword make it a regular expression.</string>
+    <string name="import_reactions_from_the_web">Import reactions from the web</string>
+    <string name="import_reactions">Import reactions</string>
+    <string name="overwrite_save">Overwrite save</string>
+    <string name="notification_sound">Notification Sound</string>
+    <string name="inapp_notification_sound">Enable In-app notification sound</string>
+</resources>

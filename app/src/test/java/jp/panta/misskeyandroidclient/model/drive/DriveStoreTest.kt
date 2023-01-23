@@ -1,9 +1,19 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import junit.framework.TestCase
 
-class DriveStoreTest : TestCase() {
+import net.pantasystem.milktea.app_store.drive.DriveState
+import net.pantasystem.milktea.app_store.drive.DriveStore
+import net.pantasystem.milktea.model.drive.Directory
+import net.pantasystem.milktea.model.drive.DirectoryPath
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
+class DriveStoreTest {
+
+    @Test
     fun testToggleSelect() {
 
         val driveStore = DriveStore(
@@ -52,6 +62,7 @@ class DriveStoreTest : TestCase() {
         )
     }
 
+    @Test
     fun testSelect() {
         val driveStore = DriveStore(
             DriveState(
@@ -65,6 +76,7 @@ class DriveStoreTest : TestCase() {
 
     }
 
+    @Test
     fun testDeselect() {
         val driveStore = DriveStore(
             DriveState(
@@ -90,6 +102,7 @@ class DriveStoreTest : TestCase() {
         )
     }
 
+    @Test
     fun testPop() {
         val directories = listOf("dir1", "dir2", "dir3", "dir4", "di5")
         val root = Directory(

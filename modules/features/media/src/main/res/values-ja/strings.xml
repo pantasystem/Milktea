@@ -1,0 +1,7 @@
+<resources>
+    <string name="download">ダウンロード</string>
+    <string name="start_downloading_placeholder">%sのダウンロードを開始します。</string>
+    <string name="success_download_file_message">ファイルのダウンロードに成功にしました</string>
+    <string name="failed_download_file_message">ファイルのダウンロードに失敗しました</string>
+
+</resources>

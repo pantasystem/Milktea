@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+
+
+        <variable
+                name="choice"
+                type="net.pantasystem.milktea.model.notes.PollChoiceState" />
+    </data>
+    <LinearLayout
+            android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            >
+
+        <EditText
+                android:id="@+id/input_choice_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="text"
+                android:text="@{choice.text}"
+                android:importantForAutofill="no"
+                tools:ignore="LabelFor" />
+
+        <ImageView
+                android:id="@+id/delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_clear_black_24dp"
+                tools:ignore="ContentDescription,PrivateResource"
+                app:tint="?attr/normalIconTint" />
+    </LinearLayout>
+</layout>

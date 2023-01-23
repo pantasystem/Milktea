@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.mfm
 
-import jp.panta.misskeyandroidclient.model.emoji.Emoji
-import org.junit.Assert.*
-import org.junit.Test
+import net.pantasystem.milktea.common_android.mfm.ElementType
+import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.model.emoji.Emoji
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 class MFMParserTest{
 
@@ -19,14 +21,14 @@ class MFMParserTest{
         val text = "> Hello quote\n>>>>> Hello world"
         println(text)
         val root = MFMParser.parse(text)
-        assertNotNull(root)
+        Assertions.assertNotNull(root)
         var node: Node? = root!!.childElements[1] as Node
         for (i in 0 until 4) {
             node = node!!.childElements[0] as Node
-            assertEquals(ElementType.QUOTE, node.elementType)
+            Assertions.assertEquals(ElementType.QUOTE, node.elementType)
         }
         //assertEquals(ElementType.TEXT, node?.elementType)
-        assertEquals(ElementType.TEXT, node!!.childElements[0].elementType)
+        Assertions.assertEquals(ElementType.TEXT, node!!.childElements[0].elementType)
         println("node:$node")
     }
 
@@ -36,7 +38,7 @@ class MFMParserTest{
         println(text)
         val node = MFMParser.parse(text)
         val n = node!!.childElements[0]
-        assertEquals(ElementType.TEXT, n.elementType)
+        Assertions.assertEquals(ElementType.TEXT, n.elementType)
         println(node)
     }
 
@@ -45,7 +47,7 @@ class MFMParserTest{
         val text = ">  "
         println(text)
         val node = MFMParser.parse(text)
-        assertEquals(ElementType.QUOTE, node!!.childElements[0].elementType)
+        Assertions.assertEquals(ElementType.QUOTE, node!!.childElements[0].elementType)
         println(node)
     }
 
@@ -55,9 +57,9 @@ class MFMParserTest{
         println(text)
         val node = MFMParser.parse(text)
         val italic = node!!.childElements[0] as Node
-        assertEquals(ElementType.ITALIC, italic.elementType)
-        assertEquals("test", (italic.childElements[0] as Text).text)
-        assertEquals(ElementType.SMALL, italic.childElements[1].elementType)
+        Assertions.assertEquals(ElementType.ITALIC, italic.elementType)
+        Assertions.assertEquals("test", (italic.childElements[0] as Text).text)
+        Assertions.assertEquals(ElementType.SMALL, italic.childElements[1].elementType)
 
         println(node)
     }
@@ -68,8 +70,8 @@ class MFMParserTest{
         println(text)
         val node = MFMParser.parse(text)
         val italic = node!!.childElements[0] as Node
-        assertEquals(ElementType.ITALIC, italic.elementType)
-        assertEquals("\n> must error\n ", (italic.childElements[0] as Text).text)
+        Assertions.assertEquals(ElementType.ITALIC, italic.elementType)
+        Assertions.assertEquals("\n> must error\n ", (italic.childElements[0] as Text).text)
         println(node)
     }
 
@@ -80,8 +82,8 @@ class MFMParserTest{
         val italic = node!!.childElements[0] as Node
         println(node)
 
-        assertEquals(ElementType.ITALIC, italic.elementType)
-        assertEquals(ElementType.TEXT, italic.childElements[0].elementType)
+        Assertions.assertEquals(ElementType.ITALIC, italic.elementType)
+        Assertions.assertEquals(ElementType.TEXT, italic.childElements[0].elementType)
         println(node)
     }
 
@@ -212,5 +214,15 @@ class MFMParserTest{
     fun percentUrlTest(){
         val url = "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%97%E3%83%B3%E3%82%BD%E3%83%BC%E3%82%B9%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2"
         println(MFMParser.parse(url))
+    }
+
+    @Test
+    fun memOverflowText() {
+        val text = """
+            plain
+            **test**
+            test [search]
+        """.trimIndent()
+        println(MFMParser.parse(text))
     }
 }

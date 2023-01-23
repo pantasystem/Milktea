@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+                name="note"
+                type="net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewData" />
+
+        <import type="android.view.View" />
+
+
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+
+
+        <import type="net.pantasystem.milktea.note.R" />
+
+
+        <variable
+                name="noteCardActionListener"
+                type="net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            app:cardUseCompatPadding="false"
+            app:cardCornerRadius="0dp"
+            android:layout_marginTop="0.5dp"
+            android:elevation="0dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+
+            >
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/note_horizontal_padding_size"
+                android:paddingTop="@dimen/note_top_padding_size"
+
+                android:paddingBottom="5dp"
+                app:mainNameView="@{mainName}"
+                app:subNameView="@{subName}"
+                app:user="@{note.toShowNote.user}"
+                app:account="@{note.account}"
+
+                app:foldingNote="@{note}"
+                app:foldingButton="@{contentFoldingButton}"
+                app:cw="@{cw}"
+                app:foldingContent="@{contentMain}"
+                app:isFolding="@{note.contentFolding}">
+
+            <TextView
+                    android:id="@+id/statusView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    statusMessageTargetViewNote="@{note}"
+                     tools:text="パン太さんができました" />
+
+            <ImageView
+                    android:id="@+id/avatarIcon"
+                    android:layout_width="@dimen/note_avatar_icon_size"
+                    android:layout_height="@dimen/note_avatar_icon_size"
+                    android:layout_below="@id/statusView"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/avataricon"
+                    app:circleIcon='@{note.avatarUrl}'
+                    app:transitionDestinationUser="@{note.toShowNote.user}"
+                    tools:srcCompat="@android:drawable/sym_def_app_icon" />
+
+            <TextView
+                    android:id="@+id/mainName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/statusView"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toEndOf="@id/avatarIcon"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/statusView"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@id/mainName"
+                    android:gravity="end"
+                    android:textSize="15sp"
+                    tools:text="36秒前" />
+
+            <TextView
+                    android:id="@+id/subName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/mainName"
+                    android:layout_toEndOf="@id/avatarIcon"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textSize="15sp"
+                    android:textStyle="italic"
+
+                    />
+
+            <TextView
+                    android:id="@+id/instanceInfoLabel"
+                    tools:text="Misskey.io"
+                    android:textSize="12sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:background="#8BC34A"
+                    rectViewById="@{4}"
+                    android:gravity="center_vertical"
+                    android:padding="2dp"
+                    instanceInfo="@{note.toShowNote.user.instance}"
+                    android:layout_below="@id/avatarIcon"
+                    android:layout_marginTop="4dp"
+                    />
+            <TextView
+                    android:id="@+id/cw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/instanceInfoLabel"
+                    app:textNode="@{note.cwNode}"
+                    tools:text="cwcwcwwcwcw" />
+
+
+            <TextView
+                    android:id="@+id/contentFoldingButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/cw"
+
+                    android:layout_marginStart="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:onClick="@{()-> note.changeContentFolding() }"
+                    stringSource="@{note.contentFoldingStatusMessage}"
+                    android:textColor="?attr/colorAccent"
+                    android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE }'
+                    tools:text="展開する" />
+
+            <RelativeLayout
+                    android:id="@+id/contentMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/contentFoldingButton"
+                    android:visibility="@{SafeUnbox.unboxBool(note.contentFolding) ? View.GONE : View.VISIBLE }"
+                    android:layout_marginBottom="8dp">
+
+                <TextView
+                        android:id="@id/text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
+                        textTypeSource="@{note.textNode}"
+                        tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
+
+                <include
+                        android:layout_below="@id/text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/translationView"
+                        layout="@layout/view_translation"
+                        android:layout_marginTop="8dp"
+
+                        app:emojis="@{note.emojis}"
+                        app:translationState="@{note.translateState}"
+                        android:layout_marginBottom="8dp" />
+
+                <include
+                        android:id="@+id/mediaPreview"
+                        layout="@layout/media_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_below="@id/translationView"
+                        android:visibility="@{note.media.visibleMediaPreviewArea ? View.VISIBLE : View.GONE}"
+                        app:media="@{note.media}"
+                        tools:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/manyFilePreviewListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/mediaPreview"
+                        tools:layout_height="20dp"
+                        android:visibility="gone"
+                        mediaViewData="@{note.media}"
+                        previewAbleList="@{note.media.files}" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/poll"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/manyFilePreviewListView"
+                        android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                        tools:itemCount="2"
+                        tools:listitem="@layout/item_choice"
+                        noteId="@{note.toShowNote.note.id}"
+                        poll="@{note.poll}"
+                        noteCardActionListenerAdapter="@{noteCardActionListener}"
+
+                        />
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/url_preview_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/poll"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_url_preview"
+                        previewList="@{note.previews}"
+
+                        />
+
+
+                <RelativeLayout
+                        android:id="@+id/subNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/url_preview_list"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/shape_rounded_square_line"
+                        android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(note.toShowNote.note)}"
+                        android:padding="8dp"
+                        android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
+                        app:mainNameView="@{subNoteMainName}"
+                        app:subNameView="@{subNoteSubName}"
+                        app:user="@{note.subNote.user}"
+                        app:account="@{note.account}">
+
+                    <ImageView
+                            android:id="@+id/subAvatarIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginEnd="5dp"
+                            android:contentDescription="@string/avataricon"
+                            app:circleIcon='@{note.subNoteAvatarUrl}'
+                            app:transitionDestinationUser="@{note.subNote.user}" />
+
+                    <TextView
+                            android:id="@+id/subNoteMainName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:layout_toEndOf="@+id/subAvatarIcon"
+                            android:textSize="15sp"
+
+                            android:textStyle="bold" />
+
+                    <TextView
+                            android:id="@+id/subNoteSubName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/subNoteMainName"
+                            android:singleLine="true"
+                            android:textSize="15sp"
+                            android:textStyle="italic"
+
+                            />
+
+                    <TextView
+                            android:id="@+id/subCw"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/subNoteMainName"
+                            android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
+                            app:textNode="@{note.subCwNode}"
+                            tools:text="cwcwcwwcwcw" />
+
+
+                    <TextView
+                            android:id="@+id/subContentFoldingButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/subCw"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:onClick="@{()-> note.changeSubContentFolding() }"
+                            stringSource="@{note.subContentFoldingStatusMessage}"
+                            android:textColor="?attr/colorAccent"
+                            android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
+                            tools:text="展開する"
+
+                            />
+
+                    <TextView
+                            android:id="@+id/subNoteText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/subContentFoldingButton"
+                            android:textSize="15sp"
+                            android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
+                            textTypeSource="@{note.subNoteTextNode}"
+                            tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
+
+                    <include
+                            android:id="@+id/subNoteMediaPreview"
+                            layout="@layout/media_preview"
+                            android:layout_width="match_parent"
+                            android:layout_height="250dp"
+                            android:layout_below="@id/subNoteText"
+                            android:visibility="@{note.subNoteFiles.empty ? View.GONE : View.VISIBLE}"
+                            app:media="@{note.subNoteMedia}"
+                            tools:layout_height="50dp" />
+
+
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <ImageView
+                    android:id="@+id/visibility"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    app:noteVisibility="@{ note.toShowNote.note.visibility}"
+                    tools:src="@drawable/ic_follow"
+                    android:layout_below="@id/contentMain"
+                    android:layout_marginEnd="4dp"
+                    tools:ignore="ContentDescription"
+                    app:tint="?attr/normalIconTint" />
+
+            <TextView
+                    android:id="@+id/elapsed_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    createdAt="@{note.toShowNote.note.createdAt}"
+                    android:layout_below="@id/contentMain"
+                    tools:text="10秒前"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:layout_toEndOf="@id/visibility"
+                    android:layout_alignBaseline="@id/visibility"
+
+                    />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/via"
+                    android:visibility="@{ note.toShowNote.note.app == null ? View.GONE : View.VISIBLE}"
+                    android:layout_toStartOf="@id/via_name"
+                    android:id="@+id/via"
+                    android:layout_below="@id/contentMain"
+                    android:layout_marginEnd="4dp"
+
+                    />
+
+            <TextView
+                    android:id="@+id/via_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{ note.toShowNote.note.app.name }"
+                    android:visibility="@{ note.toShowNote.note.app == null ? View.GONE : View.VISIBLE}"
+                    android:layout_below="@id/contentMain"
+                    tools:text="Milktea"
+                    android:textStyle="bold"
+                    android:layout_alignParentEnd="true" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reaction_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/elapsed_time"
+                    android:layout_marginTop="4dp"
+                    tools:layout_height="50dp"
+                    tools:visibility="visible"
+
+                    />
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/reaction_view"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                <ImageButton
+                        android:id="@+id/replyButton"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
+                        android:contentDescription="@string/reply_title"
+                        android:onClick="@{ ()-> noteCardActionListener.onReplyButtonClicked(note) }"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/ic_reply_black_24dp"
+                        app:tint="?attr/normalIconTint" />
+
+                <TextView
+                        android:id="@+id/replyCountView"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
+                        android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
+
+                <ImageButton
+                        android:id="@+id/renoteButton"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
+                        android:contentDescription="@string/renote"
+                        android:onClick="@{ ()-> noteCardActionListener.onRenoteButtonClicked(note)}"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/ic_re_note"
+                        renoteButtonColor="@{note.currentNote}"
+                        android:visibility="@{ note.canRenote ? View.VISIBLE : View.GONE }"
+                        app:tint="?attr/normalIconTint" />
+
+                <TextView
+                        android:id="@+id/renoteCountView"
+                        android:layout_width="50dp"
+
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
+                        android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+
+                        />
+                <ImageButton
+                        android:id="@+id/toggleMastodonFavouriteButton"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
+                        tools:srcCompat="@drawable/ic_star_black_24dp"
+                        android:src="@drawable/ic_star_black_24dp"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="@string/reaction"
+                        app:tint="?attr/normalIconTint"
+                        favoriteButtonIcon="@{note.currentNote}"
+
+                        tools:ignore="TouchTargetSizeCheck"
+                        android:onClick="@{ () -> noteCardActionListener.onFavoriteButtonClicked(note.currentNote) }"
+                        />
+                <TextView
+                        android:id="@+id/mastodonFavoriteCountView"
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.favoriteCount))}'
+                        android:visibility='@{note.currentNote.mastodon ? (note.favoriteCount == null || note.favoriteCount == 0 ? View.INVISIBLE : View.VISIBLE ) : View.GONE }'
+
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
+                        android:maxLines="1"
+
+                        tools:text="10"
+                        app:emojiCompatEnabled="false"
+                        />
+
+
+                <ImageButton
+                        android:id="@+id/toggleReactionButton"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
+                        android:contentDescription="@string/reaction"
+                        android:onClick="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
+                        android:scaleType="centerCrop"
+                        app:isReacted="@{note.myReaction != null}"
+                        tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
+                        android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"
+                        app:tint="?attr/normalIconTint" />
+
+                <TextView
+                        android:layout_width="50dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
+                        android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
+
+                        />
+
+                <ImageButton
+                        android:id="@+id/noteOptionButton"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="@dimen/note_bottom_action_icon_size"
+                        android:layout_height="@dimen/note_bottom_action_icon_size"
+                        android:contentDescription="@string/more"
+                        android:onClick="@{() -> noteCardActionListener.onOptionButtonClicked(note)}"
+                        android:padding="@dimen/note_bottom_action_icon_padding_size"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/ic_more_horiz_black_24dp"
+                        app:tint="?attr/normalIconTint" />
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</layout>

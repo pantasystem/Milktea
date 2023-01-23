@@ -1,10 +1,66 @@
 # Milktea
+
 <img src="https://github.com/Kinoshita0623/MisskeyAndroidClient/blob/master/app/src/main/ic_launcher-web.png?raw=true" width="100px">
-MisskeyのAndroidクライアント
+<br>
+MisskeyにMilkteaはいかが？<br>
+MisskeyのAndroidクライアント<br>
 
 ## 説明
-MisskeyにMilkteaはいかが？<br>
-これはMisskeyのAndroidのクライアント
+Milkteaは[Misskey](https://github.com/misskey-dev/misskey)のためのAndroidクライアントアプリケーションです。<br>
+
+## 目標
+Milkteaでは以下のことを達成することを目標とし開発をしました。
+- AndroidらしいUIで提供すること
+- Misskeyの機能をできるだけ多くサポートすること
+- 競合サービスから移住してきても違和感なく触れるUIであること
+- 独自機能を追加してより使いやすくすること
+- Misskeyをより多くの人に使ってもらうこと
+- 継続的な開発ができること
+
+## 機能
+### タイムライン
+Misskeyから流れてきたタイムラインを、<br>
+リアルタイムで表示することができます。<br>
+
+### タイムラインタブ機能
+よく表示するタイムラインを上部のタブに固定＆並び替えをすることができます。<br>
+タブ機能は以下のタイムラインの項目を固定することができます。
+- グローバルタイムライン
+- ソーシャルタイムライン
+- ローカルタイムライン
+- ホームタイムライン
+- ユーザーリストタイムライン
+- ユーザーの投稿一覧
+- 検索結果
+- アンテナタイムライン
+- ギャラリー
+- スレッド一覧
+- お気に入り
+- 通知
+### ノート投稿
+Milkteaから投稿を作成することができます。<br>
+ファイルのアップロードが非同期で行われるため、<br>
+投稿時にファイルアップロードを待つ必要がありません。<br>
+
+### リアクションピッカー
+ノートにリアクションを付けるときのための機能です。<br>
+リアクションピッカーはタブ状にカスタム絵文字、絵文字が分類されています。<br>
+- ユーザー固定
+- よく使うリアクション
+- カテゴリ別(複数)
+
+### ノートの下書き機能
+Milkteaの独自機能で、<br>
+ノートを途中で下書き保存することができます。
+### ドライブ
+Misskeyのドライブのファイルを表示することができます。
+
+### ニックネームの上書き
+Misskeyでは表記上のニックネームと、<br>
+実際にユーザー間の会話で用いられる呼び名が異なることがありました。<br>
+表示名と呼び名が異なるのは非常にややこしかったので、<br>
+表面的にニックネームを上書き＆表示する機能を実装しました。<br>
+
 
 ## インストール方法
 [GooglePlayストア](https://play.google.com/store/apps/details?id=jp.panta.misskeyandroidclient)でダウンロード&インストール
@@ -25,32 +81,10 @@ app nameはインスタンスのバージョンによってはvia名として公
 
 認証画面がブラウザに表示されるので、問題がなければ許可(Accept)を押します。<br>
 もし、リダイレクトしない場合は戻るボタンを押して、「私は許可をしました」を押してください。
-<img src="https://user-images.githubusercontent.com/38454985/81928454-3cb77f80-9620-11ea-839b-ea28962a0a92.png" width="320px">
+<img src="https://user-images.githubusercontent.com/38454985/81928454-3cb77f80-9620-11ea-839b-ea28962a0a92.png" width="320px"><br>
 
 成功すればMilkteaにリダイレクトするので[続行(CONTINUE)]を押し完了です。<br>
-<img src="https://user-images.githubusercontent.com/38454985/81928572-6c668780-9620-11ea-800a-bbb03721ce8e.png" width="320px">
+<img src="https://user-images.githubusercontent.com/38454985/81928572-6c668780-9620-11ea-800a-bbb03721ce8e.png" width="320px"><br>
 
 
 
-## ビルドするには
-
-プロジェクトをgit cloneします。<br>
-local.propertiesを作成します。<br>
-```
-touch local.properties
-```
-local.propertiesには<br>
-以下のような属性を追加してプッシュ通知の中継鯖についての設定をします。<br>
-プッシュ通知中継サーバについて<br>
-https://github.com/pantasystem/MisskeyAndroidClient/blob/develop/PushToFCM/README.md<br>
-
-push_to_fcm.server_base_urlにはプッシュ通知サーバのベースURLを設定します。<br>
-push_to_fcm.public_keyにはPushToFCMで生成したpublicを設定します。<br>
-push_to_fcm.authにはPushToFCMで生成したauthを設定します。
-
-```
-push_to_fcm.server_base_url=https://hogehogehoge-pus
-push_to_fcm.public_key=中継鯖（PushToFCM）に設定したpublic_keyを設定します
-push_to_fcm.auth=中継鯖に設定したauth_secret.txtを設定します
-```
-Android SDK, AndroidStudioでビルドします。

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="birthday">Birthday: %s</string>
+    <string name="registration_date">Registered on the %s</string>
+    <string name="confirm_user_block_title">Confirmation</string>
+    <string name="confirm_user_block_description">Are you sure you want to block %s?</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15 minutes later</string>
+    <string name="user_mute_specify_time_30_minutes_later">30 minutes later</string>
+    <string name="user_mute_specify_time_1_hours_later">1 hour later</string>
+    <string name="user_mute_specify_time_1_day_later">1 day later</string>
+    <string name="user_mute_specify_time_1_week_later">1 week later</string>
+    <string name="user_mute_specify_time_1_month_later">1 month later</string>
+    <string name="user_mute_specify_time_indefinite_period">Indefinite perio</string>
+    <string name="view_remotely">View remotely</string>
+    <string name="follows_you">Follows you</string>
+</resources>

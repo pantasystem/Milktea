@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="notification_horizontal_padding_size">16dp</dimen>
+    <dimen name="notification_top_padding_size">12dp</dimen>
+    <dimen name="notification_bottom_padding_size">8dp</dimen>
+</resources>

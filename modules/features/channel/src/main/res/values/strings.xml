@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="n_people">%d people</string>
+    <string name="n_posts">%d posts</string>
+    <string name="owned">Owned</string>
+    <string name="channel">Channel</string>
+    <string name="following">Following</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="featured">Featured</string>
+
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="custom_app_name">应用名称</string>
+    <string name="app_name">Milktea</string>
+    <string name="successfully_created_the_app">成功创建应用</string>
+    <string name="warning_s">警告：%s</string>
+    <string name="error_s">发生错误：%s</string>
+    <string name="continue_auth">继续</string>
+    <string name="copied_to_clipboard">已复制到剪贴板</string>
+    <string name="instance_domain">实例 URL</string>
+    <string name="https">https://</string>
+    <string name="auth">用户身份验证</string>
+    <string name="waiting_4_u_to_approve">正在等待您的同意</string>
+    <string name="i_have_approved">已同意的</string>
+    <string name="waiting_4_approval">正在等待同意</string>
+    <string name="authentication_url">验证 URL</string>
+    <string name="copy_the_url_of_the_authentication_destination_to_the_clipboard">将身份验证 URL 复制到剪贴板。</string>
+    <string name="welcome">欢迎</string>
+    <string name="san">先生 / 女士</string>
+    <string name="open_in_webview">使用 WebView 打开</string>
+    <string name="terms_of_service_agreeation">我同意服务条款</string>
+    <string name="privacy_policy_agreeation">我同意隐私政策</string>
+
+</resources>

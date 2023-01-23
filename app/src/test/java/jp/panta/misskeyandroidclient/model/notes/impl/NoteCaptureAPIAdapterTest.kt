@@ -1,31 +1,27 @@
 package jp.panta.misskeyandroidclient.model.notes.impl
 
-import jp.panta.misskeyandroidclient.Logger
-import jp.panta.misskeyandroidclient.api.notes.NoteDTO
-import jp.panta.misskeyandroidclient.api.notes.toNote
-import jp.panta.misskeyandroidclient.api.users.UserDTO
+
 import jp.panta.misskeyandroidclient.logger.TestLogger
-import jp.panta.misskeyandroidclient.model.AddResult
-import jp.panta.misskeyandroidclient.model.account.Account
-import jp.panta.misskeyandroidclient.model.account.AccountRepository
 import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIAdapter
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProvider
-import jp.panta.misskeyandroidclient.model.notes.NoteCaptureAPIWithAccountProviderImpl
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.streaming.NoteUpdated
 import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
-import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPI
-import jp.panta.misskeyandroidclient.streaming.notes.NoteCaptureAPIImpl
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
-import java.time.Instant
-import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.api_streaming.NoteCaptureAPIImpl
+import net.pantasystem.milktea.api_streaming.NoteUpdated
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
+import net.pantasystem.milktea.data.infrastructure.toNote
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.notes.NoteDataSource
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+
+import org.junit.jupiter.api.Test
 
 class NoteCaptureAPIAdapterTest {
 
@@ -33,20 +29,21 @@ class NoteCaptureAPIAdapterTest {
     private lateinit var accountRepository: AccountRepository
     private lateinit var noteDataSource: NoteDataSource
 
-    @Before
+    @BeforeEach
     fun setUp() {
         loggerFactory = TestLogger.Factory()
         accountRepository = TestAccountRepository()
-        noteDataSource = InMemoryNoteDataSource(loggerFactory)
+        noteDataSource = InMemoryNoteDataSource()
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun testCapture() {
-        val noteCaptureAPIWithAccountProvider = NoteCaptureAPIWithAccountProviderImpl(
-            TestSocketWithAccountProviderImpl(),
-            loggerFactory
-        )
+        val noteCaptureAPIWithAccountProvider =
+            NoteCaptureAPIWithAccountProviderImpl(
+                TestSocketWithAccountProviderImpl(),
+                loggerFactory
+            )
 
 
 //        val coroutineScope = CoroutineScope(Job())
@@ -62,7 +59,7 @@ class NoteCaptureAPIAdapterTest {
 
         runBlocking {
 
-            val account = accountRepository.getCurrentAccount()
+            val account = accountRepository.getCurrentAccount().getOrThrow()
             val noteCapture = noteCaptureAPIWithAccountProvider.get(account) as NoteCaptureAPIImpl
 
             val dto = NoteDTO(
@@ -73,7 +70,15 @@ class NoteCaptureAPIAdapterTest {
                 userId = "hoge",
                 user = UserDTO("hoge", "hogeName")
             )
-            val note = dto.toNote(account)
+            val note = dto.toNote(
+                account, NodeInfo(
+                    host = "", version = "", software = NodeInfo.Software(
+                        name = "misskey",
+                        version = ""
+                    )
+
+                )
+            )
             noteDataSource.add(
                 note
             )
@@ -81,14 +86,47 @@ class NoteCaptureAPIAdapterTest {
             var counter = 1
             noteDataSource.addEventListener {
                 if (it.noteId == note.id) {
-                    assertEquals(1, (it as NoteDataSource.Event.Updated).note.reactionCounts[0].count)
-                    counter ++
+                    assertEquals(
+                        1,
+                        (it as NoteDataSource.Event.Updated).note.reactionCounts[0].count
+                    )
+                    counter++
                 }
             }
 
-            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
-            noteCapture.onMessage(NoteUpdated(NoteUpdated.Body.Reacted(id = note.id.noteId, body = NoteUpdated.Body.Reacted.Body(reaction = "hoge", account.remoteId))))
+            noteCapture.onMessage(
+                NoteUpdated(
+                    NoteUpdated.Body.Reacted(
+                        id = note.id.noteId,
+                        body = NoteUpdated.Body.Reacted.Body(
+                            reaction = "hoge",
+                            account.remoteId
+                        )
+                    )
+                )
+            )
+            noteCapture.onMessage(
+                NoteUpdated(
+                    NoteUpdated.Body.Reacted(
+                        id = note.id.noteId,
+                        body = NoteUpdated.Body.Reacted.Body(
+                            reaction = "hoge",
+                            account.remoteId
+                        )
+                    )
+                )
+            )
+            noteCapture.onMessage(
+                NoteUpdated(
+                    NoteUpdated.Body.Reacted(
+                        id = note.id.noteId,
+                        body = NoteUpdated.Body.Reacted.Body(
+                            reaction = "hoge",
+                            account.remoteId
+                        )
+                    )
+                )
+            )
 
 
         }

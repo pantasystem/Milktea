@@ -1,28 +1,30 @@
-apply plugin: 'com.android.application'
+plugins {
+    id('com.android.application')
+    id('kotlin-android')
+    id('kotlin-kapt')
+    id('org.jetbrains.kotlin.plugin.serialization')
+    id('com.google.gms.google-services')
+    id('com.google.android.gms.oss-licenses-plugin')
+    id('dagger.hilt.android.plugin')
+    id('com.github.triplet.play') version("3.7.0")
+    id('com.google.firebase.crashlytics')
+}
 
-apply plugin: 'kotlin-android'
 
-
-apply plugin: 'kotlin-kapt'
-
-
-apply plugin: "org.jetbrains.kotlin.plugin.serialization"
-
-apply plugin: 'com.google.gms.google-services'
-
-apply plugin: "com.google.android.gms.oss-licenses-plugin"
-
-apply plugin: 'dagger.hilt.android.plugin'
+play {
+    track = "internal"
+    enabled = (System.getenv("ANDROID_PUBLISHER_CREDENTIALS") != null)
+}
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     defaultConfig {
         applicationId "jp.panta.misskeyandroidclient"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         multiDexEnabled true
-        versionCode 78
-        versionName "v2.14.0"
+        versionCode VERSION_CODE as int
+        versionName VERSION_NAME
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -32,7 +34,7 @@ android {
 
         // プッシュ通知関連のデータをlocal.propertiesからBuildConfigへ書き込んでいます。
         def properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        properties.load(project.rootProject.file('secret.properties').newDataInputStream())
         def PUSH_TO_FCM_SERVER_BASE_URL = properties.getProperty('push_to_fcm.server_base_url')
         def PUSH_TO_FCM_PUBLIC_KEY = properties.getProperty('push_to_fcm.public_key')
         def PUSH_TO_FCM_AUTH = properties.getProperty('push_to_fcm.auth')
@@ -50,8 +52,8 @@ android {
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility "1.8"
-        targetCompatibility "1.8"
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildFeatures {
@@ -65,42 +67,79 @@ android {
 
 
     composeOptions {
-        kotlinCompilerExtensionVersion = '1.1.0-rc02'
+        kotlinCompilerExtensionVersion = compose_version
+    }
+    // for junit5
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
     }
 }
 
 
-ext {
-    retrofit = '2.9.0'
-    room_version = "2.4.1"
-    coroutines_version = '1.6.0'
-}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation project(path: ':modules:data')
+    implementation project(path: ':modules:common')
+    implementation project(path: ':modules:model')
+    implementation project(path: ':modules:api')
+    implementation project(path: ':modules:app_store')
+    implementation project(path: ':modules:features:auth')
+    implementation project(path: ':modules:features:channel')
+    implementation project(path: ':modules:features:drive')
+    implementation project(path: ':modules:features:media')
+    implementation project(path: ':modules:common_compose')
+    implementation project(path: ':modules:common_resource')
+    implementation project(path: ':modules:common_compose')
+    implementation project(path: ':modules:features:messaging')
+    implementation project(path: ':modules:common_navigation')
+    implementation project(path: ':modules:common_viewmodel')
+    implementation project(path: ':modules:features:gallery')
+    implementation project(path: ':modules:api_streaming')
+    implementation project(path: ':modules:features:group')
+    implementation project(path: ':modules:features:note')
+    implementation project(path: ':modules:common_android_ui')
+    implementation project(path: ':modules:features:antenna')
+    implementation project(path: ':modules:features:user')
+    implementation project(path: ':modules:features:notification')
+    implementation project(path: ':modules:features:search')
+    implementation project(path: ':modules:features:favorite')
+    implementation project(path: ':modules:worker')
+
+
+    testImplementation project(path: ':modules:api_streaming')
+    implementation project(path: ':modules:common_android')
+    implementation project(path: ':modules:features:setting')
+    implementation project(path: ':modules:features:userlist')
+
+
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     //noinspection GradleCompatible
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation "androidx.appcompat:appcompat:1.4.1"
+    implementation libs.appcompat.appcompat
+
+    implementation libs.bundles.emoji2
 
 
     // NOTE: リアクションピッカーなどでリフレクションを行っているのでバージョンを変更しないこと
-    implementation 'com.google.android.material:material:1.5.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation libs.android.material.material
+    implementation libs.androidx.constraintlayout
 
     implementation 'androidx.preference:preference-ktx:1.2.0'
     //noinspection GradleDynamicVersion
     testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation libs.androidx.test.ext.junit
 
 
     // Required for instrumented tests
     androidTestImplementation 'com.android.support:support-annotations:28.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation libs.androidx.test.espresso.core
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
 
     implementation "androidx.room:room-runtime:$room_version"
@@ -113,8 +152,8 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
 
 
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.viewmodel
 
 
     //Kotlin coroutines用ライブラリ(async, await)
@@ -126,15 +165,18 @@ dependencies {
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+    implementation libs.okhttp3.logging.inspector
 
-    implementation 'com.google.code.gson:gson:2.8.6'
+
 
     //glide
     //implementation 'com.github.bumptech.glide:glide:3.7.0'
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    kapt 'com.github.bumptech.glide:compiler:4.12.0'
+    implementation libs.glide.glide
+    kapt libs.glide.compiler
+    implementation libs.accompanist.glide
+    implementation libs.animation.apng
+
+
 
     //CardView
     //implementation "com.android.support:cardview-v7:28.0.0"
@@ -143,85 +185,93 @@ dependencies {
     //svg
     implementation 'com.caverock:androidsvg-aar:1.4'
 
-    //ExoPlayer
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
-
-    //PhotoView
-    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
-
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
-
-    // RxJava
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.18'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation libs.flexbox
 
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 
     // Swipe refresh
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
+    implementation libs.androidx.swiperefreshlayout
+
 
     // ViewPager2
-    implementation "androidx.viewpager2:viewpager2:1.1.0-beta01"
+    implementation libs.androidx.viewpager2
 
-    implementation 'org.jsoup:jsoup:1.13.1'
 
-    // EmojiCompat
-    implementation "androidx.emoji:emoji-bundled:1.2.0-alpha03"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
 
-    implementation 'com.github.wada811:DataBinding-ktx:5.0.2'
+    implementation libs.wada811.databinding
 
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
-    implementation platform('com.google.firebase:firebase-bom:28.1.0')
+    implementation libs.fragment.ktx
+    implementation platform('com.google.firebase:firebase-bom:31.0.2')
     implementation 'com.google.firebase:firebase-messaging'
-    implementation "androidx.core:core-ktx:1.7.0"
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
-    def work_version = "2.7.1"
-    implementation "androidx.work:work-runtime-ktx:$work_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.1"
+    implementation libs.androidx.core.ktx
 
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0"
+    implementation libs.androidx.work.ktx
+    implementation libs.kotlin.datetime
 
+    implementation libs.lifecycle.livedata
 
-    implementation 'androidx.compose.ui:ui:1.2.0-alpha02'
-    // Tooling support (Previews, etc.)
-    implementation 'androidx.compose.ui:ui-tooling:1.2.0-alpha02'
-    // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
-    implementation 'androidx.compose.foundation:foundation:1.2.0-alpha02'
-    // Material Design
-    implementation 'androidx.compose.material:material:1.2.0-alpha02'
-    // Material design icons
-    implementation 'androidx.compose.material:material-icons-core:1.2.0-alpha02'
-    implementation 'androidx.compose.material:material-icons-extended:1.2.0-alpha02'
-    // UI Tests
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.2.0-alpha02'
-    // Integration with observables
-    implementation 'androidx.compose.runtime:runtime-livedata:1.2.0-alpha02'
-    implementation "com.google.android.material:compose-theme-adapter:1.1.3"
-    implementation "com.google.accompanist:accompanist-swiperefresh:0.14.0"
-    implementation "com.google.accompanist:accompanist-glide:0.14.0"
-    implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation "com.google.accompanist:accompanist-pager:0.14.0"
-    implementation "com.google.accompanist:accompanist-pager-indicators:0.14.0"
-    implementation "io.coil-kt:coil-compose:1.4.0"
+    // compose
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
+    implementation libs.compose.constraintlayout
 
     // hilt
-    implementation 'com.google.dagger:hilt-android:2.40.5'
-    kapt 'com.google.dagger:hilt-compiler:2.40.5'
-    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    androidTestImplementation  libs.hilt.android.testing
+    kaptAndroidTest libs.hilt.compiler
+    testImplementation libs.hilt.android.testing
+    kaptTest libs.hilt.compiler
 
-    // For instrumentation tests
-    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.40.5'
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
-    // For local unit tests
-    testImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptTest 'com.google.dagger:hilt-compiler:2.40.5'
 
-    implementation 'com.github.penfeizhou.android.animation:apng:2.17.2'
+    // Java language implementation
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
+    // Kotlin
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Feature module Support
+    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
+    // Testing Navigation
+    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+
+    // Jetpack Compose Integration
+    implementation "androidx.navigation:navigation-compose:$nav_version"
+
+//    implementation libs.activity.ktx
+    implementation libs.activity.ktx
+
+    debugImplementation 'com.facebook.flipper:flipper:0.163.0'
+    debugImplementation 'com.facebook.soloader:soloader:0.10.4'
+    debugImplementation 'com.facebook.flipper:flipper-network-plugin:0.163.0'
+
+    implementation libs.hilt.work
+    kapt libs.androidx.hilt.compiler
+
+    implementation libs.androidx.appstartup
+
+    testImplementation libs.junit.jupiter.api
+    testRuntimeOnly libs.junit.jupiter.engine
 }
 
 kapt {

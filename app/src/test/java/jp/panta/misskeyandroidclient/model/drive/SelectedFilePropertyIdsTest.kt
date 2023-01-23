@@ -1,10 +1,11 @@
 package jp.panta.misskeyandroidclient.model.drive
 
-import junit.framework.TestCase
-import org.junit.Test
-import java.lang.IllegalArgumentException
+import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.drive.SelectedFilePropertyIds
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.*
 
-class SelectedFilePropertyIdsTest : TestCase() {
+class SelectedFilePropertyIdsTest {
 
     @Test
     fun testAddAndCopy_WhenNew() {

@@ -1,0 +1,20 @@
+<resources>
+    <string name="time_machine">Back to the future</string>
+    <string name="dialog_timemachine_message">Please specify the time of the timeline you want to display</string>
+    <string name="show_error">Show Error</string>
+
+    <string name="timeout_error">Timeout</string>
+    <string name="server_error">Server error</string>
+    <string name="bot_error">Are you human?</string>
+    <string name="auth_error">Authentication error</string>
+    <string name="parameter_error">Parameter error</string>
+    <string name="timeline_unauthorized_error">Unauthorized error</string>
+    <string name="reauthenticate">Reauthenticate</string>
+    <string name="expand">Expand</string>
+
+    <string name="file_size_warning_dialog_title">File size warning</string>
+    <string name="file_size_warning_dialog_message">%1$s does not allow attachments larger than %2$s.\nDo you want to continue?</string>
+    <string name="file_size_warning_dialo_positive_button">Continue</string>
+    <string name="file_size_warning_dialog_negative_button">Cancel attachment</string>
+
+</resources>

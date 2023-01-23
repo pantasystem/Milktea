@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        >
+    <data>
+
+        <variable
+                name="pollEditingState"
+                type="net.pantasystem.milktea.model.notes.PollEditingState" />
+        <variable
+                name="noteEditorViewModel"
+                type="net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel" />
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+        <import type="android.view.View" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            >
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/choices"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@+id/checkBox2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/addChoiceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_choice"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/deadLineType"
+                app:layout_constraintTop_toBottomOf="@+id/choices"
+
+                android:textColor="?android:attr/textColorPrimary"
+                android:padding="5dp"
+                />
+        <Spinner
+                android:id="@+id/deadLineType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/addChoiceButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:entries="@array/deadline_choices"
+                android:padding="5dp"
+
+                />
+
+        <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:checked="true"
+                android:onClick="@{()-> noteEditorViewModel.disablePoll() }"
+                />
+        <Button
+                android:id="@+id/dateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="2019/6/3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/deadLineType"
+                android:visibility="@{noteEditorViewModel.poll.expiresAtDateTime ? View.VISIBLE : View.GONE}"
+                dateOnly="@{noteEditorViewModel.poll.expiresAt.asDate()}"
+                />
+        <Button
+                android:id="@+id/timeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="19/20"
+                app:layout_constraintStart_toEndOf="@+id/dateButton"
+                app:layout_constraintTop_toBottomOf="@+id/deadLineType"
+                timeOnly="@{noteEditorViewModel.poll.expiresAt.asDate()}"
+                android:visibility="@{noteEditorViewModel.poll.expiresAtDateTime ? View.VISIBLE : View.GONE}"
+                />
+
+
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/multipleAnswerSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/multiple_answer"
+                android:checked="@{noteEditorViewModel.poll.multiple}"
+                android:onClick="@{()-> noteEditorViewModel.togglePollMultiple()}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dateButton" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

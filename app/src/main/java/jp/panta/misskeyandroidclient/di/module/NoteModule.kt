@@ -7,27 +7,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import jp.panta.misskeyandroidclient.model.notes.NoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.NoteRepository
-import jp.panta.misskeyandroidclient.model.notes.impl.InMemoryNoteDataSource
-import jp.panta.misskeyandroidclient.model.notes.impl.NoteRepositoryImpl
-import jp.panta.misskeyandroidclient.model.notes.reservation.AndroidNoteReservationPostExecutor
-import jp.panta.misskeyandroidclient.model.notes.reservation.NoteReservationPostExecutor
+import jp.panta.misskeyandroidclient.impl.AndroidNoteReservationPostExecutor
+import net.pantasystem.milktea.common_android_ui.UserPinnedNotesFragmentFactory
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.ReactionRepositoryImpl
+import net.pantasystem.milktea.model.notes.reaction.ReactionRepository
+import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecutor
+import net.pantasystem.milktea.note.pinned.UserPinnedNotesFragmentFactoryImpl
 import javax.inject.Singleton
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class NoteBindModule{
-
-    @Binds
-    @Singleton
-    abstract fun noteDataSource(inMem: InMemoryNoteDataSource): NoteDataSource
-
-    @Binds
-    @Singleton
-    abstract fun noteRepository(impl: NoteRepositoryImpl): NoteRepository
-}
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,4 +25,18 @@ object NoteModule {
     ) : NoteReservationPostExecutor {
         return AndroidNoteReservationPostExecutor(context)
     }
+
+
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class NoteBindModule {
+    @Binds
+    @Singleton
+    abstract fun bindUserPinnedNotesFragmentFactory(impl: UserPinnedNotesFragmentFactoryImpl): UserPinnedNotesFragmentFactory
+
+    @Binds
+    @Singleton
+    abstract fun bindReactionRepository(impl: ReactionRepositoryImpl): ReactionRepository
 }

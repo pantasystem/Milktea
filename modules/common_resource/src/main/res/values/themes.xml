@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+
+
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorSecondary">#575DAE</item>
+
+        <item name="actionBarSize">53dp</item>
+
+        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
+        <item name="colorSelectedReactionCounterBackground">#808EDD</item>
+        <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
+
+        <item name="normalIconTint">@color/colorItemNotSelected</item>
+        <item name="colorMessageSelf">#808EDD</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+
+        <item name="colorSeparator">@color/colorSeparator</item>
+
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.Toolbar</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
+        <item name="tabStyle">@style/TabLayout4Light</item>
+
+
+
+        <item name="android:navigationBarColor">#FFFFFF</item>
+
+        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+
+
+
+        <item name="colorDotTabSelected">#575DAE</item>
+        <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+
+    <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+
+        <item name="colorPrimary">#9FA8DA</item>
+        <item name="colorSecondary">#6D7FE1</item>
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.PrimarySurface</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout.PrimarySurface</item>
+        <item name="bottomNavigationStyle">@style/BottomNavigationView4Dark</item>
+
+        <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
+
+        <item name="colorSurface">#1E1E1E</item>
+
+        <item name="normalIconTint">@color/colorDarkTextColor</item>
+        <item name="actionBarSize">53dp</item>
+
+        <item name="colorNormalReactionCounterBackground">#3A3A3A</item>
+        <item name="colorSelectedReactionCounterBackground">#3F51B5</item>
+
+        <item name="colorMessageSelf">@color/colorMessageSelfDark</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipientDark</item>
+        <item name="colorSeparator">@color/colorSeparatorDark</item>
+
+        <item name="android:navigationBarColor">#1E1E1E</item>
+        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+        <item name="colorDotTabSelected">@color/colorDarkAccent</item>
+        <item name="colorDotTabNormal">@color/colorDarkTextColor</item>
+    </style>
+
+    <style name="AppThemeBlack" parent="AppThemeDark">
+        <item name="android:windowBackground">@color/colorBlackPrimary</item>
+        <item name="colorSurface">#000000</item>
+
+        <item name="normalIconTint">@color/colorItemNotSelected</item>
+        <item name="actionBarSize">53dp</item>
+        
+        <item name="colorSeparator">@color/colorSeparator</item>
+        <item name="android:navigationBarColor">@color/colorBlackPrimary</item>
+
+
+    </style>
+
+    <style name="AppThemeBread" parent="AppTheme">
+        <item name="colorPrimary">@color/colorBreadPrimary</item>
+        <item name="colorPrimaryDark">@color/colorBreadPrimaryDark</item>
+        <item name="colorSurface">@color/colorBreadSurface</item>
+        <item name="colorSecondary">#8BC34A</item>
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Primary</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface</item>
+        <item name="colorSelectedReactionCounterBackground">#FFCA28</item>
+        <item name="colorNormalReactionCounterBackground">#A6A6A6</item>
+        <item name="android:navigationBarColor">@color/colorBreadPrimary</item>
+
+    </style>
+
+
+</resources>

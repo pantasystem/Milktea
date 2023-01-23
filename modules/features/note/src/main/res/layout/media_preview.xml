@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+        <import type="android.view.View" />
+        <variable
+                name="media"
+                type="net.pantasystem.milktea.note.media.viewmodel.MediaViewData" />
+
+
+    </data>
+    <LinearLayout
+            android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false"
+            rect="@{30F}" >
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:id="@+id/leftMediaBase"
+                android:visibility="@{ media.fileOne != null || media.fileThree != null ? View.VISIBLE : View.GONE }"
+                >
+
+            <FrameLayout
+                    android:id="@+id/baseFrameTopLeft"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:ignore="NestedWeights"
+                    thumbnailView="@{thumbnailTopLeft}"
+                    playButton="@{actionButtonTopLeft}"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileOne}"
+
+                    android:onClick="@{()-> media.show(0) }"
+                    android:visibility="@{ media.fileOne == null ? View.GONE : View.VISIBLE }"
+                    >
+
+                <ImageView
+                        android:id="@+id/thumbnailTopLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
+                        thumbnailView="@{ media.fileOne }"
+                        />
+                <ImageButton
+                        android:id="@+id/actionButtonTopLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:src="@drawable/ic_play_circle_outline_black_24dp"
+                        android:scaleType="fitCenter"
+                        android:visibility="@{media.fileOne.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                        app:tint="?attr/colorAccent" />
+
+                <TextView
+                        android:id="@+id/nsfwMessageTopLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="クリックで表示"
+                        android:layout_gravity="center"
+                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
+                        android:text="@string/sensitive_content"
+                        app:emojiCompatEnabled="false"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+
+                        android:src="@{media.fileOne.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(0) }"
+
+                        tools:ignore="ContentDescription" />
+
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/baseFrameBottomLeft"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    thumbnailView="@{thumbnailBottomLeft}"
+                    playButton="@{actionButtonBottomLeft}"
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileThree}"
+                    android:onClick="@{()-> media.show(2)}"
+                    android:layout_marginTop="4dp"
+                    android:visibility="@{ media.fileThree == null ? View.GONE : View.VISIBLE }"
+                    >
+                <ImageView
+                        android:id="@+id/thumbnailBottomLeft"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
+                        thumbnailView="@{ media.fileThree }"
+                        />
+
+                <ImageButton
+                        android:id="@+id/actionButtonBottomLeft"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_play_circle_outline_black_24dp"
+                        android:visibility="@{ media.fileThree.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+
+                        app:tint="?attr/colorAccent" />
+
+                <TextView
+                        android:id="@+id/nsfwMessageBottomLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sensitive_content"
+                        android:layout_gravity="center"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
+                        app:emojiCompatEnabled="false"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(2) }"
+                        android:src="@{media.fileThree.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                        tools:ignore="ContentDescription"
+
+                        />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/rightMediaBase"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:orientation="vertical"
+                android:visibility="@{ media.fileTwo != null || media.fileFour != null ? View.VISIBLE : View.GONE }">
+
+            <FrameLayout
+                    android:id="@+id/baseFrameTopRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:ignore="NestedWeights"
+                    thumbnailView="@{thumbnailTopRight}"
+
+                    playButton="@{actionButtonTopRight}"
+
+                    previewAbleFile="@{media.fileTwo}"
+                    previewAbleFileList="@{media.files}"
+                    android:onClick="@{()-> media.show(1) }"
+                    android:visibility="@{ media.fileTwo == null ? View.GONE : View.VISIBLE }"
+
+                    >
+                <ImageView
+                        android:id="@+id/thumbnailTopRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+
+                        thumbnailView="@{media.fileTwo}"
+                        />
+                <ImageButton
+                        android:id="@+id/actionButtonTopRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:src="@drawable/ic_play_circle_outline_black_24dp"
+                        android:scaleType="fitCenter"
+                        android:visibility="@{media.fileTwo.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+
+                        app:tint="?attr/colorAccent" />
+                <TextView
+                        android:id="@+id/nsfwMessageTopRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="クリックで表示"
+                        android:layout_gravity="center"
+                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
+                        android:text="@string/sensitive_content"
+                        app:emojiCompatEnabled="false"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(1) }"
+                        android:src="@{media.fileTwo.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                        tools:ignore="ContentDescription"
+
+                        />
+            </FrameLayout>
+            <FrameLayout
+                    android:id="@+id/baseFrameBottomRight"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    thumbnailView="@{thumbnailBottomRight}"
+
+                    playButton="@{actionButtonBottomRight}"
+
+                    previewAbleFileList="@{media.files}"
+                    previewAbleFile="@{media.fileFour}"
+                    android:onClick="@{()-> media.show(3) }"
+                    android:layout_marginTop="4dp"
+                    android:visibility="@{ media.fileFour == null ? View.GONE : View.VISIBLE }"
+                    >
+                <ImageView
+                        android:id="@+id/thumbnailBottomRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/thumbnail"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/ic_baseline_hide_image_24"
+                        thumbnailView="@{ media.fileFour }"
+                        />
+                <ImageButton
+                        android:id="@+id/actionButtonBottomRight"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/play_media"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:src="@drawable/ic_play_circle_outline_black_24dp"
+
+                        android:scaleType="fitCenter"
+                        android:visibility="@{ media.fileFour.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                        app:tint="?attr/colorAccent" />
+
+                <TextView
+                        android:id="@+id/nsfwMessageBottomRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/sensitive_content"
+                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
+                        app:emojiCompatEnabled="false"
+                        />
+                <ImageButton
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
+
+                        android:onClick="@{()-> media.toggleVisibility(3) }"
+                        android:src="@{media.fileFour.isHiding() ? @drawable/ic_baseline_image_24 : @drawable/ic_baseline_hide_image_24 }"
+
+                        tools:ignore="ContentDescription"
+
+                        />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</layout>

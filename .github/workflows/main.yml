@@ -18,21 +18,23 @@ jobs:
           distribution: 'zulu'
           java-version: '11'
 
-      - name: Generate google-services.json
-        env:
-          GOOGLE_SERVICE: ${{ secrets.GOOGLE_SERVICE_JSON }}
-        run: echo $GOOGLE_SERVICE | base64 --decode --ignore-garbage > $GITHUB_WORKSPACE/app/google-services.json
-      - name: Generate local.properties
+      - name: Generate secret.properties
         env:
           PUSH_TO_FCM_AUTH: ${{ secrets.PUSH_TO_FCM_AUTH }}
           PUSH_TO_FCM_PUBLIC_KEY: ${{ secrets.PUSH_TO_FCM_PUBLIC_KEY }}
           PUSH_TO_FCM_SERVER_BASE_URL: ${{ secrets.PUSH_TO_FCM_SERVER_BASE_URL }}
         run: |
-          echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./local.properties
-          echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./local.properties
-          echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./local.properties
+          echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./secret.properties
+          echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
+          echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+      - name: unit-test
+        run: ./gradlew lint testDebug --continue
       - name: build
+        run: ./gradlew assembleRelease
+      - uses: actions/upload-artifact@v3
+        with:
+          name: outputs
+          path: app/build/outputs/
 
-        run: ./gradlew build
