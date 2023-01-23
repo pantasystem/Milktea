@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.notes.Note
 
 @kotlinx.serialization.Serializable
 data class TootStatusDTO(
@@ -48,13 +49,29 @@ data class TootStatusDTO(
         val username: String,
         val url: String,
         val acct: String,
-    )
+    ) {
+        fun toModel(): Note.Type.Mastodon.Mention {
+            return Note.Type.Mastodon.Mention(
+                id = id,
+                username = username,
+                url = url,
+                acct = acct
+            )
+        }
+    }
 
     @kotlinx.serialization.Serializable
     data class Tag(
         val name: String,
         val url: String,
-    )
+    ) {
+        fun toModel(): Note.Type.Mastodon.Tag {
+            return Note.Type.Mastodon.Tag(
+                name = name,
+                url = url,
+            )
+        }
+    }
 
 
     @kotlinx.serialization.Serializable

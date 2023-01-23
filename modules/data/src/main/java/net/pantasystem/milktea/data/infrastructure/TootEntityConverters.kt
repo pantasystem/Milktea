@@ -95,6 +95,12 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
             bookmarked = bookmarked,
             muted = muted,
             favoriteCount = favouritesCount,
+            tags = tags?.map {
+                it.toModel()
+            } ?: emptyList(),
+            mentions = mentions?.map {
+                it.toModel()
+            } ?: emptyList()
         ),
         nodeInfo = nodeInfo,
     )
