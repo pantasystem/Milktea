@@ -138,7 +138,8 @@ data class Note(
      */
     fun canRenote(userId: User.Id): Boolean {
         return when (type) {
-            is Type.Mastodon -> true
+            is Type.Mastodon -> visibility is Visibility.Public
+                    || visibility is Visibility.Home
             Type.Misskey -> id.accountId == userId.accountId
                     && (visibility is Visibility.Public
                     || visibility is Visibility.Home
