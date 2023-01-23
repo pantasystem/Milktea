@@ -121,6 +121,12 @@ interface MastodonAPI {
     @POST("api/v1/statuses/{statusId}/unfavourite")
     suspend fun unfavouriteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
 
+    @POST("api/v1/statuses/{statusId}/bookmark")
+    suspend fun bookmarkStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unbookmark")
+    suspend fun unbookmarkStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
     @GET("api/v1/favourites")
     suspend fun getFavouriteStatuses(
         @Query("min_id") minId: String? = null,

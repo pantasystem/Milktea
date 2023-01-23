@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.notes.bookmark
+package net.pantasystem.milktea.model.notes.bookmark
 
 import net.pantasystem.milktea.model.notes.Note
 
