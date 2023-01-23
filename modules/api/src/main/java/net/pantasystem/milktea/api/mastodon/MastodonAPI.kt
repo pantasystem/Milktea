@@ -98,7 +98,7 @@ interface MastodonAPI {
     suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
 
     @GET("api/v1/accounts/relationships")
-    suspend fun getAccountRelationships(@Query("id") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
+    suspend fun getAccountRelationships(@Query("id[]") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
     suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
