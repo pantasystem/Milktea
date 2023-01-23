@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api.misskey.v10.MisskeyAPIV10
@@ -12,11 +13,8 @@ import net.pantasystem.milktea.api.misskey.v10.RequestFollowFollower
 import net.pantasystem.milktea.api.misskey.v11.MisskeyAPIV11
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.RequestType
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
-import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
@@ -232,26 +230,26 @@ internal class V10Paginator(
     }
 }
 
-class FollowFollowerPagingModelImpl (
+class FollowFollowerPagingModelImpl(
     val requestType: RequestType,
     val getAccount: GetAccount,
     val userDataSource: UserDataSource,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val mastodonAPIProvider: MastodonAPIProvider,
-        ): StateLocker,
+) : StateLocker,
     PreviousLoader<FollowFollowerResponseItemType>,
     EntityConverter<FollowFollowerResponseItemType, UserIdAndNextId>,
     PaginationState<UserIdAndNextId>,
-    IdGetter<String>
-{
+    IdGetter<String> {
     override val mutex: Mutex = Mutex()
 
-    private val _state = MutableStateFlow<PageableState<List<UserIdAndNextId>>>(PageableState.Loading.Init())
+    private val _state =
+        MutableStateFlow<PageableState<List<UserIdAndNextId>>>(PageableState.Loading.Init())
     override val state: Flow<PageableState<List<UserIdAndNextId>>> = _state
     override suspend fun convertAll(list: List<FollowFollowerResponseItemType>): List<UserIdAndNextId> {
         val account = getAccount.get(requestType.userId.accountId)
         val users = list.map {
-            when(it) {
+            when (it) {
                 is FollowFollowerResponseItemType.Default -> {
                     it.userDTO.toUser(account, true)
                 }
@@ -269,33 +267,42 @@ class FollowFollowerPagingModelImpl (
         }
     }
 
-    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> = runCancellableCatching{
-        val account = getAccount.get(requestType.userId.accountId)
-        when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                when(misskeyAPIProvider.get(account)) {
-                    is MisskeyAPIV11 -> {
-                        DefaultLoader(
-                            account,
-                            misskeyAPIProvider,
-                            this@FollowFollowerPagingModelImpl
-                        )
+    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> =
+        runCancellableCatching {
+            val account = getAccount.get(requestType.userId.accountId)
+            when (account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    when (misskeyAPIProvider.get(account)) {
+                        is MisskeyAPIV11 -> {
+                            DefaultLoader(
+                                requestType,
+                                account,
+                                misskeyAPIProvider,
+                                this@FollowFollowerPagingModelImpl
+                            )
+                        }
+                        is MisskeyAPIV10 -> {
+                            V10Loader(
+                                requestType,
+                                account,
+                                misskeyAPIProvider,
+                                this@FollowFollowerPagingModelImpl
+                            )
+                        }
+                        else -> throw IllegalStateException("not support follow follower list")
                     }
-                    is MisskeyAPIV10 -> {
-                        V10Loader(
-                            account,
-                            misskeyAPIProvider,
-                            this@FollowFollowerPagingModelImpl
-                        )
-                    }
-                    else -> throw IllegalStateException("not support follow follower list")
                 }
-            }
-            Account.InstanceType.MASTODON -> {
-                MastodonLoader(account, mastodonAPIProvider = mastodonAPIProvider, this@FollowFollowerPagingModelImpl)
-            }
-        }.loadPrevious().getOrThrow()
-    }
+                Account.InstanceType.MASTODON -> {
+                    MastodonLoader(
+                        requestType,
+                        account,
+                        mastodonAPIProvider = mastodonAPIProvider,
+                        this@FollowFollowerPagingModelImpl,
+                        this@FollowFollowerPagingModelImpl
+                    )
+                }
+            }.loadPrevious().getOrThrow()
+        }
 
     override fun getState(): PageableState<List<UserIdAndNextId>> {
         return _state.value
@@ -316,6 +323,7 @@ class FollowFollowerPagingModelImpl (
 }
 
 class V10Loader(
+    val type: RequestType,
     val account: Account,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val idGetter: IdGetter<String>,
@@ -327,6 +335,7 @@ class V10Loader(
 }
 
 class DefaultLoader(
+    val type: RequestType,
     val account: Account,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val idGetter: IdGetter<String>,
@@ -339,14 +348,54 @@ class DefaultLoader(
 }
 
 class MastodonLoader(
+    val type: RequestType,
     val account: Account,
     val mastodonAPIProvider: MastodonAPIProvider,
     val idGetter: IdGetter<String>,
+    val state: PaginationState<UserIdAndNextId>,
 ) : PreviousLoader<FollowFollowerResponseItemType> {
-    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> {
-        val api = mastodonAPIProvider.get(account)
-        TODO("Not yet implemented")
-    }
+    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> =
+        runCancellableCatching {
+            val isEmpty = (state.getState().content as? StateContent.Exist?)?.rawContent.isNullOrEmpty()
+            if (isEmpty && idGetter.getUntilId() == null) {
+                return@runCancellableCatching emptyList()
+            }
+            val api = mastodonAPIProvider.get(account)
+            val response = when (type) {
+                is RequestType.Follower -> {
+                    api.getFollowers(
+                        type.userId.id,
+                        maxId = idGetter.getUntilId()
+                    )
+                }
+                is RequestType.Following -> {
+                    api.getFollowing(
+                        type.userId.id,
+                        maxId = idGetter.getUntilId()
+                    )
+                }
+            }.throwIfHasError()
+            val linkHeader = response.headers()["link"]
+            val body = requireNotNull(response.body())
+            val ids = body.map {
+                it.id
+            }
+            val idAndRelation = requireNotNull(
+                mastodonAPIProvider.get(account).getAccountRelationships(ids)
+                    .throwIfHasError().body()
+            ).associateBy {
+                it.id
+            }
+            val nextId = MastodonLinkHeaderDecoder(linkHeader).getMaxId()
+            body.map {
+                FollowFollowerResponseItemType.Mastodon(
+                    userDTO = it,
+                    nextId = nextId,
+                    relationship = idAndRelation[it.id]
+                )
+            }
+
+        }
 }
 
 data class UserIdAndNextId(
@@ -356,7 +405,7 @@ data class UserIdAndNextId(
 
 fun FollowFollowerResponseItemType.toUserIdAndNextId(accountId: Long): UserIdAndNextId {
     return UserIdAndNextId(
-        userId = when(this) {
+        userId = when (this) {
             is FollowFollowerResponseItemType.Default -> User.Id(accountId, userDTO.id)
             is FollowFollowerResponseItemType.Mastodon -> User.Id(accountId, userDTO.id)
             is FollowFollowerResponseItemType.V10 -> User.Id(accountId, userDTO.id)
@@ -374,6 +423,10 @@ sealed interface FollowFollowerResponseItemType {
     data class V10(val userDTO: UserDTO, override val nextId: String?) :
         FollowFollowerResponseItemType
 
-    data class Mastodon(val userDTO: MastodonAccountDTO, override val nextId: String?) :
+    data class Mastodon(
+        val userDTO: MastodonAccountDTO,
+        val relationship: MastodonAccountRelationshipDTO?,
+        override val nextId: String?
+    ) :
         FollowFollowerResponseItemType
 }

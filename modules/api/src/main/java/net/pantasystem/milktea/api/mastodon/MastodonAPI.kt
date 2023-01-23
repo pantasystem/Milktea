@@ -126,6 +126,7 @@ interface MastodonAPI {
 
     @GET("api/v1/accounts/{accountId}/followers")
     suspend fun getFollowers(
+        @Path("accountId") accountId: String,
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
@@ -134,11 +135,12 @@ interface MastodonAPI {
 
     @GET("api/v1/accounts/{accountId}/following")
     suspend fun getFollowing(
+        @Path("accountId") accountId: String,
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
         @Query("limit") limit: Int = 40
-    ): Response<MastodonAccountDTO>
+    ): Response<List<MastodonAccountDTO>>
 
 
 }
