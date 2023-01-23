@@ -64,6 +64,7 @@ data class Note(
             val favoriteCount: Int?,
             val tags: List<Tag>,
             val mentions: List<Mention>,
+            val isFedibirdQuote: Boolean,
         ) : Type {
             data class Tag(
                 val name: String,
@@ -89,10 +90,14 @@ data class Note(
      * 引用リノートであるか
      */
     fun isQuote(): Boolean {
+        if (type is Type.Mastodon && type.isFedibirdQuote) {
+            return true
+        }
         // NOTE: mastodonには引用が存在しない
         if (isMastodon) {
             return false
         }
+
         return isRenote() && hasContent()
     }
 
@@ -112,6 +117,10 @@ data class Note(
      * ファイル、投票、テキストなどのコンテンツを持っているか
      */
     fun hasContent(): Boolean {
+        if (type is Type.Mastodon && type.isFedibirdQuote) {
+            return true
+        }
+
         if (isMastodon && isRenote()) {
             return false
         }

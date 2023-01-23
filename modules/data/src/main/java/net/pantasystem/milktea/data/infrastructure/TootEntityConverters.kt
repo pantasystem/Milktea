@@ -57,7 +57,8 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         },
         userId = User.Id(account.accountId, this.account.id),
         replyId = this.inReplyToId?.let { Note.Id(account.accountId, this.inReplyToId!!) },
-        renoteId = this.reblog?.id?.let { Note.Id(account.accountId, this.reblog?.id!!) },
+        renoteId = this.quote?.id?.let { Note.Id(account.accountId, it) }
+            ?: this.reblog?.id?.let { Note.Id(account.accountId, this.reblog?.id!!) },
         viaMobile = null,
 
         // TODO: 正しいVisibilityを得るようにする
@@ -100,7 +101,8 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
             } ?: emptyList(),
             mentions = mentions?.map {
                 it.toModel()
-            } ?: emptyList()
+            } ?: emptyList(),
+            isFedibirdQuote = quote != null,
         ),
         nodeInfo = nodeInfo,
     )
@@ -135,6 +137,7 @@ fun TootStatusDTO.pickEntities(
         }
     )
     this.reblog?.pickEntities(account, notes, users, files, nodeInfo)
+    this.quote?.pickEntities(account, notes, users, files, nodeInfo)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
