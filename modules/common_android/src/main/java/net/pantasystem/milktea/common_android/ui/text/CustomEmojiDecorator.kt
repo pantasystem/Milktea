@@ -63,5 +63,26 @@ class CustomEmojiDecorator {
 
         return builder
     }
+
+    fun decorate(spanned: Spanned, accountHost: String?, result: CustomEmojiParsedResult, view: View): Spanned {
+
+        val emojiAdapter = EmojiAdapter(view)
+        val builder = SpannableStringBuilder(spanned)
+
+        result.emojis.filter {
+            HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
+        }.map {
+            val span = DrawableEmojiSpan(emojiAdapter)
+            GlideApp.with(view)
+                .asDrawable()
+                .load(it.result.getUrl(accountHost))
+                .into(span.target)
+            builder.setSpan(span, it.start, it.end, 0)
+        }
+
+
+        return builder
+    }
+
 }
 

@@ -188,6 +188,8 @@
                             android:layout_height="wrap_content"
                             android:layout_alignStart="@id/avatarIcon"
                             app:sourceText="@{userViewModel.user.info.description}"
+                            app:account="@{userViewModel.account}"
+                            app:host="@{userViewModel.user.host}"
                             app:emojis="@{userViewModel.user.emojis}"
                             tools:text="awoijfoiwaehfoaiwehfoiawjefoiawjefiojawioefjioawhfoiawehfoiawef"
                             android:layout_marginEnd="16dp"

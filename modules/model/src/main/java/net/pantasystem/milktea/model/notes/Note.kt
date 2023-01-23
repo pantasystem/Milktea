@@ -62,10 +62,23 @@ data class Note(
             val bookmarked: Boolean?,
             val muted: Boolean?,
             val favoriteCount: Int?,
-        ) : Type
+            val tags: List<Tag>,
+            val mentions: List<Mention>,
+        ) : Type {
+            data class Tag(
+                val name: String,
+                val url: String,
+            )
+            data class Mention(
+                val id: String,
+                val username: String,
+                val url: String,
+                val acct: String,
+            )
+        }
     }
 
-    companion object;
+    companion object
 
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey

@@ -1,5 +1,8 @@
 package jp.panta.misskeyandroidclient.mfm
 
+import net.pantasystem.milktea.common_android.mfm.ElementType
+import net.pantasystem.milktea.common_android.mfm.Leaf
+
 class Search(
     override val text: String,
     override val start: Int,

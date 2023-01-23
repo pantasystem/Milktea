@@ -23,6 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
+import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentEmojiPickerBinding
@@ -56,7 +58,12 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
             recyclerView = binding.reactionChoicesViewPager,
             searchWordTextField = binding.searchReactionEditText,
             onReactionSelected = {
-                onSelect(it)
+                val selected = if (Reaction(it).isCustomEmojiFormat()) {
+                    it
+                } else {
+                    LegacyReaction.reactionMap[it] ?: it
+                }
+                onSelect(selected)
             },
             onSearchEmojiTextFieldEntered = {
                 onSelect(it)

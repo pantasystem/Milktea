@@ -8,6 +8,7 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
+import net.pantasystem.milktea.common_android.TextType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
@@ -186,7 +187,7 @@ class PlaneNoteViewDataCache(
     }
 
     private suspend fun loadUrlPreview(note: PlaneNoteViewData) {
-        note.textNode?.getUrls()?.let { urls ->
+        (note.textNode as? TextType.Misskey?)?.root?.getUrls()?.let { urls ->
             UrlPreviewLoadTask(
                 GetUrlPreviewStore.invoke(getAccount.invoke()),
                 urls,
