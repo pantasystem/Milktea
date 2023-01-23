@@ -328,13 +328,26 @@ class V10Loader(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val idGetter: IdGetter<String>,
 ) : PreviousLoader<FollowFollowerResponseItemType> {
-    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> {
+    override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> = runCancellableCatching {
         val api = misskeyAPIProvider.get(account) as MisskeyAPIV10
-        when(type) {
-            is RequestType.Follower -> TODO()
-            is RequestType.Following -> TODO()
+        val func = when(type) {
+            is RequestType.Follower -> api::followers
+            is RequestType.Following -> api::following
         }
-        TODO("Not yet implemented")
+        val body = func(
+            RequestFollowFollower(
+                i = account.token,
+                cursor = idGetter.getUntilId(),
+                userId = type.userId.id
+            )
+        ).throwIfHasError().body()
+        val nextId = requireNotNull(body).next
+        body.users.map {
+            FollowFollowerResponseItemType.V10(
+                it,
+                nextId
+            )
+        }
     }
 }
 
