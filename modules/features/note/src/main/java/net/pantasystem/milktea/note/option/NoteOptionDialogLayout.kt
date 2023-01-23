@@ -6,6 +6,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,6 +24,8 @@ fun NoteOptionDialogLayout(
     onShareButtonClicked: (note: Note?) -> Unit,
     onTranslateButtonClicked: (noteId: Note.Id) -> Unit,
     onDeleteFavoriteButtonClicked: (noteId: Note.Id) -> Unit,
+    onDeleteBookmarkButtonClicked: (noteId: Note.Id) -> Unit,
+    onAddBookmarkButtonClicked: (noteId: Note.Id) -> Unit,
     onCreateFavoriteButtonClicked: (noteId: Note.Id) -> Unit,
     onCreateThreadMuteButtonClicked: (noteId: Note.Id) -> Unit,
     onDeleteThreadMuteButtonClicked: (noteId: Note.Id) -> Unit,
@@ -90,6 +93,30 @@ fun NoteOptionDialogLayout(
                             text = stringResource(id = R.string.favorite)
                         )
                     }
+                }
+            } else {
+                when ((uiState.note?.type as? Note.Type.Mastodon)?.bookmarked) {
+                    true -> {
+                        NormalBottomSheetDialogSelectionLayout(
+                            onClick = {
+                                onDeleteBookmarkButtonClicked(uiState.note.id)
+                            },
+                            icon = Icons.Filled.BookmarkRemove,
+                            text = stringResource(
+                                id = R.string.remove_bookmark
+                            )
+                        )
+                    }
+                    false -> {
+                        NormalBottomSheetDialogSelectionLayout(
+                            onClick = {
+                                onAddBookmarkButtonClicked(uiState.note.id)
+                            },
+                            icon = Icons.Outlined.BookmarkAdd,
+                            text = stringResource(id = R.string.add_to_bookmark)
+                        )
+                    }
+                    else -> {}
                 }
             }
 

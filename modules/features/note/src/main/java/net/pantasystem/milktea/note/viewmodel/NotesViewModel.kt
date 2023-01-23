@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
+import net.pantasystem.milktea.model.notes.bookmark.BookmarkRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNote
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.toDraftNote
@@ -34,6 +35,7 @@ class NotesViewModel @Inject constructor(
     val accountStore: AccountStore,
     val draftNoteRepository: DraftNoteRepository,
     private val translationStore: NoteTranslationStore,
+    private val bookmarkRepository: BookmarkRepository,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
@@ -109,6 +111,23 @@ class NotesViewModel @Inject constructor(
                 "お気に入りから削除しました"
             } else {
                 "お気に入りの削除に失敗しました"
+            }
+        }
+    }
+
+
+    fun addBookmark(noteId: Note.Id) {
+        viewModelScope.launch {
+            bookmarkRepository.create(noteId).onFailure {
+                logger.error("add book mark error", it)
+            }
+        }
+    }
+
+    fun removeBookmark(noteId: Note.Id) {
+        viewModelScope.launch {
+            bookmarkRepository.delete(noteId).onFailure {
+                logger.error("remove book mark error", it)
             }
         }
     }
