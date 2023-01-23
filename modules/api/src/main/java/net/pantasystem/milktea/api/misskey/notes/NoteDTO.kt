@@ -7,6 +7,7 @@ import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
 
@@ -65,9 +66,12 @@ data class NoteDTO(
     val app: App? = null
 ) : Serializable
 
-@kotlinx.serialization.Serializable
+
+@kotlinx.serialization.Serializable(with = NoteVisibilityTypeSerializer::class)
 enum class NoteVisibilityType {
     @SerialName("public") Public, @SerialName("home") Home, @SerialName("followers") Followers, @SerialName("specified") Specified
 }
+
+object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibilityType>(NoteVisibilityType.values(), NoteVisibilityType.Public)
 
 
