@@ -24,7 +24,7 @@ data class NoteDTO(
     val renoteId: String? = null,
 
     val viaMobile: Boolean? = null,
-    val visibility: String? = null,
+    val visibility: NoteVisibilityType? = null,
     val localOnly: Boolean? = null,
 
     @SerialName("visibleUserIds")
@@ -65,5 +65,9 @@ data class NoteDTO(
     val app: App? = null
 ) : Serializable
 
+@kotlinx.serialization.Serializable
+enum class NoteVisibilityType {
+    @SerialName("public") Public, @SerialName("home") Home, @SerialName("followers") Followers, @SerialName("specified") Specified
+}
 
 
