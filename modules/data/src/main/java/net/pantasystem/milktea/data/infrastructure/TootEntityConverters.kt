@@ -60,9 +60,7 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         renoteId = this.quote?.id?.let { Note.Id(account.accountId, it) }
             ?: this.reblog?.id?.let { Note.Id(account.accountId, this.reblog?.id!!) },
         viaMobile = null,
-
-        // TODO: 正しいVisibilityを得るようにする
-        visibility = Visibility.Public(false),
+        visibility = Visibility(visibility, circleId, visibilityEx),
         localOnly = null,
         emojis = emojis.map {
             it.toEmoji()

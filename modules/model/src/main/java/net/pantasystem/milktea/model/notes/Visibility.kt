@@ -96,15 +96,22 @@ fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<User.Id>
     }
 }
 
-fun Visibility(type: String, circleId: String? = null): Visibility {
+fun Visibility(type: String, circleId: String? = null, visibilityEx: String? = null,): Visibility {
     return when(type.lowercase()) {
-        "private" -> Visibility.Followers(false)
+        "private" -> {
+            when(visibilityEx) {
+                "limited" -> Visibility.Limited(circleId)
+                else -> Visibility.Followers(false)
+            }
+        }
         "unlisted" -> Visibility.Home(false)
         "public" -> Visibility.Public(false)
-        "direct" -> Visibility.Specified(emptyList())
+        "direct" -> when(visibilityEx) {
+            "personal" -> Visibility.Personal
+            else -> Visibility.Specified(emptyList())
+        }
         "followers" -> Visibility.Followers(false)
         "home" -> Visibility.Home(false)
-        "limited" -> Visibility.Limited(circleId)
         else -> throw IllegalArgumentException("limited, direct, unlisted, private public, home, followers, specified以外許可されていません。与えられたデータ:$type")
     }
 }

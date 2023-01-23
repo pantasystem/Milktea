@@ -43,6 +43,8 @@ data class TootStatusDTO(
     val filtered: Boolean? = null,
     @SerialName("emoji_reactions") val emojiReactions: List<EmojiReactionCount>? = null,
     @SerialName("quote") val quote: TootStatusDTO? = null,
+    @SerialName("circle_id") val circleId: String? = null,
+    @SerialName("visibility_ex") val visibilityEx: String? = null,
 ) {
     @kotlinx.serialization.Serializable
     data class Mention(
