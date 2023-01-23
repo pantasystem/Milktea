@@ -278,20 +278,20 @@ class MastodonLoader(
     override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> =
         runCancellableCatching {
             val isEmpty = (state.getState().content as? StateContent.Exist?)?.rawContent.isNullOrEmpty()
-            if (isEmpty && idGetter.getUntilId() == null) {
+            if (!isEmpty && idGetter.getUntilId() == null) {
                 return@runCancellableCatching emptyList()
             }
             val api = mastodonAPIProvider.get(account)
             val response = when (type) {
                 is RequestType.Follower -> {
                     api.getFollowers(
-                        type.userId.id,
+                        accountId = type.userId.id,
                         maxId = idGetter.getUntilId()
                     )
                 }
                 is RequestType.Following -> {
                     api.getFollowing(
-                        type.userId.id,
+                        accountId = type.userId.id,
                         maxId = idGetter.getUntilId()
                     )
                 }
