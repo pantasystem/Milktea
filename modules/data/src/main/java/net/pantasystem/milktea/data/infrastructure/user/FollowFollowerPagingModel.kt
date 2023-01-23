@@ -177,6 +177,7 @@ class FollowFollowerPagingModelImpl(
                                 requestType,
                                 account,
                                 misskeyAPIProvider,
+                                this@FollowFollowerPagingModelImpl,
                                 this@FollowFollowerPagingModelImpl
                             )
                         }
@@ -218,8 +219,13 @@ class V10Loader(
     val account: Account,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val idGetter: IdGetter<String>,
+    val state: PaginationState<UserIdAndNextId>,
 ) : PreviousLoader<FollowFollowerResponseItemType> {
     override suspend fun loadPrevious(): Result<List<FollowFollowerResponseItemType>> = runCancellableCatching {
+        val isEmpty = (state.getState().content as? StateContent.Exist?)?.rawContent.isNullOrEmpty()
+        if (!isEmpty && idGetter.getUntilId() == null) {
+            return@runCancellableCatching emptyList()
+        }
         val api = misskeyAPIProvider.get(account) as MisskeyAPIV10
         val func = when(type) {
             is RequestType.Follower -> api::followers
