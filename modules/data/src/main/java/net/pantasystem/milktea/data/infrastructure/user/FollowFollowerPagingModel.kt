@@ -19,12 +19,12 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
-import javax.inject.Singleton
 
 
 class FollowFollowerPagingStoreImpl(
@@ -74,8 +74,6 @@ class FollowFollowerPagingStoreImpl(
     )
 
 
-    private val _state =
-        MutableStateFlow<PageableState<List<User.Id>>>(PageableState.Loading.Init())
     override val state: Flow<PageableState<List<User.Id>>>
         get() = loader.state.map { state ->
             state.convert { list ->
@@ -93,7 +91,7 @@ class FollowFollowerPagingStoreImpl(
             it is StateContent.Exist
         }.flatMapLatest { stateContent ->
             val ids = (stateContent as StateContent.Exist).rawContent
-            val accountId = ids.map { it.accountId }.distinct().first()
+            val accountId = type.userId.accountId
             userDataSource.observeIn(accountId, ids.map { it.id }).map { list ->
                 list.mapNotNull { user ->
                     user as User.Detail?
@@ -122,113 +120,6 @@ class FollowFollowerPagingStoreImpl(
     }
 }
 
-internal interface Paginator {
-    companion object
-
-    val idHolder: IdHolder
-    suspend fun next(): List<UserDTO>
-    suspend fun init()
-}
-
-
-@Singleton
-internal class PaginatorFactory @Inject constructor(
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val getAccount: GetAccount,
-
-    val logger: Logger.Factory,
-) {
-    suspend fun create(type: RequestType, idHolder: IdHolder): Paginator {
-        val account = getAccount.get(type.userId.accountId)
-        val api = misskeyAPIProvider.get(account)
-        return if (api is MisskeyAPIV10) {
-            V10Paginator(
-                account,
-                api,
-                type,
-                idHolder,
-            )
-        } else {
-            DefaultPaginator(
-                account,
-                api as MisskeyAPIV11,
-                type,
-                logger.create("DefaultPaginator"),
-                idHolder,
-            )
-        }
-
-    }
-}
-
-
-internal class IdHolder(
-    var nextId: String? = null
-)
-
-@Suppress("BlockingMethodInNonBlockingContext")
-internal class DefaultPaginator(
-    val account: Account,
-    private val misskeyAPI: MisskeyAPIV11,
-    val type: RequestType,
-    private val logger: Logger?,
-    override val idHolder: IdHolder,
-
-    ) : Paginator {
-
-
-    private val api =
-        if (type is RequestType.Follower) misskeyAPI::followers else misskeyAPI::following
-
-    override suspend fun next(): List<UserDTO> {
-        logger?.debug("next: ${idHolder.nextId}")
-        val res = api.invoke(
-            RequestUser(
-                account.token,
-                userId = type.userId.id,
-                untilId = idHolder.nextId
-            )
-        ).body()
-            ?: return emptyList()
-        idHolder.nextId = res.last().id
-        require(idHolder.nextId != null)
-        return res.mapNotNull {
-            it.followee ?: it.follower
-        }
-    }
-
-    override suspend fun init() {
-        idHolder.nextId = null
-    }
-}
-
-
-@Suppress("BlockingMethodInNonBlockingContext")
-internal class V10Paginator(
-    val account: Account,
-    private val misskeyAPIV10: MisskeyAPIV10,
-    val type: RequestType,
-    override val idHolder: IdHolder,
-) : Paginator {
-    private val api =
-        if (type is RequestType.Follower) misskeyAPIV10::followers else misskeyAPIV10::following
-
-    override suspend fun next(): List<UserDTO> {
-        val res = api.invoke(
-            RequestFollowFollower(
-                i = account.token,
-                cursor = idHolder.nextId,
-                userId = type.userId.id
-            )
-        ).body() ?: return emptyList()
-        idHolder.nextId = res.next
-        return res.users
-    }
-
-    override suspend fun init() {
-        idHolder.nextId = null
-    }
-}
 
 class FollowFollowerPagingModelImpl(
     val requestType: RequestType,
@@ -254,7 +145,7 @@ class FollowFollowerPagingModelImpl(
                     it.userDTO.toUser(account, true)
                 }
                 is FollowFollowerResponseItemType.Mastodon -> {
-                    it.userDTO.toModel(account)
+                    it.userDTO.toModel(account, it.relationship?.toUserRelated())
                 }
                 is FollowFollowerResponseItemType.V10 -> {
                     it.userDTO.toUser(account, true)
