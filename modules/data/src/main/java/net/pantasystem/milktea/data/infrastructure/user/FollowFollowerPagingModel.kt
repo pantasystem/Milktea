@@ -33,6 +33,7 @@ class FollowFollowerPagingStoreImpl(
     override val type: RequestType,
     val userDataSource: UserDataSource,
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val mastodonAPIProvider: MastodonAPIProvider,
     val getAccount: GetAccount,
     val loggerFactory: Logger.Factory,
     val noteDataSourceAdder: NoteDataSourceAdder,
@@ -41,6 +42,7 @@ class FollowFollowerPagingStoreImpl(
     class Factory @Inject constructor(
         val userDataSource: UserDataSource,
         val misskeyAPIProvider: MisskeyAPIProvider,
+        val mastodonAPIProvider: MastodonAPIProvider,
         val loggerFactory: Logger.Factory,
         val getAccount: GetAccount,
         val noteDataSourceAdder: NoteDataSourceAdder
@@ -52,20 +54,38 @@ class FollowFollowerPagingStoreImpl(
                 loggerFactory = loggerFactory,
                 getAccount = getAccount,
                 userDataSource = userDataSource,
-                noteDataSourceAdder = noteDataSourceAdder
+                noteDataSourceAdder = noteDataSourceAdder,
+                mastodonAPIProvider = mastodonAPIProvider,
             )
         }
     }
 
-    private val factory: PaginatorFactory = PaginatorFactory(
+    private val loader = FollowFollowerPagingModelImpl(
+        requestType = type,
         getAccount = getAccount,
-        logger = loggerFactory,
+        userDataSource = userDataSource,
         misskeyAPIProvider = misskeyAPIProvider,
+        mastodonAPIProvider = mastodonAPIProvider,
     )
+
+    private val previousPagingController = PreviousPagingController(
+        loader,
+        loader,
+        loader,
+        loader,
+    )
+
+
     private val _state =
         MutableStateFlow<PageableState<List<User.Id>>>(PageableState.Loading.Init())
-    override val state: StateFlow<PageableState<List<User.Id>>>
-        get() = _state
+    override val state: Flow<PageableState<List<User.Id>>>
+        get() = loader.state.map { state ->
+            state.convert { list ->
+                list.map {
+                    it.userId
+                }
+            }
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val users: Flow<List<User.Detail>>
@@ -90,51 +110,16 @@ class FollowFollowerPagingStoreImpl(
             loggerFactory.create("FollowFollowerPagingModel").error("error", it)
         }
 
-    private val idHolder = IdHolder()
-    private val mutex = Mutex()
 
     override suspend fun loadPrevious() {
-
-        mutex.withLock {
-            runCancellableCatching {
-                val s = _state.value
-                _state.value = when (s) {
-                    is PageableState.Loading.Init -> s
-                    else -> PageableState.Loading.Previous(s.content)
-                }
-                val res = factory.create(type, idHolder).next()
-
-                val account = getAccount.get(type.userId.accountId)
-                val users = res.map {
-                    it.pinnedNotes?.map { noteDTO ->
-                        noteDataSourceAdder.addNoteDtoToDataSource(account, noteDTO)
-                    }
-                    it.toUser(account, true)
-                }
-                userDataSource.addAll(users)
-                users.map { it.id }
-            }.onFailure {
-                _state.value = PageableState.Error(
-                    _state.value.content,
-                    it
-                )
-            }.onSuccess { responseUserIds ->
-                val list = ((_state.value.content as? StateContent.Exist)?.rawContent
-                    ?: emptyList())
-                val newList = list.toMutableList().also { mutableList ->
-                    mutableList.addAll(responseUserIds)
-                }
-                _state.value = PageableState.Fixed(
-                    StateContent.Exist(newList)
-                )
-            }
+        previousPagingController.loadPrevious().onFailure {
+            loggerFactory.create("FollowFollowerPagingModel").error("フォロー・フォロワーの読み込みに失敗", it)
         }
     }
 
     override suspend fun clear() {
-        mutex.withLock {
-            factory.create(type, idHolder).init()
-            _state.value = PageableState.Fixed(StateContent.NotExist())
+        loader.mutex.withLock {
+            loader.setState(PageableState.Loading.Init())
         }
     }
 }
