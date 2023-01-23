@@ -409,5 +409,8 @@
     <string name="poll">poll</string>
     <string name="add_to_bookmark">Add to Bookmark</string>
     <string name="remove_bookmark">Remove Bookmark</string>
+    <string name="visibility_personal">Personal</string>
+    <string name="visibility_limited">Circle</string>
+    <string name="visibility_mutual">Mutual Follow</string>
 
 </resources>

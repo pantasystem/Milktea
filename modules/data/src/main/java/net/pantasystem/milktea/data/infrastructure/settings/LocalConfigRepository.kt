@@ -60,6 +60,8 @@ class LocalConfigRepositoryImpl(
                     "home" -> Visibility.Home(localOnly)
                     "followers" -> Visibility.Followers(localOnly)
                     "specified" -> Visibility.Specified(emptyList())
+                    "mutual" -> Visibility.Mutual
+                    "personal" -> Visibility.Personal
                     else -> Visibility.Public(localOnly)
                 }
                 RememberVisibility.Remember(
@@ -82,6 +84,9 @@ class LocalConfigRepositoryImpl(
                         is Visibility.Home -> "home"
                         is Visibility.Followers -> "followers"
                         is Visibility.Specified -> "specified"
+                        is Visibility.Limited -> "limited"
+                        Visibility.Mutual -> "mutual"
+                        Visibility.Personal -> "personal"
                     }
                     sharedPreference.edit {
                         putString(
