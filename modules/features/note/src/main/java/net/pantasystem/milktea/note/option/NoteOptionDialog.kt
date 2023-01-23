@@ -119,9 +119,16 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         onDeleteThreadMuteButtonClicked = {
                             viewModel.deleteThreadMute(it)
                             dismiss()
+                        },
+                        onAddBookmarkButtonClicked = {
+                            notesViewModel.addBookmark(it)
+                            dismiss()
+                        },
+                        onDeleteBookmarkButtonClicked = {
+                            notesViewModel.removeBookmark(it)
+                            dismiss()
                         }
                     )
-
                 }
             }
         })
