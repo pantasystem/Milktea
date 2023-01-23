@@ -132,7 +132,7 @@ object MFMDecorator {
         private fun decorateEmoji(emojiElement: EmojiElement): Spanned {
             val spanned = SpannableString(emojiElement.text)
             if (skipEmojis.contains(emojiElement.emoji)) {
-                return SpannableString(":${emojiElement.text}:")
+                return spanned
             }
             textView.get()?.let { textView ->
                 //val emojiSpan = EmojiSpan(textView)
