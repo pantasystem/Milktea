@@ -417,5 +417,7 @@
     <string name="char_count">%1$d文字</string>
     <string name="file_count">%1$dファイル</string>
     <string name="poll">投票</string>
+    <string name="add_to_bookmark">ブックマークに追加</string>
+    <string name="remove_bookmark">ブックマークを解除</string>
 
 </resources>
