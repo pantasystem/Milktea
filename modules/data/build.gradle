@@ -103,7 +103,7 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    implementation platform('com.google.firebase:firebase-bom:30.5.0')
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
     implementation 'com.google.firebase:firebase-messaging'
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
 
