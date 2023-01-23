@@ -23,7 +23,11 @@ object MastodonHTMLParser {
             .replace("<br /> ", "<br />&nbsp;")
             .replace("<br/> ", "<br/>&nbsp;")
             .replace("  ", "&nbsp;&nbsp;").parseAsHtml().trim() as Spanned
-        val result = CustomEmojiParser.parse(sourceHost = userHost, text = spanned.toString(), emojis = emojis)
+        val result = CustomEmojiParser.parse(
+            sourceHost = userHost,
+            text = spanned.toString(),
+            emojis = emojis
+        )
         return MastodonHTML(
             spanned = spanned,
             result,
