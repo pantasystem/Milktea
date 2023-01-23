@@ -1,10 +1,9 @@
 package net.pantasystem.milktea.model.notes
 
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.user.User
 import java.io.Serializable
-import java.lang.IllegalArgumentException
 import java.util.*
-import kotlin.jvm.Throws
 
 sealed class Visibility : Serializable{
     data class Public(
@@ -40,6 +39,11 @@ sealed class Visibility : Serializable{
         override val isLocalOnly: Boolean = true
     }*/
 
+    object Personal : Visibility()
+
+    data class Limited(val circleId: String?) : Visibility()
+
+    object Mutual : Visibility()
 }
 
 interface CanLocalOnly {
@@ -63,6 +67,21 @@ fun Visibility.type(): String {
         is Visibility.Specified -> {
             "specified"
         }
+        is Visibility.Limited -> "limited"
+        Visibility.Mutual -> "mutual"
+        Visibility.Personal -> "personal"
+    }
+}
+
+fun Visibility.type4Mastodon(): String {
+    return when(this) {
+        is Visibility.Followers -> "private"
+        is Visibility.Home -> "unlisted"
+        is Visibility.Public -> "public"
+        is Visibility.Specified -> "direct"
+        is Visibility.Limited -> "limited"
+        Visibility.Mutual -> "mutual"
+        Visibility.Personal -> "personal"
     }
 }
 
@@ -73,13 +92,21 @@ fun Visibility(type: String, isLocalOnly: Boolean, visibleUserIds: List<User.Id>
         "home" -> Visibility.Home(isLocalOnly)
         "followers" -> Visibility.Followers(isLocalOnly)
         "specified" -> Visibility.Specified(visibleUserIds ?: emptyList())
-        else -> throw IllegalArgumentException("public, home, followers, specified以外許可されていません。与えられたデータ:$type")
+        else -> Visibility(type)
     }
-    /*require((isLocalOnly && visibility is CanLocalOnly) || !isLocalOnly) {
-        "$type では localOnlyは指定できません。"
-    }*/
+}
 
-
+fun Visibility(type: String, circleId: String? = null): Visibility {
+    return when(type.lowercase()) {
+        "private" -> Visibility.Followers(false)
+        "unlisted" -> Visibility.Home(false)
+        "public" -> Visibility.Public(false)
+        "direct" -> Visibility.Specified(emptyList())
+        "followers" -> Visibility.Followers(false)
+        "home" -> Visibility.Home(false)
+        "limited" -> Visibility.Limited(circleId)
+        else -> throw IllegalArgumentException("limited, direct, unlisted, private public, home, followers, specified以外許可されていません。与えられたデータ:$type")
+    }
 }
 
 fun Visibility.isLocalOnly(): Boolean {
@@ -92,11 +119,23 @@ fun CreateNote.visibleUserIds(): List<String>? {
     }
 }
 
-fun Visibility.getName() : String{
+fun Visibility.getName(softwareType: NodeInfo.SoftwareType? = null) : String{
     return when(this) {
         is Visibility.Public -> "public"
-        is Visibility.Home -> "home"
-        is Visibility.Specified -> "specified"
-        is Visibility.Followers -> "followers"
+        is Visibility.Home -> when(softwareType) {
+            is NodeInfo.SoftwareType.Mastodon -> "unlisted"
+            else -> "home"
+        }
+        is Visibility.Specified -> when(softwareType) {
+            is NodeInfo.SoftwareType.Mastodon -> "direct"
+            else -> "specified"
+        }
+        is Visibility.Followers -> when(softwareType) {
+            is NodeInfo.SoftwareType.Mastodon -> "private"
+            else -> "followers"
+        }
+        is Visibility.Limited -> "limited"
+        is Visibility.Mutual -> "mutual"
+        is Visibility.Personal -> "personal"
     }
 }

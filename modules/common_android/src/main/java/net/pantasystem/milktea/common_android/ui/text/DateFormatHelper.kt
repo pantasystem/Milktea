@@ -52,6 +52,9 @@ object DateFormatHelper {
             is Visibility.Home -> R.drawable.ic_home_black_24dp
             is Visibility.Public -> null
             is Visibility.Specified -> R.drawable.ic_email_black_24dp
+            is Visibility.Limited -> R.drawable.ic_groups
+            Visibility.Mutual -> R.drawable.ic_sync_alt_24px
+            Visibility.Personal -> R.drawable.ic_person_black_24dp
         }
         val text = GetElapsedTimeStringSource(
             SimpleElapsedTime(
