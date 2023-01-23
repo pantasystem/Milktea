@@ -20,6 +20,7 @@ import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 
 object DecorateTextHelper {
@@ -104,12 +105,14 @@ object DecorateTextHelper {
 
     }
 
-    @BindingAdapter("sourceText", "emojis")
+    @BindingAdapter("sourceText", "emojis", "account", "host")
     @JvmStatic
-    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<Emoji>?) {
+    fun TextView.decorateWithLowPerformance(sourceText: String?, emojis: List<Emoji>?, account: Account?, host: String?) {
         sourceText ?: return
         emojis ?: return
-        val node = MFMParser.parse(sourceText, emojis)
+        account ?: return
+        host ?: return
+        val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
             ?: return
         this.movementMethod = LinkMovementMethod.getInstance()
         this.text = MFMDecorator.decorate(this, node)
