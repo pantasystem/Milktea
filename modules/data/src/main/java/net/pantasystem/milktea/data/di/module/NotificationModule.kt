@@ -4,10 +4,12 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import net.pantasystem.milktea.model.notification.NotificationDataSource
-import net.pantasystem.milktea.model.notification.NotificationRepository
 import net.pantasystem.milktea.data.infrastructure.notification.impl.MediatorNotificationDataSource
+import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationPagingStoreImpl
 import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationRepositoryImpl
+import net.pantasystem.milktea.model.notification.NotificationDataSource
+import net.pantasystem.milktea.model.notification.NotificationPagingStore
+import net.pantasystem.milktea.model.notification.NotificationRepository
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -26,4 +28,10 @@ abstract class NotificationModule {
     abstract fun notificationRepository(
         impl: NotificationRepositoryImpl
     ): NotificationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationPagingStoreFactory(
+        impl: NotificationPagingStoreImpl.Factory
+    ) : NotificationPagingStore.Factory
 }
