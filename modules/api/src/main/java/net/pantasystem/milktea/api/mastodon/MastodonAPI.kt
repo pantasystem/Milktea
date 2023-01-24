@@ -159,7 +159,7 @@ interface MastodonAPI {
         @Query("types") types: List<MstNotificationDTO.NotificationType>? = null,
         @Query("exclude_types") excludeTypes: List<MstNotificationDTO.NotificationType>? = null,
         @Query("account_id") accountId: String? = null,
-    ): Response<MstNotificationDTO>
+    ): Response<List<MstNotificationDTO>>
 
 
 
