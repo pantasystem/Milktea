@@ -123,4 +123,78 @@ class NoteTest {
         assertFalse(note.canRenote(User.Id(accountId = note.id.accountId + 1L, "acId")))
     }
 
+    @Test
+    fun isQuote_GiveFedibirdPost() {
+        val note = generateEmptyNote().copy(
+            text = "<p>hogehoge</p>",
+            type = Note.Type.Mastodon(
+                reblogged = null,
+                favorited = null,
+                bookmarked = null,
+                muted = null,
+                favoriteCount = null,
+                tags = listOf(),
+                mentions = listOf(),
+                isFedibirdQuote = true
+            )
+        )
+        assertTrue(note.isQuote())
+    }
+
+    @Test
+    fun isQuote_GiveMastodonBoostReturnsFalse() {
+        val note = generateEmptyNote().copy(
+            text = "<p>hogehoge</p>",
+            type = Note.Type.Mastodon(
+                reblogged = null,
+                favorited = null,
+                bookmarked = null,
+                muted = null,
+                favoriteCount = null,
+                tags = listOf(),
+                mentions = listOf(),
+                isFedibirdQuote = false
+            )
+        )
+        assertFalse(note.isQuote())
+    }
+
+    @Test
+    fun isRenote_GiveMastodonBoost() {
+        val note = generateEmptyNote().copy(
+            text = "<p>hogehoge</p>",
+            type = Note.Type.Mastodon(
+                reblogged = null,
+                favorited = null,
+                bookmarked = null,
+                muted = null,
+                favoriteCount = null,
+                tags = listOf(),
+                mentions = listOf(),
+                isFedibirdQuote = false
+            ),
+            renoteId = Note.Id(0L, "id")
+        )
+        assertTrue(note.isRenote())
+    }
+
+    @Test
+    fun hasContent_GiveMastodonBoostReturnsFalse() {
+        val note = generateEmptyNote().copy(
+            text = "<p>hogehoge</p>",
+            renoteId = Note.Id(0L, "id"),
+            type = Note.Type.Mastodon(
+                reblogged = null,
+                favorited = null,
+                bookmarked = null,
+                muted = null,
+                favoriteCount = null,
+                tags = listOf(),
+                mentions = listOf(),
+                isFedibirdQuote = false
+            )
+        )
+        assertFalse(note.hasContent())
+    }
+
 }

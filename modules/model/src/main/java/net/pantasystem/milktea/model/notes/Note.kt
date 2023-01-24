@@ -62,10 +62,24 @@ data class Note(
             val bookmarked: Boolean?,
             val muted: Boolean?,
             val favoriteCount: Int?,
-        ) : Type
+            val tags: List<Tag>,
+            val mentions: List<Mention>,
+            val isFedibirdQuote: Boolean,
+        ) : Type {
+            data class Tag(
+                val name: String,
+                val url: String,
+            )
+            data class Mention(
+                val id: String,
+                val username: String,
+                val url: String,
+                val acct: String,
+            )
+        }
     }
 
-    companion object;
+    companion object
 
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
@@ -76,10 +90,14 @@ data class Note(
      * 引用リノートであるか
      */
     fun isQuote(): Boolean {
+        if (type is Type.Mastodon && type.isFedibirdQuote) {
+            return true
+        }
         // NOTE: mastodonには引用が存在しない
         if (isMastodon) {
             return false
         }
+
         return isRenote() && hasContent()
     }
 
@@ -99,6 +117,10 @@ data class Note(
      * ファイル、投票、テキストなどのコンテンツを持っているか
      */
     fun hasContent(): Boolean {
+        if (type is Type.Mastodon && type.isFedibirdQuote) {
+            return true
+        }
+
         if (isMastodon && isRenote()) {
             return false
         }
@@ -116,7 +138,8 @@ data class Note(
      */
     fun canRenote(userId: User.Id): Boolean {
         return when (type) {
-            is Type.Mastodon -> true
+            is Type.Mastodon -> visibility is Visibility.Public
+                    || visibility is Visibility.Home
             Type.Misskey -> id.accountId == userId.accountId
                     && (visibility is Visibility.Public
                     || visibility is Visibility.Home

@@ -414,5 +414,10 @@
     <string name="char_count">%1$d个字符</string>
     <string name="file_count">%1$d 个文件</string>
     <string name="poll">投票</string>
+    <string name="remove_bookmark">删除书签</string>
+    <string name="add_to_bookmark">添加到书签</string>
+    <string name="visibility_personal">自我限制</string>
+    <string name="visibility_limited">圆圈</string>
+    <string name="visibility_mutual">相互关注</string>
 
 </resources>

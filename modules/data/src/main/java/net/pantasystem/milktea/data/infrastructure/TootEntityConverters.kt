@@ -4,6 +4,7 @@ import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationship
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -59,11 +60,10 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         },
         userId = User.Id(account.accountId, this.account.id),
         replyId = this.inReplyToId?.let { Note.Id(account.accountId, this.inReplyToId!!) },
-        renoteId = this.reblog?.id?.let { Note.Id(account.accountId, this.reblog?.id!!) },
+        renoteId = this.quote?.id?.let { Note.Id(account.accountId, it) }
+            ?: this.reblog?.id?.let { Note.Id(account.accountId, this.reblog?.id!!) },
         viaMobile = null,
-
-        // TODO: 正しいVisibilityを得るようにする
-        visibility = Visibility.Public(false),
+        visibility = Visibility(visibility, circleId, visibilityEx),
         localOnly = null,
         emojis = emojis.map {
             it.toEmoji()
@@ -97,6 +97,13 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
             bookmarked = bookmarked,
             muted = muted,
             favoriteCount = favouritesCount,
+            tags = tags?.map {
+                it.toModel()
+            } ?: emptyList(),
+            mentions = mentions?.map {
+                it.toModel()
+            } ?: emptyList(),
+            isFedibirdQuote = quote != null,
         ),
         nodeInfo = nodeInfo,
     )
@@ -131,6 +138,7 @@ fun TootStatusDTO.pickEntities(
         }
     )
     this.reblog?.pickEntities(account, notes, users, files, nodeInfo)
+    this.quote?.pickEntities(account, notes, users, files, nodeInfo)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
@@ -204,6 +212,22 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
         }
         MstNotificationDTO.NotificationType.AdminReport -> {
             TODO("通知種別${type}はまだ実装されていません")
+        }
+    }
+}
+fun Visibility(type: StatusVisibilityType, circleId: String? = null, visibilityEx: String? = null,): Visibility {
+    return when(type) {
+        StatusVisibilityType.Private -> {
+            when(visibilityEx) {
+                "limited" -> Visibility.Limited(circleId)
+                else -> Visibility.Followers(false)
+            }
+        }
+        StatusVisibilityType.Unlisted -> Visibility.Home(false)
+        StatusVisibilityType.Public -> Visibility.Public(false)
+        StatusVisibilityType.Direct -> when(visibilityEx) {
+            "personal" -> Visibility.Personal
+            else -> Visibility.Specified(emptyList())
         }
     }
 }

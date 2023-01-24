@@ -6,5 +6,5 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 @Serializable
 data class FollowFollowerUsers(
     val users: List<UserDTO>,
-    val next: String
+    val next: String? = null,
 )

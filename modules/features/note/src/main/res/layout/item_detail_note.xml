@@ -157,7 +157,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
-                        app:textNode="@{note.textNode}"
+                        textTypeSource="@{note.textNode}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
 
                 <include
@@ -295,7 +295,7 @@
                             android:layout_below="@+id/subContentFoldingButton"
                             android:textSize="15sp"
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
-                            app:textNode="@{note.subNoteTextNode}"
+                            textTypeSource="@{note.subNoteTextNode}"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
 
                     <include

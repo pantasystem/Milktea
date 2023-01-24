@@ -5,6 +5,7 @@ import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.notes.NoteVisibilityType
 import net.pantasystem.milktea.api.misskey.notes.PollDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -158,7 +159,7 @@ fun PollDTO?.toPoll(): Poll? {
 
 
 fun NoteDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
-    val visibility = Visibility(this.visibility?: "public", isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
+    val visibility = Visibility(this.visibility?: NoteVisibilityType.Public, isLocalOnly = localOnly?: false, visibleUserIds = visibleUserIds?.map { id ->
         User.Id(account.accountId, id)
     }?: emptyList())
     return Note(
@@ -193,6 +194,17 @@ fun NoteDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         type = Note.Type.Misskey,
         nodeInfo = nodeInfo,
     )
+}
+
+@Throws(IllegalArgumentException::class)
+fun Visibility(type: NoteVisibilityType, isLocalOnly: Boolean, visibleUserIds: List<User.Id>? = null): Visibility {
+    return when(type){
+        NoteVisibilityType.Public -> Visibility.Public(isLocalOnly)
+        NoteVisibilityType.Followers -> Visibility.Followers(isLocalOnly)
+        NoteVisibilityType.Home -> Visibility.Home(isLocalOnly)
+        NoteVisibilityType.Specified -> Visibility.Specified(visibleUserIds ?: emptyList())
+        else -> Visibility.Public(isLocalOnly)
+    }
 }
 
 

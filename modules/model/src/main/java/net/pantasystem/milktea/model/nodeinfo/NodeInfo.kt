@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.model.nodeinfo
 
+import net.pantasystem.milktea.model.instance.Version
+
 
 data class NodeInfo(
     val host: String,
@@ -53,4 +55,8 @@ data class NodeInfo(
         "fedibird" -> SoftwareType.Mastodon.Fedibird(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
+}
+
+fun NodeInfo.SoftwareType.getVersion(): Version {
+    return Version(this.version)
 }

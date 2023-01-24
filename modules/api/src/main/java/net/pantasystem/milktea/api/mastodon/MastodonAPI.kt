@@ -77,11 +77,29 @@ interface MastodonAPI {
     @POST("api/v1/statuses/{statusId}/unreblog")
     suspend fun unreblog(@Path("statusId") statusId: String): Response<TootStatusDTO>
 
+    @GET("api/v1/accounts/{accountId}/followers")
+    suspend fun getFollowers(
+        @Path("accountId") accountId: String,
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("limit") limit: Int = 40
+    ): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/accounts/{accountId}/following")
+    suspend fun getFollowing(
+        @Path("accountId") accountId: String,
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("limit") limit: Int = 40
+    ): Response<List<MastodonAccountDTO>>
+
     @GET("api/v1/accounts/{accountId}")
     suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
 
     @GET("api/v1/accounts/relationships")
-    suspend fun getAccountRelationships(@Query("id") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
+    suspend fun getAccountRelationships(@Query("id[]") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
     suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
@@ -104,6 +122,12 @@ interface MastodonAPI {
     @POST("api/v1/statuses/{statusId}/unfavourite")
     suspend fun unfavouriteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
 
+    @POST("api/v1/statuses/{statusId}/bookmark")
+    suspend fun bookmarkStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unbookmark")
+    suspend fun unbookmarkStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
     @GET("api/v1/favourites")
     suspend fun getFavouriteStatuses(
         @Query("min_id") minId: String? = null,
@@ -111,7 +135,10 @@ interface MastodonAPI {
     ): Response<List<TootStatusDTO>>
 
     @POST("api/v1/accounts/{accountId}/mute")
-    suspend fun muteAccount(@Path("accountId") accountId: String, @Body body: MuteAccountRequest): Response<MastodonAccountRelationshipDTO>
+    suspend fun muteAccount(
+        @Path("accountId") accountId: String,
+        @Body body: MuteAccountRequest
+    ): Response<MastodonAccountRelationshipDTO>
 
     @POST("api/v1/accounts/{accountId}/unmute")
     suspend fun unmuteAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
@@ -133,6 +160,7 @@ interface MastodonAPI {
         @Query("exclude_types") excludeTypes: List<MstNotificationDTO.NotificationType>? = null,
         @Query("account_id") accountId: String? = null,
     ): Response<MstNotificationDTO>
+
 
 
 }

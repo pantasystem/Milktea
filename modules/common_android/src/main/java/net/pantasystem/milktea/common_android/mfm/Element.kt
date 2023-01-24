@@ -1,4 +1,4 @@
-package jp.panta.misskeyandroidclient.mfm
+package net.pantasystem.milktea.common_android.mfm
 
 import java.io.Serializable
 

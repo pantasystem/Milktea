@@ -414,11 +414,11 @@ object MFMParser {
 
             return EmojiElement(
                 emoji,
-                tagName,
+                matcher.group(),
                 start = position + matcher.start(),
                 end = position + matcher.end(),
-                insideStart = position + matcher.start(1),
-                insideEnd = position + matcher.end(1)
+                insideStart = position + matcher.start(),
+                insideEnd = position + matcher.end()
             )
         }
 

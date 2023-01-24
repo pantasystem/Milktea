@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.notes.Note
 
 @kotlinx.serialization.Serializable
 data class TootStatusDTO(
@@ -15,7 +16,7 @@ data class TootStatusDTO(
     @SerialName("created_at") val createdAt: Instant,
     val account: MastodonAccountDTO,
     val content: String,
-    val visibility: String,
+    val visibility: StatusVisibilityType,
     val sensitive: Boolean,
     @SerialName("spoiler_text") val spoilerText: String,
     @SerialName("media_attachments") val mediaAttachments: List<TootMediaAttachment>,
@@ -40,7 +41,10 @@ data class TootStatusDTO(
     val bookmarked: Boolean? = null,
     val pinned: Boolean? = null,
     val filtered: Boolean? = null,
-    @SerialName("emoji_reactions") val emojiReactions: List<EmojiReactionCount>? = null
+    @SerialName("emoji_reactions") val emojiReactions: List<EmojiReactionCount>? = null,
+    @SerialName("quote") val quote: TootStatusDTO? = null,
+    @SerialName("circle_id") val circleId: String? = null,
+    @SerialName("visibility_ex") val visibilityEx: String? = null,
 ) {
     @kotlinx.serialization.Serializable
     data class Mention(
@@ -48,13 +52,29 @@ data class TootStatusDTO(
         val username: String,
         val url: String,
         val acct: String,
-    )
+    ) {
+        fun toModel(): Note.Type.Mastodon.Mention {
+            return Note.Type.Mastodon.Mention(
+                id = id,
+                username = username,
+                url = url,
+                acct = acct
+            )
+        }
+    }
 
     @kotlinx.serialization.Serializable
     data class Tag(
         val name: String,
         val url: String,
-    )
+    ) {
+        fun toModel(): Note.Type.Mastodon.Tag {
+            return Note.Type.Mastodon.Tag(
+                name = name,
+                url = url,
+            )
+        }
+    }
 
 
     @kotlinx.serialization.Serializable
@@ -101,4 +121,12 @@ data class TootStatusDTO(
             }
         }
     }
+}
+
+@kotlinx.serialization.Serializable
+enum class StatusVisibilityType {
+    @SerialName("private") Private,
+    @SerialName("unlisted") Unlisted,
+    @SerialName("public") Public,
+    @SerialName("direct") Direct
 }

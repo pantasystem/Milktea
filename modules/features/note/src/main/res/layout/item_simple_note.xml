@@ -188,7 +188,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="15sp"
-                            app:textNode="@{note.textNode}"
+                            textTypeSource="@{note.textNode}"
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                             android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
 
@@ -342,7 +342,7 @@
                                 android:textSize="15sp"
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
-                                app:textNode="@{note.subNoteTextNode}"
+                                textTypeSource="@{note.subNoteTextNode}"
                                 app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
                                 app:layout_constraintStart_toStartOf="parent"
                                 android:visibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>

@@ -62,6 +62,8 @@ class ReactionHistoryPagerViewModel @Inject constructor(
 
     private val author = note.filterNotNull().map {
         userRepository.find(it.userId)
+    }.catch {
+        logger.error("投稿したユーザの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val uiState = combine(note, account, author, types) { note, ac, author, types ->
         ReactionHistoryPagerUiState(note, ac, author,types)
