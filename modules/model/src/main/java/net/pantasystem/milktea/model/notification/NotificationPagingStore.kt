@@ -10,9 +10,9 @@ interface NotificationPagingStore {
         fun create(getAccount: () -> Account): NotificationPagingStore
     }
 
-    val notifications: Flow<PageableState<Notification>>
+    val notifications: Flow<PageableState<List<Notification>>>
 
-    fun loadPrevious(): Result<Unit>
+    suspend fun loadPrevious(): Result<Unit>
 
-    fun clear(): Result<Unit>
+    suspend fun clear()
 }
