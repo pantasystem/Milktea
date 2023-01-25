@@ -60,6 +60,22 @@ class NotificationPagingStoreImpl(
     override suspend fun loadPrevious(): Result<Unit> = runCancellableCatching {
         previousPagingController.loadPrevious().getOrThrow()
     }
+
+    override suspend fun onReceiveNewNotification(notificationRelation: NotificationRelation) {
+        delegate.mutex.withLock {
+            val state = delegate.getState()
+            val updated = when(state.content) {
+                is StateContent.Exist -> state.convert {
+                    listOf(
+                        NotificationAndNextId(notificationRelation, null)
+                    ) + it
+                }
+                is StateContent.NotExist -> state
+            }
+            delegate.setState(updated)
+
+        }
+    }
 }
 
 
