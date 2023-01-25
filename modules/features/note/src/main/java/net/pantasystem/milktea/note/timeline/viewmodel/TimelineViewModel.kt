@@ -180,12 +180,18 @@ class TimelineViewModel @AssistedInject constructor(
     fun onResume() {
         isActive = true
         noteStreamingCollector.onResume()
+        viewModelScope.launch {
+            cache.captureNotes()
+        }
     }
 
     fun onPause() {
         isActive = false
         timelineStore.suspendStreaming()
         noteStreamingCollector.onSuspend()
+        viewModelScope.launch {
+            cache.suspendNoteCapture()
+        }
     }
 
 }

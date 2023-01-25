@@ -195,4 +195,23 @@ class PlaneNoteViewDataCache(
             ).load(note.urlPreviewLoadTaskCallback)
         }
     }
+
+    suspend fun suspendNoteCapture() {
+        lock.withLock {
+            cache.values.map {
+                it.job?.cancel()
+            }
+        }
+    }
+
+    suspend fun captureNotes() {
+        lock.withLock {
+            cache.values.filter {
+                it.job == null
+            }.map {
+                it.captureNotes()
+            }
+        }
+    }
+
 }
