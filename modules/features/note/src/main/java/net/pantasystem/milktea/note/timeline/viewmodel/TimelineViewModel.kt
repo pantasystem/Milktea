@@ -7,11 +7,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
@@ -112,6 +109,17 @@ class TimelineViewModel @AssistedInject constructor(
         viewModelScope
     )
 
+    private val noteStreamingCollector = NoteStreamingCollector(
+        accountStore = accountStore,
+        timelineStore = timelineStore,
+        coroutineScope = viewModelScope,
+        logger = logger,
+        currentAccountWatcher = currentAccountWatcher,
+        noteStreaming = noteStreaming,
+        pageable = pageable,
+    )
+    private var isActive = true
+
     init {
 
         viewModelScope.launch {
@@ -124,14 +132,15 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
 
-        accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
-            noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
-        }.map {
-            timelineStore.onReceiveNote(it.id)
-        }.catch {
-            logger.error("receive not error", it)
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
+        viewModelScope.launch {
+            (0..Int.MAX_VALUE).asFlow().map {
+                delay(10_000)
+            }.filter {
+                isActive && !timelineStore.isActiveStreaming
+            }.map {
+                timelineStore.loadFuture()
+            }.collect()
+        }
     }
 
 
@@ -166,6 +175,24 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
+
+
+    fun onResume() {
+        isActive = true
+        noteStreamingCollector.onResume()
+        viewModelScope.launch {
+            cache.captureNotes()
+        }
+    }
+
+    fun onPause() {
+        isActive = false
+        timelineStore.suspendStreaming()
+        noteStreamingCollector.onSuspend()
+        viewModelScope.launch {
+            cache.suspendNoteCapture()
+        }
+    }
 
 }
 
@@ -248,5 +275,42 @@ fun PageableState<List<PlaneNoteViewData>>.toList(): List<TimelineListItem> {
                 }
             )
         }
+    }
+}
+
+class NoteStreamingCollector(
+    val coroutineScope: CoroutineScope,
+    val timelineStore: TimelineStore,
+    val accountStore: AccountStore,
+    val noteStreaming: NoteStreaming,
+    val logger: Logger,
+    val pageable: Pageable,
+    val currentAccountWatcher: CurrentAccountWatcher,
+) {
+
+    private var job: Job? = null
+
+    fun onSuspend() {
+        synchronized(this) {
+            job?.cancel()
+            job = null
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun onResume() {
+        synchronized(this) {
+            if (job != null) {
+                return
+            }
+            job = accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
+                noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
+            }.map {
+                timelineStore.onReceiveNote(it.id)
+            }.catch {
+                logger.error("receive not error", it)
+            }.launchIn(coroutineScope + Dispatchers.IO)
+        }
+
     }
 }

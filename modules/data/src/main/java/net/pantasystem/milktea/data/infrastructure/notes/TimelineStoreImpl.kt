@@ -111,9 +111,12 @@ class TimelineStoreImpl(
     override val timelineState: Flow<PageableState<List<Note.Id>>>
         get() = pageableStore.state.distinctUntilChanged()
 
-    var latestReceiveId: Note.Id? = null
+    private var latestReceiveId: Note.Id? = null
 
-    var initialLoadQuery: InitialLoadQuery? = null
+    private var initialLoadQuery: InitialLoadQuery? = null
+
+    override var isActiveStreaming: Boolean = true
+        private set
 
     init {
         coroutineScope.launch(Dispatchers.IO) {
@@ -164,6 +167,7 @@ class TimelineStoreImpl(
             }
             if (addedCount.getOrElse { Int.MAX_VALUE } < LIMIT) {
                 initialLoadQuery = null
+                isActiveStreaming = true
             }
             latestReceiveId = null
         }
@@ -205,6 +209,7 @@ class TimelineStoreImpl(
     override suspend fun clear(initialLoadQuery: InitialLoadQuery?) {
         pageableStore.mutex.withLock {
             this.initialLoadQuery = initialLoadQuery
+            isActiveStreaming = true
             pageableStore.setState(PageableState.Loading.Init())
         }
     }
@@ -218,11 +223,18 @@ class TimelineStoreImpl(
         return latestReceiveId
     }
 
+    override fun suspendStreaming() {
+        isActiveStreaming = false
+    }
+
     private suspend fun appendStreamEventNote(noteId: Note.Id) {
         val store = pageableStore
         if (store is StreamingReceivableStore) {
             store.mutex.withLock {
                 if (initialLoadQuery != null) {
+                    return@withLock
+                }
+                if (!isActiveStreaming) {
                     return@withLock
                 }
                 val content = store.getState().content
