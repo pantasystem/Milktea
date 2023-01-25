@@ -260,6 +260,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onResume()
 
         isShowing = true
+        mViewModel.onResume()
+
         currentPageableTimelineViewModel.setCurrentPageable(mPageable)
         try {
             mLinearLayoutManager.scrollToPosition(mViewModel.position)
@@ -270,8 +272,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     override fun onPause() {
         super.onPause()
-
         isShowing = false
+        mViewModel.onPause()
         Log.d("TimelineFragment", "onPause")
     }
 
