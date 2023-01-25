@@ -1,29 +1,25 @@
 package net.pantasystem.milktea.notification.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
-import net.pantasystem.milktea.data.infrastructure.notification.impl.NotificationCacheAdder
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.group.GroupRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,39 +27,50 @@ import javax.inject.Inject
 class NotificationViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private val userRepository: UserRepository,
+    private val groupRepository: GroupRepository,
+    private val notificationStreaming: NotificationStreaming,
+    planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
-    private val noteTranslationStore: NoteTranslationStore,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val notificationCacheAdder: NotificationCacheAdder,
-    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val unreadNotificationDAO: UnreadNotificationDAO,
-    private val groupRepository: GroupRepository,
-    private val metaRepository: MetaRepository,
-    private val notificationStreaming: NotificationStreaming,
+    notificationPagingStoreFactory: NotificationPagingStore.Factory
 ) : ViewModel() {
 
+    private val planeNoteViewDataCache: PlaneNoteViewDataCache = planeNoteViewDataCacheFactory.create({
+        accountRepository.getCurrentAccount().getOrThrow()
+    }, viewModelScope)
 
-    val isLoading = MutableLiveData<Boolean>()
-    private var isLoadingFlag = false
-        set(value) {
-            isLoading.postValue(value)
-            field = value
+    private val notificationPagingStore = notificationPagingStoreFactory.create {
+        accountRepository.getCurrentAccount().getOrThrow()
+    }
+
+    private val notifications = notificationPagingStore.notifications.map { state ->
+        state.suspendConvert { list ->
+            list.map { n ->
+                val noteViewData = n.note?.let {
+                    planeNoteViewDataCache.get(it)
+                }
+                NotificationViewData(
+                    n,
+                    noteViewData,
+                )
+            }
         }
+    }.catch {
+        logger.error("observe notifications error", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PageableState.Loading.Init())
 
-    private var noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.IO)
+    val notificationsLiveData = notifications.map {
+        (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
+    }.asLiveData()
 
-
-    val notificationsLiveData = MutableLiveData<List<NotificationViewData>>()
+    val isLoading = notifications.map {
+        it is PageableState.Loading
+    }.asLiveData()
     private val _error = MutableSharedFlow<Throwable>(
         onBufferOverflow = BufferOverflow.DROP_LATEST,
         extraBufferCapacity = 100
     )
-    private var notifications: List<NotificationViewData> = emptyList()
-        set(value) {
-            notificationsLiveData.postValue(value)
-            field = value
-        }
+
     private val logger = loggerFactory.create("NotificationViewModel")
 
     init {
@@ -78,115 +85,32 @@ class NotificationViewModel @Inject constructor(
             }.map {
                 ac to it
             }
-        }.map { accountAndNotificationRelation ->
-            val notificationRelation = accountAndNotificationRelation.second
-            val account = accountAndNotificationRelation.first
-            NotificationViewData(
-                notificationRelation,
-                account,
-                noteCaptureAPIAdapter,
-                noteTranslationStore,
-                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
-            )
-        }.catch { e ->
+        }.buffer(100).catch { e ->
             logger.warning("ストーリミング受信中にエラー発生", e = e)
         }.onEach {
-
-            it.noteViewData?.eventFlow?.launchIn(viewModelScope + Dispatchers.IO)
-            val list = ArrayList(notifications)
-            list.add(0, it)
-            notifications = list
+            notificationPagingStore.onReceiveNewNotification(it.second)
         }.launchIn(viewModelScope + Dispatchers.IO)
 
         //loadInit()
     }
 
     fun loadInit() {
-        if (isLoadingFlag) {
-            logger.debug("cancel loadInit")
-            return
-        }
-        logger.debug("loadInit")
-
-        isLoadingFlag = true
-        //noteCaptureScope.cancel()
-        noteCaptureScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.IO)
-
-        logger.debug("before launch:${viewModelScope.isActive}")
-        viewModelScope.launch(Dispatchers.IO) {
-            logger.debug("in launch")
-            val account = accountRepository.getCurrentAccount().getOrThrow()
-            val request = NotificationRequest(i = account.token, limit = 20)
-            val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
-
-            runCancellableCatching {
-                val notificationDTOList = misskeyAPI.notification(request).throwIfHasError().body()
-                logger.debug("res: $notificationDTOList")
-                val viewDataList = notificationDTOList?.toNotificationViewData(account)
-                    ?: emptyList()
-                viewDataList.forEach {
-                    it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
-                }
-                unreadNotificationDAO.deleteWhereAccountId(account.accountId)
-
-                viewDataList
-            }.onSuccess {
-                notifications = it
-            }.onFailure {
-                logger.error("読み込みエラー", e = it)
+        viewModelScope.launch {
+            notificationPagingStore.clear()
+            notificationPagingStore.loadPrevious().onFailure {
+                logger.error("通知の読み込みに失敗", it)
+                _error.tryEmit(it)
             }
-
-            isLoadingFlag = false
         }
-
     }
 
     fun loadOld() {
-        logger.debug("loadOld")
-        if (isLoadingFlag) {
-            return
-        }
-        isLoadingFlag = true
-
-        val exNotificationList = notifications
-        val untilId = exNotificationList.lastOrNull()?.id
-        if (exNotificationList.isEmpty() || untilId == null) {
-            isLoadingFlag = false
-            return loadInit()
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val account = accountRepository.getCurrentAccount().getOrThrow()
-            val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
-
-            val request = NotificationRequest(
-                i = account.token,
-                limit = 20,
-                untilId = untilId.notificationId
-            )
-            val notifications = runCancellableCatching {
-                misskeyAPI.notification(request).throwIfHasError().body()
-            }.getOrNull()
-            val list = notifications?.toNotificationViewData(account)
-            if (list.isNullOrEmpty()) {
-                isLoadingFlag = false
-                return@launch
+        viewModelScope.launch {
+            notificationPagingStore.loadPrevious().onFailure {
+                logger.error("通知の読み込みに失敗", it)
+                _error.tryEmit(it)
             }
-            list.forEach {
-                it.noteViewData?.eventFlow?.launchIn(noteCaptureScope)
-            }
-
-            val notificationViewDataList =
-                ArrayList<NotificationViewData>(exNotificationList).also {
-                    it.addAll(
-                        list
-                    )
-                }
-            this@NotificationViewModel.notifications = notificationViewDataList
-            isLoadingFlag = false
         }
-
-
     }
 
     fun acceptFollowRequest(notification: Notification) {
@@ -251,32 +175,5 @@ class NotificationViewModel @Inject constructor(
 
         }
     }
-
-    private suspend fun NotificationDTO.toNotificationRelation(account: Account): NotificationRelation {
-        return notificationCacheAdder.addAndConvert(account, this)
-    }
-
-    private suspend fun List<NotificationDTO>.toNotificationRelations(account: Account): List<NotificationRelation> {
-        return this.mapNotNull {
-            runCancellableCatching {
-                it.toNotificationRelation(account)
-            }.onFailure {
-                logger.error("変換失敗", e = it)
-            }.getOrNull()
-        }
-    }
-
-    private suspend fun List<NotificationDTO>.toNotificationViewData(account: Account): List<NotificationViewData> {
-        return this.toNotificationRelations(account).map {
-            NotificationViewData(
-                it,
-                account,
-                noteCaptureAPIAdapter,
-                noteTranslationStore,
-                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
-            )
-        }
-    }
-
 
 }

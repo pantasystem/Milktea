@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure
 
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
+import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -12,6 +13,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
 
 fun TootPollDTO?.toPoll(): Poll? {
@@ -150,6 +152,70 @@ fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {
     )
 }
 
+fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
+    val id = Notification.Id(a.accountId, id)
+    val userId = User.Id(a.accountId, account.id)
+    return when(type) {
+        MstNotificationDTO.NotificationType.Mention -> {
+            MentionNotification(
+                createdAt = createdAt,
+                id = id,
+                userId = userId,
+                isRead = isRead,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id)
+            )
+        }
+        MstNotificationDTO.NotificationType.Status -> {
+            TODO("通知種別${type}はまだ実装されていません")
+        }
+        MstNotificationDTO.NotificationType.Reblog -> {
+            RenoteNotification(
+                id = id,
+                createdAt = createdAt,
+                userId = userId,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id),
+                isRead = isRead,
+            )
+        }
+        MstNotificationDTO.NotificationType.Follow -> {
+            FollowNotification(
+                id = id,
+                createdAt = createdAt,
+                userId = userId,
+                isRead = isRead,
+            )
+        }
+        MstNotificationDTO.NotificationType.FollowRequest -> {
+            FollowRequestAcceptedNotification(
+                id = id,
+                createdAt = createdAt,
+                userId = userId,
+                isRead = isRead,
+            )
+        }
+        MstNotificationDTO.NotificationType.Favourite -> {
+            TODO("通知種別${type}はまだ実装されていません")
+        }
+        MstNotificationDTO.NotificationType.Poll -> {
+            PollEndedNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id),
+            )
+        }
+        MstNotificationDTO.NotificationType.Update -> {
+            TODO("通知種別${type}はまだ実装されていません")
+        }
+        MstNotificationDTO.NotificationType.AdminSingUp -> {
+            TODO("通知種別${type}はまだ実装されていません")
+        }
+        MstNotificationDTO.NotificationType.AdminReport -> {
+            TODO("通知種別${type}はまだ実装されていません")
+        }
+        MstNotificationDTO.NotificationType.EmojiReaction -> TODO("通知種別${type}はまだ実装されていません")
+    }
+}
 fun Visibility(type: StatusVisibilityType, circleId: String? = null, visibilityEx: String? = null,): Visibility {
     return when(type) {
         StatusVisibilityType.Private -> {
