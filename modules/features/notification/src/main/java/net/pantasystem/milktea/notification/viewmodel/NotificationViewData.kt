@@ -1,10 +1,6 @@
 package net.pantasystem.milktea.notification.viewmodel
 
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common_android.resource.StringSource
-import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -12,10 +8,7 @@ import net.pantasystem.milktea.notification.R
 
 class NotificationViewData(
     val notification: NotificationRelation,
-    account: Account,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    translationStore: NoteTranslationStore,
-    instanceEmojis: List<Emoji>,
+    val noteViewData: PlaneNoteViewData?
 ) {
     enum class Type(val default: String) {
         FOLLOW("follow"),
@@ -34,14 +27,6 @@ class NotificationViewData(
     }
 
     val id = notification.notification.id
-    val noteViewData: PlaneNoteViewData? =
-        if (notification.notification is HasNote) PlaneNoteViewData(
-            notification.note!!,
-            account,
-            noteCaptureAPIAdapter,
-            translationStore,
-            instanceEmojis
-        ) else null
 
     val type: Type = when (notification.notification) {
         is FollowNotification -> Type.FOLLOW
