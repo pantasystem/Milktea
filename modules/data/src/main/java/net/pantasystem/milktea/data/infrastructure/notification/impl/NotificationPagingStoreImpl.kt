@@ -13,20 +13,20 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationPagingStore
+import net.pantasystem.milktea.model.notification.NotificationRelation
 import javax.inject.Inject
 import javax.inject.Singleton
 
 class NotificationPagingStoreImpl(
-    val getAccount: () -> Account,
+    val getAccount: suspend () -> Account,
     val delegate: NotificationStoreImpl
 ) : NotificationPagingStore {
 
     class Factory @Inject constructor(
         val factory: NotificationStoreImpl.Factory,
     ) : NotificationPagingStore.Factory {
-        override fun create(getAccount: () -> Account): NotificationPagingStore {
+        override fun create(getAccount: suspend () -> Account): NotificationPagingStore {
             return NotificationPagingStoreImpl(
                 getAccount,
                 delegate = factory.create(getAccount)
@@ -41,7 +41,7 @@ class NotificationPagingStoreImpl(
         delegate
     )
 
-    override val notifications: Flow<PageableState<List<Notification>>> = delegate.state.map { state ->
+    override val notifications: Flow<PageableState<List<NotificationRelation>>> = delegate.state.map { state ->
         state.convert { list ->
             list.map {
                 it.notification
@@ -130,7 +130,7 @@ class NotificationStoreImpl(
                 is NotificationItem.Mastodon -> {
                     runCancellableCatching {
                         NotificationAndNextId(
-                            notificationCacheAdder.addConvert(account, it.mstNotificationDTO).notification,
+                            notificationCacheAdder.addConvert(account, it.mstNotificationDTO),
                             it.nextId
                         )
                     }.getOrNull()
@@ -139,7 +139,7 @@ class NotificationStoreImpl(
                 is NotificationItem.Misskey -> {
                     runCancellableCatching {
                         NotificationAndNextId(
-                            notificationCacheAdder.addAndConvert(account, it.notificationDTO).notification,
+                            notificationCacheAdder.addAndConvert(account, it.notificationDTO),
                             it.nextId
                         )
                     }.getOrNull()
@@ -220,6 +220,6 @@ sealed interface NotificationItem {
 }
 
 data class NotificationAndNextId(
-    val notification: Notification,
+    val notification: NotificationRelation,
     val nextId: String?,
 )

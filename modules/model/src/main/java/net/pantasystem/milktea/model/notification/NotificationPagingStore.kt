@@ -7,10 +7,10 @@ import net.pantasystem.milktea.model.account.Account
 interface NotificationPagingStore {
 
     interface Factory {
-        fun create(getAccount: () -> Account): NotificationPagingStore
+        fun create(getAccount: suspend () -> Account): NotificationPagingStore
     }
 
-    val notifications: Flow<PageableState<List<Notification>>>
+    val notifications: Flow<PageableState<List<NotificationRelation>>>
 
     suspend fun loadPrevious(): Result<Unit>
 
