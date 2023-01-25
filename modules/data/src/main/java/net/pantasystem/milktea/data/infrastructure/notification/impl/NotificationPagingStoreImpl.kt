@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notification.NotificationPagingStore
 import net.pantasystem.milktea.model.notification.NotificationRelation
@@ -20,16 +21,19 @@ import javax.inject.Singleton
 
 class NotificationPagingStoreImpl(
     val getAccount: suspend () -> Account,
-    val delegate: NotificationStoreImpl
+    val delegate: NotificationStoreImpl,
+    val unreadNotificationDAO: UnreadNotificationDAO,
 ) : NotificationPagingStore {
 
     class Factory @Inject constructor(
         val factory: NotificationStoreImpl.Factory,
+        val unreadNotificationDAO: UnreadNotificationDAO,
     ) : NotificationPagingStore.Factory {
         override fun create(getAccount: suspend () -> Account): NotificationPagingStore {
             return NotificationPagingStoreImpl(
                 getAccount,
-                delegate = factory.create(getAccount)
+                delegate = factory.create(getAccount),
+                unreadNotificationDAO = unreadNotificationDAO,
             )
         }
     }
@@ -58,6 +62,7 @@ class NotificationPagingStoreImpl(
     }
 
     override suspend fun loadPrevious(): Result<Unit> = runCancellableCatching {
+        unreadNotificationDAO.deleteWhereAccountId(getAccount().accountId)
         previousPagingController.loadPrevious().getOrThrow()
     }
 
