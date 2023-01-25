@@ -46,6 +46,9 @@ data class MstNotificationDTO(
 
         @SerialName("admin.report")
         AdminReport,
+
+        @SerialName("emoji_reaction")
+        EmojiReaction
     }
 }
 

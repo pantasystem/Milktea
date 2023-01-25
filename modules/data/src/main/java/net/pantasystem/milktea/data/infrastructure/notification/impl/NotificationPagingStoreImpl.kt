@@ -122,18 +122,18 @@ class NotificationStoreImpl(
         val account = getAccount()
         when(account.instanceType) {
             Account.InstanceType.MISSKEY -> {
+                MisskeyNotificationEntityLoader(
+                    account = account,
+                    idGetter = this,
+                    misskeyAPIProvider = misskeyAPIProvider,
+                )
+            }
+            Account.InstanceType.MASTODON -> {
                 MstNotificationEntityLoader(
                     account = account,
                     idGetter = this,
                     state = this,
                     mastodonAPIProvider = mastodonAPIProvider,
-                )
-            }
-            Account.InstanceType.MASTODON -> {
-                MisskeyNotificationEntityLoader(
-                    account = account,
-                    idGetter = this,
-                    misskeyAPIProvider = misskeyAPIProvider,
                 )
             }
         }.loadPrevious().getOrThrow()
@@ -186,14 +186,18 @@ class MstNotificationEntityLoader(
         if (nextId == null && !isEmpty) {
             return@runCancellableCatching emptyList()
         }
-        val body = mastodonAPIProvider.get(account).getNotifications(
+        val res = mastodonAPIProvider.get(account).getNotifications(
             maxId = nextId
         ).throwIfHasError()
-            .body()
+
+        val body = res.body()
+
+        val maxId = MastodonLinkHeaderDecoder(res.headers()["link"]).getMaxId()
+
         requireNotNull(body).map {
             NotificationItem.Mastodon(
                 it,
-                it.id
+                maxId
             )
         }
     }
@@ -211,11 +215,10 @@ class MisskeyNotificationEntityLoader(
                 untilId = idGetter.getUntilId()
             )
         )
-        val maxId = MastodonLinkHeaderDecoder(res.headers()["link"]).getMaxId()
         requireNotNull(res.body()).map {
             NotificationItem.Misskey(
                 it,
-                maxId,
+                it.id,
             )
         }
     }

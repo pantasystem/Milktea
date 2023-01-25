@@ -156,8 +156,8 @@ interface MastodonAPI {
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
         @Query("limit") limit: Int? = null,
-        @Query("types") types: List<MstNotificationDTO.NotificationType>? = null,
-        @Query("exclude_types") excludeTypes: List<MstNotificationDTO.NotificationType>? = null,
+        @Query("types") types: List<String>? = null,
+        @Query("exclude_types") excludeTypes: List<String>? = null,
         @Query("account_id") accountId: String? = null,
     ): Response<List<MstNotificationDTO>>
 
