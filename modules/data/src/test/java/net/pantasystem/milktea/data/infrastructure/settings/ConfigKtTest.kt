@@ -115,6 +115,14 @@ class ConfigKtTest {
                     config.isEnableNotificationSound,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsStopNoteCaptureWhenBackground -> Assertions.assertEquals(
+                    config.isStopNoteCaptureWhenBackground,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsStopStreamingApiWhenBackground -> Assertions.assertEquals(
+                    config.isStopStreamingApiWhenBackground,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

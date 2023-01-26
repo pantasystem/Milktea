@@ -7,5 +7,8 @@
     <string name="overwrite_save">上書き保存</string>
     <string name="notification_sound">通知音</string>
     <string name="inapp_notification_sound">アプリ内通知音を有効にする</string>
+    <string name="streaming">自動更新</string>
+    <string name="is_stop_timeline_streaming_when_background">バックグラウンドでタイムラインを更新しない</string>
+    <string name="is_stop_note_capture_when_background">バックグラウンドでノートをキャプチャしない</string>
 
 </resources>

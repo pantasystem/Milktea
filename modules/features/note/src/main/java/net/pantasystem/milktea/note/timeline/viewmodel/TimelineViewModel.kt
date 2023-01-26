@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -40,6 +41,7 @@ class TimelineViewModel @AssistedInject constructor(
     private val accountStore: AccountStore,
     private val wordFilterConfigRepository: WordFilterConfigRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
+    private val configRepository: LocalConfigRepository,
     @Assisted val account: Account?,
     @Assisted val accountId: Long? = account?.accountId,
     @Assisted val pageable: Pageable,
@@ -180,18 +182,27 @@ class TimelineViewModel @AssistedInject constructor(
 
     fun onResume() {
         isActive = true
-        noteStreamingCollector.onResume()
         viewModelScope.launch {
+            noteStreamingCollector.onResume()
             cache.captureNotes()
+            val config = configRepository.get().getOrNull()
+            if (config?.isStopStreamingApiWhenBackground == true) {
+                loadNew()
+            }
         }
     }
 
     fun onPause() {
         isActive = false
-        timelineStore.suspendStreaming()
-        noteStreamingCollector.onSuspend()
         viewModelScope.launch {
-            cache.suspendNoteCapture()
+            val config = configRepository.get().getOrNull()
+            if (config?.isStopStreamingApiWhenBackground == true) {
+                timelineStore.suspendStreaming()
+                noteStreamingCollector.onSuspend()
+            }
+            if (config?.isStopNoteCaptureWhenBackground == true) {
+                cache.suspendNoteCapture()
+            }
         }
     }
 

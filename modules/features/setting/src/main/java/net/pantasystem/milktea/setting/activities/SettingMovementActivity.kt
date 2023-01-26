@@ -39,7 +39,6 @@ import net.pantasystem.milktea.setting.SettingTitleTile
 import javax.inject.Inject
 
 
-
 @AndroidEntryPoint
 class SettingMovementActivity : AppCompatActivity() {
 
@@ -198,10 +197,38 @@ class SettingMovementActivity : AppCompatActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp),
-                                checked = currentConfigState.isEnableNotificationSound, onChanged = {
-                                    currentConfigState = currentConfigState.copy(isEnableNotificationSound = it)
+                                checked = currentConfigState.isEnableNotificationSound,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(isEnableNotificationSound = it)
                                 }) {
                                 Text(stringResource(id = R.string.inapp_notification_sound))
+                            }
+                        }
+
+                        item {
+                            SettingTitleTile(text = stringResource(id = R.string.streaming))
+                            SwitchTile(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                checked = currentConfigState.isStopStreamingApiWhenBackground,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(isStopStreamingApiWhenBackground = it)
+                                }) {
+                                Text(stringResource(id = R.string.is_stop_timeline_streaming_when_background))
+                            }
+                            SwitchTile(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                checked = currentConfigState.isStopNoteCaptureWhenBackground,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(isStopNoteCaptureWhenBackground = it)
+                                }) {
+                                Text(stringResource(id = R.string.is_stop_note_capture_when_background))
                             }
                         }
                     }

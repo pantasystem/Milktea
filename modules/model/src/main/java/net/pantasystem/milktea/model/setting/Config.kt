@@ -44,6 +44,8 @@ data class IsAnalyticsCollectionEnabled(
  * @param isEnableInstanceTicker Instance Tickerの有無
  * @param isDriveUsingGridView 一覧表示時にグリッド表示を行うのか
  * @param isEnableNotificationSound アプリ内通知の通知音の有無
+ * @param isStopNoteCaptureWhenBackground バックグラウンド移行時にノートのキャプチャーを停止する
+ * @param isStopStreamingApiWhenBackground バックグルアンド移行時にストリーミングを中止する
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -65,6 +67,8 @@ data class Config(
     val isEnableInstanceTicker: Boolean,
     val isDriveUsingGridView: Boolean,
     val isEnableNotificationSound: Boolean,
+    val isStopStreamingApiWhenBackground: Boolean,
+    val isStopNoteCaptureWhenBackground: Boolean,
 ) {
     companion object
 
@@ -114,6 +118,8 @@ object DefaultConfig {
         isEnableInstanceTicker = true,
         isDriveUsingGridView = false,
         isEnableNotificationSound = true,
+        isStopNoteCaptureWhenBackground = true,
+        isStopStreamingApiWhenBackground = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
