@@ -5,12 +5,15 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
-class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
+class InMemoryNoteDataSource @Inject constructor(
+    memoryCacheCleaner: MemoryCacheCleaner
+): NoteDataSource, MemoryCacheCleaner.Cleanable {
 
 
     private var notes = mapOf<Note.Id, Note>()
@@ -34,6 +37,7 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
                 it.copy(notes)
             }
         }
+        memoryCacheCleaner.register(this)
     }
 
     override fun addEventListener(listener: NoteDataSource.Listener): Unit = runBlocking {
@@ -154,6 +158,12 @@ class InMemoryNoteDataSource @Inject constructor(): NoteDataSource {
             } else {
                 AddResult.Updated
             }
+        }
+    }
+
+    override suspend fun clean() {
+        mutex.withLock {
+            notes = emptyMap()
         }
     }
 

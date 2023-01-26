@@ -299,7 +299,13 @@ class MediatorUserDataSource @Inject constructor(
     }
 
     override fun observe(userName: String, host: String?, accountId: Long): Flow<User?> {
-        return inMem.observe(userName, host, accountId).distinctUntilChanged().catch {
+        return if (host == null) {
+            userDao.observeByUserName(userName = userName, accountId = accountId)
+        } else {
+            userDao.observeByUserName(userName = userName, accountId = accountId, host = host)
+        }.map {
+            it?.toModel()
+        }.catch {
             logger.error("observe error", it)
             throw it
         }

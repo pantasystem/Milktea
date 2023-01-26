@@ -12,6 +12,7 @@ import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api_streaming.NoteCaptureAPIImpl
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.toNote
@@ -33,7 +34,7 @@ class NoteCaptureAPIAdapterTest {
     fun setUp() {
         loggerFactory = TestLogger.Factory()
         accountRepository = TestAccountRepository()
-        noteDataSource = InMemoryNoteDataSource()
+        noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
     }
 
     @ExperimentalCoroutinesApi
