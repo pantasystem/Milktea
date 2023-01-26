@@ -206,8 +206,8 @@ class PlaneNoteViewDataCache(
 
     suspend fun captureNotes() {
         lock.withLock {
-            cache.values.filter {
-                it.job == null
+            cache.values.filterNot {
+                it.job?.isActive == true
             }.map {
                 it.captureNotes()
             }

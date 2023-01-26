@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.users.nickname
 
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOnMemoryImpl
 import net.pantasystem.milktea.model.user.User
@@ -23,7 +24,7 @@ class DeleteNicknameUseCaseTest {
     fun setUp() {
         val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
         this.nicknameRepository = nicknameRepository
-        userDataSource = InMemoryUserDataSource()
+        userDataSource = InMemoryUserDataSource(MemoryCacheCleaner())
 
         user = User.Simple(
             User.Id(1, "remoteId"),

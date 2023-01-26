@@ -7,6 +7,7 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.AddResult
@@ -36,7 +37,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun testAdd() {
-        val noteDataSource = InMemoryNoteDataSource()
+        val noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
 
         val dto = NoteDTO(
             "",
@@ -75,7 +76,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun testUpdateNote(): Unit = runBlocking {
-        val noteDataSource = InMemoryNoteDataSource()
+        val noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
 
         val dto = NoteDTO(
             "note-1",

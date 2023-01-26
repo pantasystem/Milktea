@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.model.users.nickname
 
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.user.InMemoryUserDataSource
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameRepositoryOnMemoryImpl
 import net.pantasystem.milktea.model.user.User
@@ -17,7 +18,7 @@ class UpdateNicknameUseCaseTest {
     fun testUpdate() {
         runBlocking {
             val nicknameRepository = UserNicknameRepositoryOnMemoryImpl()
-            val userDataSource = InMemoryUserDataSource()
+            val userDataSource = InMemoryUserDataSource(MemoryCacheCleaner())
             val updateNicknameUseCase = UpdateNicknameUseCase(
                 userDataSource,
                 nicknameRepository
