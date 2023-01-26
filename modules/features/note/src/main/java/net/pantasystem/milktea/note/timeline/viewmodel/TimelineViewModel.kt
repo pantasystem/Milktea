@@ -182,9 +182,13 @@ class TimelineViewModel @AssistedInject constructor(
 
     fun onResume() {
         isActive = true
-        noteStreamingCollector.onResume()
         viewModelScope.launch {
+            noteStreamingCollector.onResume()
             cache.captureNotes()
+            val config = configRepository.get().getOrNull()
+            if (config?.isStopStreamingApiWhenBackground == true) {
+                loadNew()
+            }
         }
     }
 
