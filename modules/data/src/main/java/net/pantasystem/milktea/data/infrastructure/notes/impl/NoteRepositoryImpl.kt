@@ -5,11 +5,13 @@ import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.APIError
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
@@ -26,11 +28,11 @@ class NoteRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
-    private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val mastodonAPIProvider: MastodonAPIProvider,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
+    private val noteApiAdapter: NoteApiAdapter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
 
@@ -39,26 +41,14 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val task = PostNoteTask(
-                createNote,
-                createNote.author,
-                loggerFactory,
-                filePropertyDataSource
-            )
-            val result = runCancellableCatching {
-                task.execute(
-                    uploader.get(createNote.author)
-                ) ?: throw IllegalStateException("ファイルのアップロードに失敗しました")
-            }.mapCancellableCatching {
-                misskeyAPIProvider.get(createNote.author).create(it).throwIfHasError()
-                    .body()?.createdNote
-            }.onFailure {
-                logger.error("create note error", it)
+            when(val result = noteApiAdapter.create(createNote)) {
+                is NoteCreatedResultType.Mastodon -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(createNote.author, result.status)
+                }
+                is NoteCreatedResultType.Misskey -> {
+                    noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, result.note)
+                }
             }
-
-            val noteDTO = result.getOrThrow()
-            require(noteDTO != null)
-            noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, noteDTO)
         }
     }
 
