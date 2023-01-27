@@ -174,4 +174,6 @@ interface MastodonAPI {
     ): Response<ScheduledStatus>
 
 
+    @GET("api/v1/statuses/{statusId}")
+    suspend fun getStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
 }
