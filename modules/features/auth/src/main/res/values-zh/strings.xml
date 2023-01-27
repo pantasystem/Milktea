@@ -20,5 +20,6 @@
     <string name="open_in_webview">使用 WebView 打开</string>
     <string name="terms_of_service_agreeation">我同意服务条款</string>
     <string name="privacy_policy_agreeation">我同意隐私政策</string>
+    <string name="accpet_mastodon_alpha_test">我明白Mastodon相关的功能仍处于alpha阶段，可能存在尚未实现或无法工作的功能，我同意不对开发人员负责</string>
 
 </resources>
