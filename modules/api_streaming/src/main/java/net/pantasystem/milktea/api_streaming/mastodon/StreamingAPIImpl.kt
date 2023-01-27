@@ -228,7 +228,7 @@ class StreamingAPIImpl(
                         Event.Update(decoder.decodeFromString(data))
                     }
                     "notification" -> {
-                        Event.Notification(data)
+                        Event.Notification(decoder.decodeFromString(data))
                     }
                     "delete" -> {
                         Event.Delete(data)
