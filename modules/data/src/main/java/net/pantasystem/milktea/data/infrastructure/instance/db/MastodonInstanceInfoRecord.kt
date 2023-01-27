@@ -44,7 +44,7 @@ data class MastodonInstanceInfoRecord(
 }
 
 
-fun MastodonInstanceInfoRecord.from(model: MastodonInstanceInfo): MastodonInstanceInfoRecord {
+fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): MastodonInstanceInfoRecord {
     return MastodonInstanceInfoRecord(
         uri = model.uri,
         title = model.title,
