@@ -11,6 +11,7 @@ sealed interface Event {
     data class Delete(val id: String) : Event
     data class Notification(val notification: MstNotificationDTO) : Event
     data class Reaction(val reaction: EmojiReaction) : Event
+    data class StatusUpdated(val status: TootStatusDTO) : Event
 }
 
 // {

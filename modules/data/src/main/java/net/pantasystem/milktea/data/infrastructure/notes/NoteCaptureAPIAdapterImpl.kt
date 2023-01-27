@@ -258,6 +258,9 @@ class NoteCaptureAPIAdapterImpl(
                     }.getOrThrow()
 
                 }
+                is Event.StatusUpdated -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, e.status)
+                }
             }
         } catch (_: NoteNotFoundException) {
             return
