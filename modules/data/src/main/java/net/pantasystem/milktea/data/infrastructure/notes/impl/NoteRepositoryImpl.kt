@@ -41,14 +41,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
-            when(val result = noteApiAdapter.create(createNote)) {
-                is NoteCreatedResultType.Mastodon -> {
-                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(createNote.author, result.status)
-                }
-                is NoteCreatedResultType.Misskey -> {
-                    noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, result.note)
-                }
-            }
+            convertAndAdd(createNote.author, noteApiAdapter.create(createNote))
         }
     }
 
@@ -117,14 +110,7 @@ class NoteRepositoryImpl @Inject constructor(
 
             logger.debug("request notes/show=$noteId")
             note = try {
-                misskeyAPIProvider.get(account).showNote(
-                    NoteRequest(
-                        i = account.token,
-                        noteId = noteId.noteId
-                    )
-                ).throwIfHasError().body()?.let { resDTO ->
-                    noteDataSourceAdder.addNoteDtoToDataSource(account, resDTO)
-                }
+                convertAndAdd(account, noteApiAdapter.showNote(noteId))
             } catch (e: APIError.NotFoundException) {
                 // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
                 noteDataSource.delete(noteId)
@@ -247,13 +233,7 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            val note = misskeyAPIProvider.get(account).showNote(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError().body()!!
-            noteDataSourceAdder.addNoteDtoToDataSource(account, note)
+            convertAndAdd(account, noteApiAdapter.showNote(noteId))
         }
     }
 
@@ -308,5 +288,12 @@ class NoteRepositoryImpl @Inject constructor(
 
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return noteDataSource.observeOne(noteId)
+    }
+
+    private suspend fun convertAndAdd(account: Account, type: NoteResultType): Note {
+        return when(type) {
+            is NoteResultType.Mastodon -> noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, type.status)
+            is NoteResultType.Misskey -> noteDataSourceAdder.addNoteDtoToDataSource(account, type.note)
+        }
     }
 }
