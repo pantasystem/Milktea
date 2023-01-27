@@ -176,4 +176,7 @@ interface MastodonAPI {
 
     @GET("api/v1/statuses/{statusId}")
     suspend fun getStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @DELETE("api/v1/statuses/{statusId}")
+    suspend fun deleteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
 }

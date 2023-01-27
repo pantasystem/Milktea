@@ -2,7 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.APIError
@@ -85,10 +84,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(noteId: Note.Id): Result<Unit> = runCancellableCatching{
         withContext(ioDispatcher) {
-            val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).delete(
-                DeleteNote(i = account.token, noteId = noteId.noteId)
-            ).throwIfHasError()
+            noteApiAdapter.delete(noteId)
         }
     }
 

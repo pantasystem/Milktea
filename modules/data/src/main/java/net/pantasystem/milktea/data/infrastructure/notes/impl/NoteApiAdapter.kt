@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.Logger
@@ -98,6 +99,22 @@ class NoteApiAdapter @Inject constructor(
                     .getStatus(noteId.noteId)
                     .throwIfHasError().body()
                 NoteResultType.Mastodon(requireNotNull(body))
+            }
+        }
+    }
+
+    suspend fun delete(noteId: Note.Id) {
+        val account = accountRepository.get(noteId.accountId).getOrThrow()
+        when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).delete(DeleteNote(
+                    i = account.token,
+                    noteId = noteId.noteId
+                )).throwIfHasError()
+            }
+            Account.InstanceType.MASTODON -> {
+                mastodonAPIProvider.get(account).deleteStatus(noteId.noteId)
+                    .throwIfHasError()
             }
         }
     }
