@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
 import net.pantasystem.milktea.api_streaming.NoteUpdated
+import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
@@ -222,4 +223,88 @@ class NoteEventReducerKtTest {
         )
     }
 
+
+    @Test
+    fun onEmojiReacted_GiveAddMyReaction() {
+        val note = Note.make(
+            id = Note.Id(0L, "1"),
+            text = "",
+            userId = User.Id(0L, "2"),
+            reactionCounts = listOf(
+                ReactionCount("watasimo", 1),
+            ),
+            myReaction = null
+        )
+        val updated = note.onEmojiReacted(
+            account, EmojiReaction(
+                name = "watasimo",
+                count = 2,
+                url = null,
+                staticUrl = null,
+                domain = null,
+                accountIds = listOf("test"),
+                statusId = "1"
+            )
+        )
+        Assertions.assertEquals("watasimo", updated.myReaction)
+        Assertions.assertEquals(updated.reactionCounts, listOf(
+            ReactionCount("watasimo", 2)
+        ))
+    }
+
+    @Test
+    fun onEmojiReacted_Unreacted() {
+        val note = Note.make(
+            id = Note.Id(0L, "1"),
+            text = "",
+            userId = User.Id(0L, "2"),
+            reactionCounts = listOf(
+                ReactionCount("watasimo", 2),
+            ),
+            myReaction = "watasimo"
+        )
+        val updated = note.onEmojiReacted(
+            account, EmojiReaction(
+                name = "watasimo",
+                count = 1,
+                url = null,
+                staticUrl = null,
+                domain = null,
+                accountIds = listOf(),
+                statusId = "1"
+            )
+        )
+        Assertions.assertEquals(null, updated.myReaction)
+        Assertions.assertEquals(updated.reactionCounts, listOf(
+            ReactionCount("watasimo", 1)
+        ))
+    }
+
+    @Test
+    fun onEmojiReacted_WhenApplied() {
+        val note = Note.make(
+            id = Note.Id(0L, "1"),
+            text = "",
+            userId = User.Id(0L, "2"),
+            reactionCounts = listOf(
+                ReactionCount("watasimo", 2),
+            ),
+            myReaction = "watasimo"
+        )
+        val updated = note.onEmojiReacted(
+            account, EmojiReaction(
+                name = "watasimo",
+                count = 2,
+                url = null,
+                staticUrl = null,
+                domain = null,
+                accountIds = listOf("test"),
+                statusId = "1"
+            )
+        )
+        Assertions.assertEquals("watasimo", updated.myReaction)
+        Assertions.assertEquals(updated.reactionCounts, listOf(
+            ReactionCount("watasimo", 2)
+        ))
+    }
 }
