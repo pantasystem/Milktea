@@ -135,7 +135,8 @@ class NoteTest {
                 favoriteCount = null,
                 tags = listOf(),
                 mentions = listOf(),
-                isFedibirdQuote = true
+                isFedibirdQuote = true,
+                pollId = null,
             )
         )
         assertTrue(note.isQuote())
@@ -153,7 +154,8 @@ class NoteTest {
                 favoriteCount = null,
                 tags = listOf(),
                 mentions = listOf(),
-                isFedibirdQuote = false
+                isFedibirdQuote = false,
+                pollId = null
             )
         )
         assertFalse(note.isQuote())
@@ -171,7 +173,8 @@ class NoteTest {
                 favoriteCount = null,
                 tags = listOf(),
                 mentions = listOf(),
-                isFedibirdQuote = false
+                isFedibirdQuote = false,
+                pollId = null
             ),
             renoteId = Note.Id(0L, "id")
         )
@@ -191,7 +194,8 @@ class NoteTest {
                 favoriteCount = null,
                 tags = listOf(),
                 mentions = listOf(),
-                isFedibirdQuote = false
+                isFedibirdQuote = false,
+                pollId = null
             )
         )
         assertFalse(note.hasContent())

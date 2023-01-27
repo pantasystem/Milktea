@@ -65,6 +65,7 @@ data class Note(
             val tags: List<Tag>,
             val mentions: List<Mention>,
             val isFedibirdQuote: Boolean,
+            val pollId: String?,
         ) : Type {
             data class Tag(
                 val name: String,
