@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.model.instance
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -40,6 +43,31 @@ class InstanceInfoService @Inject constructor(
                 }
                 is NodeInfo.SoftwareType.Misskey -> {
                     metaRepository.sync(instanceDomain)
+                }
+                is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
+            }
+        }
+    }
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    fun observe(instanceDomain: String): Flow<InstanceInfoType?> {
+        return suspend {
+            nodeInfoRepository.find(URL(instanceDomain).host).getOrNull()
+        }.asFlow().filterNotNull().flatMapLatest { nodeInfo ->
+            when(nodeInfo.type) {
+                is NodeInfo.SoftwareType.Mastodon -> {
+                    mastodonInstanceInfoRepository.observe(instanceDomain).map {
+                        it?.let {
+                            InstanceInfoType.Mastodon(it)
+                        }
+                    }
+                }
+                is NodeInfo.SoftwareType.Misskey -> {
+                    metaRepository.observe(instanceDomain).map {
+                        it?.let {
+                            InstanceInfoType.Misskey(it)
+                        }
+                    }
                 }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }

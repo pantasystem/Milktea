@@ -14,8 +14,8 @@ import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -30,7 +30,7 @@ class AccountViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
-    private val metaRepository: MetaRepository,
+    private val instanceInfoService: InstanceInfoService,
     private val signOutUseCase: SignOutUseCase,
     private val syncMetaExecutor: SyncMetaExecutor,
 ) : ViewModel() {
@@ -50,7 +50,7 @@ class AccountViewModel @Inject constructor(
 
     private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
         val flows = accounts.map {
-            metaRepository.observe(it.normalizedInstanceDomain).flowOn(Dispatchers.IO)
+            instanceInfoService.observe(it.normalizedInstanceDomain).flowOn(Dispatchers.IO)
         }
         combine(flows) {
             it.toList()
@@ -182,7 +182,7 @@ class AccountViewModel @Inject constructor(
 data class AccountInfo(
     val account: Account,
     val user: User?,
-    val instanceMeta: Meta?,
+    val instanceMeta: InstanceInfoType?,
     val isCurrentAccount: Boolean
 )
 
