@@ -11,7 +11,6 @@ import net.pantasystem.milktea.api.misskey.auth.SignInRequest
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
-import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
@@ -170,9 +169,6 @@ class AuthStateHelper @Inject constructor(
                 return InstanceType.Misskey(misskey)
             }
             if (mastodon != null) {
-                if (!BuildConfig.DEBUG) {
-                    throw IllegalArgumentException("Mastodon does not support.")
-                }
                 return InstanceType.Mastodon(mastodon)
             }
             throw IllegalArgumentException()
