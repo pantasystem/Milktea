@@ -25,7 +25,10 @@ import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
-import net.pantasystem.milktea.model.instance.*
+import net.pantasystem.milktea.model.instance.FeatureEnables
+import net.pantasystem.milktea.model.instance.InstanceInfo
+import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
@@ -45,7 +48,7 @@ class NoteEditorViewModel @Inject constructor(
     accountStore: AccountStore,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val metaRepository: MetaRepository,
+    private val instanceInfoService: InstanceInfoService,
     private val driveFileRepository: DriveFileRepository,
     private val draftNoteService: DraftNoteService,
     private val draftNoteRepository: DraftNoteRepository,
@@ -127,8 +130,8 @@ class NoteEditorViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
         currentAccount.filterNotNull().flatMapLatest { account ->
-            metaRepository.observe(account.normalizedInstanceDomain).filterNotNull().map { meta ->
-                meta.maxNoteTextLength ?: 1500
+            instanceInfoService.observe(account.normalizedInstanceDomain).filterNotNull().map { meta ->
+                meta.maxNoteTextLength
             }
         }.stateIn(
             viewModelScope + Dispatchers.IO,
@@ -142,13 +145,7 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
     val maxFileCount = currentAccount.filterNotNull().mapNotNull {
-        metaRepository.get(it.normalizedInstanceDomain)?.getVersion()
-    }.map {
-        if (it >= Version("12.100.2")) {
-            16
-        } else {
-            4
-        }
+        instanceInfoService.find(it.normalizedInstanceDomain).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
     @OptIn(ExperimentalCoroutinesApi::class)

@@ -2,13 +2,8 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
-import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -41,14 +36,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun create(createNote: CreateNote): Result<Note> = runCancellableCatching {
         withContext(ioDispatcher) {
-            when(val result = noteApiAdapter.create(createNote)) {
-                is NoteCreatedResultType.Mastodon -> {
-                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(createNote.author, result.status)
-                }
-                is NoteCreatedResultType.Misskey -> {
-                    noteDataSourceAdder.addNoteDtoToDataSource(createNote.author, result.note)
-                }
-            }
+            convertAndAdd(createNote.author, noteApiAdapter.create(createNote))
         }
     }
 
@@ -92,10 +80,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(noteId: Note.Id): Result<Unit> = runCancellableCatching{
         withContext(ioDispatcher) {
-            val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).delete(
-                DeleteNote(i = account.token, noteId = noteId.noteId)
-            ).throwIfHasError()
+            noteApiAdapter.delete(noteId)
         }
     }
 
@@ -117,14 +102,7 @@ class NoteRepositoryImpl @Inject constructor(
 
             logger.debug("request notes/show=$noteId")
             note = try {
-                misskeyAPIProvider.get(account).showNote(
-                    NoteRequest(
-                        i = account.token,
-                        noteId = noteId.noteId
-                    )
-                ).throwIfHasError().body()?.let { resDTO ->
-                    noteDataSourceAdder.addNoteDtoToDataSource(account, resDTO)
-                }
+                convertAndAdd(account, noteApiAdapter.showNote(noteId))
             } catch (e: APIError.NotFoundException) {
                 // NOTE(pantasystem): 削除フラグが立つようになり次からNoteDeletedExceptionが投げられる
                 noteDataSource.delete(noteId)
@@ -164,13 +142,25 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).vote(
-                Vote(
-                    i = getAccount.get(noteId.accountId).token,
-                    choice = choice.index,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError()
+            val note = find(noteId).getOrThrow()
+            when(val type = note.type) {
+                is Note.Type.Mastodon -> {
+                    mastodonAPIProvider.get(account).voteOnPoll(
+                        requireNotNull(type.pollId),
+                        choices = listOf(choice.index)
+                    )
+                }
+                Note.Type.Misskey -> {
+                    misskeyAPIProvider.get(account).vote(
+                        Vote(
+                            i = getAccount.get(noteId.accountId).token,
+                            choice = choice.index,
+                            noteId = noteId.noteId
+                        )
+                    ).throwIfHasError()
+                }
+            }
+
         }
     }
 
@@ -247,58 +237,66 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            val note = misskeyAPIProvider.get(account).showNote(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError().body()!!
-            noteDataSourceAdder.addNoteDtoToDataSource(account, note)
+            convertAndAdd(account, noteApiAdapter.showNote(noteId))
         }
     }
 
     override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).createThreadMute(
-                ToggleThreadMuteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError()
+            when(val result = noteApiAdapter.createThreadMute(noteId)) {
+                is ToggleThreadMuteResultType.Mastodon -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
+                }
+                ToggleThreadMuteResultType.Misskey -> Unit
+            }
         }
     }
 
     override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).deleteThreadMute(
-                ToggleThreadMuteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId,
-                )
-            ).throwIfHasError()
+            when(val result = noteApiAdapter.deleteThreadMute(noteId)) {
+                is ToggleThreadMuteResultType.Mastodon -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
+                }
+                ToggleThreadMuteResultType.Misskey -> Unit
+            }
         }
     }
 
     override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError().body()!!.let {
-                NoteState(
-                    isFavorited = it.isFavorited,
-                    isMutedThread = it.isMutedThread,
-                    isWatching = when(val watching = it.isWatching) {
-                        null -> NoteState.Watching.None
-                        else -> NoteState.Watching.Some(watching)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
+                        NoteRequest(
+                            i = account.token,
+                            noteId = noteId.noteId
+                        )
+                    ).throwIfHasError().body()!!.let {
+                        NoteState(
+                            isFavorited = it.isFavorited,
+                            isMutedThread = it.isMutedThread,
+                            isWatching = when(val watching = it.isWatching) {
+                                null -> NoteState.Watching.None
+                                else -> NoteState.Watching.Some(watching)
+                            }
+                        )
                     }
-                )
+                }
+                Account.InstanceType.MASTODON -> {
+                    find(noteId).mapCancellableCatching {
+                        NoteState(
+                            isFavorited = (it.type as Note.Type.Mastodon).favorited ?: false,
+                            isMutedThread = (it.type as Note.Type.Mastodon).muted ?: false,
+                            isWatching = NoteState.Watching.None,
+                        )
+                    }.getOrThrow()
+                }
             }
+
         }
     }
 
@@ -308,5 +306,12 @@ class NoteRepositoryImpl @Inject constructor(
 
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return noteDataSource.observeOne(noteId)
+    }
+
+    private suspend fun convertAndAdd(account: Account, type: NoteResultType): Note {
+        return when(type) {
+            is NoteResultType.Mastodon -> noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, type.status)
+            is NoteResultType.Misskey -> noteDataSourceAdder.addNoteDtoToDataSource(account, type.note)
+        }
     }
 }

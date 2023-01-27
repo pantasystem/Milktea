@@ -10,6 +10,7 @@ import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
+import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -174,4 +175,18 @@ interface MastodonAPI {
     ): Response<ScheduledStatus>
 
 
+    @GET("api/v1/statuses/{statusId}")
+    suspend fun getStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @DELETE("api/v1/statuses/{statusId}")
+    suspend fun deleteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/polls/{pollId}/votes")
+    suspend fun voteOnPoll(@Path("pollId") pollId: String, @Field("choices[]", encoded = true) choices: List<Int>): Response<TootPollDTO>
+
+    @POST("api/v1/statuses/{statusId}/mute")
+    suspend fun muteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unmute")
+    suspend fun unmuteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
 }
