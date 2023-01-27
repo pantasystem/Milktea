@@ -12,7 +12,6 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
@@ -29,12 +28,11 @@ class NoteRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val noteDataSource: NoteDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
-    private val uploader: FileUploaderProvider,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val mastodonAPIProvider: MastodonAPIProvider,
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
-    val noteApiAdapter: NoteApiAdapter,
+    private val noteApiAdapter: NoteApiAdapter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
 
