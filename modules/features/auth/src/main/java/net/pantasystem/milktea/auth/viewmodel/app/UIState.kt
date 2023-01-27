@@ -1,11 +1,11 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
-import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.model.instance.InstanceInfo
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
 
 
@@ -42,7 +42,7 @@ data class BeforeAuthState(
 
 
 sealed interface InstanceType {
-    data class Mastodon(val instance: Instance) : InstanceType
+    data class Mastodon(val instance: MastodonInstanceInfo) : InstanceType
     data class Misskey(val instance: Meta) : InstanceType
 }
 

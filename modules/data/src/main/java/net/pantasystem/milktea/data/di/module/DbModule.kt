@@ -12,6 +12,7 @@ import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
+import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoDAO
 import net.pantasystem.milktea.data.infrastructure.list.UserListDao
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
 import net.pantasystem.milktea.data.infrastructure.notes.draft.db.DraftNoteDao
@@ -111,4 +112,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideNodeInfoDao(db: DataBase): NodeInfoDao = db.nodeInfoDao()
+
+    @Provides
+    @Singleton
+    fun provideMastodonInfoDao(db: DataBase): MastodonInstanceInfoDAO = db.mastodonInstanceInfoDao()
 }

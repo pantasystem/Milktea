@@ -176,4 +176,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun searchHistoryDao(): SearchHistoryDao
 
     abstract fun nodeInfoDao(): NodeInfoDao
+
+    abstract fun mastodonInstanceInfoDao(): MastodonInstanceInfoDAO
 }

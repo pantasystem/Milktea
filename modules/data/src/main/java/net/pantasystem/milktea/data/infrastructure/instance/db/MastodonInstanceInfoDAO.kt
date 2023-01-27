@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.instance.db
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
+@Dao
 abstract class MastodonInstanceInfoDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
