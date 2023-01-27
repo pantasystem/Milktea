@@ -10,6 +10,8 @@ import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
+import net.pantasystem.milktea.api.mastodon.status.CreateStatus
+import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import retrofit2.Response
 import retrofit2.http.*
@@ -161,6 +163,15 @@ interface MastodonAPI {
         @Query("account_id") accountId: String? = null,
     ): Response<List<MstNotificationDTO>>
 
+    @POST("api/v1/statuses")
+    suspend fun createStatus(
+        @Body body: CreateStatus
+    ): Response<TootStatusDTO>
+
+    @POST("api/v1/status")
+    suspend fun createScheduledStatus(
+        @Body body: CreateStatus,
+    ): Response<ScheduledStatus>
 
 
 }
