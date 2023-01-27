@@ -6,6 +6,7 @@ import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.DeleteNote
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
+import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -118,6 +119,50 @@ class NoteApiAdapter @Inject constructor(
             }
         }
     }
+
+    suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
+        val account = accountRepository.get(noteId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).createThreadMute(
+                    ToggleThreadMuteRequest(
+                        i = account.token,
+                        noteId = noteId.noteId
+                    )
+                ).throwIfHasError()
+                ToggleThreadMuteResultType.Misskey
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = mastodonAPIProvider.get(account)
+                    .muteConversation(noteId.noteId)
+                    .throwIfHasError()
+                    .body()
+                ToggleThreadMuteResultType.Mastodon(requireNotNull(body))
+            }
+        }
+    }
+
+    suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
+        val account = accountRepository.get(noteId.accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                misskeyAPIProvider.get(account).deleteThreadMute(
+                    ToggleThreadMuteRequest(
+                        i = account.token,
+                        noteId = noteId.noteId,
+                    )
+                ).throwIfHasError()
+                ToggleThreadMuteResultType.Misskey
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = mastodonAPIProvider.get(account).unmuteConversation(noteId.noteId)
+                    .throwIfHasError()
+                    .body()
+                ToggleThreadMuteResultType.Mastodon(requireNotNull(body))
+            }
+        }
+    }
+
 }
 
 sealed interface NoteResultType {
@@ -128,3 +173,8 @@ sealed interface NoteResultType {
 typealias ShowNoteResultType = NoteResultType
 
 typealias NoteCreatedResultType = NoteResultType
+
+sealed interface ToggleThreadMuteResultType {
+    object Misskey : ToggleThreadMuteResultType
+    data class Mastodon(val status: TootStatusDTO) : ToggleThreadMuteResultType
+}

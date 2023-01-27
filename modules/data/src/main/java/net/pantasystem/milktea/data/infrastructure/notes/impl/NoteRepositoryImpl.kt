@@ -3,11 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
-import net.pantasystem.milktea.api.misskey.notes.mute.ToggleThreadMuteRequest
-import net.pantasystem.milktea.common.APIError
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -248,45 +244,59 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun createThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).createThreadMute(
-                ToggleThreadMuteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError()
+            when(val result = noteApiAdapter.createThreadMute(noteId)) {
+                is ToggleThreadMuteResultType.Mastodon -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
+                }
+                ToggleThreadMuteResultType.Misskey -> Unit
+            }
         }
     }
 
     override suspend fun deleteThreadMute(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).deleteThreadMute(
-                ToggleThreadMuteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId,
-                )
-            ).throwIfHasError()
+            when(val result = noteApiAdapter.deleteThreadMute(noteId)) {
+                is ToggleThreadMuteResultType.Mastodon -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
+                }
+                ToggleThreadMuteResultType.Misskey -> Unit
+            }
         }
     }
 
     override suspend fun findNoteState(noteId: Note.Id): Result<NoteState> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError().body()!!.let {
-                NoteState(
-                    isFavorited = it.isFavorited,
-                    isMutedThread = it.isMutedThread,
-                    isWatching = when(val watching = it.isWatching) {
-                        null -> NoteState.Watching.None
-                        else -> NoteState.Watching.Some(watching)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
+                        NoteRequest(
+                            i = account.token,
+                            noteId = noteId.noteId
+                        )
+                    ).throwIfHasError().body()!!.let {
+                        NoteState(
+                            isFavorited = it.isFavorited,
+                            isMutedThread = it.isMutedThread,
+                            isWatching = when(val watching = it.isWatching) {
+                                null -> NoteState.Watching.None
+                                else -> NoteState.Watching.Some(watching)
+                            }
+                        )
                     }
-                )
+                }
+                Account.InstanceType.MASTODON -> {
+                    find(noteId).mapCancellableCatching {
+                        NoteState(
+                            isFavorited = (it.type as Note.Type.Mastodon).favorited ?: false,
+                            isMutedThread = (it.type as Note.Type.Mastodon).muted ?: false,
+                            isWatching = NoteState.Watching.None,
+                        )
+                    }.getOrThrow()
+                }
             }
+
         }
     }
 

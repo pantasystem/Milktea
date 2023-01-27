@@ -183,4 +183,10 @@ interface MastodonAPI {
 
     @POST("api/v1/polls/{pollId}/votes")
     suspend fun voteOnPoll(@Path("pollId") pollId: String, @Field("choices[]", encoded = true) choices: List<Int>): Response<TootPollDTO>
+
+    @POST("api/v1/statuses/{statusId}/mute")
+    suspend fun muteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unmute")
+    suspend fun unmuteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
 }
