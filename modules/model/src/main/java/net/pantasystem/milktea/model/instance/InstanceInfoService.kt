@@ -69,7 +69,7 @@ class InstanceInfoService @Inject constructor(
                         }
                     }
                 }
-                is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
+                is NodeInfo.SoftwareType.Other -> emptyFlow()
             }
         }
     }
