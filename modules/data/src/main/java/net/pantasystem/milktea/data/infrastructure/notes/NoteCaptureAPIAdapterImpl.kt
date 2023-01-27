@@ -1,17 +1,20 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.Event
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteNotFoundException
 
 /**
  * Noteの更新イベントをWebSocket経由でキャプチャーして
@@ -45,7 +48,7 @@ class NoteCaptureAPIAdapterImpl(
     /**
      * mastodonのStreaming APIから流れてきたEventがここに入る
      */
-    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>()
+    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>(extraBufferCapacity = 1000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     /**
      * Noteのキャプチャーによって発生したイベントのQueue。
@@ -249,10 +252,18 @@ class NoteCaptureAPIAdapterImpl(
                 }
                 is Event.Reaction -> {
                     val noteId = Note.Id(account.accountId, e.reaction.statusId)
-                    val note = noteDataSource.get(noteId).getOrThrow()
-                    noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+
+                    noteDataSource.get(noteId).mapCancellableCatching { note ->
+                        noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+                    }.getOrThrow()
+
+                }
+                is Event.StatusUpdated -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, e.status)
                 }
             }
+        } catch (_: NoteNotFoundException) {
+            return
         } catch (e: Exception) {
             logger.warning("更新対称のノートが存在しませんでした", e = e)
         }

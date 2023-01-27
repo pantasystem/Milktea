@@ -228,14 +228,16 @@ class StreamingAPIImpl(
                         Event.Update(decoder.decodeFromString(data))
                     }
                     "notification" -> {
-                        Event.Notification(data)
+                        Event.Notification(decoder.decodeFromString(data))
                     }
                     "delete" -> {
                         Event.Delete(data)
                     }
                     "emoji_reaction" -> {
-                        logger.debug("emoji_reaction")
                         Event.Reaction(decoder.decodeFromString(data))
+                    }
+                    "status.update" -> {
+                        Event.StatusUpdated(decoder.decodeFromString(data))
                     }
                     else -> {
                         logger.debug("unknown event $type, data:$data")
