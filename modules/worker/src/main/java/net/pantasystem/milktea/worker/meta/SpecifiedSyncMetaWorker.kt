@@ -6,7 +6,7 @@ import androidx.work.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class SpecifiedSyncMetaWorker  @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val params: WorkerParameters,
-    private val metaRepository: MetaRepository,
+    private val instanceInfoService: InstanceInfoService,
 ): CoroutineWorker(context, params) {
 
     companion object {
@@ -30,7 +30,7 @@ class SpecifiedSyncMetaWorker  @AssistedInject constructor(
         }
     }
     override suspend fun doWork(): Result {
-        return metaRepository.sync(
+        return instanceInfoService.sync(
             requireNotNull(params.inputData.getString(EXTRA_INSTANCE_BASE_URL))
         ).fold(
             onSuccess = {
