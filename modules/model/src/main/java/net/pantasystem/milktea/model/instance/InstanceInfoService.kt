@@ -53,8 +53,8 @@ class InstanceInfoService @Inject constructor(
     fun observe(instanceDomain: String): Flow<InstanceInfoType?> {
         return suspend {
             nodeInfoRepository.find(URL(instanceDomain).host).getOrNull()
-        }.asFlow().filterNotNull().flatMapLatest { nodeInfo ->
-            when(nodeInfo.type) {
+        }.asFlow().flatMapLatest { nodeInfo ->
+            when(nodeInfo?.type) {
                 is NodeInfo.SoftwareType.Mastodon -> {
                     mastodonInstanceInfoRepository.observe(instanceDomain).map {
                         it?.let {
@@ -69,7 +69,7 @@ class InstanceInfoService @Inject constructor(
                         }
                     }
                 }
-                is NodeInfo.SoftwareType.Other -> emptyFlow()
+                else -> flowOf(null)
             }
         }
     }
