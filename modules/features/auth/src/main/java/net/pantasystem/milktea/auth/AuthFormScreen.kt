@@ -41,6 +41,7 @@ fun AuthFormScreen(
     onShowTermsOfService: () -> Unit,
     onTogglePrivacyPolicyAgreement: (Boolean) -> Unit,
     onToggleTermsOfServiceAgreement: (Boolean) -> Unit,
+    onToggleAcceptMastodonAlphaTest: (Boolean) -> Unit,
 ) {
     Column(
         modifier
@@ -133,6 +134,26 @@ fun AuthFormScreen(
                     onCheckedChange = onTogglePrivacyPolicyAgreement
                 )
             }
+
+            if (uiState.isMastodon) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        stringResource(id = R.string.accpet_mastodon_alpha_test),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .weight(1f)
+                    )
+                    Switch(
+                        checked = uiState.formState.isAcceptMastodonAlphaTest,
+                        onCheckedChange = onToggleAcceptMastodonAlphaTest,
+                    )
+                }
+            }
+
             Spacer(Modifier.height(8.dp))
             if (uiState.isProgress) {
                 CircularProgressIndicator()
@@ -151,7 +172,8 @@ fun AuthFormScreen(
                 enabled = uiState.metaState is ResultState.Fixed
                         && uiState.metaState.content is StateContent.Exist
                         && uiState.formState.isPrivacyPolicyAgreement
-                        && uiState.formState.isTermsOfServiceAgreement,
+                        && uiState.formState.isTermsOfServiceAgreement
+                        && (!uiState.isMastodon || uiState.formState.isAcceptMastodonAlphaTest),
                 shape = RoundedCornerShape(32.dp)
             ) {
                 Text(stringResource(R.string.start_auth))
@@ -187,7 +209,8 @@ fun Preview_AuthFormScreen() {
                         "",
                         "",
                         isPrivacyPolicyAgreement = false,
-                        isTermsOfServiceAgreement = false
+                        isTermsOfServiceAgreement = false,
+                        isAcceptMastodonAlphaTest = false,
                     ),
                     metaState = ResultState.Loading(StateContent.NotExist()),
                     stateType = Authorization.BeforeAuthentication
@@ -196,8 +219,9 @@ fun Preview_AuthFormScreen() {
                 onShowTermsOfService = {},
                 onTogglePrivacyPolicyAgreement = {},
                 onToggleTermsOfServiceAgreement = {},
+                onToggleAcceptMastodonAlphaTest = {}
 
-                )
+            )
         }
     }
 }
