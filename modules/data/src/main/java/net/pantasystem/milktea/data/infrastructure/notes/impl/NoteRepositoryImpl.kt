@@ -146,13 +146,25 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun vote(noteId: Note.Id, choice: Poll.Choice): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            misskeyAPIProvider.get(account).vote(
-                Vote(
-                    i = getAccount.get(noteId.accountId).token,
-                    choice = choice.index,
-                    noteId = noteId.noteId
-                )
-            ).throwIfHasError()
+            val note = find(noteId).getOrThrow()
+            when(val type = note.type) {
+                is Note.Type.Mastodon -> {
+                    mastodonAPIProvider.get(account).voteOnPoll(
+                        requireNotNull(type.pollId),
+                        choices = listOf(choice.index)
+                    )
+                }
+                Note.Type.Misskey -> {
+                    misskeyAPIProvider.get(account).vote(
+                        Vote(
+                            i = getAccount.get(noteId.accountId).token,
+                            choice = choice.index,
+                            noteId = noteId.noteId
+                        )
+                    ).throwIfHasError()
+                }
+            }
+
         }
     }
 
