@@ -44,7 +44,7 @@ interface MastodonAPI {
         @Query("since_id") sinceId: String? = null,
         @Query("min_id") minId: String? = null,
         @Query("limit") limit: Int = 20,
-        @Query("visibilities") visibilities: List<String>? = null,
+        @Query("visibilities[]", encoded = true) visibilities: List<String>? = null,
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/tag/{tag}")
@@ -61,7 +61,7 @@ interface MastodonAPI {
     suspend fun getHomeTimeline(
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
-        @Query("visibilities") visibilities: List<String>? = null
+        @Query("visibilities", encoded = true) visibilities: List<String>? = null
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/list/{listId}")
@@ -99,7 +99,7 @@ interface MastodonAPI {
     suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
 
     @GET("api/v1/accounts/relationships")
-    suspend fun getAccountRelationships(@Query("id[]") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
+    suspend fun getAccountRelationships(@Query("id[]", encoded = true) ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
     suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
@@ -156,7 +156,7 @@ interface MastodonAPI {
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
         @Query("limit") limit: Int? = null,
-        @Query("types") types: List<String>? = null,
+        @Query("types", encoded = true) types: List<String>? = null,
         @Query("exclude_types") excludeTypes: List<String>? = null,
         @Query("account_id") accountId: String? = null,
     ): Response<List<MstNotificationDTO>>
