@@ -2,7 +2,6 @@ package net.pantasystem.milktea.api.mastodon.status
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
-import net.pantasystem.milktea.model.notes.poll.CreatePoll
 
 @kotlinx.serialization.Serializable
 data class CreateStatus(
@@ -13,14 +12,14 @@ data class CreateStatus(
     val sensitive: Boolean = false,
     @SerialName("spoiler_text") val spoilerText: String? = null,
     val visibility: String = "public",
-    val language: String,
+    val language: String? = null,
     @SerialName("scheduled_at") val scheduledAt: Instant? = null
 ) {
 
     @kotlinx.serialization.Serializable
     data class CreatePoll(
         val options: List<String>,
-        @SerialName("expires_in") val expiresIn: Boolean,
+        @SerialName("expires_in") val expiresIn: Int,
         val multiple: Boolean = false,
         @SerialName("hide_totals") val hideTotals: Boolean = false,
 
