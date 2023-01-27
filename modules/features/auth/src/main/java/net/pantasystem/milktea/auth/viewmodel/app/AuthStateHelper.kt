@@ -144,9 +144,6 @@ class AuthStateHelper @Inject constructor(
 
             suspend fun fetchInstance(): MastodonInstanceInfo? {
                 return withContext(Dispatchers.IO) {
-                    if (!BuildConfig.DEBUG) {
-                        return@withContext null
-                    }
                     mastodonInstanceInfoRepository.find(url).getOrNull()
                 }
             }

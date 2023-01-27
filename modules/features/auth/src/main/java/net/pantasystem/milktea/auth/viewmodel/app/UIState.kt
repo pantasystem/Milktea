@@ -16,6 +16,7 @@ data class AuthUserInputState(
     val password: String,
     val isPrivacyPolicyAgreement: Boolean,
     val isTermsOfServiceAgreement: Boolean,
+    val isAcceptMastodonAlphaTest: Boolean
 ) {
     val isIdPassword: Boolean by lazy {
         userNameRegex.matches(rawInputInstanceDomain)
@@ -68,5 +69,7 @@ data class AuthUiState(
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
     }
 
-
+    val isMastodon by lazy {
+        (metaState.content as? StateContent.Exist)?.rawContent is InstanceType.Mastodon
+    }
 }

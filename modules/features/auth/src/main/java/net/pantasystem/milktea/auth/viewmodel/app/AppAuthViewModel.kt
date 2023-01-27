@@ -68,20 +68,38 @@ class AppAuthViewModel @Inject constructor(
     private val isPrivacyPolicyAgreement = MutableStateFlow(false)
     private val isTermsOfServiceAgreement = MutableStateFlow(false)
 
+    private val isAcceptMastodonAlphaTest = MutableStateFlow(false)
+
+    private val checkBoxes = combine(
+        isPrivacyPolicyAgreement,
+        isTermsOfServiceAgreement,
+        isAcceptMastodonAlphaTest,
+    ) { privacyPolicy, termsOfService, isAcceptMastodonAlphaTest ->
+        CheckBoxes(
+            isPrivacyPolicyAgreement = privacyPolicy,
+            isTermsOfServiceAgreement = termsOfService,
+            isAcceptMastodonAlphaTest = isAcceptMastodonAlphaTest
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        CheckBoxes()
+    )
+
     private val authUserInputState = combine(
         instanceDomain,
         appName,
         password,
-        isPrivacyPolicyAgreement,
-        isTermsOfServiceAgreement
-    ) { domain, name, password, privacyPolicy, termsOfService ->
+        checkBoxes
+    ) { domain, name, password, checkBoxes ->
         AuthUserInputState(
             instanceDomain = authService.toEnableUrl(domain),
             appName = name,
             rawInputInstanceDomain = domain,
             password = password,
-            isPrivacyPolicyAgreement = privacyPolicy,
-            isTermsOfServiceAgreement = termsOfService,
+            isPrivacyPolicyAgreement = checkBoxes.isPrivacyPolicyAgreement,
+            isTermsOfServiceAgreement = checkBoxes.isTermsOfServiceAgreement,
+            isAcceptMastodonAlphaTest = checkBoxes.isAcceptMastodonAlphaTest
         )
     }.stateIn(
         viewModelScope,
@@ -92,7 +110,8 @@ class AppAuthViewModel @Inject constructor(
             "Milktea",
             "",
             isTermsOfServiceAgreement = false,
-            isPrivacyPolicyAgreement = false
+            isPrivacyPolicyAgreement = false,
+            isAcceptMastodonAlphaTest = false,
         )
     )
 
@@ -308,6 +327,10 @@ class AppAuthViewModel @Inject constructor(
         isPrivacyPolicyAgreement.value = value
     }
 
+    fun onToggleAcceptMastodonAlphaTest(value: Boolean) {
+        isAcceptMastodonAlphaTest.value = value
+    }
+
 
 }
 
@@ -316,4 +339,10 @@ private data class CombineStates(
     val approved: Authorization.Approved? = null,
     val finished: Authorization.Finish? = null,
     val generateTokenResult: GenerateTokenResult = GenerateTokenResult.Fixed
+)
+
+private data class CheckBoxes(
+    val isPrivacyPolicyAgreement: Boolean = false,
+    val isTermsOfServiceAgreement: Boolean = false,
+    val isAcceptMastodonAlphaTest: Boolean = false,
 )
