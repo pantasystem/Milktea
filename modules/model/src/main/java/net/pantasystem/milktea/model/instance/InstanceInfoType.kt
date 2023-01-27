@@ -17,4 +17,22 @@ sealed interface InstanceInfoType {
             is Misskey -> meta.uri
         }
     }
+
+    val maxNoteTextLength: Int get() {
+        return when(this) {
+            is Mastodon -> info.configuration?.statuses?.maxCharacters ?: 500
+            is Misskey -> meta.maxNoteTextLength ?: 3000
+        }
+    }
+
+    val maxFileCount: Int get() {
+        return when(this) {
+            is Mastodon -> info.configuration?.statuses?.maxMediaAttachments ?: 4
+            is Misskey -> if (meta.getVersion() >= Version("12.100.2")) {
+                16
+            } else {
+                4
+            }
+        }
+    }
 }
