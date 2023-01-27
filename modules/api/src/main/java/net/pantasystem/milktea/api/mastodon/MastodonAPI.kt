@@ -61,7 +61,7 @@ interface MastodonAPI {
     suspend fun getHomeTimeline(
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
-        @Query("visibilities", encoded = true) visibilities: List<String>? = null
+        @Query("visibilities[]", encoded = true) visibilities: List<String>? = null
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/list/{listId}")
@@ -156,8 +156,8 @@ interface MastodonAPI {
         @Query("max_id") maxId: String? = null,
         @Query("since_id") sinceId: String? = null,
         @Query("limit") limit: Int? = null,
-        @Query("types", encoded = true) types: List<String>? = null,
-        @Query("exclude_types") excludeTypes: List<String>? = null,
+        @Query("types[]", encoded = true) types: List<String>? = null,
+        @Query("exclude_types[]", encoded = true) excludeTypes: List<String>? = null,
         @Query("account_id") accountId: String? = null,
     ): Response<List<MstNotificationDTO>>
 
