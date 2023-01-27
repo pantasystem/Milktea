@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure
 
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
+import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
@@ -8,6 +9,7 @@ import net.pantasystem.milktea.api.mastodon.status.StatusVisibilityType
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
@@ -231,4 +233,37 @@ fun Visibility(type: StatusVisibilityType, circleId: String? = null, visibilityE
             else -> Visibility.Specified(emptyList())
         }
     }
+}
+
+fun Instance.toModel(): MastodonInstanceInfo {
+    return MastodonInstanceInfo(
+        uri = uri,
+        title = title,
+        description = description,
+        email = email,
+        urls = urls.let {
+            MastodonInstanceInfo.Urls(
+                streamingApi = it.streamingApi
+            )
+        },
+        version = version,
+        configuration = configuration?.let { config ->
+            MastodonInstanceInfo.Configuration(
+                statuses = config.statuses?.let {
+                    MastodonInstanceInfo.Configuration.Statuses(
+                        maxCharacters = it.maxCharacters,
+                        maxMediaAttachments = it.maxMediaAttachments,
+                    )
+                },
+                polls = config.polls?.let {
+                    MastodonInstanceInfo.Configuration.Polls(
+                        maxOptions = it.maxOptions,
+                        maxCharactersPerOption = it.maxCharactersPerOption,
+                        maxExpiration = it.maxExpiration,
+                        minExpiration = it.minExpiration,
+                    )
+                }
+            )
+        }
+    )
 }
