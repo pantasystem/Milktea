@@ -198,6 +198,7 @@ class StreamingAPIImpl(
             logger.debug("onOpen")
             synchronized(listenersMap) {
                 if (connections[connectType] != null) {
+                    logger.debug("既に接続済みのコネクションが存在するため接続解除 type:$connectType")
                     connections[connectType]?.cancel()
                 }
                 isWaitingConnections.remove(connectType)
