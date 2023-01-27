@@ -4,7 +4,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
-import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
@@ -25,6 +24,8 @@ import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
 import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -48,6 +49,7 @@ class AuthStateHelper @Inject constructor(
     val subscriptionRegistration: SubscriptionRegistration,
     val userDataSource: UserDataSource,
     val nodeInfoRepository: NodeInfoRepository,
+    val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
     ) {
     private val urlPattern =
         Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
@@ -130,7 +132,7 @@ class AuthStateHelper @Inject constructor(
             val nodeInfo = nodeInfoRepository.find(URL(url).host).getOrNull()
 
             val misskey: Meta?
-            val mastodon: Instance?
+            val mastodon: MastodonInstanceInfo?
 
             suspend fun fetchMeta(): Meta? {
                 return withContext(Dispatchers.IO) {
@@ -140,15 +142,9 @@ class AuthStateHelper @Inject constructor(
                 }
             }
 
-            suspend fun fetchInstance(): Instance? {
+            suspend fun fetchInstance(): MastodonInstanceInfo? {
                 return withContext(Dispatchers.IO) {
-                    if (!BuildConfig.DEBUG) {
-                        return@withContext null
-                    }
-                    runCancellableCatching {
-                        mastodonAPIProvider.get(url)
-                            .getInstance()
-                    }.getOrNull()
+                    mastodonInstanceInfoRepository.find(url).getOrNull()
                 }
             }
             when(nodeInfo?.type) {

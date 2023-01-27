@@ -1,0 +1,205 @@
+{
+  "uri": "fedibird.com",
+  "title": "Fedibird",
+  "short_description": "様々な目的に使える、日本の汎用マストドンサーバーです。安定した利用環境と、多数の独自機能を提供しています。",
+  "description": "様々な目的に使える、日本の汎用マストドンサーバーです。安定した利用環境と、多数の独自機能を提供しています。",
+  "email": "support@fedibird.com",
+  "version": "3.4.1",
+  "urls": {
+    "streaming_api": "wss://streaming.fedibird.com"
+  },
+  "stats": {
+    "user_count": 26299,
+    "status_count": 7413419,
+    "domain_count": 21627
+  },
+  "thumbnail": "https://s3.fedibird.com/site_uploads/files/000/000/001/original/fedibird_hero_image.png",
+  "max_toot_chars": 560,
+  "languages": [
+    "ja"
+  ],
+  "registrations": true,
+  "approval_required": false,
+  "invites_enabled": true,
+  "configuration": {
+    "accounts": {
+      "max_favourite_tags": 10,
+      "max_featured_tags": 10
+    },
+    "statuses": {
+      "max_characters": 560,
+      "max_media_attachments": 4,
+      "characters_reserved_per_url": 23,
+      "min_expiration": 60,
+      "max_expiration": 37152000,
+      "supported_expires_actions": [
+        "delete",
+        "mark"
+      ]
+    },
+    "media_attachments": {
+      "supported_mime_types": [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/heif",
+        "image/heic",
+        "video/webm",
+        "video/mp4",
+        "video/quicktime",
+        "video/ogg",
+        "audio/wave",
+        "audio/wav",
+        "audio/x-wav",
+        "audio/x-pn-wave",
+        "audio/ogg",
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/webm",
+        "audio/flac",
+        "audio/aac",
+        "audio/m4a",
+        "audio/x-m4a",
+        "audio/mp4",
+        "audio/3gpp",
+        "video/x-ms-asf"
+      ],
+      "image_size_limit": 10485760,
+      "image_matrix_limit": 16777216,
+      "video_size_limit": 41943040,
+      "video_frame_rate_limit": 60,
+      "video_matrix_limit": 3061440
+    },
+    "polls": {
+      "max_options": 4,
+      "max_characters_per_option": 50,
+      "min_expiration": 300,
+      "max_expiration": 2629746
+    },
+    "emoji_reactions": {
+      "max_reactions": 20
+    },
+    "status_references": {
+      "max_references": 100
+    }
+  },
+  "feature_quote": true,
+  "fedibird_capabilities": [
+    "favourite_hashtag",
+    "favourite_domain",
+    "favourite_list",
+    "status_expire",
+    "follow_no_delivery",
+    "follow_hashtag",
+    "subscribe_account",
+    "subscribe_domain",
+    "subscribe_keyword",
+    "timeline_home_visibility",
+    "timeline_no_local",
+    "timeline_domain",
+    "timeline_group",
+    "timeline_group_directory",
+    "visibility_mutual",
+    "visibility_limited",
+    "visibility_personal",
+    "emoji_reaction",
+    "misskey_birthday",
+    "misskey_location",
+    "status_reference",
+    "searchability",
+    "status_compact_mode",
+    "account_conversations"
+  ],
+  "contact_account": {
+    "id": "1",
+    "username": "noellabo",
+    "acct": "noellabo",
+    "display_name": "のえる",
+    "locked": false,
+    "bot": false,
+    "cat": false,
+    "discoverable": true,
+    "group": false,
+    "created_at": "2019-08-15T00:00:00.000Z",
+    "note": "<p>主に、Fediverseへの関心に基づいた投稿を行うアカウントです。DTP・印刷に関する話をしたり、同人の話をしたり、カレーをブーストしたりします。</p><p>Mastodonのcollaborator（開発者の一員）です。また、独自機能を盛り込んだFedibirdを管理・開発しています！</p><p>Mastodonサーバ『fedibird.com』の管理者アカウントでもあります。ご連絡は当アカウントへ、サーバインフォメーションについては <a href=\"https://fedibird.com/about/more\" rel=\"nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">fedibird.com/about/more</span><span class=\"invisible\"></span></a> と <span class=\"h-card\"><a href=\"https://fedibird.com/@info\" class=\"u-url mention\">@<span>info</span></a></span> を参照してください。</p><p><a href=\"https://fedibird.com/tags/webdev\" class=\"mention hashtag\" rel=\"tag\">#<span>webdev</span></a> <a href=\"https://fedibird.com/tags/fedi22\" class=\"mention hashtag\" rel=\"tag\">#<span>fedi22</span></a></p>",
+    "url": "https://fedibird.com/@noellabo",
+    "avatar": "https://s3.fedibird.com/accounts/avatars/000/000/001/original/198f101fdf1d7750.png",
+    "avatar_static": "https://s3.fedibird.com/accounts/avatars/000/000/001/original/198f101fdf1d7750.png",
+    "header": "https://s3.fedibird.com/accounts/headers/000/000/001/original/6a5a51722c094835.jpg",
+    "header_static": "https://s3.fedibird.com/accounts/headers/000/000/001/original/6a5a51722c094835.jpg",
+    "searchability": "public",
+    "followers_count": 6345,
+    "following_count": 956,
+    "subscribing_count": 58,
+    "statuses_count": 85226,
+    "last_status_at": "2023-01-27",
+    "emojis": [
+      {
+        "shortcode": "liberapay",
+        "url": "https://s3.fedibird.com/custom_emojis/images/000/025/634/original/5b8620742973f844.png",
+        "static_url": "https://s3.fedibird.com/custom_emojis/images/000/025/634/static/5b8620742973f844.png",
+        "visible_in_picker": true
+      },
+      {
+        "shortcode": "mastodon",
+        "url": "https://s3.fedibird.com/custom_emojis/images/000/008/396/original/1317b6f8efcf8318.png",
+        "static_url": "https://s3.fedibird.com/custom_emojis/images/000/008/396/static/1317b6f8efcf8318.png",
+        "visible_in_picker": true
+      },
+      {
+        "shortcode": "misskey12_67",
+        "url": "https://s3.fedibird.com/custom_emojis/images/000/101/204/original/8f8aab6fd3a4c214.png",
+        "static_url": "https://s3.fedibird.com/custom_emojis/images/000/101/204/static/8f8aab6fd3a4c214.png",
+        "visible_in_picker": true
+      }
+    ],
+    "fields": [
+      {
+        "name": ":liberapay: Liberapay",
+        "value": "<a href=\"https://liberapay.com/noellabo\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">liberapay.com/noellabo</span><span class=\"invisible\"></span></a>",
+        "verified_at": "2020-10-22T03:04:43.206+00:00"
+      },
+      {
+        "name": ":mastodon: DTP-Mstdn.jp",
+        "value": "<a class=\"account-url-link\" data-account-acct=\"noellabo@dtp-mstdn.jp\" data-account-actor-type=\"Person\" data-account-id=\"55\" href=\"https://dtp-mstdn.jp/@noellabo\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">dtp-mstdn.jp/@noellabo</span><span class=\"invisible\"></span></a>",
+        "verified_at": "2020-05-23T00:14:02.232+00:00"
+      },
+      {
+        "name": ":mastodon: 別宅",
+        "value": "<a class=\"account-url-link\" data-account-acct=\"noellabo@gorone.xyz\" data-account-actor-type=\"Person\" data-account-id=\"14504\" href=\"https://gorone.xyz/@noellabo\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">gorone.xyz/@noellabo</span><span class=\"invisible\"></span></a>",
+        "verified_at": "2021-08-11T07:48:53.479+00:00"
+      },
+      {
+        "name": ":misskey12_67: misskey.cloud",
+        "value": "<a class=\"account-url-link\" data-account-acct=\"noellabo@misskey.cloud\" data-account-actor-type=\"Person\" data-account-id=\"108409794834880061\" href=\"https://misskey.cloud/@noellabo\" rel=\"me nofollow noopener noreferrer\" target=\"_blank\"><span class=\"invisible\">https://</span><span class=\"\">misskey.cloud/@noellabo</span><span class=\"invisible\"></span></a>",
+        "verified_at": "2022-07-12T00:51:11.984+00:00"
+      }
+    ],
+    "other_settings": {
+      "birthday": null,
+      "location": "埼玉県",
+      "cat_ears_color": "#d5c6c0",
+      "noindex": true,
+      "hide_network": false,
+      "hide_statuses_count": false,
+      "hide_following_count": false,
+      "hide_followers_count": false,
+      "enable_reaction": true
+    }
+  },
+  "rules": [
+    {
+      "id": "2",
+      "text": "日本の法律と社会規範に従った行動を心がけてください"
+    },
+    {
+      "id": "3",
+      "text": "不快や脅威に対してはブロック・ミュート・フィルターで距離をとってください"
+    },
+    {
+      "id": "1",
+      "text": "投稿する際は、適切な公開範囲・CW・閲覧注意を使用してください"
+    }
+  ]
+}

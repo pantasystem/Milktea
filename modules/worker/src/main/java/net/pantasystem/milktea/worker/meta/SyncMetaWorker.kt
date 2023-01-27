@@ -13,14 +13,14 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
 class SyncMetaWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val params: WorkerParameters,
-    private val metaRepository: MetaRepository,
+    private val instanceInfoService: InstanceInfoService,
     private val accountRepository: AccountRepository,
 ): CoroutineWorker(context, params) {
 
@@ -35,7 +35,7 @@ class SyncMetaWorker @AssistedInject constructor(
             coroutineScope {
                 accounts.map {
                     async {
-                        metaRepository.sync(it.normalizedInstanceDomain)
+                        instanceInfoService.sync(it.normalizedInstanceDomain)
                     }
                 }.awaitAll()
             }.forEach {

@@ -23,6 +23,7 @@
 
     <string name="privacy_policy_agreeation">I agree to the Privacy Policy</string>
     <string name="terms_of_service_agreeation">I agree to the Terms of service</string>
+    <string name="accpet_mastodon_alpha_test">I understand that the features related to Mastodon are still in the alpha stage and there may be features that are not yet implemented or not working, and I agree not to hold the developers responsible for this.</string>
 
 
 </resources>
