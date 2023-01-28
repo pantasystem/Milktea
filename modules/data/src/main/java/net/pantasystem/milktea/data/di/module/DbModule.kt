@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.*
 import net.pantasystem.milktea.data.infrastructure.account.db.AccountDAO
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
+import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.InstanceInfoDao
 import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoDAO
@@ -116,4 +117,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideMastodonInfoDao(db: DataBase): MastodonInstanceInfoDAO = db.mastodonInstanceInfoDao()
+
+    @Provides
+    @Singleton
+    fun provideCustomEmojiDao(db: DataBase): CustomEmojiDAO = db.customEmojiDao()
 }

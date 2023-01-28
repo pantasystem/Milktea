@@ -1,5 +1,6 @@
 package jp.panta.misskeyandroidclient.di.module
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -8,8 +9,10 @@ import jp.panta.misskeyandroidclient.impl.CheckEmojiAndroidImpl
 import kotlinx.coroutines.CoroutineScope
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.DataBase
+import net.pantasystem.milktea.data.infrastructure.emoji.CustomEmojiRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.UtfEmojiRepository
 import net.pantasystem.milktea.model.notes.reaction.CheckEmoji
 import javax.inject.Singleton
@@ -45,4 +48,12 @@ object EmojiModule {
     fun provideUtf8EmojiDao(database: DataBase): Utf8EmojisDAO {
         return database.utf8EmojiDAO()
     }
+}
+
+@InstallIn(SingletonComponent::class)
+@Module
+abstract class EmojiBindsModule {
+    @Singleton
+    @Binds
+    abstract fun bindCustomEmojiRepository(impl: CustomEmojiRepositoryImpl): CustomEmojiRepository
 }
