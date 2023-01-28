@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.UserEmojiConfigRepository
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistoryRepository
@@ -16,14 +17,17 @@ class EmojiPickerViewModel @Inject constructor(
     reactionHistoryDao: ReactionHistoryRepository,
     userEmojiConfigRepository: UserEmojiConfigRepository,
     customEmojiRepository: CustomEmojiRepository,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
+    private val logger = loggerFactory.create("EmojiPickerViewModel")
 
     private val uiStateService = EmojiPickerUiStateService(
         accountStore = accountStore,
         reactionHistoryRepository = reactionHistoryDao,
         userEmojiConfigRepository = userEmojiConfigRepository,
         coroutineScope = viewModelScope,
-        customEmojiRepository = customEmojiRepository
+        customEmojiRepository = customEmojiRepository,
+        logger = logger,
     )
 
     val searchWord = uiStateService.searchWord

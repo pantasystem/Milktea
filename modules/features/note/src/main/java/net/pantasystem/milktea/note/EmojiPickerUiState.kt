@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.text.LevenshteinDistance
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
@@ -23,6 +24,7 @@ class EmojiPickerUiStateService(
     private val customEmojiRepository: CustomEmojiRepository,
     private val reactionHistoryRepository: ReactionHistoryRepository,
     private val userEmojiConfigRepository: UserEmojiConfigRepository,
+    private val logger: Logger,
     coroutineScope: CoroutineScope,
 ) {
 
@@ -30,18 +32,24 @@ class EmojiPickerUiStateService(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val emojis = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
         customEmojiRepository.observeBy(ac.getHost())
+    }.catch {
+        logger.error("絵文字の取得に失敗", it)
     }.flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val reactionCount =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
             reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceDomain)
+        }.catch {
+            logger.error("リアクション履歴の取得に失敗", it)
         }.flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val userSetting =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
+        }.catch {
+            logger.error("ユーザーリアクション設定情報の取得に失敗", it)
         }
 
     private val reactions = combine(reactionCount, userSetting) { counts, settings ->
@@ -67,6 +75,8 @@ class EmojiPickerUiStateService(
     private val recentlyUsedReactions =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             reactionHistoryRepository.observeRecentlyUsedBy(it.normalizedInstanceDomain, limit = 20)
+        }.catch {
+            logger.error("絵文字の直近使用履歴の取得に失敗", it)
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val searchWord = MutableStateFlow("")
