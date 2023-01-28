@@ -29,19 +29,25 @@ class CustomEmojiRepositoryImpl @Inject constructor(
     private val customEmojiDAO: CustomEmojiDAO,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val customEmojiCache: CustomEmojiCache,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ): CustomEmojiRepository {
 
     override suspend fun findBy(host: String): Result<List<Emoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
+            var emojis = customEmojiCache.get(host)
+            if (emojis != null && emojis.isNotEmpty()) {
+                return@withContext emojis
+            }
             val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
-            var emojis = customEmojiDAO.findBy(host).map {
+            emojis = customEmojiDAO.findBy(host).map {
                 it.toModel()
             }
             if (emojis.isEmpty()) {
                 emojis = fetch(nodeInfo).getOrThrow()
                 upInsert(nodeInfo.host, emojis)
             }
+            customEmojiCache.put(host, emojis)
             emojis
         }
     }
@@ -51,6 +57,7 @@ class CustomEmojiRepositoryImpl @Inject constructor(
             val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
             val emojis = fetch(nodeInfo).getOrThrow()
             customEmojiDAO.deleteByHost(nodeInfo.host)
+            customEmojiCache.put(host, emojis)
             upInsert(nodeInfo.host, emojis)
         }
     }
@@ -66,6 +73,8 @@ class CustomEmojiRepositoryImpl @Inject constructor(
                     it.toModel()
                 }
             }
+        }.onEach {
+            customEmojiCache.put(host, it)
         }.flowOn(ioDispatcher)
     }
 
@@ -99,6 +108,10 @@ class CustomEmojiRepositoryImpl @Inject constructor(
             }
             is NodeInfo.SoftwareType.Other -> throw IllegalStateException()
         } ?: throw IllegalArgumentException()
+    }
+
+    override fun get(host: String): List<Emoji>? {
+        return customEmojiCache.get(host)
     }
 
     private suspend fun upInsert(host: String, emojis: List<Emoji>) {

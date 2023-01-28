@@ -10,6 +10,7 @@ interface CustomEmojiRepository {
 
     fun observeBy(host: String): Flow<List<Emoji>>
 
+    fun get(host: String): List<Emoji>?
 
 }
 
