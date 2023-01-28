@@ -28,6 +28,7 @@ enum class PageType(val defaultName: String){
     MASTODON_HOME_TIMELINE("MastodonHomeTimeline"),
     MASTODON_HASHTAG_TIMELINE("MastodonHashtagTimeline"),
     MASTODON_LIST_TIMELINE("MastodonListTimeline"),
+    MASTODON_USER_TIMELINE("MastodonUserTimeline")
     //USER_PINは別
 }
 

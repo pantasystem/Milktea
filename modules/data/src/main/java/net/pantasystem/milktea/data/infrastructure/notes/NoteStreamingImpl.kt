@@ -101,6 +101,7 @@ class NoteStreamingImpl @Inject constructor(
                                 ac
                             )
                         ).connectPublic().convertToNoteFromStatus(getAccount)
+                        else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
                     }
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")

@@ -479,6 +479,24 @@ class UserTimelinePagerAdapterV2(
                     includeReplies = true
                 )
             )
+            is UserDetailTabType.MastodonMedia -> pageableFragmentFactory.create(
+                Pageable.Mastodon.UserTimeline(
+                    tab.userId.id,
+                    isOnlyMedia = true,
+                )
+            )
+            is UserDetailTabType.MastodonUserTimeline -> pageableFragmentFactory.create(
+                Pageable.Mastodon.UserTimeline(
+                    tab.userId.id,
+                    excludeReplies = true,
+                )
+            )
+            is UserDetailTabType.MastodonUserTimelineWithReplies -> pageableFragmentFactory.create(
+                Pageable.Mastodon.UserTimeline(
+                    tab.userId.id,
+                    excludeReplies = false,
+                )
+            )
         }
 
     }

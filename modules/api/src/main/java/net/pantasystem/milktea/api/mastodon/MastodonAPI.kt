@@ -102,7 +102,12 @@ interface MastodonAPI {
     suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
 
     @GET("api/v1/accounts/relationships")
-    suspend fun getAccountRelationships(@Query("id[]", encoded = true) ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
+    suspend fun getAccountRelationships(
+        @Query(
+            "id[]",
+            encoded = true
+        ) ids: List<String>
+    ): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
     suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
@@ -182,11 +187,26 @@ interface MastodonAPI {
     suspend fun deleteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
 
     @POST("api/v1/polls/{pollId}/votes")
-    suspend fun voteOnPoll(@Path("pollId") pollId: String, @Field("choices[]", encoded = true) choices: List<Int>): Response<TootPollDTO>
+    suspend fun voteOnPoll(
+        @Path("pollId") pollId: String,
+        @Field("choices[]", encoded = true) choices: List<Int>
+    ): Response<TootPollDTO>
 
     @POST("api/v1/statuses/{statusId}/mute")
     suspend fun muteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
 
     @POST("api/v1/statuses/{statusId}/unmute")
     suspend fun unmuteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+
+    @GET("api/v1/accounts/{accountId}/statuses")
+    suspend fun getAccountTimeline(
+        @Path("accountId") accountId: String,
+        @Query("only_media") onlyMedia: Boolean? = false,
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int = 20,
+        @Query("exclude_reblogs") excludeReblogs: Boolean? = null,
+        @Query("exclude_replies") excludeReplies: Boolean? = null,
+    ): Response<List<TootStatusDTO>>
 }
