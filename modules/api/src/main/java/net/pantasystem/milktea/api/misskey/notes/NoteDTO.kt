@@ -6,6 +6,8 @@ import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -41,7 +43,8 @@ data class NoteDTO(
     @SerialName("reactions")
     val reactionCounts: LinkedHashMap<String, Int>? = null,
 
-    @SerialName("emojis") val emojis: List<Emoji>? = null,
+    @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
+    @SerialName("emojis") val rawEmojis: EmojisType? = null,
 
     @SerialName("repliesCount")
     val replyCount: Int,
@@ -66,7 +69,17 @@ data class NoteDTO(
     val channelId: String? = null,
 
     val app: App? = null
-) : Serializable
+) : Serializable {
+
+    val emojiList: List<Emoji>? = when(rawEmojis) {
+        EmojisType.None -> null
+        is EmojisType.TypeArray -> rawEmojis.emojis
+        is EmojisType.TypeObject -> rawEmojis.emojis.map {
+            Emoji(name = it.key, url = it.value, uri = it.value)
+        }
+        null -> null
+    }
+}
 
 
 @kotlinx.serialization.Serializable(with = NoteVisibilityTypeSerializer::class)
@@ -75,5 +88,3 @@ enum class NoteVisibilityType {
 }
 
 object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibilityType>(NoteVisibilityType.values(), NoteVisibilityType.Public)
-
-

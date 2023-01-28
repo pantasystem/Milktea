@@ -84,6 +84,8 @@ dependencyResolutionManagement {
             library("junit-jupiter-engine", "org.junit.jupiter:junit-jupiter-engine:5.7.0")
 
             library("okhttp-sse", "com.squareup.okhttp3:okhttp-sse:4.10.0")
+
+            library("kotlin-serialization", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
         }
     }
 }
