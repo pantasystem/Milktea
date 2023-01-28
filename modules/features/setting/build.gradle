@@ -111,7 +111,7 @@ dependencies {
     implementation libs.flexbox
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+    implementation libs.kotlin.serialization
 
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine

@@ -67,7 +67,7 @@ dependencies {
     kaptTest libs.hilt.compiler
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+    implementation libs.kotlin.serialization
 
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
