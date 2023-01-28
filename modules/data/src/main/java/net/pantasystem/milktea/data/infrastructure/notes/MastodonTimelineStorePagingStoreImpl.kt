@@ -4,11 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -25,13 +22,16 @@ class MastodonTimelineStorePagingStoreImpl(
     val nodeInfoRepository: NodeInfoRepository,
 ) : EntityConverter<TootStatusDTO, Note.Id>, PreviousLoader<TootStatusDTO>,
     FutureLoader<TootStatusDTO>,
-    IdGetter<Note.Id>, StateLocker, TimelinePagingBase, StreamingReceivableStore {
+    IdGetter<String>, StateLocker, TimelinePagingBase, StreamingReceivableStore {
 
     private val _state =
         MutableStateFlow<PageableState<List<Note.Id>>>(PageableState.Loading.Init())
     override val state: Flow<PageableState<List<Note.Id>>>
         get() = _state
     override val mutex: Mutex = Mutex()
+
+    private var maxId: String? = null
+    private var minId: String? = null
 
     override suspend fun convertAll(list: List<TootStatusDTO>): List<Note.Id> {
         val account = getAccount()
@@ -42,42 +42,61 @@ class MastodonTimelineStorePagingStoreImpl(
 
     override suspend fun loadFuture(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
-
+        if (getSinceId() == null && (pageableTimeline is Pageable.Mastodon.UserTimeline)) {
+            if (!(getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()) {
+                return@runCancellableCatching emptyList()
+            }
+        }
         when (pageableTimeline) {
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
-                minId = getSinceId()?.noteId
+                minId = getSinceId(),
             )
             Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
-                minId = getSinceId()?.noteId,
+                minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount())
             )
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
-                minId = getSinceId()?.noteId,
+                minId = getSinceId(),
                 listId = pageableTimeline.listId,
             )
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
-                minId = getSinceId()?.noteId,
+                minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount())
             )
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
-                minId = getSinceId()?.noteId,
+                minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount())
             )
+            is Pageable.Mastodon.UserTimeline -> {
+                api.getAccountTimeline(
+                    accountId = pageableTimeline.userId,
+                    onlyMedia = pageableTimeline.isOnlyMedia ?: false,
+                    excludeReplies = pageableTimeline.excludeReplies,
+                    excludeReblogs = pageableTimeline.excludeReblogs,
+                    minId = getSinceId()
+                ).throwIfHasError().also {
+                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
+                    this@MastodonTimelineStorePagingStoreImpl.minId = decoder.getMinId()
+                    if (this@MastodonTimelineStorePagingStoreImpl.maxId == null) {
+                        decoder.getMaxId()
+                    }
+                }
+            }
         }.throwIfHasError().body()!!
     }
 
-    override suspend fun getSinceId(): Note.Id? {
-        return (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
+    override suspend fun getSinceId(): String? {
+        return minId ?: (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
             it.noteId
-        }
+        }?.noteId
     }
 
-    override suspend fun getUntilId(): Note.Id? {
-        return (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
+    override suspend fun getUntilId(): String? {
+        return maxId ?: (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
             it.noteId
-        }
+        }?.noteId
     }
 
     override fun setState(state: PageableState<List<Note.Id>>) {
@@ -91,29 +110,49 @@ class MastodonTimelineStorePagingStoreImpl(
 
     override suspend fun loadPrevious(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
+        val maxId = getUntilId()
+        if (maxId == null && (pageableTimeline is Pageable.Mastodon.UserTimeline)) {
+            if (!(getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()) {
+                return@runCancellableCatching emptyList()
+            }
+        }
         when (pageableTimeline) {
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
-                maxId = getUntilId()?.noteId
+                maxId = maxId
             )
             Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
-                maxId = getUntilId()?.noteId,
+                maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount())
             )
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
-                maxId = getUntilId()?.noteId,
+                maxId = maxId,
                 listId = pageableTimeline.listId,
-
                 )
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
-                maxId = getUntilId()?.noteId,
+                maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount())
             )
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
-                maxId = getUntilId()?.noteId,
+                maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount())
             )
+            is Pageable.Mastodon.UserTimeline -> {
+                api.getAccountTimeline(
+                    accountId = pageableTimeline.userId,
+                    onlyMedia = pageableTimeline.isOnlyMedia ?: false,
+                    excludeReplies = pageableTimeline.excludeReplies,
+                    excludeReblogs = pageableTimeline.excludeReblogs,
+                    maxId = maxId,
+                ).throwIfHasError().also {
+                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
+                    this@MastodonTimelineStorePagingStoreImpl.maxId = decoder.getMaxId()
+                    if (this@MastodonTimelineStorePagingStoreImpl.minId == null) {
+                        decoder.getMinId()
+                    }
+                }
+            }
         }.throwIfHasError().body()!!
     }
 
