@@ -7,15 +7,15 @@ import net.pantasystem.milktea.model.emoji.Emoji
     tableName = "custom_emojis",
     indices = [
         Index("name"),
-        Index("host"),
+        Index("emojiHost"),
         Index("category"),
-        Index("host", "name", unique = true)
+        Index("emojiHost", "name", unique = true)
     ]
 )
 data class CustomEmojiRecord(
     val serverId: String? = null,
     val name: String,
-    val host: String,
+    val emojiHost: String,
     val url: String? = null,
     val uri: String? = null,
     val type: String? = null,
@@ -28,6 +28,7 @@ data class CustomEmojiRecord(
     indices = [
         Index("emojiId", "value")
     ],
+    primaryKeys = ["emojiId", "value"],
     foreignKeys = [
         ForeignKey(
             parentColumns = ["id"],
@@ -79,6 +80,6 @@ fun Emoji.toRecord(host: String, dbId: Long = 0L): CustomEmojiRecord {
         id = dbId,
         type = type,
         category = category,
-        host = host,
+        emojiHost = host,
     )
 }

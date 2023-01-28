@@ -6,15 +6,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CustomEmojiDAO {
 
-    @Query("select * from custom_emojis where host = :host and name = :name")
+    @Transaction
+    @Query("select * from custom_emojis where emojiHost = :host and name = :name")
     suspend fun findBy(host: String, name: String): CustomEmojiRelated?
 
 
-    @Query("select * from custom_emojis where host = :host")
+    @Transaction
+    @Query("select * from custom_emojis where emojiHost = :host")
     suspend fun findBy(host: String): List<CustomEmojiRelated>
 
-
-    @Query("select * from custom_emojis where host = :host")
+    @Transaction
+    @Query("select * from custom_emojis where emojiHost = :host")
     fun observeBy(host: String): Flow<List<CustomEmojiRelated>>
 
 
@@ -30,7 +32,7 @@ interface CustomEmojiDAO {
     @Query("delete from custom_emoji_aliases where emojiId = :emojiId")
     suspend fun deleteAliasByEmojiId(emojiId: Long)
 
-    @Query("delete from custom_emojis where host = :host")
+    @Query("delete from custom_emojis where emojiHost = :host")
     suspend fun deleteByHost(host: String)
 
     @Update
