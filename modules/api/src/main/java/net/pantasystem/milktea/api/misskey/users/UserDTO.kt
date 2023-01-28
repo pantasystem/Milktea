@@ -4,8 +4,8 @@ package net.pantasystem.milktea.api.misskey.users
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
-import net.pantasystem.milktea.api.misskey.notes.CustomEmojisTypeSerializer
-import net.pantasystem.milktea.api.misskey.notes.EmojisType
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
@@ -82,15 +82,5 @@ data class UserDTO(
 
     @kotlinx.serialization.Serializable
     data class FieldDTO(val name: String, val value: String)
-
-    val displayUserName: String
-        get() = "@" + this.userName + if (this.host == null) {
-            ""
-        } else {
-            "@" + this.host
-        }
-
-    val displayName: String
-        get() = name ?: userName
 
 }

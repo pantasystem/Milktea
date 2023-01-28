@@ -2,6 +2,8 @@ package net.pantasystem.milktea.api.misskey.users
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class BaseUserDTOTest {
@@ -30,5 +32,6 @@ class BaseUserDTOTest {
         """.trimIndent()
 
         val result = parser.decodeFromString<UserDTO>(json)
+        Assertions.assertEquals(EmojisType.TypeObject(emptyMap()), result.rawEmojis)
     }
 }

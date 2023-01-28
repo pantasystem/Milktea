@@ -3,21 +3,11 @@ package net.pantasystem.milktea.api.misskey.notes
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.serializers.InstantIso8601Serializer
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonContentPolymorphicSerializer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -98,67 +88,3 @@ enum class NoteVisibilityType {
 }
 
 object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibilityType>(NoteVisibilityType.values(), NoteVisibilityType.Public)
-
-@kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
-sealed interface EmojisType {
-    @kotlinx.serialization.Serializable(with = TypeArraySerializer::class)
-    data class TypeArray(val emojis: List<Emoji>) : EmojisType
-
-    @kotlinx.serialization.Serializable(with = TypeObjectSerializer::class)
-    data class TypeObject(val emojis: Map<String, String>) : EmojisType
-
-    @kotlinx.serialization.Serializable
-    object None : EmojisType
-}
-
-@kotlinx.serialization.Serializable
-data class TestNoteObject(
-    @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class) val emojis: EmojisType
-)
-
-
-
-class CustomEmojisTypeSerializer : JsonContentPolymorphicSerializer<EmojisType>(EmojisType::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out EmojisType> {
-        if (element is JsonArray) {
-            println("element is JsonArray, value:${element}")
-            return TypeArraySerializer()
-        }
-        if (element is JsonObject) {
-            println("element is JsonObject")
-            return TypeObjectSerializer
-        }
-
-        println("element type is unknown:$element")
-
-        Int.serializer()
-        return EmojisType.None.serializer()
-    }
-
-}
-
-object TypeObjectSerializer : KSerializer<EmojisType.TypeObject> {
-    val mapSerializer = MapSerializer(String.serializer(), String.serializer())
-    override val descriptor: SerialDescriptor = mapSerializer.descriptor
-    override fun deserialize(decoder: Decoder): EmojisType.TypeObject {
-        return EmojisType.TypeObject(mapSerializer.deserialize(decoder))
-    }
-
-    override fun serialize(encoder: Encoder, value: EmojisType.TypeObject) {
-        mapSerializer.serialize(encoder, value.emojis)
-    }
-}
-
-class TypeArraySerializer : KSerializer<EmojisType.TypeArray> {
-    val listSerializer = ListSerializer(Emoji.serializer())
-    override val descriptor: SerialDescriptor = listSerializer.descriptor
-
-    override fun deserialize(decoder: Decoder): EmojisType.TypeArray {
-        return EmojisType.TypeArray(listSerializer.deserialize(decoder))
-    }
-
-    override fun serialize(encoder: Encoder, value: EmojisType.TypeArray) {
-        return listSerializer.serialize(encoder, value.emojis)
-    }
-}
-

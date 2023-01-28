@@ -3,9 +3,9 @@ package jp.panta.misskeyandroidclient.api.notes
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.api.misskey.notes.EmojisType
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
+import net.pantasystem.milktea.api.misskey.emoji.TestNoteObject
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.notes.TestNoteObject
 import net.pantasystem.milktea.model.emoji.Emoji
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
