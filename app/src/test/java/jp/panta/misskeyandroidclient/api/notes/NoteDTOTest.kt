@@ -3,7 +3,10 @@ package jp.panta.misskeyandroidclient.api.notes
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.misskey.notes.EmojisType
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.api.misskey.notes.TestNoteObject
+import net.pantasystem.milktea.model.emoji.Emoji
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -855,5 +858,58 @@ class NoteDTOTest {
         val noteDTO: List<NoteDTO> = builder.decodeFromString(jsonStr)
         Assertions.assertNotNull(noteDTO)
 
+    }
+
+    @Test
+    fun decodeArrayTypeEmoji() {
+        val builder = Json {
+            ignoreUnknownKeys = true
+        }
+        val json1 = """
+            [{"name": "hoge", "url": "https://example.com"}]
+        """.trimIndent()
+        val result = builder.decodeFromString<EmojisType>(json1)
+        Assertions.assertEquals(EmojisType.TypeArray(listOf(Emoji(name = "hoge", url = "https://example.com"))), result)
+
+    }
+
+    @Test
+    fun decodeObjectTypeEmoji() {
+        val builder = Json {
+            ignoreUnknownKeys = true
+        }
+        val json1 = """
+            {"hoge": "https://example.com", "piyo": "https://misskey.io"}
+        """.trimIndent()
+        val result = builder.decodeFromString<EmojisType>(json1)
+
+        Assertions.assertEquals(EmojisType.TypeObject(mapOf("hoge" to "https://example.com", "piyo" to "https://misskey.io")), result)
+    }
+
+    @Test
+    fun decodeFunckingObject() {
+        val builder = Json {
+            ignoreUnknownKeys = true
+        }
+        val json1 = """
+            {"emojis": [{"name": "hoge", "url": "https://example.com"}]}
+        """.trimIndent()
+        val result = builder.decodeFromString<TestNoteObject>(json1)
+        Assertions.assertEquals(TestNoteObject(EmojisType.TypeArray(
+            listOf(Emoji(name = "hoge", url = "https://example.com"))
+        )), result)
+    }
+
+    @Test
+    fun decodeEmptyObject() {
+        val builder = Json {
+            ignoreUnknownKeys = true
+        }
+        val json1 = """
+            {"emojis": {}}
+        """.trimIndent()
+        val result = builder.decodeFromString<TestNoteObject>(json1)
+
+        Assertions.assertEquals(TestNoteObject(EmojisType.TypeObject(emptyMap())), result)
     }
 }
