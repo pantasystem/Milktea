@@ -141,7 +141,7 @@ class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
                     accountId = pageableTimeline.userId,
-                    onlyMedia = pageableTimeline.isOnlyMedia ?: false,
+                    onlyMedia = pageableTimeline.isOnlyMedia,
                     excludeReplies = pageableTimeline.excludeReplies,
                     excludeReblogs = pageableTimeline.excludeReblogs,
                     maxId = maxId,

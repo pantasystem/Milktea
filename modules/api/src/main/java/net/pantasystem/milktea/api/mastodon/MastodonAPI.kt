@@ -201,7 +201,8 @@ interface MastodonAPI {
 
     @GET("api/v1/accounts/{accountId}/statuses")
     suspend fun getAccountTimeline(
-        @Path("accountId") accountId: String, @Query("only_media") onlyMedia: Boolean = false,
+        @Path("accountId") accountId: String,
+        @Query("only_media") onlyMedia: Boolean? = false,
         @Query("max_id") maxId: String? = null,
         @Query("min_id") minId: String? = null,
         @Query("limit") limit: Int = 20,
