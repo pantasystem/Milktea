@@ -172,6 +172,14 @@ data class PageParams(
                         listId = requireNotNull(listId),
                     )
                 }
+                MASTODON_USER_TIMELINE -> {
+                    Pageable.Mastodon.UserTimeline(
+                        userId = requireNotNull(userId),
+                        isOnlyMedia = withFiles,
+                        excludeReblogs = includeMyRenotes?.not(),
+                        excludeReplies = includeReplies?.not()
+                    )
+                }
             }
         } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")

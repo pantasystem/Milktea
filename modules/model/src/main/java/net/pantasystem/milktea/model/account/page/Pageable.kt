@@ -320,6 +320,23 @@ sealed class Pageable : Serializable {
             }
         }
 
+        data class UserTimeline(
+            val userId: String,
+            val isOnlyMedia: Boolean? = null,
+            val excludeReplies: Boolean? = null,
+            val excludeReblogs: Boolean? = null,
+        ) : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_USER_TIMELINE,
+                    withFiles = isOnlyMedia,
+                    includeReplies = excludeReplies?.not(),
+                    includeMyRenotes = excludeReblogs?.not(),
+                    userId = userId
+                )
+            }
+        }
+
     }
 
 
