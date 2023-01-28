@@ -37,17 +37,12 @@ data class TestNoteObject(
 class CustomEmojisTypeSerializer : JsonContentPolymorphicSerializer<EmojisType>(EmojisType::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out EmojisType> {
         if (element is JsonArray) {
-            println("element is JsonArray, value:${element}")
             return TypeArraySerializer()
         }
         if (element is JsonObject) {
-            println("element is JsonObject")
             return TypeObjectSerializer
         }
 
-        println("element type is unknown:$element")
-
-        Int.serializer()
         return EmojisType.None.serializer()
     }
 
