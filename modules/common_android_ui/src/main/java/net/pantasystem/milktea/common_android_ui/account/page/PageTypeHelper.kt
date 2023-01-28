@@ -38,6 +38,7 @@ object PageTypeHelper{
             MASTODON_HOME_TIMELINE -> context.getString(R.string.home_timeline)
             MASTODON_HASHTAG_TIMELINE -> context.getString(R.string.tag)
             MASTODON_LIST_TIMELINE -> context.getString(R.string.list)
+            MASTODON_USER_TIMELINE -> context.getString(R.string.user)
         }
     }
 }
