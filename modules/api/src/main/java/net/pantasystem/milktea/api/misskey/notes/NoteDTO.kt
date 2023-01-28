@@ -41,6 +41,7 @@ data class NoteDTO(
     @SerialName("reactions")
     val reactionCounts: LinkedHashMap<String, Int>? = null,
 
+    @kotlinx.serialization.Transient
     @SerialName("emojis") val emojis: List<Emoji>? = null,
 
     @SerialName("repliesCount")
