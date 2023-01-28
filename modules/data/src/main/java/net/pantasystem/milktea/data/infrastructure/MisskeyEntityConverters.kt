@@ -174,7 +174,7 @@ fun NoteDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         viaMobile = this.viaMobile,
         visibility = visibility,
         localOnly = this.localOnly,
-        emojis = (this.emojis ?: emptyList()) + (this.reactionEmojis?.map {
+        emojis = (this.emojiList ?: emptyList()) + (this.reactionEmojis?.map {
             Emoji(name = it.key, uri = it.value, url = it.value)
         } ?: emptyList()),
         app = this.app?.toModel(),
@@ -361,7 +361,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
         return User.Detail(
             id = User.Id(account.accountId, this.id),
             avatarUrl = this.avatarUrl,
-            emojis = this.emojis ?: emptyList(),
+            emojis = this.emojiList ?: emptyList(),
             isBot = this.isBot,
             isCat = this.isCat,
             name = this.name,
@@ -404,7 +404,7 @@ fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
         return User.Simple(
             id = User.Id(account.accountId, this.id),
             avatarUrl = this.avatarUrl,
-            emojis = this.emojis ?: emptyList(),
+            emojis = this.emojiList ?: emptyList(),
             isBot = this.isBot,
             isCat = this.isCat,
             name = this.name,
