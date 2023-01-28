@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.emoji.db
 
 import androidx.room.*
+import net.pantasystem.milktea.model.emoji.Emoji
 
 @Entity(
     tableName = "custom_emojis",
@@ -50,4 +51,34 @@ data class CustomEmojiRelated(
         entityColumn = "emojiId"
     )
     val aliases: List<CustomEmojiAliasRecord>
-)
+) {
+
+    @Ignore
+    fun toModel(): Emoji {
+        return Emoji(
+            id = emoji.serverId,
+            name = emoji.name,
+            uri = emoji.uri,
+            url = emoji.url,
+            category = emoji.category,
+            type = emoji.type,
+            aliases = aliases.map {
+                it.value
+            },
+
+        )
+    }
+}
+
+fun Emoji.toRecord(host: String, dbId: Long = 0L): CustomEmojiRecord {
+    return CustomEmojiRecord(
+        serverId = id,
+        name = name,
+        uri = uri,
+        url = url,
+        id = dbId,
+        type = type,
+        category = category,
+        host = host,
+    )
+}
