@@ -82,7 +82,7 @@ class TimelineStoreImpl(
         get() = willAddNoteQueue
 
 
-    val pageableStore: TimelinePagingBase by lazy {
+    internal val pageableStore: TimelinePagingBase by lazy {
         when (pageableTimeline) {
             is Pageable.Favorite -> {
                 FavoriteNoteTimelinePagingStoreImpl(
@@ -138,7 +138,7 @@ class TimelineStoreImpl(
 
 
     override suspend fun loadFuture(): Result<Unit> {
-        return runCancellableCatching {
+        return runCancellableCatching<Unit> {
             val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     FuturePagingController(
@@ -174,7 +174,7 @@ class TimelineStoreImpl(
     }
 
     override suspend fun loadPrevious(): Result<Unit> {
-        return runCancellableCatching {
+        return runCancellableCatching<Unit> {
             when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     PreviousPagingController(
@@ -272,6 +272,6 @@ class TimelineStoreImpl(
 
 }
 
-sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
+internal sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
 
 interface StreamingReceivableStore : StateLocker

@@ -25,7 +25,7 @@ import net.pantasystem.milktea.model.notes.Note
 import retrofit2.Response
 
 
-class TimelinePagingStoreImpl(
+internal class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,

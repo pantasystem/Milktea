@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
 
 
-class MastodonTimelineStorePagingStoreImpl(
+internal class MastodonTimelineStorePagingStoreImpl(
     val pageableTimeline: Pageable.Mastodon,
     val mastodonAPIProvider: MastodonAPIProvider,
     val getAccount: suspend () -> Account,
