@@ -34,6 +34,8 @@ data class UserDTO(
     val isAdmin: Boolean? = null,
     val avatarUrl: String? = null,
     val bannerUrl: String? = null,
+
+    @kotlinx.serialization.Transient
     val emojis: List<Emoji>? = null,
 
     val isFollowing: Boolean? = null,

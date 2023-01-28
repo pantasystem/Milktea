@@ -31,6 +31,8 @@ data class NoteDTO(
     @SerialName("visibleUserIds")
     val visibleUserIds: List<String>? = null,
 
+    val reactionEmojis: Map<String, String>? = null,
+
     val url: String? = null,
     val uri: String? = null,
 
