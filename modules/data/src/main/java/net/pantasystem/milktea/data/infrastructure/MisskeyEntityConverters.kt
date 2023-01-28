@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.InvitationId
@@ -173,7 +174,9 @@ fun NoteDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         viaMobile = this.viaMobile,
         visibility = visibility,
         localOnly = this.localOnly,
-        emojis = this.emojis,
+        emojis = (this.emojis ?: emptyList()) + (this.reactionEmojis?.map {
+            Emoji(name = it.key, uri = it.value, url = it.value)
+        } ?: emptyList()),
         app = this.app?.toModel(),
         fileIds = this.fileIds?.map { FileProperty.Id(account.accountId, it) },
         poll = this.poll?.toPoll(),
