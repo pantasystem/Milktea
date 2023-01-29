@@ -9,6 +9,9 @@ import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
+import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
+import net.pantasystem.milktea.api.mastodon.list.ListDTO
+import net.pantasystem.milktea.api.mastodon.list.RemoveAccountsFromList
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
@@ -209,4 +212,25 @@ interface MastodonAPI {
         @Query("exclude_reblogs") excludeReblogs: Boolean? = null,
         @Query("exclude_replies") excludeReplies: Boolean? = null,
     ): Response<List<TootStatusDTO>>
+
+
+    @GET("api/v1/lists")
+    suspend fun getMyLists(): Response<List<ListDTO>>
+
+    @GET("api/v1/lists/{listId}")
+    suspend fun getList(@Path("listId") listId: String): Response<ListDTO>
+
+    @POST("api/v1/lists/{listId}/accounts")
+    suspend fun addAccountsToList(@Path("listId") listId: String, @Body body: AddAccountsToList): Response<Unit>
+
+    @DELETE("api/v1/lists/{listId}/accounts")
+    suspend fun removeAccountsFromList(@Path("listId") listId: String, @Body body: RemoveAccountsFromList): Response<Unit>
+
+    @GET("api/v1/lists/{listId}")
+    suspend fun getAccountsInList(
+        @Path("listId") listId: String,
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null
+    ): Response<List<MastodonAccountDTO>>
+
 }

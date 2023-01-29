@@ -38,7 +38,7 @@ fun TootPollDTO?.toPoll(): Poll? {
     }
 }
 
-fun TootMediaAttachment.toFileProperty(account: Account): FileProperty {
+fun TootMediaAttachment.toFileProperty(account: Account, isSensitive: Boolean): FileProperty {
     return FileProperty(
         id = FileProperty.Id(account.accountId, id),
         name = "",
@@ -47,6 +47,7 @@ fun TootMediaAttachment.toFileProperty(account: Account): FileProperty {
         md5 = null,
         size = null,
         url = url,
+        isSensitive = isSensitive,
         thumbnailUrl = previewUrl,
         blurhash = blurhash,
         comment = description,
@@ -58,7 +59,7 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         id = Note.Id(account.accountId, id),
         text = this.content,
         cw = this.spoilerText.takeIf {
-            sensitive
+            it.isNotBlank()
         },
         userId = User.Id(account.accountId, this.account.id),
         replyId = this.inReplyToId?.let { Note.Id(account.accountId, this.inReplyToId!!) },
@@ -137,7 +138,7 @@ fun TootStatusDTO.pickEntities(
     users.add(user)
     files.addAll(
         mediaAttachments.map {
-            it.toFileProperty(account)
+            it.toFileProperty(account, sensitive)
         }
     )
     this.reblog?.pickEntities(account, notes, users, files, nodeInfo)
@@ -216,7 +217,16 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
         MstNotificationDTO.NotificationType.AdminReport -> {
             TODO("通知種別${type}はまだ実装されていません")
         }
-        MstNotificationDTO.NotificationType.EmojiReaction -> TODO("通知種別${type}はまだ実装されていません")
+        MstNotificationDTO.NotificationType.EmojiReaction -> {
+            ReactionNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id),
+                reaction = requireNotNull(emojiReaction).reaction,
+                userId = userId,
+            )
+        }
     }
 }
 fun Visibility(type: StatusVisibilityType, circleId: String? = null, visibilityEx: String? = null,): Visibility {
