@@ -104,7 +104,7 @@ class MiApplication : Application(), Configuration.Provider {
         }
 
         activeNetworkFlow().distinctUntilChanged().onEach {
-            logger.debug("接続状態が変化:${if (it) "接続" else "未接続"}")
+            logger.debug { "接続状態が変化:${if (it) "接続" else "未接続"}" }
             mSocketWithAccountProvider.all().forEach { socket ->
                 if (it) {
                     socket.onNetworkActive()
@@ -154,7 +154,7 @@ class MiApplication : Application(), Configuration.Provider {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
 
-        when(level) {
+        when (level) {
             TRIM_MEMORY_RUNNING_CRITICAL, TRIM_MEMORY_RUNNING_MODERATE, TRIM_MEMORY_MODERATE, TRIM_MEMORY_RUNNING_LOW -> {
                 applicationScope.launch {
                     memoryCacheCleaner.clean()

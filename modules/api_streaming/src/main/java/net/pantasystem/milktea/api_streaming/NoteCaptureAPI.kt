@@ -120,7 +120,7 @@ class NoteCaptureAPIImpl(
 
     override fun onMessage(e: StreamingEvent): Boolean {
         if (e is NoteUpdated) {
-            logger?.debug("noteUpdated: $e")
+            logger?.debug{ "noteUpdated: $e" }
             val listeners = if (noteIdListenMap[e.body.id].isNullOrEmpty()) {
                 logger?.warning("listenerは未登録ですが、何か受信したようです。")
                 null
@@ -136,7 +136,7 @@ class NoteCaptureAPIImpl(
     }
 
     override fun onStateChanged(e: Socket.State) {
-        logger?.debug("onStateChanged $e")
+        logger?.debug { "onStateChanged $e" }
         if (e is Socket.State.Connected) {
             noteIdListenMap.keys.forEach {
                 sendSub(it)
@@ -151,7 +151,7 @@ class NoteCaptureAPIImpl(
     }
 
     private fun sendSub(noteId: String): Boolean {
-        logger?.debug("購読メッセージ送信 noteId: $noteId")
+        logger?.debug { "購読メッセージ送信 noteId: $noteId" }
         return socket.send(
             Send.SubscribeNote(Send.SubscribeNote.Body(noteId)).toJson()
         )

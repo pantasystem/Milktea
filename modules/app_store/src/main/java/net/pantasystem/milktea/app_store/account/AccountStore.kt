@@ -119,7 +119,7 @@ class AccountStore @Inject constructor(
                 return
             }
 
-            logger.debug("accountId:${current.accountId}, account:$current")
+            logger.debug { "accountId:${current.accountId}, account:$current" }
             if (current.pages.isEmpty()) {
                 saveDefaultPages(current)
                 accounts = accountRepository.findAll().getOrThrow()

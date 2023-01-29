@@ -54,7 +54,7 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun syncOne(groupId: Group.Id): Group {
         return withContext(ioDispatcher) {
             var group = groupDataSource.find(groupId).onFailure {
-                logger.debug("ローカルには存在しません。:${groupId}")
+                logger.debug { "ローカルには存在しません。:${groupId}" }
             }.getOrNull()
 
             if (group != null) {

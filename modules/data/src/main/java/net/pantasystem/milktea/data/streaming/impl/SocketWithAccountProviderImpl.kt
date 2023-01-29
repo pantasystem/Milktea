@@ -44,7 +44,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
             if (socket != null) {
                 // NOTE: tokenが異なる場合は再認証された可能性があるので、再生成を行う
                 if (account.token == accountIdWithToken[account.accountId]) {
-                    logger.debug("すでにインスタンス化済み")
+                    logger.debug { "すでにインスタンス化済み" }
                     return socket
                 } else {
                     if (socket is SocketImpl) {
@@ -60,7 +60,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
                 uri = "${uri}?i=$i"
 
             }catch (e: UnauthorizedException) {
-                logger.debug("未認証アカウント:id=${account.accountId}, baseURL=${account.instanceDomain}")
+                logger.debug { "未認証アカウント:id=${account.accountId}, baseURL=${account.instanceDomain}" }
             }
             //logger.debug("url:$uri")
 

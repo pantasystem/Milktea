@@ -29,6 +29,7 @@ class ChannelAPI(
         data class Antenna(
             val antennaId: String
         ) : Type
+
         data class Channel(
             val channelId: String
         ) : Type
@@ -57,7 +58,7 @@ class ChannelAPI(
             val callback: (ChannelBody) -> Unit = {
                 val result = trySend(it)
                 if (!result.isSuccess) {
-                    logger.debug("スルーされたメッセージ: $it")
+                    logger.debug { "スルーされたメッセージ: $it" }
                 }
                 //logger.debug("ChannelAPI message:${if(it.toString().length > 50) it.toString().subSequence(0, 50) else it.toString()}")
             }
@@ -87,7 +88,7 @@ class ChannelAPI(
         // NOTE すでにlistenerを追加済みであれば何もせずに終了する。
         mutex.withLock {
             if (listenersMap[type]?.contains(listener) == true) {
-                logger.debug("リッスン済み")
+                logger.debug { "リッスン済み" }
                 return@runBlocking
             }
 
@@ -106,9 +107,9 @@ class ChannelAPI(
                 socket.addMessageEventListener(this@ChannelAPI)
             }
             if (typeIdMap[type] == null) {
-                logger.debug("接続処理を開始")
+                logger.debug { "接続処理を開始" }
                 sendConnect(type)
-                logger.debug("after sendConnect:${typeIdMap}")
+                logger.debug { "after sendConnect:${typeIdMap}" }
             }
         }
 
@@ -156,7 +157,7 @@ class ChannelAPI(
      * 接続メッセージを現在の状態にかかわらずサーバーに送信する
      */
     private fun sendConnect(type: Type): Boolean {
-        logger.debug("sendConnect($type)")
+        logger.debug { "sendConnect($type)" }
         val body = when (type) {
             is Type.Global -> Send.Connect.Type.GLOBAL_TIMELINE
             is Type.Hybrid -> Send.Connect.Type.HYBRID_TIMELINE
@@ -185,7 +186,7 @@ class ChannelAPI(
                 )
             ).toJson()
         ).also {
-            logger.debug("channel=$body API登録完了 result=$it, typeIdMap=${typeIdMap}, hash=${this.hashCode()}")
+            logger.debug { "channel=$body API登録完了 result=$it, typeIdMap=${typeIdMap}, hash=${this.hashCode()}" }
         }
     }
 
@@ -199,7 +200,7 @@ class ChannelAPI(
                 socket.send((Send.Disconnect(Send.Disconnect.Body(id)).toJson()))
             }
 
-            logger.debug("channel 購読解除, type=$type, id=$id")
+            logger.debug { "channel 購読解除, type=$type, id=$id" }
         }
     }
 
@@ -211,7 +212,7 @@ class ChannelAPI(
                 //logger.debug("接続処理: $it")
                 sendConnect(it)
             }
-            logger.debug("types: $typeIdMap, 送信済み数:$sendCount")
+            logger.debug { "types: $typeIdMap, 送信済み数:$sendCount" }
         }
 
     }

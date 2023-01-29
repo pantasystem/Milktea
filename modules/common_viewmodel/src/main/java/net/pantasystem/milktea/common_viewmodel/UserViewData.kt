@@ -192,7 +192,7 @@ open class UserViewData(
                     userRepository.find(userId, true)
                 }
             }.onFailure {
-                logger.debug("取得エラー", e = it)
+                logger.debug(e = it) { "取得エラー" }
             }.getOrNull()
 
         }

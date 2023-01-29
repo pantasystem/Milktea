@@ -55,16 +55,16 @@ class GetAccessToken @Inject constructor(
         code: String
     ): AccessToken.Mastodon {
         try {
-            logger.debug("認証種別Mastodon: $a")
+            logger.debug { "認証種別Mastodon: $a" }
             val obtainToken = a.client.createObtainToken(scope = a.scope, code = code)
             val accessToken = mastodonAPIProvider.get(a.instanceBaseURL).obtainToken(obtainToken)
                 .throwIfHasError()
                 .body()
-            logger.debug("accessToken:$accessToken")
+            logger.debug { "accessToken:$accessToken" }
             val me = mastodonAPIProvider.get(a.instanceBaseURL, accessToken!!.accessToken)
                 .verifyCredentials()
                 .throwIfHasError()
-            logger.debug("自身の情報, code=${me.code()}, message=${me.message()}")
+            logger.debug { "自身の情報, code=${me.code()}, message=${me.message()}" }
             val account = me.body()!!
             return accessToken.toModel(account)
         } catch (e: Exception) {

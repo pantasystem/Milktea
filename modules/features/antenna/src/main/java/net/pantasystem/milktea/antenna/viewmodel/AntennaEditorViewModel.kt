@@ -286,7 +286,7 @@ class AntennaEditorViewModel @Inject constructor(
     }
 
     fun setUserNames(userNames: List<String>){
-        logger.debug("setUserNames: $userNames")
+        logger.debug { "setUserNames: $userNames" }
         this.userNames.value = userNames
     }
 

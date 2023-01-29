@@ -19,7 +19,7 @@ class ChannelAPIWithAccountProvider @Inject constructor(
 
     suspend fun get(account: Account): ChannelAPI? {
         mutex.withLock {
-            logger.debug("ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}")
+            logger.debug { "ChannelAPIWithAccountProvider get accountId=${account.accountId} hash=${hashCode()}" }
             var channelAPI = accountWithChannelAPI[account.accountId]
             val socketAPI = socketWithAccountProvider.get(account)
                 ?: return null
