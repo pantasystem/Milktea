@@ -99,17 +99,17 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onDeleteAndEditButtonClicked = {
-                            notesViewModel.confirmDeleteAndEditEvent.event = it
+                            notesViewModel.confirmDeleteAndEditEvent.tryEmit(it)
                             dismiss()
                         },
                         onDeleteButtonClicked = {
-                            notesViewModel.confirmDeletionEvent.event = it
+                            notesViewModel.confirmDeletionEvent.tryEmit(it)
                             dismiss()
                         },
                         onReportButtonClicked ={
                             val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
                             val report = it?.toReport(baseUrl!!)
-                            notesViewModel.confirmReportEvent.event = report
+                            notesViewModel.confirmReportEvent.tryEmit(report)
                             dismiss()
                         },
                         onCreateThreadMuteButtonClicked = {
