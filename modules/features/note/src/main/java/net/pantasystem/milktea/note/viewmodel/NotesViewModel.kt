@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -11,7 +14,6 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -43,23 +45,25 @@ class NotesViewModel @Inject constructor(
         loggerFactory.create("NotesViewModel")
     }
 
-    val statusMessage = EventBus<String>()
+    private val _statusMessage = MutableSharedFlow<String>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    val statusMessage = _statusMessage.asSharedFlow()
 
-    val quoteRenoteTarget = EventBus<Note>()
+    val quoteRenoteTarget = MutableSharedFlow<Note>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val confirmDeletionEvent = EventBus<NoteRelation>()
+    val confirmDeletionEvent = MutableSharedFlow<NoteRelation?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val confirmDeleteAndEditEvent = EventBus<NoteRelation>()
+    val confirmDeleteAndEditEvent = MutableSharedFlow<NoteRelation?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val confirmReportEvent = EventBus<Report>()
+    val confirmReportEvent = MutableSharedFlow<Report?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val openNoteEditor = EventBus<DraftNote?>()
+    private val _openNoteEditorEvent = MutableSharedFlow<DraftNote?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    val openNoteEditorEvent = _openNoteEditorEvent.asSharedFlow()
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch {
             recursiveSearchHasContentNote(noteId).onSuccess { note ->
                 withContext(Dispatchers.Main) {
-                    quoteRenoteTarget.event = note
+                    quoteRenoteTarget.tryEmit(note)
                 }
             }
 
@@ -97,9 +101,9 @@ class NotesViewModel @Inject constructor(
     fun addFavorite(noteId: Note.Id) {
         viewModelScope.launch {
             favoriteRepository.create(noteId).onSuccess {
-                statusMessage.event = "お気に入りに追加しました"
+                _statusMessage.tryEmit("お気に入りに追加しました")
             }.onFailure {
-                statusMessage.event = "お気に入りにへの追加に失敗しました"
+                _statusMessage.tryEmit("お気に入りにへの追加に失敗しました")
             }
         }
     }
@@ -107,11 +111,11 @@ class NotesViewModel @Inject constructor(
     fun deleteFavorite(noteId: Note.Id) {
         viewModelScope.launch {
             val result = favoriteRepository.delete(noteId).getOrNull() != null
-            statusMessage.event = if (result) {
+            _statusMessage.tryEmit(if (result) {
                 "お気に入りから削除しました"
             } else {
                 "お気に入りの削除に失敗しました"
-            }
+            })
         }
     }
 
@@ -135,7 +139,7 @@ class NotesViewModel @Inject constructor(
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch {
             noteRepository.delete(noteId).onSuccess {
-                statusMessage.event = "削除に成功しました"
+                _statusMessage.tryEmit("削除に成功しました")
             }.onFailure {
                 logger.error("ノート削除に失敗", it)
             }
@@ -150,7 +154,7 @@ class NotesViewModel @Inject constructor(
                 noteRepository.delete(note.note.id).getOrThrow()
                 dn
             }.onSuccess {
-                openNoteEditor.event = it
+                _openNoteEditorEvent.tryEmit(it)
             }.onFailure { t ->
                 logger.error("削除に失敗しました", t)
             }

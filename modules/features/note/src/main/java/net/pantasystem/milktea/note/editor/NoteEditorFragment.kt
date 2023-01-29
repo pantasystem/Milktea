@@ -238,21 +238,21 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
         noteEditorToolbar.viewModel = noteEditorViewModel
-        accountViewModel.switchAccount.observe(viewLifecycleOwner) {
+
+        accountViewModel.switchAccountEvent.onEach {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
-        }
-        accountViewModel.showProfile.observe(viewLifecycleOwner) {
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
+        accountViewModel.showProfileEvent.onEach {
             val intent = userDetailNavigation.newIntent(
                 UserDetailNavigationArgs.UserId(
                     User.Id(it.accountId, it.remoteId)
                 )
             )
-
             intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-
             startActivity(intent)
-        }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             metaRepository.observe(it.normalizedInstanceDomain)
@@ -410,8 +410,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-
-        confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
+        confirmViewModel.confirmedEvent.onEach {
             when (it.eventType) {
                 CONFIRM_SAVE_AS_DRAFT_OR_DELETE -> {
                     if (it.resultType == ResultType.POSITIVE) {
@@ -421,11 +420,12 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     }
                 }
             }
-        }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
-        confirmViewModel.confirmEvent.observe(viewLifecycleOwner) {
-            ConfirmDialog().show(childFragmentManager, "confirm")
-        }
+        confirmViewModel.confirmEvent.onEach {
+            ConfirmDialog.newInstance(it).show(childFragmentManager, "confirm")
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
 
         noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
             Handler(Looper.getMainLooper()).post {
@@ -611,14 +611,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private fun finishOrConfirmSaveAsDraftOrDelete() {
         if (noteEditorViewModel.canSaveDraft()) {
-            confirmViewModel.confirmEvent.event = ConfirmCommand(
-                getString(R.string.save_draft),
-                getString(R.string.save_the_note_as_a_draft),
-                eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE,
-                args = "",
-                positiveButtonText = getString(R.string.save),
-                negativeButtonText = getString(R.string.delete)
-
+            confirmViewModel.confirmEvent.tryEmit(
+                ConfirmCommand(
+                    getString(R.string.save_draft),
+                    getString(R.string.save_the_note_as_a_draft),
+                    eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE,
+                    args = "",
+                    positiveButtonText = getString(R.string.save),
+                    negativeButtonText = getString(R.string.delete)
+                )
             )
         } else {
             upTo()
