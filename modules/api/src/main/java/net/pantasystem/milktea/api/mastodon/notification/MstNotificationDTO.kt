@@ -14,6 +14,7 @@ data class MstNotificationDTO(
     val account: MastodonAccountDTO,
     val status: TootStatusDTO? = null,
     val report: MstReportDTO? = null,
+    @SerialName("emoji_reaction") val emojiReaction: EmojiReaction? = null,
 ) {
     @kotlinx.serialization.Serializable
     enum class NotificationType {
@@ -49,6 +50,28 @@ data class MstNotificationDTO(
 
         @SerialName("emoji_reaction")
         EmojiReaction
+    }
+
+    @kotlinx.serialization.Serializable
+    data class EmojiReaction(
+        val name: String,
+        val count: Int,
+        val me: Boolean? = null,
+        val url: String? = null,
+        val domain: String?  = null,
+        @SerialName("static_url") val staticUrl: String? = null,
+    ) {
+        private val isCustomEmoji = url != null || staticUrl != null
+
+        val reaction = if (isCustomEmoji) {
+            if (domain == null) {
+                ":$name@.:"
+            } else {
+                ":$name@$domain:"
+            }
+        } else {
+            name
+        }
     }
 }
 

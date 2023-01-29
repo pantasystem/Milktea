@@ -217,7 +217,16 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
         MstNotificationDTO.NotificationType.AdminReport -> {
             TODO("通知種別${type}はまだ実装されていません")
         }
-        MstNotificationDTO.NotificationType.EmojiReaction -> TODO("通知種別${type}はまだ実装されていません")
+        MstNotificationDTO.NotificationType.EmojiReaction -> {
+            ReactionNotification(
+                id = id,
+                createdAt = createdAt,
+                isRead = isRead,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id),
+                reaction = requireNotNull(emojiReaction).reaction,
+                userId = userId,
+            )
+        }
     }
 }
 fun Visibility(type: StatusVisibilityType, circleId: String? = null, visibilityEx: String? = null,): Visibility {
