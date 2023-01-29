@@ -9,10 +9,9 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListRepository
+import net.pantasystem.milktea.model.list.UserListTabToggleAddToTabUseCase
 import net.pantasystem.milktea.model.list.UserListWithMembers
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -25,7 +24,8 @@ class ListListViewModel @Inject constructor(
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
     private val userListRepository: UserListRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val toggleAddToTabUseCase: UserListTabToggleAddToTabUseCase,
 ) : ViewModel() {
 
 
@@ -106,30 +106,7 @@ class ListListViewModel @Inject constructor(
     fun toggleTab(userList: UserList?) {
         userList?.let { ul ->
             viewModelScope.launch {
-                runCancellableCatching {
-                    val account = accountRepository.get(userList.id.accountId).getOrThrow()
-                    val exPage = account.pages.firstOrNull {
-                        val pageable = it.pageable()
-                        if (pageable is Pageable.UserListTimeline) {
-                            pageable.listId == ul.id.userListId
-                        } else {
-                            false
-                        }
-                    }
-                    if (exPage == null) {
-                        val page = Page(
-                            account.accountId,
-                            ul.name,
-                            pageable = Pageable.UserListTimeline(
-                                ul.id.userListId
-                            ),
-                            weight = 0
-                        )
-                        accountStore.addPage(page)
-                    } else {
-                        accountStore.removePage(exPage)
-                    }
-                }.onFailure {
+                toggleAddToTabUseCase(ul.id).onFailure {
                     logger.error("タブtoggle処理失敗", e = it)
                 }
             }
