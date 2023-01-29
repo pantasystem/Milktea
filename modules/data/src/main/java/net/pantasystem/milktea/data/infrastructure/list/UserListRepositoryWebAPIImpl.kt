@@ -14,8 +14,10 @@ import net.pantasystem.milktea.api.misskey.list.UpdateList
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListMember
@@ -28,6 +30,7 @@ import javax.inject.Singleton
 @Singleton
 class UserListRepositoryWebAPIImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val mastodonAPIProvider: MastodonAPIProvider,
     val accountRepository: AccountRepository,
     private val userListDao: UserListDao,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
@@ -35,13 +38,26 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
-            val api = misskeyAPIProvider.get(account)
-            val body = api.userList(I(account.token))
-                .throwIfHasError()
-                .body()
-            body!!.map {
-                it.toEntity(account)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val api = misskeyAPIProvider.get(account)
+                    val body = api.userList(I(account.token))
+                        .throwIfHasError()
+                        .body()
+                    body!!.map {
+                        it.toEntity(account)
+                    }
+                }
+                Account.InstanceType.MASTODON -> {
+                    val body = mastodonAPIProvider.get(account).getMyLists()
+                        .throwIfHasError()
+                        .body()
+                    body!!.map {
+                        it.toModel(account)
+                    }
+                }
             }
+
         }
     }
 
