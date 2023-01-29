@@ -136,7 +136,8 @@ class UserListDetailActivity : AppCompatActivity(), UserListEditorDialog.OnSubmi
                     },
                     onDeleteUserButtonClicked = {
                         mUserListDetailViewModel.pullUser(it.id)
-                    }
+                    },
+                    instanceType = account?.instanceType
                 )
 
             }
