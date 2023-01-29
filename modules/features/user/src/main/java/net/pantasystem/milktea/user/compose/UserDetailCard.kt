@@ -42,6 +42,7 @@ fun UserDetailCard(
     userDetail: User.Detail,
     isUserNameMain: Boolean,
     accountHost: String?,
+    myId: String?,
     onAction: (UserDetailCardAction) -> Unit,
 ) {
     Card(
@@ -98,16 +99,18 @@ fun UserDetailCard(
                 )
             }
 
-            UserStateActionButton(
-                userState = userDetail.followState,
-                modifier = Modifier.constrainAs(actionButton) {
-                    end.linkTo(parent.end, margin = 8.dp)
-                    top.linkTo(parent.top, margin = 8.dp)
-                },
-                onClick = {
-                    onAction(UserDetailCardAction.ToggleFollow(userDetail.id))
-                }
-            )
+            if (myId != userDetail.id.id) {
+                UserStateActionButton(
+                    userState = userDetail.followState,
+                    modifier = Modifier.constrainAs(actionButton) {
+                        end.linkTo(parent.end, margin = 8.dp)
+                        top.linkTo(parent.top, margin = 8.dp)
+                    },
+                    onClick = {
+                        onAction(UserDetailCardAction.ToggleFollow(userDetail.id))
+                    }
+                )
+            }
 
 
             Image(
@@ -282,6 +285,7 @@ fun Preview_UserDetail() {
             isFollower = true,
         ),
         isUserNameMain = true,
-        accountHost = "misskey.io"
+        accountHost = "misskey.io",
+        myId = null,
     ) {}
 }

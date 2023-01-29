@@ -98,6 +98,7 @@ class FollowFollowerViewModel @AssistedInject constructor(
             followUsers = follows,
             followerUsersState = followerState,
             followUsersState = followState,
+            myId = a?.remoteId,
         )
     }.stateIn(
         viewModelScope,
@@ -141,6 +142,7 @@ enum class LoadType {
 data class FollowFollowerUiState(
     val user: User? = null,
     val accountHost: String? = null,
+    val myId: String? = null,
     val followUsers: List<User.Detail> = emptyList(),
     val followerUsers: List<User.Detail> = emptyList(),
     val followerUsersState: PageableState<List<User.Id>> = PageableState.Loading.Init(),
