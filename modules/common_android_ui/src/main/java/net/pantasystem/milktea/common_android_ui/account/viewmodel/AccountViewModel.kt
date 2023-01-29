@@ -142,7 +142,7 @@ class AccountViewModel @Inject constructor(
 
     fun showProfile(account: Account?) {
         if (account == null) {
-            logger.debug("showProfile account未取得のためキャンセル")
+            logger.debug { "showProfile account未取得のためキャンセル" }
             return
         }
         showProfile.event = account

@@ -9,6 +9,12 @@ class AndroidDefaultLogger(
     override val defaultTag: String
 ) : Logger {
 
+    override fun debug(tag: String, e: Throwable?, message: () -> String) {
+        if (BuildConfig.DEBUG) {
+            Log.d(tag, message(), e)
+        }
+    }
+
     override fun debug(msg: String, tag: String, e: Throwable?) {
         if (BuildConfig.DEBUG) {
             Log.d(tag, msg, e)

@@ -147,7 +147,7 @@ class AppAuthViewModel @Inject constructor(
                         is InstanceType.Mastodon -> "https://${info.instance.uri}"
                         is InstanceType.Misskey -> info.instance.uri
                     }
-                    logger.debug("instanceBaseUrl: $instanceBase")
+                    logger.debug { "instanceBaseUrl: $instanceBase" }
                     authService.createWaiting4Approval(
                         instanceBase,
                         authService.createApp(

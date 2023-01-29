@@ -112,7 +112,7 @@ class ChannelPagingModel @AssistedInject constructor(
         val i = account.token
         val res = when (type) {
             ChannelListType.FOLLOWED -> {
-                logger.debug("loadPrevious:${_state.value}")
+                logger.debug { "loadPrevious:${_state.value}" }
                 if (getUntilId() != null) {
                     throw IllegalStateException()
                 }
@@ -149,7 +149,7 @@ class ChannelPagingModel @AssistedInject constructor(
                 api.featuredChannels(I(i))
             }
         }
-        logger.debug("loadPrevious res:${res.code()}")
+        logger.debug { "loadPrevious res:${res.code()}" }
         return runCancellableCatching {
             res.throwIfHasError().body()!!
         }

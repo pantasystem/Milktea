@@ -140,7 +140,7 @@ class TimelineViewModel @AssistedInject constructor(
             }.filter {
                 this@TimelineViewModel.isActive && !timelineStore.isActiveStreaming
             }.map {
-                logger.debug("active state isActive:${isActive}, isActiveStreaming:${timelineStore.isActiveStreaming}")
+                logger.debug { "active state isActive:${isActive}, isActiveStreaming:${timelineStore.isActiveStreaming}" }
                 timelineStore.loadFuture()
             }.collect()
         }

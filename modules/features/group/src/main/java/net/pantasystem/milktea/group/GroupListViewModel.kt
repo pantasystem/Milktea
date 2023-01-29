@@ -62,7 +62,7 @@ class GroupListViewModel @Inject constructor(
     private val joinedGroupSyncState = syncEvents.flatMapLatest {
         accountStore.observeCurrentAccount
     }.filterNotNull().flatMapLatest {
-        logger.debug("joinedGroupSyncState")
+        logger.debug { "joinedGroupSyncState" }
         suspend {
             groupRepository.syncByJoined(it.accountId)
         }.asLoadingStateFlow()

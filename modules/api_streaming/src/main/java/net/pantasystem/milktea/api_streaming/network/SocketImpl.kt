@@ -37,7 +37,7 @@ class SocketImpl(
     private var mState: Socket.State = Socket.State.NeverConnected
         set(value) {
             field = value
-            logger.debug("SocketImpl状態変化: ${value.javaClass.simpleName}, $value}")
+            logger.debug { "SocketImpl状態変化: ${value.javaClass.simpleName}, $value}" }
             stateListeners.forEach {
                 it.onStateChanged(value)
             }
@@ -97,16 +97,16 @@ class SocketImpl(
     override fun connect(): Boolean {
         synchronized(this) {
             if (mWebSocket != null) {
-                logger.debug("接続済みのためキャンセル")
+                logger.debug { "接続済みのためキャンセル" }
                 return false
             }
             if (!isNetworkActive) {
-                logger.debug("ネットワークがアクティブではないのでキャンセル")
+                logger.debug { "ネットワークがアクティブではないのでキャンセル" }
                 return false
             }
 
             if (isDestroyed) {
-                logger.debug("destroyedされているのでキャンセル")
+                logger.debug { "destroyedされているのでキャンセル" }
                 return false
             }
 
@@ -138,7 +138,7 @@ class SocketImpl(
         return suspendCoroutine { continuation ->
             var isResumed = false
             if (!connect()) {
-                logger.debug("connect -> falseのためキャンセル")
+                logger.debug { "connect -> falseのためキャンセル" }
                 continuation.resume(false)
                 isResumed = true
             }
@@ -177,9 +177,9 @@ class SocketImpl(
     }
 
     override fun send(msg: String, isAutoConnect: Boolean): Boolean {
-        logger.debug("メッセージ送信: $msg, state${state()}")
+        logger.debug { "メッセージ送信: $msg, state${state()}" }
         if (state() != Socket.State.Connected) {
-            logger.debug("送信をキャンセル state:${state()}")
+            logger.debug { "送信をキャンセル state:${state()}" }
             if (isAutoConnect) {
                 connect()
             }
@@ -221,7 +221,7 @@ class SocketImpl(
     inner class WebSocketListenerImpl : WebSocketListener() {
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             super.onClosed(webSocket, code, reason)
-            logger.debug("WebSocketをClose: $code")
+            logger.debug { "WebSocketをClose: $code" }
 
             synchronized(this@SocketImpl) {
                 mState = Socket.State.Closed(code, reason)
@@ -294,14 +294,14 @@ class SocketImpl(
 
             }
 
-            logger.debug("受諾されんかったメッセージ: $text")
+            logger.debug { "受諾されんかったメッセージ: $text" }
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
 
 
-            logger.debug("onOpen webSocket 接続")
+            logger.debug { "onOpen webSocket 接続" }
             synchronized(this@SocketImpl) {
                 pollingJob.cancel()
                 pollingJob = PollingJob(this@SocketImpl).also {
