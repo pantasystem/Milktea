@@ -62,6 +62,7 @@ class SearchUserFragment : Fragment() {
                         users = users,
                         isUserNameMain = false,
                         accountHost = account?.getHost(),
+                        myId = account?.remoteId,
                         onAction = ::onAction
                     )
                 }

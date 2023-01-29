@@ -158,6 +158,7 @@ private fun Pager(
                     users = uiState.followUsers,
                     isUserNameMain = false,
                     accountHost = uiState.accountHost,
+                    myId = uiState.myId,
                     onAction = { action ->
                         onAction(LoadType.Follow, action)
                     }
@@ -169,6 +170,7 @@ private fun Pager(
                     users = uiState.followerUsers,
                     isUserNameMain = false,
                     accountHost = uiState.accountHost,
+                    myId = uiState.myId,
                     onAction = { action ->
                         onAction(LoadType.Follower, action)
                     }
