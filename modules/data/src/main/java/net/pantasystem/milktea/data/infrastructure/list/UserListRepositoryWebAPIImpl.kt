@@ -135,10 +135,20 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun findOne(userListId: UserList.Id): UserList {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(userListId.accountId).getOrThrow()
-            val misskeyAPI = misskeyAPIProvider.get(account)
-            val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
-                .throwIfHasError()
-            res.body()!!.toEntity(account)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val misskeyAPI = misskeyAPIProvider.get(account)
+                    val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
+                        .throwIfHasError()
+                    res.body()!!.toEntity(account)
+                }
+                Account.InstanceType.MASTODON -> {
+                    val res = mastodonAPIProvider.get(account).getList(userListId.userListId)
+                        .throwIfHasError()
+                    requireNotNull(res.body()).toModel(account)
+                }
+            }
+
         }
     }
 
