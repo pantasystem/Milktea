@@ -145,49 +145,8 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
 
     override suspend fun syncByAccountId(accountId: Long): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
-
             val source = findByAccountId(accountId)
-            val beforeInsertRecords = source.map { ul ->
-                UserListRecord(
-                    serverId = ul.id.userListId,
-                    accountId = ul.id.accountId,
-                    createdAt = ul.createdAt,
-                    name = ul.name,
-                )
-            }
-
-            val resultIds = userListDao.insertAll(beforeInsertRecords)
-            val localLists =
-                userListDao.findUserListWhereIn(accountId, source.map { it.id.userListId })
-
-            val ids = resultIds.mapIndexed { index, resultId ->
-                if (resultId == -1L) {
-                    localLists[index].id
-                } else {
-                    resultId
-                }
-            }
-            resultIds.forEachIndexed { index, l ->
-                if (l == -1L) {
-                    val id = ids[index]
-                    val updateTarget = beforeInsertRecords[index]
-                    userListDao.update(updateTarget.copy(id = id))
-                }
-            }
-
-
-
-            ids.forEachIndexed { index, l ->
-                userListDao.detachUserIds(l)
-                userListDao.attachMemberIds(
-                    source[index].userIds.map {
-                        UserListMemberIdRecord(
-                            userId = it.id,
-                            userListId = l
-                        )
-                    }
-                )
-            }
+            upInsertAll(accountId, source)
         }
     }
 
@@ -248,5 +207,48 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
                 )
             }
         )
+    }
+
+    private suspend fun upInsertAll(accountId: Long, source: List<UserList>) {
+        val beforeInsertRecords = source.map { ul ->
+            UserListRecord(
+                serverId = ul.id.userListId,
+                accountId = ul.id.accountId,
+                createdAt = ul.createdAt,
+                name = ul.name,
+            )
+        }
+        val resultIds = userListDao.insertAll(beforeInsertRecords)
+        val localLists =
+            userListDao.findUserListWhereIn(accountId, source.map { it.id.userListId })
+
+        val ids = resultIds.mapIndexed { index, resultId ->
+            if (resultId == -1L) {
+                localLists[index].id
+            } else {
+                resultId
+            }
+        }
+        resultIds.forEachIndexed { index, l ->
+            if (l == -1L) {
+                val id = ids[index]
+                val updateTarget = beforeInsertRecords[index]
+                userListDao.update(updateTarget.copy(id = id))
+            }
+        }
+
+
+
+        ids.forEachIndexed { index, l ->
+            userListDao.detachUserIds(l)
+            userListDao.attachMemberIds(
+                source[index].userIds.map {
+                    UserListMemberIdRecord(
+                        userId = it.id,
+                        userListId = l
+                    )
+                }
+            )
+        }
     }
 }
