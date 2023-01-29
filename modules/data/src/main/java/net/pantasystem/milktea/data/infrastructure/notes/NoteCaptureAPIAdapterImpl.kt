@@ -54,7 +54,7 @@ class NoteCaptureAPIAdapterImpl(
      * Noteのキャプチャーによって発生したイベントのQueue。
      * ここから順番にイベントを取り出し、キャッシュに反映させるなどをしている。
      */
-    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
+    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>(extraBufferCapacity = 1000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 //    /**
 //     * 使用されなくなったNoteのリソースが順番に入れられるQueue。
@@ -162,7 +162,7 @@ class NoteCaptureAPIAdapterImpl(
 //                noteResourceReleaseEvent.tryEmit(id)
 //            }
         }
-    }.shareIn(coroutineScope, replay = 1, started = SharingStarted.WhileSubscribed())
+    }
 
 
     /**

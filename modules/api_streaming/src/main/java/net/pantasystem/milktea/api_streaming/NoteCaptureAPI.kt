@@ -1,14 +1,12 @@
 package net.pantasystem.milktea.api_streaming
 
-
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.Logger
-
-import java.util.*
 
 interface NoteCaptureAPI {
     fun capture(noteId: String): Flow<NoteUpdated.Body>
@@ -26,27 +24,17 @@ class NoteCaptureAPIImpl(
     val logger = loggerFactory?.create("NoteCaptureAPI")
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun capture(noteId: String): Flow<NoteUpdated.Body> {
 
         return channelFlow {
-            logger?.debug("channelFlow起動")
-            val listenId = UUID.randomUUID().toString()
 
             val listener: (NoteUpdated) -> Unit = { noteUpdated ->
-                logger?.debug("受信:$noteUpdated")
                 trySend(noteUpdated.body)
             }
-            //logger?.debug("before capture")
             capture(noteId, listener)
 
-            //logger?.debug("after capture")
-
             awaitClose {
-                logger?.debug("captureを終了する noteId=$noteId, listenId=$listenId")
                 unSubscribe(noteId, listener)
-
-
             }
         }
 
@@ -85,7 +73,6 @@ class NoteCaptureAPIImpl(
                 socket.addMessageEventListener(this@NoteCaptureAPIImpl)
             }
             if (listeners.isEmpty()) {
-                logger?.debug("リモートへCaptureができていなかったので開始する")
                 if (!sendSub(noteId)) {
                     return@runBlocking
                 }
@@ -103,7 +90,6 @@ class NoteCaptureAPIImpl(
 
     private fun unSubscribe(noteId: String, listener: (NoteUpdated) -> Unit) = runBlocking {
         lock.withLock {
-            logger?.debug("unSubscribe noteId: $noteId")
             val listeners = noteIdListenMap.getOrNew(noteId)
             if (listeners.isEmpty()) {
                 return@runBlocking
