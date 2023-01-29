@@ -238,21 +238,21 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
         noteEditorToolbar.viewModel = noteEditorViewModel
-        accountViewModel.switchAccount.observe(viewLifecycleOwner) {
+
+        accountViewModel.switchAccountEvent.onEach {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
-        }
-        accountViewModel.showProfile.observe(viewLifecycleOwner) {
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
+        accountViewModel.showProfileEvent.onEach {
             val intent = userDetailNavigation.newIntent(
                 UserDetailNavigationArgs.UserId(
                     User.Id(it.accountId, it.remoteId)
                 )
             )
-
             intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-
             startActivity(intent)
-        }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             metaRepository.observe(it.normalizedInstanceDomain)

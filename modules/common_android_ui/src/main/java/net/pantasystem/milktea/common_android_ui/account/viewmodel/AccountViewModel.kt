@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
@@ -98,13 +98,18 @@ class AccountViewModel @Inject constructor(
         }
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val switchAccount = EventBus<Int>()
+    private val _switchAccountEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val switchAccountEvent = _switchAccountEvent.asSharedFlow()
 
 
-    val showFollowers = EventBus<User.Id>()
-    val showFollowings = EventBus<User.Id>()
+    private val _showFollowersEvent = MutableSharedFlow<User.Id>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val showFollowersEvent = _showFollowersEvent.asSharedFlow()
 
-    val showProfile = EventBus<Account>()
+    private val _showFollowingsEvent = MutableSharedFlow<User.Id>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val showFollowingsEvent = _showFollowingsEvent.asSharedFlow()
+
+    private val _showProfileEvent = MutableSharedFlow<Account>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val showProfileEvent = _showProfileEvent.asSharedFlow()
 
 
     init {
@@ -125,18 +130,18 @@ class AccountViewModel @Inject constructor(
     }
 
     fun showSwitchDialog() {
-        switchAccount.event = switchAccount.event
+        _switchAccountEvent.tryEmit(Unit)
     }
 
     fun showFollowers(userId: User.Id?) {
         userId?.let {
-            showFollowers.event = userId
+            _showFollowersEvent.tryEmit(it)
         }
     }
 
     fun showFollowings(userId: User.Id?) {
         userId?.let {
-            showFollowings.event = userId
+            _showFollowingsEvent.tryEmit(it)
         }
     }
 
@@ -145,7 +150,7 @@ class AccountViewModel @Inject constructor(
             logger.debug { "showProfile account未取得のためキャンセル" }
             return
         }
-        showProfile.event = account
+        _showProfileEvent.tryEmit(account)
     }
 
 

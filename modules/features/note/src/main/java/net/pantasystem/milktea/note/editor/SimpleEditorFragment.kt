@@ -113,7 +113,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
         mBinding.accountViewModel = accountViewModel
 
-        accountViewModel.showProfile.observe(this) {
+        accountViewModel.showProfileEvent.onEach {
             val intent = userDetailNavigation.newIntent(
                 UserDetailNavigationArgs.UserId(
                     User.Id(it.accountId, it.remoteId)
@@ -121,7 +121,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
             )
 
             startActivity(intent)
-        }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             metaRepository.observe(it.normalizedInstanceDomain)

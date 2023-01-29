@@ -133,61 +133,12 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
     }
 
-
-    class TimelinePagerAdapter(
-        fragmentManager: FragmentManager,
-        val pageableFragmentFactory: PageableFragmentFactory,
-        list: List<Page>,
-    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        private var requestBaseList: List<Page> = list
-        private var oldRequestBaseSetting = requestBaseList
-
-
-        val scrollableTopFragments = ArrayList<ScrollableTop>()
-        private val mFragments = ArrayList<Fragment>()
-
-        override fun getCount(): Int {
-            return requestBaseList.size
-        }
-
-        override fun getItem(position: Int): Fragment {
-            val item = requestBaseList[position]
-            val fragment = pageableFragmentFactory.create(item)
-
-            if (fragment is ScrollableTop) {
-                scrollableTopFragments.add(fragment)
-            }
-            mFragments.add(fragment)
-            return fragment
-        }
-
-
-        override fun getPageTitle(position: Int): String {
-            val page = requestBaseList[position]
-            return page.title
-        }
-
-        override fun getItemPosition(any: Any): Int {
-            val target = any as Fragment
-            if (mFragments.contains(target)) {
-                return PagerAdapter.POSITION_UNCHANGED
-            }
-            return PagerAdapter.POSITION_NONE
-        }
-
-
-        fun setList(list: List<Page>) {
-            mFragments.clear()
-            oldRequestBaseSetting = requestBaseList
-            requestBaseList = list
-            if (requestBaseList != oldRequestBaseSetting) {
-                notifyDataSetChanged()
-            }
-
-        }
-
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mPagerAdapter.onDestroy()
     }
+    
+    
 
     override fun showTop() {
         showTopCurrentFragment()
@@ -204,5 +155,64 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
 
     }
 
+
+}
+
+internal class TimelinePagerAdapter(
+    fragmentManager: FragmentManager,
+    private val pageableFragmentFactory: PageableFragmentFactory,
+    list: List<Page>,
+) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    private var requestBaseList: List<Page> = list
+    private var oldRequestBaseSetting = requestBaseList
+
+
+    val scrollableTopFragments = ArrayList<ScrollableTop>()
+    private val mFragments = ArrayList<Fragment>()
+
+    override fun getCount(): Int {
+        return requestBaseList.size
+    }
+
+    override fun getItem(position: Int): Fragment {
+        val item = requestBaseList[position]
+        val fragment = pageableFragmentFactory.create(item)
+
+        if (fragment is ScrollableTop) {
+            scrollableTopFragments.add(fragment)
+        }
+        mFragments.add(fragment)
+        return fragment
+    }
+
+
+    override fun getPageTitle(position: Int): String {
+        val page = requestBaseList[position]
+        return page.title
+    }
+
+    override fun getItemPosition(any: Any): Int {
+        val target = any as Fragment
+        if (mFragments.contains(target)) {
+            return PagerAdapter.POSITION_UNCHANGED
+        }
+        return PagerAdapter.POSITION_NONE
+    }
+
+
+    fun setList(list: List<Page>) {
+        mFragments.clear()
+        oldRequestBaseSetting = requestBaseList
+        requestBaseList = list
+        if (requestBaseList != oldRequestBaseSetting) {
+            notifyDataSetChanged()
+        }
+
+    }
+
+    fun onDestroy() {
+        mFragments.clear()
+        scrollableTopFragments.clear()
+    }
 
 }
