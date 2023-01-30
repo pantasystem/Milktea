@@ -16,7 +16,7 @@ data class TootStatusDTO(
     val uri: String,
     @SerialName("created_at") val createdAt: Instant,
     val account: MastodonAccountDTO,
-    val content: String,
+    val content: String? = null,
     val visibility: StatusVisibilityType,
     val sensitive: Boolean,
     @SerialName("spoiler_text") val spoilerText: String,
