@@ -48,7 +48,7 @@ class OkHttpFileUploaderProvider(
         return runBlocking {
             lock.withLock {
                 val map = instances.toMutableMap()
-                map[account.accountId] = OkHttpDriveFileUploader(context, account, json, okHttpClientProvider)
+                map[account.accountId] = MisskeyOkHttpDriveFileUploader(context, account, json, okHttpClientProvider)
                 instances = map
                 instances[account.accountId]
                     ?: throw IllegalStateException("生成したはずのインスタンスが消滅しました！！")

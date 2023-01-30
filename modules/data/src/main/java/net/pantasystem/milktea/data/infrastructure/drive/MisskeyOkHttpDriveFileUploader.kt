@@ -19,7 +19,7 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 
-object OkHttpDriveFileUploaderConstants {
+object MisskeyOkHttpDriveFileUploaderConstants {
     const val i = "i"
     const val force = "force"
     const val file = "file"
@@ -28,7 +28,7 @@ object OkHttpDriveFileUploaderConstants {
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-class OkHttpDriveFileUploader(
+class MisskeyOkHttpDriveFileUploader(
     val context: Context,
     val account: Account,
     val json: Json,
@@ -48,18 +48,18 @@ class OkHttpDriveFileUploader(
 
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.token)
-                .addFormDataPart(OkHttpDriveFileUploaderConstants.force, isForce.toString())
+                .addFormDataPart(MisskeyOkHttpDriveFileUploaderConstants.i, account.token)
+                .addFormDataPart(MisskeyOkHttpDriveFileUploaderConstants.force, isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart(
-                    OkHttpDriveFileUploaderConstants.file,
+                    MisskeyOkHttpDriveFileUploaderConstants.file,
                     fileProperty.name,
                     createRequestBody(fileProperty.type, res.execute().body!!.byteStream())
                 )
 
             if (fileProperty.folderId != null) {
                 requestBodyBuilder.addFormDataPart(
-                    OkHttpDriveFileUploaderConstants.folderId,
+                    MisskeyOkHttpDriveFileUploaderConstants.folderId,
                     fileProperty.folderId!!
                 )
             }
@@ -101,24 +101,24 @@ class OkHttpDriveFileUploader(
             val client = getOkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart(OkHttpDriveFileUploaderConstants.i, account.token)
-                .addFormDataPart(OkHttpDriveFileUploaderConstants.force, isForce.toString())
+                .addFormDataPart(MisskeyOkHttpDriveFileUploaderConstants.i, account.token)
+                .addFormDataPart(MisskeyOkHttpDriveFileUploaderConstants.force, isForce.toString())
                 //.addFormDataPart("file", uploadFile.file.name, RequestBody.create(MediaType.parse(mime), uploadFile.file))
                 .addFormDataPart(
-                    OkHttpDriveFileUploaderConstants.file,
+                    MisskeyOkHttpDriveFileUploaderConstants.file,
                     file.name,
                     createRequestBody(Uri.parse(file.path))
                 )
 
             val isSensitive = file.isSensitive
             requestBodyBuilder.addFormDataPart(
-                OkHttpDriveFileUploaderConstants.isSensitive,
+                MisskeyOkHttpDriveFileUploaderConstants.isSensitive,
                 isSensitive.toString()
             )
 
             val folderId = file.folderId
             if (folderId != null) requestBodyBuilder.addFormDataPart(
-                OkHttpDriveFileUploaderConstants.folderId,
+                MisskeyOkHttpDriveFileUploaderConstants.folderId,
                 folderId
             )
 
