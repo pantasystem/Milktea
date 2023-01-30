@@ -39,20 +39,22 @@ fun<T> Response<T>.throwIfHasError(): Response<T> {
             formatter.decodeFromString<Error>(it)
         }
     }.getOrNull()
-    error.let {
-        when(this.code()) {
-            400 -> throw APIError.ClientException(it)
-            401 -> throw APIError.AuthenticationException(it)
-            403 -> throw APIError.ForbiddenException(it)
-            404 -> throw APIError.NotFoundException(it)
-            418 -> throw APIError.IAmAIException(it)
-            500 -> throw APIError.InternalServerException(it)
-            else -> if (code() in 400..599) {
-                throw APIError.SomethingException(it, code())
-            }
-
-        }
-    }
+    throwErrorFromStatusCode(code(), error)
     return this
 
+}
+
+
+fun throwErrorFromStatusCode(code: Int, error: Error? = null) {
+    when(code) {
+        400 -> throw APIError.ClientException(error)
+        401 -> throw APIError.AuthenticationException(error)
+        403 -> throw APIError.ForbiddenException(error)
+        404 -> throw APIError.NotFoundException(error)
+        418 -> throw APIError.IAmAIException(error)
+        500 -> throw APIError.InternalServerException(error)
+        else -> if (code in 400..599) {
+            throw APIError.SomethingException(error, code)
+        }
+    }
 }

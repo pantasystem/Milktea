@@ -27,6 +27,7 @@ import net.pantasystem.milktea.model.file.FilePreviewSource
 @Composable
 fun HorizontalFilePreviewList(
     modifier: Modifier = Modifier,
+    isMisskey: Boolean = true,
     files: List<FilePreviewSource>,
     allowMaxFileSize: Long? = null,
     onShow: (FilePreviewSource) -> Unit,
@@ -40,6 +41,7 @@ fun HorizontalFilePreviewList(
     ) {
         items(count = files.size) { index ->
             FilePreview(
+                isMisskey = isMisskey,
                 file = files[index],
                 allowMaxFileSize = allowMaxFileSize,
                 onShow = onShow,
@@ -56,6 +58,7 @@ fun HorizontalFilePreviewList(
 
 @Composable
 fun FilePreview(
+    isMisskey: Boolean = true,
     file: FilePreviewSource,
     allowMaxFileSize: Long?,
     onShow: (FilePreviewSource) -> Unit,
@@ -92,6 +95,7 @@ fun FilePreview(
         }
         val target = dropDownTarget
         FilePreviewActionDropDown(
+            isMisskey = isMisskey,
             isSensitive = target != null
                     && (
                     (target is FilePreviewSource.Local && target.file.isSensitive)
@@ -208,6 +212,7 @@ fun RemoteFilePreview(
 
 @Composable
 fun FilePreviewActionDropDown(
+    isMisskey: Boolean = true,
     isSensitive: Boolean,
     onToggleSensitive: (Boolean) -> Unit,
     onDetach: () -> Unit,
@@ -270,13 +275,16 @@ fun FilePreviewActionDropDown(
             )
         }
 
-        if (onEditFileName != null) {
-            DropdownMenuItem(onClick = {
-                onEditFileName()
-                onDismissRequest()
-            }) {
-                Icon(Icons.Filled.Edit, contentDescription = stringResource(id = R.string.edit_file_name), modifier = Modifier.size(24.dp))
-                Text(stringResource(R.string.edit_file_name))
+        if (isMisskey) {
+            if (onEditFileName != null) {
+
+                DropdownMenuItem(onClick = {
+                    onEditFileName()
+                    onDismissRequest()
+                }) {
+                    Icon(Icons.Filled.Edit, contentDescription = stringResource(id = R.string.edit_file_name), modifier = Modifier.size(24.dp))
+                    Text(stringResource(R.string.edit_file_name))
+                }
             }
         }
 

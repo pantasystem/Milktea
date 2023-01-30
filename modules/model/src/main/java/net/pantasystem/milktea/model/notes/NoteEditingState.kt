@@ -78,6 +78,15 @@ fun List<AppFile>.toggleFileSensitiveStatus(appFile: AppFile.Local): List<AppFil
     }
 }
 
+fun List<AppFile>.toggleNsfwForMastodon(): List<AppFile> {
+    return this.map {
+        when(it) {
+            is AppFile.Local -> it.copy(isSensitive = !it.isSensitive)
+            is AppFile.Remote -> it
+        }
+    }
+}
+
 fun List<AppFile>.updateFileName(appFile: AppFile.Local, name: String): List<AppFile> {
     return this.map {
         if (it === appFile || it is AppFile.Local && it.isAttributeSame(appFile)) {

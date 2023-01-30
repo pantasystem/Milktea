@@ -20,9 +20,11 @@ class MastodonAPIFactory @Inject constructor(
 
     private val sharedOkHttp = okHttpProvider.get()
 
+    private var okHttpClientMap = mapOf<MastodonAPIProvider.Key, OkHttpClient>()
+
     @OptIn(ExperimentalSerializationApi::class)
     fun build(baseURL: String, token: String?): MastodonAPI {
-        val okHttp = getOkHttp(token)
+        val okHttp = getOkHttp(baseURL, token)
         return Retrofit.Builder()
             .baseUrl(baseURL)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
@@ -32,18 +34,28 @@ class MastodonAPIFactory @Inject constructor(
 
     }
 
-    private fun getOkHttp(token: String?): OkHttpClient {
+    fun getOkHttp(baseURL: String, token: String?): OkHttpClient {
         return if (token == null) {
             sharedOkHttp
         } else {
-            okHttpProvider.get().newBuilder()
-                .addInterceptor {
-                    val request = it.request()
-                    val newReq = request.newBuilder()
-                        .header("Authorization", "Bearer $token")
-                        .build()
-                    it.proceed(newReq)
-                }.build()
+            synchronized(this) {
+                val key = MastodonAPIProvider.Key(instanceBaseURL = baseURL, token = token)
+                var client = okHttpClientMap[key]
+                if (client == null) {
+                    client = okHttpProvider.get().newBuilder()
+                        .addInterceptor {
+                            val request = it.request()
+                            val newReq = request.newBuilder()
+                                .header("Authorization", "Bearer $token")
+                                .build()
+                            it.proceed(newReq)
+                        }.build()
+                    okHttpClientMap = okHttpClientMap + (key to client)
+                }
+                client
+
+            }
+
         }
     }
 

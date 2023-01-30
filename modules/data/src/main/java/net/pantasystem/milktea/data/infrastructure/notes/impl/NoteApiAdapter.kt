@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -14,9 +17,11 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
+import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.type4Mastodon
@@ -30,12 +35,11 @@ class NoteApiAdapter @Inject constructor(
     val mastodonAPIProvider: MastodonAPIProvider,
     val loggerFactory: Logger.Factory,
     val filePropertyDataSource: FilePropertyDataSource,
-    private val uploader: FileUploaderProvider,
-
-    ) {
+    private val uploader: FileUploaderProvider
+) {
 
     suspend fun create(createNote: CreateNote): NoteCreatedResultType {
-        return when(createNote.author.instanceType) {
+        return when (createNote.author.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 val task = PostNoteTask(
                     createNote,
@@ -58,14 +62,30 @@ class NoteApiAdapter @Inject constructor(
                 NoteResultType.Misskey(requireNotNull(noteDTO))
             }
             Account.InstanceType.MASTODON -> {
-                // TODO: 画像投稿処理を追加する
+                val fileIds = coroutineScope {
+                    createNote.files?.map { appFile ->
+                        async {
+                            when (appFile) {
+                                is AppFile.Local -> {
+                                    uploader.get(createNote.author)
+                                        .upload(UploadSource.LocalFile(appFile), false).id
+                                }
+                                is AppFile.Remote -> appFile.id
+                            }
+                        }
+                    }?.awaitAll()
+                }
                 val body = mastodonAPIProvider.get(createNote.author).createStatus(
                     CreateStatus(
                         status = createNote.text ?: "",
-                        mediaIds = emptyList(),
+                        mediaIds = fileIds?.map {
+                            it.fileId
+                        } ?: emptyList(),
                         inReplyToId = createNote.replyId?.noteId,
                         spoilerText = createNote.cw,
-                        sensitive = createNote.cw != null,
+                        sensitive = createNote.files?.any {
+                            (it as? AppFile.Local)?.isSensitive == true
+                        } == true,
                         visibility = createNote.visibility.type4Mastodon(),
                         poll = createNote.poll?.let { poll ->
                             CreateStatus.CreatePoll(
@@ -85,7 +105,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun showNote(noteId: Note.Id): ShowNoteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 val body = misskeyAPIProvider.get(account).showNote(
                     NoteRequest(
@@ -106,12 +126,14 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun delete(noteId: Note.Id) {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        when(account.instanceType) {
+        when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).delete(DeleteNote(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )).throwIfHasError()
+                misskeyAPIProvider.get(account).delete(
+                    DeleteNote(
+                        i = account.token,
+                        noteId = noteId.noteId
+                    )
+                ).throwIfHasError()
             }
             Account.InstanceType.MASTODON -> {
                 mastodonAPIProvider.get(account).deleteStatus(noteId.noteId)
@@ -122,7 +144,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).createThreadMute(
                     ToggleThreadMuteRequest(
@@ -144,7 +166,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).deleteThreadMute(
                     ToggleThreadMuteRequest(

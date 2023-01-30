@@ -43,6 +43,10 @@ class WordFilterConfigRepositoryImplTest {
                     override fun warning(msg: String, tag: String, e: Throwable?) {
                     }
 
+                    override fun debug(tag: String, e: Throwable?, message: () -> String) {
+
+                    }
+
                 }
             }
 

@@ -35,6 +35,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
@@ -125,29 +126,33 @@ fun VisibilitySelectionDialogContent(viewModel: NoteEditorViewModel) {
                         onClick = viewModel::setVisibility
                     )
 
-                    VisibilityLocalOnlySwitch(
-                        checked = visibility.isLocalOnly(),
-                        enabled = visibility is CanLocalOnly && channelId == null,
-                        onChanged = { result ->
-                            (visibility as? CanLocalOnly)?.changeLocalOnly(
-                                result
-                            )?.also {
-                                viewModel.setVisibility(it as Visibility)
-                            }
-                        },
-                    )
+                    if (uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
+                        VisibilityLocalOnlySwitch(
+                            checked = visibility.isLocalOnly(),
+                            enabled = visibility is CanLocalOnly && channelId == null,
+                            onChanged = { result ->
+                                (visibility as? CanLocalOnly)?.changeLocalOnly(
+                                    result
+                                )?.also {
+                                    viewModel.setVisibility(it as Visibility)
+                                }
+                            },
+                        )
 
-                    VisibilityChannelTitle()
+                        VisibilityChannelTitle()
+                    }
                 }
 
-                items(channels) { channel ->
-                    VisibilityChannelSelection(
-                        item = channel,
-                        isSelected = channel.id == channelId,
-                        onClick = {
-                            viewModel.setChannelId(it.id)
-                        }
-                    )
+                if (uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY) {
+                    items(channels) { channel ->
+                        VisibilityChannelSelection(
+                            item = channel,
+                            isSelected = channel.id == channelId,
+                            onClick = {
+                                viewModel.setChannelId(it.id)
+                            }
+                        )
+                    }
                 }
             }
         }
