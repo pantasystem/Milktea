@@ -68,7 +68,6 @@ class DriveFileRepositoryImpl @Inject constructor(
             withContext(ioDispatcher) {
                 val property = driveFileUploaderProvider.get(getAccount.get(accountId))
                     .upload(UploadSource.LocalFile(file), true)
-                    .toFileProperty(getAccount.get(accountId))
                 driveFileDataSource.add(property).getOrThrow()
                 driveFileDataSource.find(property.id).getOrThrow()
             }

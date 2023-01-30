@@ -8,7 +8,6 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
 import net.pantasystem.milktea.data.infrastructure.toEntity
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
@@ -42,11 +41,7 @@ class GalleryRepositoryImpl @Inject constructor(
                             is AppFile.Remote -> it.id
                             is AppFile.Local -> {
                                 fileUploaderProvider.get(createGalleryPost.author)
-                                    .upload(UploadSource.LocalFile(it), true).let {
-                                        it.toFileProperty(createGalleryPost.author).also { entity ->
-                                            filePropertyDataSource.add(entity)
-                                        }
-                                    }.id
+                                    .upload(UploadSource.LocalFile(it), true).id
                             }
                         }
                     }
@@ -145,12 +140,10 @@ class GalleryRepositoryImpl @Inject constructor(
                 updateGalleryPost.files.map {
                     async {
                         when (it) {
-                            is AppFile.Remote -> it.id.fileId
+                            is AppFile.Remote -> it.id
                             is AppFile.Local -> {
                                 fileUploaderProvider.get(account)
-                                    .upload(UploadSource.LocalFile(it), true).also {
-                                        filePropertyDataSource.add(it.toFileProperty(account))
-                                    }.id
+                                    .upload(UploadSource.LocalFile(it), true).id
                             }
                         }
                     }
@@ -162,7 +155,7 @@ class GalleryRepositoryImpl @Inject constructor(
                     postId = updateGalleryPost.id.galleryId,
                     description = updateGalleryPost.description,
                     title = updateGalleryPost.title,
-                    fileIds = files,
+                    fileIds = files.map { it.fileId },
                     isSensitive = updateGalleryPost.isSensitive
                 )
             ).throwIfHasError().body()
