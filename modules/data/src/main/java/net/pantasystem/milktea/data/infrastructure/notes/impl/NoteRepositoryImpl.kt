@@ -183,14 +183,7 @@ class NoteRepositoryImpl @Inject constructor(
                 async {
                     try {
                         val account = accountMap.getValue(noteId.accountId)
-                        misskeyAPIProvider.get(account).showNote(
-                            NoteRequest(
-                                i = account.token,
-                                noteId = noteId.noteId,
-                            )
-                        ).throwIfHasError().body()?.let {
-                            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
-                        }
+                        convertAndAdd(account, noteApiAdapter.showNote(noteId))
                     } catch (e: Throwable) {
                         if (e is APIError.NotFoundException) {
                             noteDataSource.delete(noteId)
@@ -205,32 +198,62 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            val dtoList = misskeyAPIProvider.get(account).children(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId,
-                    limit = 100,
-                )
-            ).throwIfHasError().body()!!
-            dtoList.map {
-                noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val dtoList = misskeyAPIProvider.get(account).children(
+                        NoteRequest(
+                            i = account.token,
+                            noteId = noteId.noteId,
+                            limit = 100,
+                        )
+                    ).throwIfHasError().body()!!
+                    dtoList.map {
+                        noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+                    }
+                }
+                Account.InstanceType.MASTODON -> {
+                    val body = mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
+                        .throwIfHasError()
+                        .body()
+                    requireNotNull(body).let {
+                        it.ancestors + it.descendants
+                    }.map {
+                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
+                    }
+                }
             }
+
         }
     }
 
     override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
-            val dtoList = misskeyAPIProvider.get(account).conversation(
-                NoteRequest(
-                    i = account.token,
-                    noteId = noteId.noteId,
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val dtoList = misskeyAPIProvider.get(account).conversation(
+                        NoteRequest(
+                            i = account.token,
+                            noteId = noteId.noteId,
 
-                    )
-            ).throwIfHasError().body()!!
-            dtoList.map {
-                noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+                            )
+                    ).throwIfHasError().body()!!
+                    dtoList.map {
+                        noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+                    }
+                }
+                Account.InstanceType.MASTODON -> {
+                    val body = mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
+                        .throwIfHasError()
+                        .body()
+                    requireNotNull(body).let {
+                        it.ancestors + it.descendants
+                    }.map {
+                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
+                    }
+                }
             }
+
         }
     }
 

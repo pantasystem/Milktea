@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.mastodon.apps.AccessToken
 import net.pantasystem.milktea.api.mastodon.apps.App
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
+import net.pantasystem.milktea.api.mastodon.context.ContextDTO
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
@@ -233,4 +234,6 @@ interface MastodonAPI {
         @Query("min_id") minId: String? = null
     ): Response<List<MastodonAccountDTO>>
 
+    @GET("api/v1/statuses/{statusId}/context")
+    suspend fun getStatusesContext(@Path("statusId") statusId: String): Response<ContextDTO>
 }
