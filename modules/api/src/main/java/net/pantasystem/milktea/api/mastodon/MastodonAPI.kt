@@ -13,6 +13,8 @@ import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
 import net.pantasystem.milktea.api.mastodon.list.ListDTO
 import net.pantasystem.milktea.api.mastodon.list.RemoveAccountsFromList
+import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
+import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
@@ -236,4 +238,7 @@ interface MastodonAPI {
 
     @GET("api/v1/statuses/{statusId}/context")
     suspend fun getStatusesContext(@Path("statusId") statusId: String): Response<ContextDTO>
+
+    @PUT("api/v1/media/{mediaId}")
+    suspend fun updateMediaAttachment(@Path("mediaId") mediaId: String, @Body body: UpdateMediaAttachment): Response<TootMediaAttachment>
 }

@@ -6,8 +6,11 @@ import kotlinx.coroutines.delay
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
+import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
 import net.pantasystem.milktea.common.throwErrorFromStatusCode
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIFactory
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -21,6 +24,7 @@ class MastodonOkHttpFileUploader(
     val account: Account,
     val json: Json,
     private val mastodonAPIFactory: MastodonAPIFactory,
+    private val mastodonAPIProvider: MastodonAPIProvider,
     private val filePropertyDataSource: FilePropertyDataSource,
 ) : FileUploader {
 
@@ -60,8 +64,15 @@ class MastodonOkHttpFileUploader(
         while(code == 202 || code == 206) {
             code = checkUploadStatus(property.id.fileId)
             throwErrorFromStatusCode(code)
-            delay(500)
+            delay(100)
         }
+        if (!file.file.comment.isNullOrBlank()) {
+            mastodonAPIProvider.get(account).updateMediaAttachment(result.id, UpdateMediaAttachment(
+                description = file.file.comment ?: "",
+                focus = "0.00,0.00"
+            )).throwIfHasError()
+        }
+
         return property
     }
 

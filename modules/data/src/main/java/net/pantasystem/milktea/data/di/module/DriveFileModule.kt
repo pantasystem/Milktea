@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIFactory
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -42,6 +43,7 @@ object DriveFileModule {
         okHttpClientProvider: OkHttpClientProvider,
         filePropertyDataSource: FilePropertyDataSource,
         mastodonAPIFactory: MastodonAPIFactory,
+        mastodonAPIProvider: MastodonAPIProvider,
     ): FileUploaderProvider {
         return OkHttpFileUploaderProvider(
             okHttpClientProvider,
@@ -51,6 +53,7 @@ object DriveFileModule {
             },
             filePropertyDataSource = filePropertyDataSource,
             mastodonAPIFactory = mastodonAPIFactory,
+            mastodonAPIProvider = mastodonAPIProvider,
         )
     }
 }
