@@ -4,6 +4,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
+import net.pantasystem.milktea.api.mastodon.filter.FilterResultDTO
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -40,7 +41,7 @@ data class TootStatusDTO(
     val muted: Boolean? = null,
     val bookmarked: Boolean? = null,
     val pinned: Boolean? = null,
-    val filtered: Boolean? = null,
+    val filtered: List<FilterResultDTO>? = null,
     @SerialName("emoji_reactions") val emojiReactions: List<EmojiReactionCount>? = null,
     @SerialName("quote") val quote: TootStatusDTO? = null,
     @SerialName("circle_id") val circleId: String? = null,
