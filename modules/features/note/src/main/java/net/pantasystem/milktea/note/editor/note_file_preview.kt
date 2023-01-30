@@ -12,6 +12,7 @@ import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
 import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 
 @ExperimentalCoroutinesApi
@@ -25,12 +26,14 @@ fun NoteFilePreview(
     val uiState by noteEditorViewModel.uiState.collectAsState()
     val maxFileCount = noteEditorViewModel.maxFileCount.asLiveData().observeAsState()
     val instanceInfo by noteEditorViewModel.instanceInfo.collectAsState()
+    val instanceInfoType by noteEditorViewModel.instanceInfoType.collectAsState()
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         HorizontalFilePreviewList(
             files = uiState.files,
             modifier = Modifier.weight(1f),
+            isMisskey = instanceInfoType is InstanceInfoType.Misskey,
             allowMaxFileSize = instanceInfo?.clientMaxBodyByteSize,
             onToggleSensitive = {
                 noteEditorViewModel.toggleNsfw(it.file)
