@@ -451,8 +451,14 @@ class NoteEditorViewModel @Inject constructor(
         when (appFile) {
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.toggleFileSensitiveStatus(appFile))
-                savedStateHandle[NoteEditorSavedStateKey.PickedFiles.name] =
-                    files.value.toggleFileSensitiveStatus(appFile)
+                if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+                    savedStateHandle[NoteEditorSavedStateKey.PickedFiles.name] =
+                        files.value.toggleNsfwForMastodon()
+                } else {
+                    savedStateHandle[NoteEditorSavedStateKey.PickedFiles.name] =
+                        files.value.toggleFileSensitiveStatus(appFile)
+                }
+
             }
             is AppFile.Remote -> {
                 viewModelScope.launch {
