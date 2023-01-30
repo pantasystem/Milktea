@@ -35,12 +35,11 @@ class NoteApiAdapter @Inject constructor(
     val mastodonAPIProvider: MastodonAPIProvider,
     val loggerFactory: Logger.Factory,
     val filePropertyDataSource: FilePropertyDataSource,
-    private val uploader: FileUploaderProvider,
-
-    ) {
+    private val uploader: FileUploaderProvider
+) {
 
     suspend fun create(createNote: CreateNote): NoteCreatedResultType {
-        return when(createNote.author.instanceType) {
+        return when (createNote.author.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 val task = PostNoteTask(
                     createNote,
@@ -66,9 +65,10 @@ class NoteApiAdapter @Inject constructor(
                 val fileIds = coroutineScope {
                     createNote.files?.map { appFile ->
                         async {
-                            when(appFile) {
+                            when (appFile) {
                                 is AppFile.Local -> {
-                                    uploader.get(createNote.author).upload(UploadSource.LocalFile(appFile), false).id
+                                    uploader.get(createNote.author)
+                                        .upload(UploadSource.LocalFile(appFile), false).id
                                 }
                                 is AppFile.Remote -> appFile.id
                             }
@@ -83,7 +83,9 @@ class NoteApiAdapter @Inject constructor(
                         } ?: emptyList(),
                         inReplyToId = createNote.replyId?.noteId,
                         spoilerText = createNote.cw,
-                        sensitive = createNote.cw != null,
+                        sensitive = createNote.files?.any {
+                            (it as? AppFile.Local)?.isSensitive == true
+                        } == true,
                         visibility = createNote.visibility.type4Mastodon(),
                         poll = createNote.poll?.let { poll ->
                             CreateStatus.CreatePoll(
@@ -103,7 +105,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun showNote(noteId: Note.Id): ShowNoteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 val body = misskeyAPIProvider.get(account).showNote(
                     NoteRequest(
@@ -124,12 +126,14 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun delete(noteId: Note.Id) {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        when(account.instanceType) {
+        when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).delete(DeleteNote(
-                    i = account.token,
-                    noteId = noteId.noteId
-                )).throwIfHasError()
+                misskeyAPIProvider.get(account).delete(
+                    DeleteNote(
+                        i = account.token,
+                        noteId = noteId.noteId
+                    )
+                ).throwIfHasError()
             }
             Account.InstanceType.MASTODON -> {
                 mastodonAPIProvider.get(account).deleteStatus(noteId.noteId)
@@ -140,7 +144,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun createThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).createThreadMute(
                     ToggleThreadMuteRequest(
@@ -162,7 +166,7 @@ class NoteApiAdapter @Inject constructor(
 
     suspend fun deleteThreadMute(noteId: Note.Id): ToggleThreadMuteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).deleteThreadMute(
                     ToggleThreadMuteRequest(
