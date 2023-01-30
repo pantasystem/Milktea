@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.drive
 
 import android.content.Context
 import android.net.Uri
+import kotlinx.coroutines.delay
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
@@ -52,8 +53,27 @@ class MastodonOkHttpFileUploader(
         val response = okHttpClient.newCall(request).execute()
         throwErrorFromStatusCode(response.code)
         val result = json.decodeFromString<TootMediaAttachment>(requireNotNull(response.body?.string()))
-        return result.toFileProperty(account, false).also {
+        val property = result.toFileProperty(account, false).also {
             filePropertyDataSource.add(it).getOrThrow()
         }
+        var code = response.code
+        while(code == 202 || code == 206) {
+            code = checkUploadStatus(property.id.fileId)
+            throwErrorFromStatusCode(code)
+            delay(500)
+        }
+        return property
+    }
+
+    private fun checkUploadStatus(fileId: String): Int {
+        val okHttpClient =
+            mastodonAPIFactory.getOkHttp(account.normalizedInstanceDomain, account.token)
+        val request = Request.Builder()
+            .url(URL("${account.normalizedInstanceDomain}/api/v1/media/${fileId}"))
+            .get()
+            .build()
+        return okHttpClient.newCall(
+            request
+        ).execute().code
     }
 }

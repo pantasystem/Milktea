@@ -46,7 +46,7 @@ fun TootMediaAttachment.toFileProperty(account: Account, isSensitive: Boolean): 
         type = type,
         md5 = null,
         size = null,
-        url = url,
+        url = url ?: "",
         isSensitive = isSensitive,
         thumbnailUrl = previewUrl,
         blurhash = blurhash,

@@ -14,9 +14,11 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
+import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
+import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.CreateNote
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.type4Mastodon
@@ -58,11 +60,21 @@ class NoteApiAdapter @Inject constructor(
                 NoteResultType.Misskey(requireNotNull(noteDTO))
             }
             Account.InstanceType.MASTODON -> {
-                // TODO: 画像投稿処理を追加する
+                val fileIds = createNote.files?.map { appFile ->
+                    when(appFile) {
+                        is AppFile.Local -> {
+                            uploader.get(createNote.author).upload(UploadSource.LocalFile(appFile), false).id
+                        }
+                        is AppFile.Remote -> appFile.id
+                    }
+
+                }
                 val body = mastodonAPIProvider.get(createNote.author).createStatus(
                     CreateStatus(
                         status = createNote.text ?: "",
-                        mediaIds = emptyList(),
+                        mediaIds = fileIds?.map {
+                            it.fileId
+                        } ?: emptyList(),
                         inReplyToId = createNote.replyId?.noteId,
                         spoilerText = createNote.cw,
                         sensitive = createNote.cw != null,
