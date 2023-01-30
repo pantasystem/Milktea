@@ -1,5 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -60,14 +63,17 @@ class NoteApiAdapter @Inject constructor(
                 NoteResultType.Misskey(requireNotNull(noteDTO))
             }
             Account.InstanceType.MASTODON -> {
-                val fileIds = createNote.files?.map { appFile ->
-                    when(appFile) {
-                        is AppFile.Local -> {
-                            uploader.get(createNote.author).upload(UploadSource.LocalFile(appFile), false).id
+                val fileIds = coroutineScope {
+                    createNote.files?.map { appFile ->
+                        async {
+                            when(appFile) {
+                                is AppFile.Local -> {
+                                    uploader.get(createNote.author).upload(UploadSource.LocalFile(appFile), false).id
+                                }
+                                is AppFile.Remote -> appFile.id
+                            }
                         }
-                        is AppFile.Remote -> appFile.id
-                    }
-
+                    }?.awaitAll()
                 }
                 val body = mastodonAPIProvider.get(createNote.author).createStatus(
                     CreateStatus(
