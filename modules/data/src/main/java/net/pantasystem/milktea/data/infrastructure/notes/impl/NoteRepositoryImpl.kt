@@ -183,14 +183,7 @@ class NoteRepositoryImpl @Inject constructor(
                 async {
                     try {
                         val account = accountMap.getValue(noteId.accountId)
-                        misskeyAPIProvider.get(account).showNote(
-                            NoteRequest(
-                                i = account.token,
-                                noteId = noteId.noteId,
-                            )
-                        ).throwIfHasError().body()?.let {
-                            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
-                        }
+                        convertAndAdd(account, noteApiAdapter.showNote(noteId))
                     } catch (e: Throwable) {
                         if (e is APIError.NotFoundException) {
                             noteDataSource.delete(noteId)
