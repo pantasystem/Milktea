@@ -453,6 +453,9 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun toggleNsfw(appFile: AppFile) {
+        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+            return
+        }
         when (appFile) {
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.toggleFileSensitiveStatus(appFile))
