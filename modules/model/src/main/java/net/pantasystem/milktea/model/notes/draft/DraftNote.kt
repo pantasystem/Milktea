@@ -92,15 +92,7 @@ fun NoteRelation.toDraftNote(): DraftNote {
         text = this.note.text,
         cw = this.note.cw,
         draftFiles = this.files?.map {
-            DraftNoteFile.Remote(
-                it.copy(
-                    isSensitive = when (this.note.type) {
-                        // NOTE: Mastodonの場合sensitiveフラグがあるので、メディアにセンシティブフラグを立てたくない
-                        is Note.Type.Mastodon -> false
-                        Note.Type.Misskey -> it.isSensitive
-                    }
-                )
-            )
+            DraftNoteFile.Remote(it)
         },
         viaMobile = this.note.viaMobile,
         localOnly = this.note.visibility.isLocalOnly(),

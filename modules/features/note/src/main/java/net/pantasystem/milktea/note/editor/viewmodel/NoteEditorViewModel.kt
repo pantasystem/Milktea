@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.InstanceInfoRepository
@@ -63,6 +64,7 @@ class NoteEditorViewModel @Inject constructor(
     private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
     private val instanceInfoRepository: InstanceInfoRepository,
+    private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -89,7 +91,8 @@ class NoteEditorViewModel @Inject constructor(
         instanceInfoService.observe(it.normalizedInstanceDomain)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val isSensitiveMedia = savedStateHandle.getStateFlow<Boolean?>(NoteEditorSavedStateKey.IsSensitive.name, null)
+    val isSensitiveMedia =
+        savedStateHandle.getStateFlow<Boolean?>(NoteEditorSavedStateKey.IsSensitive.name, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val driveFiles = files.flatMapLatest { files ->
@@ -137,9 +140,10 @@ class NoteEditorViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
         currentAccount.filterNotNull().flatMapLatest { account ->
-            instanceInfoService.observe(account.normalizedInstanceDomain).filterNotNull().map { meta ->
-                meta.maxNoteTextLength
-            }
+            instanceInfoService.observe(account.normalizedInstanceDomain).filterNotNull()
+                .map { meta ->
+                    meta.maxNoteTextLength
+                }
         }.stateIn(
             viewModelScope + Dispatchers.IO,
             started = SharingStarted.Lazily,
@@ -159,7 +163,6 @@ class NoteEditorViewModel @Inject constructor(
     val instanceInfo = currentAccount.filterNotNull().flatMapLatest {
         instanceInfoRepository.observeByHost(it.getHost())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
 
 
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
@@ -192,14 +195,15 @@ class NoteEditorViewModel @Inject constructor(
         null
     )
 
-    private val noteEditorFormState = combine(text, cw, hasCw, isSensitiveMedia) { text, cw, hasCw, sensitive ->
-        NoteEditorFormState(
-            text = text,
-            cw = cw,
-            hasCw = hasCw,
-            isSensitive = sensitive ?: false,
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
+    private val noteEditorFormState =
+        combine(text, cw, hasCw, isSensitiveMedia) { text, cw, hasCw, sensitive ->
+            NoteEditorFormState(
+                text = text,
+                cw = cw,
+                hasCw = hasCw,
+                isSensitive = sensitive ?: false,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
 
     val address = visibility.map {
         it as? Visibility.Specified
@@ -474,7 +478,19 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun toggleSensitive() {
-        savedStateHandle.setSensitive(savedStateHandle.getSensitive().not())
+        val sensitive = savedStateHandle.getSensitive()
+        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+            viewModelScope.launch {
+                savedStateHandle.setFiles(
+                    savedStateHandle.getFiles().mapNotNull { appFile ->
+                        updateSensitiveUseCase(appFile, !sensitive).onFailure {
+                            logger.error("ファイルのセンシティブの状態の更新に失敗しました", it)
+                        }.getOrNull()
+                    }
+                )
+            }
+        }
+        savedStateHandle.setSensitive(!sensitive)
     }
 
     fun updateFileName(appFile: AppFile, name: String) {
