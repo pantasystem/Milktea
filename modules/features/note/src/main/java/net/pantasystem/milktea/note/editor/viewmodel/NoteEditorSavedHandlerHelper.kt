@@ -131,6 +131,9 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
             Date(it.toEpochMilliseconds())
         }
     )
+    setSensitive(
+        note.formState.isSensitive,
+    )
 }
 
 suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibility?, fileRepository: DriveFileRepository): NoteEditorUiState {
@@ -139,6 +142,7 @@ suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility
             text = getText(),
             cw = getCw(),
             hasCw = getHasCw(),
+            isSensitive = getSensitive()
         ),
         sendToState = NoteEditorSendToState(
             visibility = visibility ?: getVisibility() ?: Visibility.Public(false),

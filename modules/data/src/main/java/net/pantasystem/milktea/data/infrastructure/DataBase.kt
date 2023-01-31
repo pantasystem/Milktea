@@ -101,7 +101,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         CustomEmojiRecord::class,
         CustomEmojiAliasRecord::class,
     ],
-    version = 36,
+    version = 37,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -129,6 +129,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 33, to = 34),
         AutoMigration(from = 34, to = 35),
         AutoMigration(from = 35, to = 36),
+        AutoMigration(from = 36, to = 37),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )

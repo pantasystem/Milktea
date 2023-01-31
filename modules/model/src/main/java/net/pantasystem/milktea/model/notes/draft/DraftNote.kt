@@ -5,6 +5,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.getName
 import net.pantasystem.milktea.model.notes.isLocalOnly
@@ -29,6 +30,7 @@ data class DraftNote(
     val draftPoll: DraftPoll? = null,
     val reservationPostingAt: Date? = null,
     val channelId: Channel.Id? = null,
+    val isSensitive: Boolean? = null,
     var draftNoteId: Long = 0L
 ) : Serializable {
     val filePreviewSources: List<FilePreviewSource> by lazy {
@@ -102,5 +104,6 @@ fun NoteRelation.toDraftNote(): DraftNote {
         },
         draftPoll = this.note.poll?.toDraftPoll(),
         channelId = this.note.channelId,
+        isSensitive = (this.note.type as? Note.Type.Mastodon)?.isSensitive
     )
 }

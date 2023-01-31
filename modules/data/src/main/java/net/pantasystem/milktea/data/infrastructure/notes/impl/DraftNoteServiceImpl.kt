@@ -71,7 +71,8 @@ class DraftNoteServiceImpl @Inject constructor(
                             Date(it)
                         },
                     channelId = createNote.channelId,
-                    draftNoteId = createNote.draftNoteId ?: 0L
+                    draftNoteId = createNote.draftNoteId ?: 0L,
+                    isSensitive = createNote.isSensitive
                 )
             ).getOrThrow()
         }.onFailure {

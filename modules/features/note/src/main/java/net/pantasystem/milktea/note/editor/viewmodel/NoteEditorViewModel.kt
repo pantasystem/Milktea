@@ -192,11 +192,12 @@ class NoteEditorViewModel @Inject constructor(
         null
     )
 
-    private val noteEditorFormState = combine(text, cw, hasCw) { text, cw, hasCw ->
+    private val noteEditorFormState = combine(text, cw, hasCw, isSensitiveMedia) { text, cw, hasCw, sensitive ->
         NoteEditorFormState(
             text = text,
             cw = cw,
-            hasCw = hasCw
+            hasCw = hasCw,
+            isSensitive = sensitive ?: false,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
 

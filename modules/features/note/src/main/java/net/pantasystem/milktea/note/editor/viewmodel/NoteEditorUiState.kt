@@ -16,6 +16,7 @@ data class NoteEditorFormState(
     val text: String? = null,
     val cw: String? = null,
     val hasCw: Boolean = false,
+    val isSensitive: Boolean = false,
 )
 
 data class VisibilityAndChannelId(
@@ -96,6 +97,7 @@ fun NoteEditorUiState.toCreateNote(account: Account): CreateNote {
         draftNoteId = sendToState.draftNoteId,
         channelId = sendToState.channelId,
         scheduleWillPostAt = sendToState.schedulePostAt,
+        isSensitive = formState.isSensitive,
     )
 }
 
@@ -106,6 +108,7 @@ fun DraftNote.toNoteEditingState(): NoteEditorUiState {
             text = this.text,
             cw = this.cw,
             hasCw = this.cw != null,
+            isSensitive = this.isSensitive ?: false,
         ),
         sendToState = NoteEditorSendToState(
             draftNoteId = this.draftNoteId,
