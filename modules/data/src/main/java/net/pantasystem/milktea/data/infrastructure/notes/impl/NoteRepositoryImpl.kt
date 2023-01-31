@@ -78,9 +78,14 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun delete(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+    override suspend fun delete(noteId: Note.Id): Result<Note> = runCancellableCatching{
         withContext(ioDispatcher) {
-            noteApiAdapter.delete(noteId)
+            val account = getAccount.get(noteId.accountId)
+            val note = find(noteId).getOrThrow()
+            when(val result = noteApiAdapter.delete(noteId)) {
+                is DeleteNoteResultType.Mastodon -> noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, result.status)
+                DeleteNoteResultType.Misskey -> note
+            }
         }
     }
 

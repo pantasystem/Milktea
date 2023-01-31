@@ -122,9 +122,9 @@ class NoteApiAdapter @Inject constructor(
         }
     }
 
-    suspend fun delete(noteId: Note.Id) {
+    suspend fun delete(noteId: Note.Id): DeleteNoteResultType {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
-        when (account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).delete(
                     DeleteNote(
@@ -132,10 +132,13 @@ class NoteApiAdapter @Inject constructor(
                         noteId = noteId.noteId
                     )
                 ).throwIfHasError()
+                DeleteNoteResultType.Misskey
             }
             Account.InstanceType.MASTODON -> {
-                mastodonAPIProvider.get(account).deleteStatus(noteId.noteId)
+                val body = mastodonAPIProvider.get(account).deleteStatus(noteId.noteId)
                     .throwIfHasError()
+                    .body()
+                DeleteNoteResultType.Mastodon(requireNotNull(body))
             }
         }
     }
@@ -190,9 +193,16 @@ sealed interface NoteResultType {
     data class Mastodon(val status: TootStatusDTO) : NoteResultType
 }
 
+sealed interface DeleteNoteResultType {
+    data class Mastodon(val status: TootStatusDTO) : DeleteNoteResultType
+    object Misskey : DeleteNoteResultType
+}
+
+
 typealias ShowNoteResultType = NoteResultType
 
 typealias NoteCreatedResultType = NoteResultType
+
 
 sealed interface ToggleThreadMuteResultType {
     object Misskey : ToggleThreadMuteResultType

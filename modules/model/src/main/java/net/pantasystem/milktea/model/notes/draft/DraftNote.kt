@@ -89,7 +89,7 @@ fun NoteRelation.toDraftNote(): DraftNote {
         visibleUserIds = this.note.visibleUserIds?.map {
             it.id
         },
-        text = this.note.text,
+        text = (this.note.type as? Note.Type.Mastodon)?.pureText ?: this.note.text,
         cw = this.note.cw,
         draftFiles = this.files?.map {
             DraftNoteFile.Remote(it)

@@ -67,7 +67,8 @@ data class Note(
             val isFedibirdQuote: Boolean,
             val pollId: String?,
             val isSensitive: Boolean?,
-        ) : Type {
+            val pureText: String?,
+            ) : Type {
             data class Tag(
                 val name: String,
                 val url: String,
