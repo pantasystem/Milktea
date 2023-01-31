@@ -37,6 +37,7 @@ data class DraftNoteDTO(
     @ColumnInfo(name = "draft_note_id")
     @PrimaryKey(autoGenerate = true)
     var draftNoteId: Long? = null,
+    val isSensitive: Boolean? = null,
 
 ) {
 
@@ -60,7 +61,7 @@ data class DraftNoteDTO(
                 draftNote.reservationPostingAt,
                 DraftPollDTO.make(draftNote.draftPoll),
                 draftNoteId = if(draftNote.draftNoteId == 0L) null else draftNote.draftNoteId,
-
+                isSensitive = draftNote.isSensitive
             )
         }
     }
@@ -93,7 +94,8 @@ data class DraftNoteDTO(
                 Channel.Id(accountId, it)
             },
             draftNoteId = draftNoteId ?: 0L,
-            reservationPostingAt = scheduleWillPostAt
+            reservationPostingAt = scheduleWillPostAt,
+            isSensitive = isSensitive,
         )
     }
 

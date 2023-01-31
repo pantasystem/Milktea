@@ -171,7 +171,6 @@ fun LocalFilePreview(
                 }
             }
 
-
         }
 
     }
@@ -240,25 +239,29 @@ fun FilePreviewActionDropDown(
             )
             Text(stringResource(id = R.string.remove_attachment))
         }
-        DropdownMenuItem(
-            onClick = {
-                onToggleSensitive(!isSensitive)
-                onDismissRequest()
-            }
-        ) {
 
-            Icon(
-                if (isSensitive)
-                    Icons.Filled.Image
-                else
-                    Icons.Filled.HideImage,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                if (isSensitive) stringResource(id = R.string.undo_nsfw) else stringResource(id = R.string.mark_as_nsfw)
-            )
+        if (isMisskey) {
+            DropdownMenuItem(
+                onClick = {
+                    onToggleSensitive(!isSensitive)
+                    onDismissRequest()
+                }
+            ) {
+
+                Icon(
+                    if (isSensitive)
+                        Icons.Filled.Image
+                    else
+                        Icons.Filled.HideImage,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    if (isSensitive) stringResource(id = R.string.undo_nsfw) else stringResource(id = R.string.mark_as_nsfw)
+                )
+            }
         }
+
         DropdownMenuItem(
             onClick = {
                 onShow()

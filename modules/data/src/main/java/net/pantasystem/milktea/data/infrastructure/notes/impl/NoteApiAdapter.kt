@@ -83,9 +83,7 @@ class NoteApiAdapter @Inject constructor(
                         } ?: emptyList(),
                         inReplyToId = createNote.replyId?.noteId,
                         spoilerText = createNote.cw,
-                        sensitive = createNote.files?.any {
-                            (it as? AppFile.Local)?.isSensitive == true
-                        } == true,
+                        sensitive = createNote.isSensitive ?: false,
                         visibility = createNote.visibility.type4Mastodon(),
                         poll = createNote.poll?.let { poll ->
                             CreateStatus.CreatePoll(

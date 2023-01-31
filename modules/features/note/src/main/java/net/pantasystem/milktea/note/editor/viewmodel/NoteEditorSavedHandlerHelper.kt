@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.notes.Visibility
 import java.util.*
 
 enum class NoteEditorSavedStateKey() {
-    Text, Cw, PickedFiles, Visibility, ChannelId, ReplyId, RenoteId, ScheduleAt, DraftNoteId, HasCW, Poll
+    Text, Cw, PickedFiles, Visibility, ChannelId, ReplyId, RenoteId, ScheduleAt, DraftNoteId, HasCW, Poll, IsSensitive,
 }
 
 
@@ -44,6 +44,10 @@ fun SavedStateHandle.getFiles(): List<AppFile> {
 
 fun SavedStateHandle.setChannelId(channelId: Channel.Id?) {
     this[NoteEditorSavedStateKey.ChannelId.name] = channelId
+}
+
+fun SavedStateHandle.setSensitive(value: Boolean?) {
+    this[NoteEditorSavedStateKey.IsSensitive.name] = value
 }
 
 fun SavedStateHandle.getChannelId(): Channel.Id? {
@@ -107,6 +111,10 @@ fun SavedStateHandle.getDraftNoteId(): Long? {
     return this[NoteEditorSavedStateKey.DraftNoteId.name]
 }
 
+fun SavedStateHandle.getSensitive(): Boolean {
+    return this[NoteEditorSavedStateKey.IsSensitive.name] ?: false
+}
+
 fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
     setVisibility(note.sendToState.visibility)
     setText(note.formState.text)
@@ -123,6 +131,9 @@ fun SavedStateHandle.applyBy(note: NoteEditorUiState) {
             Date(it.toEpochMilliseconds())
         }
     )
+    setSensitive(
+        note.formState.isSensitive,
+    )
 }
 
 suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility: Visibility?, fileRepository: DriveFileRepository): NoteEditorUiState {
@@ -131,6 +142,7 @@ suspend fun SavedStateHandle.getNoteEditingUiState(account: Account?, visibility
             text = getText(),
             cw = getCw(),
             hasCw = getHasCw(),
+            isSensitive = getSensitive()
         ),
         sendToState = NoteEditorSendToState(
             visibility = visibility ?: getVisibility() ?: Visibility.Public(false),

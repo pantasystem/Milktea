@@ -32,6 +32,7 @@ data class CreateNote(
     val draftNoteId: Long? = null,
     val channelId: Channel.Id? = null,
     val scheduleWillPostAt: Instant? = null,
+    val isSensitive: Boolean? = null,
 )
 
 
@@ -68,5 +69,6 @@ fun DraftNote.toCreateNote(author: Account): CreateNote {
         },
         channelId = channelId,
         author = author,
+        isSensitive = isSensitive,
     )
 }
