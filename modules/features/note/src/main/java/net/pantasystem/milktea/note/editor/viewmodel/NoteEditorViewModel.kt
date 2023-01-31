@@ -85,6 +85,13 @@ class NoteEditorViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
+    val instanceInfoType = currentAccount.filterNotNull().flatMapLatest {
+        instanceInfoService.observe(it.normalizedInstanceDomain)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val isSensitiveMedia = savedStateHandle.getStateFlow<Boolean?>(NoteEditorSavedStateKey.IsSensitive.name, null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val driveFiles = files.flatMapLatest { files ->
         val fileIds = files.mapNotNull {
             it as? AppFile.Remote
@@ -153,10 +160,7 @@ class NoteEditorViewModel @Inject constructor(
         instanceInfoRepository.observeByHost(it.getHost())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfoType = currentAccount.filterNotNull().flatMapLatest {
-        instanceInfoService.observe(it.normalizedInstanceDomain)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
 
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
         NoteEditorSavedStateKey.Visibility.name,
@@ -463,6 +467,10 @@ class NoteEditorViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun toggleSensitive() {
+        savedStateHandle.setSensitive(savedStateHandle.getSensitive().not())
     }
 
     fun updateFileName(appFile: AppFile, name: String) {
