@@ -13,14 +13,12 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
-import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.notes.DeleteAndEditUseCase
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.bookmark.BookmarkRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.favorite.ToggleFavoriteUseCase
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -35,10 +33,10 @@ class NotesViewModel @Inject constructor(
     private val toggleReactionUseCase: ToggleReactionUseCase,
     private val favoriteRepository: FavoriteRepository,
     val accountStore: AccountStore,
-    val draftNoteRepository: DraftNoteRepository,
     private val translationStore: NoteTranslationStore,
     private val bookmarkRepository: BookmarkRepository,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val deleteAndEditUseCase: DeleteAndEditUseCase,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
@@ -149,14 +147,10 @@ class NotesViewModel @Inject constructor(
 
     fun removeAndEditNote(note: NoteRelation) {
         viewModelScope.launch {
-            runCancellableCatching {
-                val dn = draftNoteRepository.save(note.toDraftNote()).getOrThrow()
-                noteRepository.delete(note.note.id).getOrThrow()
-                dn
-            }.onSuccess {
+            deleteAndEditUseCase(note.note.id).onSuccess {
                 _openNoteEditorEvent.tryEmit(it)
-            }.onFailure { t ->
-                logger.error("削除に失敗しました", t)
+            }.onFailure {
+                logger.error("削除に失敗しました", it)
             }
         }
 
