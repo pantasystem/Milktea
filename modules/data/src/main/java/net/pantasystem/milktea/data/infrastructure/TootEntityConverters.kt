@@ -109,6 +109,7 @@ fun TootStatusDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
             isFedibirdQuote = quote != null,
             pollId = poll?.id,
             isSensitive = sensitive,
+            pureText = text
         ),
         nodeInfo = nodeInfo,
     )
