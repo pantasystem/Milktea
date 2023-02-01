@@ -32,7 +32,7 @@ class ActionNoteHandler(
     fun initViewModelListener() {
 
         mNotesViewModel.statusMessage.onEach {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            Toast.makeText(activity, it.getString(activity), Toast.LENGTH_LONG).show()
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED)
             .launchIn(activity.lifecycleScope)
 

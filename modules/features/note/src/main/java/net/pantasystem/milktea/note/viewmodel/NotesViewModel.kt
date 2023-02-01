@@ -13,6 +13,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.notes.DeleteAndEditUseCase
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
@@ -24,6 +25,7 @@ import net.pantasystem.milktea.model.notes.favorite.ToggleFavoriteUseCase
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.user.report.Report
+import net.pantasystem.milktea.note.R
 import javax.inject.Inject
 
 
@@ -43,7 +45,7 @@ class NotesViewModel @Inject constructor(
         loggerFactory.create("NotesViewModel")
     }
 
-    private val _statusMessage = MutableSharedFlow<String>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    private val _statusMessage = MutableSharedFlow<StringSource>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
     val statusMessage = _statusMessage.asSharedFlow()
 
     val quoteRenoteTarget = MutableSharedFlow<Note>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
@@ -99,9 +101,9 @@ class NotesViewModel @Inject constructor(
     fun addFavorite(noteId: Note.Id) {
         viewModelScope.launch {
             favoriteRepository.create(noteId).onSuccess {
-                _statusMessage.tryEmit("お気に入りに追加しました")
+                _statusMessage.tryEmit(StringSource(R.string.successfully_added_to_favorites))
             }.onFailure {
-                _statusMessage.tryEmit("お気に入りにへの追加に失敗しました")
+                _statusMessage.tryEmit(StringSource(R.string.failed_to_add_to_favorites))
             }
         }
     }
@@ -110,9 +112,9 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             val result = favoriteRepository.delete(noteId).getOrNull() != null
             _statusMessage.tryEmit(if (result) {
-                "お気に入りから削除しました"
+                StringSource(R.string.removed_from_favorites)
             } else {
-                "お気に入りの削除に失敗しました"
+                StringSource(R.string.failed_to_delete_favorites)
             })
         }
     }
@@ -137,7 +139,7 @@ class NotesViewModel @Inject constructor(
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch {
             noteRepository.delete(noteId).onSuccess {
-                _statusMessage.tryEmit("削除に成功しました")
+                _statusMessage.tryEmit(StringSource(R.string.successfully_deleted))
             }.onFailure {
                 logger.error("ノート削除に失敗", it)
             }
