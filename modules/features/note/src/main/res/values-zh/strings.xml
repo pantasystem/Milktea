@@ -16,4 +16,5 @@
     <string name="file_size_warning_dialog_negative_button">取消附件</string>
     <string name="file_size_warning_dialo_positive_button">继续</string>
     <string name="file_size_warning_dialog_title">文件大小警告</string>
+    <string name="mark_media_as_sensitive">将媒体标记为敏感</string>
 </resources>
