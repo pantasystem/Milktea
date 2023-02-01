@@ -84,7 +84,7 @@ class PageSettingViewModel @Inject constructor(
                     PageType.NOTIFICATION,
                     PageType.FAVORITE,
                     PageType.MASTODON_LIST_TIMELINE,
-                    PageType.MASTODON_USER_TIMELINE,
+//                    PageType.MASTODON_USER_TIMELINE,
 
                 )
             }
