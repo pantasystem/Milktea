@@ -8,14 +8,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
-import net.pantasystem.milktea.api.misskey.v12_75_0.MisskeyAPIV1275
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.*
+import net.pantasystem.milktea.model.instance.Version
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
+import net.pantasystem.milktea.model.nodeinfo.getVersion
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.setting.PageTypeNameMap
@@ -27,7 +28,7 @@ class PageSettingViewModel @Inject constructor(
     private val pageTypeNameMap: PageTypeNameMap,
     private val userRepository: UserRepository,
     private val accountStore: AccountStore,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val nodeInfoRepository: NodeInfoRepository,
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
     val selectedPages = MutableStateFlow<List<Page>>(emptyList())
@@ -41,17 +42,53 @@ class PageSettingViewModel @Inject constructor(
     val pageOnUpdateEvent = EventBus<Page>()
 
     val pageTypes = account.filterNotNull().map {
-        var pageTypeList = PageType.values().toList().toMutableList()
-        val api = misskeyAPIProvider.get(accountStore.state.value.currentAccount!!)
-        if(api !is MisskeyAPIV12){
-            pageTypeList.remove(PageType.ANTENNA)
+        val nodeInfo = nodeInfoRepository.find(it.getHost()).getOrNull()
+        val version = nodeInfo?.type?.getVersion() ?: Version("0")
+        when(it.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                listOfNotNull(
+                    PageType.HOME,
+                    PageType.LOCAL,
+                    PageType.SOCIAL,
+                    PageType.GLOBAL,
+                    if (version >= Version("12")) PageType.ANTENNA else null,
+                    PageType.NOTIFICATION,
+                    PageType.USER_LIST,
+                    PageType.MENTION,
+                    PageType.FAVORITE,
+                    if (version >= Version("12")) PageType.CHANNEL_TIMELINE else null,
+                    PageType.SEARCH,
+                    PageType.SEARCH_HASH,
+                    PageType.USER,
+                    PageType.FEATURED,
+                    PageType.DETAIL,
+                ) + if (version >= Version("12.75.0")) {
+                    listOf(
+                        PageType.GALLERY_FEATURED,
+                        PageType.GALLERY_POPULAR,
+                        PageType.GALLERY_POSTS,
+                        PageType.USERS_GALLERY_POSTS,
+                        PageType.MY_GALLERY_POSTS,
+                        PageType.I_LIKED_GALLERY_POSTS,
+                    )
+                } else {
+                    emptyList()
+                }
+            }
+            Account.InstanceType.MASTODON -> {
+                listOf(
+                    PageType.MASTODON_HOME_TIMELINE,
+                    PageType.MASTODON_LOCAL_TIMELINE,
+                    PageType.MASTODON_PUBLIC_TIMELINE,
+//                    PageType.MASTODON_HASHTAG_TIMELINE,
+                    PageType.NOTIFICATION,
+                    PageType.FAVORITE,
+                    PageType.MASTODON_LIST_TIMELINE,
+                    PageType.MASTODON_USER_TIMELINE,
+
+                )
+            }
         }
-        if(api !is MisskeyAPIV1275) {
-            pageTypeList = pageTypeList.filterNot {
-                galleryTypes.contains(it)
-            }.toMutableList()
-        }
-        pageTypeList
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
@@ -212,6 +249,24 @@ class PageSettingViewModel @Inject constructor(
                 account.value!!.newPage(
                     Pageable.Gallery.ILikedPosts,
                     name
+                )
+            )
+            PageType.MASTODON_HOME_TIMELINE -> addPage(
+                account.value!!.newPage(
+                    Pageable.Mastodon.HomeTimeline,
+                    name,
+                )
+            )
+            PageType.MASTODON_LOCAL_TIMELINE -> addPage(
+                account.value!!.newPage(
+                    Pageable.Mastodon.LocalTimeline(),
+                    name,
+                )
+            )
+            PageType.MASTODON_PUBLIC_TIMELINE -> addPage(
+                account.value!!.newPage(
+                    Pageable.Mastodon.PublicTimeline(),
+                    name,
                 )
             )
             else -> {
