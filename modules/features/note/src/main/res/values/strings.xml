@@ -18,4 +18,9 @@
     <string name="file_size_warning_dialog_negative_button">Cancel attachment</string>
 
     <string name="mark_media_as_sensitive">Mark media as sensitive</string>
+    <string name="successfully_added_to_favorites">Successfully added to Favorites</string>
+    <string name="failed_to_add_to_favorites">Failed to add to favorites</string>
+    <string name="removed_from_favorites">Removed from Favorites</string>
+    <string name="failed_to_delete_favorites">Failed to delete favorites</string>
+    <string name="successfully_deleted">Successfully deleted</string>
 </resources>
