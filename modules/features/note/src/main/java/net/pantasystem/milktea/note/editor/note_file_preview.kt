@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,6 +18,7 @@ import net.pantasystem.milktea.common_compose.HorizontalFilePreviewList
 import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.instance.InstanceInfoType
+import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 
 @ExperimentalCoroutinesApi
@@ -65,7 +67,7 @@ fun NoteFilePreview(
                     noteEditorViewModel.toggleSensitive()
                 }
             ) {
-                Text("メディアをセンシティブにする")
+                Text(stringResource(id = R.string.mark_media_as_sensitive))
             }
         }
     }
