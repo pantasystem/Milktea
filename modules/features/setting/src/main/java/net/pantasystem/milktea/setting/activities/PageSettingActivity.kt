@@ -64,7 +64,7 @@ class PageSettingActivity : AppCompatActivity() {
 //
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
             when (pt) {
-                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
+                PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_HASHTAG_TIMELINE -> startActivity(
                     searchNavigation.newIntent(SearchNavType.SearchScreen())
                 )
                 PageType.USER -> {
@@ -76,7 +76,7 @@ class PageSettingActivity : AppCompatActivity() {
                         )
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
-                PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
+                PageType.USER_LIST, PageType.MASTODON_LIST_TIMELINE -> startActivity(userListNavigation.newIntent(UserListArgs()))
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
                 PageType.USERS_GALLERY_POSTS -> {

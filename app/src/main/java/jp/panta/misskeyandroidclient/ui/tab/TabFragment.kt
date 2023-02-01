@@ -205,6 +205,7 @@ internal class TimelinePagerAdapter(
         oldRequestBaseSetting = requestBaseList
         requestBaseList = list
         if (requestBaseList != oldRequestBaseSetting) {
+            scrollableTopFragments.clear()
             notifyDataSetChanged()
         }
 
