@@ -31,7 +31,7 @@ class CustomEmojiRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val customEmojiCache: CustomEmojiCache,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-): CustomEmojiRepository {
+) : CustomEmojiRepository {
 
     override suspend fun findBy(host: String): Result<List<Emoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
@@ -79,7 +79,7 @@ class CustomEmojiRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetch(nodeInfo: NodeInfo): Result<List<Emoji>> = runCancellableCatching {
-        when(nodeInfo.type) {
+        when (nodeInfo.type) {
             is NodeInfo.SoftwareType.Mastodon -> {
                 val emojis = mastodonAPIProvider.get("https://${nodeInfo.host}").getCustomEmojis()
                     .throwIfHasError()
@@ -89,10 +89,14 @@ class CustomEmojiRepositoryImpl @Inject constructor(
                 }
             }
             is NodeInfo.SoftwareType.Misskey -> {
-                if (nodeInfo.type.getVersion() >= Version("13")) {
-                    val emojis = misskeyAPIProvider.get("https://${nodeInfo.host}").getEmojis(EmptyRequest)
-                        .throwIfHasError()
-                        .body()
+                if (
+                    nodeInfo.type.getVersion() >= Version("13")
+                    && nodeInfo.type !is NodeInfo.SoftwareType.Misskey.Calckey
+                ) {
+                    val emojis =
+                        misskeyAPIProvider.get("https://${nodeInfo.host}").getEmojis(EmptyRequest)
+                            .throwIfHasError()
+                            .body()
                     emojis?.emojis?.map {
                         it.copy(
                             url = V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}"),
@@ -100,7 +104,8 @@ class CustomEmojiRepositoryImpl @Inject constructor(
                         )
                     }
                 } else {
-                    misskeyAPIProvider.get("https://${nodeInfo.host}").getMeta(RequestMeta(detail = true))
+                    misskeyAPIProvider.get("https://${nodeInfo.host}")
+                        .getMeta(RequestMeta(detail = true))
                         .throwIfHasError()
                         .body()
                         ?.emojis
