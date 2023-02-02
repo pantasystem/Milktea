@@ -15,6 +15,7 @@ import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.*
 import net.pantasystem.milktea.model.instance.Version
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.nodeinfo.getVersion
 import net.pantasystem.milktea.model.user.User
@@ -44,6 +45,7 @@ class PageSettingViewModel @Inject constructor(
     val pageTypes = account.filterNotNull().map {
         val nodeInfo = nodeInfoRepository.find(it.getHost()).getOrNull()
         val version = nodeInfo?.type?.getVersion() ?: Version("0")
+        val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
         when(it.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 listOfNotNull(
@@ -51,6 +53,7 @@ class PageSettingViewModel @Inject constructor(
                     PageType.LOCAL,
                     PageType.SOCIAL,
                     PageType.GLOBAL,
+                    if (isCalckey) PageType.CALCKEY_RECOMMENDED_TIMELINE else null,
                     if (version >= Version("12")) PageType.ANTENNA else null,
                     PageType.NOTIFICATION,
                     PageType.USER_LIST,
