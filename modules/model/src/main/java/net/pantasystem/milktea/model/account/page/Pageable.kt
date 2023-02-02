@@ -339,6 +339,14 @@ sealed class Pageable : Serializable {
 
     }
 
+    object CalckeyRecommendedTimeline : Pageable(), UntilPaginate, SincePaginate {
+        override fun toParams(): PageParams {
+            return PageParams(
+                type = PageType.CALCKEY_RECOMMENDED_TIMELINE,
+            )
+        }
+    }
+
 
     abstract fun toParams(): PageParams
 
