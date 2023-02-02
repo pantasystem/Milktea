@@ -183,7 +183,8 @@ interface MisskeyAPI {
     @POST("api/notes/mentions")
     suspend fun mentions(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
-
+    @POST("api/notes/recommended-timeline")
+    suspend fun getCalckeyRecommendedTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     //drive
     @POST("api/drive/files")
