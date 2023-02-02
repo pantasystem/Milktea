@@ -419,5 +419,6 @@
     <string name="visibility_personal">自我限制</string>
     <string name="visibility_limited">圆圈</string>
     <string name="visibility_mutual">相互关注</string>
+    <string name="calckey_recomended_timeline">推荐的</string>
 
 </resources>
