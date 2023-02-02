@@ -80,6 +80,15 @@ class PageableTemplate(val account: Account?) {
             Pageable.Mastodon.HomeTimeline
         )
     }
+
+    fun calckeyRecommendedTimeline(title: String): Page {
+        return Page(
+            account?.accountId ?: -1,
+            title,
+            0,
+            Pageable.CalckeyRecommendedTimeline
+        )
+    }
 }
 
 fun Account.newPage(pageable: Pageable, name: String): Page {

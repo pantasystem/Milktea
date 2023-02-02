@@ -180,6 +180,9 @@ data class PageParams(
                         excludeReplies = includeReplies?.not()
                     )
                 }
+                CALCKEY_RECOMMENDED_TIMELINE -> {
+                    Pageable.CalckeyRecommendedTimeline
+                }
             }
         } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")

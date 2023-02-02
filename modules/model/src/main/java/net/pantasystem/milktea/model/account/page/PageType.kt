@@ -28,17 +28,9 @@ enum class PageType(val defaultName: String){
     MASTODON_HOME_TIMELINE("MastodonHomeTimeline"),
     MASTODON_HASHTAG_TIMELINE("MastodonHashtagTimeline"),
     MASTODON_LIST_TIMELINE("MastodonListTimeline"),
-    MASTODON_USER_TIMELINE("MastodonUserTimeline")
+    MASTODON_USER_TIMELINE("MastodonUserTimeline"),
+
+    CALCKEY_RECOMMENDED_TIMELINE("CalckeyRecommendedTimeline"),
+
     //USER_PINは別
 }
-
-
-
-val galleryTypes = setOf(
-    PageType.GALLERY_FEATURED,
-    PageType.GALLERY_POSTS,
-    PageType.GALLERY_POPULAR,
-    PageType.USERS_GALLERY_POSTS,
-    PageType.I_LIKED_GALLERY_POSTS,
-    PageType.MY_GALLERY_POSTS
-)

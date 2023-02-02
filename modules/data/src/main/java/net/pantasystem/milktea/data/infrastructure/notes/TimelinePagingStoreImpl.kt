@@ -127,6 +127,7 @@ internal class TimelinePagingStoreImpl(
                 is Pageable.SearchByTag -> api::searchByTag
                 is Pageable.Featured -> api::featured
                 is Pageable.Mention -> api::mentions
+                is Pageable.CalckeyRecommendedTimeline -> api::getCalckeyRecommendedTimeline
                 is Pageable.Antenna -> {
                     if (api is MisskeyAPIV12) {
                         (api)::antennasNotes

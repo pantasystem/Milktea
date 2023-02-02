@@ -412,5 +412,6 @@
     <string name="visibility_personal">Personal</string>
     <string name="visibility_limited">Circle</string>
     <string name="visibility_mutual">Mutual Follow</string>
+    <string name="calckey_recomended_timeline">Recommended</string>
 
 </resources>

@@ -422,5 +422,6 @@
     <string name="visibility_personal">自分限定</string>
     <string name="visibility_limited">サークル</string>
     <string name="visibility_mutual">相互フォロー</string>
+    <string name="calckey_recomended_timeline">一押し</string>
 
 </resources>

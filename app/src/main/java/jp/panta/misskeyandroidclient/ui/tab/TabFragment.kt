@@ -23,14 +23,13 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
+class TabFragment : Fragment(R.layout.fragment_tab) {
 
     companion object {
         private const val PAGES = "pages"
@@ -137,24 +136,6 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         super.onDestroyView()
         mPagerAdapter.onDestroy()
     }
-    
-    
-
-    override fun showTop() {
-        showTopCurrentFragment()
-    }
-
-    private fun showTopCurrentFragment() {
-        try {
-            mPagerAdapter.scrollableTopFragments.forEach {
-                it.showTop()
-            }
-        } catch (_: UninitializedPropertyAccessException) {
-
-        }
-
-    }
-
 
 }
 
@@ -167,7 +148,6 @@ internal class TimelinePagerAdapter(
     private var oldRequestBaseSetting = requestBaseList
 
 
-    val scrollableTopFragments = ArrayList<ScrollableTop>()
     private val mFragments = ArrayList<Fragment>()
 
     override fun getCount(): Int {
@@ -178,9 +158,6 @@ internal class TimelinePagerAdapter(
         val item = requestBaseList[position]
         val fragment = pageableFragmentFactory.create(item)
 
-        if (fragment is ScrollableTop) {
-            scrollableTopFragments.add(fragment)
-        }
         mFragments.add(fragment)
         return fragment
     }
@@ -205,7 +182,6 @@ internal class TimelinePagerAdapter(
         oldRequestBaseSetting = requestBaseList
         requestBaseList = list
         if (requestBaseList != oldRequestBaseSetting) {
-            scrollableTopFragments.clear()
             notifyDataSetChanged()
         }
 
@@ -213,7 +189,6 @@ internal class TimelinePagerAdapter(
 
     fun onDestroy() {
         mFragments.clear()
-        scrollableTopFragments.clear()
     }
 
 }
