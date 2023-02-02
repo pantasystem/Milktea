@@ -17,7 +17,6 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
-import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
@@ -31,7 +30,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class NotificationFragment : Fragment(R.layout.fragment_notification), ScrollableTop {
+class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
@@ -141,7 +140,4 @@ class NotificationFragment : Fragment(R.layout.fragment_notification), Scrollabl
         }
     }
 
-    override fun showTop() {
-        mLinearLayoutManager.scrollToPosition(0)
-    }
 }
