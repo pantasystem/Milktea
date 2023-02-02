@@ -47,21 +47,35 @@
 
         </com.google.android.material.tabs.TabLayout>
 
-
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reaction_choices_view_pager"
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/reaction_choices_tab"
-                android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
-                />
+                android:orientation="vertical"
+                android:layout_below="@id/reaction_choices_tab">
+            <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <androidx.appcompat.widget.LinearLayoutCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/reaction_choices_view_pager"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/reaction_choices_tab"
+                            android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                            />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/searchSuggestionsView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/reaction_choices_tab"
-                android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
-                />
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/searchSuggestionsView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_below="@id/reaction_choices_tab"
+                            android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
+                            />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+
     </RelativeLayout>
 </layout>
