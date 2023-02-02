@@ -14,4 +14,6 @@ class PageDefaultStringsOnAndroid(val context: Context) :
         get() = context.getString(R.string.hybrid_timeline)
     override val localTimeline: String
         get() = context.getString(R.string.local_timeline)
+    override val recommendedTimeline: String
+        get() = context.getString(R.string.calckey_recomended_timeline)
 }

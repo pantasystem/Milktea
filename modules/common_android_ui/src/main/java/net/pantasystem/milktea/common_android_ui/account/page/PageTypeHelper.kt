@@ -39,6 +39,7 @@ object PageTypeHelper{
             MASTODON_HASHTAG_TIMELINE -> context.getString(R.string.tag)
             MASTODON_LIST_TIMELINE -> context.getString(R.string.list)
             MASTODON_USER_TIMELINE -> context.getString(R.string.user)
+            CALCKEY_RECOMMENDED_TIMELINE -> context.getString(R.string.calckey_recomended_timeline)
         }
     }
 }
