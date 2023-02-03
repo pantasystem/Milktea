@@ -1,7 +1,4 @@
-package jp.panta.misskeyandroidclient.mfm
-
-import net.pantasystem.milktea.common_android.mfm.ElementType
-import net.pantasystem.milktea.common_android.mfm.Leaf
+package net.pantasystem.milktea.common_android.mfm
 
 class Link(
     override val text: String,
@@ -9,7 +6,8 @@ class Link(
     override val end: Int,
     override val insideStart: Int,
     override val insideEnd: Int,
-    val url: String
+    val url: String,
+    val skipOgpLink: Boolean? = null,
 ) : Leaf(){
     override val elementType: ElementType = ElementType.LINK
     override fun toString(): String {

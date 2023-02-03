@@ -23,6 +23,7 @@ import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common_android.mfm.Element
 import net.pantasystem.milktea.common_android.mfm.ElementType
 import net.pantasystem.milktea.common_android.mfm.Leaf
+import net.pantasystem.milktea.common_android.mfm.Link
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
