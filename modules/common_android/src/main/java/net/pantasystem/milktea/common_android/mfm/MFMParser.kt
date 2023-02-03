@@ -376,7 +376,8 @@ object MFMParser {
                 end = position + matcher.end(),
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
-                url = url + matcher.group(3)
+                url = url + matcher.group(3),
+                skipOgpLink = targetText.startsWith("?")
             )
         }
 
