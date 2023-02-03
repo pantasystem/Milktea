@@ -14,7 +14,7 @@ class OkHttpClientProviderImpl @Inject constructor(): OkHttpClientProvider {
         DefaultOkHttpClientProvider().client.newBuilder()
             .addInterceptor { interceptor ->
                 val request = interceptor.request().newBuilder()
-                    .addHeader("User-Agent", "Milktae/:${BuildConfig.VERSION_NAME} Android/${Build.VERSION.RELEASE}")
+                    .addHeader("User-Agent", "Milktea/:${BuildConfig.VERSION_NAME} Android/${Build.VERSION.RELEASE}")
                     .build()
                 interceptor.proceed(request)
             }.build()
