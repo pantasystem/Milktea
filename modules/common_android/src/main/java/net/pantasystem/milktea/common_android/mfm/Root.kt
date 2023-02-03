@@ -18,7 +18,9 @@ class Root(
             if(el is Node){
                 getUrls(urls, el)
             }else if(el is Link){
-                urls.add(el.url)
+                if (el.skipOgpLink == null || !el.skipOgpLink) {
+                    urls.add(el.url)
+                }
             }
         }
         return urls.toList()
