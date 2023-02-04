@@ -88,6 +88,10 @@ class InMemoryNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun exists(noteId: Note.Id): Boolean {
+        return notes[noteId] != null
+    }
+
     override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         mutex.withLock{
             val n = this.notes[noteId]
@@ -138,13 +142,13 @@ class InMemoryNoteDataSource @Inject constructor(
             noteIds.mapNotNull {
                 state.getOrNull(it)
             }
-        }
+        }.distinctUntilChanged()
     }
 
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return _state.map {
             it.getOrNull(noteId)
-        }
+        }.distinctUntilChanged()
     }
 
     private suspend fun createOrUpdate(note: Note): AddResult {

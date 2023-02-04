@@ -92,7 +92,9 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList()
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
+                        viewModelScope,
+                        noteDataSource,
                     ).also {
                         it.capture()
                         cache.put(it)
@@ -112,7 +114,9 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList()
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
+                        noteDataSource,
+                        viewModelScope,
                     ).also {
                         it.capture()
                         cache.put(it)
@@ -189,8 +193,8 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     private fun <T : PlaneNoteViewData> T.capture(): T {
         val self = this
-        viewModelScope.launch(Dispatchers.IO) {
-            self.eventFlow.collect()
+        self.capture {
+            it.launchIn(viewModelScope + Dispatchers.IO)
         }
         return this
     }

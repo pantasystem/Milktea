@@ -106,6 +106,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isStopNoteCaptureWhenBackground = map.getValue<PrefType.BoolPref>(
             Keys.IsStopNoteCaptureWhenBackground
         )?.value ?: DefaultConfig.config.isStopNoteCaptureWhenBackground,
+        isEnableStreamingAPIAndNoteCapture = map.getValue<PrefType.BoolPref>(
+            Keys.IsEnableStreamingAPIAndNoteCapture
+        )?.value ?: DefaultConfig.config.isEnableStreamingAPIAndNoteCapture
     )
 }
 
@@ -189,6 +192,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsStopStreamingApiWhenBackground -> {
             PrefType.BoolPref(isStopStreamingApiWhenBackground)
+        }
+        Keys.IsEnableStreamingAPIAndNoteCapture -> {
+            PrefType.BoolPref(isEnableStreamingAPIAndNoteCapture)
         }
     }
 }

@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common_android.TextType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.url.UrlPreviewStore
 import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
@@ -27,6 +28,8 @@ class PlaneNoteViewDataCache(
     private val coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
     private val metaRepository: MetaRepository,
+    private val noteDataSource: NoteDataSource,
+    private val configRepository: LocalConfigRepository,
 ) {
 
     @Singleton
@@ -36,6 +39,8 @@ class PlaneNoteViewDataCache(
         private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
         private val noteRelationGetter: NoteRelationGetter,
         private val metaRepository: MetaRepository,
+        private val noteDataSource: NoteDataSource,
+        private val configRepository: LocalConfigRepository
     ) {
         fun create(
             getAccount: suspend () -> Account,
@@ -50,7 +55,9 @@ class PlaneNoteViewDataCache(
                 },
                 coroutineScope,
                 noteRelationGetter,
-                metaRepository
+                metaRepository,
+                noteDataSource,
+                configRepository
             )
         }
     }
@@ -150,7 +157,9 @@ class PlaneNoteViewDataCache(
                 account,
                 noteCaptureAdapter,
                 translationStore,
-                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
+                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
+                noteDataSource,
+                coroutineScope,
             )
         } else {
             HasReplyToNoteViewData(
@@ -158,7 +167,9 @@ class PlaneNoteViewDataCache(
                 account,
                 noteCaptureAdapter,
                 translationStore,
-                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList()
+                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
+                noteDataSource,
+                coroutineScope
             )
         }.also {
             it.captureNotes()
@@ -178,12 +189,17 @@ class PlaneNoteViewDataCache(
     }
 
     private fun PlaneNoteViewData.captureNotes() {
+        if (configRepository.get().getOrNull()?.isEnableStreamingAPIAndNoteCapture == false) {
+            return
+        }
         val scope = coroutineScope + Dispatchers.IO
-        this.job = this.eventFlow.onEach {
-            if (it is NoteDataSource.Event.Deleted) {
-                onDeleted(it.noteId)
-            }
-        }.launchIn(scope)
+        this.capture { flow ->
+            flow.onEach {
+                if (it is NoteDataSource.Event.Deleted) {
+                    onDeleted(it.noteId)
+                }
+            }.launchIn(scope)
+        }
     }
 
     private suspend fun loadUrlPreview(note: PlaneNoteViewData) {

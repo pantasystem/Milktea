@@ -10,5 +10,6 @@
     <string name="streaming">自動更新</string>
     <string name="is_stop_timeline_streaming_when_background">在后台不更新时间线</string>
     <string name="is_stop_note_capture_when_background">不要在后台捕捉笔记</string>
+    <string name="enable_automic_updates">启用自动更新</string>
 
 </resources>
