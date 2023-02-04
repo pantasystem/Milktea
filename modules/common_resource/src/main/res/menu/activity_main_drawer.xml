@@ -6,6 +6,11 @@
     <group android:checkableBehavior="single">
 
         <item
+                android:id="@+id/nav_switch_account"
+                android:icon="@drawable/ic_supervisor_account_black_24dp"
+                android:title="@string/switch_account"
+            />
+        <item
                 android:id="@+id/nav_favorite"
                 android:icon="@drawable/ic_star_black_24dp"
                 android:title="@string/nav_like" />
