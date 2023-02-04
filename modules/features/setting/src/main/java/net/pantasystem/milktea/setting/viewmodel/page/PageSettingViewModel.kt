@@ -272,6 +272,12 @@ class PageSettingViewModel @Inject constructor(
                     name,
                 )
             )
+            PageType.CALCKEY_RECOMMENDED_TIMELINE -> addPage(
+                account.value!!.newPage(
+                    Pageable.CalckeyRecommendedTimeline,
+                    name,
+                )
+            )
             else -> {
                 Log.d("PageSettingViewModel", "管轄外な設定パターン:$type, name:$name")
             }
