@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.common_android_ui
 
 import android.app.Activity
+import android.graphics.drawable.AnimatedImageDrawable
+import android.os.Build
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
@@ -46,6 +48,13 @@ object DecorateTextHelper {
                     }
                     is APNGDrawable -> {
                         imageDrawable.stop()
+                    }
+                    else -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            if (imageDrawable is AnimatedImageDrawable) {
+                                imageDrawable.stop()
+                            }
+                        }
                     }
                 }
             }
