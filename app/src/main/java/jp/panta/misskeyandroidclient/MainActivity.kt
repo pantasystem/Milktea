@@ -99,7 +99,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         toggleNavigationDrawerDelegate = ToggleNavigationDrawerDelegate(this, binding.drawerLayout)
 
         binding.navView.setNavigationItemSelectedListener { item ->
-            StartActivityFromNavDrawerItems(this).showNavDrawersActivityBy(item)
+            MainActivityNavigationDrawerMenuItemClickListener(this, mAccountViewModel)
+                .onSelect(item)
             binding.drawerLayout.closeDrawerWhenOpened()
             false
         }
