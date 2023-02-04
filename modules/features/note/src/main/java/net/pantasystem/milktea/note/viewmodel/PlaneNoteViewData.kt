@@ -3,9 +3,9 @@ package net.pantasystem.milktea.note.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common_android.getTextType
@@ -18,6 +18,7 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.user.User
@@ -26,9 +27,11 @@ import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 open class PlaneNoteViewData(
     val note: NoteRelation,
     val account: Account,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val noteTranslationStore: NoteTranslationStore,
     private val instanceEmojis: List<Emoji>,
+    noteDataSource: NoteDataSource,
+    coroutineScope: CoroutineScope,
 ) : NoteViewData {
 
     val id = note.note.id
@@ -42,8 +45,11 @@ open class PlaneNoteViewData(
             }
         }
 
-    private val _currentNote = MutableLiveData(toShowNote.note)
-    val currentNote: LiveData<Note> = _currentNote
+    val currentNote: LiveData<Note> = noteDataSource.observeOne(toShowNote.note.id).map {
+        it ?: toShowNote.note
+    }.onStart {
+        emit(toShowNote.note)
+    }.asLiveData(coroutineScope.coroutineContext)
 
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
@@ -121,7 +127,9 @@ open class PlaneNoteViewData(
     val replyCount = MutableLiveData(toShowNote.note.repliesCount)
 
 
-    val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
+    val renoteCount: LiveData<Int> = Transformations.map(currentNote) {
+        it?.renoteCount ?: 0
+    }
 
     val favoriteCount = Transformations.map(currentNote) {
         (it.type as? Note.Type.Mastodon?)?.favoriteCount
@@ -131,7 +139,9 @@ open class PlaneNoteViewData(
         it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
     }
 
-    val reactionCounts = MutableLiveData(toShowNote.note.reactionCounts)
+    val reactionCounts: LiveData<List<ReactionCount>> = Transformations.map(currentNote) {
+        it?.reactionCounts ?: emptyList()
+    }
 
     val reactionCount = Transformations.map(reactionCounts) {
         var sum = 0
@@ -141,7 +151,9 @@ open class PlaneNoteViewData(
         return@map sum
     }
 
-    val myReaction = MutableLiveData<String?>(toShowNote.note.myReaction)
+    val myReaction: LiveData<String?> = Transformations.map(currentNote) {
+        it.myReaction
+    }
 
     val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
@@ -198,23 +210,20 @@ open class PlaneNoteViewData(
             it.name to it
         } ?: emptyList())
         emojis = emojiMap.values.toList() + instanceEmojis
-        renoteCount.postValue(note.renoteCount)
-
-        myReaction.postValue(note.myReaction)
-        reactionCounts.postValue(note.reactionCounts)
         note.poll?.let {
             poll.postValue(it)
         }
-        _currentNote.postValue(note)
     }
 
-
-    val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-        if (it is NoteDataSource.Event.Updated) {
-            update(it.note)
+    fun capture(job: (Flow<NoteDataSource.Event>) -> Job) {
+        val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
+            if (it is NoteDataSource.Event.Updated) {
+                update(it.note)
+            }
+        }.catch { e ->
+            Log.d("PlaneNoteViewData", "error", e)
         }
-    }.catch { e ->
-        Log.d("PlaneNoteViewData", "error", e)
+        job(flow)
     }
 
     var job: Job? = null
