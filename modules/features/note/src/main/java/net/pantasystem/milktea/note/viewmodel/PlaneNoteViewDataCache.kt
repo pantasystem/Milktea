@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common_android.TextType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.url.UrlPreviewStore
 import net.pantasystem.milktea.model.url.UrlPreviewStoreProvider
@@ -28,6 +29,7 @@ class PlaneNoteViewDataCache(
     private val noteRelationGetter: NoteRelationGetter,
     private val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
+    private val configRepository: LocalConfigRepository,
 ) {
 
     @Singleton
@@ -38,6 +40,7 @@ class PlaneNoteViewDataCache(
         private val noteRelationGetter: NoteRelationGetter,
         private val metaRepository: MetaRepository,
         private val noteDataSource: NoteDataSource,
+        private val configRepository: LocalConfigRepository
     ) {
         fun create(
             getAccount: suspend () -> Account,
@@ -54,6 +57,7 @@ class PlaneNoteViewDataCache(
                 noteRelationGetter,
                 metaRepository,
                 noteDataSource,
+                configRepository
             )
         }
     }
@@ -185,6 +189,9 @@ class PlaneNoteViewDataCache(
     }
 
     private fun PlaneNoteViewData.captureNotes() {
+        if (configRepository.get().getOrNull()?.isEnableStreamingAPIAndNoteCapture == false) {
+            return
+        }
         val scope = coroutineScope + Dispatchers.IO
         this.capture { flow ->
             flow.onEach {
