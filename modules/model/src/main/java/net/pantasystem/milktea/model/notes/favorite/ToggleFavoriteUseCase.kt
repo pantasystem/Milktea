@@ -18,7 +18,7 @@ class ToggleFavoriteUseCase @Inject constructor(
             is Note.Type.Mastodon -> {
                 type.favorited == true
             }
-            Note.Type.Misskey -> {
+            is Note.Type.Misskey -> {
                 val state = noteRepository.findNoteState(noteId).getOrThrow()
                 state.isFavorited
             }

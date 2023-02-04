@@ -68,8 +68,15 @@ data class NoteDTO(
     val promotionId: String? = null,
     val channelId: String? = null,
 
-    val app: App? = null
+    val app: App? = null,
+    val channel: ChannelInfo? = null,
 ) : Serializable {
+
+    @kotlinx.serialization.Serializable
+    data class ChannelInfo(
+        val id: String,
+        val name: String,
+    ) : Serializable
 
     val emojiList: List<Emoji>? = when(rawEmojis) {
         EmojisType.None -> null

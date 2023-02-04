@@ -155,7 +155,7 @@ class NoteRepositoryImpl @Inject constructor(
                         choices = listOf(choice.index)
                     )
                 }
-                Note.Type.Misskey -> {
+                is Note.Type.Misskey -> {
                     misskeyAPIProvider.get(account).vote(
                         Vote(
                             i = getAccount.get(noteId.accountId).token,

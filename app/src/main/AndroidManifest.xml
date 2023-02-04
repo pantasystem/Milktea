@@ -4,16 +4,18 @@
         package="jp.panta.misskeyandroidclient">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission
+            android:name="android.permission.READ_EXTERNAL_STORAGE"
+            android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -37,12 +39,10 @@
                     tools:node="remove" />
             <meta-data
                     android:name="jp.panta.misskeyandroidclient.startup.EmojiCompatInitializer"
-                    android:value="androidx.startup"
-                />
+                    android:value="androidx.startup" />
             <meta-data
                     android:name="jp.panta.misskeyandroidclient.startup.DebuggerSetupInitializer"
-                    android:value="androidx.startup"
-                    />
+                    android:value="androidx.startup" />
         </provider>
 
         <activity
@@ -50,7 +50,15 @@
                 android:exported="false" />
         <activity
                 android:name="net.pantasystem.milktea.channel.ChannelActivity"
-                android:exported="false" />
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="milktea" />
+            </intent-filter>
+        </activity>
 
         <receiver
                 android:name=".AlarmNotePostReceiver"
@@ -67,7 +75,9 @@
                 android:name="firebase_analytics_collection_enabled"
                 android:value="false" />
 
-        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <meta-data
+                android:name="google_analytics_adid_collection_enabled"
+                android:value="false" />
 
 
         <service
@@ -213,7 +223,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <meta-data android:name="android.app.shortcuts"
+            <meta-data
+                    android:name="android.app.shortcuts"
                     android:resource="@xml/shortcuts" />
         </activity>
     </application>

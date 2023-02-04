@@ -184,6 +184,10 @@ open class PlaneNoteViewData(
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
     } ?: emptyList())
 
+    val channelInfo: LiveData<Note.Type.Misskey.SimpleChannelInfo?> = currentNote.map {
+        (it.type as? Note.Type.Misskey)?.channel
+    }
+
 
     fun changeContentFolding() {
         val isFolding = contentFolding.value ?: return

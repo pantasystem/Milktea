@@ -370,6 +370,22 @@
 
         </net.pantasystem.milktea.common_android.ui.AutoCollapsingLayout>
 
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/channelInfoView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/autoExpanded"
+                app:layout_constraintStart_toEndOf="@id/avatarIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@{ note.channelInfo.name }"
+                android:visibility="@{ note.channelInfo == null ? View.GONE : View.VISIBLE }"
+                app:layout_constraintHorizontal_bias="0.0"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:drawableLeft="@drawable/ic_baseline_radio_24"
+                drawableTintCompat="@{null}"
+                android:onClick="@{ ()-> noteCardActionListener.onChannelButtonClicked(note.channelInfo.id) }"
+                />
+
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reaction_view"
                 android:layout_width="0dp"
@@ -379,7 +395,7 @@
                 tools:visibility="visible"
                 tools:listitem="@layout/item_reaction"
                 tools:itemCount="1"
-                app:layout_constraintTop_toBottomOf="@id/autoExpanded"
+                app:layout_constraintTop_toBottomOf="@id/channelInfoView"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="4dp"

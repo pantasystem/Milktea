@@ -8,21 +8,25 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.ChannelNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
@@ -88,7 +92,8 @@ class ChannelActivity : AppCompatActivity() {
                             navArgument(ChannelDetailArgs.channelId) {
                                 type = NavType.StringType
                             }
-                        )
+                        ),
+                        deepLinks = listOf(navDeepLink { uriPattern = "milktea://accounts/{${ChannelDetailArgs.accountId}}/channels/{${ChannelDetailArgs.channelId}}" })
                     ) {
                         val viewModel: ChannelDetailViewModel = hiltViewModel()
                         val channel by viewModel.channel.collectAsState()
@@ -124,5 +129,16 @@ class ChannelActivity : AppCompatActivity() {
 class ChannelNavigationImpl @Inject constructor(val activity: Activity) : ChannelNavigation {
     override fun newIntent(args: Unit): Intent {
         return Intent(activity, ChannelActivity::class.java)
+    }
+}
+
+class ChannelDetailNavigationImpl @Inject constructor(val activity: Activity) : ChannelDetailNavigation {
+    override fun newIntent(args: Channel.Id): Intent {
+        return Intent(
+            Intent.ACTION_VIEW,
+            "milktea://accounts/${args.accountId}/channels/${args.channelId}".toUri(),
+            activity,
+            ChannelActivity::class.java,
+        )
     }
 }

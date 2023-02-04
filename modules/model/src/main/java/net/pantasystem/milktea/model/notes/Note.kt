@@ -55,7 +55,12 @@ data class Note(
 
 
     sealed interface Type {
-        object Misskey : Type
+        data class Misskey(
+            val channel: SimpleChannelInfo? = null,
+        ) : Type {
+            data class SimpleChannelInfo(val id: Channel.Id, val name: String)
+        }
+
         data class Mastodon(
             val reblogged: Boolean?,
             val favorited: Boolean?,
@@ -143,7 +148,7 @@ data class Note(
         return when (type) {
             is Type.Mastodon -> visibility is Visibility.Public
                     || visibility is Visibility.Home
-            Type.Misskey -> id.accountId == userId.accountId
+            is Type.Misskey -> id.accountId == userId.accountId
                     && (visibility is Visibility.Public
                     || visibility is Visibility.Home
                     || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
@@ -194,7 +199,7 @@ fun Note.Companion.make(
     myReaction: String? = null,
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
-    type: Note.Type = Note.Type.Misskey,
+    type: Note.Type = Note.Type.Misskey(),
     nodeInfo: NodeInfo? = null,
 ): Note {
     return Note(

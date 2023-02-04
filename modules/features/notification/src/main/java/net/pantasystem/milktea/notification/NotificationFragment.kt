@@ -17,6 +17,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
@@ -47,6 +48,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    lateinit var channelDetailNavigation: ChannelDetailNavigation
+
     private val mBinding: FragmentNotificationBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,7 +67,8 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
                 requireActivity() as AppCompatActivity,
                 notesViewModel,
                 settingStore,
-                userDetailNavigation
+                userDetailNavigation,
+                channelDetailNavigation,
             ).onAction(it)
         }
 
