@@ -138,13 +138,13 @@ class InMemoryNoteDataSource @Inject constructor(
             noteIds.mapNotNull {
                 state.getOrNull(it)
             }
-        }
+        }.distinctUntilChanged()
     }
 
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return _state.map {
             it.getOrNull(noteId)
-        }
+        }.distinctUntilChanged()
     }
 
     private suspend fun createOrUpdate(note: Note): AddResult {
