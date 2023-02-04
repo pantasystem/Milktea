@@ -93,7 +93,7 @@ class NoteCardActionHandler(
                     is Note.Type.Mastodon -> {
                         notesViewModel.toggleReblog(action.note.toShowNote.note.id)
                     }
-                    Note.Type.Misskey -> {
+                    is Note.Type.Misskey -> {
                         RenoteBottomSheetDialog.newInstance(
                             action.note.note.note.id,
                             action.note.isRenotedByMe
