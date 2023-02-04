@@ -197,7 +197,7 @@ fun NoteDTO.toNote(account: Account, nodeInfo: NodeInfo?): Note {
         type = Note.Type.Misskey(
             channel = channel?.let {
                 Note.Type.Misskey.SimpleChannelInfo(
-                    id = it.id,
+                    id = Channel.Id(account.accountId, it.id),
                     name = it.name
                 )
             }

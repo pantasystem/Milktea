@@ -58,7 +58,7 @@ data class Note(
         data class Misskey(
             val channel: SimpleChannelInfo? = null,
         ) : Type {
-            data class SimpleChannelInfo(val id: String, val name: String)
+            data class SimpleChannelInfo(val id: Channel.Id, val name: String)
         }
 
         data class Mastodon(
