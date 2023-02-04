@@ -2,6 +2,7 @@ package net.pantasystem.milktea.note.view
 
 import androidx.appcompat.app.AppCompatActivity
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -24,6 +25,7 @@ class NoteCardActionHandler(
     val notesViewModel: NotesViewModel,
     val settingStore: SettingStore,
     val userDetailNavigation: UserDetailNavigation,
+    val channelDetailNavigation: ChannelDetailNavigation,
     val currentPageable: Pageable? = null,
 ) {
 
@@ -121,6 +123,14 @@ class NoteCardActionHandler(
             }
             is NoteCardAction.OnFavoriteButtonClicked -> {
                 notesViewModel.onToggleFavoriteUseCase(action.note)
+            }
+            is NoteCardAction.OnChannelButtonClicked -> {
+                if (currentPageable is Pageable.ChannelTimeline && currentPageable.channelId == action.channelId.channelId) {
+                    return
+                }
+                activity.startActivity(
+                    channelDetailNavigation.newIntent(action.channelId)
+                )
             }
         }
     }

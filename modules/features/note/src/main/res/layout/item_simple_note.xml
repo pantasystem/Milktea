@@ -383,6 +383,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:drawableLeft="@drawable/ic_baseline_radio_24"
                 drawableTintCompat="@{null}"
+                android:onClick="@{ ()-> noteCardActionListener.onChannelButtonClicked(note.channelInfo.id) }"
                 />
 
         <androidx.recyclerview.widget.RecyclerView

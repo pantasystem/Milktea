@@ -17,6 +17,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Page
@@ -81,6 +82,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    lateinit var channelDetailNavigation: ChannelDetailNavigation
+
     @Suppress("DEPRECATION")
     val page: Pageable.Show by lazy {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
@@ -111,7 +115,8 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
                 requireActivity() as AppCompatActivity,
                 notesViewModel,
                 settingStore,
-                userDetailNavigation
+                userDetailNavigation,
+                channelDetailNavigation,
             ).onAction(it)
         }
         lifecycleScope.launch {

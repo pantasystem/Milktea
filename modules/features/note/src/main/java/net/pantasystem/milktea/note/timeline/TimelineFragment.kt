@@ -25,6 +25,7 @@ import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.PageableView
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
@@ -102,6 +103,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     @Inject
     lateinit var accountStore: AccountStore
 
+    @Inject
+    lateinit var channelDetailNavigation: ChannelDetailNavigation
+
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
@@ -160,7 +164,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 notesViewModel,
                 settingStore,
                 userDetailNavigation,
-                currentPageable = mPageable
+                channelDetailNavigation,
+                currentPageable = mPageable,
             ).onAction(it)
         }
 
