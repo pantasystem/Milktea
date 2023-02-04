@@ -5,14 +5,14 @@ import kotlinx.serialization.SerialName
 @kotlinx.serialization.Serializable
 data class FilterResultDTO(
     val filter: HitFilter,
-    @SerialName("keyword_matches") val keywordMatches: List<String>,
-    @SerialName("status_matches") val statusMatches: List<String>,
+    @SerialName("keyword_matches") val keywordMatches: List<String>? = null,
+    @SerialName("status_matches") val statusMatches: List<String>? = null,
 ) {
     @kotlinx.serialization.Serializable
     data class HitFilter(
         val id: String,
         val title: String,
         val context: List<FilterContext>,
-        val filterAction: V2FilterDTO.FilterAction,
+        @SerialName("filter_action") val filterAction: V2FilterDTO.FilterAction,
     )
 }
