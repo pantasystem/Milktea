@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager.widget.PagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -131,6 +132,10 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mPagerAdapter.onDestroy()
+    }
 }
 
 internal class TimelinePagerAdapter(
@@ -141,7 +146,7 @@ internal class TimelinePagerAdapter(
     private var requestBaseList: List<Page> = list
     private var oldRequestBaseSetting = requestBaseList
 
-
+    private val mFragments = ArrayList<Fragment>()
 
     override fun getCount(): Int {
         return requestBaseList.size
@@ -150,7 +155,7 @@ internal class TimelinePagerAdapter(
     override fun getItem(position: Int): Fragment {
         val item = requestBaseList[position]
         val fragment = pageableFragmentFactory.create(item)
-
+        mFragments.add(fragment)
         return fragment
     }
 
@@ -161,9 +166,16 @@ internal class TimelinePagerAdapter(
     }
 
 
-
+    override fun getItemPosition(any: Any): Int {
+        val target = any as Fragment
+        if (mFragments.contains(target)) {
+            return PagerAdapter.POSITION_UNCHANGED
+        }
+        return PagerAdapter.POSITION_NONE
+    }
 
     fun setList(list: List<Page>) {
+        mFragments.clear()
         oldRequestBaseSetting = requestBaseList
         requestBaseList = list
         if (requestBaseList != oldRequestBaseSetting) {
@@ -171,4 +183,7 @@ internal class TimelinePagerAdapter(
         }
     }
 
+    fun onDestroy() {
+        mFragments.clear()
+    }
 }
