@@ -212,23 +212,38 @@ class SettingMovementActivity : AppCompatActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp),
-                                checked = currentConfigState.isStopStreamingApiWhenBackground,
+                                checked = currentConfigState.isEnableStreamingAPIAndNoteCapture,
                                 onChanged = {
-                                    currentConfigState =
-                                        currentConfigState.copy(isStopStreamingApiWhenBackground = it)
-                                }) {
-                                Text(stringResource(id = R.string.is_stop_timeline_streaming_when_background))
+                                    currentConfigState = currentConfigState.copy(
+                                        isEnableStreamingAPIAndNoteCapture = it
+                                    )
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.enable_automic_updates))
                             }
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                checked = currentConfigState.isStopNoteCaptureWhenBackground,
-                                onChanged = {
-                                    currentConfigState =
-                                        currentConfigState.copy(isStopNoteCaptureWhenBackground = it)
-                                }) {
-                                Text(stringResource(id = R.string.is_stop_note_capture_when_background))
+                            if (currentConfigState.isEnableStreamingAPIAndNoteCapture) {
+                                SwitchTile(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    checked = currentConfigState.isStopStreamingApiWhenBackground,
+                                    onChanged = {
+                                        currentConfigState =
+                                            currentConfigState.copy(isStopStreamingApiWhenBackground = it)
+                                    }) {
+                                    Text(stringResource(id = R.string.is_stop_timeline_streaming_when_background))
+                                }
+                                SwitchTile(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    checked = currentConfigState.isStopNoteCaptureWhenBackground,
+                                    onChanged = {
+                                        currentConfigState =
+                                            currentConfigState.copy(isStopNoteCaptureWhenBackground = it)
+                                    }) {
+                                    Text(stringResource(id = R.string.is_stop_note_capture_when_background))
+                                }
                             }
                         }
                     }
