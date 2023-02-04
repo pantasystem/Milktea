@@ -123,6 +123,10 @@ class ConfigKtTest {
                     config.isStopStreamingApiWhenBackground,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsEnableStreamingAPIAndNoteCapture -> Assertions.assertEquals(
+                    config.isEnableStreamingAPIAndNoteCapture,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

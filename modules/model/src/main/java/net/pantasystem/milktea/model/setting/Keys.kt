@@ -25,6 +25,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsEnableNotificationSound,
         Keys.IsStopStreamingApiWhenBackground,
         Keys.IsStopNoteCaptureWhenBackground,
+        Keys.IsEnableStreamingAPIAndNoteCapture,
     )
 }
 
@@ -70,6 +71,8 @@ sealed interface Keys {
 
     object IsStopNoteCaptureWhenBackground : Keys
 
+    object IsEnableStreamingAPIAndNoteCapture : Keys
+
     companion object
 }
 
@@ -98,5 +101,6 @@ fun Keys.str(): String {
         is Keys.IsEnableNotificationSound -> "IsEnableNotificationSound"
         is Keys.IsStopNoteCaptureWhenBackground -> "IsStopNoteCaptureWhenBackground"
         is Keys.IsStopStreamingApiWhenBackground -> "IsStopStreamingApiWhenBackground"
+        is Keys.IsEnableStreamingAPIAndNoteCapture -> "IsEnableStreamingAPIAndNoteCapture"
     }
 }

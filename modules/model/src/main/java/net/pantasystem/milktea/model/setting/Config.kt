@@ -46,6 +46,7 @@ data class IsAnalyticsCollectionEnabled(
  * @param isEnableNotificationSound アプリ内通知の通知音の有無
  * @param isStopNoteCaptureWhenBackground バックグラウンド移行時にノートのキャプチャーを停止する
  * @param isStopStreamingApiWhenBackground バックグルアンド移行時にストリーミングを中止する
+ * @param isEnableStreamingAPIAndNoteCapture 自動更新のON/OFF
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -69,6 +70,7 @@ data class Config(
     val isEnableNotificationSound: Boolean,
     val isStopStreamingApiWhenBackground: Boolean,
     val isStopNoteCaptureWhenBackground: Boolean,
+    val isEnableStreamingAPIAndNoteCapture: Boolean,
 ) {
     companion object
 
@@ -120,6 +122,7 @@ object DefaultConfig {
         isEnableNotificationSound = true,
         isStopNoteCaptureWhenBackground = true,
         isStopStreamingApiWhenBackground = true,
+        isEnableStreamingAPIAndNoteCapture = true,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

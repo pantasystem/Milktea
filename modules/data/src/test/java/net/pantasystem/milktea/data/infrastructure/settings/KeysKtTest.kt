@@ -84,6 +84,10 @@ class KeysKtTest {
                     "IsStopStreamingApiWhenBackground",
                     key.str()
                 )
+                Keys.IsEnableStreamingAPIAndNoteCapture -> Assertions.assertEquals(
+                    "IsEnableStreamingAPIAndNoteCapture",
+                    key.str()
+                )
             }
         }
     }
@@ -91,8 +95,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(23, Keys.allKeys.size)
-        Assertions.assertEquals(23, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(24, Keys.allKeys.size)
+        Assertions.assertEquals(24, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
