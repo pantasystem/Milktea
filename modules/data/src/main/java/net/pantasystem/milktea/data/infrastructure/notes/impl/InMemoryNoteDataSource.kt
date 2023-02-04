@@ -88,6 +88,10 @@ class InMemoryNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun exists(noteId: Note.Id): Boolean {
+        return notes[noteId] != null
+    }
+
     override suspend fun remove(noteId: Note.Id): Result<Boolean> = runCancellableCatching {
         mutex.withLock{
             val n = this.notes[noteId]
