@@ -81,7 +81,7 @@ data class NoteDTO(
     val emojiList: List<Emoji>? = when(rawEmojis) {
         EmojisType.None -> null
         is EmojisType.TypeArray -> rawEmojis.emojis
-        is EmojisType.TypeObject -> rawEmojis.emojis.map {
+        is EmojisType.TypeObject -> (rawEmojis.emojis + (reactionEmojis ?: emptyMap())).map {
             Emoji(name = it.key, url = it.value, uri = it.value)
         }
         null -> null
