@@ -85,4 +85,65 @@ class UserDTOEntityConverterTest {
         Assertions.assertEquals(userDTO.bannerUrl, result.info.bannerUrl)
         Assertions.assertEquals(userDTO.avatarBlurhash, result.avatarBlurhash)
     }
+
+    @Test
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun convert_GiveSimpleUser() = runTest {
+        val converter = UserDTOEntityConverter()
+
+        val userDTO = UserDTO(
+            id = "test-id",
+            userName = "test-user-name2",
+            name = "name-2",
+            host = "misskey.io",
+            description = "hogehogewefaw",
+            followersCount = 10,
+            followingCount = 20,
+            hostLower = null,
+            notesCount = 128,
+            email = null,
+            isBot = false,
+            isCat = true,
+            pinnedNoteIds = listOf(),
+            pinnedNotes = listOf(),
+            twoFactorEnabled = null,
+            isAdmin = null,
+            avatarUrl = "avatarUrl",
+            bannerUrl = "bannerUrl",
+            rawEmojis = null,
+            isFollowing = true,
+            isFollowed = false,
+            isBlocking = false,
+            isMuted = false,
+            url = "https://url",
+            hasPendingFollowRequestFromYou = false,
+            hasPendingFollowRequestToYou = false,
+            isLocked = false,
+            instance = null,
+            fields = listOf(),
+            birthday = Clock.System.now().toLocalDateTime(TimeZone.UTC).date,
+            createdAt = Clock.System.now(),
+            updatedAt = Clock.System.now().plus(1.days),
+            publicReactions = null,
+            avatarBlurhash = "aowfjioa0392"
+        )
+        val account = Account(
+            remoteId = "test-id",
+            instanceDomain = "https://misskey.pantasystem.com",
+            userName = "Panta",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = "",
+        ).copy(accountId = 1L)
+
+        val result = converter.convert(account, userDTO, true)
+        Assertions.assertEquals(userDTO.userName, result.userName)
+        Assertions.assertEquals(userDTO.name, result.name)
+        Assertions.assertEquals(userDTO.host, result.host)
+
+        Assertions.assertEquals(userDTO.isBot, result.isBot)
+        Assertions.assertEquals(userDTO.isCat, result.isCat)
+
+        Assertions.assertEquals(userDTO.avatarUrl, result.avatarUrl)
+        Assertions.assertEquals(userDTO.avatarBlurhash, result.avatarBlurhash)
+    }
 }
