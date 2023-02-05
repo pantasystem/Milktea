@@ -6,22 +6,19 @@ import jp.panta.misskeyandroidclient.model.account.TestAccountRepository
 import jp.panta.misskeyandroidclient.streaming.TestSocketWithAccountProviderImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api_streaming.NoteCaptureAPIImpl
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.notes.NoteCaptureAPIWithAccountProviderImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
-import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.make
+import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
-
 import org.junit.jupiter.api.Test
 
 class NoteCaptureAPIAdapterTest {
@@ -63,22 +60,9 @@ class NoteCaptureAPIAdapterTest {
             val account = accountRepository.getCurrentAccount().getOrThrow()
             val noteCapture = noteCaptureAPIWithAccountProvider.get(account) as NoteCaptureAPIImpl
 
-            val dto = NoteDTO(
-                "note-1",
-                Clock.System.now(),
-                renoteCount = 0,
-                replyCount = 0,
-                userId = "hoge",
-                user = UserDTO("hoge", "hogeName")
-            )
-            val note = dto.toNote(
-                account, NodeInfo(
-                    host = "", version = "", software = NodeInfo.Software(
-                        name = "misskey",
-                        version = ""
-                    )
-
-                )
+            val note = Note.make(
+                id = Note.Id(account.accountId, "note-1"),
+                userId = User.Id(account.accountId, "hoge")
             )
             noteDataSource.add(
                 note

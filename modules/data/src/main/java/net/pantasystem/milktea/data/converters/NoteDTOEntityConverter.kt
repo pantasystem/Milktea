@@ -2,14 +2,15 @@ package net.pantasystem.milktea.data.converters
 
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteVisibilityType
-import net.pantasystem.milktea.data.infrastructure.Visibility
-import net.pantasystem.milktea.data.infrastructure.toPoll
+import net.pantasystem.milktea.api.misskey.notes.PollDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.notes.Visibility
+import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -65,5 +66,34 @@ class NoteDTOEntityConverter @Inject constructor() {
             ),
             nodeInfo = nodeInfo,
         )
+    }
+}
+
+fun PollDTO?.toPoll(): Poll? {
+    return this?.let { dto ->
+        Poll(
+            multiple = dto.multiple,
+            expiresAt = dto.expiresAt,
+            choices = choices.mapIndexed { index, value ->
+                Poll.Choice(
+                    index = index,
+                    text = value.text,
+                    isVoted = value.isVoted,
+                    votes = value.votes
+                )
+            }
+        )
+    }
+}
+
+
+@Throws(IllegalArgumentException::class)
+fun Visibility(type: NoteVisibilityType, isLocalOnly: Boolean, visibleUserIds: List<User.Id>? = null): Visibility {
+    return when(type){
+        NoteVisibilityType.Public -> Visibility.Public(isLocalOnly)
+        NoteVisibilityType.Followers -> Visibility.Followers(isLocalOnly)
+        NoteVisibilityType.Home -> Visibility.Home(isLocalOnly)
+        NoteVisibilityType.Specified -> Visibility.Specified(visibleUserIds ?: emptyList())
+        else -> Visibility.Public(isLocalOnly)
     }
 }
