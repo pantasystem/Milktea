@@ -147,7 +147,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
                 val tab = binding.reactionHistoryTab.getTabAt(i + 1)!!
                 val textView = tab.view.children.firstOrNull {
                     it is TextView && it.id == -1
-                }
+                } as? TextView
 
                 if (textView != null) {
                     val spanned = CustomEmojiDecorator().decorate(

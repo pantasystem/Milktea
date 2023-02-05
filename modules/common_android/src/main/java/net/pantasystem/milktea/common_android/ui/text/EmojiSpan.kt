@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
 import com.bumptech.glide.request.target.CustomTarget
+import kotlin.math.min
 
 abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan(){
 
@@ -59,7 +60,7 @@ abstract class EmojiSpan<T : Any>(val adapter: EmojiAdapter) : ReplacementSpan()
 
 
     private fun updateImageDrawableSize(paint: Paint) {
-        val emojiSize = (paint.textSize * 1.2).toInt()
+        val emojiSize = min((paint.textSize * 1.2).toInt(), 640)
         if (emojiSize != textSize) {
             textSize = emojiSize
             imageDrawable?.setBounds(0, 0, emojiSize, emojiSize)
