@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toEntity
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -25,10 +26,14 @@ data class LikedGalleryPostId(
     val postId: GalleryPost.Id
 )
 
-class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<String>, GetGalleryPostsStateFlow {
+class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<String>,
+    GetGalleryPostsStateFlow {
 
-    private val _state = MutableStateFlow<PageableState<List<LikedGalleryPostId>>>(PageableState.Fixed(
-        StateContent.NotExist()))
+    private val _state = MutableStateFlow<PageableState<List<LikedGalleryPostId>>>(
+        PageableState.Fixed(
+            StateContent.NotExist()
+        )
+    )
 
     override fun getFlow(): Flow<PageableState<List<GalleryPost.Id>>> {
         return _state.map {
@@ -43,8 +48,9 @@ class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<Str
 
 
     private fun getList(): List<LikedGalleryPostId> {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?: emptyList()
+        return (_state.value.content as? StateContent.Exist)?.rawContent ?: emptyList()
     }
+
     override suspend fun getSinceId(): String? {
         return getList().firstOrNull()?.id
     }
@@ -69,7 +75,8 @@ class LikedGalleryPostsConverter(
     private val getAccount: suspend () -> Account,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: UserDataSource,
-    private val galleryDataSource: GalleryDataSource
+    private val galleryDataSource: GalleryDataSource,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
 ) : EntityConverter<LikedGalleryPost, LikedGalleryPostId> {
 
     override suspend fun convertAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
@@ -77,7 +84,12 @@ class LikedGalleryPostsConverter(
         return list.map {
             LikedGalleryPostId(
                 it.id,
-                it.post.toEntity(account, filePropertyDataSource, userDataSource).also { post ->
+                it.post.toEntity(
+                    account,
+                    filePropertyDataSource,
+                    userDataSource,
+                    userDTOEntityConverter
+                ).also { post ->
                     galleryDataSource.add(post)
                 }.id
             )
@@ -88,13 +100,14 @@ class LikedGalleryPostsConverter(
 class LikedGalleryPostsLoader(
     private val idGetter: IdGetter<String>,
     private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val getAccount: suspend ()-> Account,
+    private val getAccount: suspend () -> Account,
 ) : FutureLoader<LikedGalleryPost>, PreviousLoader<LikedGalleryPost> {
 
     override suspend fun loadFuture(): Result<List<LikedGalleryPost>> {
         return runCancellableCatching {
-            val api = misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
-                ?: throw IllegalVersionException()
+            val api =
+                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
+                    ?: throw IllegalVersionException()
             api.likedGalleryPosts(
                 GetPosts(
                     sinceId = idGetter.getSinceId(),
@@ -107,8 +120,9 @@ class LikedGalleryPostsLoader(
 
     override suspend fun loadPrevious(): Result<List<LikedGalleryPost>> {
         return runCancellableCatching {
-            val api = misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
-                ?: throw IllegalVersionException()
+            val api =
+                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
+                    ?: throw IllegalVersionException()
             api.likedGalleryPosts(
                 GetPosts(
                     untilId = idGetter.getUntilId(),

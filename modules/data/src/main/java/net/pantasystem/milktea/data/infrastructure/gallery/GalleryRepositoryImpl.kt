@@ -5,6 +5,7 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
 import net.pantasystem.milktea.data.infrastructure.toEntity
@@ -28,6 +29,7 @@ class GalleryRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val accountRepository: AccountRepository,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GalleryRepository {
 
@@ -62,7 +64,12 @@ class GalleryRepositoryImpl @Inject constructor(
             requireNotNull(created)
 
             val gallery =
-                created.toEntity(createGalleryPost.author, filePropertyDataSource, userDataSource)
+                created.toEntity(
+                    createGalleryPost.author,
+                    filePropertyDataSource,
+                    userDataSource,
+                    userDTOEntityConverter
+                )
             galleryDataSource.add(gallery)
             gallery
         }
@@ -97,7 +104,12 @@ class GalleryRepositoryImpl @Inject constructor(
             ).throwIfHasError()
             val body = res.body()
             requireNotNull(body)
-            val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
+            val gallery = body.toEntity(
+                account,
+                filePropertyDataSource,
+                userDataSource,
+                userDTOEntityConverter
+            )
             galleryDataSource.add(gallery)
             gallery
         }
@@ -160,7 +172,12 @@ class GalleryRepositoryImpl @Inject constructor(
                 )
             ).throwIfHasError().body()
             requireNotNull(body)
-            val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
+            val gallery = body.toEntity(
+                account,
+                filePropertyDataSource,
+                userDataSource,
+                userDTOEntityConverter
+            )
             galleryDataSource.add(gallery)
             gallery
         }

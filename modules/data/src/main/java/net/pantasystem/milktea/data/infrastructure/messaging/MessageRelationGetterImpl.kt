@@ -1,15 +1,18 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
-import net.pantasystem.milktea.data.infrastructure.entities
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
+import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.messaging.MessageNotFoundException
 import net.pantasystem.milktea.model.messaging.MessageRelation
 import net.pantasystem.milktea.model.messaging.MessageRelationGetter
+import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,10 +28,11 @@ class MessageRelationGetterImpl @Inject constructor(
     private val userDataSource: UserDataSource,
     private val groupDataSource: GroupDataSource,
     private val accountRepository: AccountRepository,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
 ) : MessageRelationGetter, MessageAdder {
 
     override suspend fun add(account: Account, messageDTO: MessageDTO): MessageRelation {
-        val (message, users) = messageDTO.entities(account)
+        val (message, users) = messageDTO.entities(account, userDTOEntityConverter)
         messageDataSource.add(message)
         userDataSource.addAll(users)
         messageDTO.group?.let{
@@ -63,4 +67,41 @@ class MessageRelationGetterImpl @Inject constructor(
             }
         }
     }
+}
+
+
+suspend fun MessageDTO.entities(account: Account, userDTOEntityConverter: UserDTOEntityConverter,): Pair<Message, List<User>> {
+    val list = mutableListOf<User>()
+    val id = Message.Id(account.accountId, id)
+    list.add(userDTOEntityConverter.convert(account, user))
+    val message = if(groupId == null) {
+        require(recipientId != null)
+        Message.Direct(
+            id,
+            createdAt,
+            text,
+            User.Id(account.accountId, userId),
+            fileId,
+            file?.toFileProperty(account),
+            isRead,
+            emojis?: emptyList(),
+            recipientId = User.Id(account.accountId, recipientId!!)
+        )
+    }else{
+        Message.Group(
+            id,
+            createdAt,
+            text,
+            User.Id(account.accountId, userId),
+            fileId,
+            file?.toFileProperty(account),
+            isRead = reads?.contains(account.remoteId) ?: false,
+            emojis?: emptyList(),
+            Group.Id(account.accountId, groupId!!),
+            reads = reads?.map {
+                User.Id(account.accountId, it)
+            }?: emptyList()
+        )
+    }
+    return message to list
 }

@@ -3,12 +3,11 @@ package net.pantasystem.milktea.data.infrastructure
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
-import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteVisibilityType
 import net.pantasystem.milktea.api.misskey.notes.PollDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.api.misskey.users.UserDTO
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -18,7 +17,6 @@ import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.group.InvitationId
 import net.pantasystem.milktea.model.list.UserList
-import net.pantasystem.milktea.model.messaging.Message
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
@@ -60,86 +58,7 @@ fun UserListDTO.toEntity(account: Account): UserList {
     )
 }
 
-fun MessageDTO.entities(account: Account): Pair<Message, List<User>> {
-    val list = mutableListOf<User>()
-    val id = Message.Id(account.accountId, id)
-    list.add(user.toUser(account, false))
-    val message = if(groupId == null) {
-        require(recipientId != null)
-        Message.Direct(
-            id,
-            createdAt,
-            text,
-            User.Id(account.accountId, userId),
-            fileId,
-            file?.toFileProperty(account),
-            isRead,
-            emojis?: emptyList(),
-            recipientId = User.Id(account.accountId, recipientId!!)
-        )
-    }else{
-        Message.Group(
-            id,
-            createdAt,
-            text,
-            User.Id(account.accountId, userId),
-            fileId,
-            file?.toFileProperty(account),
-            isRead = reads?.contains(account.remoteId) ?: false,
-            emojis?: emptyList(),
-            Group.Id(account.accountId, groupId!!),
-            reads = reads?.map {
-                User.Id(account.accountId, it)
-            }?: emptyList()
-        )
-    }
-    return message to list
-}
 
-fun NoteDTO.toEntities(account: Account, nodeInfo: NodeInfo?): NoteRelationEntities {
-    val dtoList = mutableListOf<NoteDTO>()
-    dtoList.add(this)
-
-
-    if(this.reply != null){
-
-        dtoList.add(this.reply!!)
-    }
-    if(this.reNote != null){
-        dtoList.add(reNote!!)
-    }
-
-    val note = this.toNote(account, nodeInfo)
-    val users = mutableListOf<User>()
-    val notes = mutableListOf<Note>()
-    val files = mutableListOf<FileProperty>()
-
-    pickEntities(account, notes, users, files, nodeInfo)
-    return NoteRelationEntities(
-        note = note,
-        notes = notes,
-        users = users,
-        files = files
-    )
-}
-
-private fun NoteDTO.pickEntities(account: Account, notes: MutableList<Note>, users: MutableList<User>, files: MutableList<FileProperty>, nodeInfo: NodeInfo?) {
-    val (note, user) = this.toNoteAndUser(account, nodeInfo)
-    notes.add(note)
-    users.add(user)
-    files.addAll(
-        this.files?.map {
-            it.toFileProperty(account)
-        }?: emptyList()
-    )
-    if(this.reply != null) {
-        this.reply!!.pickEntities(account, notes, users, files, nodeInfo)
-    }
-
-    if(this.reNote != null) {
-        this.reNote!!.pickEntities(account, notes, users, files, nodeInfo)
-    }
-}
 
 fun PollDTO?.toPoll(): Poll? {
     return this?.let { dto ->
@@ -217,12 +136,6 @@ fun Visibility(type: NoteVisibilityType, isLocalOnly: Boolean, visibleUserIds: L
     }
 }
 
-
-fun NoteDTO.toNoteAndUser(account: Account, nodeInfo: NodeInfo?): Pair<Note, User> {
-    val note = this.toNote(account, nodeInfo)
-    val user = this.user.toUser(account,false)
-    return note to user
-}
 
 
 fun NotificationDTO.toNotification(account: Account, nodeInfo: NodeInfo?): Notification {
@@ -352,79 +265,6 @@ fun NotificationDTO.toNotification(account: Account, nodeInfo: NodeInfo?): Notif
     }
 }
 
-fun UserDTO.toUser(account: Account, isDetail: Boolean = false): User {
-    val instanceInfo = instance?.let {
-        User.InstanceInfo(
-            name = it.name,
-            faviconUrl = it.faviconUrl,
-            iconUrl = it.iconUrl,
-            softwareName = it.softwareName,
-            softwareVersion = it.softwareVersion,
-            themeColor = it.themeColor
-        )
-    }
-    if (isDetail) {
-
-        return User.Detail(
-            id = User.Id(account.accountId, this.id),
-            avatarUrl = this.avatarUrl,
-            emojis = this.emojiList ?: emptyList(),
-            isBot = this.isBot,
-            isCat = this.isCat,
-            name = this.name,
-            userName = this.userName,
-            host = this.host ?: account.getHost(),
-            nickname = null,
-            isSameHost = host == null,
-            instance = instanceInfo,
-            avatarBlurhash = avatarBlurhash,
-            info = User.Info(
-                bannerUrl = this.bannerUrl,
-                description = this.description,
-                followersCount = this.followersCount,
-                followingCount = this.followingCount,
-                url = this.url,
-                hostLower = this.hostLower,
-                notesCount = this.notesCount,
-                pinnedNoteIds = this.pinnedNoteIds?.map {
-                    Note.Id(account.accountId, it)
-                },
-                isLocked = isLocked ?: false,
-                birthday = birthday,
-                createdAt = createdAt,
-                updatedAt = updatedAt,
-                fields = fields?.map {
-                    User.Field(it.name, it.value)
-                }?: emptyList(),
-                isPublicReactions = publicReactions ?: false,
-            ),
-            related = User.Related(
-                isFollowing = this.isFollowing ?: false,
-                isFollower = this.isFollowed ?: false,
-                isBlocking = this.isBlocking ?: false,
-                isMuting = this.isMuted ?: false,
-                hasPendingFollowRequestFromYou = hasPendingFollowRequestFromYou ?: false,
-                hasPendingFollowRequestToYou = hasPendingFollowRequestToYou ?: false,
-            )
-        )
-    } else {
-        return User.Simple(
-            id = User.Id(account.accountId, this.id),
-            avatarUrl = this.avatarUrl,
-            emojis = this.emojiList ?: emptyList(),
-            isBot = this.isBot,
-            isCat = this.isCat,
-            name = this.name,
-            userName = this.userName,
-            host = this.host ?: account.getHost(),
-            nickname = null,
-            isSameHost = host == null,
-            instance = instanceInfo,
-            avatarBlurhash = avatarBlurhash
-        )
-    }
-
-}
 
 fun GroupDTO.toGroup(accountId: Long): Group {
     return Group(
@@ -442,13 +282,14 @@ fun GroupDTO.toGroup(accountId: Long): Group {
 suspend fun net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost.toEntity(
     account: Account,
     filePropertyDataSource: FilePropertyDataSource,
-    userDataSource: net.pantasystem.milktea.model.user.UserDataSource
+    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
+    userDTOEntityConverter: UserDTOEntityConverter,
 ): GalleryPost {
     filePropertyDataSource.addAll(files.map {
         it.toFileProperty(account)
     })
     // NOTE: API上ではdetailだったが実際に受信されたデータはSimpleだったのでfalse
-    userDataSource.add(user.toUser(account, false))
+    userDataSource.add(userDTOEntityConverter.convert(account, user, false))
     if (this.likedCount == null || this.isLiked == null) {
 
         return GalleryPost.Normal(

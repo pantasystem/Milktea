@@ -13,10 +13,10 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.reaction.UserReaction
@@ -66,6 +66,7 @@ class UserReactionPagingImpl(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val noteRelationGetter: NoteRelationGetter,
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val userDTOEntityConverter: UserDTOEntityConverter,
 ) : StateLocker, PreviousLoader<UserReactionDTO>,
     PaginationState<UserReactionRelation>, EntityConverter<UserReactionDTO, UserReactionRelation>,
     IdGetter<String> {
@@ -77,6 +78,7 @@ class UserReactionPagingImpl(
         val noteRelationGetter: NoteRelationGetter,
         val misskeyAPIProvider: MisskeyAPIProvider,
         val accountRepository: AccountRepository,
+        val userDTOEntityConverter: UserDTOEntityConverter,
     ){
         fun create(userId: User.Id): UserReactionPagingImpl {
             return UserReactionPagingImpl(
@@ -86,6 +88,7 @@ class UserReactionPagingImpl(
                 misskeyAPIProvider = misskeyAPIProvider,
                 accountRepository = accountRepository,
                 noteRelationGetter = noteRelationGetter,
+                userDTOEntityConverter = userDTOEntityConverter,
             )
         }
     }
@@ -130,7 +133,7 @@ class UserReactionPagingImpl(
     override suspend fun convertAll(list: List<UserReactionDTO>): List<UserReactionRelation> {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return list.map { userReaction ->
-            val user = userReaction.user.toUser(account, false)
+            val user = userDTOEntityConverter.convert(account, userReaction.user, false)
             userDataSource.add(user)
             val note = noteDataSourceAdder.addNoteDtoToDataSource(account, userReaction.note)
             UserReactionRelation(
