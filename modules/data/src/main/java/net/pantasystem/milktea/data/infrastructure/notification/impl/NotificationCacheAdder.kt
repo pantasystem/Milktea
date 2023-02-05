@@ -2,8 +2,12 @@ package net.pantasystem.milktea.data.infrastructure.notification.impl
 
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.data.infrastructure.*
+import net.pantasystem.milktea.data.converters.NotificationDTOEntityConverter
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.toGroup
+import net.pantasystem.milktea.data.infrastructure.toModel
+import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -22,9 +26,13 @@ class NotificationCacheAdder @Inject constructor(
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val groupDataSource: GroupDataSource,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val notificationDTOEntityConverter: NotificationDTOEntityConverter,
 ) {
     suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO): NotificationRelation {
-        val user = notificationDTO.user?.toUser(account, false)
+        val user = notificationDTO.user?.let {
+            userDTOEntityConverter.convert(account, it)
+        }
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         if (user != null) {
             userDataSource.add(user)
@@ -32,7 +40,7 @@ class NotificationCacheAdder @Inject constructor(
         val noteRelation = notificationDTO.note?.let{
             noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(account, it))
         }
-        val notification = notificationDTO.toNotification(account, nodeInfo)
+        val notification = notificationDTOEntityConverter.convert(notificationDTO, account, nodeInfo)
         notificationDataSource.add(notification)
         notificationDTO.invitation?.group?.toGroup(account.accountId)?.let { group ->
             groupDataSource.add(group)

@@ -8,8 +8,8 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.ap.ApResolver
 import net.pantasystem.milktea.model.ap.ApResolverRepository
@@ -21,6 +21,7 @@ class ApResolverRepositoryImpl @Inject constructor(
     private val getAccount: GetAccount,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val userDataSource: UserDataSource,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ): ApResolverRepository {
 
@@ -39,7 +40,7 @@ class ApResolverRepositoryImpl @Inject constructor(
                 }
 
                 is ApResolveResult.TypeUser -> {
-                    val user = result.user.toUser(account, isDetail = true)
+                    val user = userDTOEntityConverter.convert(account, result.user, true)
                     userDataSource.add(user)
                     ApResolver.TypeUser(
                         user

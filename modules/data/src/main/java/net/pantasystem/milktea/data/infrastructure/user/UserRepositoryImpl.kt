@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -32,6 +32,7 @@ class UserRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val loggerFactory: Logger.Factory,
     val userApiAdapter: UserApiAdapter,
+    val userDTOEntityConverter: UserDTOEntityConverter,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
@@ -95,7 +96,7 @@ class UserRepositoryImpl @Inject constructor(
         res.throwIfHasError()
 
         res.body()?.let {
-            val user = it.toUser(account, detail)
+            val user = userDTOEntityConverter.convert(account, it, detail)
             userDataSource.add(user)
             return@withContext userDataSource.get(user.id).getOrThrow()
         }
@@ -130,7 +131,7 @@ class UserRepositoryImpl @Inject constructor(
                 .throwIfHasError()
 
             results.body()!!.forEach {
-                it.toUser(ac, true).also { u ->
+                userDTOEntityConverter.convert(ac, it, true).also { u ->
                     userDataSource.add(u)
                 }
             }
@@ -341,7 +342,7 @@ class UserRepositoryImpl @Inject constructor(
             val res = misskeyAPIProvider.get(account).getUsers(request)
                 .throwIfHasError()
             res.body()?.map {
-                it.toUser(account, true)
+                userDTOEntityConverter.convert(account, it, true)
             }?.onEach {
                 userDataSource.add(it)
             } ?: emptyList()
@@ -375,7 +376,7 @@ class UserRepositoryImpl @Inject constructor(
                             )
                         ).throwIfHasError()
                         .body()!!.map {
-                            it.toUser(account, true)
+                            userDTOEntityConverter.convert(account, it, true)
                         }
                     userDataSource.addAll(users)
                     users.map { it.id }

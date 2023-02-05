@@ -12,6 +12,7 @@ import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.app_store.drive.FilePropertyPagingStore
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIFactory
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.drive.*
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -44,6 +45,7 @@ object DriveFileModule {
         filePropertyDataSource: FilePropertyDataSource,
         mastodonAPIFactory: MastodonAPIFactory,
         mastodonAPIProvider: MastodonAPIProvider,
+        filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     ): FileUploaderProvider {
         return OkHttpFileUploaderProvider(
             okHttpClientProvider,
@@ -54,6 +56,7 @@ object DriveFileModule {
             filePropertyDataSource = filePropertyDataSource,
             mastodonAPIFactory = mastodonAPIFactory,
             mastodonAPIProvider = mastodonAPIProvider,
+            filePropertyDTOEntityConverter = filePropertyDTOEntityConverter
         )
     }
 }
