@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.user.User
+import kotlin.math.min
 
 object InstanceInfoHelper {
 
@@ -30,7 +31,7 @@ object InstanceInfoHelper {
             val iconDrawable = DrawableEmojiSpan(emojiAdapter)
             Glide.with(this)
                 .load(info!!.faviconUrl)
-                .override(this.textSize.toInt())
+                .override(min(this.textSize.toInt(), 640))
                 .into(iconDrawable.target)
             text =  SpannableStringBuilder(":${info.faviconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.faviconUrl}:".length, 0)

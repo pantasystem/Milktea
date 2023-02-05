@@ -12,6 +12,7 @@ import net.pantasystem.milktea.common_android.R
 import net.pantasystem.milktea.model.notes.Visibility
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 
 object DateFormatHelper {
 
@@ -73,6 +74,7 @@ object DateFormatHelper {
                 setSpan(span, text.length + 1, target.length,0)
                 GlideApp.with(this@setElapsedTimeAndVisibility)
                     .load(drawable)
+                    .override(min(textSize.toInt(), 640))
                     .into(span.target)
             }
         }

@@ -158,7 +158,7 @@ class MediaActivity : AppCompatActivity() {
         Log.d(MediaNavigationKeys.TAG, "ダウンロードを開始します:$file")
         Toast.makeText(
             this,
-            String.format(getString(R.string.start_downloading_placeholder, file.name)),
+            getString(R.string.start_downloading_placeholder, file.name),
             Toast.LENGTH_LONG
         ).show()
         WorkManager.getInstance(this)
