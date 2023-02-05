@@ -12,15 +12,11 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.toEntity
+import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.instance.IllegalVersionException
-import net.pantasystem.milktea.model.user.UserDataSource
 import retrofit2.Response
 import net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost as GalleryPostDTO
 
@@ -71,22 +67,12 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>,
 
 class GalleryPostsConverter(
     private val getAccount: suspend () -> Account,
-    private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource,
-    private val galleryDataSource: GalleryDataSource,
-    private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter
 ) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
     override suspend fun convertAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
         return list.map {
-            it.toEntity(
-                getAccount.invoke(),
-                filePropertyDataSource,
-                userDataSource,
-                userDTOEntityConverter
-            ).also { post ->
-                galleryDataSource.add(post)
-            }.id
+            galleryPostDTOEntityConverter.convert(it, getAccount.invoke()).id
         }
     }
 }

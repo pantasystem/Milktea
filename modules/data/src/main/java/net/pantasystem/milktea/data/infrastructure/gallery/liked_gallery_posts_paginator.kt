@@ -12,14 +12,11 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.toEntity
+import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.instance.IllegalVersionException
-import net.pantasystem.milktea.model.user.UserDataSource
 
 data class LikedGalleryPostId(
     val id: String,
@@ -73,10 +70,8 @@ class LikedGalleryPostsState : PaginationState<LikedGalleryPostId>, IdGetter<Str
 
 class LikedGalleryPostsConverter(
     private val getAccount: suspend () -> Account,
-    private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource,
     private val galleryDataSource: GalleryDataSource,
-    private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter
 ) : EntityConverter<LikedGalleryPost, LikedGalleryPostId> {
 
     override suspend fun convertAll(list: List<LikedGalleryPost>): List<LikedGalleryPostId> {
@@ -84,12 +79,7 @@ class LikedGalleryPostsConverter(
         return list.map {
             LikedGalleryPostId(
                 it.id,
-                it.post.toEntity(
-                    account,
-                    filePropertyDataSource,
-                    userDataSource,
-                    userDTOEntityConverter
-                ).also { post ->
+                galleryPostDTOEntityConverter.convert(it.post, account).also { post ->
                     galleryDataSource.add(post)
                 }.id
             )

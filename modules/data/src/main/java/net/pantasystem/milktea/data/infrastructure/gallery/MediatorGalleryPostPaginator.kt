@@ -9,6 +9,7 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.paginator.FuturePagingController
 import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -23,10 +24,7 @@ class GalleryPostsStoreImpl(
     pageable: Pageable.Gallery,
     getAccount: suspend () -> Account,
     misskeyAPIProvider: MisskeyAPIProvider,
-    filePropertyDataSource: FilePropertyDataSource,
-    userDataSource: UserDataSource,
-    galleryDataSource: GalleryDataSource,
-    userDTOEntityConverter: UserDTOEntityConverter
+    galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
 ) : GalleryPostsStore {
 
     class Factory @Inject constructor(
@@ -34,7 +32,8 @@ class GalleryPostsStoreImpl(
         val filePropertyDataSource: FilePropertyDataSource,
         val userDataSource: UserDataSource,
         val galleryDataSource: GalleryDataSource,
-        val userDTOEntityConverter: UserDTOEntityConverter
+        val userDTOEntityConverter: UserDTOEntityConverter,
+        val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
     ) : GalleryPostsStore.Factory {
         override fun create(
             pageable: Pageable.Gallery,
@@ -44,20 +43,15 @@ class GalleryPostsStoreImpl(
                 LikedGalleryPostStoreImpl(
                     getAccount,
                     misskeyAPIProvider,
-                    filePropertyDataSource,
-                    userDataSource,
                     galleryDataSource,
-                    userDTOEntityConverter,
+                    galleryPostDTOEntityConverter
                 )
             } else {
                 GalleryPostsStoreImpl(
                     pageable,
                     getAccount,
                     misskeyAPIProvider,
-                    filePropertyDataSource,
-                    userDataSource,
-                    galleryDataSource,
-                    userDTOEntityConverter
+                    galleryPostDTOEntityConverter,
                 )
             }
         }
@@ -70,10 +64,7 @@ class GalleryPostsStoreImpl(
     private val entityAdder =
         GalleryPostsConverter(
             getAccount,
-            filePropertyDataSource,
-            userDataSource,
-            galleryDataSource,
-            userDTOEntityConverter
+            galleryPostDTOEntityConverter,
         )
     private val loader = GalleryPostsLoader(pageable, galleryPostState, misskeyAPIProvider, getAccount)
     private val previousPagingController =
@@ -101,10 +92,8 @@ class GalleryPostsStoreImpl(
 class LikedGalleryPostStoreImpl(
     getAccount: suspend () -> Account,
     misskeyAPIProvider: MisskeyAPIProvider,
-    filePropertyDataSource: FilePropertyDataSource,
-    userDataSource: UserDataSource,
     galleryDataSource: GalleryDataSource,
-    userDTOEntityConverter: UserDTOEntityConverter,
+    galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
 ) : GalleryPostsStore {
 
     override val mutex: Mutex = Mutex()
@@ -112,10 +101,8 @@ class LikedGalleryPostStoreImpl(
     private val galleryPostState = LikedGalleryPostsState()
     private val entityAdder = LikedGalleryPostsConverter(
         getAccount,
-        filePropertyDataSource,
-        userDataSource,
         galleryDataSource,
-        userDTOEntityConverter,
+        galleryPostDTOEntityConverter = galleryPostDTOEntityConverter,
     )
     private val loader =
         LikedGalleryPostsLoader(galleryPostState, misskeyAPIProvider, getAccount)

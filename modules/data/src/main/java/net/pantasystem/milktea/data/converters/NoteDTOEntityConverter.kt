@@ -14,7 +14,9 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NoteDTOEntityConverter @Inject constructor() {
 
     suspend fun convert(noteDTO: NoteDTO, account: Account, nodeInfo: NodeInfo?): Note {

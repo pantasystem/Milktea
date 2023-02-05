@@ -3,11 +3,8 @@ package net.pantasystem.milktea.data.infrastructure
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.groups.GroupDTO
 import net.pantasystem.milktea.api.misskey.list.UserListDTO
-import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.group.Group
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.notes.Note
@@ -60,51 +57,6 @@ fun GroupDTO.toGroup(accountId: Long): Group {
     )
 }
 
-
-suspend fun net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost.toEntity(
-    account: Account,
-    filePropertyDataSource: FilePropertyDataSource,
-    userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
-    userDTOEntityConverter: UserDTOEntityConverter,
-): GalleryPost {
-    filePropertyDataSource.addAll(files.map {
-        it.toFileProperty(account)
-    })
-    // NOTE: API上ではdetailだったが実際に受信されたデータはSimpleだったのでfalse
-    userDataSource.add(userDTOEntityConverter.convert(account, user, false))
-    if (this.likedCount == null || this.isLiked == null) {
-
-        return GalleryPost.Normal(
-            GalleryPost.Id(account.accountId, this.id),
-            createdAt,
-            updatedAt,
-            title,
-            description,
-            User.Id(account.accountId, userId),
-            files.map {
-                FileProperty.Id(account.accountId, it.id)
-            },
-            tags ?: emptyList(),
-            isSensitive
-        )
-    } else {
-        return GalleryPost.Authenticated(
-            GalleryPost.Id(account.accountId, this.id),
-            createdAt,
-            updatedAt,
-            title,
-            description,
-            User.Id(account.accountId, userId),
-            files.map {
-                FileProperty.Id(account.accountId, it.id)
-            },
-            tags ?: emptyList(),
-            isSensitive,
-            likedCount ?: 0,
-            isLiked ?: false
-        )
-    }
-}
 
 data class NoteRelationEntities(
     val note: Note,

@@ -9,7 +9,9 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NotificationDTOEntityConverter @Inject constructor(
     private val noteDTOEntityConverter: NoteDTOEntityConverter
 ) {
