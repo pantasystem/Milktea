@@ -7,7 +7,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
+import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -36,13 +36,14 @@ class MisskeyOkHttpDriveFileUploader(
     val json: Json,
     private val okHttpClientProvider: OkHttpClientProvider,
     private val filePropertyDataSource: FilePropertyDataSource,
+    private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
 ) : FileUploader {
     override suspend fun upload(file: UploadSource, isForce: Boolean): FileProperty {
         return when (file) {
             is UploadSource.LocalFile -> upload(file.file, isForce)
             is UploadSource.OtherAccountFile -> transferUpload(file.fileProperty, isForce)
         }.let {
-            val property = it.toFileProperty(account)
+            val property = filePropertyDTOEntityConverter.convert(it, account)
             filePropertyDataSource.add(property).getOrThrow()
             property
         }

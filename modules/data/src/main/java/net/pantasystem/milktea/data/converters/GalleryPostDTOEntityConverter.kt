@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.converters
 
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -14,6 +13,7 @@ class GalleryPostDTOEntityConverter @Inject constructor(
     private val filePropertyDataSource: FilePropertyDataSource,
     private val userDataSource: net.pantasystem.milktea.model.user.UserDataSource,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
 ) {
 
     suspend fun convert(
@@ -21,7 +21,7 @@ class GalleryPostDTOEntityConverter @Inject constructor(
         account: Account
     ): GalleryPost {
         filePropertyDataSource.addAll(galleryPostDTO.files.map {
-            it.toFileProperty(account)
+            filePropertyDTOEntityConverter.convert(it, account)
         })
         // NOTE: API上ではdetailだったが実際に受信されたデータはSimpleだったのでfalse
         userDataSource.add(userDTOEntityConverter.convert(account, galleryPostDTO.user, false))

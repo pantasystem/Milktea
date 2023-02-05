@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIFactory
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
+import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -48,6 +49,7 @@ class OkHttpFileUploaderProvider(
     val filePropertyDataSource: FilePropertyDataSource,
     private val mastodonAPIFactory: MastodonAPIFactory,
     private val mastodonAPIProvider: MastodonAPIProvider,
+    private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
 ) : FileUploaderProvider {
     private val lock = Mutex()
     private var instances = mapOf<Long, FileUploader>()
@@ -63,7 +65,8 @@ class OkHttpFileUploaderProvider(
                             account,
                             json,
                             okHttpClientProvider,
-                            filePropertyDataSource
+                            filePropertyDataSource,
+                            filePropertyDTOEntityConverter,
                         )
                         instances = map
                         instances[account.accountId]

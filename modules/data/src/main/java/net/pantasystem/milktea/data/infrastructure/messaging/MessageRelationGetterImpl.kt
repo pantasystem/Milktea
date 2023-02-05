@@ -1,8 +1,8 @@
 package net.pantasystem.milktea.data.infrastructure.messaging
 
 import net.pantasystem.milktea.api.misskey.messaging.MessageDTO
+import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -29,13 +29,18 @@ class MessageRelationGetterImpl @Inject constructor(
     private val groupDataSource: GroupDataSource,
     private val accountRepository: AccountRepository,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
 ) : MessageRelationGetter, MessageAdder {
 
     override suspend fun add(account: Account, messageDTO: MessageDTO): MessageRelation {
-        val (message, users) = messageDTO.entities(account, userDTOEntityConverter)
+        val (message, users) = messageDTO.entities(
+            account,
+            userDTOEntityConverter,
+            filePropertyDTOEntityConverter
+        )
         messageDataSource.add(message)
         userDataSource.addAll(users)
-        messageDTO.group?.let{
+        messageDTO.group?.let {
             groupDataSource.add(it.toGroup(account.accountId))
         }
         return get(message)
@@ -50,7 +55,7 @@ class MessageRelationGetterImpl @Inject constructor(
 
     override suspend fun get(message: Message): MessageRelation {
 
-        return when(message) {
+        return when (message) {
             is Message.Direct -> {
                 MessageRelation.Direct(
                     message,
@@ -70,11 +75,15 @@ class MessageRelationGetterImpl @Inject constructor(
 }
 
 
-suspend fun MessageDTO.entities(account: Account, userDTOEntityConverter: UserDTOEntityConverter,): Pair<Message, List<User>> {
+suspend fun MessageDTO.entities(
+    account: Account,
+    userDTOEntityConverter: UserDTOEntityConverter,
+    filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
+): Pair<Message, List<User>> {
     val list = mutableListOf<User>()
     val id = Message.Id(account.accountId, id)
     list.add(userDTOEntityConverter.convert(account, user))
-    val message = if(groupId == null) {
+    val message = if (groupId == null) {
         require(recipientId != null)
         Message.Direct(
             id,
@@ -82,25 +91,29 @@ suspend fun MessageDTO.entities(account: Account, userDTOEntityConverter: UserDT
             text,
             User.Id(account.accountId, userId),
             fileId,
-            file?.toFileProperty(account),
+            file?.let {
+                filePropertyDTOEntityConverter.convert(it, account)
+            },
             isRead,
-            emojis?: emptyList(),
+            emojis ?: emptyList(),
             recipientId = User.Id(account.accountId, recipientId!!)
         )
-    }else{
+    } else {
         Message.Group(
             id,
             createdAt,
             text,
             User.Id(account.accountId, userId),
             fileId,
-            file?.toFileProperty(account),
+            file?.let {
+                filePropertyDTOEntityConverter.convert(it, account)
+            },
             isRead = reads?.contains(account.remoteId) ?: false,
-            emojis?: emptyList(),
+            emojis ?: emptyList(),
             Group.Id(account.accountId, groupId!!),
             reads = reads?.map {
                 User.Id(account.accountId, it)
-            }?: emptyList()
+            } ?: emptyList()
         )
     }
     return message to list
