@@ -2,11 +2,11 @@ package net.pantasystem.milktea.data.infrastructure.notes
 
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
+import net.pantasystem.milktea.data.converters.NoteDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.NoteRelationEntities
 import net.pantasystem.milktea.data.infrastructure.toEntities
 import net.pantasystem.milktea.data.infrastructure.toFileProperty
-import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -27,12 +27,14 @@ class NoteDataSourceAdder @Inject constructor(
     private val filePropertyDataSource: FilePropertyDataSource,
     private val nodeInfoRepository: NodeInfoRepository,
     private val userDTOEntityConverter: UserDTOEntityConverter,
+    private val noteDTOEntityConverter: NoteDTOEntityConverter,
 ) {
 
 
     suspend fun addNoteDtoToDataSource(account: Account, noteDTO: NoteDTO): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
-        val entities = noteDTO.toEntities(account, nodeInfo, userDTOEntityConverter)
+        val entities =
+            noteDTO.toEntities(account, nodeInfo, userDTOEntityConverter, noteDTOEntityConverter)
         userDataSource.addAll(entities.users)
         noteDataSource.addAll(entities.notes)
         filePropertyDataSource.addAll(entities.files)
@@ -53,7 +55,8 @@ class NoteDataSourceAdder @Inject constructor(
 suspend fun NoteDTO.toEntities(
     account: Account,
     nodeInfo: NodeInfo?,
-    userDTOEntityConverter: UserDTOEntityConverter
+    userDTOEntityConverter: UserDTOEntityConverter,
+    noteDTOEntityConverter: NoteDTOEntityConverter,
 ): NoteRelationEntities {
     val dtoList = mutableListOf<NoteDTO>()
     dtoList.add(this)
@@ -67,12 +70,20 @@ suspend fun NoteDTO.toEntities(
         dtoList.add(reNote!!)
     }
 
-    val note = this.toNote(account, nodeInfo)
+    val note = noteDTOEntityConverter.convert(this, account, nodeInfo)
     val users = mutableListOf<User>()
     val notes = mutableListOf<Note>()
     val files = mutableListOf<FileProperty>()
 
-    pickEntities(account, notes, users, files, nodeInfo, userDTOEntityConverter)
+    pickEntities(
+        account,
+        notes,
+        users,
+        files,
+        nodeInfo,
+        userDTOEntityConverter,
+        noteDTOEntityConverter
+    )
     return NoteRelationEntities(
         note = note,
         notes = notes,
@@ -88,8 +99,14 @@ private suspend fun NoteDTO.pickEntities(
     files: MutableList<FileProperty>,
     nodeInfo: NodeInfo?,
     userDTOEntityConverter: UserDTOEntityConverter,
+    noteDTOEntityConverter: NoteDTOEntityConverter,
 ) {
-    val (note, user) = this.toNoteAndUser(account, nodeInfo, userDTOEntityConverter)
+    val (note, user) = this.toNoteAndUser(
+        account,
+        nodeInfo,
+        userDTOEntityConverter,
+        noteDTOEntityConverter
+    )
     notes.add(note)
     users.add(user)
     files.addAll(
@@ -98,20 +115,37 @@ private suspend fun NoteDTO.pickEntities(
         } ?: emptyList()
     )
     if (this.reply != null) {
-        this.reply!!.pickEntities(account, notes, users, files, nodeInfo, userDTOEntityConverter)
+        this.reply!!.pickEntities(
+            account,
+            notes,
+            users,
+            files,
+            nodeInfo,
+            userDTOEntityConverter,
+            noteDTOEntityConverter
+        )
     }
 
     if (this.reNote != null) {
-        this.reNote!!.pickEntities(account, notes, users, files, nodeInfo, userDTOEntityConverter)
+        this.reNote!!.pickEntities(
+            account,
+            notes,
+            users,
+            files,
+            nodeInfo,
+            userDTOEntityConverter,
+            noteDTOEntityConverter
+        )
     }
 }
 
 suspend fun NoteDTO.toNoteAndUser(
     account: Account,
     nodeInfo: NodeInfo?,
-    userDTOEntityConverter: UserDTOEntityConverter
+    userDTOEntityConverter: UserDTOEntityConverter,
+    noteDTOEntityConverter: NoteDTOEntityConverter,
 ): Pair<Note, User> {
-    val note = this.toNote(account, nodeInfo)
+    val note = noteDTOEntityConverter.convert(this, account, nodeInfo)
     val user = userDTOEntityConverter.convert(account, user, false)
     return note to user
 }
