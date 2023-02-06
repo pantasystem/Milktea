@@ -11,6 +11,7 @@ import net.pantasystem.milktea.common_android.resource.convertDp2Px
 import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.SegmentType
 import net.pantasystem.milktea.note.databinding.ItemCategoryWithListBinding
+import kotlin.math.max
 
 
 class EmojiChoicesListAdapter(
@@ -40,19 +41,25 @@ class EmojiChoicesListAdapter(
     }
 ) {
 
+    val holder = CalculatedGridItemCountHolder(4)
+
     override fun onBindViewHolder(holder: SegmentViewHolder, position: Int) {
         holder.onBind(getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SegmentViewHolder {
         return SegmentViewHolder(
+            holder,
             ItemCategoryWithListBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onEmojiSelected
         )
     }
 }
 
+data class CalculatedGridItemCountHolder(var count: Int)
+
 class SegmentViewHolder(
+    val countHolder: CalculatedGridItemCountHolder,
     val binding: ItemCategoryWithListBinding,
     private val onEmojiSelected: (EmojiType) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -67,15 +74,25 @@ class SegmentViewHolder(
         if (!isSatLayoutManager) {
             val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    val layoutManager =
-                        GridLayoutManager(binding.root.context, calculateSpanCount())
-
-                    binding.emojisView.layoutManager = layoutManager
+                    val count = max(calculateSpanCount(), 4)
+                    if (count != countHolder.count) {
+                        countHolder.count = count
+                        val layoutManager =
+                            GridLayoutManager(binding.root.context, count)
+                        binding.emojisView.layoutManager = layoutManager
+                    }
                     binding.emojisView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     isSatLayoutManager = true
                 }
             }
             binding.emojisView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        }
+
+        if (!isSatLayoutManager) {
+            val layoutManager =
+                GridLayoutManager(binding.root.context, countHolder.count)
+
+            binding.emojisView.layoutManager = layoutManager
         }
 
 
