@@ -22,8 +22,9 @@ class NotificationViewData(
         FOLLOW_REQUEST_ACCEPTED("followRequestAccepted"),
         POLL_ENDED("pollEnded"),
         UNKNOWN("unknown"),
-        GROUP_INVITED("groupInvited")
-
+        GROUP_INVITED("groupInvited"),
+        STATUS("status"),
+        FAVORITE("favorite"),
     }
 
     val id = notification.notification.id
@@ -41,6 +42,8 @@ class NotificationViewData(
         is PollEndedNotification -> Type.POLL_ENDED
         is GroupInvitedNotification -> Type.GROUP_INVITED
         is UnknownNotification -> Type.UNKNOWN
+        is FavoriteNotification -> Type.FAVORITE
+        is StatusNotification -> Type.STATUS
     }
     val statusType: String = type.default
 

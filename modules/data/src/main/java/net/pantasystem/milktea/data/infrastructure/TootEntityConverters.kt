@@ -172,7 +172,13 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Status -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            StatusNotification(
+                createdAt = createdAt,
+                id = id,
+                userId = userId,
+                isRead = isRead,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id)
+            )
         }
         MstNotificationDTO.NotificationType.Reblog -> {
             RenoteNotification(
@@ -200,7 +206,13 @@ fun MstNotificationDTO.toModel(a: Account, isRead: Boolean): Notification {
             )
         }
         MstNotificationDTO.NotificationType.Favourite -> {
-            TODO("通知種別${type}はまだ実装されていません")
+            FavoriteNotification(
+                createdAt = createdAt,
+                id = id,
+                userId = userId,
+                isRead = isRead,
+                noteId = Note.Id(a.accountId, requireNotNull(status).id)
+            )
         }
         MstNotificationDTO.NotificationType.Poll -> {
             PollEndedNotification(
