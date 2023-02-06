@@ -11,4 +11,5 @@
     <string name="is_stop_timeline_streaming_when_background">Do not update timeline when in background</string>
     <string name="is_stop_note_capture_when_background">Do not capture notes in background</string>
     <string name="enable_automic_updates">Enable automatic updates</string>
+    <string name="please_login">Please login</string>
 </resources>

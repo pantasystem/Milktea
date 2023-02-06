@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
@@ -42,9 +43,6 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
         intent.getStringExtra(EXTRA_ACCOUNT_HOST)
     }
 
-    private val jsInterfaceName by lazy {
-        "milktea"
-    }
 
     private val binding: ActivityImportReactionFromWebViewBinding by dataBinding()
 
@@ -83,6 +81,15 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
 
 
         binding.importButton.setOnClickListener {
+            val currentAccount = accountStore.currentAccount
+            if (currentAccount != null) {
+                val token = getWebClientTokenFromCookie(currentAccount)
+                if (token.isNullOrBlank()) {
+                    Toast.makeText(this, getString(R.string.please_login), Toast.LENGTH_LONG).show()
+                } else {
+                    importReactionFromWebViewViewModel.onGotWebClientToken(currentAccount, token)
+                }
+            }
         }
 
         val adapter = ReactionChoicesAdapter {}
@@ -149,8 +156,4 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.webView.removeJavascriptInterface(jsInterfaceName)
-    }
 }
