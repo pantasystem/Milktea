@@ -21,11 +21,11 @@ class EmojiChoicesAdapter(
 ){
     class DiffUtilItemCallback : DiffUtil.ItemCallback<EmojiType>(){
         override fun areContentsTheSame(oldItem: EmojiType, newItem: EmojiType): Boolean {
-            return oldItem == newItem
+            return oldItem.areContentsTheSame(newItem)
         }
 
         override fun areItemsTheSame(oldItem: EmojiType, newItem: EmojiType): Boolean {
-            return oldItem == newItem
+            return oldItem.areItemsTheSame(newItem)
         }
     }
     class Holder(val binding : ItemEmojiChoiceBinding) : RecyclerView.ViewHolder(binding.root)

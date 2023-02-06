@@ -235,6 +235,30 @@ sealed interface EmojiType {
     data class CustomEmoji(val emoji: Emoji) : EmojiType
     data class UtfEmoji(val code: String) : EmojiType
     companion object
+
+    fun areItemsTheSame(other: EmojiType): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (this.javaClass != other.javaClass) {
+            return false
+        }
+        return when(this) {
+            is CustomEmoji -> {
+                emoji == (other as? CustomEmoji)?.emoji
+            }
+            is Legacy -> {
+                type == (other as? Legacy)?.type
+            }
+            is UtfEmoji -> {
+                code == (other as? UtfEmoji)?.code
+            }
+        }
+    }
+
+    fun areContentsTheSame(other: EmojiType): Boolean {
+        return areItemsTheSame(other) && this == other
+    }
 }
 
 fun EmojiType.toTextReaction(): String {
