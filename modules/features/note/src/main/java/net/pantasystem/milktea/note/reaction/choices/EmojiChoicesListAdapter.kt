@@ -41,19 +41,25 @@ class EmojiChoicesListAdapter(
     }
 ) {
 
+    val holder = CalculatedGridItemCountHolder(4)
+
     override fun onBindViewHolder(holder: SegmentViewHolder, position: Int) {
         holder.onBind(getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SegmentViewHolder {
         return SegmentViewHolder(
+            holder,
             ItemCategoryWithListBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onEmojiSelected
         )
     }
 }
 
+data class CalculatedGridItemCountHolder(var count: Int)
+
 class SegmentViewHolder(
+    val countHolder: CalculatedGridItemCountHolder,
     val binding: ItemCategoryWithListBinding,
     private val onEmojiSelected: (EmojiType) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -68,10 +74,13 @@ class SegmentViewHolder(
         if (!isSatLayoutManager) {
             val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    val layoutManager =
-                        GridLayoutManager(binding.root.context, max(calculateSpanCount(), 4))
-
-                    binding.emojisView.layoutManager = layoutManager
+                    val count = max(calculateSpanCount(), 4)
+                    if (count != countHolder.count) {
+                        countHolder.count = count
+                        val layoutManager =
+                            GridLayoutManager(binding.root.context, count)
+                        binding.emojisView.layoutManager = layoutManager
+                    }
                     binding.emojisView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     isSatLayoutManager = true
                 }
@@ -81,7 +90,7 @@ class SegmentViewHolder(
 
         if (!isSatLayoutManager) {
             val layoutManager =
-                GridLayoutManager(binding.root.context, 4)
+                GridLayoutManager(binding.root.context, countHolder.count)
 
             binding.emojisView.layoutManager = layoutManager
         }
