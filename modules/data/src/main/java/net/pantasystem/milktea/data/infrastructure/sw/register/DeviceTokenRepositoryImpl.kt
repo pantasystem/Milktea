@@ -25,6 +25,7 @@ class DeviceTokenRepositoryImpl @Inject constructor(
             "net.pantasystem.milktea.data.infrastructure.sw.register.DeviceTokenRepositoryImpl.TOKEN"
         const val GET_START_AT =
             "net.pantasystem.milktea.data.infrastructure.sw.register.DeviceTokenRepositoryImpl.GET_START_AT"
+        const val FAILURE_COUNT = "net.pantasystem.milktea.data.infrastructure.sw.register.DeviceTokenRepositoryImpl.FAILURE_COUNT"
     }
 
     val lock = Mutex()
@@ -33,6 +34,7 @@ class DeviceTokenRepositoryImpl @Inject constructor(
         sharedPreferences.edit {
             putString(TOKEN, null)
             putString(GET_START_AT, null)
+            putInt(FAILURE_COUNT, 0)
         }
     }
 
@@ -57,15 +59,21 @@ class DeviceTokenRepositoryImpl @Inject constructor(
                 }
             }
 
-            // NOTE: 前回のTokenの取得に失敗していて、まだ24時間経過していない場合はエラー扱いにする
+            // NOTE: 初期値は0なので+1しないと2回目失敗時のdelayが0時間になってしまう
+            val failureCount = sharedPreferences.getInt(FAILURE_COUNT, 0) + 1
+
+            // NOTE: 前回のTokenの取得に失敗していて、まだ失敗回数 * 24時間経過していない場合はエラー扱いにする
             if (beforeGetStartAt != null) {
                 val diff = now - beforeGetStartAt
-                if (diff < 1.days) {
+                if (diff < failureCount.days) {
                     throw IllegalArgumentException("Tokenの取得は24時間以内に失敗している可能性があります。前回失敗した場合は24時間以上時間を空けて取得する必要性があります。")
                 }
             }
             sharedPreferences.edit {
                 putString(GET_START_AT, now.toString())
+
+                // NOTE: failureCountは既に+1しているのでここでインクリメントする必要性はない
+                putInt(FAILURE_COUNT, failureCount)
             }
 
             when (val state =
@@ -87,6 +95,7 @@ class DeviceTokenRepositoryImpl @Inject constructor(
         sharedPreferences.edit {
             putString(TOKEN, deviceToken)
             putString(GET_START_AT, null)
+            putInt(FAILURE_COUNT, 0)
         }
     }
 }
