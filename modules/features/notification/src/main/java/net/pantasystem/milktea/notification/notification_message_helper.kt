@@ -55,8 +55,19 @@ class NotificationMessageScope(val context: Context) {
                 this.user?.displayUserName ?: ""
             )
             is PollEndedNotification -> context.getString(R.string.poll_ended)
-            is GroupInvitedNotification -> context.getString(R.string.notification_group_invited_message, notification.group.name)
+            is GroupInvitedNotification -> context.getString(
+                R.string.notification_group_invited_message,
+                notification.group.name
+            )
             is UnknownNotification -> context.getString(R.string.unknown_notification)
+            is FavoriteNotification -> context.getString(
+                R.string.notification_favorited_by,
+                user?.displayUserName ?: ""
+            )
+            is StatusNotification -> context.getString(
+                R.string.notification_posted_by,
+                user?.displayUserName ?: ""
+            )
         }
     }
 }

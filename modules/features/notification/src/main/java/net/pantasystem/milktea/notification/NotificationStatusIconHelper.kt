@@ -11,13 +11,33 @@ import net.pantasystem.milktea.notification.viewmodel.NotificationViewData
 object NotificationStatusIconHelper {
 
     @JvmStatic
-    @BindingAdapter("notificationStatusView", "notificationReactionImageView", "notificationReactionStringView", "notificationType", "notificationReaction", "notification")
-    fun LinearLayout.setStatusIcon(notificationStatusView: ImageView, notificationReactionImageView: ImageView, notificationReactionStringView: TextView, notificationType: String, notificationReaction: String?, notification: NotificationViewData){
-        when(notificationType){
+    @BindingAdapter(
+        "notificationStatusView",
+        "notificationReactionImageView",
+        "notificationReactionStringView",
+        "notificationType",
+        "notificationReaction",
+        "notification"
+    )
+    fun LinearLayout.setStatusIcon(
+        notificationStatusView: ImageView,
+        notificationReactionImageView: ImageView,
+        notificationReactionStringView: TextView,
+        notificationType: String,
+        notificationReaction: String?,
+        notification: NotificationViewData
+    ) {
+        when (notificationType) {
             "reaction" -> {
                 //context: Context, reactionTextTypeView: TextView, reactionImageTypeView: ImageView,reaction: String, note: PlaneNoteViewData)
-                if(notificationReaction != null && notification.noteViewData != null) {
-                    NoteReactionViewHelper.setReactionCount(this.context, notificationReactionStringView, notificationReactionImageView,  notificationReaction, notification.noteViewData)
+                if (notificationReaction != null && notification.noteViewData != null) {
+                    NoteReactionViewHelper.setReactionCount(
+                        this.context,
+                        notificationReactionStringView,
+                        notificationReactionImageView,
+                        notificationReaction,
+                        notification.noteViewData
+                    )
                 }
                 notificationStatusView.visibility = View.GONE
 
@@ -30,9 +50,9 @@ object NotificationStatusIconHelper {
         }
     }
 
-    private fun setStatusView(statusView: ImageView, type: String){
+    private fun setStatusView(statusView: ImageView, type: String) {
         statusView.visibility = View.VISIBLE
-        when(type){
+        when (type) {
             "follow" -> statusView.setImageResource(R.drawable.ic_follow)
             "mention" -> statusView.setImageResource(R.drawable.ic_mention)
             "reply" -> statusView.setImageResource(R.drawable.ic_reply_black_24dp)
@@ -43,6 +63,8 @@ object NotificationStatusIconHelper {
             "receiveFollowRequest", "groupInvited" -> statusView.setImageResource(R.drawable.ic_supervisor_account_black_24dp)
             "followRequestAccepted" -> statusView.setImageResource(R.drawable.ic_done_black_24dp)
             "unknown" -> statusView.setImageResource(R.drawable.ic_baseline_report_problem_24)
+            "favorite" -> statusView.setImageResource(R.drawable.ic_star_black_24dp)
+            "status" -> statusView.setImageResource(R.drawable.ic_menu_send)
         }
     }
 }

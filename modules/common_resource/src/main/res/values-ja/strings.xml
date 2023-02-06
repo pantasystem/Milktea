@@ -423,5 +423,7 @@
     <string name="visibility_limited">サークル</string>
     <string name="visibility_mutual">相互フォロー</string>
     <string name="calckey_recomended_timeline">一押し</string>
+    <string name="notification_favorited_by">%sさんにお気に入りにされました</string>
+    <string name="notification_posted_by">%sさんが投稿しました</string>
 
 </resources>

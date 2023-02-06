@@ -420,5 +420,7 @@
     <string name="visibility_limited">圆圈</string>
     <string name="visibility_mutual">相互关注</string>
     <string name="calckey_recomended_timeline">推荐的</string>
+    <string name="notification_favorited_by">被 %s 收藏</string>
+    <string name="notification_posted_by">发布者 %s</string>
 
 </resources>
