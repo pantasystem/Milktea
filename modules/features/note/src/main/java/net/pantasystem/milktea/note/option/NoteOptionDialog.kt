@@ -20,6 +20,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 @AndroidEntryPoint
@@ -127,6 +128,10 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         onDeleteBookmarkButtonClicked = {
                             notesViewModel.removeBookmark(it)
                             dismiss()
+                        },
+                        onShowReactionHistoryButtonClicked = {
+                            dismiss()
+                            ReactionHistoryPagerDialog.newInstance(it).show(parentFragmentManager, "ReactionHistoryPagerDialog")
                         }
                     )
                 }

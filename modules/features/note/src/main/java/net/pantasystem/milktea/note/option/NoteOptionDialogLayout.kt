@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.note.R
@@ -32,6 +33,7 @@ fun NoteOptionDialogLayout(
     onDeleteAndEditButtonClicked: (NoteRelation?) -> Unit,
     onDeleteButtonClicked: (NoteRelation?) -> Unit,
     onReportButtonClicked: (NoteRelation?) -> Unit,
+    onShowReactionHistoryButtonClicked: (noteId: Note.Id) -> Unit,
 ) {
     Surface(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth()) {
@@ -42,6 +44,19 @@ fun NoteOptionDialogLayout(
                     },
                     icon = Icons.Default.Info,
                     text = stringResource(id = R.string.show_detail)
+                )
+            }
+
+            if (uiState.currentAccount?.instanceType == Account.InstanceType.MISSKEY
+                && uiState.note?.id != null
+            ) {
+                NormalBottomSheetDialogSelectionLayout(
+                    onClick = {
+                        onShowReactionHistoryButtonClicked(uiState.note.id)
+                    },
+                    icon = Icons.Default.Mood, text = stringResource(
+                        id = R.string.reaction
+                    )
                 )
             }
 
