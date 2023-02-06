@@ -11,6 +11,7 @@ import net.pantasystem.milktea.common_android.resource.convertDp2Px
 import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.SegmentType
 import net.pantasystem.milktea.note.databinding.ItemCategoryWithListBinding
+import kotlin.math.max
 
 
 class EmojiChoicesListAdapter(
@@ -68,7 +69,7 @@ class SegmentViewHolder(
             val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     val layoutManager =
-                        GridLayoutManager(binding.root.context, calculateSpanCount())
+                        GridLayoutManager(binding.root.context, max(calculateSpanCount(), 4))
 
                     binding.emojisView.layoutManager = layoutManager
                     binding.emojisView.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -76,6 +77,13 @@ class SegmentViewHolder(
                 }
             }
             binding.emojisView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        }
+
+        if (!isSatLayoutManager) {
+            val layoutManager =
+                GridLayoutManager(binding.root.context, 4)
+
+            binding.emojisView.layoutManager = layoutManager
         }
 
 
