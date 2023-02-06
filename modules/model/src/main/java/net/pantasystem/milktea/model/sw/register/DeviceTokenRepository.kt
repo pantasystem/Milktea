@@ -4,8 +4,8 @@ interface DeviceTokenRepository {
 
     suspend fun getOrCreate(): Result<String>
 
-    suspend fun save(deviceToken: String): Result<Unit>
+    fun save(deviceToken: String): Result<Unit>
 
-    suspend fun clear(): Result<Unit>
+    fun clear(): Result<Unit>
 
 }
