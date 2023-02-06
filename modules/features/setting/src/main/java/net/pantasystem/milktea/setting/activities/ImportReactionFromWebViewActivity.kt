@@ -2,13 +2,13 @@ package net.pantasystem.milktea.setting.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.webkit.JavascriptInterface
+import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
@@ -20,9 +20,7 @@ import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
@@ -45,9 +43,6 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
         intent.getStringExtra(EXTRA_ACCOUNT_HOST)
     }
 
-    private val jsInterfaceName by lazy {
-        "milktea"
-    }
 
     private val binding: ActivityImportReactionFromWebViewBinding by dataBinding()
 
@@ -82,11 +77,19 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
             }
         })
 
-        binding.webView.loadUrl("https://$host/settings/reaction")
+        binding.webView.loadUrl("https://$host")
 
 
         binding.importButton.setOnClickListener {
-            executeImportReactionsScript(accountStore.currentAccount)
+            val currentAccount = accountStore.currentAccount
+            if (currentAccount != null) {
+                val token = getWebClientTokenFromCookie(currentAccount)
+                if (token.isNullOrBlank()) {
+                    Toast.makeText(this, getString(R.string.please_login), Toast.LENGTH_LONG).show()
+                } else {
+                    importReactionFromWebViewViewModel.onGotWebClientToken(currentAccount, token)
+                }
+            }
         }
 
         val adapter = ReactionChoicesAdapter {}
@@ -112,8 +115,11 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
                     delay(500)
                 }.flatMapLatest {
                     accountStore.observeCurrentAccount
-                }.collect {
-                    executeImportReactionsScript(it)
+                }.filterNotNull().map {
+                    val token = getWebClientTokenFromCookie(it)
+                    it to token
+                }.distinctUntilChanged().collect { (account, token) ->
+                    importReactionFromWebViewViewModel.onGotWebClientToken(account, token)
                 }
             }
         }
@@ -123,55 +129,31 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
     fun setupWebView() {
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.domStorageEnabled = true
-        binding.webView.addJavascriptInterface(
-            jsInterface, jsInterfaceName
-        )
 
-        val current = accountStore.currentAccount
 
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                executeImportReactionsScript(current)
             }
 
         }
     }
 
-    fun executeImportReactionsScript(current: Account?) {
-        val script = """
-        $jsInterfaceName.setLocalStorageCache(
-            window.localStorage
-                .getItem(
-                    'pizzax::base::cache::${current?.remoteId}'
-                )
-            )
-        """.trimIndent()
-        Log.d("ImportReactionFrom", "script:$script")
-        binding.webView.evaluateJavascript(
-            script
-        ) {
-            Log.d("ImportReactionFrom", "result:$it")
-        }
+
+    private fun getWebClientTokenFromCookie(account: Account): String? {
+        val rawCookie: String? = CookieManager.getInstance().getCookie(account.normalizedInstanceDomain)
+        val cookies = rawCookie?.split(";")?.map { it.trim() }?.mapNotNull {
+            val key = it.split("=").getOrNull(0)?.lowercase()
+            val value = it.split("=").getOrNull(1)
+            if (key == null || value == null) {
+                null
+            } else {
+                key to value
+            }
+        }?.toMap() ?: emptyMap()
+
+        return cookies["token"]
     }
 
-    private val jsInterface: LocalStorageResultJSInterface by lazy {
-        LocalStorageResultJSInterface(importReactionFromWebViewViewModel)
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.webView.removeJavascriptInterface(jsInterfaceName)
-    }
-}
-
-class LocalStorageResultJSInterface(
-    private val importReactionFromWebViewViewModel: ImportReactionFromWebViewViewModel
-) {
-
-    @JavascriptInterface
-    fun setLocalStorageCache(cache: String) {
-        Log.d("setLocalStorageCache", "cache:$cache")
-        importReactionFromWebViewViewModel.onLocalStorageCacheLoaded(cache)
-    }
 }

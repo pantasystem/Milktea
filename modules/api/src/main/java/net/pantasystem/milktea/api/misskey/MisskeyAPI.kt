@@ -25,6 +25,8 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
+import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
+import net.pantasystem.milktea.api.misskey.register.WebClientRegistries
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
@@ -45,11 +47,6 @@ interface MisskeyAPI {
     @POST("api/app/create")
     suspend fun createApp(@Body createApp: CreateApp): Response<App>
 
-    @POST("api/my/apps")
-    suspend fun myApps(@Body i: I) : Response<List<App>>
-
-    @POST("api/app/show")
-    suspend fun showApp(@Body showApp: ShowApp) : Response<App>
 
     @POST("api/blocking/create")
     suspend fun blockUser(@Body requestUser: RequestUser): Response<Unit>
@@ -268,4 +265,7 @@ interface MisskeyAPI {
 
     @POST("api/emojis")
     suspend fun getEmojis(@Body req: EmptyRequest) : Response<EmojisResponse>
+
+    @POST("https://misskey.pantasystem.com/api/i/registry/get-all")
+    suspend fun getReactionsFromGetAll(@Body req: WebClientBaseRequest): Response<WebClientRegistries>
 }
