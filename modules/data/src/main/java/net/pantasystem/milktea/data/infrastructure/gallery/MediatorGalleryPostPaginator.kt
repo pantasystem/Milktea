@@ -24,6 +24,7 @@ class GalleryPostsStoreImpl(
     pageable: Pageable.Gallery,
     getAccount: suspend () -> Account,
     misskeyAPIProvider: MisskeyAPIProvider,
+    galleryDataSource: GalleryDataSource,
     galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
 ) : GalleryPostsStore {
 
@@ -51,6 +52,7 @@ class GalleryPostsStoreImpl(
                     pageable,
                     getAccount,
                     misskeyAPIProvider,
+                    galleryDataSource,
                     galleryPostDTOEntityConverter,
                 )
             }
@@ -65,6 +67,7 @@ class GalleryPostsStoreImpl(
         GalleryPostsConverter(
             getAccount,
             galleryPostDTOEntityConverter,
+            galleryDataSource = galleryDataSource,
         )
     private val loader = GalleryPostsLoader(pageable, galleryPostState, misskeyAPIProvider, getAccount)
     private val previousPagingController =
@@ -72,12 +75,12 @@ class GalleryPostsStoreImpl(
     private val futurePaginatorController =
         FuturePagingController(entityAdder, this, galleryPostState, loader)
 
-    override suspend fun loadPrevious() {
-        previousPagingController.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return previousPagingController.loadPrevious()
     }
 
-    override suspend fun loadFuture() {
-        futurePaginatorController.loadFuture()
+    override suspend fun loadFuture(): Result<Int> {
+        return futurePaginatorController.loadFuture()
     }
 
     override suspend fun clear() {
@@ -111,12 +114,12 @@ class LikedGalleryPostStoreImpl(
     private val futurePaginatorController =
         FuturePagingController(entityAdder, this, galleryPostState, loader)
 
-    override suspend fun loadPrevious() {
-        previousPagingController.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return previousPagingController.loadPrevious()
     }
 
-    override suspend fun loadFuture() {
-        futurePaginatorController.loadFuture()
+    override suspend fun loadFuture(): Result<Int> {
+        return futurePaginatorController.loadFuture()
     }
 
     override suspend fun clear() {

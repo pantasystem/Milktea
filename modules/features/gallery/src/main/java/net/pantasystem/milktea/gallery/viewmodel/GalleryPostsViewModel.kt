@@ -15,6 +15,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.gallery.GalleryPostSendFavoriteStore
 import net.pantasystem.milktea.app_store.gallery.GalleryPostsStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -37,6 +38,7 @@ class GalleryPostsViewModel @AssistedInject constructor(
     private val userRepository: UserRepository,
     private val accountRepository: AccountRepository,
     private val galleryPostsStoreFactory: GalleryPostsStore.Factory,
+    private val loggerFactory: Logger.Factory,
     @Assisted val pageable: Pageable.Gallery,
     @Assisted private var accountId: Long?,
 ) : ViewModel(), GalleryToggleLikeOrUnlike {
@@ -48,6 +50,10 @@ class GalleryPostsViewModel @AssistedInject constructor(
         fun create(pageable: Pageable.Gallery, accountId: Long?): GalleryPostsViewModel
     }
     companion object;
+
+    private val logger by lazy {
+        loggerFactory.create("GalleryPostsViewModel")
+    }
 
     private val galleryPostsStore: GalleryPostsStore by lazy {
         galleryPostsStoreFactory.create(pageable, this::getAccount)
@@ -155,7 +161,9 @@ class GalleryPostsViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             galleryPostsStore.clear()
-            galleryPostsStore.loadPrevious()
+            galleryPostsStore.loadPrevious().onFailure {
+                logger.error("failed loadInit", it)
+            }
         }
     }
 
@@ -173,7 +181,9 @@ class GalleryPostsViewModel @AssistedInject constructor(
             return
         }
         viewModelScope.launch {
-            galleryPostsStore.loadPrevious()
+            galleryPostsStore.loadPrevious().onFailure {
+                logger.error("failed loadPrevious", it)
+            }
         }
     }
 
