@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
@@ -45,5 +46,12 @@ class MediatorNotificationDataSource @Inject constructor(
         inMemoryNotificationDataSource.removeEventListener(listener)
     }
 
+    override fun observeIn(notificationIds: List<Notification.Id>): Flow<List<Notification>> {
+        return inMemoryNotificationDataSource.observeIn(notificationIds)
+    }
+
+    override fun observeOne(notificationId: Notification.Id): Flow<Notification?> {
+        return inMemoryNotificationDataSource.observeOne(notificationId)
+    }
 
 }

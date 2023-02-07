@@ -121,4 +121,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideCustomEmojiDao(db: DataBase): CustomEmojiDAO = db.customEmojiDao()
+
+    @Provides
+    @Singleton
+    fun provideNotificationJsonCacheDao(db: DataBase) = db.notificationJsonCacheRecordDAO()
 }

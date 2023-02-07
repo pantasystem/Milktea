@@ -1,57 +1,77 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
-import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
-import net.pantasystem.milktea.common.*
-import net.pantasystem.milktea.common.paginator.*
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.common.PageableState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.IdPreviousLoader
+import net.pantasystem.milktea.common.paginator.MediatorPreviousPagingController
+import net.pantasystem.milktea.common.paginator.PreviousCacheSaver
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecord
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecordDAO
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.notification.NotificationPagingStore
 import net.pantasystem.milktea.model.notification.NotificationRelation
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class NotificationPagingStoreImpl(
     val getAccount: suspend () -> Account,
     val delegate: NotificationStoreImpl,
     val unreadNotificationDAO: UnreadNotificationDAO,
+    val notificationCacheAdder: NotificationCacheAdder,
+    val notificationJsonCacheRecordDAO: NotificationJsonCacheRecordDAO,
 ) : NotificationPagingStore {
 
     class Factory @Inject constructor(
-        val factory: NotificationStoreImpl.Factory,
-        val unreadNotificationDAO: UnreadNotificationDAO,
+        private val factory: NotificationStoreImpl.Factory,
+        private val unreadNotificationDAO: UnreadNotificationDAO,
+        private val notificationCacheAdder: NotificationCacheAdder,
+        private val notificationJsonCacheRecordDAO: NotificationJsonCacheRecordDAO,
     ) : NotificationPagingStore.Factory {
         override fun create(getAccount: suspend () -> Account): NotificationPagingStore {
             return NotificationPagingStoreImpl(
                 getAccount,
                 delegate = factory.create(getAccount),
                 unreadNotificationDAO = unreadNotificationDAO,
+                notificationCacheAdder = notificationCacheAdder,
+                notificationJsonCacheRecordDAO = notificationJsonCacheRecordDAO
             )
         }
     }
 
-    val previousPagingController = PreviousPagingController(
-        delegate,
-        delegate,
-        delegate,
-        delegate
+    private val cacheSaver = NotificationPreviousCacheSaver(
+        getAccount,
+        notificationJsonCacheRecordDAO
     )
 
-    override val notifications: Flow<PageableState<List<NotificationRelation>>> = delegate.state.map { state ->
-        state.convert { list ->
-            list.map {
-                it.notification
+    val previousPagingController = MediatorPreviousPagingController(
+        entityConverter = delegate,
+        locker = delegate,
+        state = delegate,
+        idGetter = delegate,
+        previousCacheSaver = cacheSaver,
+        localPreviousLoader = cacheSaver,
+        localRecordConverter = NotificationRecordConverter(getAccount, notificationCacheAdder),
+        previousLoader = delegate,
+    )
+
+    override val notifications: Flow<PageableState<List<NotificationRelation>>> =
+        delegate.state.map { state ->
+            state.convert { list ->
+                list.map {
+                    it.notification
+                }
             }
         }
-    }
 
     override suspend fun clear() {
         delegate.mutex.withLock {
@@ -69,7 +89,7 @@ class NotificationPagingStoreImpl(
     override suspend fun onReceiveNewNotification(notificationRelation: NotificationRelation) {
         delegate.mutex.withLock {
             val state = delegate.getState()
-            val updated = when(state.content) {
+            val updated = when (state.content) {
                 is StateContent.Exist -> state.convert {
                     listOf(
                         NotificationAndNextId(notificationRelation, null)
@@ -83,164 +103,123 @@ class NotificationPagingStoreImpl(
     }
 }
 
-
-class NotificationStoreImpl(
+class NotificationPreviousCacheSaver(
     private val getAccount: suspend () -> Account,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val mastodonAPIProvider: MastodonAPIProvider,
-    private val notificationCacheAdder: NotificationCacheAdder,
-) : StateLocker, PreviousLoader<NotificationItem>, PaginationState<NotificationAndNextId>,
-    IdGetter<String>, EntityConverter<NotificationItem, NotificationAndNextId> {
+    private val notificationJsonCacheRecordDAO: NotificationJsonCacheRecordDAO
+) : PreviousCacheSaver<String, NotificationItem>,
+    IdPreviousLoader<String, NotificationJsonCacheRecord, NotificationAndNextId> {
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
 
-    @Singleton
-    class Factory @Inject constructor(
-        private val misskeyAPIProvider: MisskeyAPIProvider,
-        private val mastodonAPIProvider: MastodonAPIProvider,
-        private val notificationCacheAdder: NotificationCacheAdder,
-    ) {
-        fun create(getAccount: suspend () -> Account): NotificationStoreImpl {
-            return NotificationStoreImpl(
-                getAccount = getAccount,
-                misskeyAPIProvider = misskeyAPIProvider,
-                mastodonAPIProvider = mastodonAPIProvider,
-                notificationCacheAdder = notificationCacheAdder
+    override suspend fun savePrevious(key: String?, elements: List<NotificationItem>) {
+        val firstEl = elements.firstOrNull()
+        if (firstEl != null) {
+            if (key == null) {
+                notificationJsonCacheRecordDAO.deleteByNullKey(firstEl.accountId)
+            } else {
+                notificationJsonCacheRecordDAO.deleteByKey(firstEl.accountId, key)
+            }
+        }
+        val records = elements.mapIndexed { index, element ->
+            NotificationJsonCacheRecord(
+                accountId = element.accountId,
+                json = json.encodeToString(element),
+                weight = index,
+                notificationId = element.id,
+                key = key
             )
         }
-    }
-    override val mutex: Mutex = Mutex()
-
-    private val _state = MutableStateFlow<PageableState<List<NotificationAndNextId>>>(
-        PageableState.Loading.Init()
-    )
-    override val state: Flow<PageableState<List<NotificationAndNextId>>>
-        get() = _state
-
-    override fun getState(): PageableState<List<NotificationAndNextId>> {
-        return _state.value
+        notificationJsonCacheRecordDAO.insertAll(records)
     }
 
-    override fun setState(state: PageableState<List<NotificationAndNextId>>) {
-        _state.value = state
-    }
+    override suspend fun loadPrevious(
+        state: PageableState<List<NotificationAndNextId>>,
+        id: String?
+    ): Result<List<NotificationJsonCacheRecord>> = runCancellableCatching {
+        val notifications = if (id == null) {
+            notificationJsonCacheRecordDAO.findByNullKey(getAccount().accountId)
+        } else {
+            notificationJsonCacheRecordDAO.findByKey(getAccount().accountId, id)
+        }
 
-    override suspend fun loadPrevious(): Result<List<NotificationItem>> = runCancellableCatching {
-        val account = getAccount()
-        when(account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                MisskeyNotificationEntityLoader(
-                    account = account,
-                    idGetter = this,
-                    misskeyAPIProvider = misskeyAPIProvider,
-                )
+        if (notifications.isEmpty() && id != null) {
+            notificationJsonCacheRecordDAO.filterPaged(getAccount().accountId, id, 50).map { record ->
+                val i = when(val item = json.decodeFromString<NotificationItem>(record.json)) {
+                    is NotificationItem.Mastodon -> item.copy(nextId = item.id)
+                    is NotificationItem.Misskey -> item
+                }
+                record.copy(json = json.encodeToString(i))
             }
-            Account.InstanceType.MASTODON -> {
-                MstNotificationEntityLoader(
-                    account = account,
-                    idGetter = this,
-                    state = this,
-                    mastodonAPIProvider = mastodonAPIProvider,
-                )
-            }
-        }.loadPrevious().getOrThrow()
+        } else {
+            notifications
+        }
+    }
+}
+
+class NotificationRecordConverter constructor(
+    val getAccount: suspend () -> Account,
+    val notificationCacheAdder: NotificationCacheAdder,
+) : EntityConverter<NotificationJsonCacheRecord, NotificationAndNextId> {
+    val json = Json {
+        ignoreUnknownKeys = true
     }
 
-    override suspend fun convertAll(list: List<NotificationItem>): List<NotificationAndNextId> {
-        val account = getAccount()
+    override suspend fun convertAll(list: List<NotificationJsonCacheRecord>): List<NotificationAndNextId> {
         return list.mapNotNull {
-            when(it) {
+            when (val item = json.decodeFromString<NotificationItem>(it.json)) {
                 is NotificationItem.Mastodon -> {
                     runCancellableCatching {
                         NotificationAndNextId(
-                            notificationCacheAdder.addConvert(account, it.mstNotificationDTO),
-                            it.nextId
+                            notificationCacheAdder.addConvert(
+                                getAccount(),
+                                item.mstNotificationDTO,
+                                true
+                            ),
+                            item.nextId,
                         )
                     }.getOrNull()
-
                 }
                 is NotificationItem.Misskey -> {
                     runCancellableCatching {
                         NotificationAndNextId(
-                            notificationCacheAdder.addAndConvert(account, it.notificationDTO),
-                            it.nextId
+                            notificationCacheAdder.addAndConvert(
+                                getAccount(),
+                                item.notificationDTO,
+                                true
+                            ),
+                            item.nextId,
                         )
                     }.getOrNull()
                 }
             }
         }
     }
-
-    override suspend fun getSinceId(): String? {
-        return null
-    }
-
-    override suspend fun getUntilId(): String? {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?.lastOrNull()?.nextId
-    }
 }
 
 
-class MstNotificationEntityLoader(
-    val account: Account,
-    private val mastodonAPIProvider: MastodonAPIProvider,
-    private val idGetter: IdGetter<String>,
-    val state: PaginationState<NotificationAndNextId>,
-) : PreviousLoader<NotificationItem> {
-    override suspend fun loadPrevious(): Result<List<NotificationItem>> = runCancellableCatching {
-        val nextId = idGetter.getUntilId()
-        val isEmpty = (state.getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()
-        if (nextId == null && !isEmpty) {
-            return@runCancellableCatching emptyList()
-        }
-        val res = mastodonAPIProvider.get(account).getNotifications(
-            maxId = nextId
-        ).throwIfHasError()
 
-        val body = res.body()
+@kotlinx.serialization.Serializable
+sealed class NotificationItem {
+    abstract val nextId: String?
+    abstract val id: String
+    abstract val accountId: Long
 
-        val maxId = MastodonLinkHeaderDecoder(res.headers()["link"]).getMaxId()
-
-        requireNotNull(body).map {
-            NotificationItem.Mastodon(
-                it,
-                maxId
-            )
-        }
-    }
-}
-
-class MisskeyNotificationEntityLoader(
-    val account: Account,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
-    private val idGetter: IdGetter<String>,
-) : PreviousLoader<NotificationItem> {
-    override suspend fun loadPrevious(): Result<List<NotificationItem>> = runCancellableCatching {
-        val res = misskeyAPIProvider.get(account).notification(
-            NotificationRequest(
-                i = account.token,
-                untilId = idGetter.getUntilId()
-            )
-        )
-        requireNotNull(res.body()).map {
-            NotificationItem.Misskey(
-                it,
-                it.id,
-            )
-        }
-    }
-}
-
-sealed interface NotificationItem {
-    val nextId: String?
-
+    @kotlinx.serialization.Serializable
     data class Misskey(
         val notificationDTO: NotificationDTO,
         override val nextId: String?,
-    ) : NotificationItem
+        override val id: String,
+        override val accountId: Long
+    ) : NotificationItem()
 
+    @kotlinx.serialization.Serializable
     data class Mastodon(
         val mstNotificationDTO: MstNotificationDTO,
         override val nextId: String?,
-    ) : NotificationItem
+        override val id: String,
+        override val accountId: Long
+    ) : NotificationItem()
 }
 
 data class NotificationAndNextId(

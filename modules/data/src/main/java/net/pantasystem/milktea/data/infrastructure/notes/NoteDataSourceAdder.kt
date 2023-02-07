@@ -32,7 +32,7 @@ class NoteDataSourceAdder @Inject constructor(
 ) {
 
 
-    suspend fun addNoteDtoToDataSource(account: Account, noteDTO: NoteDTO): Note {
+    suspend fun addNoteDtoToDataSource(account: Account, noteDTO: NoteDTO, skipExists: Boolean = false): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val entities =
             noteDTO.toEntities(
@@ -42,19 +42,63 @@ class NoteDataSourceAdder @Inject constructor(
                 noteDTOEntityConverter,
                 filePropertyDTOEntityConverter
             )
-        userDataSource.addAll(entities.users)
-        noteDataSource.addAll(entities.notes)
-        filePropertyDataSource.addAll(entities.files)
+        if (skipExists) {
+            userDataSource.addAll(
+                entities.users.filterNot {
+                    userDataSource.get(it.id).isSuccess
+                }
+            )
+            noteDataSource.addAll(
+                entities.notes.filterNot {
+                    noteDataSource.exists(it.id)
+                }
+            )
+            if (!noteDataSource.exists(entities.note.id)) {
+                noteDataSource.add(entities.note)
+            }
+            filePropertyDataSource.addAll(
+                entities.files.filterNot {
+                    filePropertyDataSource.find(it.id).isSuccess
+                }
+            )
+        } else {
+            userDataSource.addAll(entities.users)
+            noteDataSource.addAll(entities.notes)
+            filePropertyDataSource.addAll(entities.files)
+        }
+
         return entities.note
     }
 
-    suspend fun addTootStatusDtoIntoDataSource(account: Account, status: TootStatusDTO): Note {
+    suspend fun addTootStatusDtoIntoDataSource(account: Account, status: TootStatusDTO, skipExists: Boolean = false): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val entities = status.toEntities(account, nodeInfo)
-        userDataSource.addAll(entities.users)
-        noteDataSource.addAll(entities.notes)
-        noteDataSource.add(entities.note)
-        filePropertyDataSource.addAll(entities.files)
+        if (skipExists) {
+            userDataSource.addAll(
+                entities.users.filterNot {
+                    userDataSource.get(it.id).isSuccess
+                }
+            )
+            noteDataSource.addAll(
+                entities.notes.filterNot {
+                    noteDataSource.exists(it.id)
+                }
+            )
+            if (!noteDataSource.exists(entities.note.id)) {
+                noteDataSource.add(entities.note)
+            }
+            filePropertyDataSource.addAll(
+                entities.files.filterNot {
+                    filePropertyDataSource.find(it.id).isSuccess
+                }
+            )
+        } else {
+            userDataSource.addAll(entities.users)
+            noteDataSource.addAll(entities.notes)
+            noteDataSource.add(entities.note)
+            filePropertyDataSource.addAll(entities.files)
+        }
+
         return entities.note
     }
 }
