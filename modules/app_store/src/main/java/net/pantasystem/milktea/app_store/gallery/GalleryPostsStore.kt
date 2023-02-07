@@ -14,7 +14,7 @@ interface GalleryPostsStore : StateLocker {
     }
     val state: Flow<PageableState<List<GalleryPost.Id>>>
 
-    suspend fun loadPrevious()
-    suspend fun loadFuture()
+    suspend fun loadPrevious(): Result<Int>
+    suspend fun loadFuture(): Result<Int>
     suspend fun clear()
 }

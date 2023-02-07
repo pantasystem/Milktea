@@ -72,12 +72,12 @@ class GalleryPostsStoreImpl(
     private val futurePaginatorController =
         FuturePagingController(entityAdder, this, galleryPostState, loader)
 
-    override suspend fun loadPrevious() {
-        previousPagingController.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return previousPagingController.loadPrevious()
     }
 
-    override suspend fun loadFuture() {
-        futurePaginatorController.loadFuture()
+    override suspend fun loadFuture(): Result<Int> {
+        return futurePaginatorController.loadFuture()
     }
 
     override suspend fun clear() {
@@ -111,12 +111,12 @@ class LikedGalleryPostStoreImpl(
     private val futurePaginatorController =
         FuturePagingController(entityAdder, this, galleryPostState, loader)
 
-    override suspend fun loadPrevious() {
-        previousPagingController.loadPrevious()
+    override suspend fun loadPrevious(): Result<Int> {
+        return previousPagingController.loadPrevious()
     }
 
-    override suspend fun loadFuture() {
-        futurePaginatorController.loadFuture()
+    override suspend fun loadFuture(): Result<Int> {
+        return futurePaginatorController.loadFuture()
     }
 
     override suspend fun clear() {
