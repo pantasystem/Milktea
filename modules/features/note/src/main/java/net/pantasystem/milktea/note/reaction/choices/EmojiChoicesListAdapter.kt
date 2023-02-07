@@ -30,13 +30,7 @@ class EmojiChoicesListAdapter(
         }
 
         override fun areItemsTheSame(oldItem: SegmentType, newItem: SegmentType): Boolean {
-            return when (oldItem) {
-                is SegmentType.Category -> oldItem.name == (newItem as? SegmentType.Category)?.name
-                is SegmentType.OftenUse -> oldItem == newItem
-                is SegmentType.OtherCategory -> oldItem == newItem
-                is SegmentType.RecentlyUsed -> oldItem == newItem
-                is SegmentType.UserCustom -> oldItem == newItem
-            }
+            return oldItem.javaClass == newItem.javaClass && oldItem.label == newItem.label
         }
     }
 ) {
