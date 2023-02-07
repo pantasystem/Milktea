@@ -13,6 +13,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -47,53 +49,61 @@ fun GalleryPostCardList(
     val state by viewModel.galleryPosts.collectAsState()
 
     val content = state.content
-    if (content is StateContent.Exist) {
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(rememberNestedScrollInteropConnection())
-        ) {
-            items(content.rawContent) { post ->
-                GalleryPostCard(
-                    galleryState = post,
-                    onAction = {
-                        if (
-                            it is GalleryPostCardAction.OnThumbnailClicked
-                            && (!visibleFileIds.contains(it.fileProperty.id) && it.fileProperty.isSensitive)
-                        ) {
-                            viewModel.toggleFileVisibleState(it.fileProperty.id)
-                        } else {
-                            onAction.invoke(it)
-                        }
-                    },
-                    visibleFileIds = visibleFileIds
-                )
-            }
-            if (state is PageableState.Loading.Previous) {
-                item {
-                    CircularProgressIndicator()
-                }
-            }
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing = state is PageableState.Loading.Init),
+        onRefresh = {
+            viewModel.loadInit()
         }
-    } else {
-        Box(Modifier.fillMaxSize()) {
-            when (state) {
+    ) {
+        if (content is StateContent.Exist) {
 
-                is PageableState.Loading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(rememberNestedScrollInteropConnection())
+            ) {
+                items(content.rawContent) { post ->
+                    GalleryPostCard(
+                        galleryState = post,
+                        onAction = {
+                            if (
+                                it is GalleryPostCardAction.OnThumbnailClicked
+                                && (!visibleFileIds.contains(it.fileProperty.id) && it.fileProperty.isSensitive)
+                            ) {
+                                viewModel.toggleFileVisibleState(it.fileProperty.id)
+                            } else {
+                                onAction.invoke(it)
+                            }
+                        },
+                        visibleFileIds = visibleFileIds
+                    )
+                }
+                if (state is PageableState.Loading.Previous) {
+                    item {
                         CircularProgressIndicator()
                     }
                 }
-                is PageableState.Error -> {
-                    Text("Load error")
-                }
-                is PageableState.Fixed -> {
-                    Text("No contents")
+            }
+        } else {
+            Box(Modifier.fillMaxSize()) {
+                when (state) {
+
+                    is PageableState.Loading -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    is PageableState.Error -> {
+                        Text("Load error")
+                    }
+                    is PageableState.Fixed -> {
+                        Text("No contents")
+                    }
                 }
             }
         }
     }
+
 
 
 }
