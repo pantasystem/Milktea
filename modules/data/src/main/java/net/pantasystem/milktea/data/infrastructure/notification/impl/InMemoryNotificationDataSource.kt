@@ -1,5 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.notification.impl
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -12,11 +16,18 @@ import javax.inject.Inject
 
 class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSource {
 
+    private val _state = MutableStateFlow<NotificationsWrapper>(NotificationsWrapper(emptyMap()))
     private val listeners = mutableSetOf<NotificationDataSource.Listener>()
     private val notificationIdAndNotification = mutableMapOf<Notification.Id, Notification>()
 
     private val notificationsMapLock = Mutex()
     private val listenersLock = Mutex()
+
+    init {
+        addEventListener {
+            _state.value = NotificationsWrapper(notificationIdAndNotification)
+        }
+    }
 
     override fun addEventListener(listener: NotificationDataSource.Listener) = runBlocking <Unit>{
         listenersLock.withLock {
@@ -60,6 +71,19 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 
+    override fun observeIn(notificationIds: List<Notification.Id>): Flow<List<Notification>> {
+        return _state.map { map ->
+            notificationIds.mapNotNull {
+                map.notifications[it]
+            }
+        }.distinctUntilChanged()
+    }
+
+    override fun observeOne(notificationId: Notification.Id): Flow<Notification?> {
+        return _state.map {
+            it.notifications[notificationId]
+        }.distinctUntilChanged()
+    }
 
 
     private suspend fun find(id: Notification.Id): Notification? {
@@ -94,3 +118,7 @@ class InMemoryNotificationDataSource @Inject constructor() : NotificationDataSou
         }
     }
 }
+
+private data class NotificationsWrapper(
+    val notifications: Map<Notification.Id, Notification>
+)
