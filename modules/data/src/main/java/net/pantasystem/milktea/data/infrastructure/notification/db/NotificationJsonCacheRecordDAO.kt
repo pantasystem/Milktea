@@ -35,7 +35,7 @@ interface NotificationJsonCacheRecordDAO {
                 limit :limit
         """
     )
-    suspend fun filterByIdOrderById(accountId: Long, untilId: String, limit: Int): List<NotificationJsonCacheRecord>
+    suspend fun filterPaged(accountId: Long, untilId: String, limit: Int): List<NotificationJsonCacheRecord>
 
     @Query(
         """

@@ -144,7 +144,7 @@ class NotificationPreviousCacheSaver(
         }
 
         if (notifications.isEmpty() && id != null) {
-            notificationJsonCacheRecordDAO.filterByIdOrderById(getAccount().accountId, id, 50).map { record ->
+            notificationJsonCacheRecordDAO.filterPaged(getAccount().accountId, id, 50).map { record ->
                 val i = when(val item = json.decodeFromString<NotificationItem>(record.json)) {
                     is NotificationItem.Mastodon -> item.copy(nextId = item.id)
                     is NotificationItem.Misskey -> item
