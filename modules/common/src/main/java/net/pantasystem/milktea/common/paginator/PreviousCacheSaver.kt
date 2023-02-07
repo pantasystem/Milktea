@@ -1,5 +1,5 @@
 package net.pantasystem.milktea.common.paginator
 
-interface PreviousCacheSaver<E> {
-    suspend fun savePrevious(elements: List<E>)
+interface PreviousCacheSaver<Id, E> {
+    suspend fun savePrevious(key: Id?, elements: List<E>)
 }

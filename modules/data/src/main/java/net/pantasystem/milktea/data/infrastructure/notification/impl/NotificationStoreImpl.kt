@@ -19,7 +19,7 @@ class NotificationStoreImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val notificationCacheAdder: NotificationCacheAdder,
-) : StateLocker, PreviousLoader<NotificationItem>, PaginationState<NotificationAndNextId>,
+) : StateLocker, IdPreviousLoader<String, NotificationItem, NotificationAndNextId>, PaginationState<NotificationAndNextId>,
     IdGetter<String>, EntityConverter<NotificationItem, NotificationAndNextId> {
 
     @Singleton
@@ -53,13 +53,12 @@ class NotificationStoreImpl(
         _state.value = state
     }
 
-    override suspend fun loadPrevious(): Result<List<NotificationItem>> = runCancellableCatching {
+    override suspend fun loadPrevious(state: PageableState<List<NotificationAndNextId>>, id: String?): Result<List<NotificationItem>> = runCancellableCatching {
         val account = getAccount()
         when(account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 MisskeyNotificationEntityLoader(
                     account = account,
-                    idGetter = this,
                     misskeyAPIProvider = misskeyAPIProvider,
                 )
             }
@@ -67,11 +66,10 @@ class NotificationStoreImpl(
                 MstNotificationEntityLoader(
                     account = account,
                     idGetter = this,
-                    state = this,
                     mastodonAPIProvider = mastodonAPIProvider,
                 )
             }
-        }.loadPrevious().getOrThrow()
+        }.loadPrevious(state, id).getOrThrow()
     }
 
     override suspend fun convertAll(list: List<NotificationItem>): List<NotificationAndNextId> {

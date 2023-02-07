@@ -17,7 +17,7 @@ class MediatorPreviousPagingController<Id, DTO, Record, E>(
     private val previousLoader: IdPreviousLoader<Id, DTO, E>,
     private val localPreviousLoader: IdPreviousLoader<Id, Record, E>,
     private val idGetter: IdGetter<Id>,
-    private val previousCacheSaver: PreviousCacheSaver<DTO>,
+    private val previousCacheSaver: PreviousCacheSaver<Id, DTO>,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PreviousPaginator {
 
@@ -49,7 +49,7 @@ class MediatorPreviousPagingController<Id, DTO, Record, E>(
                 }.getOrThrow()
 
                 withContext(dispatcher) {
-                    previousCacheSaver.savePrevious(remoteRawRes.getOrThrow())
+                    previousCacheSaver.savePrevious(id, remoteRawRes.getOrThrow())
                 }
 
                 applyFinalState(beforeUpdateState, remoteRes)

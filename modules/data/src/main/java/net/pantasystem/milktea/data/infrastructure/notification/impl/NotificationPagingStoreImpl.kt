@@ -7,7 +7,10 @@ import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.paginator.PreviousPagingController
+import net.pantasystem.milktea.common.paginator.EntityConverter
+import net.pantasystem.milktea.common.paginator.IdPreviousLoader
+import net.pantasystem.milktea.common.paginator.MediatorPreviousPagingController
+import net.pantasystem.milktea.common.paginator.PreviousCacheSaver
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.model.account.Account
@@ -19,26 +22,35 @@ class NotificationPagingStoreImpl(
     val getAccount: suspend () -> Account,
     val delegate: NotificationStoreImpl,
     val unreadNotificationDAO: UnreadNotificationDAO,
+    val notificationCacheAdder: NotificationCacheAdder,
 ) : NotificationPagingStore {
 
     class Factory @Inject constructor(
         val factory: NotificationStoreImpl.Factory,
         val unreadNotificationDAO: UnreadNotificationDAO,
+        val notificationCacheAdder: NotificationCacheAdder,
     ) : NotificationPagingStore.Factory {
         override fun create(getAccount: suspend () -> Account): NotificationPagingStore {
             return NotificationPagingStoreImpl(
                 getAccount,
                 delegate = factory.create(getAccount),
                 unreadNotificationDAO = unreadNotificationDAO,
+                notificationCacheAdder = notificationCacheAdder,
             )
         }
     }
 
-    val previousPagingController = PreviousPagingController(
-        delegate,
-        delegate,
-        delegate,
-        delegate
+    val cacheSaver = NotificationPreviousCacheSaver(getAccount)
+
+    val previousPagingController = MediatorPreviousPagingController(
+        entityConverter = delegate,
+        locker = delegate,
+        state = delegate,
+        idGetter = delegate,
+        previousCacheSaver = cacheSaver,
+        localPreviousLoader = cacheSaver,
+        localRecordConverter = NotificationRecordConverter(getAccount, notificationCacheAdder),
+        previousLoader = delegate,
     )
 
     override val notifications: Flow<PageableState<List<NotificationRelation>>> = delegate.state.map { state ->
@@ -79,8 +91,64 @@ class NotificationPagingStoreImpl(
     }
 }
 
+// TODO: データベース上に実装する
+class NotificationPreviousCacheSaver(
+    val getAccount: suspend () -> Account,
+) : PreviousCacheSaver<String, NotificationItem>, IdPreviousLoader<String, NotificationCacheRecord, NotificationAndNextId> {
+
+    private data class Key(val key: String?, val accountId: Long)
+    private var lists = mutableMapOf<Key, List<NotificationCacheRecord>>()
 
 
+    override suspend fun savePrevious(key: String?, elements: List<NotificationItem>) {
+        val accountId = getAccount().accountId
+        lists[Key(key, accountId)] = elements.map {
+            NotificationCacheRecord(key, accountId, it)
+        }
+    }
+
+    override suspend fun loadPrevious(
+        state: PageableState<List<NotificationAndNextId>>,
+        id: String?
+    ): Result<List<NotificationCacheRecord>> = runCancellableCatching {
+        lists[Key(id, getAccount().accountId)] ?: emptyList()
+    }
+}
+
+class NotificationRecordConverter constructor(
+    val getAccount: suspend () -> Account,
+    val notificationCacheAdder: NotificationCacheAdder,
+): EntityConverter<NotificationCacheRecord, NotificationAndNextId> {
+    override suspend fun convertAll(list: List<NotificationCacheRecord>): List<NotificationAndNextId> {
+        return list.mapNotNull {
+            when(it.item) {
+                is NotificationItem.Mastodon -> {
+                    runCancellableCatching {
+                        NotificationAndNextId(
+                            notificationCacheAdder.addConvert(getAccount(), it.item.mstNotificationDTO, true),
+                            it.item.nextId,
+                        )
+                    }.getOrNull()
+                }
+                is NotificationItem.Misskey -> {
+                    runCancellableCatching {
+                        NotificationAndNextId(
+                            notificationCacheAdder.addAndConvert(getAccount(), it.item.notificationDTO, true),
+                            it.item.nextId,
+                        )
+                    }.getOrNull()
+                }
+            }
+        }
+    }
+}
+
+
+data class NotificationCacheRecord(
+    val key: String?,
+    val accountId: Long,
+    val item: NotificationItem,
+)
 
 sealed interface NotificationItem {
     val nextId: String?
