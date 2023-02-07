@@ -2,6 +2,7 @@ package net.pantasystem.milktea.gallery
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -50,6 +51,9 @@ fun GalleryPostCardList(
 
     val content = state.content
     SwipeRefresh(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(rememberNestedScrollInteropConnection()),
         state = rememberSwipeRefreshState(isRefreshing = state is PageableState.Loading.Init),
         onRefresh = {
             viewModel.loadInit()
@@ -59,8 +63,8 @@ fun GalleryPostCardList(
 
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(rememberNestedScrollInteropConnection())
+                    .fillMaxSize(),
+                state = listViewState,
             ) {
                 items(content.rawContent) { post ->
                     GalleryPostCard(
@@ -80,7 +84,12 @@ fun GalleryPostCardList(
                 }
                 if (state is PageableState.Loading.Previous) {
                     item {
-                        CircularProgressIndicator()
+                        Box(
+                            Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }
@@ -103,7 +112,6 @@ fun GalleryPostCardList(
             }
         }
     }
-
 
 
 }
