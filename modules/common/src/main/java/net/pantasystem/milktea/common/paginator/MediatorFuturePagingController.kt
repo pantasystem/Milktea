@@ -14,8 +14,8 @@ class MediatorFuturePagingController<Id, DTO, Record, E>(
     private val localRecordConverter: EntityConverter<Record, E>,
     private val locker: StateLocker,
     private val state: PaginationState<E>,
-    private val futureLoader: IdFutureLoader<Id, DTO>,
-    private val localFutureLoader: IdFutureLoader<Id, Record>,
+    private val futureLoader: IdFutureLoader<Id, DTO, E>,
+    private val localFutureLoader: IdFutureLoader<Id, Record, E>,
     private val idGetter: IdGetter<Id>,
     private val futureCacheSaver: FutureCacheSaver<DTO>,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -34,7 +34,7 @@ class MediatorFuturePagingController<Id, DTO, Record, E>(
                 )
                 state.setState(loading)
                 val localCaches = withContext(dispatcher) {
-                    localFutureLoader.loadFuture(id)
+                    localFutureLoader.loadFuture(beforeUpdateState, id)
                 }.mapCancellableCatching {
                     localRecordConverter.convertAll(it)
                 }.getOrThrow()
@@ -42,7 +42,7 @@ class MediatorFuturePagingController<Id, DTO, Record, E>(
                 applyLocalSourceState(beforeUpdateState, localCaches)
 
                 val futureRawRes = withContext(dispatcher) {
-                    futureLoader.loadFuture(id)
+                    futureLoader.loadFuture(beforeUpdateState, id)
                 }
                 val remoteRes = futureRawRes.mapCancellableCatching {
                     entityConverter.convertAll(it)
