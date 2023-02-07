@@ -137,10 +137,22 @@ class NotificationPreviousCacheSaver(
         state: PageableState<List<NotificationAndNextId>>,
         id: String?
     ): Result<List<NotificationJsonCacheRecord>> = runCancellableCatching {
-        if (id == null) {
+        val notifications = if (id == null) {
             notificationJsonCacheRecordDAO.findByNullKey(getAccount().accountId)
         } else {
             notificationJsonCacheRecordDAO.findByKey(getAccount().accountId, id)
+        }
+
+        if (notifications.isEmpty() && id != null) {
+            notificationJsonCacheRecordDAO.filterByIdOrderById(getAccount().accountId, id, 50).map { record ->
+                val i = when(val item = json.decodeFromString<NotificationItem>(record.json)) {
+                    is NotificationItem.Mastodon -> item.copy(nextId = item.id)
+                    is NotificationItem.Misskey -> item
+                }
+                record.copy(json = json.encodeToString(i))
+            }
+        } else {
+            notifications
         }
     }
 }

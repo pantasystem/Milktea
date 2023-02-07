@@ -29,6 +29,16 @@ interface NotificationJsonCacheRecordDAO {
 
     @Query(
         """
+            select * from notification_json_cache_v1 
+                where accountId = :accountId and notificationId < :untilId
+                order by notificationId desc
+                limit :limit
+        """
+    )
+    suspend fun filterByIdOrderById(accountId: Long, untilId: String, limit: Int): List<NotificationJsonCacheRecord>
+
+    @Query(
+        """
             delete from notification_json_cache_v1
                 where accountId = :accountId and `key` = :key
         """
