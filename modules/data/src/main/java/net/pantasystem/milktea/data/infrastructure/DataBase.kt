@@ -40,6 +40,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterCond
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRegexRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionWordRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecord
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecordDAO
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
@@ -100,8 +102,10 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
 
         CustomEmojiRecord::class,
         CustomEmojiAliasRecord::class,
+
+        NotificationJsonCacheRecord::class
     ],
-    version = 37,
+    version = 38,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -130,6 +134,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 34, to = 35),
         AutoMigration(from = 35, to = 36),
         AutoMigration(from = 36, to = 37),
+        AutoMigration(from = 37, to = 38)
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -188,4 +193,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun mastodonInstanceInfoDao(): MastodonInstanceInfoDAO
 
     abstract fun customEmojiDao(): CustomEmojiDAO
+
+    abstract fun notificationJsonCacheRecordDAO(): NotificationJsonCacheRecordDAO
 }

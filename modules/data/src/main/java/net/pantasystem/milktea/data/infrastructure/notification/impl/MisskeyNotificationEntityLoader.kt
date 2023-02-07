@@ -22,6 +22,8 @@ class MisskeyNotificationEntityLoader(
             NotificationItem.Misskey(
                 it,
                 it.id,
+                it.id,
+                account.accountId
             )
         }
     }

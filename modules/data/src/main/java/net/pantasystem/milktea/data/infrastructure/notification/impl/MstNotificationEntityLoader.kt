@@ -28,6 +28,8 @@ class MstNotificationEntityLoader(
             NotificationItem.Mastodon(
                 it,
                 maxId,
+                it.id,
+                account.accountId
             )
         }
     }
