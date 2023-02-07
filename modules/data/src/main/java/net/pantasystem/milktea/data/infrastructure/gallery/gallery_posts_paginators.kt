@@ -15,6 +15,7 @@ import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.instance.IllegalVersionException
 import retrofit2.Response
@@ -67,12 +68,17 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>,
 
 class GalleryPostsConverter(
     private val getAccount: suspend () -> Account,
-    private val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter
+    private val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
+    private val galleryDataSource: GalleryDataSource,
 ) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
     override suspend fun convertAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
-        return list.map {
-            galleryPostDTOEntityConverter.convert(it, getAccount.invoke()).id
+        val posts = list.map {
+            galleryPostDTOEntityConverter.convert(it, getAccount.invoke())
+        }
+        galleryDataSource.addAll(posts)
+        return posts.map {
+            it.id
         }
     }
 }
