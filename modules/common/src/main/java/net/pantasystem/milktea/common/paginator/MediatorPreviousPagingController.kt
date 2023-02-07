@@ -55,6 +55,12 @@ class MediatorPreviousPagingController<Id, DTO, Record, E>(
                 applyFinalState(beforeUpdateState, remoteRes)
 
                 remoteRes.size
+            }.onFailure {
+                val errorState = PageableState.Error(
+                    state.getState().content,
+                    it
+                )
+                state.setState(errorState)
             }
 
         }
