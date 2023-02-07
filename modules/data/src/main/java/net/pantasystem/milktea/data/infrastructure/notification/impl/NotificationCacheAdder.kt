@@ -29,21 +29,29 @@ class NotificationCacheAdder @Inject constructor(
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val notificationDTOEntityConverter: NotificationDTOEntityConverter,
 ) {
-    suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO): NotificationRelation {
+    suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO, skipExists: Boolean = false): NotificationRelation {
         val user = notificationDTO.user?.let {
             userDTOEntityConverter.convert(account, it)
         }
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         if (user != null) {
-            userDataSource.add(user)
+            if (!skipExists || userDataSource.get(user.id).isFailure) {
+                userDataSource.add(user)
+            }
         }
         val noteRelation = notificationDTO.note?.let{
-            noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(account, it))
+            noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(account, it, skipExists))
         }
         val notification = notificationDTOEntityConverter.convert(notificationDTO, account, nodeInfo)
-        notificationDataSource.add(notification)
+
+        if (!skipExists || notificationDataSource.get(notification.id).isFailure) {
+            notificationDataSource.add(notification)
+        }
+
         notificationDTO.invitation?.group?.toGroup(account.accountId)?.let { group ->
-            groupDataSource.add(group)
+            if (!skipExists || groupDataSource.find(group.id).isFailure) {
+                groupDataSource.add(group)
+            }
         }
         return NotificationRelation(
             notification,
@@ -52,14 +60,21 @@ class NotificationCacheAdder @Inject constructor(
         )
     }
 
-    suspend fun addConvert(account: Account, mstNotificationDTO: MstNotificationDTO): NotificationRelation {
+    suspend fun addConvert(account: Account, mstNotificationDTO: MstNotificationDTO, skipExists: Boolean = false): NotificationRelation {
         val user = mstNotificationDTO.account.toModel(account)
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val noteRelation = mstNotificationDTO.status?.toNote(account, nodeInfo)?.let {
             noteRelationGetter.get(it)
         }
         val notification = mstNotificationDTO.toModel(account, isRead = true)
-        notificationDataSource.add(notification)
+        mstNotificationDTO.status?.let {
+            noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it, skipExists)
+        }
+
+        if (!skipExists || notificationDataSource.get(notification.id).isFailure) {
+            notificationDataSource.add(notification)
+        }
+
         return NotificationRelation(
             notification = notification,
             user = user,
