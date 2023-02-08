@@ -30,6 +30,7 @@ data class PageParams(
     var host: String? = null,
     val antennaId: String? = null,
     val channelId: String? = null,
+    val clipId: String? = null,
 ) : Serializable, Parcelable {
 
 
@@ -182,6 +183,11 @@ data class PageParams(
                 }
                 CALCKEY_RECOMMENDED_TIMELINE -> {
                     Pageable.CalckeyRecommendedTimeline
+                }
+                CLIP_NOTES -> {
+                    Pageable.ClipNotes(
+                        clipId = requireNotNull(clipId)
+                    )
                 }
             }
         } catch (e: NullPointerException) {

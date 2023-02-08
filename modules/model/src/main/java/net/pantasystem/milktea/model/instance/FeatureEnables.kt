@@ -11,5 +11,5 @@ interface FeatureEnables {
 }
 
 enum class FeatureType {
-    Gallery, Channel, Group, Antenna, UserReactionHistory, Drive, Bookmark
+    Gallery, Channel, Group, Antenna, UserReactionHistory, Drive, Bookmark, Clip,
 }

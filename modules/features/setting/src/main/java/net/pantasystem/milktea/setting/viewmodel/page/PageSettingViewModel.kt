@@ -60,6 +60,7 @@ class PageSettingViewModel @Inject constructor(
                     PageType.MENTION,
                     PageType.FAVORITE,
                     if (version >= Version("12")) PageType.CHANNEL_TIMELINE else null,
+                    if (version >= Version("12")) PageType.CLIP_NOTES else null,
                     PageType.SEARCH,
                     PageType.SEARCH_HASH,
                     PageType.USER,

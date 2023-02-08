@@ -225,6 +225,17 @@ sealed class Pageable : Serializable {
         }
     }
 
+    data class ClipNotes(
+        val clipId: String
+    ) : Pageable(), UntilPaginate, SincePaginate {
+        override fun toParams(): PageParams {
+            return PageParams(
+                PageType.CLIP_NOTES,
+                clipId = clipId
+            )
+        }
+    }
+
     object Favorite : Pageable(), UntilPaginate, SincePaginate {
         override fun toParams(): PageParams {
             return PageParams(PageType.FAVORITE)

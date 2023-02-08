@@ -32,5 +32,7 @@ enum class PageType(val defaultName: String){
 
     CALCKEY_RECOMMENDED_TIMELINE("CalckeyRecommendedTimeline"),
 
+    CLIP_NOTES("ClipNotes"),
+
     //USER_PINは別
 }

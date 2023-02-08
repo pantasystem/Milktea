@@ -422,5 +422,6 @@
     <string name="calckey_recomended_timeline">推荐的</string>
     <string name="notification_favorited_by">被 %s 收藏</string>
     <string name="notification_posted_by">发布者 %s</string>
+    <string name="clip">夹子</string>
 
 </resources>

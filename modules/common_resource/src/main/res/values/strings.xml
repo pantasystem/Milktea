@@ -415,5 +415,6 @@
     <string name="calckey_recomended_timeline">Recommended</string>
     <string name="notification_favorited_by">Favorited by %s</string>
     <string name="notification_posted_by">Posted by %s</string>
+    <string name="clip">Clip</string>
 
 </resources>

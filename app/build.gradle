@@ -107,6 +107,7 @@ dependencies {
     implementation project(path: ':modules:features:search')
     implementation project(path: ':modules:features:favorite')
     implementation project(path: ':modules:worker')
+    implementation project(path: ':modules:features:clip')
 
 
     testImplementation project(path: ':modules:api_streaming')
