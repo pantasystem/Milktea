@@ -16,22 +16,20 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common_compose.CircleCheckbox
 import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.clip.ClipId
-import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 
 @Composable
 fun ToggleAddNoteToClipTile(
     modifier: Modifier = Modifier,
-    noteId: Note.Id,
     clip: Clip,
     isAdded: Boolean,
-    onClick: (Note.Id, Clip) -> Unit
+    onClick: () -> Unit
 ) {
     Surface(
         modifier
             .fillMaxWidth()
 
-            .clickable { onClick(noteId, clip) },
+            .clickable { onClick() },
         color = MaterialTheme.colors.surface,
     ) {
         Row(
@@ -50,7 +48,6 @@ fun ToggleAddNoteToClipTile(
 @Composable
 fun Preview_ToggleAddNoteToClipTile() {
     ToggleAddNoteToClipTile(
-        noteId = Note.Id(0L, ""),
         clip = Clip(
             id = ClipId(accountId = 0, clipId = ""),
             createdAt = Clock.System.now(),
@@ -60,8 +57,6 @@ fun Preview_ToggleAddNoteToClipTile() {
             isPublic = false
         ),
         isAdded = true,
-        onClick = { _, _ ->
-
-        }
+        onClick = {}
     )
 }

@@ -34,6 +34,7 @@ fun NoteOptionDialogLayout(
     onDeleteButtonClicked: (NoteRelation?) -> Unit,
     onReportButtonClicked: (NoteRelation?) -> Unit,
     onShowReactionHistoryButtonClicked: (noteId: Note.Id) -> Unit,
+    onToggleAddNoteToClipButtonClicked: (noteId: Note.Id) -> Unit,
 ) {
     Surface(Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth()) {
@@ -133,6 +134,17 @@ fun NoteOptionDialogLayout(
                     }
                     else -> {}
                 }
+            }
+
+            if (uiState.note?.isMisskey == true) {
+                NormalBottomSheetDialogSelectionLayout(
+                    icon = Icons.Default.Attachment, text = stringResource(id = R.string.clip),
+                    onClick = {
+                        onToggleAddNoteToClipButtonClicked(
+                            uiState.note.id
+                        )
+                    },
+                )
             }
 
             if (uiState.noteState == null || uiState.noteState.isMutedThread != null) {

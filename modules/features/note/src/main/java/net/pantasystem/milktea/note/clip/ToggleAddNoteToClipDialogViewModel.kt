@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ToggleAddNoteToClipDialogViewModel @Inject constructor(
     private val clipRepository: ClipRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -46,25 +46,16 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
     )
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val relatedClips = noteId.filterNotNull().flatMapLatest {
-        suspend {
-            clipRepository.findBy(it).getOrThrow()
-        }.asLoadingStateFlow()
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        ResultState.Loading(StateContent.NotExist())
-    )
+
+    private val _relatedClips = MutableStateFlow<List<Clip>>(emptyList())
 
     private val clipStatuses: StateFlow<ResultState<List<ClipWithAddedState>>> =
-        combine(myClipsState, relatedClips) { own, related ->
-            val clips = (related.content as? StateContent.Exist)?.rawContent ?: emptyList()
+        combine(myClipsState, _relatedClips) { own, related ->
             own.convert { list ->
                 list.map { clip ->
                     ClipWithAddedState(
                         clip,
-                        isAdded = clips.any {
+                        isAdded = related.any {
                             it.id == clip.id
                         }
                     )
@@ -87,6 +78,12 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
         ToggleAddNoteToClipDialogUiState()
     )
 
+    init {
+        noteId.filterNotNull().onEach {
+            loadRelatedClips(it)
+        }.launchIn(viewModelScope)
+    }
+
     fun onAddToClip(noteId: Note.Id, clipId: ClipId) {
         viewModelScope.launch {
             clipRepository.appendNote(clipId, noteId).onSuccess {
@@ -94,8 +91,7 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
             }.onFailure {
                 logger.error("クリップへの追加に失敗", it)
             }
-            savedStateHandle[EXTRA_NOTE_ID] = noteId
-
+            loadRelatedClips(noteId)
         }
     }
 
@@ -106,7 +102,15 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
             }.onFailure {
                 logger.error("クリップからの削除に失敗", it)
             }
-            savedStateHandle[EXTRA_NOTE_ID] = noteId
+            loadRelatedClips(noteId)
+        }
+    }
+
+    private suspend fun loadRelatedClips(noteId: Note.Id) {
+        clipRepository.findBy(noteId).onSuccess {
+            _relatedClips.value = it
+        }.onFailure {
+            logger.error("関連しているクリップの取得に失敗", it)
         }
     }
 

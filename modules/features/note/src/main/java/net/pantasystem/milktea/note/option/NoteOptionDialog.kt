@@ -20,6 +20,7 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.clip.ToggleAddNoteToClipDialog
 import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
@@ -132,6 +133,10 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         onShowReactionHistoryButtonClicked = {
                             dismiss()
                             ReactionHistoryPagerDialog.newInstance(it).show(parentFragmentManager, "ReactionHistoryPagerDialog")
+                        },
+                        onToggleAddNoteToClipButtonClicked = {
+                            dismiss()
+                            ToggleAddNoteToClipDialog.newInstance(it).show(parentFragmentManager, "ToggleAddNoteToClipDialog")
                         }
                     )
                 }
