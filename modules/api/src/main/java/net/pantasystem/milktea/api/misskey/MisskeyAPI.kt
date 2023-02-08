@@ -3,8 +3,8 @@ package net.pantasystem.milktea.api.misskey
 import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
 import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
 import net.pantasystem.milktea.api.misskey.app.CreateApp
-import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.api.misskey.auth.App
+import net.pantasystem.milktea.api.misskey.clip.*
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
@@ -268,4 +268,32 @@ interface MisskeyAPI {
 
     @POST("https://misskey.pantasystem.com/api/i/registry/get-all")
     suspend fun getReactionsFromGetAll(@Body req: WebClientBaseRequest): Response<WebClientRegistries>
+
+    @POST("api/clips/create")
+    suspend fun createClip(@Body req: CreateClipRequest): Response<ClipDTO>
+
+    @POST("api/clips/update")
+    suspend fun updateClip(@Body req: UpdateClipRequest): Response<ClipDTO>
+
+    @POST("api/clips/delete")
+    suspend fun deleteClip(@Body req: DeleteClipRequest): Response<Unit>
+
+    @POST("api/users/clips")
+    suspend fun findByUsersClip(@Body req: FindUsersClipRequest): Response<List<ClipDTO>>
+
+    @POST("api/notes/clips")
+    suspend fun findByNotesClip(@Body req: FindNotesClip): Response<List<ClipDTO>>
+
+
+    @POST("api/clips/add-note")
+    suspend fun addNoteToClip(@Body req: AddNoteToClipRequest): Response<Unit>
+
+    @POST("api/clips/remove-note")
+    suspend fun removeNoteToClip(@Body req: RemoveNoteToClipRequest): Response<Unit>
+
+    @POST("api/clips/show")
+    suspend fun showClip(@Body req: ShowClipRequest): Response<ClipDTO>
+
+    @POST("api/clips/list")
+    suspend fun findMyClips(@Body req: I): Response<List<ClipDTO>>
 }
