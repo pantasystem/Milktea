@@ -6,6 +6,7 @@ import jp.panta.misskeyandroidclient.MainActivity
 import jp.panta.misskeyandroidclient.R
 import net.pantasystem.milktea.antenna.AntennaListActivity
 import net.pantasystem.milktea.channel.ChannelActivity
+import net.pantasystem.milktea.clip.ClipListActivity
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.drive.DriveActivity
 import net.pantasystem.milktea.favorite.FavoriteActivity
@@ -30,6 +31,7 @@ internal class MainActivityNavigationDrawerMenuItemClickListener(
             R.id.nav_gallery -> GalleryPostsActivity::class.java
             R.id.nav_channel -> ChannelActivity::class.java
             R.id.nav_group -> GroupActivity::class.java
+            R.id.nav_clip -> ClipListActivity::class.java
             R.id.nav_switch_account -> {
                 accountViewModel.showSwitchDialog()
                 return
