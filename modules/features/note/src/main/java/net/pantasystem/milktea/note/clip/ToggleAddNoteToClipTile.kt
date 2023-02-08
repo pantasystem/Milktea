@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QuestionMark
@@ -29,7 +30,6 @@ fun ToggleAddNoteToClipTile(
     Surface(
         modifier
             .fillMaxWidth()
-
             .clickable { onClick() },
         color = MaterialTheme.colors.surface,
     ) {
@@ -48,7 +48,10 @@ fun ToggleAddNoteToClipTile(
             when (state) {
                 ClipAddState.Added -> CircleCheckbox(selected = true)
                 ClipAddState.NotAdded -> CircleCheckbox(selected = false)
-                ClipAddState.Progress -> CircularProgressIndicator()
+                ClipAddState.Progress -> CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
                 ClipAddState.Unknown -> Icon(
                     Icons.Default.QuestionMark,
                     contentDescription = "unknown added status"
