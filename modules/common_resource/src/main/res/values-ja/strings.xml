@@ -425,5 +425,6 @@
     <string name="calckey_recomended_timeline">一押し</string>
     <string name="notification_favorited_by">%sさんにお気に入りにされました</string>
     <string name="notification_posted_by">%sさんが投稿しました</string>
+    <string name="clip">クリップ</string>
 
 </resources>
