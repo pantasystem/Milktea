@@ -7,10 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.clip.ClipId
 import net.pantasystem.milktea.model.clip.ClipRepository
@@ -46,17 +43,41 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
     )
 
 
-
     private val _relatedClips = MutableStateFlow<List<Clip>>(emptyList())
 
+    private val clipActionState = MutableStateFlow<Map<ClipId, ClipOptionalActionState>>(mapOf())
+    private val clipActionStateQueue =
+        MutableSharedFlow<Pair<ClipId, ClipOptionalActionState>>(extraBufferCapacity = 20)
+
     private val clipStatuses: StateFlow<ResultState<List<ClipWithAddedState>>> =
-        combine(myClipsState, _relatedClips) { own, related ->
+        combine(myClipsState, _relatedClips, clipActionState) { own, related, optionStatuses ->
+
             own.convert { list ->
                 list.map { clip ->
+                    val status = optionStatuses.get(clip.id)
+                    val isAdded = related.any {
+                        it.id == clip.id
+                    }
                     ClipWithAddedState(
                         clip,
-                        isAdded = related.any {
-                            it.id == clip.id
+                        if (clip.isPublic) {
+                            if (status is ClipOptionalActionState.Adding || status is ClipOptionalActionState.Removing) {
+                                ClipAddState.Progress
+                            } else if (isAdded) {
+                                ClipAddState.Added
+                            } else {
+                                ClipAddState.NotAdded
+                            }
+                        } else {
+                            when(status) {
+                                is ClipOptionalActionState.Added -> ClipAddState.Added
+                                is ClipOptionalActionState.Adding -> ClipAddState.Progress
+                                is ClipOptionalActionState.AlreadyAdded -> ClipAddState.Added
+                                is ClipOptionalActionState.AlreadyRemoved -> ClipAddState.NotAdded
+                                is ClipOptionalActionState.Removed -> ClipAddState.NotAdded
+                                is ClipOptionalActionState.Removing -> ClipAddState.Progress
+                                null -> ClipAddState.Unknown
+                            }
                         }
                     )
                 }
@@ -82,25 +103,44 @@ class ToggleAddNoteToClipDialogViewModel @Inject constructor(
         noteId.filterNotNull().onEach {
             loadRelatedClips(it)
         }.launchIn(viewModelScope)
+
+        clipActionStateQueue.onEach { (clipId, state) ->
+            clipActionState.value = clipActionState.value.toMutableMap().also { map ->
+                map[clipId] = state
+            }
+        }.launchIn(viewModelScope)
     }
 
-    fun onAddToClip(noteId: Note.Id, clipId: ClipId) {
+    fun onAddToClip(noteId: Note.Id, clip: Clip) {
         viewModelScope.launch {
-            clipRepository.appendNote(clipId, noteId).onSuccess {
-
+            clipActionStateQueue.emit(clip.id to ClipOptionalActionState.Adding(clip, noteId))
+            clipRepository.appendNote(clip.id, noteId).onSuccess {
+                clipActionStateQueue.emit(clip.id to ClipOptionalActionState.Added(clip, noteId))
             }.onFailure {
                 logger.error("クリップへの追加に失敗", it)
+                if (it is APIError.ClientException) {
+                    clipActionStateQueue.emit(
+                        clip.id to ClipOptionalActionState.AlreadyAdded(
+                            clip,
+                            noteId
+                        )
+                    )
+                }
             }
             loadRelatedClips(noteId)
         }
     }
 
-    fun onRemoveToClip(noteId: Note.Id, clipId: ClipId) {
+    fun onRemoveToClip(noteId: Note.Id, clip: Clip) {
         viewModelScope.launch {
-            clipRepository.removeNote(clipId, noteId).onSuccess {
-
+            clipActionStateQueue.emit(clip.id to ClipOptionalActionState.Removing(clip, noteId))
+            clipRepository.removeNote(clip.id, noteId).onSuccess {
+                clipActionStateQueue.emit(clip.id to ClipOptionalActionState.Removed(clip, noteId))
             }.onFailure {
                 logger.error("クリップからの削除に失敗", it)
+                if (it is APIError.ClientException) {
+                    clipActionStateQueue.emit(clip.id to ClipOptionalActionState.AlreadyRemoved(clip, noteId))
+                }
             }
             loadRelatedClips(noteId)
         }
@@ -123,5 +163,21 @@ data class ToggleAddNoteToClipDialogUiState(
 
 data class ClipWithAddedState(
     val clip: Clip,
-    val isAdded: Boolean,
+    val addState: ClipAddState,
 )
+
+sealed interface ClipOptionalActionState {
+    data class Adding(val clip: Clip, val noteId: Note.Id) : ClipOptionalActionState
+    data class Removing(val clip: Clip, val noteId: Note.Id) : ClipOptionalActionState
+    data class Added(val clip: Clip, val noteId: Note.Id) : ClipOptionalActionState
+    data class Removed(val clip: Clip, val noteId: Note.Id) : ClipOptionalActionState
+    data class AlreadyAdded(val clip: Clip, val noteId: Note.Id) : ClipOptionalActionState
+    data class AlreadyRemoved(val clip: Clip, val noteId: Note.Id) : ClipOptionalActionState
+}
+
+sealed interface ClipAddState {
+    object Added : ClipAddState
+    object NotAdded : ClipAddState
+    object Unknown : ClipAddState
+    object Progress : ClipAddState
+}
