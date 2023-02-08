@@ -27,6 +27,15 @@ class ClipRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun findOne(clipId: ClipId): Result<Clip> = runCancellableCatching  {
+        val account = accountRepository.get(clipId.accountId).getOrThrow()
+        val api = misskeyAPIProvider.get(account)
+        val body = api.showClip(ShowClipRequest(i = account.token, clipId = clipId.clipId))
+            .throwIfHasError()
+            .body()
+        clipDTOEntityConverter.convert(account, requireNotNull(body))
+    }
+
     override suspend fun findBy(
         userId: User.Id,
         sinceId: String?,

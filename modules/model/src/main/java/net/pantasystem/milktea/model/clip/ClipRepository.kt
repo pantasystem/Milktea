@@ -26,5 +26,5 @@ interface ClipRepository {
 
     suspend fun removeNote(clipId: ClipId, noteId: Note.Id): Result<Unit>
 
-
+    suspend fun findOne(clipId: ClipId): Result<Clip>
 }
