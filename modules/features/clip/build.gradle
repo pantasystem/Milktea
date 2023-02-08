@@ -51,6 +51,8 @@ dependencies {
     implementation project(path: ':modules:common_navigation')
     implementation project(path: ':modules:common_android_ui')
     implementation project(path: ':modules:common_viewmodel')
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.google.android.material:material:1.4.0'
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
