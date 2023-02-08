@@ -7,13 +7,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.watchAccount
 import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.clip.ClipRepository
 import net.pantasystem.milktea.model.clip.ToggleClipAddToTabUseCase
@@ -23,6 +23,7 @@ import javax.inject.Inject
 class ClipListViewModel @Inject constructor(
     private val clipRepository: ClipRepository,
     private val accountRepository: AccountRepository,
+    private val accountStore: AccountStore,
     private val toggleClipAddToTabUseCase: ToggleClipAddToTabUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -42,8 +43,12 @@ class ClipListViewModel @Inject constructor(
         } else {
             accountRepository.get(it).getOrNull()
         }
-    }.filterNotNull().flatMapLatest {
-        accountRepository.watchAccount(it.accountId)
+    }.filterNotNull().flatMapLatest { ac ->
+        accountStore.observeAccounts.map { accounts ->
+            accounts.firstOrNull {
+                ac.accountId == it.accountId
+            }
+        }
     }.catch {
 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
