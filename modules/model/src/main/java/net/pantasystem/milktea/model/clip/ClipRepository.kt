@@ -6,7 +6,12 @@ interface ClipRepository {
 
     suspend fun getMyClips(): Result<List<Clip>>
 
-    suspend fun findBy(clipId: ClipId): Result<Clip>
+    suspend fun findBy(
+        clipId: ClipId,
+        sinceId: String? = null,
+        untilId: String? = null,
+        limit: Int = 10
+    ): Result<Clip>
 
     suspend fun findBy(noteId: Note.Id): Result<List<Clip>>
 
