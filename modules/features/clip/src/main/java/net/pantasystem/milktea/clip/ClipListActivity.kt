@@ -6,22 +6,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.ClipListNavigation
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
@@ -50,48 +38,15 @@ class ClipListActivity : AppCompatActivity() {
             val uiState by clipListViewModel.uiState.collectAsState()
 
             MdcTheme {
-                Scaffold() {
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(it)
-                            .fillMaxSize()
-                    ) {
-                        when(val content = uiState.clipStatusesState.content) {
-                            is StateContent.Exist -> {
-                                items(content.rawContent) { clipState ->
-                                    ClipTile(
-                                        clipState = clipState,
-                                        isSelectMode = mode != ClipListNavigationArgs.Mode.View,
-                                        isSelected = mode != ClipListNavigationArgs.Mode.View && clipState.isAddedToTab,
-                                        onClick = {
-                                            clipListViewModel.onClipTileClicked(clipState)
-                                        },
-                                        onAddToTabButtonClicked = {
-                                            clipListViewModel.onToggleAddToTabButtonClicked(clipState)
-                                        }
-                                    )
-                                }
-                            }
-                            is StateContent.NotExist -> {
-                                item {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        when(uiState.clipStatusesState) {
-                                            is ResultState.Error -> {
-                                                Text("Load error")
-                                            }
-                                            is ResultState.Fixed -> {
-                                                Text("Clip is not exists")
-                                            }
-                                            is ResultState.Loading -> {
-                                                CircularProgressIndicator()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                ClipListScreen(
+                    uiState = uiState,
+                    mode = mode,
+                    onClipTileClicked = clipListViewModel::onClipTileClicked,
+                    onToggleAddToTabButtonClicked = clipListViewModel::onToggleAddToTabButtonClicked,
+                    onNavigateUp = {
+                        finish()
                     }
-                }
+                )
             }
         }
     }
@@ -101,11 +56,12 @@ class ClipListActivity : AppCompatActivity() {
 
 class ClipListNavigationImpl @Inject constructor(
     private val activity: Activity
-): ClipListNavigation {
+) : ClipListNavigation {
     companion object {
         const val EXTRA_ACCOUNT_ID = "ClipListActivity.EXTRA_ACCOUNT_ID"
         const val EXTRA_MODE = "ClipListActivity.EXTRA_MODE"
     }
+
     override fun newIntent(args: ClipListNavigationArgs): Intent {
         return Intent(activity, ClipListActivity::class.java).apply {
             args.accountId?.let {
