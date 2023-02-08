@@ -23,4 +23,5 @@
     <string name="removed_from_favorites">Removed from Favorites</string>
     <string name="failed_to_delete_favorites">Failed to delete favorites</string>
     <string name="successfully_deleted">Successfully deleted</string>
+    <string name="clip">Clip</string>
 </resources>
