@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.common_compose.CircleCheckbox
 import net.pantasystem.milktea.model.clip.Clip
@@ -36,13 +37,22 @@ fun ToggleAddNoteToClipTile(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(clip.name, modifier = Modifier.weight(1f))
+            Text(
+                clip.name,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                fontSize = 18.sp
+            )
 
-            when(state) {
+            when (state) {
                 ClipAddState.Added -> CircleCheckbox(selected = true)
                 ClipAddState.NotAdded -> CircleCheckbox(selected = false)
                 ClipAddState.Progress -> CircularProgressIndicator()
-                ClipAddState.Unknown -> Icon(Icons.Default.QuestionMark, contentDescription = "unknown added status")
+                ClipAddState.Unknown -> Icon(
+                    Icons.Default.QuestionMark,
+                    contentDescription = "unknown added status"
+                )
             }
 
         }

@@ -43,7 +43,7 @@ fun ToggleAddNoteToClipDialogLayout(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(id = R.string.clip), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(stringResource(id = R.string.clip), fontWeight = FontWeight.Bold, fontSize = 24.sp)
             }
             LazyColumn(
                 Modifier
