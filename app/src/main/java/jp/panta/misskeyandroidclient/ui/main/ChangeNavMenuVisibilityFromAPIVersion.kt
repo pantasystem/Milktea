@@ -18,6 +18,7 @@ internal class ChangeNavMenuVisibilityFromAPIVersion(
             menu.findItem(R.id.nav_gallery).isVisible = enableFeatures.contains(FeatureType.Gallery)
             menu.findItem(R.id.nav_group).isVisible = enableFeatures.contains(FeatureType.Group)
             menu.findItem(R.id.nav_drive).isVisible = enableFeatures.contains(FeatureType.Drive)
+            menu.findItem(R.id.nav_clip).isVisible = enableFeatures.contains(FeatureType.Clip)
         }
     }
 }

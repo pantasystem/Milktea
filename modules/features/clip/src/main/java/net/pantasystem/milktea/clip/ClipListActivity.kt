@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common.ui.ApplyTheme
+import net.pantasystem.milktea.common_navigation.ClipDetailNavigation
 import net.pantasystem.milktea.common_navigation.ClipListNavigation
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
 import javax.inject.Inject
@@ -20,6 +21,9 @@ class ClipListActivity : AppCompatActivity() {
 
     @Inject
     internal lateinit var applyTheme: ApplyTheme
+
+    @Inject
+    internal lateinit var clipDetailNavigation: ClipDetailNavigation
 
     private val mode: ClipListNavigationArgs.Mode by lazy {
         intent.getStringExtra(ClipListNavigationImpl.EXTRA_MODE)?.let {
@@ -41,7 +45,16 @@ class ClipListActivity : AppCompatActivity() {
                 ClipListScreen(
                     uiState = uiState,
                     mode = mode,
-                    onClipTileClicked = clipListViewModel::onClipTileClicked,
+                    onClipTileClicked = {
+                        when(mode) {
+                            ClipListNavigationArgs.Mode.AddToTab -> {
+                                clipListViewModel.onClipTileClicked(it)
+                            }
+                            ClipListNavigationArgs.Mode.View -> {
+                                startActivity(clipDetailNavigation.newIntent(it.clip.id))
+                            }
+                        }
+                    },
                     onToggleAddToTabButtonClicked = clipListViewModel::onToggleAddToTabButtonClicked,
                     onNavigateUp = {
                         finish()
