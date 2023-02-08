@@ -82,11 +82,19 @@ class ClipListViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         ClipListUiState()
     )
+
+    fun onToggleAddToTabButtonClicked(clipItemState: ClipItemState) {
+
+    }
+
+    fun onClipTileClicked(clipItemState: ClipItemState) {
+
+    }
 }
 
 data class ClipItemState(
     val clip: Clip,
-    val isAddToTab: Boolean,
+    val isAddedToTab: Boolean,
 )
 
 data class ClipListUiState(
