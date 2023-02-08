@@ -35,13 +35,13 @@ fun ClipTile(
         color = MaterialTheme.colors.surface
     ) {
         Row(
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+            modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(clipState.clip.name, fontSize = 18.sp)
+                Text(clipState.clip.name, fontSize = 20.sp)
                 if (clipState.clip.description != null) {
-                    Text(clipState.clip.description ?: "", fontSize = 14.sp)
+                    Text(clipState.clip.description ?: "", fontSize = 16.sp)
                 }
             }
 
