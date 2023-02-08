@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.common_navigation
 
+import net.pantasystem.milktea.model.clip.ClipId
+
 interface ClipListNavigation : ActivityNavigation<ClipListNavigationArgs>
 
 data class ClipListNavigationArgs(
@@ -11,3 +13,5 @@ data class ClipListNavigationArgs(
         View,
     }
 }
+
+interface ClipDetailNavigation : ActivityNavigation<ClipId>
