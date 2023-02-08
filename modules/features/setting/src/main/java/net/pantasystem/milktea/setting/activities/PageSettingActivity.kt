@@ -48,6 +48,9 @@ class PageSettingActivity : AppCompatActivity() {
     @Inject
     lateinit var userListNavigation: UserListNavigation
 
+    @Inject
+    lateinit var clipListNavigation: ClipListNavigation
+
     private val mPageSettingViewModel: PageSettingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,9 +79,16 @@ class PageSettingActivity : AppCompatActivity() {
                         )
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
-                PageType.USER_LIST, PageType.MASTODON_LIST_TIMELINE -> startActivity(userListNavigation.newIntent(UserListArgs()))
+                PageType.USER_LIST, PageType.MASTODON_LIST_TIMELINE -> startActivity(
+                    userListNavigation.newIntent(UserListArgs())
+                )
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
+                PageType.CLIP_NOTES -> startActivity(
+                    clipListNavigation.newIntent(
+                        ClipListNavigationArgs(mode = ClipListNavigationArgs.Mode.AddToTab)
+                    )
+                )
                 PageType.USERS_GALLERY_POSTS -> {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(
@@ -104,13 +114,14 @@ class PageSettingActivity : AppCompatActivity() {
                 val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
                 val list by mPageSettingViewModel.selectedPages.collectAsState()
                 val scope = rememberCoroutineScope()
-                val dragAndDropState = rememberDragDropListState(scope = scope, onMove = { from, to ->
-                    val tmp = list[to]
-                    val mutable = list.toMutableList()
-                    mutable[to] = mutable[from]
-                    mutable[from] = tmp
-                    mPageSettingViewModel.setList(mutable)
-                })
+                val dragAndDropState =
+                    rememberDragDropListState(scope = scope, onMove = { from, to ->
+                        val tmp = list[to]
+                        val mutable = list.toMutableList()
+                        mutable[to] = mutable[from]
+                        mutable[from] = tmp
+                        mPageSettingViewModel.setList(mutable)
+                    })
 
                 TabItemsListScreen(
                     pageTypes = pageTypes,
