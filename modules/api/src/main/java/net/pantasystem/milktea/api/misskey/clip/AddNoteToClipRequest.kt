@@ -7,4 +7,5 @@ data class AddNoteToClipRequest(
     val noteId: String
 )
 
-typealias RemoteNoteToClipRequest = AddNoteToClipRequest
+
+typealias RemoveNoteToClipRequest = AddNoteToClipRequest

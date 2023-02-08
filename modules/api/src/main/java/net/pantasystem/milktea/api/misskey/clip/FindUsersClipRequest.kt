@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.api.misskey.clip
 
+@kotlinx.serialization.Serializable
 data class FindUsersClipRequest(
     val i: String,
     val userId: String,
