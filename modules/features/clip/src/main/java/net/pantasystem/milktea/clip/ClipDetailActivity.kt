@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.clip
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.FrameLayout
@@ -84,7 +85,7 @@ class ClipDetailActivity : AppCompatActivity() {
 
 
 class ClipDetailNavigationImpl @Inject constructor(
-    val activity: AppCompatActivity,
+    val activity: Activity,
 ) : ClipDetailNavigation {
     companion object {
         const val EXTRA_ACCOUNT_ID = "ClipDetailNavigationImpl.EXTRA_ACCOUNT_ID"
