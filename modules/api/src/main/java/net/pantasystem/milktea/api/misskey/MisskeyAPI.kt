@@ -296,4 +296,7 @@ interface MisskeyAPI {
 
     @POST("api/clips/list")
     suspend fun findMyClips(@Body req: I): Response<List<ClipDTO>>
+
+    @POST("api/clips/notes")
+    suspend fun getClipNotes(@Body req: NoteRequest): Response<List<NoteDTO>?>
 }

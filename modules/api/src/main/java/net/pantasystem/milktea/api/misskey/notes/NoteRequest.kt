@@ -36,6 +36,7 @@ data class NoteRequest(
     val host: String? = null,
     val markAsRead: Boolean? = null,
     val channelId: String? = null,
+    val clipId: String? = null,
 ) : JavaSerializable {
 
 
@@ -76,7 +77,8 @@ data class NoteRequest(
                 reply = params.reply,
                 listId = params.listId,
                 noteId = params.noteId,
-                channelId = params.channelId
+                channelId = params.channelId,
+                clipId = params.clipId
             )
         }
 
