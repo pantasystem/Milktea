@@ -6,21 +6,25 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.watchAccount
 import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.clip.ClipRepository
+import net.pantasystem.milktea.model.clip.ToggleClipAddToTabUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class ClipListViewModel @Inject constructor(
     private val clipRepository: ClipRepository,
     private val accountRepository: AccountRepository,
-    savedStateHandle: SavedStateHandle
+    private val toggleClipAddToTabUseCase: ToggleClipAddToTabUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val accountId = savedStateHandle.getStateFlow<Long>(
@@ -84,11 +88,21 @@ class ClipListViewModel @Inject constructor(
     )
 
     fun onToggleAddToTabButtonClicked(clipItemState: ClipItemState) {
-
+        viewModelScope.launch {
+            toggleClipAddToTabUseCase(clipItemState.clip)
+        }
     }
 
     fun onClipTileClicked(clipItemState: ClipItemState) {
-
+        val mode = savedStateHandle.get<String?>(ClipListNavigationImpl.EXTRA_MODE)?.let {
+            ClipListNavigationArgs.Mode.valueOf(it)
+        } ?: ClipListNavigationArgs.Mode.View
+        when(mode) {
+            ClipListNavigationArgs.Mode.AddToTab -> {
+                onToggleAddToTabButtonClicked(clipItemState)
+            }
+            ClipListNavigationArgs.Mode.View -> Unit
+        }
     }
 }
 
