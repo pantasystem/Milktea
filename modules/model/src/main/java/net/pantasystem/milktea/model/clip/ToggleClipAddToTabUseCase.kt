@@ -11,8 +11,8 @@ import javax.inject.Singleton
 
 @Singleton
 class ToggleClipAddToTabUseCase @Inject constructor(
-    val accountService: AccountService,
-    val accountRepository: AccountRepository,
+    private val accountService: AccountService,
+    private val accountRepository: AccountRepository,
 ) : UseCase {
 
     suspend operator fun invoke(clip: Clip): Result<Unit> = runCancellableCatching {
