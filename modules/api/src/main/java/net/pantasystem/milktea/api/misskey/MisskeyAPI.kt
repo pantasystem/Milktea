@@ -278,8 +278,12 @@ interface MisskeyAPI {
     @POST("api/clips/delete")
     suspend fun deleteClip(@Body req: DeleteClipRequest): Response<Unit>
 
-    @POST("api/users/clip")
+    @POST("api/users/clips")
     suspend fun findByUsersClip(@Body req: FindUsersClipRequest): Response<List<ClipDTO>>
+
+    @POST("api/notes/clips")
+    suspend fun findByNotesClip(@Body req: FindNotesClip): Response<List<ClipDTO>>
+
 
     @POST("api/clips/add-note")
     suspend fun addNoteToClip(@Body req: AddNoteToClipRequest): Response<Unit>

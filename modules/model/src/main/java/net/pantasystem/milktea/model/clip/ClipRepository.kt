@@ -1,17 +1,18 @@
 package net.pantasystem.milktea.model.clip
 
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.user.User
 
 interface ClipRepository {
 
-    suspend fun getMyClips(): Result<List<Clip>>
+    suspend fun getMyClips(accountId: Long): Result<List<Clip>>
 
     suspend fun findBy(
-        clipId: ClipId,
+        userId: User.Id,
         sinceId: String? = null,
         untilId: String? = null,
         limit: Int = 10
-    ): Result<Clip>
+    ): Result<List<Clip>>
 
     suspend fun findBy(noteId: Note.Id): Result<List<Clip>>
 
