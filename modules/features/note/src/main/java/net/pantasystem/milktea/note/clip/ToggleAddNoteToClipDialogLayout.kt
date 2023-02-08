@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.model.clip.ClipId
+import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.R
 
@@ -29,8 +29,8 @@ import net.pantasystem.milktea.note.R
 @Composable
 fun ToggleAddNoteToClipDialogLayout(
     uiState: ToggleAddNoteToClipDialogUiState,
-    onAddNoteToClip: (Note.Id, ClipId) -> Unit,
-    onRemoveNoteToClip: (Note.Id, ClipId) -> Unit,
+    onAddNoteToClip: (Note.Id, Clip) -> Unit,
+    onRemoveNoteToClip: (Note.Id, Clip) -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth()
@@ -63,16 +63,20 @@ fun ToggleAddNoteToClipDialogLayout(
                                 items(content.rawContent) { clip ->
                                     ToggleAddNoteToClipTile(
                                         clip = clip.clip,
-                                        isAdded = clip.isAdded,
+                                        state = clip.addState,
                                         onClick = {
-                                            if (clip.isAdded) {
-                                                uiState.noteId?.let {
-                                                    onRemoveNoteToClip(it, clip.clip.id)
+                                            when(clip.addState) {
+                                                ClipAddState.Added -> {
+                                                    uiState.noteId?.let {
+                                                        onRemoveNoteToClip(it, clip.clip)
+                                                    }
                                                 }
-                                            } else {
-                                                uiState.noteId?.let {
-                                                    onAddNoteToClip(it, clip.clip.id)
+                                                ClipAddState.Unknown, ClipAddState.NotAdded -> {
+                                                    uiState.noteId?.let {
+                                                        onAddNoteToClip(it, clip.clip)
+                                                    }
                                                 }
+                                                ClipAddState.Progress -> {}
                                             }
                                         }
                                     )

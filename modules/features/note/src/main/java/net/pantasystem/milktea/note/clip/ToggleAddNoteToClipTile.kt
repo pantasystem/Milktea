@@ -4,9 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +22,7 @@ import net.pantasystem.milktea.model.user.User
 fun ToggleAddNoteToClipTile(
     modifier: Modifier = Modifier,
     clip: Clip,
-    isAdded: Boolean,
+    state: ClipAddState,
     onClick: () -> Unit
 ) {
     Surface(
@@ -37,7 +37,14 @@ fun ToggleAddNoteToClipTile(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(clip.name, modifier = Modifier.weight(1f))
-            CircleCheckbox(selected = isAdded)
+
+            when(state) {
+                ClipAddState.Added -> CircleCheckbox(selected = true)
+                ClipAddState.NotAdded -> CircleCheckbox(selected = false)
+                ClipAddState.Progress -> CircularProgressIndicator()
+                ClipAddState.Unknown -> Icon(Icons.Default.QuestionMark, contentDescription = "unknown added status")
+            }
+
         }
     }
 
@@ -56,7 +63,7 @@ fun Preview_ToggleAddNoteToClipTile() {
             description = null,
             isPublic = false
         ),
-        isAdded = true,
+        state = ClipAddState.Added,
         onClick = {}
     )
 }
