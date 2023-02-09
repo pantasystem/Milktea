@@ -35,15 +35,16 @@ class NotificationViewModel @Inject constructor(
     notificationPagingStoreFactory: NotificationPagingStore.Factory
 ) : ViewModel() {
 
-    private val planeNoteViewDataCache: PlaneNoteViewDataCache = planeNoteViewDataCacheFactory.create({
-        accountRepository.getCurrentAccount().getOrThrow()
-    }, viewModelScope)
+    private val planeNoteViewDataCache: PlaneNoteViewDataCache =
+        planeNoteViewDataCacheFactory.create({
+            accountRepository.getCurrentAccount().getOrThrow()
+        }, viewModelScope)
 
     private val notificationPagingStore = notificationPagingStoreFactory.create {
         accountRepository.getCurrentAccount().getOrThrow()
     }
 
-    private val notifications = notificationPagingStore.notifications.map { state ->
+    private val notificationPageableState = notificationPagingStore.notifications.map { state ->
         state.suspendConvert { list ->
             list.map { n ->
                 val noteViewData = n.note?.let {
@@ -59,11 +60,19 @@ class NotificationViewModel @Inject constructor(
         logger.error("observe notifications error", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PageableState.Loading.Init())
 
-    val notificationsLiveData = notifications.map {
+    val notifications = notificationPageableState.map {
+        it.toList()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        listOf(NotificationListItem.Loading)
+    )
+
+    val notificationsLiveData = notificationPageableState.map {
         (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
     }.asLiveData()
 
-    val isLoading = notifications.map {
+    val isLoading = notificationPageableState.map {
         it is PageableState.Loading
     }.asLiveData()
     private val _error = MutableSharedFlow<Throwable>(
@@ -176,4 +185,43 @@ class NotificationViewModel @Inject constructor(
         }
     }
 
+}
+
+sealed interface NotificationListItem {
+    data class Notification(
+        val notificationViewData: NotificationViewData
+    ) : NotificationListItem
+
+    object Loading : NotificationListItem
+
+    data class Error(val throwable: Throwable) : NotificationListItem
+
+    object Empty : NotificationListItem
+}
+
+fun PageableState<List<NotificationViewData>>.toList(): List<NotificationListItem> {
+    return when (val content = this.content) {
+        is StateContent.Exist -> {
+            if (content.rawContent.isEmpty()) {
+                listOf(NotificationListItem.Empty)
+            } else {
+                content.rawContent.map { viewData ->
+                    NotificationListItem.Notification(viewData)
+                }
+            } + if (this is PageableState.Loading.Previous) {
+                listOf(NotificationListItem.Loading)
+            } else {
+                emptyList()
+            }
+        }
+        is StateContent.NotExist -> {
+            when (this) {
+                is PageableState.Error -> {
+                    listOf(NotificationListItem.Error(this.throwable))
+                }
+                is PageableState.Fixed -> listOf(NotificationListItem.Empty)
+                is PageableState.Loading -> listOf(NotificationListItem.Loading)
+            }
+        }
+    }
 }
