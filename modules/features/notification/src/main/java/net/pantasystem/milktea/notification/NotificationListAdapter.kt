@@ -28,6 +28,7 @@ class NotificationListAdapter constructor(
     val notificationViewModel: NotificationViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val onRetryButtonClicked: () -> Unit,
+    private val onReauthenticateButtonClicked: () -> Unit,
     onNoteCardAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<NotificationListItem, NotificationBaseViewHolder>(diffUtilCallBack) {
 
@@ -75,7 +76,8 @@ class NotificationListAdapter constructor(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
-                    )
+                    ),
+                    onReauthenticateButtonClicked
                 )
             }
             NotificationViewType.Empty -> {
@@ -176,7 +178,10 @@ class NotificationLoading(val binding: ItemNotificationLoadingBinding) :
     fun onBind() = Unit
 }
 
-class NotificationErrorViewHolder(val binding: ItemNotificationErrorBinding) :
+class NotificationErrorViewHolder(
+    val binding: ItemNotificationErrorBinding,
+    val onReauthenticateButtonClicked: () -> Unit
+) :
     NotificationBaseViewHolder(binding.root) {
     fun onBind(item: NotificationListItem.Error) {
         binding.errorItem = item
@@ -185,6 +190,9 @@ class NotificationErrorViewHolder(val binding: ItemNotificationErrorBinding) :
         binding.errorView.text = item.throwable.toString()
         binding.showErrorMessageButton.setOnClickListener {
             binding.errorView.isVisible = true
+        }
+        binding.reauthenticateButton.setOnClickListener {
+            onReauthenticateButtonClicked()
         }
     }
 }

@@ -19,7 +19,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common_navigation.AuthorizationArgs
+import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
@@ -54,6 +57,12 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
     @Inject
     lateinit var channelDetailNavigation: ChannelDetailNavigation
 
+    @Inject
+    lateinit var authorizationNavigation: AuthorizationNavigation
+
+    @Inject
+    lateinit var accountStore: AccountStore
+
     private val mBinding: FragmentNotificationBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,8 +74,17 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
             diffUtilItemCallBack,
             mViewModel,
             viewLifecycleOwner,
-            {
+            onRetryButtonClicked = {
                 mViewModel.loadInit()
+            },
+            onReauthenticateButtonClicked = {
+                startActivity(
+                    authorizationNavigation.newIntent(
+                        AuthorizationArgs.ReAuth(
+                            accountStore.currentAccount
+                        )
+                    )
+                )
             }
         ) {
             NoteCardActionHandler(
