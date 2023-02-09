@@ -23,7 +23,6 @@ import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
-import kotlin.math.min
 
 open class PlaneNoteViewData(
     val note: NoteRelation,
@@ -140,14 +139,14 @@ open class PlaneNoteViewData(
         it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
     }
 
-    val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= 16)
+    val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
     val reactionCounts: LiveData<List<ReactionCount>> = currentNote.switchMap { note ->
         reactionCountsExpanded.map {
             if (it == true) {
                 note.reactionCounts
             } else {
-                note.reactionCounts.subList(0, min(note.reactionCounts.size, 16))
+                note.shortReactionCounts
             }
 
         }
