@@ -15,6 +15,7 @@ import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import java.util.*
 import javax.inject.Inject
 
@@ -34,6 +35,7 @@ class AppAuthViewModel @Inject constructor(
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
     private val instanceInfoRepository: InstanceInfoRepository,
+    private val syncMetaExecutor: SyncMetaExecutor,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -185,6 +187,8 @@ class AppAuthViewModel @Inject constructor(
             authService.createAccount(it)
         }.onFailure {
             logger.error("アカウント登録処理失敗", it)
+        }.onSuccess {
+            syncMetaExecutor(it.account.normalizedInstanceDomain)
         }.getOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
