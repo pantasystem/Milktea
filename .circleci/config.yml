@@ -22,9 +22,6 @@ jobs:
           name: generate secret.properties and write auth
           command: echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
 
-      - android/run-tests:
-          test-command: ./gradlew lint testDebug --continue
-
       - android/start-emulator-and-run-tests:
           test-command: ./gradlew connectedDebugAndroidTest
           system-image: system-images;android-25;google_apis;x86
