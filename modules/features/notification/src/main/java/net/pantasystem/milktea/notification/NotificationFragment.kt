@@ -79,7 +79,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         }
 
 
-
+        mViewModel.errors.onEach {
+            NotificationErrorHandler(requireContext())(it)
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
         mBinding.notificationListView.adapter = adapter
         mBinding.notificationListView.layoutManager = mLinearLayoutManager

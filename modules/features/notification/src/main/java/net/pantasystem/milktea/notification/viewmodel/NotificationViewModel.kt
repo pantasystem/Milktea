@@ -77,6 +77,8 @@ class NotificationViewModel @Inject constructor(
         extraBufferCapacity = 100
     )
 
+    val errors = _error.asSharedFlow()
+
     private val logger = loggerFactory.create("NotificationViewModel")
 
     init {
