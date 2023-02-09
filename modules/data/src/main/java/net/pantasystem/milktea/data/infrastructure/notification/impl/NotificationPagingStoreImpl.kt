@@ -82,6 +82,9 @@ class NotificationPagingStoreImpl(
     }
 
     override suspend fun loadPrevious(): Result<Unit> = runCancellableCatching {
+        if (delegate.mutex.isLocked) {
+            return@runCancellableCatching
+        }
         unreadNotificationDAO.deleteWhereAccountId(getAccount().accountId)
         previousPagingController.loadPrevious().getOrThrow()
     }
