@@ -19,10 +19,6 @@
             android:icon="@drawable/ic_selectable_message"
             />
 
-    <item android:id="@+id/action_settings"
-          android:title="@string/setting"
-          android:orderInCategory="100"
-          app:showAsAction="never"/>
     <item
             android:id="@+id/action_tab_setting"
             android:title="@string/nav_setting_tab"

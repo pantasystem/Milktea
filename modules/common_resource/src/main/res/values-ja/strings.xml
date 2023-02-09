@@ -427,4 +427,12 @@
     <string name="notification_posted_by">%sさんが投稿しました</string>
     <string name="clip">クリップ</string>
 
+    <string name="server_error">サーバーエラー</string>
+    <string name="bot_error">ボットですか？</string>
+    <string name="auth_error">認証エラー</string>
+    <string name="parameter_error">パラメーターエラー</string>
+    <string name="unauthorized_error">未認証エラー</string>
+    <string name="rate_limit_error">レートリミットエラー</string>
+    <string name="not_found_error">404 見つからないエラー</string>
+
 </resources>

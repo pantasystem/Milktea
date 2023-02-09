@@ -4,11 +4,7 @@
     <string name="show_error">Show Error</string>
 
     <string name="timeout_error">Timeout</string>
-    <string name="server_error">Server error</string>
-    <string name="bot_error">Are you human?</string>
-    <string name="auth_error">Authentication error</string>
-    <string name="parameter_error">Parameter error</string>
-    <string name="timeline_unauthorized_error">Unauthorized error</string>
+
     <string name="reauthenticate">Reauthenticate</string>
     <string name="expand">Expand</string>
 

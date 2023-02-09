@@ -4,6 +4,7 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.paginator.IdPreviousLoader
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 
@@ -17,7 +18,7 @@ class MisskeyNotificationEntityLoader(
                 i = account.token,
                 untilId = id,
             )
-        )
+        ).throwIfHasError()
         requireNotNull(res.body()).map {
             NotificationItem.Misskey(
                 it,

@@ -29,6 +29,7 @@ sealed class APIError(msg: String) : Exception(msg){
     data class InternalServerException(override val error: Error?) : APIError("API Error Internal Server Error:$error")
     data class SomethingException(override val error: Error?, val statusCode: Int) : APIError("API Error:$error, statusCode:$statusCode")
     data class NotFoundException(override val error: Error?) : APIError("API Error Not Found:$error")
+    data class ToManyRequestsException(override val error: Error?) : APIError("To many requests $error")
 }
 
 val formatter = Json
@@ -53,6 +54,7 @@ fun throwErrorFromStatusCode(code: Int, error: Error? = null) {
         404 -> throw APIError.NotFoundException(error)
         418 -> throw APIError.IAmAIException(error)
         500 -> throw APIError.InternalServerException(error)
+        429 -> throw APIError.ToManyRequestsException(error)
         else -> if (code in 400..599) {
             throw APIError.SomethingException(error, code)
         }

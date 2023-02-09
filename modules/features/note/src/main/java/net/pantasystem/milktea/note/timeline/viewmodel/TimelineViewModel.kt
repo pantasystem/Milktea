@@ -18,6 +18,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
@@ -242,20 +243,11 @@ sealed interface TimelineListItem {
                 is IOException -> {
                     StringSource(R.string.timeout_error)
                 }
-                is APIError.AuthenticationException -> {
-                    StringSource(R.string.auth_error)
-                }
-                is APIError.IAmAIException -> {
-                    StringSource(R.string.bot_error)
-                }
-                is APIError.InternalServerException -> {
-                    StringSource(R.string.server_error)
-                }
-                is APIError.ClientException -> {
-                    StringSource(R.string.parameter_error)
+                is APIError -> {
+                    APIErrorStringConverter()(throwable)
                 }
                 is UnauthorizedException -> {
-                    StringSource(R.string.timeline_unauthorized_error)
+                    StringSource(R.string.unauthorized_error)
                 }
                 else -> {
                     StringSource("error:$throwable")

@@ -424,4 +424,12 @@
     <string name="notification_posted_by">发布者 %s</string>
     <string name="clip">夹子</string>
 
+    <string name="server_error">服务器错误</string>
+    <string name="bot_error">你是人类吗？</string>
+    <string name="auth_error">用户身份验证错误</string>
+    <string name="parameter_error">参数错误</string>
+    <string name="unauthorized_error">未认证错误（Unauthorized）</string>
+    <string name="rate_limit_error">速率限制错误</string>
+    <string name="not_found_error">404 未找到错误</string>
+
 </resources>
