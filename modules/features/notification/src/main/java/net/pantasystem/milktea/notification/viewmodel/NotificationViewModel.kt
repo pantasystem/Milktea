@@ -11,11 +11,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common.PageableState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.UserRepository
@@ -194,7 +193,19 @@ sealed interface NotificationListItem {
 
     object Loading : NotificationListItem
 
-    data class Error(val throwable: Throwable) : NotificationListItem
+    data class Error(val throwable: Throwable) : NotificationListItem {
+
+        fun getErrorMessage(): StringSource {
+            // TODO: エラーの状態に応じて文字列リソースを取得し適切なエラーメッセージを表示する
+            return StringSource("Error")
+        }
+
+        fun isUnauthorizedError(): Boolean {
+            return throwable is APIError.AuthenticationException
+                    || throwable is APIError.ForbiddenException
+                    || throwable is UnauthorizedException
+        }
+    }
 
     object Empty : NotificationListItem
 }
@@ -202,16 +213,8 @@ sealed interface NotificationListItem {
 fun PageableState<List<NotificationViewData>>.toList(): List<NotificationListItem> {
     return when (val content = this.content) {
         is StateContent.Exist -> {
-            if (content.rawContent.isEmpty()) {
-                listOf(NotificationListItem.Empty)
-            } else {
-                content.rawContent.map { viewData ->
-                    NotificationListItem.Notification(viewData)
-                }
-            } + if (this is PageableState.Loading.Previous) {
-                listOf(NotificationListItem.Loading)
-            } else {
-                emptyList()
+            content.rawContent.map { viewData ->
+                NotificationListItem.Notification(viewData)
             }
         }
         is StateContent.NotExist -> {

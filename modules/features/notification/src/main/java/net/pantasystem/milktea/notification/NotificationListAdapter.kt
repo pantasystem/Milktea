@@ -27,8 +27,8 @@ class NotificationListAdapter constructor(
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationListItem>,
     val notificationViewModel: NotificationViewModel,
     private val lifecycleOwner: LifecycleOwner,
-    onNoteCardAction: (NoteCardAction) -> Unit,
     private val onRetryButtonClicked: () -> Unit,
+    onNoteCardAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<NotificationListItem, NotificationBaseViewHolder>(diffUtilCallBack) {
 
 
@@ -39,7 +39,7 @@ class NotificationListAdapter constructor(
             NotificationListItem.Empty -> NotificationViewType.Empty.ordinal
             is NotificationListItem.Error -> NotificationViewType.Error.ordinal
             NotificationListItem.Loading -> NotificationViewType.Loading.ordinal
-            is NotificationListItem.Notification -> NotificationViewType.Loading.ordinal
+            is NotificationListItem.Notification -> NotificationViewType.Notification.ordinal
         }
     }
 
