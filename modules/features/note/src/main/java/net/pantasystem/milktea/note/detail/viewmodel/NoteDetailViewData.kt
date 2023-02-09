@@ -30,4 +30,8 @@ class NoteDetailViewData(
     instanceEmojis,
     noteDataSource,
     coroutineScope
-)
+) {
+    init {
+        super.reactionCountsExpanded.postValue(true)
+    }
+}
