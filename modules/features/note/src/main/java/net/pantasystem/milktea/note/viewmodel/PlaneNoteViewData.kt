@@ -236,7 +236,7 @@ open class PlaneNoteViewData(
         }.catch { e ->
             Log.d("PlaneNoteViewData", "error", e)
         }
-        job(flow)
+        this.job = job(flow)
     }
 
     var job: Job? = null
