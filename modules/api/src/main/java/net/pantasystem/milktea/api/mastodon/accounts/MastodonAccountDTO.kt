@@ -36,13 +36,13 @@ data class MastodonAccountDTO (
     val emojis: List<TootEmojiDTO>,
 
     @SerialName("followers_count")
-    val followersCount: Int,
+    val followersCount: Long,
 
     @SerialName("following_count")
-    val followingCount: Int,
+    val followingCount: Long,
 
     @SerialName("statuses_count")
-    val statusesCount: Int,
+    val statusesCount: Long,
 
 
     ) {
@@ -69,9 +69,9 @@ data class MastodonAccountDTO (
             instance = null,
             avatarBlurhash = null,
             info = User.Info(
-                followersCount = followersCount,
-                followingCount = followingCount,
-                notesCount = statusesCount,
+                followersCount = followersCount.toInt(),
+                followingCount = followingCount.toInt(),
+                notesCount = statusesCount.toInt(),
                 hostLower = null,
                 pinnedNoteIds = null,
                 bannerUrl = header,
