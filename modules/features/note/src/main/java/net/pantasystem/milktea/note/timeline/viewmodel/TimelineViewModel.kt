@@ -137,12 +137,16 @@ class TimelineViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             (0..Int.MAX_VALUE).asFlow().map {
-                delay(5_000)
+                delay(1_000)
             }.filter {
                 this@TimelineViewModel.isActive && !timelineStore.isActiveStreaming
             }.map {
                 logger.debug { "active state isActive:${isActive}, isActiveStreaming:${timelineStore.isActiveStreaming}" }
-                timelineStore.loadFuture()
+                timelineStore.loadFuture().onFailure {
+                    if (it is APIError.ToManyRequestsException) {
+                        delay(10_000)
+                    }
+                }
             }.collect()
         }
     }
