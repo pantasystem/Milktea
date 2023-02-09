@@ -431,5 +431,6 @@
     <string name="unauthorized_error">未认证错误（Unauthorized）</string>
     <string name="rate_limit_error">速率限制错误</string>
     <string name="not_found_error">404 未找到错误</string>
+    <string name="show_more_reactions">显示更多反应</string>
 
 </resources>
