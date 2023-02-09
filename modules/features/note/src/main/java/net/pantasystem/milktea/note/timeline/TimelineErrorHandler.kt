@@ -48,6 +48,13 @@ class TimelineErrorHandler(
                     Toast.LENGTH_LONG
                 ).show()
             }
+            is APIError.ToManyRequestsException -> {
+                Toast.makeText(
+                    context,
+                    R.string.timeline_rate_limit_error,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             is UnauthorizedException -> {
                 Toast.makeText(
                     context,
