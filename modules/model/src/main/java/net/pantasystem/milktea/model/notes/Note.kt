@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
+import kotlin.math.min
 import java.io.Serializable as JSerializable
 
 data class Note(
@@ -87,12 +88,20 @@ data class Note(
         }
     }
 
-    companion object
+    companion object {
+        const val SHORT_REACTION_COUNT_MAX_SIZE = 16
+    }
 
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
 
     val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+
+    val shortReactionCounts = if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
+        reactionCounts
+    } else {
+        reactionCounts.subList(0, min(reactionCounts.size, SHORT_REACTION_COUNT_MAX_SIZE))
+    }
 
     /**
      * 引用リノートであるか

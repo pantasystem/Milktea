@@ -139,8 +139,17 @@ open class PlaneNoteViewData(
         it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
     }
 
-    val reactionCounts: LiveData<List<ReactionCount>> = Transformations.map(currentNote) {
-        it?.reactionCounts ?: emptyList()
+    val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
+
+    val reactionCounts: LiveData<List<ReactionCount>> = currentNote.switchMap { note ->
+        reactionCountsExpanded.map {
+            if (it == true) {
+                note.reactionCounts
+            } else {
+                note.shortReactionCounts
+            }
+
+        }
     }
 
     val reactionCount = Transformations.map(reactionCounts) {
@@ -227,7 +236,7 @@ open class PlaneNoteViewData(
         }.catch { e ->
             Log.d("PlaneNoteViewData", "error", e)
         }
-        job(flow)
+        this.job = job(flow)
     }
 
     var job: Job? = null
@@ -244,6 +253,10 @@ open class PlaneNoteViewData(
     fun expand() {
         Log.d("PlaneNoteViewData", "expand")
         expanded.value = true
+    }
+
+    fun expandReactions() {
+        reactionCountsExpanded.value = true
     }
 
 }

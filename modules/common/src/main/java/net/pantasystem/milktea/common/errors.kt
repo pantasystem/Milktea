@@ -18,26 +18,39 @@ data class Error(
     )
 }
 
+sealed interface ErrorType {
+    data class Misskey(val error: Error) : ErrorType
+    data class Raw(val body: String) : ErrorType
+}
+
 
 
 sealed class APIError(msg: String) : Exception(msg){
-    abstract val error: Error?
-    data class ClientException(override val error: Error?) : APIError("error:$error")
-    data class AuthenticationException(override val error: Error?) : APIError("error:$error")
-    data class ForbiddenException(override val error: Error?) : APIError("error:$error")
-    data class IAmAIException(override val error: Error?) : APIError("API Error I am AI Error:$error")
-    data class InternalServerException(override val error: Error?) : APIError("API Error Internal Server Error:$error")
-    data class SomethingException(override val error: Error?, val statusCode: Int) : APIError("API Error:$error, statusCode:$statusCode")
-    data class NotFoundException(override val error: Error?) : APIError("API Error Not Found:$error")
-    data class ToManyRequestsException(override val error: Error?) : APIError("To many requests $error")
+    abstract val error: ErrorType?
+    data class ClientException(override val error: ErrorType?) : APIError("error:$error")
+    data class AuthenticationException(override val error: ErrorType?) : APIError("error:$error")
+    data class ForbiddenException(override val error: ErrorType?) : APIError("error:$error")
+    data class IAmAIException(override val error: ErrorType?) : APIError("API Error I am AI Error:$error")
+    data class InternalServerException(override val error: ErrorType?) : APIError("API Error Internal Server Error:$error")
+    data class SomethingException(override val error: ErrorType?, val statusCode: Int) : APIError("API Error:$error, statusCode:$statusCode")
+    data class NotFoundException(override val error: ErrorType?) : APIError("API Error Not Found:$error")
+    data class ToManyRequestsException(override val error: ErrorType?) : APIError("To many requests $error")
 }
 
-val formatter = Json
+val formatter = Json {
+    ignoreUnknownKeys = true
+}
 
 fun<T> Response<T>.throwIfHasError(): Response<T> {
     val error = runCancellableCatching {
-        this.errorBody()?.string()?.let {
-            formatter.decodeFromString<Error>(it)
+        if (code() in 400 .. 599) {
+            this.errorBody()?.string()?.let {
+                runCancellableCatching {
+                    ErrorType.Misskey(formatter.decodeFromString<Error>(it))
+                }.getOrNull() ?: ErrorType.Raw(it)
+            }
+        } else {
+            null
         }
     }.getOrNull()
     throwErrorFromStatusCode(code(), error)
@@ -46,7 +59,7 @@ fun<T> Response<T>.throwIfHasError(): Response<T> {
 }
 
 
-fun throwErrorFromStatusCode(code: Int, error: Error? = null) {
+fun throwErrorFromStatusCode(code: Int, error: ErrorType? = null) {
     when(code) {
         400 -> throw APIError.ClientException(error)
         401 -> throw APIError.AuthenticationException(error)

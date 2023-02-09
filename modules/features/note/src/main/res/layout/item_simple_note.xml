@@ -401,11 +401,23 @@
                 android:layout_marginStart="4dp"
                 />
 
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/expandAllReactionCounts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@id/reaction_view"
+                app:layout_constraintTop_toBottomOf="@id/reaction_view"
+                android:visibility="@{ note.reactionCountsExpanded ? View.GONE : View.VISIBLE }"
+                android:text="@string/show_more_reactions"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:onClick="@{ ()-> note.expandReactions() }"
+                />
+
         <LinearLayout
                 android:id="@+id/noteActionButtonsBase"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/reaction_view"
+                app:layout_constraintTop_toBottomOf="@id/expandAllReactionCounts"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:gravity="center_vertical"

@@ -46,14 +46,14 @@ fun MessageHistoryScreen(
         ),
         onRefresh = { historyViewModel.loadGroupAndUser() }
     ) {
-        when(val content = uiState.histories.content) {
-            is StateContent.Exist -> {
-                val list = content.rawContent
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            when(val content = uiState.histories.content) {
+                is StateContent.Exist -> {
+                    val list = content.rawContent
                     items(content.rawContent.size, key = { list[it].messagingId }) { i ->
                         MessageHistoryCard(
                             history = list[i],
@@ -62,29 +62,32 @@ fun MessageHistoryScreen(
                         )
                     }
                 }
-
-            }
-            is StateContent.NotExist -> {
-                Column(
-                    Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    when (val state = uiState.histories) {
-                        is ResultState.Error -> {
-                            Text("Load Error")
-                            Text(state.throwable.toString())
-                        }
-                        is ResultState.Fixed -> {
-                            Text("No content")
-                        }
-                        is ResultState.Loading -> {
-                            CircularProgressIndicator()
+                is StateContent.NotExist -> {
+                    item {
+                        Column(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            when (val state = uiState.histories) {
+                                is ResultState.Error -> {
+                                    Text("Load Error")
+                                    Text(state.throwable.toString())
+                                }
+                                is ResultState.Fixed -> {
+                                    Text("No content")
+                                }
+                                is ResultState.Loading -> {
+                                    CircularProgressIndicator()
+                                }
+                            }
                         }
                     }
                 }
             }
+
         }
+
 
     }
 

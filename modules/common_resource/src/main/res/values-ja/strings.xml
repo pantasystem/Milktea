@@ -434,5 +434,6 @@
     <string name="unauthorized_error">未認証エラー</string>
     <string name="rate_limit_error">レートリミットエラー</string>
     <string name="not_found_error">404 見つからないエラー</string>
+    <string name="show_more_reactions">もっとリアクションを見る</string>
 
 </resources>
