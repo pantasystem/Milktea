@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <data>
+        <import type="android.view.View" />
+        <variable
+                name="errorItem"
+                type="net.pantasystem.milktea.notification.viewmodel.NotificationListItem.Error" />
+    </data>
+    <LinearLayout android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            xmlns:android="http://schemas.android.com/apk/res/android">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/failed_to_get_the_note"
+                stringSource="@{errorItem.errorMessage}"
+                />
+        <Button
+                android:id="@+id/retryLoadButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/retry"/>
+
+        <Button
+                android:id="@+id/reauthenticateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reauthenticate"
+                android:visibility="@{errorItem.unauthorizedError ? View.VISIBLE : View.GONE }"
+                />
+
+        <Button
+                android:id="@+id/showErrorMessageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_error"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+
+                />
+        <TextView
+                android:id="@+id/errorView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+    </LinearLayout>
+</layout>
