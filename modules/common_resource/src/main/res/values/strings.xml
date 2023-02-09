@@ -417,4 +417,12 @@
     <string name="notification_posted_by">Posted by %s</string>
     <string name="clip">Clip</string>
 
+
+    <string name="server_error">Server error</string>
+    <string name="bot_error">Are you human?</string>
+    <string name="auth_error">Authentication error</string>
+    <string name="parameter_error">Parameter error</string>
+    <string name="unauthorized_error">Unauthorized error</string>
+    <string name="rate_limit_error">Rate limit error</string>
+    <string name="not_found_error">404 Not found error</string>
 </resources>

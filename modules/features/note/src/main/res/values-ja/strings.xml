@@ -5,11 +5,7 @@
     <string name="show_error">Show Error</string>
 
     <string name="timeout_error">タイムアウト</string>
-    <string name="server_error">サーバーエラー</string>
-    <string name="bot_error">ボットですか？</string>
-    <string name="auth_error">認証エラー</string>
-    <string name="parameter_error">パラメーターエラー</string>
-    <string name="timeline_unauthorized_error">未認証エラー</string>
+
     <string name="reauthenticate">再認証する</string>
     <string name="expand">展開</string>
     <string name="file_size_warning_dialog_title">ファイルサイズの警告</string>
@@ -22,5 +18,4 @@
     <string name="removed_from_favorites">お気に入りから削除しました</string>
     <string name="failed_to_delete_favorites">お気に入りの削除に失敗しました</string>
     <string name="successfully_deleted">正常に削除されました</string>
-    <string name="timeline_rate_limit_error">レートリミットエラー</string>
 </resources>

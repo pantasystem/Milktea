@@ -5,11 +5,6 @@
     <string name="show_error">显示错误</string>
 
     <string name="timeout_error">超时</string>
-    <string name="server_error">服务器错误</string>
-    <string name="bot_error">你是人类吗？</string>
-    <string name="auth_error">用户身份验证错误</string>
-    <string name="parameter_error">参数错误</string>
-    <string name="timeline_unauthorized_error">未认证错误（Unauthorized）</string>
     <string name="reauthenticate">重新认证</string>
     <string name="expand">展開</string>
     <string name="file_size_warning_dialog_message">%1$s 不允许大于 %2$s 的附件。要继续吗？</string>
@@ -22,5 +17,4 @@
     <string name="removed_from_favorites">从收藏夹中删除</string>
     <string name="failed_to_delete_favorites">删除收藏失败</string>
     <string name="successfully_deleted">成功删除</string>
-    <string name="timeline_rate_limit_error">速率限制错误</string>
 </resources>

@@ -13,6 +13,7 @@ import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.group.GroupRepository
@@ -67,9 +68,6 @@ class NotificationViewModel @Inject constructor(
         listOf(NotificationListItem.Loading)
     )
 
-    val notificationsLiveData = notificationPageableState.map {
-        (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
-    }.asLiveData()
 
     val isLoading = notificationPageableState.map {
         it is PageableState.Loading
@@ -196,8 +194,12 @@ sealed interface NotificationListItem {
     data class Error(val throwable: Throwable) : NotificationListItem {
 
         fun getErrorMessage(): StringSource {
-            // TODO: エラーの状態に応じて文字列リソースを取得し適切なエラーメッセージを表示する
-            return StringSource("Error")
+            return when(throwable) {
+                is APIError -> {
+                    APIErrorStringConverter()(throwable)
+                }
+                else -> StringSource("Error: $throwable")
+            }
         }
 
         fun isUnauthorizedError(): Boolean {
