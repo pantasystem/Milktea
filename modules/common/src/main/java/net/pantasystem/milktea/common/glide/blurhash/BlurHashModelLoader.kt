@@ -13,6 +13,7 @@ import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.load.resource.SimpleResource
 import com.bumptech.glide.load.resource.transcode.ResourceTranscoder
+import kotlin.math.min
 
 
 internal class BlurHashFetcher(val hash: BlurHashSource, val width: Int, val height: Int) :
@@ -64,7 +65,14 @@ internal class BlurHashTransCoder(val context: Context) : ResourceTranscoder<Blu
         options: Options
     ): Resource<BitmapDrawable> {
         val blurHash = toTranscode.get()
-        val bitmap = BlurHashDecoder.decode(toTranscode.get().hash, width = blurHash.width, height = blurHash.height)
+        val (width, height) = scaleToMax(blurHash.width, blurHash.height)
+        val bitmap = BlurHashDecoder.decode(toTranscode.get().hash, width = width, height = height)
         return SimpleResource(BitmapDrawable(context.resources, bitmap))
+    }
+    private fun scaleToMax(width: Int, height: Int): Pair<Int, Int> {
+        val smallWidth = min(480, min(width, height))
+        val scale = smallWidth.toDouble() / width
+        val smallHeight = scale * height
+        return smallWidth to smallHeight.toInt()
     }
 }

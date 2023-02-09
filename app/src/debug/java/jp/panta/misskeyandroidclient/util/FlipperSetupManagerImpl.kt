@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.util
 
 import android.content.Context
+import android.os.Build
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.android.utils.FlipperUtils
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
@@ -24,7 +25,7 @@ class FlipperSetupManagerImpl @Inject constructor(): DebuggerSetupManager {
 
     override fun setup(context: Context) {
         SoLoader.init(context, false)
-        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(context)) {
+        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(context) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AndroidFlipperClient.getInstance(context).apply {
                 addPlugin(InspectorFlipperPlugin(context, DescriptorMapping.withDefaults()))
                 addPlugin(DatabasesFlipperPlugin(context))
