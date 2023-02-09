@@ -254,6 +254,9 @@ sealed interface TimelineListItem {
                 is APIError.ClientException -> {
                     StringSource(R.string.parameter_error)
                 }
+                is APIError.ToManyRequestsException -> {
+                    StringSource(R.string.timeline_rate_limit_error)
+                }
                 is UnauthorizedException -> {
                     StringSource(R.string.timeline_unauthorized_error)
                 }
