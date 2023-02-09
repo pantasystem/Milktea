@@ -3,7 +3,9 @@ package net.pantasystem.milktea.model.notes
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -207,6 +209,66 @@ class NoteTest {
             )
         )
         assertFalse(note.hasContent())
+    }
+
+    @Test
+    fun shortReactionCounts_GiveOverMaxCountCounts() {
+        val counts = (0..(Note.SHORT_REACTION_COUNT_MAX_SIZE)).map {
+            ReactionCount("r$it", 1)
+        }
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = counts,
+        )
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE + 1, counts.size)
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size)
+        Assertions.assertEquals(counts.subList(0, Note.SHORT_REACTION_COUNT_MAX_SIZE), note.shortReactionCounts)
+    }
+
+    @Test
+    fun shortReactionCounts_GiveUnderMaxCountCounts() {
+        val counts = (0 until (Note.SHORT_REACTION_COUNT_MAX_SIZE - 1)).map {
+            ReactionCount("r$it", 1)
+        }
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = counts,
+        )
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, counts.size)
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, note.shortReactionCounts.size)
+        Assertions.assertEquals(counts, note.shortReactionCounts)
+    }
+
+    @Test
+    fun shortReactionCounts_GiveMaxCountCounts() {
+        val counts = (0 until Note.SHORT_REACTION_COUNT_MAX_SIZE).map {
+            ReactionCount("r$it", 1)
+        }
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = counts,
+        )
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, counts.size)
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size, )
+        Assertions.assertEquals(counts, note.shortReactionCounts)
+    }
+
+    @Test
+    fun shortReactionCounts_GiveZeroElementsCounts() {
+
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = emptyList(),
+        )
+        Assertions.assertEquals(emptyList<ReactionCount>(), note.shortReactionCounts)
     }
 
 }
