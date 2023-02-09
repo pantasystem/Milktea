@@ -11,6 +11,9 @@ interface NotificationJsonCacheRecordDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<NotificationJsonCacheRecord>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: NotificationJsonCacheRecord)
+
     @Query(
         """
             select * from notification_json_cache_v1 
