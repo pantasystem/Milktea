@@ -214,7 +214,10 @@ class TimelineViewModel @AssistedInject constructor(
                 timelineStore.suspendStreaming()
                 noteStreamingCollector.onSuspend()
             }
-            if (config?.isStopNoteCaptureWhenBackground == true) {
+
+            // TODO: misskeyの不整合問題が解決したらmisskey.ioの比較を削除する
+            // TODO: サーバから返ってくるデータが信用できないのでノートのキャプチャーを停止することができない
+            if (config?.isStopNoteCaptureWhenBackground == true  && currentAccountWatcher.getAccount().getHost() != "misskey.io") {
                 cache.suspendNoteCapture()
             }
         }
