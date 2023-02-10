@@ -8,7 +8,6 @@ import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.note.R
 import java.io.IOException
-import java.net.SocketTimeoutException
 
 class TimelineErrorHandler(
     val context: Context,
@@ -17,10 +16,6 @@ class TimelineErrorHandler(
     operator fun invoke(error: Throwable) {
         Log.e("TimelineErrorHandler", "error", error)
         when (error) {
-            is SocketTimeoutException -> {
-                Toast.makeText(context, R.string.timeout_error, Toast.LENGTH_LONG)
-                    .show()
-            }
             is IOException -> {
                 Toast.makeText(context, R.string.network_error, Toast.LENGTH_LONG)
                     .show()

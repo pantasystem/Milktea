@@ -14,7 +14,13 @@ class APIErrorStringConverter @Inject constructor() {
             is APIError.IAmAIException -> StringSource(R.string.bot_error)
             is APIError.InternalServerException -> StringSource(R.string.server_error)
             is APIError.NotFoundException -> StringSource(R.string.not_found_error)
-            is APIError.SomethingException -> StringSource("error :${error.statusCode}")
+            is APIError.SomethingException -> {
+                if (error.statusCode >= 500) {
+                    StringSource(R.string.server_error)
+                } else {
+                    StringSource("error :${error.statusCode}")
+                }
+            }
             is APIError.ToManyRequestsException -> StringSource(R.string.rate_limit_error)
         }
     }
