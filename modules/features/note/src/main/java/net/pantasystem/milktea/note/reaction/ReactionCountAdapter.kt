@@ -8,7 +8,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
@@ -86,11 +85,7 @@ class ReactionCountAdapter(
         return ReactionHolder(binding)
     }
 
-    override fun onViewRecycled(holder: ReactionHolder) {
-        super.onViewRecycled(holder)
-        Glide.with(holder.binding.reactionImage)
-            .clear(holder.binding.reactionImage)
-    }
+
 }
 
 sealed interface ReactionCountAction {
