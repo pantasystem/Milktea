@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import net.pantasystem.milktea.common_android.resource.convertDp2Px
 import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.SegmentType
@@ -35,12 +36,15 @@ class EmojiChoicesListAdapter(
     }
 ) {
 
+    val viewPool = RecyclerView.RecycledViewPool()
+
     override fun onBindViewHolder(holder: SegmentViewHolder, position: Int) {
         holder.onBind(getItem(position))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SegmentViewHolder {
         return SegmentViewHolder(
+            viewPool,
             ItemCategoryWithListBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onEmojiSelected
         )
@@ -49,11 +53,16 @@ class EmojiChoicesListAdapter(
 
 
 class SegmentViewHolder(
+    recyclerViewPool: RecycledViewPool,
     val binding: ItemCategoryWithListBinding,
     private val onEmojiSelected: (EmojiType) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     var isSatLayoutManager = false
+
+    init {
+        binding.emojisView.setRecycledViewPool(recyclerViewPool)
+    }
 
     fun onBind(segmentType: SegmentType) {
         val adapter = EmojiChoicesAdapter(onEmojiSelected)

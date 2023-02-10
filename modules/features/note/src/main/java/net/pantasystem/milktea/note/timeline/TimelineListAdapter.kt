@@ -57,6 +57,10 @@ class TimelineListAdapter(
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
+    private val reactionCounterRecyclerViewPool = RecyclerView.RecycledViewPool()
+    private val urlPreviewListRecyclerViewPool = RecyclerView.RecycledViewPool()
+    private val manyFilePreviewListViewRecyclerViewPool = RecyclerView.RecycledViewPool()
+
     sealed class TimelineListItemViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
 
     sealed class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : TimelineListItemViewHolderBase(view){
@@ -71,6 +75,7 @@ class TimelineListAdapter(
             val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
             flexBoxLayoutManager.alignItems = AlignItems.STRETCH
             reactionCountsView.layoutManager = flexBoxLayoutManager
+            flexBoxLayoutManager.recycleChildrenOnDetach = true
             flexBoxLayoutManager
         }
 
@@ -261,10 +266,16 @@ class TimelineListAdapter(
         return when(ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
+                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
+                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteViewHolder(binding)
             }
             ViewHolderType.HasReplyToNote -> {
                 val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
+                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
+                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 HasReplyToNoteViewHolder(binding)
             }
             ViewHolderType.Loading -> {
