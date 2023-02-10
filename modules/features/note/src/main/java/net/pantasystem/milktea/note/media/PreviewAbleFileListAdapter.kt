@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import net.pantasystem.milktea.note.databinding.ItemMediaPreviewBinding
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
@@ -47,9 +46,5 @@ class PreviewAbleFileListAdapter(
         )
     }
 
-    override fun onViewRecycled(holder: ViewHolder) {
-        super.onViewRecycled(holder)
 
-        Glide.with(holder.binding.thumbnail).clear(holder.binding.thumbnail)
-    }
 }
