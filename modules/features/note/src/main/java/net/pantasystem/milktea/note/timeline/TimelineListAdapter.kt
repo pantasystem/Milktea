@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -293,7 +294,37 @@ class TimelineListAdapter(
     }
 
 
+    override fun onViewRecycled(holder: TimelineListItemViewHolderBase) {
+        super.onViewRecycled(holder)
+        val simpleNote = when(holder) {
+            is EmptyViewHolder -> return
+            is ErrorViewHolder -> return
+            is LoadingViewHolder -> return
+            is HasReplyToNoteViewHolder -> {
+                holder.binding.simpleNote
+            }
+            is NoteViewHolder -> {
+                holder.binding.simpleNote
+            }
+        }
+        val imageViews = listOf(
+            simpleNote.avatarIcon,
+            simpleNote.mediaPreview.thumbnailTopLeft,
+            simpleNote.mediaPreview.thumbnailTopRight,
+            simpleNote.mediaPreview.thumbnailBottomLeft,
+            simpleNote.mediaPreview.thumbnailBottomRight,
+            simpleNote.subAvatarIcon,
+            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
+            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
+        )
+
+        imageViews.map {
+            Glide.with(simpleNote.avatarIcon).clear(it)
+        }
+    }
 
 
 }
