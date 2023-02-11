@@ -7,6 +7,7 @@ class Link(
     override val insideStart: Int,
     override val insideEnd: Int,
     val url: String,
+    val rawUrl: String,
     val skipOgpLink: Boolean? = null,
 ) : Leaf(){
     override val elementType: ElementType = ElementType.LINK

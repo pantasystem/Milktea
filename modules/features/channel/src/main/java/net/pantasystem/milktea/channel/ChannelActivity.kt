@@ -27,6 +27,7 @@ import net.pantasystem.milktea.common_navigation.ChannelNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.channel.Channel
+import net.pantasystem.milktea.model.channel.generateChannelNavUrl
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.view.ActionNoteHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
@@ -88,12 +89,13 @@ class ChannelActivity : AppCompatActivity() {
                         arguments = listOf(
                             navArgument(ChannelDetailArgs.accountId) {
                                 type = NavType.LongType
+                                defaultValue = accountStore.currentAccount?.accountId ?: 0
                             },
                             navArgument(ChannelDetailArgs.channelId) {
                                 type = NavType.StringType
                             }
                         ),
-                        deepLinks = listOf(navDeepLink { uriPattern = "milktea://accounts/{${ChannelDetailArgs.accountId}}/channels/{${ChannelDetailArgs.channelId}}" })
+                        deepLinks = listOf(navDeepLink { uriPattern = "milktea://channels/{${ChannelDetailArgs.channelId}}?accountId={${ChannelDetailArgs.accountId}}" })
                     ) {
                         val viewModel: ChannelDetailViewModel = hiltViewModel()
                         val channel by viewModel.channel.collectAsState()
@@ -136,7 +138,7 @@ class ChannelDetailNavigationImpl @Inject constructor(val activity: Activity) : 
     override fun newIntent(args: Channel.Id): Intent {
         return Intent(
             Intent.ACTION_VIEW,
-            "milktea://accounts/${args.accountId}/channels/${args.channelId}".toUri(),
+            Channel.generateChannelNavUrl(args.channelId, args.accountId).toUri(),
             activity,
             ChannelActivity::class.java,
         )

@@ -55,8 +55,7 @@
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="milktea" />
+                <data android:scheme="milktea" android:host="channels" />
             </intent-filter>
         </activity>
 
@@ -187,6 +186,12 @@
                         android:host="*"
                         android:pathPrefix="/notes/"
                         android:scheme="https" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="milktea" android:pathPrefix="/notes/" android:host="*" />
             </intent-filter>
         </activity>
         <activity
