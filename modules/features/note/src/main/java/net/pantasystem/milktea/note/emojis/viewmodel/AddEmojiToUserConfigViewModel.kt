@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.note.emojis.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,10 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddEmojiToUserConfigViewModel @Inject constructor(
-//    private val customEmojiRepository: CustomEmojiRepository,
     val addEmojiToUserConfigUseCase: AddEmojiToUserConfigUseCase,
-    private val savedStateHandle: SavedStateHandle,
-//    accountStore: AccountStore,
     loggerFactory: Logger.Factory,
 ): ViewModel() {
     companion object {
@@ -24,18 +20,6 @@ class AddEmojiToUserConfigViewModel @Inject constructor(
     private val logger by lazy {
         loggerFactory.create("AddEmojiToDeckVM")
     }
-//
-//    private val textEmojiType = savedStateHandle.getStateFlow<String?>(EXTRA_TEXT_EMOJI, null)
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    private val currentAccountHostsEmojis = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-//        customEmojiRepository.observeBy(it.getHost())
-//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-//
-//    val currentEmojiType = combine(textEmojiType, currentAccountHostsEmojis) { t, emojis ->
-//        t?.let {
-//            EmojiType.from(emojis, it)
-//        }
-//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun save(textEmoji: String) {
         viewModelScope.launch {
