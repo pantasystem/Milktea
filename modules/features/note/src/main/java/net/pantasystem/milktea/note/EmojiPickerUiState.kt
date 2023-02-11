@@ -50,7 +50,7 @@ class EmojiPickerUiStateService(
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
         }.catch {
             logger.error("ユーザーリアクション設定情報の取得に失敗", it)
-        }
+        }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val reactions = combine(reactionCount, userSetting) { counts, settings ->
         Reactions(
