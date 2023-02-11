@@ -85,9 +85,33 @@ class MFMParserTest {
     }
 
     @Test
-    fun convertAppNoteUriIfGiveNoteUrl_GiveSameHostAndChannelUrl() {
-        val result = MFMParser.convertAppChannelUriIfGiveChannelUrl("misskey.io", "https://misskey.io/channels/hgeoa390fj")
-        Assertions.assertEquals(result, "milktea://channels/hgeoa390fj")
-
+    fun convertAppNoteUriIfGiveNoteUrl_GiveSameHostAndNoteUrl() {
+        val result = MFMParser.convertAppNoteUriIfGiveNoteUrl("misskey.pantasystem.com", "https://misskey.pantasystem.com/notes/hoaA8u0faf")
+        Assertions.assertEquals("milktea://notes/hoaA8u0faf", result)
     }
+
+    @Test
+    fun convertAppNoteUriIfGiveNoteUrl_GiveBlankId() {
+        val result = MFMParser.convertAppNoteUriIfGiveNoteUrl("misskey.pantasystem.com", "https://misskey.pantasystem.com/notes/")
+        Assertions.assertNull(result)
+    }
+
+    @Test
+    fun convertAppChannelUriIfGiveChannelUrl_GiveSameHostAndChannelUrl() {
+        val result = MFMParser.convertAppChannelUriIfGiveChannelUrl("misskey.pantasystem.com", "https://misskey.pantasystem.com/channels/hgeoa390fj")
+        Assertions.assertEquals("milktea://channels/hgeoa390fj", result)
+    }
+
+    @Test
+    fun convertAppChannelUrlIfGiveChannelUrl_GiveBlankId() {
+        val result = MFMParser.convertAppChannelUriIfGiveChannelUrl("misskey.pantasystem.com", "https://misskey.pantasystem.com/channels/")
+        Assertions.assertNull(result)
+    }
+
+    @Test
+    fun convertAppChannelUriIfGiveChannelUrl_GiveNotesUrlReturnsNull() {
+        val result = MFMParser.convertAppChannelUriIfGiveChannelUrl("misskey.io", "https://misskey.io/notes/hoaA8u0faf")
+        Assertions.assertNull(result)
+    }
+
 }

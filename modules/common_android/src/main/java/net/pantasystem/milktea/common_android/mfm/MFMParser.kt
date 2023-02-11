@@ -3,8 +3,6 @@ package net.pantasystem.milktea.common_android.mfm
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
-import net.pantasystem.milktea.model.channel.Channel
-import net.pantasystem.milktea.model.channel.generateChannelNavUrl
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.instance.HostWithVersion
 import java.net.URLDecoder
@@ -28,10 +26,7 @@ object MFMParser {
     private val spaceCRLFPattern = Pattern.compile("""\s""")
     private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
 
-    private const val hostPattern = """[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.+"""
-    private const val tldPattern = """[a-zA-Z]{2,}"""
-    private val channelLinkPattern = Pattern.compile("""(https?)(://)($hostPattern$tldPattern)/channels/([a-zA-Z0-9]+)""")
-    private val notesLinkPattern = Pattern.compile("""(https?)(://)($hostPattern$tldPattern)/notes/([a-zA-Z0-9]+)""")
+    private val idPattern = Pattern.compile("""^([a-zA-Z0-9]+)$""")
 
 
     fun parse(
@@ -604,24 +599,26 @@ object MFMParser {
     }
 
     fun convertAppChannelUriIfGiveChannelUrl(accountHost: String?, url: String): String? {
-        val channelLinkMatcher = channelLinkPattern.matcher(url)
-        if (channelLinkMatcher.find()) {
-            val host = channelLinkMatcher.nullableGroup(3)
-            val channelId = channelLinkMatcher.nullableGroup(4)
-            if (accountHost != null && host == accountHost && channelId != null) {
-                return Channel.generateChannelNavUrl(channelId, null)
+        accountHost?: return null
+        val startsPattern = "https://$accountHost/channels/"
+        if (url.startsWith(startsPattern)) {
+            val id = url.substring(startsPattern.length, url.length)
+            val matcher = idPattern.matcher(id)
+            if (matcher.find()) {
+                return "milktea://channels/${matcher.group()}"
             }
         }
         return null
     }
 
     fun convertAppNoteUriIfGiveNoteUrl(accountHost: String?, url: String): String? {
-        val noteLinkMatcher = notesLinkPattern.matcher(url)
-        if (noteLinkMatcher.find()) {
-            val host = noteLinkMatcher.nullableGroup(3)
-            val noteId = noteLinkMatcher.nullableGroup(4)
-            if (accountHost != null && host == accountHost && noteId != null) {
-                return "milktea://notes/${noteId}"
+        accountHost?: return null
+        val startsPattern = "https://$accountHost/notes/"
+        if (url.startsWith(startsPattern)) {
+            val id = url.substring(startsPattern.length, url.length)
+            val matcher = idPattern.matcher(id)
+            if (matcher.find()) {
+                return "milktea://notes/${matcher.group()}"
             }
         }
         return null
