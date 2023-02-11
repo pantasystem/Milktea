@@ -18,13 +18,7 @@ class NotificationErrorHandler(
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            else -> {
-                Toast.makeText(
-                    context,
-                    "Error: $error",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            else -> Unit
         }
     }
 }

@@ -35,6 +35,9 @@ interface CustomEmojiDAO {
     @Query("delete from custom_emojis where emojiHost = :host")
     suspend fun deleteByHost(host: String)
 
+    @Query("delete from custom_emojis where emojiHost = :host and name in (:names)")
+    suspend fun deleteByHostAndNames(host: String, names: List<String>)
+
     @Update
     suspend fun update(customEmoji: CustomEmojiRecord)
 }

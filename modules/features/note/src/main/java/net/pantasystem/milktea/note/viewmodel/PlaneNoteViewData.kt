@@ -152,12 +152,10 @@ open class PlaneNoteViewData(
         }
     }
 
-    val reactionCount = Transformations.map(reactionCounts) {
-        var sum = 0
-        it?.forEach { count ->
-            sum += count.count
+    val reactionCount = currentNote.map { note ->
+        note.reactionCounts.sumOf {
+            it.count
         }
-        return@map sum
     }
 
     val myReaction: LiveData<String?> = Transformations.map(currentNote) {

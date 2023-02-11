@@ -285,3 +285,26 @@ data class EmojiAdded(
         val emoji: Emoji
     )
 }
+
+@SerialName("emojiDeleted")
+@Serializable
+data class EmojiDeleted(
+    val body: Body
+) : StreamingEvent() {
+    @Serializable
+    data class Body(
+        val emojis: List<Emoji>,
+    )
+}
+
+@SerialName("emojiUpdated")
+@Serializable
+data class EmojiUpdated(
+    val body: Body
+) : StreamingEvent() {
+
+    @Serializable
+    data class Body(
+        val emojis: List<Emoji>,
+    )
+}

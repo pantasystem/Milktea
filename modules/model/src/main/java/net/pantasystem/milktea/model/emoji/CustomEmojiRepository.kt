@@ -8,6 +8,10 @@ interface CustomEmojiRepository {
 
     suspend fun sync(host: String): Result<Unit>
 
+    suspend fun addEmojis(host: String, emojis: List<Emoji>): Result<Unit>
+
+    suspend fun deleteEmojis(host: String, emojis: List<Emoji>): Result<Unit>
+
     fun observeBy(host: String): Flow<List<Emoji>>
 
     fun get(host: String): List<Emoji>?

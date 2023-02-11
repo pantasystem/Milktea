@@ -25,7 +25,7 @@ object PollHelper {
         }
         val layoutManager = this.layoutManager as? LinearLayoutManager
             ?: LinearLayoutManager(this.context)
-
+        layoutManager.recycleChildrenOnDetach = true
         this.adapter = adapter
         this.layoutManager = layoutManager
         adapter.submitList(poll.choices)
