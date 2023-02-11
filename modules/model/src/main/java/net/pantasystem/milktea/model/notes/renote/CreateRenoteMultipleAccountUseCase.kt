@@ -62,6 +62,7 @@ class CreateRenoteMultipleAccountUseCase @Inject constructor(
                     text = null,
                     visibility = note.visibility,
                     renoteId = note.id,
+                    channelId = note.channelId
                 )
             ).getOrThrow()
         } else {

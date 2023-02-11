@@ -343,6 +343,15 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setRenoteTo(noteId: Note.Id?) {
         savedStateHandle.setRenoteId(noteId)
+        if (noteId == null) {
+            return
+        }
+        viewModelScope.launch {
+            noteRepository.find(noteId).onSuccess { note ->
+                savedStateHandle.setVisibility(note.visibility)
+                savedStateHandle.setChannelId(note.channelId)
+            }
+        }
     }
 
     fun setReplyTo(noteId: Note.Id?) {

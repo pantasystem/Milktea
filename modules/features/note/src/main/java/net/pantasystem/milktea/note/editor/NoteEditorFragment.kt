@@ -281,7 +281,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
         noteEditorViewModel.setReplyTo(replyToNoteId)
         noteEditorViewModel.setRenoteTo(quoteToNoteId)
-        noteEditorViewModel.setChannelId(channelId)
+        if (channelId != null) {
+            noteEditorViewModel.setChannelId(channelId)
+        }
         if (draftNoteId != null && savedInstanceState == null) {
             noteEditorViewModel.setDraftNoteId(draftNoteId!!)
         }
