@@ -266,7 +266,7 @@ interface MisskeyAPI {
     @POST("api/emojis")
     suspend fun getEmojis(@Body req: EmptyRequest) : Response<EmojisResponse>
 
-    @POST("https://misskey.pantasystem.com/api/i/registry/get-all")
+    @POST("api/i/registry/get-all")
     suspend fun getReactionsFromGetAll(@Body req: WebClientBaseRequest): Response<WebClientRegistries>
 
     @POST("api/clips/create")
