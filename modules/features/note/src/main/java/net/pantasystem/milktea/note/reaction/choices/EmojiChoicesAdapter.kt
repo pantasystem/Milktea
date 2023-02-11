@@ -15,8 +15,9 @@ import net.pantasystem.milktea.note.databinding.ItemEmojiChoiceBinding
 
 
 class EmojiChoicesAdapter(
-    val emojiSelection: (EmojiType) -> Unit,
-) : ListAdapter<EmojiType, EmojiChoicesAdapter.Holder>(
+    val onEmojiSelected: (EmojiType) -> Unit,
+    val onEmojiLongClicked: (EmojiType) -> Boolean,
+    ) : ListAdapter<EmojiType, EmojiChoicesAdapter.Holder>(
     DiffUtilItemCallback()
 ){
     class DiffUtilItemCallback : DiffUtil.ItemCallback<EmojiType>(){
@@ -66,7 +67,10 @@ class EmojiChoicesAdapter(
             }
         }
         holder.binding.root.setOnClickListener {
-            emojiSelection(item)
+            onEmojiSelected(item)
+        }
+        holder.binding.root.setOnLongClickListener {
+            onEmojiLongClicked(item)
         }
         holder.binding.executePendingBindings()
     }

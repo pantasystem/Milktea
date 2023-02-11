@@ -18,4 +18,6 @@
     <string name="removed_from_favorites">お気に入りから削除しました</string>
     <string name="failed_to_delete_favorites">お気に入りの削除に失敗しました</string>
     <string name="successfully_deleted">正常に削除されました</string>
+    <string name="dialog_add_emoji_to_user_settings_title">設定に絵文字を追加する</string>
+    <string name="dialog_add_emoji_to_user_settings_message">%sをユーザ絵文字設定に追加する</string>
 </resources>

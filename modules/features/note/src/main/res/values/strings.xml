@@ -19,4 +19,6 @@
     <string name="removed_from_favorites">Removed from Favorites</string>
     <string name="failed_to_delete_favorites">Failed to delete favorites</string>
     <string name="successfully_deleted">Successfully deleted</string>
+    <string name="dialog_add_emoji_to_user_settings_title">Add emoji to settings</string>
+    <string name="dialog_add_emoji_to_user_settings_message">Add %s to user emoji settings.</string>
 </resources>

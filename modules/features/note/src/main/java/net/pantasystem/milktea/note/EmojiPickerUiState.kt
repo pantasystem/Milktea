@@ -50,7 +50,7 @@ class EmojiPickerUiStateService(
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
         }.catch {
             logger.error("ユーザーリアクション設定情報の取得に失敗", it)
-        }
+        }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val reactions = combine(reactionCount, userSetting) { counts, settings ->
         Reactions(
@@ -136,16 +136,9 @@ data class EmojiPickerUiState(
         }.distinct()
     }
 
-    val all: List<EmojiType> by lazy {
-        LegacyReaction.defaultReaction.map {
-            EmojiType.Legacy(it)
-        } + (customEmojis.map {
-            EmojiType.CustomEmoji(it)
-        })
-    }
 
 
-    private val userSettingEmojis: List<EmojiType> by lazy {
+    val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
             EmojiType.from(customEmojis, setting.reaction)
         }.ifEmpty {
@@ -198,6 +191,12 @@ data class EmojiPickerUiState(
         EmojiType.CustomEmoji(it)
     }.sortedBy {
         LevenshteinDistance(it.emoji.name, keyword)
+    }
+
+    fun isExistsConfig(emojiType: EmojiType): Boolean {
+        return userSettingEmojis.any {
+            emojiType.areItemsTheSame(it)
+        }
     }
 }
 

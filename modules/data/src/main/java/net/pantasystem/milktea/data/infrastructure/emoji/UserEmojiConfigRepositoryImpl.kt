@@ -17,6 +17,19 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
     val reactionUserSettingDao: ReactionUserSettingDao,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ): UserEmojiConfigRepository {
+
+    override suspend fun save(config: UserEmojiConfig): Result<Unit> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            reactionUserSettingDao.insert(
+                ReactionUserSetting(
+                    reaction = config.reaction,
+                    instanceDomain = config.instanceDomain,
+                    weight = config.weight
+                )
+            )
+        }
+    }
+
     override suspend fun saveAll(configs: List<UserEmojiConfig>): Result<Unit> = runCancellableCatching{
         withContext(ioDispatcher) {
             reactionUserSettingDao.insertAll(configs.map {
