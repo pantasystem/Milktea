@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.common_android
 
-import jp.panta.misskeyandroidclient.mfm.Root
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.html.MastodonHTML
 import net.pantasystem.milktea.common_android.html.MastodonHTMLParser
 import net.pantasystem.milktea.common_android.mfm.MFMParser

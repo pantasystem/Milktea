@@ -83,4 +83,11 @@ class MFMParserTest {
         )
         Assertions.assertEquals("@misskey.pantasystem.com", host)
     }
+
+    @Test
+    fun convertAppNoteUriIfGiveNoteUrl_GiveSameHostAndChannelUrl() {
+        val result = MFMParser.convertAppChannelUriIfGiveChannelUrl("misskey.io", "https://misskey.io/channels/hgeoa390fj")
+        Assertions.assertEquals(result, "milktea://channels/hgeoa390fj")
+
+    }
 }

@@ -17,7 +17,7 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
-import jp.panta.misskeyandroidclient.mfm.Root
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.TextType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
