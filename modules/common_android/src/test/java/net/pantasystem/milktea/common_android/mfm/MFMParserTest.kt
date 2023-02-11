@@ -87,7 +87,7 @@ class MFMParserTest {
     @Test
     fun convertAppNoteUriIfGiveNoteUrl_GiveSameHostAndNoteUrl() {
         val result = MFMParser.convertAppNoteUriIfGiveNoteUrl("misskey.pantasystem.com", "https://misskey.pantasystem.com/notes/hoaA8u0faf")
-        Assertions.assertEquals("milktea://notes/hoaA8u0faf", result)
+        Assertions.assertEquals("milktea://misskey.pantasystem.com/notes/hoaA8u0faf", result)
     }
 
     @Test

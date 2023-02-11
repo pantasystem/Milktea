@@ -191,7 +191,7 @@
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="milktea" android:host="notes" />
+                <data android:scheme="milktea" android:pathPrefix="/notes/" android:host="*" />
             </intent-filter>
         </activity>
         <activity

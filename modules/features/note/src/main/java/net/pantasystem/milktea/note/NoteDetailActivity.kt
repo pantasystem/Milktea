@@ -91,7 +91,7 @@ class NoteDetailActivity : AppCompatActivity() {
         mParentActivity = intent.getParentActivity()
 
         val noteId = intent.getStringExtra(EXTRA_NOTE_ID)
-            ?: intent.data?.path?.replace("/notes/", "")
+            ?: intent.data?.path?.split("/notes/")?.lastOrNull()
         Log.d(TAG, "受け取ったnoteId: $noteId")
         mNoteId = noteId
         mAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1).let {

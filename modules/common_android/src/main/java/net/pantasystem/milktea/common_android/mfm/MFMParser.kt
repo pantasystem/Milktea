@@ -618,7 +618,7 @@ object MFMParser {
             val id = url.substring(startsPattern.length, url.length)
             val matcher = idPattern.matcher(id)
             if (matcher.find()) {
-                return "milktea://notes/${matcher.group()}"
+                return "milktea://$accountHost/notes/${matcher.group()}"
             }
         }
         return null
