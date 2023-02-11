@@ -223,8 +223,8 @@ class NoteTest {
             reactionCounts = counts,
         )
         Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE + 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size)
-        Assertions.assertEquals(counts.subList(0, Note.SHORT_REACTION_COUNT_MAX_SIZE), note.shortReactionCounts)
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(false).size)
+        Assertions.assertEquals(counts.subList(0, Note.SHORT_REACTION_COUNT_MAX_SIZE), note.getShortReactionCounts(false))
     }
 
     @Test
@@ -239,8 +239,8 @@ class NoteTest {
             reactionCounts = counts,
         )
         Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, note.shortReactionCounts.size)
-        Assertions.assertEquals(counts, note.shortReactionCounts)
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, note.getShortReactionCounts(false).size)
+        Assertions.assertEquals(counts, note.getShortReactionCounts(false))
     }
 
     @Test
@@ -255,8 +255,8 @@ class NoteTest {
             reactionCounts = counts,
         )
         Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, counts.size)
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size, )
-        Assertions.assertEquals(counts, note.shortReactionCounts)
+        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(false).size, )
+        Assertions.assertEquals(counts, note.getShortReactionCounts(false))
     }
 
     @Test
@@ -268,7 +268,7 @@ class NoteTest {
             userId = User.Id(0L, ""),
             reactionCounts = emptyList(),
         )
-        Assertions.assertEquals(emptyList<ReactionCount>(), note.shortReactionCounts)
+        Assertions.assertEquals(emptyList<ReactionCount>(), note.getShortReactionCounts(false))
     }
 
     @Test
@@ -284,8 +284,8 @@ class NoteTest {
             renoteId = Note.Id(0L, "")
         )
         Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, counts.size)
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size)
-        Assertions.assertEquals(counts, note.shortReactionCounts)
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(true).size)
+        Assertions.assertEquals(counts, note.getShortReactionCounts(true))
     }
 
     @Test
@@ -297,7 +297,7 @@ class NoteTest {
             reactionCounts = emptyList(),
             renoteId = Note.Id(0L, "")
         )
-        Assertions.assertEquals(emptyList<ReactionCount>(), note.shortReactionCounts)
+        Assertions.assertEquals(emptyList<ReactionCount>(), note.getShortReactionCounts(true))
     }
 
     @Test
@@ -313,8 +313,8 @@ class NoteTest {
             renoteId = Note.Id(0L, "")
         )
         Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, note.shortReactionCounts.size)
-        Assertions.assertEquals(counts, note.shortReactionCounts)
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, note.getShortReactionCounts(true).size)
+        Assertions.assertEquals(counts, note.getShortReactionCounts(true))
     }
 
     @Test
@@ -330,8 +330,8 @@ class NoteTest {
             renoteId = Note.Id(0L, "")
         )
         Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE + 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size)
-        Assertions.assertEquals(counts.subList(0, Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE), note.shortReactionCounts)
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(true).size)
+        Assertions.assertEquals(counts.subList(0, Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE), note.getShortReactionCounts(true))
     }
 
 }

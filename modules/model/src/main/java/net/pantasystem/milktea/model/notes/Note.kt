@@ -112,6 +112,22 @@ data class Note(
         }
     }
 
+    fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
+        return if (isRenote) {
+            if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
+                reactionCounts
+            } else {
+                reactionCounts.subList(0, min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE))
+            }
+        } else {
+            if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
+                reactionCounts
+            } else {
+                reactionCounts.subList(0, min(reactionCounts.size, SHORT_REACTION_COUNT_MAX_SIZE))
+            }
+        }
+    }
+
     /**
      * 引用リノートであるか
      */
