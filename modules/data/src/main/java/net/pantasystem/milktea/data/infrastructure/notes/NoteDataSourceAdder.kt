@@ -33,7 +33,6 @@ class NoteDataSourceAdder @Inject constructor(
 
 
     suspend fun addNoteDtoToDataSource(account: Account, noteDTO: NoteDTO, skipExists: Boolean = false): Note {
-        val isMisskeyIo = account.getHost().lowercase() == "misskey.io"
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val entities =
             noteDTO.toEntities(
@@ -43,9 +42,7 @@ class NoteDataSourceAdder @Inject constructor(
                 noteDTOEntityConverter,
                 filePropertyDTOEntityConverter
             )
-        // TODO: misskeyの不整合問題が解決したらmisskey.ioの比較を削除する
-        // TODO: misskey.ioのデータが信用できないので、キャッシュ上に存在する場合はスキップする
-        if (skipExists || isMisskeyIo) {
+        if (skipExists) {
             userDataSource.addAll(
                 entities.users.filterNot {
                     userDataSource.get(it.id).isSuccess
