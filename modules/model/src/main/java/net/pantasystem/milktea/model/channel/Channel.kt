@@ -22,6 +22,8 @@ data class Channel(
     val isFollowing: Boolean?,
     val hasUnreadNote: Boolean?,
 ) {
+    companion object;
+
     data class Id(
         val accountId: Long,
         val channelId: String
@@ -32,4 +34,12 @@ data class Channel(
         name.getRGB()
     }
 
+}
+
+fun Channel.Companion.generateChannelNavUrl(channelId: String, accountId: Long?): String {
+    return if (accountId == null) {
+        "milktea://channels/${channelId}"
+    } else {
+        "milktea://channels/${channelId}?accountId=$accountId"
+    }
 }
