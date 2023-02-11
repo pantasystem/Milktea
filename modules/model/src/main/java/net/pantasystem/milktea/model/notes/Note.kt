@@ -98,17 +98,19 @@ data class Note(
 
     val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
 
-    val shortReactionCounts = if (isRenoteOnly()) {
-        if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
-            reactionCounts
+    fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
+        return if (isRenote) {
+            if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
+                reactionCounts
+            } else {
+                reactionCounts.subList(0, min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE))
+            }
         } else {
-            reactionCounts.subList(0, min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE))
-        }
-    } else {
-        if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
-            reactionCounts
-        } else {
-            reactionCounts.subList(0, min(reactionCounts.size, SHORT_REACTION_COUNT_MAX_SIZE))
+            if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
+                reactionCounts
+            } else {
+                reactionCounts.subList(0, min(reactionCounts.size, SHORT_REACTION_COUNT_MAX_SIZE))
+            }
         }
     }
 

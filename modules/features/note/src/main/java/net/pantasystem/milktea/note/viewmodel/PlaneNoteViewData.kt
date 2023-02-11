@@ -141,12 +141,12 @@ open class PlaneNoteViewData(
 
     val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
-    val reactionCounts: LiveData<List<ReactionCount>> = currentNote.switchMap { note ->
+    val reactionCounts: LiveData<List<ReactionCount>> = currentNote.switchMap { n ->
         reactionCountsExpanded.map {
             if (it == true) {
-                note.reactionCounts
+                n.reactionCounts
             } else {
-                note.shortReactionCounts
+                n.getShortReactionCounts(note.note.isRenoteOnly())
             }
 
         }
