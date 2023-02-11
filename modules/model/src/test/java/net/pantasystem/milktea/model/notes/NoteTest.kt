@@ -271,4 +271,67 @@ class NoteTest {
         Assertions.assertEquals(emptyList<ReactionCount>(), note.shortReactionCounts)
     }
 
+    @Test
+    fun shortReactionCounts_GiveRenoteAndMaxCounts() {
+        val counts = (0 until Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE).map {
+            ReactionCount("r$it", 1)
+        }
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = counts,
+            renoteId = Note.Id(0L, "")
+        )
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, counts.size)
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size)
+        Assertions.assertEquals(counts, note.shortReactionCounts)
+    }
+
+    @Test
+    fun shortReactionCounts_GiveRenoteAndZeroElementsCounts() {
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = emptyList(),
+            renoteId = Note.Id(0L, "")
+        )
+        Assertions.assertEquals(emptyList<ReactionCount>(), note.shortReactionCounts)
+    }
+
+    @Test
+    fun shortReactionCounts_GiveRenoteAndUnderMaxCountCounts() {
+        val counts = (0 until (Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1)).map {
+            ReactionCount("r$it", 1)
+        }
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = counts,
+            renoteId = Note.Id(0L, "")
+        )
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, counts.size)
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, note.shortReactionCounts.size)
+        Assertions.assertEquals(counts, note.shortReactionCounts)
+    }
+
+    @Test
+    fun shortReactionCounts_GiveRenoteAndOverMaxCountCounts() {
+        val counts = (0..(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE)).map {
+            ReactionCount("r$it", 1)
+        }
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = counts,
+            renoteId = Note.Id(0L, "")
+        )
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE + 1, counts.size)
+        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.shortReactionCounts.size)
+        Assertions.assertEquals(counts.subList(0, Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE), note.shortReactionCounts)
+    }
+
 }
