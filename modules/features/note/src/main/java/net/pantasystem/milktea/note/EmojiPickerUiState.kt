@@ -136,16 +136,9 @@ data class EmojiPickerUiState(
         }.distinct()
     }
 
-    val all: List<EmojiType> by lazy {
-        LegacyReaction.defaultReaction.map {
-            EmojiType.Legacy(it)
-        } + (customEmojis.map {
-            EmojiType.CustomEmoji(it)
-        })
-    }
 
 
-    private val userSettingEmojis: List<EmojiType> by lazy {
+    val userSettingEmojis: List<EmojiType> by lazy {
         userSettingReactions.mapNotNull { setting ->
             EmojiType.from(customEmojis, setting.reaction)
         }.ifEmpty {
@@ -198,6 +191,12 @@ data class EmojiPickerUiState(
         EmojiType.CustomEmoji(it)
     }.sortedBy {
         LevenshteinDistance(it.emoji.name, keyword)
+    }
+
+    fun isExistsConfig(emojiType: EmojiType): Boolean {
+        return userSettingEmojis.any {
+            emojiType.areItemsTheSame(it)
+        }
     }
 }
 
