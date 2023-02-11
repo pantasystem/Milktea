@@ -84,6 +84,8 @@ class ReactionCountAdapter(
         )
         return ReactionHolder(binding)
     }
+
+
 }
 
 sealed interface ReactionCountAction {

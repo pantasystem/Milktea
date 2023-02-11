@@ -214,6 +214,7 @@ class TimelineViewModel @AssistedInject constructor(
                 timelineStore.suspendStreaming()
                 noteStreamingCollector.onSuspend()
             }
+
             if (config?.isStopNoteCaptureWhenBackground == true) {
                 cache.suspendNoteCapture()
             }

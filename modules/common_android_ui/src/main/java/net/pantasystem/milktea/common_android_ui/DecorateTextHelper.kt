@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.widget.TextView
 import androidx.core.text.getSpans
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import dagger.hilt.android.EntryPointAccessors
@@ -57,6 +58,9 @@ object DecorateTextHelper {
                         }
                     }
                 }
+                // NOTE: 不要になった画像リソースを解放している
+                // NOTE: MFMDecoratorの仕様上現状はEmojiSpanを使いまわさないのでここでリソース破棄をしてしまっても問題ない。
+                Glide.with(textView).clear(it.target)
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -57,6 +58,10 @@ class TimelineListAdapter(
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
+    private val reactionCounterRecyclerViewPool = RecyclerView.RecycledViewPool()
+    private val urlPreviewListRecyclerViewPool = RecyclerView.RecycledViewPool()
+    private val manyFilePreviewListViewRecyclerViewPool = RecyclerView.RecycledViewPool()
+
     sealed class TimelineListItemViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
 
     sealed class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : TimelineListItemViewHolderBase(view){
@@ -71,6 +76,7 @@ class TimelineListAdapter(
             val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
             flexBoxLayoutManager.alignItems = AlignItems.STRETCH
             reactionCountsView.layoutManager = flexBoxLayoutManager
+            flexBoxLayoutManager.recycleChildrenOnDetach = true
             flexBoxLayoutManager
         }
 
@@ -261,10 +267,16 @@ class TimelineListAdapter(
         return when(ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
+                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
+                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteViewHolder(binding)
             }
             ViewHolderType.HasReplyToNote -> {
                 val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
+                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
+                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 HasReplyToNoteViewHolder(binding)
             }
             ViewHolderType.Loading -> {
@@ -282,7 +294,37 @@ class TimelineListAdapter(
     }
 
 
+    override fun onViewRecycled(holder: TimelineListItemViewHolderBase) {
+        super.onViewRecycled(holder)
+        val simpleNote = when(holder) {
+            is EmptyViewHolder -> return
+            is ErrorViewHolder -> return
+            is LoadingViewHolder -> return
+            is HasReplyToNoteViewHolder -> {
+                holder.binding.simpleNote
+            }
+            is NoteViewHolder -> {
+                holder.binding.simpleNote
+            }
+        }
+        val imageViews = listOf(
+            simpleNote.avatarIcon,
+            simpleNote.mediaPreview.thumbnailTopLeft,
+            simpleNote.mediaPreview.thumbnailTopRight,
+            simpleNote.mediaPreview.thumbnailBottomLeft,
+            simpleNote.mediaPreview.thumbnailBottomRight,
+            simpleNote.subAvatarIcon,
+            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
+            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
+        )
+
+        imageViews.map {
+            Glide.with(simpleNote.avatarIcon).clear(it)
+        }
+    }
 
 
 }
