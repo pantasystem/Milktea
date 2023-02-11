@@ -119,6 +119,22 @@ class CustomEmojiRepositoryImpl @Inject constructor(
         return customEmojiCache.get(host)
     }
 
+    override suspend fun addEmojis(host: String, emojis: List<Emoji>): Result<Unit> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            upInsert(host, emojis)
+            // NOTE: inMemキャッシュなどを更新したい
+            findBy(host).getOrThrow()
+        }
+    }
+
+    override suspend fun deleteEmojis(host: String, emojis: List<Emoji>): Result<Unit> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            customEmojiDAO.deleteByHostAndNames(host, emojis.map { it.name })
+            // NOTE: inMemキャッシュなどを更新したい
+            findBy(host).getOrThrow()
+        }
+    }
+
     private suspend fun upInsert(host: String, emojis: List<Emoji>) {
         val record = emojis.map {
             it.toRecord(host)
