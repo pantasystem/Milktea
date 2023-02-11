@@ -428,7 +428,7 @@
     <string name="clip">クリップ</string>
 
     <string name="server_error">サーバーエラー</string>
-    <string name="bot_error">ボットですか？</string>
+    <string name="bot_error">サーバに人間であることを疑われています</string>
     <string name="auth_error">認証エラー</string>
     <string name="parameter_error">パラメーターエラー</string>
     <string name="unauthorized_error">未認証エラー</string>
