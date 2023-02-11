@@ -26,6 +26,7 @@ object UrlPreviewHelper {
 
             val layoutManager = this.layoutManager as? LinearLayoutManager
                 ?: LinearLayoutManager(this.context)
+            layoutManager.recycleChildrenOnDetach = true
             this.layoutManager = layoutManager
             this.adapter = adapter
         }

@@ -147,6 +147,7 @@ object MediaPreviewHelper {
         this.adapter = adapter
         val layoutManager = this.layoutManager as? GridLayoutManager
             ?: GridLayoutManager(context, 2)
+        layoutManager.recycleChildrenOnDetach = true
         this.layoutManager = layoutManager
 
         adapter.submitList(previewAbleList)
