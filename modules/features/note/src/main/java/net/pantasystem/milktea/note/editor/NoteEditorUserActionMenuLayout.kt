@@ -40,18 +40,27 @@ fun NoteEditorUserActionMenuLayout(
             MenuItemLayout {
                 DropdownMenu(
                     expanded = isShowFilePickerDropDownMenu,
-                    onDismissRequest = { isShowFilePickerDropDownMenu = true }
+                    onDismissRequest = { isShowFilePickerDropDownMenu = false }
                 ) {
-                    DropdownMenuItem(onClick = onPickImageFromLocalButtonClicked) {
+                    DropdownMenuItem(onClick = {
+                        isShowFilePickerDropDownMenu = false
+                        onPickImageFromLocalButtonClicked()
+                    }) {
                         Icon(Icons.Default.Image, contentDescription = null)
                         Text("画像を選択")
                     }
-                    DropdownMenuItem(onClick = onPickFileFromLocalButtonCLicked) {
+                    DropdownMenuItem(onClick = {
+                        isShowFilePickerDropDownMenu = false
+                        onPickFileFromLocalButtonCLicked()
+                    }) {
                         Icon(Icons.Default.UploadFile, contentDescription = null)
                         Text("ファイルを選択")
                     }
                     if (isEnableDrive) {
-                        DropdownMenuItem(onClick = onPickFileFromDriveButtonClicked) {
+                        DropdownMenuItem(onClick = {
+                            isShowFilePickerDropDownMenu = false
+                            onPickFileFromDriveButtonClicked()
+                        }) {
                             Icon(Icons.Default.Cloud, contentDescription = null)
                             Text("ドライブから")
                         }
