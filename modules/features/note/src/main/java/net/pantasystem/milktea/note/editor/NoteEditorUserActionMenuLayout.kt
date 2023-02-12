@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.note.editor
 
+import android.content.Context
+import android.util.TypedValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -7,6 +9,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -79,17 +84,26 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.AddToPhotos,
                         contentDescription = null,
+                        tint = getColor(color = R.attr.normalIconTint)
                     )
                 }
             }
             MenuItemLayout {
                 IconButton(onClick = onTogglePollButtonClicked) {
-                    Icon(Icons.Default.Poll, contentDescription = null)
+                    Icon(
+                        Icons.Default.Poll,
+                        contentDescription = null,
+                        tint = getColor(color = R.attr.normalIconTint)
+                    )
                 }
             }
             MenuItemLayout {
                 IconButton(onClick = onToggleCwButtonClicked) {
-                    Icon(Icons.Default.VisibilityOff, contentDescription = null)
+                    Icon(
+                        Icons.Default.VisibilityOff,
+                        contentDescription = null,
+                        tint = getColor(color = R.attr.normalIconTint)
+                    )
                 }
             }
             MenuItemLayout {
@@ -98,6 +112,7 @@ fun NoteEditorUserActionMenuLayout(
                         painterResource(id = R.drawable.ic_mention),
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
+                        tint = getColor(color = R.attr.normalIconTint)
                     )
                 }
             }
@@ -106,6 +121,7 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.EmojiEmotions,
                         contentDescription = null,
+                        tint = getColor(color = R.attr.normalIconTint)
                     )
                 }
             }
@@ -141,5 +157,16 @@ fun Preview_NoteEditorUserActionMenuLayout() {
             onSelectEmojiButtonClicked = {},
             onToggleCwButtonClicked = {}
         )
+    }
+}
+
+@Composable
+fun getColor(color: Int): Color {
+    return colorResource(LocalContext.current.getColorFromAttrs(color).resourceId)
+}
+
+fun Context.getColorFromAttrs(attr: Int): TypedValue {
+    return TypedValue().apply {
+        theme.resolveAttribute(attr, this, true)
     }
 }
