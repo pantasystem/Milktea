@@ -324,6 +324,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             MdcTheme {
                 val state by noteEditorViewModel.enableFeatures.collectAsState()
                 NoteEditorUserActionMenuLayout(
+                    iconColor = getColor(color = R.attr.normalIconTint),
                     isEnableDrive = state.contains(FeatureType.Drive),
                     onPickFileFromDriveButtonClicked = {
                         showDriveFileSelector()

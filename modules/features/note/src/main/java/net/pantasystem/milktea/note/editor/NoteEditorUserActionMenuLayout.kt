@@ -22,6 +22,7 @@ import net.pantasystem.milktea.note.R
 fun NoteEditorUserActionMenuLayout(
     modifier: Modifier = Modifier,
     isEnableDrive: Boolean,
+    iconColor: Color,
     onPickFileFromDriveButtonClicked: () -> Unit,
     onPickFileFromLocalButtonCLicked: () -> Unit,
     onPickImageFromLocalButtonClicked: () -> Unit,
@@ -84,7 +85,7 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.AddToPhotos,
                         contentDescription = null,
-                        tint = getColor(color = R.attr.normalIconTint)
+                        tint = iconColor
                     )
                 }
             }
@@ -93,7 +94,7 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.Poll,
                         contentDescription = null,
-                        tint = getColor(color = R.attr.normalIconTint)
+                        tint = iconColor
                     )
                 }
             }
@@ -102,7 +103,7 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        tint = getColor(color = R.attr.normalIconTint)
+                        tint = iconColor
                     )
                 }
             }
@@ -112,7 +113,7 @@ fun NoteEditorUserActionMenuLayout(
                         painterResource(id = R.drawable.ic_mention),
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
-                        tint = getColor(color = R.attr.normalIconTint)
+                        tint = iconColor
                     )
                 }
             }
@@ -121,7 +122,7 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.EmojiEmotions,
                         contentDescription = null,
-                        tint = getColor(color = R.attr.normalIconTint)
+                        tint = iconColor
                     )
                 }
             }
@@ -149,6 +150,7 @@ fun Preview_NoteEditorUserActionMenuLayout() {
         NoteEditorUserActionMenuLayout(
             modifier = Modifier.height(56.dp),
             isEnableDrive = true,
+            iconColor = Color.Gray,
             onPickFileFromDriveButtonClicked = {},
             onPickFileFromLocalButtonCLicked = {},
             onPickImageFromLocalButtonClicked = {},
