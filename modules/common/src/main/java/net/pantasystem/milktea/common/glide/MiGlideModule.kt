@@ -2,14 +2,17 @@ package net.pantasystem.milktea.common.glide
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Registry
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule
 import com.caverock.androidsvg.SVG
 import com.github.penfeizhou.animation.decode.FrameSeqDecoder
+import net.pantasystem.milktea.common.glide.apng.AnimatedImageDrawableBitmapTranscoder
 import net.pantasystem.milktea.common.glide.apng.ByteBufferApngDecoder
 import net.pantasystem.milktea.common.glide.apng.FrameSeqDecoderBitmapTranscoder
 import net.pantasystem.milktea.common.glide.apng.FrameSeqDecoderDrawableTranscoder
@@ -33,6 +36,11 @@ class MiGlideModule : AppGlideModule(){
             .prepend(BlurHashSource::class.java, BlurHash::class.java, BlurHashModelLoader.Factory())
             .prepend(BlurHash::class.java, BlurHash::class.java, BlurHashResourceDecoder())
             .register(BlurHash::class.java, BitmapDrawable::class.java, BlurHashTransCoder(context))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            registry.register(AnimatedImageDrawable::class.java, Bitmap::class.java, AnimatedImageDrawableBitmapTranscoder(glide))
+        }
+
     }
 
 
