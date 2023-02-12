@@ -436,5 +436,6 @@
     <string name="not_found_error">404 見つからないエラー</string>
     <string name="show_more_reactions">もっとリアクションを見る</string>
     <string name="pick_file_from_device">端末からファイルを選択</string>
+    <string name="note_editor_file_max_size_validation_error_message">%d個を超えるファイルを添付できません</string>
 
 </resources>

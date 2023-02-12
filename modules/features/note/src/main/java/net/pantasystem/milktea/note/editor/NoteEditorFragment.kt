@@ -773,14 +773,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
 
-        val size = noteEditorViewModel.fileTotal()
 
-        if (size > noteEditorViewModel.maxFileCount.value) {
-            logger.debug("失敗しました")
-        } else {
-            val file = uri.toAppFile(requireContext())
-            noteEditorViewModel.add(file)
-            logger.debug("成功しました")
-        }
+        val file = uri.toAppFile(requireContext())
+        noteEditorViewModel.add(file)
     }
 }
