@@ -426,4 +426,6 @@
     <string name="rate_limit_error">Rate limit error</string>
     <string name="not_found_error">404 Not found error</string>
     <string name="show_more_reactions">Show more Reactions</string>
+    <string name="pick_file_from_device">Pick file from device</string>
+    <string name="note_editor_file_max_size_validation_error_message">Cannot attach more than %d files</string>
 </resources>

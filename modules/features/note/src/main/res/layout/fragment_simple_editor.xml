@@ -73,7 +73,7 @@
                 android:visibility="@{ SafeUnbox.unbox(simpleEditor.isShowEditorMenu) &amp;&amp; SafeUnbox.unboxBool(noteEditorViewModel.hasCw) ? View.VISIBLE : View.GONE}" />
 
         <LinearLayout
-                android:id="@+id/linearLayout2"
+                android:id="@+id/noteEditorUserActionMenu"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:orientation="horizontal"
