@@ -14,6 +14,8 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.app.TaskStackBuilder
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -45,6 +47,7 @@ import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toAppFile
+import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
@@ -370,24 +373,55 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
-        binding.selectFileFromDrive.setOnClickListener {
-            showDriveFileSelector()
-        }
-
-        binding.selectFileFromLocal.setOnClickListener {
-            showFileManager()
-        }
-
+//        binding.selectFileFromDrive.setOnClickListener {
+//            showDriveFileSelector()
+//        }
+//
+//        binding.selectFileFromLocal.setOnClickListener {
+//            showFileManager()
+//        }
+//
         binding.addAddress.setOnClickListener {
             startSearchAndSelectUser()
         }
 
-        binding.mentionButton.setOnClickListener {
-            startMentionToSearchAndSelectUser()
-        }
+//        binding.mentionButton.setOnClickListener {
+//            startMentionToSearchAndSelectUser()
+//        }
+//
+//        binding.showEmojisButton.setOnClickListener {
+//            CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+//        }
+        binding.noteEditorUserActionMenu.setContent {
+            MdcTheme(
 
-        binding.showEmojisButton.setOnClickListener {
-            CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+            ) {
+                val state by noteEditorViewModel.enableFeatures.collectAsState()
+                NoteEditorUserActionMenuLayout(
+                    isEnableDrive = state.contains(FeatureType.Drive),
+                    onPickFileFromDriveButtonClicked = {
+                        showDriveFileSelector()
+                    },
+                    onPickFileFromLocalButtonCLicked = {
+                        showFileManager()
+                    },
+                    onPickImageFromLocalButtonClicked = {
+
+                    },
+                    onTogglePollButtonClicked = {
+                        noteEditorViewModel.enablePoll()
+                    },
+                    onSelectMentionUsersButtonClicked = {
+                        startMentionToSearchAndSelectUser()
+                    },
+                    onSelectEmojiButtonClicked = {
+                        CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+                    },
+                    onToggleCwButtonClicked = {
+                        noteEditorViewModel.changeCwEnabled()
+                    }
+                )
+            }
         }
 
         binding.reservationAtPickDateButton.setOnClickListener {
