@@ -432,5 +432,6 @@
     <string name="rate_limit_error">速率限制错误</string>
     <string name="not_found_error">404 未找到错误</string>
     <string name="show_more_reactions">显示更多反应</string>
+    <string name="pick_file_from_device">从设备中选择文件</string>
 
 </resources>
