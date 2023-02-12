@@ -3,7 +3,6 @@
 package net.pantasystem.milktea.data.infrastructure
 
 import androidx.room.*
-import androidx.room.ForeignKey.NO_ACTION
 import net.pantasystem.milktea.data.infrastructure.core.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 
@@ -14,8 +13,8 @@ import net.pantasystem.milktea.model.account.page.Pageable
         childColumns = ["accountId"],
         parentColumns = ["id"],
         entity = Account::class,
-        onDelete = NO_ACTION,
-        onUpdate = NO_ACTION
+        onDelete = ForeignKey.NO_ACTION,
+        onUpdate = ForeignKey.NO_ACTION
     )],
     indices = [
         Index("accountId")
@@ -64,14 +63,6 @@ data class Page(
             antenna != null -> antenna
             else -> null
         }
-    }
-
-    @Ignore
-    fun toPage(): net.pantasystem.milktea.model.account.page.Page? {
-        this.pageable()?.toPageable()?.let {
-            return net.pantasystem.milktea.model.account.page.Page(0L, this.title, 0, it)
-        }
-        return null
     }
 
     abstract class Timeline : PageableOld
