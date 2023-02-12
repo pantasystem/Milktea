@@ -36,105 +36,101 @@ fun NoteEditorUserActionMenuLayout(
     var isShowFilePickerDropDownMenu: Boolean by remember {
         mutableStateOf(false)
     }
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colors.background
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-        ) {
-            MenuItemLayout {
-                DropdownMenu(
-                    expanded = isShowFilePickerDropDownMenu,
-                    onDismissRequest = { isShowFilePickerDropDownMenu = false }
-                ) {
+        MenuItemLayout {
+            DropdownMenu(
+                expanded = isShowFilePickerDropDownMenu,
+                onDismissRequest = { isShowFilePickerDropDownMenu = false }
+            ) {
+                DropdownMenuItem(onClick = {
+                    isShowFilePickerDropDownMenu = false
+                    onPickImageFromLocalButtonClicked()
+                }) {
+                    Icon(Icons.Default.Image, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(id = R.string.pick_image))
+                }
+                DropdownMenuItem(onClick = {
+                    isShowFilePickerDropDownMenu = false
+                    onPickFileFromLocalButtonCLicked()
+                }) {
+                    Icon(Icons.Default.UploadFile, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(id = R.string.pick_file_from_device))
+                }
+                if (isEnableDrive) {
                     DropdownMenuItem(onClick = {
                         isShowFilePickerDropDownMenu = false
-                        onPickImageFromLocalButtonClicked()
+                        onPickFileFromDriveButtonClicked()
                     }) {
-                        Icon(Icons.Default.Image, contentDescription = null)
+                        Icon(Icons.Default.Cloud, contentDescription = null)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.pick_image))
-                    }
-                    DropdownMenuItem(onClick = {
-                        isShowFilePickerDropDownMenu = false
-                        onPickFileFromLocalButtonCLicked()
-                    }) {
-                        Icon(Icons.Default.UploadFile, contentDescription = null)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.pick_file_from_device))
-                    }
-                    if (isEnableDrive) {
-                        DropdownMenuItem(onClick = {
-                            isShowFilePickerDropDownMenu = false
-                            onPickFileFromDriveButtonClicked()
-                        }) {
-                            Icon(Icons.Default.Cloud, contentDescription = null)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(id = R.string.pick_image_from_drive))
-                        }
+                        Text(stringResource(id = R.string.pick_image_from_drive))
                     }
                 }
-                IconButton(
-                    onClick = {
-                        isShowFilePickerDropDownMenu = true
+            }
+            IconButton(
+                onClick = {
+                    isShowFilePickerDropDownMenu = true
+                }
+            ) {
+                Icon(
+                    Icons.Default.AddToPhotos,
+                    contentDescription = null,
+                    tint = iconColor
+                )
+            }
+        }
+        MenuItemLayout {
+            IconButton(onClick = onTogglePollButtonClicked) {
+                Icon(
+                    Icons.Default.Poll,
+                    contentDescription = null,
+                    tint = if (isPoll) {
+                        MaterialTheme.colors.primary
+                    } else {
+                        iconColor
                     }
-                ) {
-                    Icon(
-                        Icons.Default.AddToPhotos,
-                        contentDescription = null,
-                        tint = iconColor
-                    )
-                }
+                )
             }
-            MenuItemLayout {
-                IconButton(onClick = onTogglePollButtonClicked) {
-                    Icon(
-                        Icons.Default.Poll,
-                        contentDescription = null,
-                        tint = if (isPoll) {
-                            MaterialTheme.colors.primary
-                        } else {
-                            iconColor
-                        }
-                    )
-                }
+        }
+        MenuItemLayout {
+            IconButton(onClick = onToggleCwButtonClicked) {
+                Icon(
+                    Icons.Default.VisibilityOff,
+                    contentDescription = null,
+                    tint = if (isCw) {
+                        MaterialTheme.colors.primary
+                    } else {
+                        iconColor
+                    }
+                )
             }
-            MenuItemLayout {
-                IconButton(onClick = onToggleCwButtonClicked) {
-                    Icon(
-                        Icons.Default.VisibilityOff,
-                        contentDescription = null,
-                        tint = if (isCw) {
-                            MaterialTheme.colors.primary
-                        } else {
-                            iconColor
-                        }
-                    )
-                }
+        }
+        MenuItemLayout {
+            IconButton(onClick = onSelectMentionUsersButtonClicked) {
+                Icon(
+                    painterResource(id = R.drawable.ic_mention),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = iconColor
+                )
             }
-            MenuItemLayout {
-                IconButton(onClick = onSelectMentionUsersButtonClicked) {
-                    Icon(
-                        painterResource(id = R.drawable.ic_mention),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = iconColor
-                    )
-                }
-            }
-            MenuItemLayout {
-                IconButton(onClick = onSelectEmojiButtonClicked) {
-                    Icon(
-                        Icons.Default.EmojiEmotions,
-                        contentDescription = null,
-                        tint = iconColor
-                    )
-                }
+        }
+        MenuItemLayout {
+            IconButton(onClick = onSelectEmojiButtonClicked) {
+                Icon(
+                    Icons.Default.EmojiEmotions,
+                    contentDescription = null,
+                    tint = iconColor
+                )
             }
         }
     }
