@@ -23,6 +23,8 @@ fun NoteEditorUserActionMenuLayout(
     modifier: Modifier = Modifier,
     isEnableDrive: Boolean,
     iconColor: Color,
+    isCw: Boolean,
+    isPoll: Boolean,
     onPickFileFromDriveButtonClicked: () -> Unit,
     onPickFileFromLocalButtonCLicked: () -> Unit,
     onPickImageFromLocalButtonClicked: () -> Unit,
@@ -94,7 +96,11 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.Poll,
                         contentDescription = null,
-                        tint = iconColor
+                        tint = if (isPoll) {
+                            MaterialTheme.colors.primary
+                        } else {
+                            iconColor
+                        }
                     )
                 }
             }
@@ -103,7 +109,11 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         Icons.Default.VisibilityOff,
                         contentDescription = null,
-                        tint = iconColor
+                        tint = if (isCw) {
+                            MaterialTheme.colors.primary
+                        } else {
+                            iconColor
+                        }
                     )
                 }
             }
@@ -151,6 +161,8 @@ fun Preview_NoteEditorUserActionMenuLayout() {
             modifier = Modifier.height(56.dp),
             isEnableDrive = true,
             iconColor = Color.Gray,
+            isCw = true,
+            isPoll = true,
             onPickFileFromDriveButtonClicked = {},
             onPickFileFromLocalButtonCLicked = {},
             onPickImageFromLocalButtonClicked = {},
