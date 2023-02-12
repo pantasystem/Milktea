@@ -605,7 +605,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            openLocalStorageResult.launch(intent)
+            openLocalStorageResult.launch(arrayOf("*/*"))
         } else {
             requestPermission()
         }
@@ -617,10 +617,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
             } else {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                intent.type = "image/* video/*"
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                openLocalStorageResult.launch(intent)
+                openLocalStorageResult.launch(arrayOf("image/*", "video/*"))
             }
         } else {
             requestPermission()
@@ -697,15 +694,12 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-    private val openLocalStorageResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-            val uri = result?.data?.data
-            if (uri != null) {
-                // NOTE: 選択したファイルに対して永続的なアクセス権を得るようにしている
-                appendFile(uri)
-            }
+    private val openLocalStorageResult = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        uris?.map { uri ->
+            appendFile(uri)
         }
+    }
+
 
     private val requestReadStoragePermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
