@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.note.R
@@ -29,6 +30,7 @@ fun NoteEditorUserActionMenuLayout(
     }
     Surface(
         modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colors.background
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -47,14 +49,16 @@ fun NoteEditorUserActionMenuLayout(
                         onPickImageFromLocalButtonClicked()
                     }) {
                         Icon(Icons.Default.Image, contentDescription = null)
-                        Text("画像を選択")
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(id = R.string.pick_image))
                     }
                     DropdownMenuItem(onClick = {
                         isShowFilePickerDropDownMenu = false
                         onPickFileFromLocalButtonCLicked()
                     }) {
                         Icon(Icons.Default.UploadFile, contentDescription = null)
-                        Text("ファイルを選択")
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(id = R.string.pick_file_from_device))
                     }
                     if (isEnableDrive) {
                         DropdownMenuItem(onClick = {
@@ -62,7 +66,8 @@ fun NoteEditorUserActionMenuLayout(
                             onPickFileFromDriveButtonClicked()
                         }) {
                             Icon(Icons.Default.Cloud, contentDescription = null)
-                            Text("ドライブから")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.pick_image_from_drive))
                         }
                     }
                 }
@@ -71,7 +76,10 @@ fun NoteEditorUserActionMenuLayout(
                         isShowFilePickerDropDownMenu = true
                     }
                 ) {
-                    Icon(Icons.Default.AddToPhotos, contentDescription = null)
+                    Icon(
+                        Icons.Default.AddToPhotos,
+                        contentDescription = null,
+                    )
                 }
             }
             MenuItemLayout {
@@ -89,13 +97,16 @@ fun NoteEditorUserActionMenuLayout(
                     Icon(
                         painterResource(id = R.drawable.ic_mention),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
             MenuItemLayout {
                 IconButton(onClick = onSelectEmojiButtonClicked) {
-                    Icon(Icons.Default.EmojiEmotions, contentDescription = null)
+                    Icon(
+                        Icons.Default.EmojiEmotions,
+                        contentDescription = null,
+                    )
                 }
             }
         }
