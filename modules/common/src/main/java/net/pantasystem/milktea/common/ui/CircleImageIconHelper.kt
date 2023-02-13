@@ -19,8 +19,10 @@ object CircleImageIconHelper {
             .error(R.drawable.ic_cloud_off_black_24dp)
             .into(this)
 
-        outlineProvider = CircleOutlineProvider
-        clipToOutline = true
+        if (outlineProvider !is CircleOutlineProvider) {
+            outlineProvider = CircleOutlineProvider
+            clipToOutline = true
+        }
     }
 }
 
