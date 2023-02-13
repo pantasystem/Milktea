@@ -85,7 +85,9 @@
                         app:circleIcon="@{notification.avatarIconUrl}"
                         android:onClick="@{()-> noteCardActionListener.onUserClicked(notification.user)}"
                         android:visibility="@{ notification.user == null ? View.GONE : View.VISIBLE }"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription"
+                        android:scaleType="centerCrop"
+                        />
 
 
 

@@ -614,7 +614,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private fun showMultipleImagePicker() {
         if (checkPermission()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (ActivityResultContracts.PickVisualMedia.isPhotoPickerAvailable()) {
                 pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
             } else {
                 openLocalStorageResult.launch(arrayOf("image/*", "video/*"))
