@@ -71,7 +71,9 @@
                     android:contentDescription="@string/avataricon"
                     app:circleIcon='@{note.avatarUrl}'
                     app:transitionDestinationUser="@{note.toShowNote.user}"
-                    tools:srcCompat="@android:drawable/sym_def_app_icon" />
+                    tools:srcCompat="@android:drawable/sym_def_app_icon"
+                    android:scaleType="centerCrop"
+                    />
 
             <TextView
                     android:id="@+id/mainName"
@@ -240,7 +242,9 @@
                             android:layout_marginEnd="5dp"
                             android:contentDescription="@string/avataricon"
                             app:circleIcon='@{note.subNoteAvatarUrl}'
-                            app:transitionDestinationUser="@{note.subNote.user}" />
+                            app:transitionDestinationUser="@{note.subNote.user}"
+                            android:scaleType="centerCrop"
+                            />
 
                     <TextView
                             android:id="@+id/subNoteMainName"

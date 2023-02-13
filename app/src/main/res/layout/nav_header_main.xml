@@ -42,6 +42,7 @@
                     android:layout_gravity="start"
                     android:paddingTop="@dimen/nav_header_vertical_spacing"
                     android:layout_marginTop="20dp"
+                    android:scaleType="centerCrop"
                     android:onClick="@{()-> accountViewModel.showProfile(accountViewModel.currentAccount)}"
                     tools:ignore="ContentDescription" />
 

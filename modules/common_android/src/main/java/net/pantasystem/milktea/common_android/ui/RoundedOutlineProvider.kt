@@ -5,16 +5,16 @@ import android.view.View
 import android.view.ViewOutlineProvider
 import java.util.concurrent.ConcurrentHashMap
 
-class CircleOutlineProvider(val rect: Float) : ViewOutlineProvider(){
+class RoundedOutlineProvider(val rect: Float) : ViewOutlineProvider(){
 
     companion object{
 
-        private val rectMap = ConcurrentHashMap<Float, CircleOutlineProvider>()
+        private val rectMap = ConcurrentHashMap<Float, RoundedOutlineProvider>()
 
-        fun getInstance(rect: Float): CircleOutlineProvider {
+        fun getInstance(rect: Float): RoundedOutlineProvider {
             var provider = rectMap[rect]
             if(provider == null){
-                provider = CircleOutlineProvider(rect)
+                provider = RoundedOutlineProvider(rect)
                 rectMap[rect] = provider
             }
             return provider

@@ -9,7 +9,7 @@ object CircleOutlineHelper {
     @BindingAdapter("rect")
     fun ViewGroup.setCircleOutline(rect: Float?){
 
-        outlineProvider = CircleOutlineProvider.getInstance(rect?: 20F)
+        outlineProvider = RoundedOutlineProvider.getInstance(rect?: 20F)
     }
 
     @JvmStatic
@@ -18,7 +18,7 @@ object CircleOutlineHelper {
         rect?: return
         val r = context.resources.displayMetrics.density * rect
 
-        outlineProvider = CircleOutlineProvider.getInstance(r)
+        outlineProvider = RoundedOutlineProvider.getInstance(r)
     }
 
     @JvmStatic
@@ -26,6 +26,6 @@ object CircleOutlineHelper {
     fun View.setCircleOutline(rect: Int?) {
         rect?: return
         val r = context.resources.displayMetrics.density * rect
-        outlineProvider = CircleOutlineProvider.getInstance(r)
+        outlineProvider = RoundedOutlineProvider.getInstance(r)
     }
 }
