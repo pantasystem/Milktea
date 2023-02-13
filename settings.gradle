@@ -75,7 +75,7 @@ dependencyResolutionManagement {
 
             library("androidx-test-ext-junit", "androidx.test.ext:junit:1.1.4")
             library("junit", "junit:junit:4.13.2")
-            library("androidx-test-espresso-core", "androidx.test.espresso:espresso-core:3.5.0")
+            library("androidx-test-espresso-core", "androidx.test.espresso:espresso-core:3.5.1")
 
             // App Startup
             library("androidx-appstartup", "androidx.startup:startup-runtime:1.1.1")
