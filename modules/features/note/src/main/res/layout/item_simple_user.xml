@@ -35,6 +35,7 @@
                     tools:src="@drawable/ic_person_add_black_24dp"
                     tools:ignore="ContentDescription"
                     circleIcon="@{user.avatarUrl}"
+                    android:scaleType="centerCrop"
                     transitionDestinationUser="@{user}"/>
             <TextView
                     android:id="@+id/nameMain"
