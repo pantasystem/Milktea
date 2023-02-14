@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
 import net.pantasystem.milktea.auth.viewmodel.SignUpUiState
 
 @Composable
@@ -21,6 +22,7 @@ fun SignUpScreen(
     uiState: SignUpUiState,
     onInputKeyword: (String) -> Unit,
     onNextButtonClicked: () -> Unit,
+    onSelected: (InstanceInfosResponse.InstanceInfo) -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -28,10 +30,11 @@ fun SignUpScreen(
             TopAppBar(
                 title = {
                     Text("インスタンスを探す")
-                }
+                },
+                backgroundColor = MaterialTheme.colors.surface,
+                elevation = 0.dp
             )
         },
-        backgroundColor = MaterialTheme.colors.surface,
     ) { paddingValues ->
         Column(
             Modifier
@@ -66,9 +69,12 @@ fun SignUpScreen(
                 items(uiState.filteredInfos) { instance ->
                     MisskeyInstanceInfoCard(
                         info = instance,
-                        selected = uiState.keyword == instance.url,
+                        selected = uiState.keyword == instance.url
+                                || (uiState.selectedUrl == instance.url && !uiState.filteredInfos.any {
+                            it.url == uiState.keyword
+                        }),
                         onClick = {
-                            onInputKeyword(instance.url)
+                            onSelected(instance)
                         }
                     )
                 }

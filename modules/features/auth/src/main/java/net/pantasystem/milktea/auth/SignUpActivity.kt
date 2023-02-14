@@ -34,7 +34,8 @@ class SignUpActivity : AppCompatActivity() {
                     onInputKeyword = signUpViewModel::onInputKeyword,
                     onNextButtonClicked = {
 
-                    }
+                    },
+                    onSelected = signUpViewModel::onSelected
                 )
             }
         }

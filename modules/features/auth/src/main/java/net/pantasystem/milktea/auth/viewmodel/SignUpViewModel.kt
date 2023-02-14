@@ -35,9 +35,13 @@ class SignUpViewModel @Inject constructor(
     private var _keyword = MutableStateFlow("")
     val keyword = _keyword.asStateFlow()
 
+    private var _selectedInstanceUrl = MutableStateFlow<String?>("misskey.io")
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfo = keyword.map {
-        if (it.startsWith("https://") || it.startsWith("http://")) {
+    val instanceInfo = combine(keyword, _selectedInstanceUrl) { it, selected ->
+        selected?.let {
+            "https://$it"
+        } ?: if (it.startsWith("https://") || it.startsWith("http://")) {
             it
         } else {
             "https://$it"
@@ -54,9 +58,15 @@ class SignUpViewModel @Inject constructor(
         ResultState.Loading(StateContent.NotExist())
     )
 
-    val uiState = combine(instancesInfosResponse, keyword, instanceInfo) { infos, keyword, info ->
+    val uiState = combine(
+        instancesInfosResponse,
+        keyword,
+        instanceInfo,
+        _selectedInstanceUrl
+    ) { infos, keyword, info, selected ->
         SignUpUiState(
             keyword = keyword,
+            selected,
             info,
             infos,
         )
@@ -69,15 +79,28 @@ class SignUpViewModel @Inject constructor(
     fun onInputKeyword(value: String) {
         _keyword.value = value
     }
+
+    fun onSelected(instancesInfosResponse: InstanceInfosResponse.InstanceInfo) {
+        _selectedInstanceUrl.value = instancesInfosResponse.url
+    }
 }
 
 data class SignUpUiState(
     val keyword: String = "",
+    val selectedUrl: String? = "misskey.io",
     val instanceInfo: ResultState<InstanceInfoType> = ResultState.Loading(StateContent.NotExist()),
     val instancesInfosResponse: InstanceInfosResponse? = null
 ) {
 
-    val filteredInfos = instancesInfosResponse?.instancesInfos?.filter {
+    val filteredInfos = (instancesInfosResponse?.instancesInfos?.filter {
         it.url.contains(keyword) || it.name.contains(keyword)
-    } ?: emptyList()
+    } ?: emptyList()).let { list ->
+        val misskeyIo = list.firstOrNull {
+            it.url == "misskey.io"
+        }
+        val otherInstances = list.filterNot {
+            it.url == "misskey.io"
+        }
+        listOfNotNull(misskeyIo) + otherInstances
+    }
 }
