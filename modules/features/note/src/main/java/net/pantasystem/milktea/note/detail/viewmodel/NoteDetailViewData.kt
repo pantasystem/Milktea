@@ -7,6 +7,7 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 /**
@@ -21,6 +22,7 @@ class NoteDetailViewData(
     translationStore: NoteTranslationStore,
     instanceEmojis: List<Emoji>,
     noteDataSource: NoteDataSource,
+    configRepository: LocalConfigRepository,
     coroutineScope: CoroutineScope,
 ) : PlaneNoteViewData(
     note,
@@ -29,6 +31,7 @@ class NoteDetailViewData(
     translationStore,
     instanceEmojis,
     noteDataSource,
+    configRepository,
     coroutineScope
 ) {
     init {

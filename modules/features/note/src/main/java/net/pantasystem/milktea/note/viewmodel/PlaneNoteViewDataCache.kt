@@ -159,6 +159,7 @@ class PlaneNoteViewDataCache(
                 translationStore,
                 metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
                 noteDataSource,
+                configRepository,
                 coroutineScope,
             )
         } else {
@@ -169,6 +170,7 @@ class PlaneNoteViewDataCache(
                 translationStore,
                 metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
                 noteDataSource,
+                configRepository,
                 coroutineScope
             )
         }.also {

@@ -19,6 +19,7 @@ import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.user.User
@@ -31,6 +32,7 @@ open class PlaneNoteViewData(
     private val noteTranslationStore: NoteTranslationStore,
     private val instanceEmojis: List<Emoji>,
     noteDataSource: NoteDataSource,
+    configRepository: LocalConfigRepository,
     coroutineScope: CoroutineScope,
 ) : NoteViewData {
 
@@ -195,6 +197,9 @@ open class PlaneNoteViewData(
         (it.type as? Note.Type.Misskey)?.channel
     }
 
+    val isVisibleNoteDivider = configRepository.observe().map {
+        it.isEnableNoteDivider
+    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
 
     fun changeContentFolding() {
         val isFolding = contentFolding.value ?: return

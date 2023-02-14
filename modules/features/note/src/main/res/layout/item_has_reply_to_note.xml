@@ -14,7 +14,6 @@
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0.5dp"
             app:cardUseCompatPadding="false"
             app:cardCornerRadius="0dp"
             android:elevation="0dp"
@@ -143,7 +142,11 @@
                     />
 
 
-
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="?android:attr/listDivider"
+                    android:visibility="@{ hasReplyToNote.isVisibleNoteDivider ? View.VISIBLE : View.GONE}" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
