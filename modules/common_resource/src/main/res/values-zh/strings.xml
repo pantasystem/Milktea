@@ -438,5 +438,8 @@
     <string name="auth_join_milktea_title">让我们从Milktea开始Misskey</string>
     <string name="auth_sign_up_button">报名</string>
     <string name="auth_sign_in">登入</string>
+    <string name="auth_find_instance">找服务器</string>
+    <string name="auth_find_instance_next_button_text">下一个</string>
+    <string name="auth_find_instance_show_in_web_browser_message">注册屏幕将出现在您的浏览器中</string>
 
 </resources>

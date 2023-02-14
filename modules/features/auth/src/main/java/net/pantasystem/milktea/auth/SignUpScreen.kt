@@ -34,7 +34,7 @@ fun SignUpScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("インスタンスを探す")
+                    Text(stringResource(R.string.auth_find_instance))
                 },
                 backgroundColor = MaterialTheme.colors.surface,
                 elevation = 0.dp,
@@ -99,7 +99,7 @@ fun SignUpScreen(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("登録画面がWebブラウザで表示されます")
+                Text(stringResource(id = R.string.auth_find_instance_show_in_web_browser_message))
                 Button(
                     shape = RoundedCornerShape(32.dp),
                     onClick = {
@@ -114,7 +114,7 @@ fun SignUpScreen(
                             && uiState.instanceInfo.content is StateContent.Exist
                 ) {
                     Text(
-                        "次へ",
+                        stringResource(id = R.string.auth_find_instance_next_button_text),
                         modifier = Modifier.padding(horizontal = 64.dp)
                     )
                 }

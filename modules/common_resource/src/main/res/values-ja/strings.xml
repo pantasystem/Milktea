@@ -441,5 +441,8 @@
     <string name="auth_join_milktea_title">Milkteaで\\nMisskeyをはじめよう</string>
     <string name="auth_sign_in">連携する(ログイン)</string>
     <string name="auth_sign_up_button">アカウントを作成する</string>
+    <string name="auth_find_instance">サーバを見つける</string>
+    <string name="auth_find_instance_next_button_text">次へ</string>
+    <string name="auth_find_instance_show_in_web_browser_message">ブラウザに登録画面が表示されます。</string>
 
 </resources>
