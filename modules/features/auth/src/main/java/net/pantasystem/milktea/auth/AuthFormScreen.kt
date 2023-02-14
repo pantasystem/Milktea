@@ -47,9 +47,8 @@ fun AuthFormScreen(
     Column(
         modifier
             .fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween,
-
-        ) {
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
         Column(
             Modifier
                 .fillMaxWidth()
@@ -114,17 +113,22 @@ fun AuthFormScreen(
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
+                .padding(vertical = 8.dp, horizontal = 14.dp),
             horizontalAlignment = Alignment.End,
         ) {
-            AgreementLayout(
-                uiState = uiState,
-                onShowPrivacyPolicy = onShowPrivacyPolicy,
-                onShowTermsOfService = onShowTermsOfService,
-                onTogglePrivacyPolicyAgreement = onTogglePrivacyPolicyAgreement,
-                onToggleTermsOfServiceAgreement = onToggleTermsOfServiceAgreement,
-                onToggleAcceptMastodonAlphaTest = onToggleAcceptMastodonAlphaTest
-            )
+            if (uiState.metaState is ResultState.Fixed
+                && uiState.metaState.content is StateContent.Exist
+            ) {
+                AgreementLayout(
+                    uiState = uiState,
+                    onShowPrivacyPolicy = onShowPrivacyPolicy,
+                    onShowTermsOfService = onShowTermsOfService,
+                    onTogglePrivacyPolicyAgreement = onTogglePrivacyPolicyAgreement,
+                    onToggleTermsOfServiceAgreement = onToggleTermsOfServiceAgreement,
+                    onToggleAcceptMastodonAlphaTest = onToggleAcceptMastodonAlphaTest
+                )
+            }
+
             Spacer(Modifier.height(8.dp))
 
             Button(
