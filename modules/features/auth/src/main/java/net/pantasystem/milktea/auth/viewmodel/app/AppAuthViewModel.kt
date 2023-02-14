@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -36,6 +37,7 @@ class AppAuthViewModel @Inject constructor(
     private val clientIdRepository: ClientIdRepository,
     private val instanceInfoRepository: InstanceInfoRepository,
     private val syncMetaExecutor: SyncMetaExecutor,
+    private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -67,6 +69,19 @@ class AppAuthViewModel @Inject constructor(
     private val instances = instanceInfoRepository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    @OptIn(FlowPreview::class)
+    private val misskeyInstances = suspend {
+        runCancellableCatching {
+            withContext(Dispatchers.IO) {
+                requireNotNull(
+                    instancesInfoAPIBuilder.build().getInstances()
+                        .throwIfHasError()
+                        .body()
+                )
+            }
+        }
+    }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     private val isPrivacyPolicyAgreement = MutableStateFlow(false)
     private val isTermsOfServiceAgreement = MutableStateFlow(false)
 
@@ -92,7 +107,7 @@ class AppAuthViewModel @Inject constructor(
         instanceDomain,
         appName,
         password,
-        checkBoxes
+        checkBoxes,
     ) { domain, name, password, checkBoxes ->
         AuthUserInputState(
             instanceDomain = authService.toEnableUrl(domain),
@@ -101,7 +116,7 @@ class AppAuthViewModel @Inject constructor(
             password = password,
             isPrivacyPolicyAgreement = checkBoxes.isPrivacyPolicyAgreement,
             isTermsOfServiceAgreement = checkBoxes.isTermsOfServiceAgreement,
-            isAcceptMastodonAlphaTest = checkBoxes.isAcceptMastodonAlphaTest
+            isAcceptMastodonAlphaTest = checkBoxes.isAcceptMastodonAlphaTest,
         )
     }.stateIn(
         viewModelScope,
@@ -205,7 +220,8 @@ class AppAuthViewModel @Inject constructor(
         instanceInfo,
         combineStates,
         instances,
-    ) { formState, (waiting4Approve, approved, finished, result), instances ->
+        misskeyInstances,
+    ) { formState, (waiting4Approve, approved, finished, result), instances, misskeyInstances ->
         AuthUiState(
             formState = formState.inputState,
             metaState = formState.meta,
@@ -218,7 +234,8 @@ class AppAuthViewModel @Inject constructor(
             },
             waiting4ApproveState = waiting4Approve,
             clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
-            instances = instances
+            instances = instances,
+            misskeyInstanceInfosResponse = misskeyInstances?.getOrNull()
         )
     }.stateIn(
         viewModelScope,
@@ -226,7 +243,8 @@ class AppAuthViewModel @Inject constructor(
         AuthUiState(
             formState = authUserInputState.value,
             metaState = metaState.value,
-            stateType = Authorization.BeforeAuthentication
+            stateType = Authorization.BeforeAuthentication,
+            misskeyInstanceInfosResponse = null,
         )
     )
 

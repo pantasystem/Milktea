@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
+import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -16,7 +17,7 @@ data class AuthUserInputState(
     val password: String,
     val isPrivacyPolicyAgreement: Boolean,
     val isTermsOfServiceAgreement: Boolean,
-    val isAcceptMastodonAlphaTest: Boolean
+    val isAcceptMastodonAlphaTest: Boolean,
 ) {
     val isIdPassword: Boolean by lazy {
         userNameRegex.matches(rawInputInstanceDomain)
@@ -61,9 +62,11 @@ data class AuthUiState(
     val metaState: ResultState<InstanceType>,
     val stateType: Authorization,
     val waiting4ApproveState: ResultState<Authorization.Waiting4UserAuthorization> = ResultState.Fixed(
-        StateContent.NotExist()),
+        StateContent.NotExist()
+    ),
     val clientId: String = "",
     val instances: List<InstanceInfo> = emptyList(),
+    val misskeyInstanceInfosResponse: InstanceInfosResponse?
 ) {
     val isProgress by lazy {
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading

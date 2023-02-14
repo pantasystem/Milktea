@@ -130,6 +130,10 @@ class AuthorizationActivity : AppCompatActivity() {
                     },
                     onShowTermsOfService = {
                         showTermsOfService()
+                    },
+                    onSignUpButtonClicked = {
+                        val intent = Intent(this, SignUpActivity::class.java)
+                        startActivity(intent)
                     }
                 )
             }

@@ -1,6 +1,7 @@
 package jp.panta.misskeyandroidclient.ui.main
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Build
@@ -20,9 +21,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.auth.JoinMilkteaActivity
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
-import net.pantasystem.milktea.common_navigation.AuthorizationArgs
-import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
@@ -38,7 +38,6 @@ internal class MainActivityEventHandler(
     val reportViewModel: ReportViewModel,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     val accountStore: AccountStore,
-    val authorizationNavigation: AuthorizationNavigation,
     val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
     private val configStore: SettingStore,
@@ -195,7 +194,7 @@ internal class MainActivityEventHandler(
                     )
                     if (state.isUnauthorized) {
                         activity.startActivity(
-                            authorizationNavigation.newIntent(AuthorizationArgs.New)
+                            Intent(activity, JoinMilkteaActivity::class.java)
                         )
                         activity.finish()
                     }

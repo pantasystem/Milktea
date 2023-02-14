@@ -434,7 +434,15 @@
     <string name="show_more_reactions">显示更多反应</string>
     <string name="pick_file_from_device">从设备中选择文件</string>
     <string name="note_editor_file_max_size_validation_error_message">不能附加超过 %d 个文件</string>
+    <string name="auth_sign_up">报名</string>
+    <string name="auth_join_milktea_title">让我们从Milktea开始Misskey</string>
+    <string name="auth_sign_up_button">报名</string>
+    <string name="auth_sign_in">登入</string>
+    <string name="auth_find_instance">找服务器</string>
+    <string name="auth_find_instance_next_button_text">下一个</string>
+    <string name="auth_find_instance_show_in_web_browser_message">注册屏幕将出现在您的浏览器中</string>
     <string name="settings_note_divider">在笔记中显示水平分隔线</string>
     <string name="settings_note">笔记</string>
+    <string name="auth_qr_code_message">在另一台设备上进行身份验证</string>
 
 </resources>

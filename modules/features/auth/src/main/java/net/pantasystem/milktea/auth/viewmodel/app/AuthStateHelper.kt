@@ -36,6 +36,7 @@ import java.net.URL
 import java.util.regex.Pattern
 import javax.inject.Inject
 
+val urlPattern: Pattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
 class AuthStateHelper @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
@@ -51,8 +52,7 @@ class AuthStateHelper @Inject constructor(
     val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
     val userDTOEntityConverter: UserDTOEntityConverter
 ) {
-    private val urlPattern =
-        Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+
 
     suspend fun createWaiting4Approval(
         instanceBase: String,

@@ -132,7 +132,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         MainActivityEventHandler(
             activity = this,
             accountStore = accountStore,
-            authorizationNavigation = authorizationNavigation,
             binding = binding,
             lifecycleOwner = this,
             lifecycleScope = lifecycleScope,
