@@ -10,14 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -149,18 +147,26 @@ class SettingMovementActivity : AppCompatActivity() {
                                     .padding(horizontal = 16.dp)
                             ) {
                                 Text(text = stringResource(id = R.string.height_limit))
-                                TextField(
-                                    placeholder = { Text(text = stringResource(id = R.string.height_limit)) },
-                                    value = currentConfigState.noteExpandedHeightSize.toString(),
-                                    keyboardOptions = KeyboardOptions
-                                        .Default.copy(keyboardType = KeyboardType.Number),
-                                    onValueChange = {
-                                        currentConfigState = currentConfigState.copy(
-                                            noteExpandedHeightSize = it.toIntOrNull()
-                                                ?: DefaultConfig.config.noteExpandedHeightSize
-                                        )
+                                Slider(
+                                    value = currentConfigState.noteExpandedHeightSize.let {
+                                        val v =
+                                            currentConfigState.noteExpandedHeightSize.toFloat() / 1000f
+                                        if (it in 0..1000) {
+                                            v
+                                        } else {
+                                            1f
+                                        }
                                     },
-                                    modifier = Modifier.fillMaxWidth()
+                                    onValueChange = {
+                                        val v = (it * 1000f).toInt()
+                                        currentConfigState = currentConfigState.copy(
+                                            noteExpandedHeightSize = if (v > 50) {
+                                                v
+                                            } else 50
+                                        )
+
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
                         }
