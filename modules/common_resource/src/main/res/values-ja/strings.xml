@@ -437,5 +437,7 @@
     <string name="show_more_reactions">もっとリアクションを見る</string>
     <string name="pick_file_from_device">端末からファイルを選択</string>
     <string name="note_editor_file_max_size_validation_error_message">%d個を超えるファイルを添付できません</string>
+    <string name="settings_note">ノート</string>
+    <string name="settings_note_divider">ノートに横区切り線を表示する</string>
 
 </resources>

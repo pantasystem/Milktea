@@ -47,6 +47,7 @@ data class IsAnalyticsCollectionEnabled(
  * @param isStopNoteCaptureWhenBackground バックグラウンド移行時にノートのキャプチャーを停止する
  * @param isStopStreamingApiWhenBackground バックグルアンド移行時にストリーミングを中止する
  * @param isEnableStreamingAPIAndNoteCapture 自動更新のON/OFF
+ * @Param isEnableNoteDivider ノートの区切り線の有無 trueで有り falseで無し
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -71,6 +72,7 @@ data class Config(
     val isStopStreamingApiWhenBackground: Boolean,
     val isStopNoteCaptureWhenBackground: Boolean,
     val isEnableStreamingAPIAndNoteCapture: Boolean,
+    val isEnableNoteDivider: Boolean,
 ) {
     companion object
 
@@ -123,6 +125,7 @@ object DefaultConfig {
         isStopNoteCaptureWhenBackground = true,
         isStopStreamingApiWhenBackground = true,
         isEnableStreamingAPIAndNoteCapture = true,
+        isEnableNoteDivider = true
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

@@ -127,6 +127,10 @@ class ConfigKtTest {
                     config.isEnableStreamingAPIAndNoteCapture,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsEnableNoteDivider -> Assertions.assertEquals(
+                    config.isEnableNoteDivider,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }
