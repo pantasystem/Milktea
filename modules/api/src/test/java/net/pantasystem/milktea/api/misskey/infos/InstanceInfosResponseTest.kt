@@ -16,7 +16,9 @@ class InstanceInfosResponseTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val file = File(CurrentClassLoader()!!.getResource("instances_info.json").file)
+        val file = File(requireNotNull(CurrentClassLoader()) {
+            "ClassLoaderの取得に失敗"
+        }.getResource("instances_info.json").file)
         val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
