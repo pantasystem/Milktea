@@ -446,5 +446,6 @@
     <string name="auth_find_instance_show_in_web_browser_message">ブラウザに登録画面が表示されます。</string>
     <string name="settings_note">ノート</string>
     <string name="settings_note_divider">ノートに横区切り線を表示する</string>
+    <string name="auth_qr_code_message">別のデバイスで認証する</string>
 
 </resources>
