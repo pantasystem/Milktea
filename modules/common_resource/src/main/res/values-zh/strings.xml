@@ -434,5 +434,6 @@
     <string name="show_more_reactions">显示更多反应</string>
     <string name="pick_file_from_device">从设备中选择文件</string>
     <string name="note_editor_file_max_size_validation_error_message">不能附加超过 %d 个文件</string>
+    <string name="auth_sign_up">报名</string>
 
 </resources>

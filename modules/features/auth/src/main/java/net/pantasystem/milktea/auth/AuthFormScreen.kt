@@ -42,6 +42,7 @@ fun AuthFormScreen(
     onTogglePrivacyPolicyAgreement: (Boolean) -> Unit,
     onToggleTermsOfServiceAgreement: (Boolean) -> Unit,
     onToggleAcceptMastodonAlphaTest: (Boolean) -> Unit,
+    onSignUpButtonClicked: () -> Unit,
 ) {
 
     Column(
@@ -131,17 +132,32 @@ fun AuthFormScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            Button(
-                onClick = onStartAuthButtonClicked,
-                enabled = uiState.metaState is ResultState.Fixed
-                        && uiState.metaState.content is StateContent.Exist
-                        && uiState.formState.isPrivacyPolicyAgreement
-                        && uiState.formState.isTermsOfServiceAgreement
-                        && (!uiState.isMastodon || uiState.formState.isAcceptMastodonAlphaTest),
-                shape = RoundedCornerShape(32.dp)
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
-                Text(stringResource(R.string.start_auth))
+                OutlinedButton(
+                    onClick = onSignUpButtonClicked,
+                    shape = RoundedCornerShape(32.dp)
+                ) {
+                    Text(stringResource(R.string.auth_sign_up))
+                }
+                
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = onStartAuthButtonClicked,
+                    enabled = uiState.metaState is ResultState.Fixed
+                            && uiState.metaState.content is StateContent.Exist
+                            && uiState.formState.isPrivacyPolicyAgreement
+                            && uiState.formState.isTermsOfServiceAgreement
+                            && (!uiState.isMastodon || uiState.formState.isAcceptMastodonAlphaTest),
+                    shape = RoundedCornerShape(32.dp)
+                ) {
+                    Text(stringResource(R.string.start_auth))
+                }
             }
+
             Spacer(modifier = Modifier.height(4.dp))
         }
 
@@ -276,8 +292,8 @@ fun Preview_AuthFormScreen() {
                 onShowTermsOfService = {},
                 onTogglePrivacyPolicyAgreement = {},
                 onToggleTermsOfServiceAgreement = {},
-                onToggleAcceptMastodonAlphaTest = {}
-
+                onToggleAcceptMastodonAlphaTest = {},
+                onSignUpButtonClicked = {}
             )
         }
     }

@@ -23,6 +23,7 @@ fun AuthScreen(
     onCopyToClipboard: (String) -> Unit,
     onShowPrivacyPolicy: () -> Unit,
     onShowTermsOfService: () -> Unit,
+    onSignUpButtonClicked: () -> Unit,
 ) {
     val uiState by authViewModel.state.collectAsState()
 
@@ -82,7 +83,8 @@ fun AuthScreen(
                         onTogglePrivacyPolicyAgreement = authViewModel::onTogglePrivacyPolicyAgreement,
                         onShowTermsOfService = onShowTermsOfService,
                         onShowPrivacyPolicy = onShowPrivacyPolicy,
-                        onToggleAcceptMastodonAlphaTest = authViewModel::onToggleAcceptMastodonAlphaTest
+                        onToggleAcceptMastodonAlphaTest = authViewModel::onToggleAcceptMastodonAlphaTest,
+                        onSignUpButtonClicked = onSignUpButtonClicked
                     )
                 }
                 is Authorization.Waiting4UserAuthorization -> {

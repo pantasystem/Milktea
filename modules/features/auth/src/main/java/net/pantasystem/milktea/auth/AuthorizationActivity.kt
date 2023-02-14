@@ -130,6 +130,9 @@ class AuthorizationActivity : AppCompatActivity() {
                     },
                     onShowTermsOfService = {
                         showTermsOfService()
+                    },
+                    onSignUpButtonClicked = {
+
                     }
                 )
             }
