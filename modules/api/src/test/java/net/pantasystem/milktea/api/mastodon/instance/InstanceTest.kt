@@ -2,6 +2,7 @@ package net.pantasystem.milktea.api.mastodon.instance
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import net.pantasystem.milktea.api.CurrentClassLoader
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.BufferedInputStream
@@ -16,7 +17,7 @@ class InstanceTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val file = File(javaClass.classLoader!!.getResource("fedibird_instance_info.json").file)
+        val file = File(CurrentClassLoader()!!.getResource("fedibird_instance_info.json").file)
         val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
@@ -29,7 +30,7 @@ class InstanceTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val file = File(javaClass.classLoader!!.getResource("mstdnjp_instance_info.json").file)
+        val file = File(CurrentClassLoader()!!.getResource("mstdnjp_instance_info.json").file)
         val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
@@ -42,7 +43,7 @@ class InstanceTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val file = File(javaClass.classLoader!!.getResource("mastodonsocial_instance_info.json").file)
+        val file = File(CurrentClassLoader()!!.getResource("mastodonsocial_instance_info.json").file)
         val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
@@ -64,7 +65,7 @@ class InstanceTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val file = File(javaClass.classLoader!!.getResource("pawoonet_instance_info.json").file)
+        val file = File(CurrentClassLoader()!!.getResource("pawoonet_instance_info.json").file)
         val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
