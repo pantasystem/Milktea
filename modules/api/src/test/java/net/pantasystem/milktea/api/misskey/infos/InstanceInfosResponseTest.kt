@@ -2,12 +2,11 @@ package net.pantasystem.milktea.api.misskey.infos
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.api.CurrentClassLoader
 import org.junit.jupiter.api.Test
 import java.io.BufferedInputStream
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
+import java.net.URL
 
 class InstanceInfosResponseTest {
 
@@ -16,10 +15,10 @@ class InstanceInfosResponseTest {
         val json = Json {
             ignoreUnknownKeys = true
         }
-        val file = File(requireNotNull(CurrentClassLoader()) {
-            "ClassLoaderの取得に失敗"
-        }.getResource("instances_info.json").file)
-        val text = BufferedReader(InputStreamReader(BufferedInputStream(file.inputStream()))).use {
+
+        val url = URL("https://instanceapp.misskey.page/instances.json")
+
+        val text = BufferedReader(InputStreamReader(BufferedInputStream(url.openStream()))).use {
             it.readLines().reduce { acc, s -> acc + s }.trimIndent()
         }
         json.decodeFromString<InstanceInfosResponse>(text)
