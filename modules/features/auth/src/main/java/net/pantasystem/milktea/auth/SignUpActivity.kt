@@ -39,7 +39,10 @@ class SignUpActivity : AppCompatActivity() {
                         intent.data = Uri.parse(instanceType.uri)
                         startActivity(intent)
                     },
-                    onSelected = signUpViewModel::onSelected
+                    onSelected = signUpViewModel::onSelected,
+                    onNavigateUp = {
+                        finish()
+                    }
                 )
             }
         }

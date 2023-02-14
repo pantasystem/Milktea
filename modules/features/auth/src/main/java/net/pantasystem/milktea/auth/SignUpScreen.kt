@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ fun SignUpScreen(
     onInputKeyword: (String) -> Unit,
     onNextButtonClicked: (InstanceInfoType) -> Unit,
     onSelected: (InstanceInfosResponse.InstanceInfo) -> Unit,
+    onNavigateUp: () -> Unit
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -35,7 +37,12 @@ fun SignUpScreen(
                     Text("インスタンスを探す")
                 },
                 backgroundColor = MaterialTheme.colors.surface,
-                elevation = 0.dp
+                elevation = 0.dp,
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "navigate up")
+                    }
+                }
             )
         },
     ) { paddingValues ->
@@ -48,7 +55,9 @@ fun SignUpScreen(
             OutlinedTextField(
                 instanceDomain,
                 onValueChange = onInputKeyword,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 maxLines = 1,
                 label = {
                     Text(stringResource(R.string.instance_domain))

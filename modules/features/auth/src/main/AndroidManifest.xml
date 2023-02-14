@@ -6,8 +6,18 @@
 
     <application>
         <activity
+                android:name=".JoinMilkteaActivity"
+                android:exported="false"
+                android:launchMode="singleInstance">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="" />
+        </activity>
+        <activity
                 android:name=".SignUpActivity"
-                android:exported="false">
+                android:exported="false"
+                android:windowSoftInputMode="adjustResize"
+                android:launchMode="singleInstance">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
