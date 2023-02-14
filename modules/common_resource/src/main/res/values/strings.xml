@@ -429,4 +429,7 @@
     <string name="pick_file_from_device">Pick file from device</string>
     <string name="note_editor_file_max_size_validation_error_message">Cannot attach more than %d files</string>
     <string name="auth_sign_up">Sign up</string>
+    <string name="auth_sign_up_button">Sign up</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_join_milktea_title">Let\'s start Misskey with Milktea</string>
 </resources>

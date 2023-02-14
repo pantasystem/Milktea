@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +38,7 @@ fun JoinMilkteaScreen(
                     .fillMaxSize(),
             ) {
                 Text(
-                    "Milkteaで\nMisskeyをはじめよう", fontSize = 28.sp,
+                    stringResource(id = R.string.auth_join_milktea_title), fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Left
@@ -52,7 +53,7 @@ fun JoinMilkteaScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(32.dp)
                     ) {
-                        Text("アカウントを作成する")
+                        Text(stringResource(id = R.string.auth_sign_up))
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -62,7 +63,7 @@ fun JoinMilkteaScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(32.dp),
                     ) {
-                        Text("アカウントを連携する")
+                        Text(stringResource(id = R.string.auth_sign_in))
                     }
                 }
             }
