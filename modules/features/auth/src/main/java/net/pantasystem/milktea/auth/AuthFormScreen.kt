@@ -57,25 +57,28 @@ fun AuthFormScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Search, contentDescription = null)
-                OutlinedTextField(
-                    instanceDomain,
-                    onValueChange = onInputInstanceDomain,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    label = {
-                        Text(stringResource(R.string.instance_domain))
+            OutlinedTextField(
+                instanceDomain,
+                onValueChange = onInputInstanceDomain,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                maxLines = 1,
+                label = {
+                    Text(stringResource(R.string.instance_domain))
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            onInputInstanceDomain("")
+                        },
+                    ) {
+                        Icon(Icons.Default.Clear, contentDescription = "clear instance domain")
                     }
-                )
-                IconButton(
-                    onClick = {
-                        onInputInstanceDomain("")
-                    },
-                ) {
-                    Icon(Icons.Default.Clear, contentDescription = "clear instance domain")
                 }
-            }
+            )
             if (uiState.formState.isIdPassword) {
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
@@ -142,7 +145,7 @@ fun AuthFormScreen(
                 ) {
                     Text(stringResource(R.string.auth_sign_up))
                 }
-                
+
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Button(
