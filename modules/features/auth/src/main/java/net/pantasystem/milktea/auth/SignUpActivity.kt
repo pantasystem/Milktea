@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.auth
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -32,8 +34,10 @@ class SignUpActivity : AppCompatActivity() {
                     uiState = uiState,
                     instanceDomain = keyword,
                     onInputKeyword = signUpViewModel::onInputKeyword,
-                    onNextButtonClicked = {
-
+                    onNextButtonClicked = { instanceType ->
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.data = Uri.parse(instanceType.uri)
+                        startActivity(intent)
                     },
                     onSelected = signUpViewModel::onSelected
                 )

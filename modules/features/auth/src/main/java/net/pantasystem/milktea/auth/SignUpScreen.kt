@@ -15,13 +15,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
 import net.pantasystem.milktea.auth.viewmodel.SignUpUiState
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 
 @Composable
 fun SignUpScreen(
     instanceDomain: String,
     uiState: SignUpUiState,
     onInputKeyword: (String) -> Unit,
-    onNextButtonClicked: () -> Unit,
+    onNextButtonClicked: (InstanceInfoType) -> Unit,
     onSelected: (InstanceInfosResponse.InstanceInfo) -> Unit,
 ) {
     Scaffold(
@@ -90,7 +93,16 @@ fun SignUpScreen(
                 Text("登録画面がWebブラウザで表示されます")
                 Button(
                     shape = RoundedCornerShape(32.dp),
-                    onClick = onNextButtonClicked
+                    onClick = {
+                        when(val content = uiState.instanceInfo.content) {
+                            is StateContent.Exist -> {
+                                onNextButtonClicked(content.rawContent)
+                            }
+                            is StateContent.NotExist -> Unit
+                        }
+                    },
+                    enabled = uiState.instanceInfo is ResultState.Fixed
+                            && uiState.instanceInfo.content is StateContent.Exist
                 ) {
                     Text(
                         "次へ",
