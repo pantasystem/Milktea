@@ -502,7 +502,7 @@
             </LinearLayout>
             <View
                     android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
+                    android:layout_height="@dimen/note_divider_height"
                     android:background="?android:attr/listDivider"
                     android:layout_below="@id/noteActionButtonBaseLayout"
                     android:visibility="@{ note.isVisibleNoteDivider ? View.VISIBLE : View.GONE}" />

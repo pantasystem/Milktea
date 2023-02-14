@@ -11,4 +11,6 @@
 
     <dimen name="note_avatar_icon_size">50dp</dimen>
 
+    <dimen name="note_divider_height">0.8dp</dimen>
+
 </resources>
