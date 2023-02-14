@@ -42,25 +42,27 @@ fun SignUpScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Search, contentDescription = null)
-                OutlinedTextField(
-                    instanceDomain,
-                    onValueChange = onInputKeyword,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    label = {
-                        Text(stringResource(R.string.instance_domain))
+            OutlinedTextField(
+                instanceDomain,
+                onValueChange = onInputKeyword,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                maxLines = 1,
+                label = {
+                    Text(stringResource(R.string.instance_domain))
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            onInputKeyword("")
+                        },
+                    ) {
+                        Icon(Icons.Default.Clear, contentDescription = "clear instance domain")
                     }
-                )
-                IconButton(
-                    onClick = {
-                        onInputKeyword("")
-                    },
-                ) {
-                    Icon(Icons.Default.Clear, contentDescription = "clear instance domain")
-                }
-            }
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                },
+            )
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()

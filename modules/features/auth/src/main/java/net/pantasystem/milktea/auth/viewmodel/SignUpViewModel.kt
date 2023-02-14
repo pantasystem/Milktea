@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.auth.viewmodel
 
-import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,8 +45,6 @@ class SignUpViewModel @Inject constructor(
         } else {
             "https://$it"
         }
-    }.filter {
-        URLUtil.isNetworkUrl(it)
     }.flatMapLatest {
         suspend {
             instanceInfoService.find(it).getOrThrow()
