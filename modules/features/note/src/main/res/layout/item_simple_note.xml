@@ -152,6 +152,7 @@
                         android:gravity="center_vertical"
                         android:padding="2dp"
                         instanceInfo="@{note.toShowNote.user.instance}"
+                        isEnable="@{note.isVisibleInstanceTicker}"
                         android:maxLines="1"
                         />
                 <TextView

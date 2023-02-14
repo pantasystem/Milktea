@@ -201,6 +201,10 @@ open class PlaneNoteViewData(
         it.isEnableNoteDivider
     }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
 
+    val isVisibleInstanceTicker = configRepository.observe().map {
+        it.isEnableInstanceTicker
+    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+
     fun changeContentFolding() {
         val isFolding = contentFolding.value ?: return
         contentFolding.value = !isFolding
