@@ -88,6 +88,10 @@ class KeysKtTest {
                     "IsEnableStreamingAPIAndNoteCapture",
                     key.str()
                 )
+                Keys.IsEnableNoteDivider -> Assertions.assertEquals(
+                    "IsEnableNoteDivider",
+                    key.str()
+                )
             }
         }
     }
@@ -95,8 +99,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(24, Keys.allKeys.size)
-        Assertions.assertEquals(24, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(25, Keys.allKeys.size)
+        Assertions.assertEquals(25, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
