@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 //viewはRecyclerView
@@ -19,6 +20,7 @@ class NoteConversationViewData(
     instanceEmojis: List<Emoji>,
     coroutineScope: CoroutineScope,
     noteDataSource: NoteDataSource,
+    configRepository: LocalConfigRepository,
 ) : PlaneNoteViewData(
     noteRelation,
     account,
@@ -26,6 +28,7 @@ class NoteConversationViewData(
     translationStore,
     instanceEmojis,
     noteDataSource,
+    configRepository,
     coroutineScope
 ) {
     val conversation = MutableLiveData<List<PlaneNoteViewData>>()

@@ -4,10 +4,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.CanLocalOnly
 import net.pantasystem.milktea.model.notes.Visibility
@@ -19,9 +16,24 @@ class LocalConfigRepositoryImpl(
     private val sharedPreference: SharedPreferences
 ) : LocalConfigRepository {
 
+    private val _configStateFlow = MutableStateFlow(DefaultConfig.config)
+    private var _config: Config? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                _configStateFlow.value = value
+            }
+        }
+
     override fun get(): Result<Config> {
+        when(val c = _config) {
+            null -> Unit
+            else -> return Result.success(c)
+        }
         return runCancellableCatching {
-            Config.from(sharedPreference.getPrefTypes())
+            Config.from(sharedPreference.getPrefTypes()).also {
+                _config = it
+            }
         }
     }
 
@@ -39,6 +51,7 @@ class LocalConfigRepositoryImpl(
                     }
                 }
             }
+            _config = config
         }
     }
 
@@ -110,9 +123,10 @@ class LocalConfigRepositoryImpl(
     }
 
     override fun observe(): Flow<Config> {
-        return sharedPreference.asFlow(Keys.allKeys.first().str()).map {
-            get().getOrThrow()
-        }.distinctUntilChanged()
+        when(_config) {
+            null -> _config = get().getOrNull()
+        }
+        return _configStateFlow
     }
 
     override fun observeRememberVisibility(accountId: Long): Flow<RememberVisibility> {

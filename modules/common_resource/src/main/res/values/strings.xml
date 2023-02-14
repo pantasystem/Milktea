@@ -435,4 +435,6 @@
     <string name="auth_find_instance">Find a server</string>
     <string name="auth_find_instance_next_button_text">Next</string>
     <string name="auth_find_instance_show_in_web_browser_message">A registration screen will appear in your browser.</string>
+    <string name="settings_note">Note</string>
+    <string name="settings_note_divider">Show horizontal separator lines in notes</string>
 </resources>

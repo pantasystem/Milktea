@@ -241,6 +241,18 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
 
+                            SettingTitleTile(text = stringResource(id = R.string.settings_note))
+                            SwitchTile(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                checked = currentConfigState.isEnableNoteDivider,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(isEnableNoteDivider = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.settings_note_divider))
+                            }
                         }
 
 

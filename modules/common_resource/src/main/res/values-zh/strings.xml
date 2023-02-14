@@ -441,5 +441,7 @@
     <string name="auth_find_instance">找服务器</string>
     <string name="auth_find_instance_next_button_text">下一个</string>
     <string name="auth_find_instance_show_in_web_browser_message">注册屏幕将出现在您的浏览器中</string>
+    <string name="settings_note_divider">在笔记中显示水平分隔线</string>
+    <string name="settings_note">笔记</string>
 
 </resources>

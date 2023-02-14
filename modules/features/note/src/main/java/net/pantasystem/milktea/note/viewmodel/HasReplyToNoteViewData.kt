@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 
 class HasReplyToNoteViewData(
     noteRelation: NoteRelation,
@@ -16,6 +17,7 @@ class HasReplyToNoteViewData(
     noteTranslationStore: NoteTranslationStore,
     instanceEmojis: List<Emoji>,
     noteDataSource: NoteDataSource,
+    configRepository: LocalConfigRepository,
     coroutineScope: CoroutineScope,
 ) : PlaneNoteViewData(
     noteRelation,
@@ -24,6 +26,7 @@ class HasReplyToNoteViewData(
     noteTranslationStore,
     instanceEmojis,
     noteDataSource,
+    configRepository,
     coroutineScope
 ) {
     val reply = noteRelation.reply
@@ -41,6 +44,7 @@ class HasReplyToNoteViewData(
             noteTranslationStore,
             instanceEmojis,
             noteDataSource,
+            configRepository,
             coroutineScope
         )
     }

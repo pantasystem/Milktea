@@ -30,7 +30,6 @@
             android:layout_marginEnd="5dp"
             app:cardUseCompatPadding="false"
             app:cardCornerRadius="0dp"
-            android:layout_marginTop="0.5dp"
             android:elevation="0dp"
             app:cardBackgroundColor="?attr/colorSurface"
 
@@ -119,6 +118,7 @@
                     android:gravity="center_vertical"
                     android:padding="2dp"
                     instanceInfo="@{note.toShowNote.user.instance}"
+                    isEnable="@{note.isVisibleInstanceTicker}"
                     android:layout_below="@id/avatarIcon"
                     android:layout_marginTop="4dp"
                     />
@@ -376,6 +376,7 @@
                     />
 
             <LinearLayout
+                    android:id="@+id/noteActionButtonBaseLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/reaction_view"
@@ -500,6 +501,12 @@
                         app:srcCompat="@drawable/ic_more_horiz_black_24dp"
                         app:tint="?attr/normalIconTint" />
             </LinearLayout>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/note_divider_height"
+                    android:background="?android:attr/listDivider"
+                    android:layout_below="@id/noteActionButtonBaseLayout"
+                    android:visibility="@{ note.isVisibleNoteDivider ? View.VISIBLE : View.GONE}" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
