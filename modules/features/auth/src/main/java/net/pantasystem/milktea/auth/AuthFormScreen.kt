@@ -2,6 +2,8 @@ package net.pantasystem.milktea.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -9,7 +11,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,7 +27,6 @@ import net.pantasystem.milktea.auth.viewmodel.app.AuthUserInputState
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import java.util.*
 
 @Composable
 fun AuthFormScreen(
@@ -31,10 +34,7 @@ fun AuthFormScreen(
     uiState: AuthUiState,
     password: String,
     instanceDomain: String,
-    appName: String,
-    clientId: String,
     onInputInstanceDomain: (String) -> Unit,
-    onInputAppName: (String) -> Unit,
     onInputPassword: (String) -> Unit,
     onStartAuthButtonClicked: () -> Unit,
     onShowPrivacyPolicy: () -> Unit,
@@ -43,6 +43,7 @@ fun AuthFormScreen(
     onToggleTermsOfServiceAgreement: (Boolean) -> Unit,
     onToggleAcceptMastodonAlphaTest: (Boolean) -> Unit,
 ) {
+
     Column(
         modifier
             .fillMaxSize(),
@@ -57,7 +58,7 @@ fun AuthFormScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.https))
+                Icon(Icons.Default.Search, contentDescription = null)
                 OutlinedTextField(
                     instanceDomain,
                     onValueChange = onInputInstanceDomain,
@@ -75,8 +76,8 @@ fun AuthFormScreen(
                     Icon(Icons.Default.Clear, contentDescription = "clear instance domain")
                 }
             }
-            Spacer(Modifier.height(8.dp))
             if (uiState.formState.isIdPassword) {
+                Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     password,
                     onInputPassword,
@@ -91,75 +92,24 @@ fun AuthFormScreen(
                         imeAction = ImeAction.Done,
                     ),
                 )
-            } else {
-                OutlinedTextField(
-                    appName,
-                    onInputAppName,
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 1,
-                    label = {
-                        Text(stringResource(R.string.custom_app_name))
-                    }
-                )
             }
 
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                TextButton(
-                    onClick = onShowTermsOfService
-                ) {
-                    Text(stringResource(id = R.string.terms_of_service_agreeation))
-                }
-                Switch(
-                    checked = uiState.formState.isTermsOfServiceAgreement,
-                    onCheckedChange = onToggleTermsOfServiceAgreement
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextButton(
-                    modifier = Modifier.clickable(onClick = onShowPrivacyPolicy),
-                    onClick = onShowPrivacyPolicy,
-                ) {
-                    Text(stringResource(id = R.string.privacy_policy_agreeation))
-                }
-                Switch(
-                    checked = uiState.formState.isPrivacyPolicyAgreement,
-                    onCheckedChange = onTogglePrivacyPolicyAgreement
-                )
-            }
 
-            if (uiState.isMastodon) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        stringResource(id = R.string.accpet_mastodon_alpha_test),
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .weight(1f)
-                    )
-                    Switch(
-                        checked = uiState.formState.isAcceptMastodonAlphaTest,
-                        onCheckedChange = onToggleAcceptMastodonAlphaTest,
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(8.dp))
             if (uiState.isProgress) {
+                Spacer(Modifier.height(8.dp))
                 CircularProgressIndicator()
             }
 
         }
+
+        FilteredInstances(
+            Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            uiState = uiState,
+            instanceDomain = instanceDomain,
+            onInputInstanceDomain = onInputInstanceDomain,
+        )
 
         Column(
             Modifier
@@ -167,6 +117,16 @@ fun AuthFormScreen(
                 .padding(vertical = 8.dp, horizontal = 16.dp),
             horizontalAlignment = Alignment.End,
         ) {
+            AgreementLayout(
+                uiState = uiState,
+                onShowPrivacyPolicy = onShowPrivacyPolicy,
+                onShowTermsOfService = onShowTermsOfService,
+                onTogglePrivacyPolicyAgreement = onTogglePrivacyPolicyAgreement,
+                onToggleTermsOfServiceAgreement = onToggleTermsOfServiceAgreement,
+                onToggleAcceptMastodonAlphaTest = onToggleAcceptMastodonAlphaTest
+            )
+            Spacer(Modifier.height(8.dp))
+
             Button(
                 onClick = onStartAuthButtonClicked,
                 enabled = uiState.metaState is ResultState.Fixed
@@ -179,9 +139,104 @@ fun AuthFormScreen(
                 Text(stringResource(R.string.start_auth))
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(clientId)
         }
 
+    }
+}
+
+@Composable
+private fun AgreementLayout(
+    uiState: AuthUiState,
+    onShowPrivacyPolicy: () -> Unit,
+    onShowTermsOfService: () -> Unit,
+    onTogglePrivacyPolicyAgreement: (Boolean) -> Unit,
+    onToggleTermsOfServiceAgreement: (Boolean) -> Unit,
+    onToggleAcceptMastodonAlphaTest: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        TextButton(
+            onClick = onShowTermsOfService
+        ) {
+            Text(stringResource(id = R.string.terms_of_service_agreeation))
+        }
+        Switch(
+            checked = uiState.formState.isTermsOfServiceAgreement,
+            onCheckedChange = onToggleTermsOfServiceAgreement
+        )
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextButton(
+            modifier = Modifier.clickable(onClick = onShowPrivacyPolicy),
+            onClick = onShowPrivacyPolicy,
+        ) {
+            Text(stringResource(id = R.string.privacy_policy_agreeation))
+        }
+        Switch(
+            checked = uiState.formState.isPrivacyPolicyAgreement,
+            onCheckedChange = onTogglePrivacyPolicyAgreement
+        )
+    }
+
+    if (uiState.isMastodon) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                stringResource(id = R.string.accpet_mastodon_alpha_test),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f)
+            )
+            Switch(
+                checked = uiState.formState.isAcceptMastodonAlphaTest,
+                onCheckedChange = onToggleAcceptMastodonAlphaTest,
+            )
+        }
+    }
+
+}
+
+@Composable
+private fun FilteredInstances(
+    modifier: Modifier = Modifier,
+    uiState: AuthUiState,
+    instanceDomain: String,
+    onInputInstanceDomain: (String) -> Unit,
+) {
+    val instances = remember(uiState.misskeyInstanceInfosResponse, uiState.formState) {
+        uiState.misskeyInstanceInfosResponse?.instancesInfos?.filter {
+            it.meta.uri.contains(instanceDomain) || it.name.contains(instanceDomain)
+        } ?: emptyList()
+    }
+    LazyColumn(
+        modifier
+    ) {
+        items(instances) { instance ->
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onInputInstanceDomain(instance.url)
+                    }
+            ) {
+                Text(
+                    instance.url,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp)
+                )
+            }
+        }
     }
 }
 
@@ -194,14 +249,11 @@ fun Preview_AuthFormScreen() {
                 Modifier
                     .padding(it)
                     .fillMaxSize(),
-                onInputAppName = {},
                 onInputInstanceDomain = {},
                 onInputPassword = {},
                 onStartAuthButtonClicked = {},
-                appName = "",
                 instanceDomain = "",
                 password = "",
-                clientId = "${UUID.randomUUID()}",
                 uiState = AuthUiState(
                     formState = AuthUserInputState(
                         "",
@@ -213,7 +265,8 @@ fun Preview_AuthFormScreen() {
                         isAcceptMastodonAlphaTest = false,
                     ),
                     metaState = ResultState.Loading(StateContent.NotExist()),
-                    stateType = Authorization.BeforeAuthentication
+                    stateType = Authorization.BeforeAuthentication,
+                    misskeyInstanceInfosResponse = null
                 ),
                 onShowPrivacyPolicy = {},
                 onShowTermsOfService = {},

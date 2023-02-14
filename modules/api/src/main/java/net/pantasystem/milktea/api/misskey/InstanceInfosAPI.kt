@@ -15,7 +15,7 @@ import javax.inject.Singleton
 interface InstanceInfosAPI {
 
     @GET("instances.json")
-    suspend fun getInstances(): Response<List<InstanceInfosResponse>>
+    suspend fun getInstances(): Response<InstanceInfosResponse>
 }
 
 @Singleton

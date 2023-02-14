@@ -63,26 +63,21 @@ fun AuthScreen(
             when (val stateType = uiState.stateType) {
                 Authorization.BeforeAuthentication -> {
                     val password by authViewModel.password.collectAsState()
-                    val appName by authViewModel.appName.collectAsState()
                     val instanceDomain by authViewModel.instanceDomain.collectAsState()
                     AuthFormScreen(
                         uiState = uiState,
                         password = password,
-                        appName = appName,
                         instanceDomain = instanceDomain,
                         onInputInstanceDomain = {
                             authViewModel.instanceDomain.value = it
                         },
-                        onInputAppName = {
-                            authViewModel.appName.value = it
-                        },
+
                         onInputPassword = {
                             authViewModel.password.value = it
                         },
                         onStartAuthButtonClicked = {
                             authViewModel.auth()
                         },
-                        clientId = uiState.clientId,
                         onToggleTermsOfServiceAgreement = authViewModel::onToggleTermsOfServiceAgreement,
                         onTogglePrivacyPolicyAgreement = authViewModel::onTogglePrivacyPolicyAgreement,
                         onShowTermsOfService = onShowTermsOfService,
