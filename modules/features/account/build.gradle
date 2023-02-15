@@ -99,4 +99,7 @@ dependencies {
 
     implementation libs.lifecycle.extenstions
     implementation libs.lifecycle.viewmodel
+
+    implementation libs.compose.constraintlayout
+
 }
