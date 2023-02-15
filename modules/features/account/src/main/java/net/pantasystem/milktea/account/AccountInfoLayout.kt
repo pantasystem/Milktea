@@ -5,9 +5,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -41,6 +43,7 @@ fun AccountInfoLayout(
             subNameRef,
             descriptionRef,
             aggregationRef,
+            fieldsRef,
         ) = createRefs()
 
         Image(
@@ -110,6 +113,7 @@ fun AccountInfoLayout(
             sourceHost = userDetail.host,
             modifier = Modifier
                 .padding(start = 8.dp, end = 8.dp)
+                .fillMaxWidth()
                 .constrainAs(descriptionRef) {
                     start.linkTo(avatarIconRef.start)
                     top.linkTo(subNameRef.bottom, margin = 2.dp)
@@ -117,8 +121,7 @@ fun AccountInfoLayout(
                 }
         )
 
-
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
@@ -126,6 +129,34 @@ fun AccountInfoLayout(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     top.linkTo(descriptionRef.bottom, margin = 4.dp)
+                }
+        ) {
+            for (i in 0 until userDetail.info.fields.size) {
+                val field = userDetail.info.fields[i]
+
+                if (i == 0) {
+                    Divider(modifier = Modifier.fillMaxWidth())
+                }
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(field.name, modifier = Modifier.weight(0.2f))
+                    Text(field.value, modifier = Modifier.weight(0.8f))
+                }
+                Divider(modifier = Modifier.fillMaxWidth())
+            }
+        }
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                .constrainAs(fieldsRef) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(aggregationRef.bottom)
                 }
         ) {
             Text(
@@ -157,7 +188,5 @@ fun AccountInfoLayout(
             )
 
         }
-
-
     }
 }
