@@ -44,6 +44,7 @@ class AccountTabViewModel @Inject constructor(
             }
             Account.InstanceType.MASTODON -> {
                 listOf(
+                    AccountTabTypes.Account,
                     AccountTabTypes.MastodonUserTimeline(userId),
                     AccountTabTypes.MastodonUserTimelineWithReplies(userId),
                     AccountTabTypes.MastodonMedia(userId)
