@@ -89,10 +89,12 @@ dependencies {
 
     implementation libs.kotlin.datetime
 
-    implementation libs.fragment.ktx
+
     implementation libs.lifecycle.livedata
 
+    implementation libs.fragment.ktx
     implementation libs.activity.ktx
+
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
 }
