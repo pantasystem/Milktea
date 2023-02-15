@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.main
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.SuitableType
@@ -21,7 +22,7 @@ internal class FabClickHandler(
         activity.apply {
             when(val type = currentPageableTimelineViewModel.currentType.value) {
                 CurrentPageType.Account -> {
-                    // TODO: アカウント切り替えボタンを表示する
+                    AccountSwitchingDialog().show(activity.supportFragmentManager, "AccountSwitchingDialog")
                 }
                 is CurrentPageType.Page -> {
                     when (val suitableType = type.pageable.suitableType()) {

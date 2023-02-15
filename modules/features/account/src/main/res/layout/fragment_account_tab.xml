@@ -38,14 +38,7 @@
                 app:tabMode="fixed"
                 app:tabGravity="fill" />
 
-        <View
-                android:id="@+id/elevationView"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
 
-                android:background="?attr/colorPrimary"
-                android:elevation="4dp"
-                android:visibility="visible" />
 
         <androidx.viewpager2.widget.ViewPager2
                 android:layout_width="match_parent"
