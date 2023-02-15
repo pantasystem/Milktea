@@ -29,6 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.user.activity.FollowFollowerActivity
 
 @AndroidEntryPoint
 class AccountFragment : Fragment() {
@@ -36,6 +37,7 @@ class AccountFragment : Fragment() {
     private val currentPageableViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
     private val accountViewModel by viewModels<AccountViewModel>()
+
 
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateView(
@@ -67,6 +69,24 @@ class AccountFragment : Fragment() {
                                                     isUserNameMain = false,
                                                     userDetail = user,
                                                     account = account,
+                                                    onFollowerCountButtonClicked = {
+                                                        requireActivity().startActivity(
+                                                            FollowFollowerActivity.newIntent(
+                                                                requireContext(),
+                                                                user.id,
+                                                                isFollowing = false
+                                                            )
+                                                        )
+                                                    },
+                                                    onFollowingCountButtonClicked = {
+                                                        requireActivity().startActivity(
+                                                            FollowFollowerActivity.newIntent(
+                                                                requireContext(),
+                                                                user.id,
+                                                                isFollowing = true
+                                                            )
+                                                        )
+                                                    }
                                                 )
                                             }
                                             else -> {

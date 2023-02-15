@@ -28,6 +28,8 @@ fun AccountInfoLayout(
     isUserNameMain: Boolean,
     userDetail: User.Detail,
     account: Account,
+    onFollowingCountButtonClicked: () -> Unit,
+    onFollowerCountButtonClicked: () -> Unit,
 ) {
     ConstraintLayout(
         modifier.fillMaxWidth()
@@ -131,9 +133,6 @@ fun AccountInfoLayout(
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier
                     .padding(2.dp)
-                    .clickable {
-//                        onAction(UserDetailCardAction.NotesCountClicked(userDetail.id))
-                    },
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
@@ -142,7 +141,7 @@ fun AccountInfoLayout(
                 modifier = Modifier
                     .padding(2.dp)
                     .clickable {
-//                        onAction(UserDetailCardAction.FollowingsCountClicked(userDetail.id))
+                        onFollowingCountButtonClicked()
                     },
             )
 
@@ -153,7 +152,7 @@ fun AccountInfoLayout(
                 modifier = Modifier
                     .padding(2.dp)
                     .clickable {
-//                        onAction(UserDetailCardAction.FollowersCountClicked(userDetail.id))
+                        onFollowerCountButtonClicked()
                     }
             )
 
