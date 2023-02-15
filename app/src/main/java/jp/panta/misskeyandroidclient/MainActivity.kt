@@ -142,6 +142,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView, featureEnables),
             configStore = settingStore,
             draftNoteService = draftNoteService,
+            currentPageableTimelineViewModel = currentPageableTimelineViewModel
         ).setup()
 
         RenoteResultHandler(
