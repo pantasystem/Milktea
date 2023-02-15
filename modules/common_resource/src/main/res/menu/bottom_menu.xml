@@ -18,5 +18,5 @@
             android:title="@string/notification" android:icon="@drawable/ic_selectable_notification"/>
     <item
             android:id="@+id/navigation_message_list"
-            android:title="@string/message" android:icon="@drawable/ic_selectable_message"/>
+            android:title="@string/message" android:icon="@drawable/ic_person_black_24dp"/>
 </menu>
