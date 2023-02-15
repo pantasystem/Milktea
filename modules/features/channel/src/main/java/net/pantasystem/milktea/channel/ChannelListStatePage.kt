@@ -9,8 +9,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,26 +23,25 @@ import net.pantasystem.milktea.model.channel.Channel
 @Composable
 fun ChannelListStateScreen(
     account: Account,
+    uiState: ChannelListUiState,
     listType: ChannelListType,
     viewModel: ChannelViewModel,
     navigateToDetailView: (Channel.Id) -> Unit = {}
 ) {
-    val key = PagingModelKey(account.accountId, listType)
 
-    val pagingState by viewModel.getObservable(key).collectAsState(
-        initial = PageableState.Fixed(StateContent.NotExist())
-    )
+
+    val pagingState = uiState.getByType(listType)
 
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
-    LaunchedEffect(true) {
-        viewModel.clearAndLoad(key)
+    LaunchedEffect(listType) {
+        viewModel.clearAndLoad(listType)
     }
 
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
-            viewModel.clearAndLoad(key)
+            viewModel.clearAndLoad(listType)
         },
         modifier = Modifier
             .fillMaxSize()
@@ -98,7 +95,7 @@ fun ChannelListStateScreen(
                             Text("no contents")
                         }
                         is PageableState.Error -> {
-                            Text("error:${((pagingState as PageableState.Error).throwable)}")
+                            Text("error:${(pagingState.throwable)}")
                         }
                     }
                 }
