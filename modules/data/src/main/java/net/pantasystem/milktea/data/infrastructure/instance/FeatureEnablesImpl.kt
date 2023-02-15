@@ -43,6 +43,7 @@ class FeatureEnablesImpl @Inject constructor(
                 if (isMisskey && version >= Version("12.75.0")) FeatureType.Antenna else null,
                 if (isMisskey && version >= Version("12")) FeatureType.UserReactionHistory else null,
                 if (isMisskey && version >= Version("12")) FeatureType.Clip else null,
+                if (isMisskey && version <= Version("13.6.1")) FeatureType.Messaging else null,
                 if (isMisskey) FeatureType.Drive else null,
                 if (isMastodon) FeatureType.Bookmark else null,
             )
