@@ -55,8 +55,11 @@ dependencies {
     implementation project(path: ':modules:model')
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_compose')
+    implementation project(path: ':modules:common_android')
+    implementation project(path: ':modules:common_android_ui')
     implementation project(path: ':modules:common')
     implementation project(path: ':modules:common_navigation')
+    implementation project(path: ':modules:features:messaging')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
