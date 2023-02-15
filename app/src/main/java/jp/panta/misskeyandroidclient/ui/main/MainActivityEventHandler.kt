@@ -13,6 +13,7 @@ import androidx.work.WorkInfo
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.MainActivity
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,8 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.auth.JoinMilkteaActivity
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
+import net.pantasystem.milktea.common_viewmodel.CurrentPageType
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
@@ -42,6 +45,7 @@ internal class MainActivityEventHandler(
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
     private val configStore: SettingStore,
     private val draftNoteService: DraftNoteService,
+    private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel,
 ) {
 
 
@@ -66,6 +70,7 @@ internal class MainActivityEventHandler(
         collectConfirmGoogleAnalyticsState()
         collectRequestPostNotificationState()
         collectDraftNoteSavedEvent()
+        collectCurrentPageableState()
     }
 
     private fun collectCrashlyticsCollectionState() {
@@ -247,5 +252,21 @@ internal class MainActivityEventHandler(
             binding.appBarMain.simpleNotification,
             createNoteWorkerExecutor,
         )(state)
+    }
+
+    private fun collectCurrentPageableState() {
+        currentPageableTimelineViewModel.currentType.onEach {
+            binding.appBarMain.fab.setImageResource(
+                when(it) {
+                    CurrentPageType.Account -> {
+                        R.drawable.ic_person_add_black_24dp
+                    }
+                    is CurrentPageType.Page -> {
+                        R.drawable.ic_edit_black_24dp
+                    }
+                }
+            )
+
+        }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
     }
 }
