@@ -1,16 +1,11 @@
 package net.pantasystem.milktea.channel
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,33 +20,32 @@ import net.pantasystem.milktea.model.channel.Channel
 @Composable
 fun ChannelListStateScreen(
     account: Account,
+    uiState: ChannelListUiState,
     listType: ChannelListType,
     viewModel: ChannelViewModel,
     navigateToDetailView: (Channel.Id) -> Unit = {}
 ) {
-    val key = PagingModelKey(account.accountId, listType)
 
-    val pagingState by viewModel.getObservable(key).collectAsState(
-        initial = PageableState.Fixed(StateContent.NotExist())
-    )
+
+    val pagingState = uiState.getByType(listType)
 
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
-    LaunchedEffect(true) {
-        viewModel.clearAndLoad(key)
+    LaunchedEffect(listType) {
+        viewModel.clearAndLoad(listType)
     }
 
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
-            viewModel.clearAndLoad(key)
+            viewModel.clearAndLoad(listType)
         },
         modifier = Modifier
             .fillMaxSize()
     ) {
-        when (val content = pagingState.content) {
-            is StateContent.Exist -> {
-                LazyColumn {
+        LazyColumn(Modifier.fillMaxSize()) {
+            when (val content = pagingState.content) {
+                is StateContent.Exist -> {
                     items(content.rawContent.size) { index ->
                         val channel = content.rawContent[index]
                         val isPaged =
@@ -77,34 +71,33 @@ fun ChannelListStateScreen(
                             }
                         )
                     }
-                    if (pagingState is PageableState.Loading.Previous) {
-                        item {
-                            ReachedElement()
+                }
+                is StateContent.NotExist -> {
+                    item {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            when (pagingState) {
+                                is PageableState.Loading -> {
+                                    ReachedElement()
+                                }
+                                is PageableState.Fixed -> {
+                                    Text("no contents")
+                                }
+                                is PageableState.Error -> {
+                                    Text("error:${(pagingState.throwable)}")
+                                }
+                            }
                         }
                     }
-                }
-            }
-            is StateContent.NotExist -> {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    when (pagingState) {
-                        is PageableState.Loading -> {
-                            CircularProgressIndicator()
-                        }
-                        is PageableState.Fixed -> {
-                            Text("no contents")
-                        }
-                        is PageableState.Error -> {
-                            Text("error:${((pagingState as PageableState.Error).throwable)}")
-                        }
-                    }
-                }
 
+                }
             }
+
         }
+
     }
 }
 
@@ -112,7 +105,7 @@ fun ChannelListStateScreen(
 fun ReachedElement() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(16.dp).fillMaxWidth()
     ) {
         CircularProgressIndicator()
     }

@@ -44,6 +44,8 @@ fun ChannelScreen(
     val pagerState = rememberPagerState(pageCount = channelTypeWithTitleList.size)
     val coroutine = rememberCoroutineScope()
 
+    val uiState by channelViewModel.uiState.collectAsState()
+
     Scaffold(
         topBar = {
             Column {
@@ -88,7 +90,8 @@ fun ChannelScreen(
                     listType = channelTypeWithTitleList[pagerState.currentPage].type,
                     account = currentAccount!!,
                     viewModel = channelViewModel,
-                    navigateToDetailView = onNavigateChannelDetail
+                    navigateToDetailView = onNavigateChannelDetail,
+                    uiState = uiState
                 )
             }
         }
