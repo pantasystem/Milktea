@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.messaging.databinding.FragmentMessagingHistoryBinding
@@ -64,13 +63,5 @@ class MessagingHistoryFragment : Fragment(R.layout.fragment_messaging_history) {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        (requireActivity() as? ToolbarSetter?)?.apply {
-            setTitle(R.string.message)
-            setToolbar(binding.toolbar)
-        }
-    }
 
 }
