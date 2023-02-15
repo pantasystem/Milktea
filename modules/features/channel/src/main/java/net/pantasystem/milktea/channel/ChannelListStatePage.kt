@@ -1,9 +1,6 @@
 package net.pantasystem.milktea.channel
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -46,9 +43,9 @@ fun ChannelListStateScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        when (val content = pagingState.content) {
-            is StateContent.Exist -> {
-                LazyColumn {
+        LazyColumn(Modifier.fillMaxSize()) {
+            when (val content = pagingState.content) {
+                is StateContent.Exist -> {
                     items(content.rawContent.size) { index ->
                         val channel = content.rawContent[index]
                         val isPaged =
@@ -74,34 +71,33 @@ fun ChannelListStateScreen(
                             }
                         )
                     }
-                    if (pagingState is PageableState.Loading.Previous) {
-                        item {
-                            ReachedElement()
+                }
+                is StateContent.NotExist -> {
+                    item {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            when (pagingState) {
+                                is PageableState.Loading -> {
+                                    ReachedElement()
+                                }
+                                is PageableState.Fixed -> {
+                                    Text("no contents")
+                                }
+                                is PageableState.Error -> {
+                                    Text("error:${(pagingState.throwable)}")
+                                }
+                            }
                         }
                     }
-                }
-            }
-            is StateContent.NotExist -> {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    when (pagingState) {
-                        is PageableState.Loading -> {
-                            CircularProgressIndicator()
-                        }
-                        is PageableState.Fixed -> {
-                            Text("no contents")
-                        }
-                        is PageableState.Error -> {
-                            Text("error:${(pagingState.throwable)}")
-                        }
-                    }
-                }
 
+                }
             }
+
         }
+
     }
 }
 
@@ -109,7 +105,7 @@ fun ChannelListStateScreen(
 fun ReachedElement() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(16.dp).fillMaxWidth()
     ) {
         CircularProgressIndicator()
     }
