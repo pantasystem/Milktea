@@ -3,6 +3,7 @@ package jp.panta.misskeyandroidclient.ui.main
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common_viewmodel.CurrentPageType
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.SuitableType
 import net.pantasystem.milktea.common_viewmodel.suitableType
@@ -18,25 +19,33 @@ internal class FabClickHandler(
 
     fun onClicked() {
         activity.apply {
-            when (val type = currentPageableTimelineViewModel.currentType.value.suitableType()) {
-                is SuitableType.Other -> {
-                    startActivity(Intent(this, NoteEditorActivity::class.java))
+            when(val type = currentPageableTimelineViewModel.currentType.value) {
+                CurrentPageType.Account -> {
+                    // TODO: アカウント切り替えボタンを表示する
                 }
-                is SuitableType.Gallery -> {
-                    val intent = Intent(this, GalleryPostsActivity::class.java)
-                    intent.action = Intent.ACTION_EDIT
-                    startActivity(intent)
-                }
-                is SuitableType.Channel -> {
-                    val accountId = accountStore.currentAccountId!!
-                    startActivity(
-                        NoteEditorActivity.newBundle(
-                            this,
-                            channelId = Channel.Id(accountId, type.channelId)
-                        )
-                    )
+                is CurrentPageType.Page -> {
+                    when (val suitableType = type.pageable.suitableType()) {
+                        is SuitableType.Other -> {
+                            startActivity(Intent(this, NoteEditorActivity::class.java))
+                        }
+                        is SuitableType.Gallery -> {
+                            val intent = Intent(this, GalleryPostsActivity::class.java)
+                            intent.action = Intent.ACTION_EDIT
+                            startActivity(intent)
+                        }
+                        is SuitableType.Channel -> {
+                            val accountId = accountStore.currentAccountId!!
+                            startActivity(
+                                NoteEditorActivity.newBundle(
+                                    this,
+                                    channelId = Channel.Id(accountId, suitableType.channelId)
+                                )
+                            )
+                        }
+                    }
                 }
             }
+
         }
 
     }

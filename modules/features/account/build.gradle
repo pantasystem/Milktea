@@ -31,9 +31,13 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
-        dataBinding true
         compose true
     }
+    
+    viewBinding {
+        enabled = true
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = compose_version
 
@@ -60,6 +64,8 @@ dependencies {
     implementation project(path: ':modules:common')
     implementation project(path: ':modules:common_navigation')
     implementation project(path: ':modules:features:messaging')
+    implementation project(path: ':modules:common_viewmodel')
+    implementation project(path: ':modules:features:user')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
