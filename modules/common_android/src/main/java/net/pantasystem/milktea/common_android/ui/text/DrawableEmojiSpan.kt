@@ -4,6 +4,7 @@ package net.pantasystem.milktea.common_android.ui.text
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.util.Log
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -80,11 +81,25 @@ private class DrawableEmojiTarget(
         resource: Drawable,
         transition: Transition<in Drawable>?
     ) {
-
+        Log.d("DrawableEmojiSpan", "resource:${resource.javaClass.simpleName}")
         span.imageDrawable = resource
-        span.imageDrawable?.callback = Animated {
-            span.adapter
+
+        val callback = span.imageDrawable?.callback
+        resource.callback = object : Drawable.Callback {
+            override fun invalidateDrawable(who: Drawable) {
+                callback?.invalidateDrawable(who)
+                span.adapter?.update()
+            }
+
+            override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) {
+                callback?.scheduleDrawable(who, what, `when`)
+            }
+
+            override fun unscheduleDrawable(who: Drawable, what: Runnable) {
+                callback?.unscheduleDrawable(who, what)
+            }
         }
+
         when (resource) {
             is GifDrawable -> {
                 resource.start()
@@ -110,17 +125,3 @@ private class DrawableEmojiTarget(
     }
 }
 
-class Animated(
-    val getAdapter: () -> EmojiAdapter?
-) : Drawable.Callback{
-    override fun invalidateDrawable(p0: Drawable) {
-        //weakReference.get()?.invalidate()
-        getAdapter()?.update()
-    }
-
-    override fun scheduleDrawable(p0: Drawable, p1: Runnable, p2: Long) {
-    }
-
-    override fun unscheduleDrawable(p0: Drawable, p1: Runnable) {
-    }
-}
