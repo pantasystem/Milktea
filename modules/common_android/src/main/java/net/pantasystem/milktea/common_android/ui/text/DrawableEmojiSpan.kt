@@ -81,7 +81,6 @@ private class DrawableEmojiTarget(
         resource: Drawable,
         transition: Transition<in Drawable>?
     ) {
-        Log.d("DrawableEmojiSpan", "resource:${resource.javaClass.simpleName}")
         span.imageDrawable = resource
 
         val callback = span.imageDrawable?.callback
