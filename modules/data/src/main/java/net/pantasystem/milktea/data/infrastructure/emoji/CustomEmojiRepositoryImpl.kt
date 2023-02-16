@@ -36,7 +36,7 @@ class CustomEmojiRepositoryImpl @Inject constructor(
     override suspend fun findBy(host: String): Result<List<Emoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
             var emojis = customEmojiCache.get(host)
-            if (emojis != null && emojis.isNotEmpty()) {
+            if (emojis != null) {
                 return@withContext emojis
             }
             val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
