@@ -2,9 +2,7 @@ package net.pantasystem.milktea.common_android.mfm
 
 import jp.panta.misskeyandroidclient.mfm.*
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.HostWithVersion
 import java.net.URLDecoder
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -394,27 +392,8 @@ object MFMParser {
 
             val tagName = matcher.group(1) ?: return null
 
-            var emoji: Emoji? = emojiNameMap[tagName]
+            val emoji: Emoji = emojiNameMap[tagName] ?: return null
 
-            // NOTE: v13の絵文字周りの改悪対応
-            if (emoji == null) {
-                if (userHost.isNullOrBlank() ||  accountHost == userHost) {
-                    return null
-                }
-
-                // NOTE: v13でなければキャンセル
-                if (!HostWithVersion.isOverV13(accountHost)) {
-                    return null
-                }
-
-                val url = V13EmojiUrlResolver.resolve(accountHost, tagName, userHost)
-                emoji = Emoji(
-                    name = tagName,
-                    url = url,
-                    uri = url,
-                    host = userHost,
-                )
-            }
 
             return EmojiElement(
                 emoji,

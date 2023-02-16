@@ -135,6 +135,10 @@ class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getAndConvertToMap(host: String): Map<String, Emoji>? {
+        return customEmojiCache.getMap(host)
+    }
+
     private suspend fun upInsert(host: String, emojis: List<Emoji>) {
         val record = emojis.map {
             it.toRecord(host)

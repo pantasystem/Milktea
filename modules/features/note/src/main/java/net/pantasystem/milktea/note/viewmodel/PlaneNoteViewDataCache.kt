@@ -8,9 +8,9 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common_android.TextType
+import net.pantasystem.milktea.common_android_ui.TextType
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
@@ -27,9 +27,9 @@ class PlaneNoteViewDataCache(
     private val GetUrlPreviewStore: suspend (Account) -> UrlPreviewStore?,
     private val coroutineScope: CoroutineScope,
     private val noteRelationGetter: NoteRelationGetter,
-    private val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
     private val configRepository: LocalConfigRepository,
+    private val emojiRepository: CustomEmojiRepository,
 ) {
 
     @Singleton
@@ -38,9 +38,9 @@ class PlaneNoteViewDataCache(
         private val translationStore: NoteTranslationStore,
         private val urlPreviewStoreProvider: UrlPreviewStoreProvider,
         private val noteRelationGetter: NoteRelationGetter,
-        private val metaRepository: MetaRepository,
         private val noteDataSource: NoteDataSource,
-        private val configRepository: LocalConfigRepository
+        private val configRepository: LocalConfigRepository,
+        private val emojiRepository: CustomEmojiRepository,
     ) {
         fun create(
             getAccount: suspend () -> Account,
@@ -55,9 +55,9 @@ class PlaneNoteViewDataCache(
                 },
                 coroutineScope,
                 noteRelationGetter,
-                metaRepository,
                 noteDataSource,
-                configRepository
+                configRepository,
+                emojiRepository,
             )
         }
     }
@@ -157,9 +157,10 @@ class PlaneNoteViewDataCache(
                 account,
                 noteCaptureAdapter,
                 translationStore,
-                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
+                emojiRepository.get(account.getHost()) ?: emptyList(),
                 noteDataSource,
                 configRepository,
+                emojiRepository,
                 coroutineScope,
             )
         } else {
@@ -168,9 +169,10 @@ class PlaneNoteViewDataCache(
                 account,
                 noteCaptureAdapter,
                 translationStore,
-                metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
+                emojiRepository.get(account.getHost()) ?: emptyList(),
                 noteDataSource,
                 configRepository,
+                emojiRepository,
                 coroutineScope
             )
         }.also {

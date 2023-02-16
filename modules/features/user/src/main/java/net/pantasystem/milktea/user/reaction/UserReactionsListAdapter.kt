@@ -59,7 +59,7 @@ class UserReactionViewHolder(
         binding.noteCardActionListener = noteCardActionListenerAdapter
         binding.bindingModel = item
 
-        item.note.reactionCounts.observe(lifecycleOwner) {
+        item.note.reactionCountsViewData.observe(lifecycleOwner) {
             adapter.submitList(it)
         }
         binding.lifecycleOwner = lifecycleOwner

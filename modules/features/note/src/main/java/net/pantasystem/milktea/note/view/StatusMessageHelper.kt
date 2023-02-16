@@ -65,7 +65,7 @@ object StatusMessageHelper {
                 Glide.with(context)
                     .load(drawable)
                     .override(min(textSize.toInt(), 640))
-                    .into(span.target)
+                    .into(span.generateTarget())
 
                 setSpan(span, 0, "icon".length, 0)
             }

@@ -36,7 +36,7 @@ class AccountFragment : Fragment() {
 
     private val currentPageableViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
-    private val accountViewModel by viewModels<AccountViewModel>()
+    private val accountViewModel by viewModels<AccountScreenViewModel>()
 
 
     @OptIn(ExperimentalComposeUiApi::class)

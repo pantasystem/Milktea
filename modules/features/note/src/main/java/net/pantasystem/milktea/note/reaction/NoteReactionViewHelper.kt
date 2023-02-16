@@ -8,10 +8,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.common_android_ui.BindingProvider
-import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -23,10 +20,38 @@ object NoteReactionViewHelper {
     fun LinearLayout.setReactionCount(
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
-        reaction: String,
+        reaction: ReactionViewData,
         note: PlaneNoteViewData
     ) {
-        setReactionCount(this.context, reactionTextTypeView, reactionImageTypeView, reaction, note)
+        setReactionCount(reactionTextTypeView, reactionImageTypeView, reaction)
+    }
+
+    @JvmStatic
+    fun setReactionCount(
+        reactionTextTypeView: TextView,
+        reactionImageTypeView: ImageView,
+        reaction: ReactionViewData,
+    ) {
+        val textReaction = reaction.reaction
+
+        val emoji = reaction.emoji
+
+
+        if (emoji == null) {
+            reactionImageTypeView.visibility = View.GONE
+            reactionTextTypeView.visibility = View.VISIBLE
+            reactionTextTypeView.text = textReaction
+        } else {
+            reactionImageTypeView.visibility = View.VISIBLE
+            reactionTextTypeView.visibility = View.GONE
+
+            GlideApp.with(reactionImageTypeView.context)
+                .load(emoji.url ?: emoji.uri)
+                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
+//                .fitCenter()
+                .into(reactionImageTypeView)
+        }
+
     }
 
     @JvmStatic
@@ -47,17 +72,8 @@ object NoteReactionViewHelper {
         val meta = cache.get(note.account.normalizedInstanceDomain)
 
         val r = Reaction(textReaction)
-        var emoji = note.emojiMap[textReaction.replace(":", "")]
+        val emoji = note.emojiMap[textReaction.replace(":", "")]
             ?: meta?.emojisMap?.get(r.getName())
-
-        val version = meta?.getVersion()
-        if (r.isCustomEmojiFormat() && emoji == null && version != null && version >= Version("13")) {
-            emoji = Emoji(
-                name = r.getName() ?: "",
-                uri = V13EmojiUrlResolver.resolve(r, note.account),
-                url = V13EmojiUrlResolver.resolve(r, note.account),
-            )
-        }
 
 
         if (emoji == null) {

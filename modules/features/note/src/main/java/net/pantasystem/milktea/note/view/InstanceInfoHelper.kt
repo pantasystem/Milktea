@@ -31,7 +31,7 @@ object InstanceInfoHelper {
             Glide.with(this)
                 .load(info!!.faviconUrl)
                 .override(min(this.textSize.toInt(), 640))
-                .into(iconDrawable.target)
+                .into(iconDrawable.generateTarget())
             text =  SpannableStringBuilder(":${info.faviconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.faviconUrl}:".length, 0)
             }

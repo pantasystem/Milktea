@@ -8,22 +8,23 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common_android.getTextType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.getTextType
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
+import net.pantasystem.milktea.note.reaction.ReactionViewData
 
 open class PlaneNoteViewData(
     val note: NoteRelation,
@@ -33,6 +34,7 @@ open class PlaneNoteViewData(
     private val instanceEmojis: List<Emoji>,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
+    emojiRepository: CustomEmojiRepository,
     coroutineScope: CoroutineScope,
 ) : NoteViewData {
 
@@ -143,14 +145,15 @@ open class PlaneNoteViewData(
 
     val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
-    val reactionCounts: LiveData<List<ReactionCount>> = currentNote.switchMap { n ->
+    val reactionCountsViewData: LiveData<List<ReactionViewData>> = currentNote.switchMap { n ->
         reactionCountsExpanded.map {
             if (it == true) {
                 n.reactionCounts
             } else {
                 n.getShortReactionCounts(note.note.isRenoteOnly())
             }
-
+        }.map {
+            ReactionViewData.from(it, n, emojiRepository.getAndConvertToMap(account.getHost()), emojiMap)
         }
     }
 

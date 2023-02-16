@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.reaction.ReactionViewData
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -142,7 +142,7 @@ class NotificationViewHolder(
 
     private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView) {
 
-        val reactionList = note.reactionCounts.value?.toList() ?: emptyList()
+        val reactionList = note.reactionCountsViewData.value?.toList() ?: emptyList()
         val adapter = ReactionCountAdapter(lifecycleOwner) {
             noteCardActionListenerAdapter.onReactionCountAction(it)
         }
@@ -151,10 +151,10 @@ class NotificationViewHolder(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<List<ReactionCount>> {
+        val observer = Observer<List<ReactionViewData>> {
             adapter.submitList(it.toList())
         }
-        note.reactionCounts.observe(lifecycleOwner, observer)
+        note.reactionCountsViewData.observe(lifecycleOwner, observer)
 
         val exLayoutManager = reactionView.layoutManager
         if (exLayoutManager !is FlexboxLayoutManager) {

@@ -12,14 +12,12 @@ import android.view.MotionEvent
 import android.widget.TextView
 import androidx.core.text.getSpans
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
-import net.pantasystem.milktea.common_android.mfm.Root
-import net.pantasystem.milktea.common_android.TextType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
@@ -35,7 +33,8 @@ object DecorateTextHelper {
         node ?: return
         this.movementMethod = LinkMovementMethod.getInstance()
         stopDrawableAnimations(this)
-        this.text = MFMDecorator.decorate(this, node)
+        val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
+        this.text = MFMDecorator.decorate(this, lazy)
     }
 
     fun stopDrawableAnimations(textView: TextView) {
@@ -58,9 +57,11 @@ object DecorateTextHelper {
                         }
                     }
                 }
+                it.imageDrawable = null
+                it.adapter = null
                 // NOTE: 不要になった画像リソースを解放している
                 // NOTE: MFMDecoratorの仕様上現状はEmojiSpanを使いまわさないのでここでリソース破棄をしてしまっても問題ない。
-                Glide.with(textView).clear(it.target)
+//                Glide.with(textView).clear(it.target)
             }
         }
     }
@@ -111,8 +112,7 @@ object DecorateTextHelper {
             }
             is TextType.Misskey -> {
                 this.movementMethod = LinkMovementMethod.getInstance()
-                val node = textType.root ?: return
-                this.text = MFMDecorator.decorate(this, node)
+                this.text = MFMDecorator.decorate(this, textType.lazyDecorateResult)
             }
         }
 
@@ -128,7 +128,8 @@ object DecorateTextHelper {
         val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
             ?: return
         this.movementMethod = LinkMovementMethod.getInstance()
-        this.text = MFMDecorator.decorate(this, node)
+        val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
+        this.text = MFMDecorator.decorate(this, lazy)
     }
 }
 
