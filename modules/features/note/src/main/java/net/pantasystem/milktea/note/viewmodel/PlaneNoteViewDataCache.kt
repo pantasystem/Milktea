@@ -151,13 +151,16 @@ class PlaneNoteViewDataCache(
 
     private suspend fun createViewData(relation: NoteRelation): PlaneNoteViewData {
         val account = getAccount()
+        val emojis = emojiRepository.findBy(account.getHost()).getOrElse {
+            emptyList()
+        }
         return if (relation.reply == null) {
             PlaneNoteViewData(
                 relation,
                 account,
                 noteCaptureAdapter,
                 translationStore,
-                emojiRepository.get(account.getHost()) ?: emptyList(),
+                emojis,
                 noteDataSource,
                 configRepository,
                 emojiRepository,
@@ -169,7 +172,7 @@ class PlaneNoteViewDataCache(
                 account,
                 noteCaptureAdapter,
                 translationStore,
-                emojiRepository.get(account.getHost()) ?: emptyList(),
+                emojis,
                 noteDataSource,
                 configRepository,
                 emojiRepository,
