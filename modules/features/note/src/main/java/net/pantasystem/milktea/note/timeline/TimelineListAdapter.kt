@@ -126,6 +126,7 @@ class TimelineListAdapter(
                 noteCardActionListenerAdapter.onReactionCountAction(it)
             }
             reactionCountAdapter?.note = note
+            reactionCountsView.layoutManager = flexBoxLayoutManager
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.isNestedScrollingEnabled = false
             reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
@@ -133,7 +134,6 @@ class TimelineListAdapter(
                 reactionCountsView.itemAnimator = DefaultItemAnimator()
             }
             note.reactionCountsViewData.observe(lifecycleOwner, reactionCountsObserver)
-            reactionCountsView.layoutManager = flexBoxLayoutManager
         }
         
         private fun bindReactionCountVisibility(reactionCounts: List<ReactionViewData>?) {
