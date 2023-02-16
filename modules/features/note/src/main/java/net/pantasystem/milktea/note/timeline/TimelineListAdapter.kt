@@ -87,7 +87,7 @@ class TimelineListAdapter(
                 if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
                     Log.d("TimelineListAdapter", "onChanged reactions:$counts")
 
-                    bindReactionCountVisibility()
+                    bindReactionCountVisibility(counts)
 
                     reactionCountAdapter?.submitList(counts) {
                         reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
@@ -138,13 +138,11 @@ class TimelineListAdapter(
             reactionCountsView.layoutManager = flexBoxLayoutManager
         }
         
-        private fun bindReactionCountVisibility() {
-            val note = mCurrentNote!!
-            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
-            reactionCountsView.visibility = if(reactionList.isNotEmpty()){
-                View.VISIBLE
-            }else{
+        private fun bindReactionCountVisibility(reactionCounts: List<ReactionViewData>?) {
+            reactionCountsView.visibility = if(reactionCounts.isNullOrEmpty()){
                 View.GONE
+            }else{
+                View.VISIBLE
             }
         }
     }

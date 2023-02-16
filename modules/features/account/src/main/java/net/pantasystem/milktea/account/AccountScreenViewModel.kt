@@ -14,7 +14,7 @@ import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
+class AccountScreenViewModel @Inject constructor(
     accountStore: AccountStore,
     private val userRepository: UserRepository,
     private val userDataSource: UserDataSource,
