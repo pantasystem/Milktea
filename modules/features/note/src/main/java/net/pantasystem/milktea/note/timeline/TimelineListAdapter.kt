@@ -122,12 +122,8 @@ class TimelineListAdapter(
         private fun bindReactionCounter() {
             val note = mCurrentNote!!
             val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-            reactionCountAdapter = if(reactionCountAdapter != null && reactionCountAdapter?.note?.id == note.id){
-                reactionCountAdapter!!
-            }else{
-                ReactionCountAdapter(lifecycleOwner) {
-                    noteCardActionListenerAdapter.onReactionCountAction(it)
-                }
+            reactionCountAdapter = ReactionCountAdapter(lifecycleOwner) {
+                noteCardActionListenerAdapter.onReactionCountAction(it)
             }
             reactionCountAdapter?.note = note
             reactionCountsView.adapter = reactionCountAdapter
