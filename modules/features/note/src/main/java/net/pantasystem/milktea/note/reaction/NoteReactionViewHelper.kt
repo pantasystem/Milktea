@@ -20,10 +20,38 @@ object NoteReactionViewHelper {
     fun LinearLayout.setReactionCount(
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
-        reaction: String,
+        reaction: ReactionViewData,
         note: PlaneNoteViewData
     ) {
-        setReactionCount(this.context, reactionTextTypeView, reactionImageTypeView, reaction, note)
+        setReactionCount(reactionTextTypeView, reactionImageTypeView, reaction)
+    }
+
+    @JvmStatic
+    fun setReactionCount(
+        reactionTextTypeView: TextView,
+        reactionImageTypeView: ImageView,
+        reaction: ReactionViewData,
+    ) {
+        val textReaction = reaction.reaction
+
+        val emoji = reaction.emoji
+
+
+        if (emoji == null) {
+            reactionImageTypeView.visibility = View.GONE
+            reactionTextTypeView.visibility = View.VISIBLE
+            reactionTextTypeView.text = textReaction
+        } else {
+            reactionImageTypeView.visibility = View.VISIBLE
+            reactionTextTypeView.visibility = View.GONE
+
+            GlideApp.with(reactionImageTypeView.context)
+                .load(emoji.url ?: emoji.uri)
+                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
+//                .fitCenter()
+                .into(reactionImageTypeView)
+        }
+
     }
 
     @JvmStatic

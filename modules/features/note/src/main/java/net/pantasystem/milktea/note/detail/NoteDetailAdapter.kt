@@ -12,18 +12,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.*
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemConversationBinding
 import net.pantasystem.milktea.note.databinding.ItemDetailNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
-import net.pantasystem.milktea.note.view.NoteCardAction
-import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
-import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
-import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.detail.viewmodel.NoteConversationViewData
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewData
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel
+import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.reaction.ReactionViewData
+import net.pantasystem.milktea.note.view.NoteCardAction
+import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
+import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class NoteDetailAdapter(
     private val noteDetailViewModel: NoteDetailViewModel,
@@ -125,7 +125,7 @@ class NoteDetailAdapter(
     }
     private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView){
 
-        val reactionList = note.reactionCounts.value?.toList()?: emptyList()
+        val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
         val adapter = ReactionCountAdapter(viewLifecycleOwner) {
             noteCardActionListenerAdapter.onReactionCountAction(it)
         }
@@ -134,10 +134,10 @@ class NoteDetailAdapter(
 
         adapter.submitList(reactionList)
 
-        val observer = Observer<List<ReactionCount>> {
+        val observer = Observer<List<ReactionViewData>> {
             adapter.submitList(it.toList())
         }
-        note.reactionCounts.observe(viewLifecycleOwner, observer)
+        note.reactionCountsViewData.observe(viewLifecycleOwner, observer)
 
         val exLayoutManager = reactionView.layoutManager
         if(exLayoutManager !is FlexboxLayoutManager){

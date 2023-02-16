@@ -19,7 +19,6 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
@@ -146,17 +145,6 @@ open class PlaneNoteViewData(
 
     val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
-    val reactionCounts: LiveData<List<ReactionCount>> = currentNote.switchMap { n ->
-        reactionCountsExpanded.map {
-            if (it == true) {
-                n.reactionCounts
-            } else {
-                n.getShortReactionCounts(note.note.isRenoteOnly())
-            }
-
-        }
-    }
-
     val reactionCountsViewData: LiveData<List<ReactionViewData>> = currentNote.switchMap { n ->
         reactionCountsExpanded.map {
             if (it == true) {
@@ -165,7 +153,7 @@ open class PlaneNoteViewData(
                 n.getShortReactionCounts(note.note.isRenoteOnly())
             }
         }.map {
-            ReactionViewData.from(n, emojiRepository.getAndConvertToMap(account.getHost()), emojiMap)
+            ReactionViewData.from(it, n, emojiRepository.getAndConvertToMap(account.getHost()), emojiMap)
         }
     }
 

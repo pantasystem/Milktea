@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.note.timeline
 
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +17,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineErrorBinding
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.reaction.ReactionViewData
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
@@ -81,10 +82,11 @@ class TimelineListAdapter(
         }
 
         @Suppress("ObjectLiteralToLambda")
-        private val reactionCountsObserver = object : Observer<List<ReactionCount>> {
-            override fun onChanged(counts: List<ReactionCount>?) {
-
+        private val reactionCountsObserver = object : Observer<List<ReactionViewData>> {
+            override fun onChanged(counts: List<ReactionViewData>?) {
                 if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
+                    Log.d("TimelineListAdapter", "onChanged reactions:$counts")
+
                     bindReactionCountVisibility()
 
                     reactionCountAdapter?.submitList(counts) {
@@ -115,13 +117,13 @@ class TimelineListAdapter(
         }
 
         private fun unbind() {
-            mCurrentNote?.reactionCounts?.removeObserver(reactionCountsObserver)
+            mCurrentNote?.reactionCountsViewData?.removeObserver(reactionCountsObserver)
             mCurrentNote = null
         }
 
         private fun bindReactionCounter() {
             val note = mCurrentNote!!
-            val reactionList = note.reactionCounts.value?.toList()?: emptyList()
+            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
             reactionCountAdapter = ReactionCountAdapter(lifecycleOwner) {
                 noteCardActionListenerAdapter.onReactionCountAction(it)
             }
@@ -132,13 +134,13 @@ class TimelineListAdapter(
             reactionCountAdapter?.submitList(reactionList) {
                 reactionCountsView.itemAnimator = DefaultItemAnimator()
             }
-            note.reactionCounts.observe(lifecycleOwner, reactionCountsObserver)
+            note.reactionCountsViewData.observe(lifecycleOwner, reactionCountsObserver)
             reactionCountsView.layoutManager = flexBoxLayoutManager
         }
         
         private fun bindReactionCountVisibility() {
             val note = mCurrentNote!!
-            val reactionList = note.reactionCounts.value?.toList()?: emptyList()
+            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
             reactionCountsView.visibility = if(reactionList.isNotEmpty()){
                 View.VISIBLE
             }else{
