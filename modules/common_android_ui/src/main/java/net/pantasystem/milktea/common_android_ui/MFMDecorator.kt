@@ -308,3 +308,15 @@ class SkipEmojiHolder {
         return skipEmojis.contains(emoji)
     }
 }
+
+data class LazyDecorateResult(
+    val spanned: Spanned,
+    val skippedEmojis: List<EmojiElement>,
+)
+
+class LazyDecorateSkipElementsHolder {
+    var skipped = mutableListOf<EmojiElement>()
+    fun add(element: EmojiElement) {
+        skipped.add(element)
+    }
+}
