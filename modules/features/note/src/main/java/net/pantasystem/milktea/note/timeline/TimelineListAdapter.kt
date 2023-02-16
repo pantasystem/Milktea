@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.note.timeline
 
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,7 +84,6 @@ class TimelineListAdapter(
         private val reactionCountsObserver = object : Observer<List<ReactionViewData>> {
             override fun onChanged(counts: List<ReactionViewData>?) {
                 if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
-                    Log.d("TimelineListAdapter", "onChanged reactions:$counts")
 
                     bindReactionCountVisibility(counts)
 
