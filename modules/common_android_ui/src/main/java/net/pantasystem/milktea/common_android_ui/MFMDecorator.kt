@@ -59,6 +59,7 @@ object MFMDecorator {
             node,
             node,
             lazyDecorateSkipElementsHolder,
+            0,
         ).decorate()
         return LazyDecorateResult(
             node.sourceText,
@@ -74,11 +75,12 @@ object MFMDecorator {
         val root: Root,
         val parent: Element,
         val lazyDecorateSkipElementsHolder: LazyDecorateSkipElementsHolder,
+        val start: Int,
 //        private val emojiAdapter: EmojiAdapter,
 //        private val skipEmojis: SkipEmojiHolder,
 //        private val retryCounter: Int,
     ) {
-        private var position = 0
+        private var position = start
         private val spannableStringBuilder = SpannableStringBuilder()
 
 
@@ -92,18 +94,21 @@ object MFMDecorator {
                     val spanned = Visitor(
                         root,
                         ele,
-                        lazyDecorateSkipElementsHolder
+                        lazyDecorateSkipElementsHolder,
+                        position,
                     ).decorate()
                         ?: closeErrorElement(ele)
                     spannableStringBuilder.append(spanned)
-                    position += spanned.length - 1
+                    position = spannableStringBuilder.length
                 }
             }
 
             // parentを装飾してしまう
             return try {
                 // 自己がLeafであればparentの情報から装飾され、自己がNodeであればstartとpositionをもとに装飾される
-                decorate(parent)
+                val result = decorate(parent)
+                position = spannableStringBuilder.length
+                result
             } catch (e: Exception) {
                 // 子要素の処理がすべて無駄になることになってしまうがとりあえずはこうする
                 null
@@ -150,9 +155,7 @@ object MFMDecorator {
 //                return spanned
 //            }
 
-            val emojiSpan = DrawableEmojiSpan(null)
-            spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
-            lazyDecorateSkipElementsHolder.add(spanned, emojiElement, emojiSpan)
+            lazyDecorateSkipElementsHolder.add(SkippedEmoji(spanned, emojiElement, position, position + spanned.length))
             return spanned
         }
 
@@ -282,8 +285,10 @@ object MFMDecorator {
         val retryCounter: Int,
     ) {
 
+        private val spannableString = SpannableString(lazyDecorateResult.spanned)
+
         fun decorate(): Spanned {
-            val spanned = lazyDecorateResult.spanned
+            val spanned = spannableString
             lazyDecorateResult.skippedEmojis.forEach {
                 decorateEmoji(it)
             }
@@ -297,7 +302,8 @@ object MFMDecorator {
 //            }
             textView.get()?.let { textView ->
                 //val emojiSpan = EmojiSpan(textView)
-                val emojiSpan = skippedEmoji.emojiSpan
+                val emojiSpan = DrawableEmojiSpan(null)
+                spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
                 emojiSpan.adapter = emojiAdapter
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
@@ -362,12 +368,13 @@ data class LazyDecorateResult(
 data class SkippedEmoji(
     val spanned: Spanned,
     val emoji: EmojiElement,
-    val emojiSpan: DrawableEmojiSpan,
+    val start: Int,
+    val end: Int,
 )
 
 class LazyDecorateSkipElementsHolder {
     var skipped = mutableListOf<SkippedEmoji>()
-    fun add(spanned: Spanned, element: EmojiElement, emojiSpan: DrawableEmojiSpan) {
-        skipped.add(SkippedEmoji(spanned, element, emojiSpan))
+    fun add(skipped: SkippedEmoji) {
+        this.skipped.add(skipped)
     }
 }
