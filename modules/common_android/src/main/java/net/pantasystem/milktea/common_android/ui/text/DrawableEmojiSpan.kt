@@ -4,7 +4,6 @@ package net.pantasystem.milktea.common_android.ui.text
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.util.Log
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
