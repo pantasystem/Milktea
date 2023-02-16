@@ -16,5 +16,7 @@ interface CustomEmojiRepository {
 
     fun get(host: String): List<Emoji>?
 
+    fun getAndConvertToMap(host: String): Map<String, Emoji>?
+
 }
 

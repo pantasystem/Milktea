@@ -14,6 +14,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -29,6 +30,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
     private val configRepository: LocalConfigRepository,
+    private val emojiRepository: CustomEmojiRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
@@ -97,6 +99,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                         metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
                         viewModelScope,
                         noteDataSource,
+                        emojiRepository,
                         configRepository,
                     ).also {
                         it.capture()
@@ -120,6 +123,7 @@ class NoteDetailViewModel @AssistedInject constructor(
                         metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
                         noteDataSource,
                         configRepository,
+                        emojiRepository,
                         viewModelScope,
                     ).also {
                         it.capture()

@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common_android_ui.TextType
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -30,6 +31,7 @@ class PlaneNoteViewDataCache(
     private val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
     private val configRepository: LocalConfigRepository,
+    private val emojiRepository: CustomEmojiRepository,
 ) {
 
     @Singleton
@@ -40,7 +42,8 @@ class PlaneNoteViewDataCache(
         private val noteRelationGetter: NoteRelationGetter,
         private val metaRepository: MetaRepository,
         private val noteDataSource: NoteDataSource,
-        private val configRepository: LocalConfigRepository
+        private val configRepository: LocalConfigRepository,
+        private val emojiRepository: CustomEmojiRepository,
     ) {
         fun create(
             getAccount: suspend () -> Account,
@@ -57,7 +60,8 @@ class PlaneNoteViewDataCache(
                 noteRelationGetter,
                 metaRepository,
                 noteDataSource,
-                configRepository
+                configRepository,
+                emojiRepository,
             )
         }
     }
@@ -160,6 +164,7 @@ class PlaneNoteViewDataCache(
                 metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
                 noteDataSource,
                 configRepository,
+                emojiRepository,
                 coroutineScope,
             )
         } else {
@@ -171,6 +176,7 @@ class PlaneNoteViewDataCache(
                 metaRepository.get(account.normalizedInstanceDomain)?.emojis ?: emptyList(),
                 noteDataSource,
                 configRepository,
+                emojiRepository,
                 coroutineScope
             )
         }.also {
