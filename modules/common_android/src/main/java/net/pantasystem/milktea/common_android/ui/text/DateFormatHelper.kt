@@ -75,7 +75,7 @@ object DateFormatHelper {
                 GlideApp.with(this@setElapsedTimeAndVisibility)
                     .load(drawable)
                     .override(min(textSize.toInt(), 640))
-                    .into(span.target)
+                    .into(DrawableEmojiTarget(span))
             }
         }
     }

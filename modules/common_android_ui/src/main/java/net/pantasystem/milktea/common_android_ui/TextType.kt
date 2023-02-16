@@ -1,16 +1,16 @@
-package net.pantasystem.milktea.common_android
+package net.pantasystem.milktea.common_android_ui
 
-import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.html.MastodonHTML
 import net.pantasystem.milktea.common_android.html.MastodonHTMLParser
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 
 sealed interface TextType {
-    data class Misskey(val root: Root?) : TextType
+    data class Misskey(val root: Root?, val lazyDecorateResult: LazyDecorateResult?) : TextType
     data class Mastodon(
         val html: MastodonHTML,
         val mentions: List<Note.Type.Mastodon.Mention>,
@@ -21,14 +21,16 @@ sealed interface TextType {
 fun getTextType(account: Account, note: NoteRelation, instanceEmojis: List<Emoji>): TextType? {
     return when (account.instanceType) {
         Account.InstanceType.MISSKEY -> {
+            val root = MFMParser.parse(
+                note.note.text, (note.note.emojis ?: emptyList()) + instanceEmojis,
+                userHost = note.user
+                    .host,
+                accountHost = account.getHost()
+            )
             note.note.text?.let {
                 TextType.Misskey(
-                    MFMParser.parse(
-                        note.note.text, (note.note.emojis ?: emptyList()) + instanceEmojis,
-                        userHost = note.user
-                            .host,
-                        accountHost = account.getHost()
-                    )
+                    root,
+                    MFMDecorator.decorate(root, LazyDecorateSkipElementsHolder())
                 )
             }
         }

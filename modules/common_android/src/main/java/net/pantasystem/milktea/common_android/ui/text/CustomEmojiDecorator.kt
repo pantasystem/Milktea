@@ -38,7 +38,7 @@ class CustomEmojiDecorator {
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
                 .override(min(view.textSize.toInt(), 640))
-                .into(span.target)
+                .into(DrawableEmojiTarget(span))
             builder.setSpan(span, it.start, it.end, 0)
         }
 
@@ -59,7 +59,7 @@ class CustomEmojiDecorator {
                 .asDrawable()
                 .override(min(view.textSize.toInt(), 640))
                 .load(it.result.getUrl(accountHost))
-                .into(span.target)
+                .into(DrawableEmojiTarget(span))
             builder.setSpan(span, it.start, it.end, 0)
         }
 
@@ -80,7 +80,7 @@ class CustomEmojiDecorator {
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
                 .override(min(view.textSize.toInt(), 640))
-                .into(span.target)
+                .into(DrawableEmojiTarget(span))
             builder.setSpan(span, it.start, it.end, 0)
         }
 

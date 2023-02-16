@@ -5,17 +5,12 @@ import android.app.SearchManager
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.*
 import android.text.style.*
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.*
@@ -25,44 +20,63 @@ import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
-import net.pantasystem.milktea.common_android.ui.text.EmojiSpan
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.lang.ref.WeakReference
+import kotlin.math.max
 
 object MFMDecorator {
 
 
+
+
     fun decorate(
         textView: TextView,
-        node: Root,
+        lazyDecorateResult: LazyDecorateResult?,
         skipEmojis: SkipEmojiHolder = SkipEmojiHolder(),
-        retryCounter: Int = 0
-    ): Spanned {
+        retryCounter: Int = 0,
+    ): Spanned? {
+        lazyDecorateResult ?: return null
         val emojiAdapter = EmojiAdapter(textView)
-        textView.setTag(R.id.TEXT_VIEW_MFM_TAG_ID, node.sourceText)
-        return Visitor(
+        textView.setTag(R.id.TEXT_VIEW_MFM_TAG_ID, lazyDecorateResult.sourceText)
+
+        return LazyEmojiDecorator(
             WeakReference(textView),
-            node,
-            node,
-            emojiAdapter,
+            lazyDecorateResult,
             skipEmojis,
-            retryCounter
+            emojiAdapter,
+            retryCounter,
         ).decorate()
-            ?: SpannedString(node.sourceText)
     }
 
+    fun decorate(
+        node: Root?,
+        lazyDecorateSkipElementsHolder: LazyDecorateSkipElementsHolder
+    ): LazyDecorateResult? {
+        node ?: return null
+        val spanned = Visitor(
+            node,
+            node,
+            lazyDecorateSkipElementsHolder,
+        ).decorate()
+        return LazyDecorateResult(
+            node.sourceText,
+            spanned ?: SpannableString(node.sourceText),
+            if (spanned == null) emptyList() else lazyDecorateSkipElementsHolder.skipped.toList()
+        )
+    }
     /**
      * VisitorパターンのVisitorとは少し違う
      */
     class Visitor(
-        val textView: WeakReference<TextView>,
+//        val textView: WeakReference<TextView>,
         val root: Root,
         val parent: Element,
-        private val emojiAdapter: EmojiAdapter,
-        private val skipEmojis: SkipEmojiHolder,
-        private val retryCounter: Int,
+        val lazyDecorateSkipElementsHolder: LazyDecorateSkipElementsHolder,
+//        private val emojiAdapter: EmojiAdapter,
+//        private val skipEmojis: SkipEmojiHolder,
+//        private val retryCounter: Int,
     ) {
         private var position = 0
         private val spannableStringBuilder = SpannableStringBuilder()
@@ -76,12 +90,9 @@ object MFMDecorator {
             if (parent is Node) {
                 parent.childElements.forEach { ele ->
                     val spanned = Visitor(
-                        textView,
                         root,
                         ele,
-                        emojiAdapter,
-                        skipEmojis,
-                        retryCounter
+                        lazyDecorateSkipElementsHolder
                     ).decorate()
                         ?: closeErrorElement(ele)
                     spannableStringBuilder.append(spanned)
@@ -127,54 +138,21 @@ object MFMDecorator {
 
         }
 
+//        private fun decorateEmoji(emojiElement: EmojiElement): Spanned {
+//            val spanned = SpannableString(emojiElement.text)
+//            lazyDecorateSkipElementsHolder.add(spanned, emojiElement)
+//            return spanned
+//        }
+
         private fun decorateEmoji(emojiElement: EmojiElement): Spanned {
             val spanned = SpannableString(emojiElement.text)
-            if (skipEmojis.contains(emojiElement.emoji)) {
-                return spanned
-            }
-            textView.get()?.let { textView ->
-                //val emojiSpan = EmojiSpan(textView)
-                val emojiSpan: EmojiSpan<*>
-                emojiSpan = DrawableEmojiSpan(emojiAdapter)
-                GlideApp.with(textView)
-                    .load(emojiElement.emoji.url)
-                    .override(textView.textSize.toInt())
-                    .addListener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            val t = this@Visitor.textView.get()
-                            if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == root.sourceText) {
-                                if (retryCounter < 100) {
-                                    t.text = decorate(
-                                        t,
-                                        node = root,
-                                        skipEmojis = skipEmojis.add(emojiElement.emoji),
-                                        retryCounter + 1
-                                    )
-                                }
-                            }
+//            if (skipEmojis.contains(emojiElement.emoji)) {
+//                return spanned
+//            }
 
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
-                    .into(emojiSpan.target)
-                spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
-            }
-
+            val emojiSpan = DrawableEmojiSpan(null)
+            spanned.setSpan(emojiSpan, 0, emojiElement.text.length, 0)
+            lazyDecorateSkipElementsHolder.add(spanned, emojiElement, emojiSpan)
             return spanned
         }
 
@@ -295,6 +273,72 @@ object MFMDecorator {
 
 
     }
+
+    class LazyEmojiDecorator(
+        val textView: WeakReference<TextView>,
+        val lazyDecorateResult: LazyDecorateResult,
+        val skipEmojis: SkipEmojiHolder,
+        val emojiAdapter: EmojiAdapter,
+        val retryCounter: Int,
+    ) {
+
+        fun decorate(): Spanned {
+            val spanned = lazyDecorateResult.spanned
+            lazyDecorateResult.skippedEmojis.forEach {
+                decorateEmoji(it)
+            }
+            return spanned
+        }
+
+        private fun decorateEmoji(skippedEmoji: SkippedEmoji) {
+            val emojiElement = skippedEmoji.emoji
+//            if (skipEmojis.contains(emojiElement.emoji)) {
+//                return
+//            }
+            textView.get()?.let { textView ->
+                //val emojiSpan = EmojiSpan(textView)
+                val emojiSpan = skippedEmoji.emojiSpan
+                emojiSpan.adapter = emojiAdapter
+                GlideApp.with(textView)
+                    .load(emojiElement.emoji.url)
+                    .override(max(textView.textSize.toInt(), 10))
+//                    .addListener(object : RequestListener<Drawable> {
+//                        override fun onLoadFailed(
+//                            e: GlideException?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
+//                            val t = this@LazyEmojiDecorator.textView.get()
+//                            if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == lazyDecorateResult.sourceText) {
+//                                if (retryCounter < 100) {
+//
+//                                    decorate(
+//                                        t,
+//                                        lazyDecorateResult = lazyDecorateResult,
+//                                        skipEmojis = skipEmojis.add(emojiElement.emoji),
+//                                        retryCounter + 1
+//                                    )
+//                                }
+//                            }
+//
+//                            return false
+//                        }
+//
+//                        override fun onResourceReady(
+//                            resource: Drawable?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            dataSource: DataSource?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
+//                            return false
+//                        }
+//                    })
+                    .into(emojiSpan.generateTarget())
+            }
+        }
+    }
 }
 
 class SkipEmojiHolder {
@@ -310,13 +354,20 @@ class SkipEmojiHolder {
 }
 
 data class LazyDecorateResult(
+    val sourceText: String,
     val spanned: Spanned,
-    val skippedEmojis: List<EmojiElement>,
+    val skippedEmojis: List<SkippedEmoji>,
+)
+
+data class SkippedEmoji(
+    val spanned: Spanned,
+    val emoji: EmojiElement,
+    val emojiSpan: DrawableEmojiSpan,
 )
 
 class LazyDecorateSkipElementsHolder {
-    var skipped = mutableListOf<EmojiElement>()
-    fun add(element: EmojiElement) {
-        skipped.add(element)
+    var skipped = mutableListOf<SkippedEmoji>()
+    fun add(spanned: Spanned, element: EmojiElement, emojiSpan: DrawableEmojiSpan) {
+        skipped.add(SkippedEmoji(spanned, element, emojiSpan))
     }
 }
