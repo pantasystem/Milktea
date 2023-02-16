@@ -34,6 +34,7 @@ class DrawableEmojiSpan(var adapter: EmojiAdapter?) : EmojiSpan<Drawable>(){
 //    }
 
 
+    val target: CustomTarget<Drawable> = generateTarget()
 //    override val target = object : CustomTarget<Drawable>(){
 //        override fun onResourceReady(
 //            resource: Drawable,
@@ -67,12 +68,12 @@ class DrawableEmojiSpan(var adapter: EmojiAdapter?) : EmojiSpan<Drawable>(){
 //    }
 
 
-    fun generateTarget(): DrawableEmojiTarget {
+    private fun generateTarget(): DrawableEmojiTarget {
         return DrawableEmojiTarget(this)
     }
 }
 
-class DrawableEmojiTarget(
+private class DrawableEmojiTarget(
     val span: DrawableEmojiSpan
 ) : CustomTarget<Drawable>() {
     override fun onResourceReady(
@@ -105,7 +106,7 @@ class DrawableEmojiTarget(
         }
     }
     override fun onLoadCleared(placeholder: Drawable?) {
-        span.imageDrawable = placeholder
+
     }
 }
 
