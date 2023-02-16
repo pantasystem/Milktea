@@ -187,15 +187,17 @@ object MFMDecorator {
             //intent.setClassName("com.google.android.googlequicksearchbox",  "com.google.android.googlequicksearchbox.SearchActivity")
             intent.putExtra(SearchManager.QUERY, search.text)
             return makeClickableSpan(
-                "${search.text}  ${(textView.get()?.context?.getString(R.string.search) ?: "Search")}",
-                intent
-            )
+                "${search.text} Search",
+            ) {
+                Intent(Intent.ACTION_SEARCH).apply {
+                    putExtra(SearchManager.QUERY, search.text)
+                }
+            }
         }
 
         private fun decorateMention(mention: Mention): Spanned {
-            return textView.get()?.let { textView ->
-
-                val activity = FragmentComponentManager.findActivity(textView.context) as Activity
+            return makeClickableSpan(mention.text) {
+                val activity = FragmentComponentManager.findActivity(it.context) as Activity
                 val intent = EntryPointAccessors.fromActivity(
                     activity,
                     NavigationEntryPointForBinding::class.java
@@ -204,39 +206,38 @@ object MFMDecorator {
                     .newIntent(UserDetailNavigationArgs.UserName(userName = mention.text))
                 intent.putActivity(Activities.ACTIVITY_IN_APP)
 
-
-                makeClickableSpan(mention.text, intent)
-            } ?: closeErrorElement(mention)
+                intent
+            }
 
         }
 
         private fun decorateLink(link: Link): Spanned {
-            return makeClickableSpan(link.text, Intent(Intent.ACTION_VIEW, Uri.parse(link.url)))
+            return makeClickableSpan(link.text) {
+                Intent(Intent.ACTION_VIEW, Uri.parse(link.url))
+            }
         }
 
 
         private fun decorateHashTag(hashTag: HashTag): Spanned {
-            return textView.get()?.let { textView ->
-                val activity = FragmentComponentManager.findActivity(textView.context) as Activity
+            return makeClickableSpan(hashTag.text) {
+                val activity = FragmentComponentManager.findActivity(it.context) as Activity
 
                 val navigation = EntryPointAccessors.fromActivity(
                     activity,
                     NavigationEntryPointForBinding::class.java
                 )
-                val intent = navigation.searchNavigation()
+                navigation.searchNavigation()
                     .newIntent(SearchNavType.ResultScreen(hashTag.text))
-//
-                makeClickableSpan(hashTag.text, intent)
-            } ?: closeErrorElement(hashTag)
+            }
 
         }
 
-        private fun makeClickableSpan(text: String, intent: Intent): SpannableString {
+        private fun makeClickableSpan(text: String, makeIntent: (View) -> Intent): SpannableString {
             val spanned = SpannableString(text)
             spanned.setSpan(
                 object : ClickableSpan() {
                     override fun onClick(p0: View) {
-                        textView.get()?.context?.startActivity(intent)
+                        p0.context?.startActivity(makeIntent(p0))
 
                     }
                 }, 0, text.length, 0

@@ -3,7 +3,7 @@ package net.pantasystem.milktea.common_android.mfm
 import jp.panta.misskeyandroidclient.mfm.Node
 
 class Root(
-    val sourceText: String
+    val sourceText: String,
 ) : Node(0, sourceText.length, 0, sourceText.length, ElementType.ROOT){
     override val elementType: ElementType = ElementType.ROOT
     override val start: Int = 0
