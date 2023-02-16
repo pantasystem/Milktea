@@ -11,6 +11,7 @@ import android.text.style.*
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.core.text.getSpans
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.*
@@ -288,6 +289,14 @@ object MFMDecorator {
         private val spannableString = SpannableString(lazyDecorateResult.spanned)
 
         fun decorate(): Spanned {
+            val beforeSpans = spannableString.getSpans<DrawableEmojiSpan>()
+            beforeSpans.forEach {
+                it.imageDrawable = null
+                it.adapter = null
+                spannableString.removeSpan(it)
+            }
+            //val emojiSpan = EmojiSpan(textView)
+
             val spanned = spannableString
             lazyDecorateResult.skippedEmojis.forEach {
                 decorateEmoji(it)
@@ -301,7 +310,6 @@ object MFMDecorator {
 //                return
 //            }
             textView.get()?.let { textView ->
-                //val emojiSpan = EmojiSpan(textView)
                 val emojiSpan = DrawableEmojiSpan(null)
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
                 emojiSpan.adapter = emojiAdapter
