@@ -58,6 +58,7 @@ object DecorateTextHelper {
                     }
                 }
                 it.imageDrawable = null
+                it.adapter = null
                 // NOTE: 不要になった画像リソースを解放している
                 // NOTE: MFMDecoratorの仕様上現状はEmojiSpanを使いまわさないのでここでリソース破棄をしてしまっても問題ない。
 //                Glide.with(textView).clear(it.target)
