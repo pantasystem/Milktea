@@ -80,7 +80,7 @@ app nameはインスタンスのバージョンによってはvia名として公
 <img src="https://user-images.githubusercontent.com/38454985/81928170-d03c8080-961f-11ea-8acc-b1d752d72de7.png" width="320px">
 
 認証画面がブラウザに表示されるので、問題がなければ許可(Accept)を押します。<br>
-もし、リダイレクトしない場合は戻るボタンを押して、「私は許可をしました」を押してください。
+もし、リダイレクトしない場合は戻るボタンを押して、「私は許可をしました」を押してください。<br>
 <img src="https://user-images.githubusercontent.com/38454985/81928454-3cb77f80-9620-11ea-839b-ea28962a0a92.png" width="320px"><br>
 
 成功すればMilkteaにリダイレクトするので[続行(CONTINUE)]を押し完了です。<br>
