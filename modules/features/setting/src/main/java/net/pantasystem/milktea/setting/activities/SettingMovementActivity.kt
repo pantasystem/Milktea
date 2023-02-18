@@ -33,7 +33,7 @@ import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.SettingTitleTile
+import net.pantasystem.milktea.setting.compose.SettingTitleTile
 import javax.inject.Inject
 
 

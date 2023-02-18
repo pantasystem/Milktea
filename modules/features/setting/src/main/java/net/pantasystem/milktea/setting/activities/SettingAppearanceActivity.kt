@@ -43,7 +43,7 @@ import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.Theme
 import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.SettingTitleTile
+import net.pantasystem.milktea.setting.compose.SettingTitleTile
 import javax.inject.Inject
 
 data class ThemeUiState(
