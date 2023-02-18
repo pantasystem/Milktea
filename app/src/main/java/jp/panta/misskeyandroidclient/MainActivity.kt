@@ -159,9 +159,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
     }
 
-    override fun setToolbar(toolbar: Toolbar) {
+    override fun setToolbar(toolbar: Toolbar, visibleTitle: Boolean) {
         setSupportActionBar(toolbar)
         toggleNavigationDrawerDelegate.updateToolbar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(visibleTitle)
     }
 
     override fun onResume() {
