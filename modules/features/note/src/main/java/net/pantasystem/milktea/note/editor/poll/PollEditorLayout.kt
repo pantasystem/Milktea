@@ -48,6 +48,9 @@ fun PollEditorLayout(
                         }) {
                             Icon(Icons.Default.Close, contentDescription = null)
                         }
+                    },
+                    label = {
+                        Text(text = stringResource(id = R.string.note_editor_poll_choice_n, i + 1))
                     }
                 )
                 if (i < (uiState.choices.size - 1)) {
