@@ -607,7 +607,11 @@ class NoteEditorViewModel @Inject constructor(
 
     fun enablePoll() {
         val poll =
-            if (savedStateHandle.getPoll() == null) PollEditingState(emptyList(), false) else null
+            if (savedStateHandle.getPoll() == null) PollEditingState(listOf(
+                PollChoiceState("", UUID.randomUUID()),
+                PollChoiceState("", UUID.randomUUID()),
+                PollChoiceState("", UUID.randomUUID())
+            ), false) else null
         savedStateHandle.setPoll(poll)
     }
 
