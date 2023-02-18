@@ -86,7 +86,7 @@
     <string name="auto_load_when_stopped" tools:ignore="Typos">Automatically look for notes notes when the instance\'s server is stopped</string>
     <string name="sync">Sync</string>
 
-    <string name="movement">Syncing</string>
+    <string name="movement">Movement</string>
     <string name="remove_note">Delete notes</string>
 
     <string name="hide_removed_note">Hide deleted notes</string>
