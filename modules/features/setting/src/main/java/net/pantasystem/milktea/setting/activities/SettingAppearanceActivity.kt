@@ -234,7 +234,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.auto_note_folding),
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(text = stringResource(id = R.string.height_limit))
+                                Text(text = "${stringResource(id = R.string.height_limit)}(${currentConfigState.noteExpandedHeightSize}dp)")
                                 Slider(
                                     value = currentConfigState.noteExpandedHeightSize.let {
                                         val v =
