@@ -452,6 +452,7 @@
     <string name="settings_app_restart_required">アプリの再起動が必要です</string>
 
     <string name="note_editor_poll_choice_n">候補%d</string>
+    <string name="settings_visible_instance_domain_in_toolbar">ツールバーにインスタンスのドメインを表示する</string>
 
 
 </resources>
