@@ -75,8 +75,6 @@ fun AccountSettingScreen(
                     title = {
                         Text(stringResource(id = R.string.account))
                     },
-                    elevation = 0.dp,
-                    backgroundColor = MaterialTheme.colors.surface,
                 )
             },
             modifier = modifier,

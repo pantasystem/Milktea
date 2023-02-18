@@ -86,7 +86,7 @@
     <string name="auto_load_when_stopped" tools:ignore="Typos">Automatically look for notes notes when the instance\'s server is stopped</string>
     <string name="sync">Sync</string>
 
-    <string name="movement">Syncing</string>
+    <string name="movement">Movement</string>
     <string name="remove_note">Delete notes</string>
 
     <string name="hide_removed_note">Hide deleted notes</string>
@@ -438,5 +438,10 @@
     <string name="settings_note">Note</string>
     <string name="settings_note_divider">Show horizontal separator lines in notes</string>
     <string name="auth_qr_code_message">Authenticate on another device</string>
+
+    <string name="settings_show_bottom_menu">Show bottom menu</string>
+    <string name="settings_app_restart_required">App restart required.</string>
+
     <string name="note_editor_poll_choice_n">Choice %d</string>
+
 </resources>
