@@ -31,7 +31,7 @@ sealed interface PollExpiresAt : java.io.Serializable {
         val hour = expiresAt.let {
             val cal = Calendar.getInstance()
             cal.time = it
-            cal.get(Calendar.HOUR)
+            cal.get(Calendar.HOUR_OF_DAY)
         }
 
         val minutes = expiresAt.let {
