@@ -6,7 +6,6 @@ import net.pantasystem.milktea.api.misskey.notes.PollDTO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
@@ -38,9 +37,7 @@ class NoteDTOEntityConverter @Inject constructor() {
             viaMobile = noteDTO.viaMobile,
             visibility = visibility,
             localOnly = noteDTO.localOnly,
-            emojis = (noteDTO.emojiList ?: emptyList()) + (noteDTO.reactionEmojis?.map {
-                Emoji(name = it.key, uri = it.value, url = it.value)
-            } ?: emptyList()),
+            emojis = noteDTO.emojiList + (noteDTO.reactionEmojiList),
             app = noteDTO.app?.toModel(),
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
