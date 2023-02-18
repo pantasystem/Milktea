@@ -46,7 +46,6 @@ class ClientWordFilterSettingActivity : AppCompatActivity() {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            backgroundColor = MaterialTheme.colors.surface,
                             title = {
                                 Text(stringResource(id = R.string.client_word_mute))
                             },

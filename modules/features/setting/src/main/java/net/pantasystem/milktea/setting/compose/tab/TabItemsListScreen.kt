@@ -54,7 +54,6 @@ internal fun TabItemsListScreen(
                     title = {
                         Text(stringResource(R.string.add_to_tab))
                     },
-                    backgroundColor = MaterialTheme.colors.surface,
                     navigationIcon = {
                         IconButton(
                             onClick = {
