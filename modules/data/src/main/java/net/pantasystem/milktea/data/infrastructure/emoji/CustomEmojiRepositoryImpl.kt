@@ -99,8 +99,8 @@ class CustomEmojiRepositoryImpl @Inject constructor(
                             .body()
                     emojis?.emojis?.map {
                         it.copy(
-                            url = V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}"),
-                            uri = V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}"),
+                            url = if (it.url == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.url,
+                            uri = if (it.uri == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.uri,
                         )
                     }
                 } else {
