@@ -69,16 +69,22 @@ fun PollEditorLayout(
             },
             onItemSelected = onExpireAtTypeChanged,
             selectedItemFactory = { modifier, item ->
-                when (item) {
-                    ExpireAtType.IndefinitePeriod -> ExpireAtTypeLayout(
-                        modifier = modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.indefinite_period)
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        when (item) {
+                            ExpireAtType.IndefinitePeriod -> stringResource(id = R.string.indefinite_period)
+                            ExpireAtType.SpecificDateAndTime -> stringResource(id = R.string.date_and_time_specification)
+                        },
+                        fontSize = 16.sp
                     )
-                    ExpireAtType.SpecificDateAndTime -> ExpireAtTypeLayout(
-                        modifier = modifier.fillMaxWidth(),
-                        stringResource(id = R.string.date_and_time_specification)
-                    )
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                 }
+
             },
         ) { item, _ ->
             when (item) {
@@ -96,8 +102,9 @@ fun PollEditorLayout(
             is PollExpiresAt.DateAndTime -> {
                 Row(Modifier.fillMaxWidth()) {
                     Button(onClick = onExpireAtChangeDateButtonClicked) {
-                        Text("${expireAt.year}/${expireAt.month}/${expireAt.dayOfMonth}:")
+                        Text("${expireAt.year}/${expireAt.month}/${expireAt.dayOfMonth}")
                     }
+                    Spacer(modifier = Modifier.width(2.dp))
                     Button(onClick = onExpireAtChangeTimeButtonClicked) {
                         Text("${expireAt.hour}:${expireAt.minutes}")
                     }
@@ -111,11 +118,10 @@ fun PollEditorLayout(
 @Composable
 fun ExpireAtTypeLayout(modifier: Modifier, text: String) {
     Row(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.padding(vertical = 8.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = text, fontSize = 16.sp)
-        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
     }
 }
 
