@@ -444,5 +444,6 @@
     <string name="settings_note_divider">在笔记中显示水平分隔线</string>
     <string name="settings_note">笔记</string>
     <string name="auth_qr_code_message">在另一台设备上进行身份验证</string>
+    <string name="settings_show_bottom_menu">显示底部菜单</string>
 
 </resources>

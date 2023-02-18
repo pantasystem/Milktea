@@ -148,10 +148,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
                         SettingSection(title = "UI") {
                             SettingSwitchTile(
 
-                                checked = currentConfigState.isClassicUI, onChanged = {
-                                    currentConfigState = currentConfigState.copy(isClassicUI = it)
+                                checked = !currentConfigState.isClassicUI, onChanged = {
+                                    currentConfigState = currentConfigState.copy(isClassicUI = !it)
                                 }) {
-                                Text(stringResource(R.string.hide_bottom_navigation))
+                                Text(stringResource(R.string.settings_show_bottom_menu))
                             }
 
                             SettingSwitchTile(
