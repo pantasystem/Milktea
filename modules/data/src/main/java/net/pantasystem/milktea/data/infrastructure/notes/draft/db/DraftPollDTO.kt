@@ -26,7 +26,9 @@ class DraftPollDTO(
             return null
         }
         return DraftPoll(
-            choices.map{
+            choices.sortedBy {
+                it.weight
+            }.map{
                 it.choice
             },
             multiple,
