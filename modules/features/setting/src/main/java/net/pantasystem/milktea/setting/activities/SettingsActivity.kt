@@ -2,25 +2,30 @@ package net.pantasystem.milktea.setting.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import com.wada811.databinding.dataBinding
+import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.SettingAdapter
-import net.pantasystem.milktea.setting.databinding.ActivitySettingsBinding
-import net.pantasystem.milktea.setting.viewmodel.MoveSettingActivityPanel
+import net.pantasystem.milktea.setting.compose.SettingListTileLayout
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
-
-    private val binding: ActivitySettingsBinding by dataBinding()
 
     @Inject
     lateinit var applyTheme: ApplyTheme
@@ -29,116 +34,143 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
-        setContentView(R.layout.activity_settings)
 
-        setSupportActionBar(binding.settingToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setContent {
+            MdcTheme {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    finish()
+                                }) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = null)
+                                }
+                            },
+                            title = {
+                                Text(stringResource(id = R.string.setting))
+                            }
+                        )
+                    }
+                ) {
+                    Column(
+                        Modifier
+                            .padding(it)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        AccountSettingActivity::class.java,
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.account))
+                        }
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        SettingMovementActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.movement))
+                        }
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        PageSettingActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.nav_setting_tab))
+                        }
 
-        val movementSetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.movement,
-            activity = SettingMovementActivity::class.java,
-            context = this
-        )
-        movementSetting.startActivityEventBus.observe(this) {
-            startActivity(Intent(this, it))
-        }
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        SettingAppearanceActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.appearance))
+                        }
 
-        val tabSetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.nav_setting_tab,
-            activity = PageSettingActivity::class.java,
-            context = this
-        )
-        tabSetting.startActivityEventBus.observe(this) {
-            startActivity(Intent(this, it))
-        }
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        SecuritySettingActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(R.string.security_setting))
+                        }
 
-        val securitySetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.security_setting,
-            activity = SecuritySettingActivity::class.java,
-            context = this
-        )
-        securitySetting.startActivityEventBus.observe(this) {
-            startActivity(Intent(this, it))
-        }
-        val appearanceSetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.appearance,
-            activity = SettingAppearanceActivity::class.java,
-            context = this
-        )
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        ReactionSettingActivity::class.java,
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.reaction))
+                        }
 
-        appearanceSetting.startActivityEventBus.observe(this) {
-            startActivity(Intent(this, it))
-        }
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        ClientWordFilterSettingActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.client_word_mute))
+                        }
 
-        val reactionSetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.reaction,
-            activity = ReactionSettingActivity::class.java,
-            context = this
-        ).apply {
-            startActivityEventBus.observe(this@SettingsActivity) {
-                startActivity(Intent(this@SettingsActivity, it))
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        OssLicensesMenuActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.license))
+                        }
+                    }
+                }
             }
         }
-
-        val clientMuteWordSetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.client_word_mute,
-            activity = ClientWordFilterSettingActivity::class.java,
-            context = this
-        ).apply {
-            startActivityEventBus.observe(this@SettingsActivity) {
-                startActivity(Intent(this@SettingsActivity, it))
-            }
-        }
-
-        val accountSetting = MoveSettingActivityPanel(
-            titleStringRes = R.string.account,
-            activity = AccountSettingActivity::class.java,
-            context = this
-        ).apply {
-            startActivityEventBus.observe(this@SettingsActivity) {
-                startActivity(Intent(this@SettingsActivity, it))
-            }
-        }
-
-        val licenseActivitySetting =
-            MoveSettingActivityPanel(
-                titleStringRes = R.string.license,
-                activity = OssLicensesMenuActivity::class.java,
-                context = this
-            )
-        licenseActivitySetting.startActivityEventBus.observe(this) {
-            val intent = Intent(this, it)
-            intent.putExtra("title", getString(R.string.license))
-            startActivity(intent)
-        }
-
-        val group = net.pantasystem.milktea.setting.viewmodel.Group(
-            titleStringRes = null,
-            context = this,
-            items = listOf(
-                accountSetting,
-                movementSetting,
-                tabSetting,
-                appearanceSetting,
-                securitySetting,
-                reactionSetting,
-                clientMuteWordSetting,
-                licenseActivitySetting
-            )
-        )
-
-        val adapter = SettingAdapter(this)
-        binding.settingList.adapter = adapter
-        binding.settingList.layoutManager = LinearLayoutManager(this)
-        adapter.submitList(listOf(group))
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 }
