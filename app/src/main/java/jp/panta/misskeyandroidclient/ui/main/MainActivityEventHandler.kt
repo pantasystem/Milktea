@@ -1,8 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.main
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
@@ -148,6 +150,8 @@ internal class MainActivityEventHandler(
                 }
             }
         }
+        val audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
         lifecycleScope.launch {
             lifecycleOwner.whenResumed {
                 // NOTE: 通知音を再生する
@@ -155,7 +159,10 @@ internal class MainActivityEventHandler(
                     if (ringtone.isPlaying) {
                         ringtone.stop()
                     }
-                    if (configStore.configState.value.isEnableNotificationSound) {
+                    if (
+                        configStore.configState.value.isEnableNotificationSound
+                            && audioManager.ringerMode == AudioManager.RINGER_MODE_NORMAL
+                    ) {
                         ringtone.play()
                     }
                 }
@@ -188,7 +195,10 @@ internal class MainActivityEventHandler(
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
                         "CURRENT_INSTANCE_DOMAIN",
                         state.currentAccount?.let {
-                            it.instanceDomain.substring(0, 36.coerceAtMost(it.instanceDomain.length))
+                            it.instanceDomain.substring(
+                                0,
+                                36.coerceAtMost(it.instanceDomain.length)
+                            )
                         }
                     )
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
@@ -257,7 +267,7 @@ internal class MainActivityEventHandler(
     private fun collectCurrentPageableState() {
         currentPageableTimelineViewModel.currentType.onEach {
             binding.appBarMain.fab.setImageResource(
-                when(it) {
+                when (it) {
                     CurrentPageType.Account -> {
                         R.drawable.ic_person_add_black_24dp
                     }
