@@ -111,7 +111,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: DefaultConfig.config.isEnableStreamingAPIAndNoteCapture,
         isEnableNoteDivider = map.getValue<PrefType.BoolPref>(
             Keys.IsEnableNoteDivider
-        )?.value ?: DefaultConfig.config.isEnableNoteDivider
+        )?.value ?: DefaultConfig.config.isEnableNoteDivider,
+        isVisibleInstanceUrlInToolbar = map.getValue<PrefType.BoolPref>(
+            Keys.IsVisibleInstanceUrlInToolbar
+        )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar
     )
 }
 
@@ -201,6 +204,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsEnableNoteDivider -> {
             PrefType.BoolPref(isEnableNoteDivider)
+        }
+        Keys.IsVisibleInstanceUrlInToolbar -> {
+            PrefType.BoolPref(isVisibleInstanceUrlInToolbar)
         }
     }
 }

@@ -118,9 +118,18 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
             }
         }
 
-        accountStore.observeCurrentAccount.filterNotNull().onEach {
-            binding.currentInstanceHostView.text = it.getHost()
+        mTabViewModel.visibleInstanceInfo.onEach {
+            when(it) {
+                CurrentAccountInstanceInfoUrl.Invisible -> {
+                    binding.currentInstanceHostView.visibility = View.GONE
+                }
+                is CurrentAccountInstanceInfoUrl.Visible -> {
+                    binding.currentInstanceHostView.visibility = View.VISIBLE
+                    binding.currentInstanceHostView.text = it.host
+                }
+            }
         }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
