@@ -438,4 +438,5 @@
     <string name="settings_note">Note</string>
     <string name="settings_note_divider">Show horizontal separator lines in notes</string>
     <string name="auth_qr_code_message">Authenticate on another device</string>
+    <string name="note_editor_poll_choice_n">Choice %d</string>
 </resources>

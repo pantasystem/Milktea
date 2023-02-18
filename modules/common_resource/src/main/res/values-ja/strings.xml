@@ -447,5 +447,6 @@
     <string name="settings_note">ノート</string>
     <string name="settings_note_divider">ノートに横区切り線を表示する</string>
     <string name="auth_qr_code_message">別のデバイスで認証する</string>
+    <string name="note_editor_poll_choice_n">候補%d</string>
 
 </resources>
