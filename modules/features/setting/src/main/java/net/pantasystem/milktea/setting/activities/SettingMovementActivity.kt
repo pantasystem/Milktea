@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -135,30 +134,7 @@ class SettingMovementActivity : AppCompatActivity() {
                         }
 
 
-                        SettingSection(title = stringResource(id = R.string.auto_note_folding)) {
-                            Text(text = stringResource(id = R.string.height_limit), modifier = Modifier.padding(horizontal = 14.dp))
-                            Slider(
-                                value = currentConfigState.noteExpandedHeightSize.let {
-                                    val v =
-                                        currentConfigState.noteExpandedHeightSize.toFloat() / 1000f
-                                    if (it in 0..1000) {
-                                        v
-                                    } else {
-                                        1f
-                                    }
-                                },
-                                onValueChange = {
-                                    val v = (it * 1000f).toInt()
-                                    currentConfigState = currentConfigState.copy(
-                                        noteExpandedHeightSize = if (v > 50) {
-                                            v
-                                        } else 50
-                                    )
 
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
                         if (currentAccount != null) {
                             SettingSection(title = stringResource(id = R.string.learn_note_visibility)) {
                                 SettingSwitchTile(
