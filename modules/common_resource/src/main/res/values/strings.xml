@@ -439,4 +439,5 @@
     <string name="settings_note_divider">Show horizontal separator lines in notes</string>
     <string name="auth_qr_code_message">Authenticate on another device</string>
     <string name="settings_show_bottom_menu">Show bottom menu</string>
+    <string name="settings_app_restart_required">App restart required.</string>
 </resources>

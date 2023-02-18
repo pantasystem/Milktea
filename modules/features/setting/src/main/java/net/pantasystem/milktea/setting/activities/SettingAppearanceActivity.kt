@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -132,6 +133,12 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             .verticalScroll(rememberScrollState())
                     ) {
                         SettingSection(title = stringResource(id = R.string.theme)) {
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
+                            )
                             for (theme in themes) {
                                 SettingRadioTile(
                                     selected = currentConfigState.theme == theme.type,
@@ -223,7 +230,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
                         }
                         SettingSection(title = stringResource(id = R.string.settings_note)) {
                             Column(Modifier.padding(horizontal = 16.dp)) {
-                                Text(text = stringResource(id = R.string.auto_note_folding), fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = stringResource(id = R.string.auto_note_folding),
+                                    fontWeight = FontWeight.Bold
+                                )
                                 Text(text = stringResource(id = R.string.height_limit))
                                 Slider(
                                     value = currentConfigState.noteExpandedHeightSize.let {
