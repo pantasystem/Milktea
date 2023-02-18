@@ -45,18 +45,22 @@ object DecorateTextHelper {
                 when (val imageDrawable = it.imageDrawable) {
                     is GifDrawable -> {
                         imageDrawable.stop()
+                        imageDrawable.clearAnimationCallbacks()
                     }
                     is APNGDrawable -> {
                         imageDrawable.stop()
+                        imageDrawable.clearAnimationCallbacks()
                     }
                     else -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                             if (imageDrawable is AnimatedImageDrawable) {
                                 imageDrawable.stop()
+                                imageDrawable.clearAnimationCallbacks()
                             }
                         }
                     }
                 }
+                it.imageDrawable?.callback = null
                 it.imageDrawable = null
                 it.adapter = null
                 // NOTE: 不要になった画像リソースを解放している
