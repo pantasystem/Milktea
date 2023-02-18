@@ -6,10 +6,10 @@ import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -28,12 +28,12 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.compose.SettingTitleTile
+import net.pantasystem.milktea.setting.SettingSection
+import net.pantasystem.milktea.setting.compose.SettingSwitchTile
 import javax.inject.Inject
 
 
@@ -95,19 +95,18 @@ class SettingMovementActivity : AppCompatActivity() {
                         )
                     },
                 ) { padding ->
-                    LazyColumn(
+
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
                             .padding(padding)
+                            .verticalScroll(
+                                rememberScrollState()
+                            )
                     ) {
 
-                        item {
-                            SettingTitleTile(text = stringResource(id = R.string.timeline))
-
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                        SettingSection(title = stringResource(id = R.string.timeline)) {
+                            SettingSwitchTile(
                                 checked = currentConfigState.isIncludeLocalRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -116,10 +115,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 Text(text = stringResource(id = R.string.include_local_renotes))
                             }
 
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                            SettingSwitchTile(
                                 checked = currentConfigState.isIncludeRenotedMyNotes,
                                 onChanged = {
                                     currentConfigState =
@@ -128,10 +124,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 Text(text = stringResource(id = R.string.include_renoted_my_notes))
                             }
 
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                            SettingSwitchTile(
                                 checked = currentConfigState.isIncludeMyRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -139,45 +132,36 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }) {
                                 Text(text = stringResource(id = R.string.include_my_renotes))
                             }
-                            SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                            ) {
-                                Text(text = stringResource(id = R.string.height_limit))
-                                Slider(
-                                    value = currentConfigState.noteExpandedHeightSize.let {
-                                        val v =
-                                            currentConfigState.noteExpandedHeightSize.toFloat() / 1000f
-                                        if (it in 0..1000) {
-                                            v
-                                        } else {
-                                            1f
-                                        }
-                                    },
-                                    onValueChange = {
-                                        val v = (it * 1000f).toInt()
-                                        currentConfigState = currentConfigState.copy(
-                                            noteExpandedHeightSize = if (v > 50) {
-                                                v
-                                            } else 50
-                                        )
-
-                                    },
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
                         }
 
+
+                        SettingSection(title = stringResource(id = R.string.auto_note_folding)) {
+                            Text(text = stringResource(id = R.string.height_limit), modifier = Modifier.padding(horizontal = 14.dp))
+                            Slider(
+                                value = currentConfigState.noteExpandedHeightSize.let {
+                                    val v =
+                                        currentConfigState.noteExpandedHeightSize.toFloat() / 1000f
+                                    if (it in 0..1000) {
+                                        v
+                                    } else {
+                                        1f
+                                    }
+                                },
+                                onValueChange = {
+                                    val v = (it * 1000f).toInt()
+                                    currentConfigState = currentConfigState.copy(
+                                        noteExpandedHeightSize = if (v > 50) {
+                                            v
+                                        } else 50
+                                    )
+
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                         if (currentAccount != null) {
-                            item {
-                                SettingTitleTile(text = stringResource(id = R.string.learn_note_visibility))
-                                SwitchTile(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                            SettingSection(title = stringResource(id = R.string.learn_note_visibility)) {
+                                SettingSwitchTile(
                                     checked = rv is RememberVisibility.Remember,
                                     onChanged = {
                                         val config = if (it) {
@@ -195,14 +179,12 @@ class SettingMovementActivity : AppCompatActivity() {
                                     )
                                 }
                             }
+
                         }
 
-                        item {
-                            SettingTitleTile(text = stringResource(id = R.string.notification_sound))
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+
+                        SettingSection(title = stringResource(id = R.string.notification_sound)) {
+                            SettingSwitchTile(
                                 checked = currentConfigState.isEnableNotificationSound,
                                 onChanged = {
                                     currentConfigState =
@@ -210,14 +192,11 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }) {
                                 Text(stringResource(id = R.string.inapp_notification_sound))
                             }
+
                         }
 
-                        item {
-                            SettingTitleTile(text = stringResource(id = R.string.streaming))
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                        SettingSection(title = stringResource(id = R.string.streaming)) {
+                            SettingSwitchTile(
                                 checked = currentConfigState.isEnableStreamingAPIAndNoteCapture,
                                 onChanged = {
                                     currentConfigState = currentConfigState.copy(
@@ -228,10 +207,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 Text(stringResource(id = R.string.enable_automic_updates))
                             }
                             if (currentConfigState.isEnableStreamingAPIAndNoteCapture) {
-                                SwitchTile(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                                SettingSwitchTile(
                                     checked = currentConfigState.isStopStreamingApiWhenBackground,
                                     onChanged = {
                                         currentConfigState =
@@ -239,10 +215,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                     }) {
                                     Text(stringResource(id = R.string.is_stop_timeline_streaming_when_background))
                                 }
-                                SwitchTile(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                                SettingSwitchTile(
                                     checked = currentConfigState.isStopNoteCaptureWhenBackground,
                                     onChanged = {
                                         currentConfigState =
@@ -253,6 +226,7 @@ class SettingMovementActivity : AppCompatActivity() {
                             }
                         }
                     }
+
                 }
             }
         }
