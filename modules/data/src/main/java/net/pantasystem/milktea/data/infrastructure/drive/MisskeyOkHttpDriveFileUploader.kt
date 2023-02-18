@@ -27,6 +27,7 @@ object MisskeyOkHttpDriveFileUploaderConstants {
     const val file = "file"
     const val folderId = "folderId"
     const val isSensitive = "isSensitive"
+    const val comment = "comment"
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -72,6 +73,13 @@ class MisskeyOkHttpDriveFileUploader(
                 )
             }
 
+            if (fileProperty.comment != null) {
+                requestBodyBuilder.addFormDataPart(
+                    MisskeyOkHttpDriveFileUploaderConstants.comment,
+                    fileProperty.comment ?: ""
+                )
+            }
+
             val requestBody = requestBodyBuilder.build()
 
             val request =
@@ -104,8 +112,6 @@ class MisskeyOkHttpDriveFileUploader(
     private fun upload(file: AppFile.Local, isForce: Boolean): FilePropertyDTO {
         Log.d("FileUploader", "アップロードしようとしている情報:$file")
         return try {
-
-
             val client = getOkHttpClient()
             val requestBodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -117,6 +123,13 @@ class MisskeyOkHttpDriveFileUploader(
                     file.name,
                     createRequestBody(Uri.parse(file.path))
                 )
+
+            if (file.comment != null) {
+                requestBodyBuilder.addFormDataPart(
+                    MisskeyOkHttpDriveFileUploaderConstants.comment,
+                    file.comment ?: ""
+                )
+            }
 
             val isSensitive = file.isSensitive
             requestBodyBuilder.addFormDataPart(
