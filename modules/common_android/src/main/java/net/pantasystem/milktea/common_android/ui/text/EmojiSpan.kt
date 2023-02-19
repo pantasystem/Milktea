@@ -119,13 +119,13 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
 
         val ratio = imageWidth.toFloat() / imageHeight.toFloat()
 
-        val width = (emojiHeight * ratio).toInt()
+        val scaledImageWidth = (emojiHeight * ratio).toInt()
 
 
-        if (width != textWidth || emojiHeight != textHeight) {
+        if (scaledImageWidth != textWidth || emojiHeight != textHeight) {
             textHeight = emojiHeight
-            textWidth = width
-            imageDrawable?.setBounds(0, 0, width, emojiHeight)
+            textWidth = scaledImageWidth
+            imageDrawable?.setBounds(0, 0, scaledImageWidth, emojiHeight)
         }
     }
 
