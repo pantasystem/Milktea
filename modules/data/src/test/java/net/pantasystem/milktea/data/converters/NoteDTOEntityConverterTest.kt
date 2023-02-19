@@ -41,7 +41,7 @@ class NoteDTOEntityConverterTest {
             visibility = NoteVisibilityType.Public,
             localOnly = false,
             visibleUserIds = listOf(),
-            reactionEmojis = mapOf(),
+            rawReactionEmojis = net.pantasystem.milktea.api.misskey.emoji.EmojisType.None,
             url = null,
             uri = null,
             renoteCount = 0,
