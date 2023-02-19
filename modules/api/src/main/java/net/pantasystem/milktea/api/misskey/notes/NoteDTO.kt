@@ -33,7 +33,9 @@ data class NoteDTO(
     @SerialName("visibleUserIds")
     val visibleUserIds: List<String>? = null,
 
-    val reactionEmojis: Map<String, String>? = null,
+    @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
+    @SerialName("reactionEmojis")
+    val rawReactionEmojis: EmojisType? = null,
 
     val url: String? = null,
     val uri: String? = null,
@@ -78,14 +80,22 @@ data class NoteDTO(
         val name: String,
     ) : Serializable
 
-    val emojiList: List<Emoji>? = when(rawEmojis) {
-        EmojisType.None -> null
+    val reactionEmojiList = when(val emojis = rawReactionEmojis) {
+        EmojisType.None -> emptyList()
+        is EmojisType.TypeArray -> emojis.emojis
+        is EmojisType.TypeObject -> emojis.emojis.map {
+            Emoji(name = it.key, url = it.value)
+        }
+        null -> emptyList()
+    }
+    val emojiList: List<Emoji> = when(rawEmojis) {
+        EmojisType.None -> emptyList()
         is EmojisType.TypeArray -> rawEmojis.emojis
-        is EmojisType.TypeObject -> (rawEmojis.emojis + (reactionEmojis ?: emptyMap())).map {
+        is EmojisType.TypeObject -> (rawEmojis.emojis).map {
             Emoji(name = it.key, url = it.value, uri = it.value)
         }
-        null -> null
-    }
+        null -> emptyList()
+    } + reactionEmojiList
 }
 
 
