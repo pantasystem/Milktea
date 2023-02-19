@@ -30,7 +30,7 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
 
     override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
         val drawable = imageDrawable
-        if (drawable == null) {
+        if (drawable == null || beforeTextSize != 0) {
             beforeTextSize = (paint.textSize * 1.2).toInt()
             return beforeTextSize
         }
