@@ -131,6 +131,10 @@ class ConfigKtTest {
                     config.isEnableNoteDivider,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsVisibleInstanceUrlInToolbar -> Assertions.assertEquals(
+                    config.isVisibleInstanceUrlInToolbar,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

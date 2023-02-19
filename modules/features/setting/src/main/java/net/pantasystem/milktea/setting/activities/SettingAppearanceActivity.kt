@@ -198,6 +198,15 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             ) {
                                 Text(stringResource(id = R.string.is_enable_instance_ticker))
                             }
+
+                            SettingSwitchTile(
+                                checked = currentConfigState.isVisibleInstanceUrlInToolbar,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(isVisibleInstanceUrlInToolbar = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.settings_visible_instance_domain_in_toolbar))
+                            }
                         }
                         SettingSection(
                             title = stringResource(id = R.string.background_image),

@@ -92,6 +92,10 @@ class KeysKtTest {
                     "IsEnableNoteDivider",
                     key.str()
                 )
+                Keys.IsVisibleInstanceUrlInToolbar -> Assertions.assertEquals(
+                    "IsVisibleInstanceUrlInToolbar",
+                    key.str()
+                )
             }
         }
     }
@@ -99,8 +103,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(25, Keys.allKeys.size)
-        Assertions.assertEquals(25, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(26, Keys.allKeys.size)
+        Assertions.assertEquals(26, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

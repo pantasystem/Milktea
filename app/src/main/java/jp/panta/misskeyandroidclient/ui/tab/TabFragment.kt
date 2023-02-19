@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager.widget.PagerAdapter
@@ -20,6 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.glide.GlideApp
@@ -114,6 +117,19 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
                 }
             }
         }
+
+        mTabViewModel.visibleInstanceInfo.onEach {
+            when(it) {
+                CurrentAccountInstanceInfoUrl.Invisible -> {
+                    binding.currentInstanceHostView.visibility = View.GONE
+                }
+                is CurrentAccountInstanceInfoUrl.Visible -> {
+                    binding.currentInstanceHostView.visibility = View.VISIBLE
+                    binding.currentInstanceHostView.text = it.host
+                }
+            }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -443,5 +443,6 @@
     <string name="settings_app_restart_required">App restart required.</string>
 
     <string name="note_editor_poll_choice_n">Choice %d</string>
+    <string name="settings_visible_instance_domain_in_toolbar">Show the instance\'s domain in the toolbar</string>
 
 </resources>
