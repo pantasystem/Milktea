@@ -33,7 +33,7 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             HostWithVersion.isOverV13(accountHost)  || it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter)
+            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
@@ -54,7 +54,7 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter)
+            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
                 .override(min(view.textSize.toInt(), 640))
@@ -75,7 +75,7 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter)
+            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))

@@ -59,7 +59,7 @@ object StatusMessageHelper {
         this.text = if (icon != null) {
             SpannableStringBuilder(text).apply {
                 insert(0, "icon")
-                val span = DrawableEmojiSpan(EmojiAdapter(this@setStatusMessage))
+                val span = DrawableEmojiSpan(EmojiAdapter(this@setStatusMessage), icon)
                 val drawable = ContextCompat.getDrawable(context, icon)
                 drawable?.setTint(currentTextColor)
                 Glide.with(context)

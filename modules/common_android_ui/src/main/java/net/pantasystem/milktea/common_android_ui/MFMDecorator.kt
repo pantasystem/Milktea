@@ -308,7 +308,7 @@ object MFMDecorator {
                 return
             }
             textView.get()?.let { textView ->
-                val emojiSpan = DrawableEmojiSpan(emojiAdapter)
+                val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url)
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
