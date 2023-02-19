@@ -86,7 +86,7 @@ private class DrawableEmojiTarget(
         resource.callback = object : Drawable.Callback {
             override fun invalidateDrawable(who: Drawable) {
                 callback?.invalidateDrawable(who)
-                span.adapter?.update()
+                span.adapter?.update(false)
             }
 
             override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) {
