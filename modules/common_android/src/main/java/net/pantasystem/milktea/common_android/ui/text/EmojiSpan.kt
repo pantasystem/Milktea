@@ -40,7 +40,7 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
         val imageHeight = drawable.intrinsicHeight
 
         // 画像がテキストの高さよりも大きい場合、画像をテキストと同じ高さに縮小する
-        val scale = if (imageHeight > textHeight) {
+        val ratio = if (imageHeight > textHeight) {
             textHeight.toFloat() / imageHeight.toFloat()
         } else {
             1.0f
@@ -54,12 +54,12 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
             fm.bottom = metrics.bottom
         }
 
-        val scaledImageWidth = (imageWidth * scale).toInt()
+        val scaledImageWidth = (imageWidth * ratio).toInt()
 
         // テキストの高さに合わせた画像の幅
         val availableWidth = paint.measureText(text, start, end)
         return if (scaledImageWidth > availableWidth) {
-            (availableWidth / scale).toInt()
+            (availableWidth / ratio).toInt()
         } else {
             scaledImageWidth
         }
@@ -92,38 +92,17 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
         canvas.translate(x, transY)
         drawable.draw(canvas)
         canvas.restore()
-//        val drawable = imageDrawable
-//        drawable ?: return
-//
-//        canvas.save()
-//
-//        updateImageDrawableSize(paint)
-//
-//        val textHeight = paint.fontMetricsInt.bottom - paint.fontMetricsInt.top
-//        val imageHeight = drawable.bounds.height()
-//
-//        // 画像がテキストの高さよりも大きい場合、画像をテキストと同じ高さに縮小する
-//        val scale = if (imageHeight > textHeight) {
-//            textHeight.toFloat() / imageHeight.toFloat()
-//        } else {
-//            1.0f
-//        }
-//
-//        canvas.translate(x, y + paint.fontMetricsInt.top + ((textHeight - imageHeight * scale) / 2))
-//        canvas.scale(scale, scale)
-//        drawable.draw(canvas)
-//
-//        canvas.restore()
+
     }
 
 
     private fun updateImageDrawableSize(paint: Paint) {
         val drawable = imageDrawable ?: return
-        val intrinsicWidth = drawable.intrinsicWidth
-        val intrinsicHeight = drawable.intrinsicHeight
+        val imageWidth = drawable.intrinsicWidth
+        val imageHeight = drawable.intrinsicHeight
         val emojiHeight = min((paint.textSize).toInt(), 640)
 
-        if (intrinsicWidth <= 0 || intrinsicHeight <= 0) {
+        if (imageWidth <= 0 || imageHeight <= 0) {
             if (beforeTextSize != 0 && beforeTextSize != emojiHeight) {
                 beforeTextSize = emojiHeight
                 imageDrawable?.setBounds(0, 0, emojiHeight, emojiHeight)
@@ -138,7 +117,7 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
             return
         }
 
-        val ratio = intrinsicWidth.toFloat() / intrinsicHeight.toFloat()
+        val ratio = imageWidth.toFloat() / imageHeight.toFloat()
 
         val width = (emojiHeight * ratio).toInt()
 
