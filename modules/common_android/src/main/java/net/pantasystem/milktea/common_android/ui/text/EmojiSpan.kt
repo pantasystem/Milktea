@@ -19,6 +19,7 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
      */
     private var textHeight: Int = 0
     private var textWidth: Int = 0
+    private var isSizeComputed = false
 
     /**
      * imageDrawableがnullの時にupdateImageDrawableSizeが呼び出されるとここに絵文字のサイズが代入される
@@ -102,16 +103,8 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
         val imageHeight = drawable.intrinsicHeight
         val emojiHeight = min((paint.textSize).toInt(), 640)
 
-        if (imageWidth <= 0 || imageHeight <= 0) {
-            if (beforeTextSize != 0 && beforeTextSize != emojiHeight) {
-                beforeTextSize = emojiHeight
-                imageDrawable?.setBounds(0, 0, emojiHeight, emojiHeight)
-                return
-            }
-            return
-        }
-
-        if (beforeTextSize != 0 && beforeTextSize != emojiHeight) {
+        val unknownEmojiSize = imageWidth <= 0 || imageHeight <= 0
+        if (beforeTextSize != 0 && beforeTextSize != emojiHeight || unknownEmojiSize) {
             beforeTextSize = emojiHeight
             imageDrawable?.setBounds(0, 0, emojiHeight, emojiHeight)
             return
@@ -122,9 +115,10 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
         val scaledImageWidth = (emojiHeight * ratio).toInt()
 
 
-        if (scaledImageWidth != textWidth || emojiHeight != textHeight) {
+        if (!isSizeComputed) {
             textHeight = emojiHeight
             textWidth = scaledImageWidth
+            isSizeComputed = true
             imageDrawable?.setBounds(0, 0, scaledImageWidth, emojiHeight)
         }
     }
