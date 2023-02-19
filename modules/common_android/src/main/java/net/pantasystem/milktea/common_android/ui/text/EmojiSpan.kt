@@ -35,13 +35,13 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
         }
         beforeTextSize = 0
 
-        val textHeight = paint.fontMetricsInt.bottom - paint.fontMetricsInt.top
+        val textHeight = paint.textSize
         val imageWidth = drawable.intrinsicWidth
         val imageHeight = drawable.intrinsicHeight
 
         // 画像がテキストの高さよりも大きい場合、画像をテキストと同じ高さに縮小する
-        val ratio = if (imageHeight > textHeight) {
-            textHeight.toFloat() / imageHeight.toFloat()
+        val scale = if (imageHeight > textHeight) {
+            textHeight / imageHeight.toFloat()
         } else {
             1.0f
         }
@@ -54,12 +54,12 @@ abstract class EmojiSpan<T : Any> : ReplacementSpan(){
             fm.bottom = metrics.bottom
         }
 
-        val scaledImageWidth = (imageWidth * ratio).toInt()
+        val scaledImageWidth = (imageWidth * scale).toInt()
 
         // テキストの高さに合わせた画像の幅
         val availableWidth = paint.measureText(text, start, end)
         return if (scaledImageWidth > availableWidth) {
-            (availableWidth / ratio).toInt()
+            (availableWidth / scale).toInt()
         } else {
             scaledImageWidth
         }
