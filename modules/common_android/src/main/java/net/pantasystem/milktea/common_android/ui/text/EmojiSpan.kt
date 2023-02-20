@@ -140,15 +140,17 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
 
         val unknownEmojiSize = imageWidth <= 0 || imageHeight <= 0
         if (beforeTextSize != 0 && beforeTextSize != emojiHeight || unknownEmojiSize) {
-            beforeTextSize = emojiHeight
-            imageDrawable?.setBounds(0, 0, emojiHeight, emojiHeight)
+            if (!isSizeComputed) {
+                beforeTextSize = emojiHeight
+                imageDrawable?.setBounds(0, 0, emojiHeight, emojiHeight)
+                isSizeComputed = true
+            }
             return
         }
 
         val ratio = imageWidth.toFloat() / imageHeight.toFloat()
 
         val scaledImageWidth = (emojiHeight * ratio).toInt()
-
 
         if (!isSizeComputed) {
             textHeight = emojiHeight
