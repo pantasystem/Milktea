@@ -127,7 +127,7 @@
                     android:layout_gravity="center_horizontal|bottom"
                     app:cornerRadius="24dp"
                     android:id="@+id/autoExpandableButton"
-                    android:visibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
+                    memoVisibility="@{ note.expanded ? View.GONE : View.VISIBLE}"
                     app:emojiCompatEnabled="false"
 
                     />
@@ -193,7 +193,7 @@
                             android:textSize="15sp"
                             textTypeSource="@{note.textNode}"
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
-                            android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
+                            memoVisibility='@{note.text == null ? View.GONE : View.VISIBLE}'
 
                             />
 
@@ -235,7 +235,7 @@
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_choice"
                             tools:itemCount="2"
-                            android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                            memoVisibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
 
                             noteId="@{note.toShowNote.note.id}"
                             poll="@{note.poll}"
@@ -255,7 +255,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="8dp"
-                            android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
+                            memoVisibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                             android:id="@+id/subNote"
                             android:background="@drawable/shape_rounded_square_line"
                             app:transitionDestinationNote="@{note.subNote.note}"
@@ -319,7 +319,7 @@
                                 android:layout_height="wrap_content"
                                 tools:text="cwcwcwwcwcw"
                                 app:textNode="@{note.subCwNode}"
-                                android:visibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
+                                memoVisibility='@{note.cw == null ? View.GONE : View.VISIBLE}'
                                 app:layout_constraintTop_toBottomOf="@id/subNoteMainName"
                                 app:layout_constraintStart_toStartOf="parent"/>
 
@@ -331,7 +331,7 @@
                                 android:layout_marginStart="5dp"
                                 android:layout_marginBottom="5dp"
                                 tools:text="展開する"
-                                android:visibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
+                                memoVisibility='@{note.subCw == null ? View.GONE : View.VISIBLE }'
                                 android:textColor="?attr/colorAccent"
                                 stringSource="@{note.subContentFoldingStatusMessage}"
 
