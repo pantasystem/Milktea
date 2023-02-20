@@ -32,6 +32,7 @@
             app:subNameView="@{subName}"
             app:user="@{note.toShowNote.user}"
             app:account="@{note.account}"
+            isUserNameDefault="@{note.isUserNameDefault}"
 
             app:foldingNote="@{note}"
             app:foldingButton="@{contentFoldingButton}"
@@ -262,6 +263,7 @@
                             app:clickedView="@{subNote}"
                             app:subNameView="@{subNoteSubName}"
                             app:mainNameView="@{subNoteMainName}"
+                            isUserNameDefault="@{note.isUserNameDefault}"
                             app:user="@{note.subNote.user}"
                             app:account="@{note.account}"
                             android:layout_marginTop="4dp">
