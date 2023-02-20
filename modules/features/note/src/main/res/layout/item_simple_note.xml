@@ -350,7 +350,7 @@
                                 textTypeSource="@{note.subNoteTextNode}"
                                 app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
                                 app:layout_constraintStart_toStartOf="parent"
-                                android:visibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>
+                                memoVisibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>
 
                         <include
                                 layout="@layout/media_preview"
@@ -358,7 +358,7 @@
                                 android:id="@+id/subNoteMediaPreview"
                                 android:layout_width="match_parent"
                                 android:layout_height="200dp"
-                                android:visibility="@{note.subContentFolding || note.subNoteFiles.empty || note.subNoteMedia.isOver4Files ? View.GONE : View.VISIBLE}"
+                                android:visibility="@{note.isVisibleSubNoteMediaPreview ? View.VISIBLE : View.GONE}"
                                 tools:layout_height="20dp"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
