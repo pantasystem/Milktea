@@ -189,6 +189,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
 
         mBinding.listView.adapter = adapter
+        mBinding.listView.setItemViewCacheSize(15)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
