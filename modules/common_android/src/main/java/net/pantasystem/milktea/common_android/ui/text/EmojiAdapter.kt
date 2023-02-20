@@ -9,9 +9,9 @@ class EmojiAdapter (view: View){
 
     private  var beforeExecute: Long = System.nanoTime()
 
-    fun update(){
+    fun update(invalidateForce: Boolean = true){
         val now = System.nanoTime()
-        if ((now - beforeExecute) > 60000) {
+        if ((now - beforeExecute) > 60000 || invalidateForce) {
             weakReference.get()?.invalidate()
 
         }

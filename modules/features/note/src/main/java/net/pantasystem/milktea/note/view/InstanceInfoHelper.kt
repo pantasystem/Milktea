@@ -27,7 +27,7 @@ object InstanceInfoHelper {
         if (enable) {
             val emojiAdapter = EmojiAdapter(this)
 
-            val iconDrawable = DrawableEmojiSpan(emojiAdapter)
+            val iconDrawable = DrawableEmojiSpan(emojiAdapter, info?.faviconUrl)
             Glide.with(this)
                 .load(info!!.faviconUrl)
                 .override(min(this.textSize.toInt(), 640))
