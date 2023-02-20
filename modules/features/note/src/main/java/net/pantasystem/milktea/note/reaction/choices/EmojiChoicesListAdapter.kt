@@ -74,6 +74,7 @@ class SegmentViewHolder(
         )
         val label = segmentType.label.getString(binding.root.context)
         binding.categoryName.text = label
+        binding.emojisView.setHasFixedSize(true)
 
         if (!isSatLayoutManager) {
             val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
