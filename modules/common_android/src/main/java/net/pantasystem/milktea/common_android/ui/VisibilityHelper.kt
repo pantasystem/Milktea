@@ -9,7 +9,7 @@ object VisibilityHelper {
 
     @BindingAdapter("memoVisibility")
     @JvmStatic
-    fun View.visibility(type: Int) {
+    fun View.setMemoVisibility(type: Int) {
         val currentVisibility = this.visibility
         if (type == currentVisibility) {
             return
@@ -19,7 +19,7 @@ object VisibilityHelper {
 
     @BindingAdapter("memoVisibility")
     @JvmStatic
-    fun ViewGroup.visibility(type: Int) {
+    fun ViewGroup.setMemoVisibility(type: Int) {
         val currentVisibility = this.visibility
         if (type == currentVisibility) {
             return

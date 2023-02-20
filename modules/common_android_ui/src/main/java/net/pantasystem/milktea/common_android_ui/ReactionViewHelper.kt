@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 
@@ -85,13 +86,13 @@ object ReactionViewHelper {
                 GlideApp.with(reactionImageView.context)
                     .load(emoji.url ?: emoji.uri)
                     .into(reactionImageView)
-                reactionImageView.visibility = View.VISIBLE
-                reactionStringView.visibility = View.GONE
+                reactionImageView.setMemoVisibility(View.VISIBLE)
+                reactionStringView.setMemoVisibility(View.GONE)
                 return
             } else {
                 Log.d("ReactionViewHelper", "emoji not found")
-                reactionImageView.visibility = View.GONE
-                reactionStringView.visibility = View.VISIBLE
+                reactionImageView.setMemoVisibility(View.GONE)
+                reactionStringView.setMemoVisibility(View.VISIBLE)
             }
 
         }
@@ -100,13 +101,13 @@ object ReactionViewHelper {
         if (constantReaction != null) {
 
             reactionStringView.text = constantReaction
-            reactionImageView.visibility = View.GONE
-            reactionStringView.visibility = View.VISIBLE
+            reactionImageView.setMemoVisibility(View.GONE)
+            reactionStringView.setMemoVisibility(View.VISIBLE)
         } else {
             //Log.d("ReactionViewHelper", "どれにも当てはまらなかった")
             reactionStringView.text = reaction
-            reactionImageView.visibility = View.GONE
-            reactionStringView.visibility = View.VISIBLE
+            reactionImageView.setMemoVisibility(View.GONE)
+            reactionStringView.setMemoVisibility(View.VISIBLE)
         }
 
     }

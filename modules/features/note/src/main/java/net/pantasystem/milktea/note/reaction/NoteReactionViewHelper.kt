@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
@@ -38,12 +39,13 @@ object NoteReactionViewHelper {
 
 
         if (emoji == null) {
-            reactionImageTypeView.visibility = View.GONE
-            reactionTextTypeView.visibility = View.VISIBLE
+            reactionImageTypeView.setMemoVisibility(View.GONE)
+
+            reactionTextTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.text = textReaction
         } else {
-            reactionImageTypeView.visibility = View.VISIBLE
-            reactionTextTypeView.visibility = View.GONE
+            reactionImageTypeView.setMemoVisibility(View.VISIBLE)
+            reactionTextTypeView.setMemoVisibility(View.GONE)
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
@@ -77,12 +79,12 @@ object NoteReactionViewHelper {
 
 
         if (emoji == null) {
-            reactionImageTypeView.visibility = View.GONE
-            reactionTextTypeView.visibility = View.VISIBLE
+            reactionImageTypeView.setMemoVisibility(View.GONE)
+            reactionTextTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.text = textReaction
         } else {
-            reactionImageTypeView.visibility = View.VISIBLE
-            reactionTextTypeView.visibility = View.GONE
+            reactionImageTypeView.setMemoVisibility(View.VISIBLE)
+            reactionTextTypeView.setMemoVisibility(View.GONE)
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
