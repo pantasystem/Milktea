@@ -18,15 +18,34 @@ object UserTextHelper {
         mainNameView: TextView?,
         subNameView: TextView?,
         user: User?,
-        account: Account?
+        account: Account?,
     ) {
-        user ?: return
         val isUserNameDefault = EntryPointAccessors.fromApplication(
             this.context.applicationContext,
             BindingProvider::class.java
         )
             .settingStore()
             .isUserNameDefault
+        setUserInfo(
+            mainNameView = mainNameView,
+            subNameView = subNameView,
+            user = user,
+            account = account,
+            isUserNameDefault = isUserNameDefault
+        )
+    }
+
+    @JvmStatic
+    @BindingAdapter("mainNameView", "subNameView", "user", "account", "isUserNameDefault")
+    fun View.setUserInfo(
+        mainNameView: TextView?,
+        subNameView: TextView?,
+        user: User?,
+        account: Account?,
+        isUserNameDefault: Boolean = false
+    ) {
+        user ?: return
+
         val userName: TextView?
         val name: TextView?
         if (isUserNameDefault) {

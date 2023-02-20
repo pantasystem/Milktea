@@ -70,7 +70,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
     }
 
-    private lateinit var mLinearLayoutManager: LinearLayoutManager
+    private var _linearLayoutManager: LinearLayoutManager? = null
+    private val layoutManager: LinearLayoutManager
+        get() = requireNotNull(_linearLayoutManager)
 
     @Inject
     lateinit var timelineViewModelFactory: TimelineViewModel.ViewModelAssistedFactory
@@ -143,7 +145,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mLinearLayoutManager = LinearLayoutManager(this.requireContext())
+        _linearLayoutManager = LinearLayoutManager(this.requireContext())
         val adapter = TimelineListAdapter(
             viewLifecycleOwner,
             onRefreshAction = {
@@ -169,10 +171,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             ).onAction(it)
         }
 
-        mBinding.listView.layoutManager = mLinearLayoutManager
+        mBinding.listView.layoutManager = layoutManager
 
         mBinding.listView.addOnScrollListener(mScrollListener)
-        mBinding.listView.layoutManager = mLinearLayoutManager
+        mBinding.listView.layoutManager = layoutManager
 
 
         mBinding.refresh.setOnRefreshListener {
@@ -187,6 +189,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
 
         mBinding.listView.adapter = adapter
+        mBinding.listView.setItemViewCacheSize(15)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -220,12 +223,10 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 if (mViewModel.timelineStore.latestReceiveNoteId() != null && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
-                    mLinearLayoutManager.scrollToPosition(0)
+                    layoutManager.scrollToPosition(0)
                 }
             }
         })
-
-
 
 
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
@@ -267,7 +268,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         currentPageableTimelineViewModel.setCurrentPageable(mPageable)
         try {
-            mLinearLayoutManager.scrollToPosition(mViewModel.position)
+            layoutManager.scrollToPosition(mViewModel.position)
         } catch (_: Exception) {
         }
 
@@ -280,12 +281,16 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         Log.d("TimelineFragment", "onPause")
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _linearLayoutManager = null
+    }
 
     @ExperimentalCoroutinesApi
     private val mScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            val firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition()
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
             mFirstVisibleItemPosition = firstVisibleItemPosition
             mViewModel.position = firstVisibleItemPosition
         }
@@ -293,8 +298,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            val endVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition()
-            val itemCount = mLinearLayoutManager.itemCount
+            val endVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+            val itemCount = layoutManager.itemCount
 
             if (endVisibleItemPosition == (itemCount - 1)) {
                 mViewModel.loadOld()

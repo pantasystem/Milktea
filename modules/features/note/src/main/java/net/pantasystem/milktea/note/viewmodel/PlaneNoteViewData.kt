@@ -208,6 +208,14 @@ open class PlaneNoteViewData(
         it.isEnableInstanceTicker
     }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
 
+    val isUserNameDefault = configRepository.observe().map {
+        it.isUserNameDefault
+    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+
+    val isVisibleSubNoteMediaPreview = subContentFolding.map { folding ->
+        !(folding || subNoteFiles.isEmpty() || subNoteMedia.isOver4Files)
+    }
+
     fun changeContentFolding() {
         val isFolding = contentFolding.value ?: return
         contentFolding.value = !isFolding

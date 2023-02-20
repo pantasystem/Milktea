@@ -58,7 +58,9 @@ class TimelineListAdapter(
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
-    private val reactionCounterRecyclerViewPool = RecyclerView.RecycledViewPool()
+    private val reactionCounterRecyclerViewPool = RecyclerView.RecycledViewPool().apply {
+        setMaxRecycledViews(0, 30)
+    }
     private val urlPreviewListRecyclerViewPool = RecyclerView.RecycledViewPool()
     private val manyFilePreviewListViewRecyclerViewPool = RecyclerView.RecycledViewPool()
 
