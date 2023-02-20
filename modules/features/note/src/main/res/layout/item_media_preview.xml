@@ -43,7 +43,7 @@
                 style="?android:attr/borderlessButtonStyle"
                 android:src="@drawable/ic_play_circle_outline_black_24dp"
                 android:scaleType="fitCenter"
-                android:visibility="@{previewAbleFile.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                memoVisibility="@{previewAbleFile.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
                 app:tint="?attr/colorAccent" />
 
         <TextView
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 tools:text="クリックで表示"
                 android:layout_gravity="center"
-                android:visibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.VISIBLE : View.GONE }"
+                memoVisibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.VISIBLE : View.GONE }"
                 android:text="@string/sensitive_content"
                 />
         <ImageButton
