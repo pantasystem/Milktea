@@ -49,6 +49,13 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
                 )
             }
         }
+        val metrics = paint.fontMetricsInt
+        if(fm != null){
+            fm.top = metrics.top
+            fm.ascent = metrics.ascent
+            fm.descent = metrics.descent
+            fm.bottom = metrics.bottom
+        }
 
         if (size == null || beforeTextSize != 0) {
             beforeTextSize = (paint.textSize * 1.2).toInt()
@@ -69,14 +76,6 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
             textHeight / imageHeight.toFloat()
         } else {
             1.0f
-        }
-
-        val metrics = paint.fontMetricsInt
-        if(fm != null){
-            fm.top = metrics.top
-            fm.ascent = metrics.ascent
-            fm.descent = metrics.descent
-            fm.bottom = metrics.bottom
         }
 
         val scaledImageWidth = (imageWidth * scale).toInt()
