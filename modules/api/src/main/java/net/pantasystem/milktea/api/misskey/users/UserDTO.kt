@@ -53,6 +53,7 @@ data class UserDTO(
     val instance: InstanceInfo? = null,
     val fields: List<FieldDTO>? = null,
 
+    @kotlinx.serialization.Transient
     val birthday: LocalDate? = null,
 
     val createdAt: Instant? = null,
