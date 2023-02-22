@@ -31,11 +31,17 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
     private var beforeTextSize: Int = 0
 
 
-    override fun getSize(paint: Paint, text: CharSequence?, start: Int, end: Int, fm: Paint.FontMetricsInt?): Int {
+    override fun getSize(
+        paint: Paint,
+        text: CharSequence?,
+        start: Int,
+        end: Int,
+        fm: Paint.FontMetricsInt?
+    ): Int {
         val drawable = imageDrawable
         val size = key?.let {
             drawableSizeCache[key]
-        }?: drawable?.let {
+        } ?: drawable?.let {
             EmojiSizeCache(
                 intrinsicHeight = it.intrinsicHeight,
                 intrinsicWidth = it.intrinsicWidth
@@ -50,7 +56,7 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
             }
         }
         val metrics = paint.fontMetricsInt
-        if(fm != null){
+        if (fm != null) {
             fm.top = metrics.top
             fm.ascent = metrics.ascent
             fm.descent = metrics.descent
@@ -78,15 +84,8 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
             1.0f
         }
 
-        val scaledImageWidth = (imageWidth * scale).toInt()
-
         // テキストの高さに合わせた画像の幅
-        val availableWidth = paint.measureText(text, start, end)
-        return if (scaledImageWidth > availableWidth) {
-            (availableWidth / scale).toInt()
-        } else {
-            scaledImageWidth
-        }
+        return (imageWidth * scale).toInt()
     }
 
     override fun updateDrawState(ds: TextPaint) {
