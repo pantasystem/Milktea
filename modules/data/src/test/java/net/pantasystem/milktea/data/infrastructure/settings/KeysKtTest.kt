@@ -96,6 +96,10 @@ class KeysKtTest {
                     "IsVisibleInstanceUrlInToolbar",
                     key.str()
                 )
+                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
+                    "IsHideMediaWhenMobileNetwork",
+                    key.str()
+                )
             }
         }
     }
@@ -103,8 +107,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(26, Keys.allKeys.size)
-        Assertions.assertEquals(26, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(27, Keys.allKeys.size)
+        Assertions.assertEquals(27, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

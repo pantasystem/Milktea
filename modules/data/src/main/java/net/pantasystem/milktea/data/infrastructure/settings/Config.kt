@@ -114,7 +114,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: DefaultConfig.config.isEnableNoteDivider,
         isVisibleInstanceUrlInToolbar = map.getValue<PrefType.BoolPref>(
             Keys.IsVisibleInstanceUrlInToolbar
-        )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar
+        )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar,
+        isHideMediaWhenMobileNetwork = map.getValue<PrefType.BoolPref>(
+            Keys.IsHideMediaWhenMobileNetwork
+        )?.value ?: DefaultConfig.config.isHideMediaWhenMobileNetwork
     )
 }
 
@@ -207,6 +210,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsVisibleInstanceUrlInToolbar -> {
             PrefType.BoolPref(isVisibleInstanceUrlInToolbar)
+        }
+        Keys.IsHideMediaWhenMobileNetwork -> {
+            PrefType.BoolPref(isHideMediaWhenMobileNetwork)
         }
     }
 }
