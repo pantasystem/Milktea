@@ -10,7 +10,7 @@ class MediaViewData(files: List<FilePreviewSource>) {
 
     // NOTE: サイズが変わることは決してない
     private val _files = MutableLiveData(files.map{
-        PreviewAbleFile(it, it.isSensitive)
+        PreviewAbleFile(it, if (it.isSensitive) PreviewAbleFile.VisibleType.SensitiveHide else PreviewAbleFile.VisibleType.Visible)
     })
     val files: LiveData<List<PreviewAbleFile>> = _files
 
@@ -37,7 +37,7 @@ class MediaViewData(files: List<FilePreviewSource>) {
         val list = (_files.value ?: emptyList()).toMutableList()
         _files.value = list.mapIndexed { i, previewAbleFile ->
             if (i == index) {
-                previewAbleFile.copy(isHiding = false)
+                previewAbleFile.copy(visibleType = PreviewAbleFile.VisibleType.Visible)
             } else {
                 previewAbleFile
             }
@@ -48,7 +48,13 @@ class MediaViewData(files: List<FilePreviewSource>) {
         val list = (_files.value ?: emptyList()).toMutableList()
         _files.value = list.mapIndexed { i, previewAbleFile ->
             if (i == index) {
-                previewAbleFile.copy(isHiding = !previewAbleFile.isHiding)
+                previewAbleFile.copy(
+                    visibleType = when(val type = previewAbleFile.visibleType) {
+                        PreviewAbleFile.VisibleType.Visible -> if (previewAbleFile.initialVisibleType == type) PreviewAbleFile.VisibleType.SensitiveHide else previewAbleFile.initialVisibleType
+                        PreviewAbleFile.VisibleType.Hide -> if (previewAbleFile.initialVisibleType == type) PreviewAbleFile.VisibleType.Visible else previewAbleFile.initialVisibleType
+                        PreviewAbleFile.VisibleType.SensitiveHide -> if (previewAbleFile.initialVisibleType == type) PreviewAbleFile.VisibleType.Visible else previewAbleFile.initialVisibleType
+                    }
+                )
             } else {
                 previewAbleFile
             }
