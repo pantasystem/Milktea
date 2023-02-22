@@ -225,4 +225,31 @@ class MFMParserTest{
         """.trimIndent()
         println(MFMParser.parse(text))
     }
+
+    @Test
+    fun bug_2023_2_22() {
+        val text = """
+            @k@misskey.neos.love GTL見てにゃいから全然知らにゃかった…
+            <small>まあ、:_ni::_ri::_ra::_mi::_bu:では連合から入ってにゃいっぽいのでGTLにも流れてこにゃいけどne！</small>
+        """.trimIndent()
+        val result = MFMParser.parse(text = text, emojis = listOf(
+            Emoji(
+                "_ni"
+            ),
+            Emoji(
+                "_ri"
+            ),
+            Emoji(
+                "_ra"
+            ),
+            Emoji(
+                "_mi"
+            ),
+            Emoji(
+                "_bu"
+            )
+
+        ), accountHost = "misskey.neos.love", userHost = "misskey.pantasystem.com")
+        println(result)
+    }
 }

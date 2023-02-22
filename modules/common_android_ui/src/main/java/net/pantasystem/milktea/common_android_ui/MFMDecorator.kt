@@ -104,7 +104,7 @@ object MFMDecorator {
                     ).decorate()
                         ?: closeErrorElement(ele)
                     spannableStringBuilder.append(spanned)
-                    position = spannableStringBuilder.length
+                    position = start + spannableStringBuilder.length
                 }
             }
 
@@ -112,7 +112,7 @@ object MFMDecorator {
             return try {
                 // 自己がLeafであればparentの情報から装飾され、自己がNodeであればstartとpositionをもとに装飾される
                 val result = decorate(parent)
-                position = spannableStringBuilder.length
+                position = start + spannableStringBuilder.length
                 result
             } catch (e: Exception) {
                 // 子要素の処理がすべて無駄になることになってしまうがとりあえずはこうする
