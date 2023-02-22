@@ -1,6 +1,7 @@
 
 package net.pantasystem.milktea.note.media
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.View
 import android.widget.FrameLayout
@@ -18,6 +19,7 @@ import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.wasabeef.glide.transformations.BlurTransformation
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
+import net.pantasystem.milktea.common_android.platform.isWifiConnected
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
@@ -93,11 +95,19 @@ object MediaPreviewHelper {
         }
     }
 
+    @SuppressLint("MissingPermission")
     @BindingAdapter("thumbnailView")
     @JvmStatic
     fun ImageView.setPreview(file: PreviewAbleFile?) {
         file ?: return
-        if (file.isHiding) {
+        val isHiding = when(file.visibleType) {
+            PreviewAbleFile.VisibleType.Visible -> false
+            PreviewAbleFile.VisibleType.Fixed -> {
+                !context.isWifiConnected()
+            }
+            PreviewAbleFile.VisibleType.SensitiveHide -> true
+        }
+        if (isHiding) {
             Glide.with(this)
                 .let {
                     when (val blurhash = file.source.blurhash) {
@@ -157,3 +167,5 @@ object MediaPreviewHelper {
 
 
 }
+
+

@@ -15,13 +15,13 @@ data class PreviewAbleFile(
 
 
     private val isVideo = type == AboutMediaType.VIDEO
-    val isHiding = visibleType != VisibleType.Visible
+    val isHiding = visibleType == VisibleType.SensitiveHide
     val isVisiblePlayButton: Boolean
         get() = isVideo && !isHiding
 
     enum class VisibleType {
         Visible,
-        Hide,
+        Fixed,
         SensitiveHide,
     }
 }
