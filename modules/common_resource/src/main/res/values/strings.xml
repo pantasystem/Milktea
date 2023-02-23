@@ -444,5 +444,6 @@
 
     <string name="note_editor_poll_choice_n">Choice %d</string>
     <string name="settings_visible_instance_domain_in_toolbar">Show the instance\'s domain in the toolbar</string>
+    <string name="settings_hide_media_when_mobile_network">Hide media when mobile network</string>
 
 </resources>
