@@ -28,6 +28,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsEnableStreamingAPIAndNoteCapture,
         Keys.IsEnableNoteDivider,
         Keys.IsVisibleInstanceUrlInToolbar,
+        Keys.IsHideMediaWhenMobileNetwork,
     )
 }
 
