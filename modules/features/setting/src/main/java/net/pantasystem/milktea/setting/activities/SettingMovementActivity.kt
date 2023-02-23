@@ -201,6 +201,16 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }
                             }
                         }
+                        SettingSection(title = stringResource(id = R.string.media)) {
+                            SettingSwitchTile(
+                                checked = currentConfigState.isHideMediaWhenMobileNetwork,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(isHideMediaWhenMobileNetwork = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.settings_hide_media_when_mobile_network))
+                            }
+                        }
                     }
 
                 }

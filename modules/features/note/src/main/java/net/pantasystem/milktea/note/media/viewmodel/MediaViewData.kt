@@ -5,12 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.isSensitive
+import net.pantasystem.milktea.model.setting.Config
 
-class MediaViewData(files: List<FilePreviewSource>) {
+class MediaViewData(files: List<FilePreviewSource>, val config: Config?) {
 
     // NOTE: サイズが変わることは決してない
     private val _files = MutableLiveData(files.map{
-        PreviewAbleFile(it, it.isSensitive)
+        PreviewAbleFile(it, if (it.isSensitive) PreviewAbleFile.VisibleType.SensitiveHide else if (config?.isHideMediaWhenMobileNetwork == true) PreviewAbleFile.VisibleType.HideWhenMobileNetwork else PreviewAbleFile.VisibleType.Visible)
     })
     val files: LiveData<List<PreviewAbleFile>> = _files
 
@@ -37,7 +38,7 @@ class MediaViewData(files: List<FilePreviewSource>) {
         val list = (_files.value ?: emptyList()).toMutableList()
         _files.value = list.mapIndexed { i, previewAbleFile ->
             if (i == index) {
-                previewAbleFile.copy(isHiding = false)
+                previewAbleFile.copy(visibleType = PreviewAbleFile.VisibleType.Visible)
             } else {
                 previewAbleFile
             }
@@ -48,7 +49,13 @@ class MediaViewData(files: List<FilePreviewSource>) {
         val list = (_files.value ?: emptyList()).toMutableList()
         _files.value = list.mapIndexed { i, previewAbleFile ->
             if (i == index) {
-                previewAbleFile.copy(isHiding = !previewAbleFile.isHiding)
+                previewAbleFile.copy(
+                    visibleType = when(previewAbleFile.visibleType) {
+                        PreviewAbleFile.VisibleType.Visible -> PreviewAbleFile.VisibleType.SensitiveHide
+                        PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> PreviewAbleFile.VisibleType.Visible
+                        PreviewAbleFile.VisibleType.SensitiveHide -> PreviewAbleFile.VisibleType.Visible
+                    }
+                )
             } else {
                 previewAbleFile
             }

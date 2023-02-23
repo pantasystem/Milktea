@@ -135,6 +135,10 @@ class ConfigKtTest {
                     config.isVisibleInstanceUrlInToolbar,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
+                    config.isHideMediaWhenMobileNetwork,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

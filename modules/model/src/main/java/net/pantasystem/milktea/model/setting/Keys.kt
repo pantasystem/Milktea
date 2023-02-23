@@ -28,6 +28,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsEnableStreamingAPIAndNoteCapture,
         Keys.IsEnableNoteDivider,
         Keys.IsVisibleInstanceUrlInToolbar,
+        Keys.IsHideMediaWhenMobileNetwork,
     )
 }
 
@@ -79,6 +80,8 @@ sealed interface Keys {
 
     object IsVisibleInstanceUrlInToolbar : Keys
 
+    object IsHideMediaWhenMobileNetwork : Keys
+
     companion object
 }
 
@@ -109,6 +112,7 @@ fun Keys.str(): String {
         is Keys.IsStopStreamingApiWhenBackground -> "IsStopStreamingApiWhenBackground"
         is Keys.IsEnableStreamingAPIAndNoteCapture -> "IsEnableStreamingAPIAndNoteCapture"
         is Keys.IsEnableNoteDivider -> "IsEnableNoteDivider"
-        Keys.IsVisibleInstanceUrlInToolbar -> "IsVisibleInstanceUrlInToolbar"
+        is Keys.IsVisibleInstanceUrlInToolbar -> "IsVisibleInstanceUrlInToolbar"
+        is Keys.IsHideMediaWhenMobileNetwork -> "IsHideMediaWhenMobileNetwork"
     }
 }

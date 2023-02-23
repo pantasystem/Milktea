@@ -453,6 +453,8 @@
 
     <string name="note_editor_poll_choice_n">候補%d</string>
     <string name="settings_visible_instance_domain_in_toolbar">ツールバーにインスタンスのドメインを表示する</string>
+    <string name="settings_hide_media_when_mobile_network">モバイル ネットワーク時にメディアを非表示にする</string>
+    <string name="notes_media_click_to_load_image">クリックして画像を読み込み</string>
 
 
 </resources>

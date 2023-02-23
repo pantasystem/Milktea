@@ -27,7 +27,7 @@ data class InstanceInfosResponse(
         @SerialName("nodeinfo") val nodeInfo: NodeInfoDTO,
         val name: String,
         val description: String? = null,
-        val langs: List<String>,
+//        val langs: Map<String, String?>,
         val isAlive: Boolean,
         val banner: Boolean,
         val icon: Boolean,

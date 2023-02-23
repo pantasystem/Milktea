@@ -34,6 +34,7 @@
                 android:scaleType="centerCrop"
                 tools:srcCompat="@drawable/ic_baseline_hide_image_24"
                 thumbnailView="@{previewAbleFile}"
+                config="@{mediaViewData.config}"
                 />
         <ImageButton
                 android:id="@+id/actionButton"
@@ -54,6 +55,8 @@
                 android:layout_gravity="center"
                 memoVisibility="@{SafeUnbox.unbox(previewAbleFile.isHiding) ? View.VISIBLE : View.GONE }"
                 android:text="@string/sensitive_content"
+                hideImageMessageImageSource="@{previewAbleFile}"
+                config="@{mediaViewData.config}"
                 />
         <ImageButton
                 android:id="@+id/toggleVisibilityButton"
