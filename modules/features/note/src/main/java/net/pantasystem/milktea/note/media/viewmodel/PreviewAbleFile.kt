@@ -21,7 +21,7 @@ data class PreviewAbleFile(
 
     enum class VisibleType {
         Visible,
-        Fixed,
+        HideWhenMobileNetwork,
         SensitiveHide,
     }
 }

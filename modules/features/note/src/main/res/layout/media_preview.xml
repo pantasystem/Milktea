@@ -49,7 +49,7 @@
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-
+                        config="@{media.config}"
                         thumbnailView="@{ media.fileOne }"
                         />
                 <ImageButton
@@ -70,6 +70,8 @@
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
                         memoVisibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
+                        hideImageMessageImageSource="@{media.fileOne}"
+                        config="@{media.config}"
                         android:text="@string/sensitive_content"
                         app:emojiCompatEnabled="false"
                         />
@@ -105,7 +107,7 @@
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-
+                        config="@{media.config}"
                         thumbnailView="@{ media.fileThree }"
                         />
 
@@ -125,7 +127,8 @@
                         android:id="@+id/nsfwMessageBottomLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sensitive_content"
+                        hideImageMessageImageSource="@{media.fileThree}"
+                        config="@{media.config}"
                         android:layout_gravity="center"
                         memoVisibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
                         app:emojiCompatEnabled="false"
@@ -176,7 +179,7 @@
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-
+                        config="@{media.config}"
                         thumbnailView="@{media.fileTwo}"
                         />
                 <ImageButton
@@ -197,7 +200,8 @@
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
                         memoVisibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
-                        android:text="@string/sensitive_content"
+                        hideImageMessageImageSource="@{media.fileTwo}"
+                        config="@{media.config}"
                         app:emojiCompatEnabled="false"
                         />
                 <ImageButton
@@ -235,6 +239,8 @@
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
                         thumbnailView="@{ media.fileFour }"
+                        config="@{media.config}"
+
                         />
                 <ImageButton
                         android:id="@+id/actionButtonBottomRight"
@@ -253,7 +259,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="@string/sensitive_content"
+                        hideImageMessageImageSource="@{media.fileFour}"
+                        config="@{media.config}"
                         memoVisibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
                         app:emojiCompatEnabled="false"
                         />

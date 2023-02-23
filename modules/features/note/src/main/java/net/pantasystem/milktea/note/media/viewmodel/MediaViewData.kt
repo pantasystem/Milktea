@@ -11,7 +11,7 @@ class MediaViewData(files: List<FilePreviewSource>, val config: Config?) {
 
     // NOTE: サイズが変わることは決してない
     private val _files = MutableLiveData(files.map{
-        PreviewAbleFile(it, if (it.isSensitive) PreviewAbleFile.VisibleType.SensitiveHide else PreviewAbleFile.VisibleType.Fixed)
+        PreviewAbleFile(it, if (it.isSensitive) PreviewAbleFile.VisibleType.SensitiveHide else if (config?.isHideMediaWhenMobileNetwork == true) PreviewAbleFile.VisibleType.HideWhenMobileNetwork else PreviewAbleFile.VisibleType.Visible)
     })
     val files: LiveData<List<PreviewAbleFile>> = _files
 
@@ -52,7 +52,7 @@ class MediaViewData(files: List<FilePreviewSource>, val config: Config?) {
                 previewAbleFile.copy(
                     visibleType = when(previewAbleFile.visibleType) {
                         PreviewAbleFile.VisibleType.Visible -> PreviewAbleFile.VisibleType.SensitiveHide
-                        PreviewAbleFile.VisibleType.Fixed -> PreviewAbleFile.VisibleType.Visible
+                        PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> PreviewAbleFile.VisibleType.Visible
                         PreviewAbleFile.VisibleType.SensitiveHide -> PreviewAbleFile.VisibleType.Visible
                     }
                 )

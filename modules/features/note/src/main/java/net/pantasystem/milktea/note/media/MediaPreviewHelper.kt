@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,8 +21,11 @@ import jp.wasabeef.glide.transformations.BlurTransformation
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.glide.blurhash.BlurHashSource
 import net.pantasystem.milktea.common_android.platform.isWifiConnected
+import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
 import net.pantasystem.milktea.note.media.viewmodel.PreviewAbleFile
 
@@ -88,7 +92,9 @@ object MediaPreviewHelper {
         thumbnailView.setOnLongClickListener(holdListener)
 
         // NOTE: 実装の仕様上、サムネイル非表示時には親レイアウトにクリックイベントを伝播する必要がある
-        if (previewAbleFile?.isHiding == true) {
+        if (previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.SensitiveHide
+            || previewAbleFile?.visibleType == PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+        ) {
             thumbnailView.setOnClickListener {
                 this.performClick()
             }
@@ -96,14 +102,19 @@ object MediaPreviewHelper {
     }
 
     @SuppressLint("MissingPermission")
-    @BindingAdapter("thumbnailView")
+    @BindingAdapter("thumbnailView", "config")
     @JvmStatic
-    fun ImageView.setPreview(file: PreviewAbleFile?) {
+    fun ImageView.setPreview(file: PreviewAbleFile?, config: Config?) {
         file ?: return
+        config ?: return
         val isHiding = when(file.visibleType) {
             PreviewAbleFile.VisibleType.Visible -> false
-            PreviewAbleFile.VisibleType.Fixed -> {
-                !context.isWifiConnected()
+            PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
+                if (config.isHideMediaWhenMobileNetwork) {
+                    !context.isWifiConnected()
+                } else {
+                    false
+                }
             }
             PreviewAbleFile.VisibleType.SensitiveHide -> true
         }
@@ -131,6 +142,31 @@ object MediaPreviewHelper {
                 .into(this)
         }
 
+    }
+
+    @JvmStatic
+    @BindingAdapter("hideImageMessageImageSource", "config")
+    fun TextView.setHideImageMessage(src: PreviewAbleFile?, config: Config?) {
+        src ?: return
+        config ?: return
+        when(src.visibleType) {
+            PreviewAbleFile.VisibleType.Visible -> {
+                this.setMemoVisibility(View.GONE)
+                return
+            }
+            PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> {
+                if (context.isWifiConnected()) {
+                    this.setMemoVisibility(View.GONE)
+                } else {
+                    this.setMemoVisibility(View.VISIBLE)
+                    this.text = context.getString(R.string.notes_media_click_to_load_image)
+                }
+            }
+            PreviewAbleFile.VisibleType.SensitiveHide -> {
+                this.setMemoVisibility(View.VISIBLE)
+                this.text = context.getString(R.string.sensitive_content)
+            }
+        }
     }
 
 
