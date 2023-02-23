@@ -5,8 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.isSensitive
+import net.pantasystem.milktea.model.setting.Config
 
-class MediaViewData(files: List<FilePreviewSource>) {
+class MediaViewData(files: List<FilePreviewSource>, val config: Config?) {
 
     // NOTE: サイズが変わることは決してない
     private val _files = MutableLiveData(files.map{
