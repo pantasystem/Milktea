@@ -152,7 +152,7 @@ open class PlaneNoteViewData(
             } else {
                 n.getShortReactionCounts(note.note.isRenoteOnly())
             }
-            ReactionViewData.from(reactions, n, emojiRepository.getAndConvertToMap(account.getHost()), emojiMap)
+            ReactionViewData.from(reactions, n, emojiRepository.getAndConvertToMap(account.getHost()))
         }
     }
 
