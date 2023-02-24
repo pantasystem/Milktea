@@ -24,7 +24,6 @@
             reactionImageTypeView="@{reactionImage}"
             reactionTextTypeView="@{reactionText}"
             reaction="@{reaction}"
-            note="@{note}"
             android:layout_marginStart="4dp"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
