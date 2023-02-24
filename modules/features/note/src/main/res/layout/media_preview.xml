@@ -74,6 +74,9 @@
                         config="@{media.config}"
                         android:text="@string/sensitive_content"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -132,6 +135,9 @@
                         android:layout_gravity="center"
                         memoVisibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -203,6 +209,9 @@
                         hideImageMessageImageSource="@{media.fileTwo}"
                         config="@{media.config}"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -263,6 +272,9 @@
                         config="@{media.config}"
                         memoVisibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"

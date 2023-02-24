@@ -57,6 +57,9 @@
                 android:text="@string/sensitive_content"
                 hideImageMessageImageSource="@{previewAbleFile}"
                 config="@{mediaViewData.config}"
+                android:background="@drawable/shape_media_message_background"
+                android:padding="4dp"
+                android:textColor="@android:color/white"
                 />
         <ImageButton
                 android:id="@+id/toggleVisibilityButton"
