@@ -147,13 +147,12 @@ open class PlaneNoteViewData(
 
     val reactionCountsViewData: LiveData<List<ReactionViewData>> = currentNote.switchMap { n ->
         reactionCountsExpanded.map {
-            if (it == true) {
+            val reactions = if (it == true) {
                 n.reactionCounts
             } else {
                 n.getShortReactionCounts(note.note.isRenoteOnly())
             }
-        }.map {
-            ReactionViewData.from(it, n, emojiRepository.getAndConvertToMap(account.getHost()), emojiMap)
+            ReactionViewData.from(reactions, n, emojiRepository.getAndConvertToMap(account.getHost()), emojiMap)
         }
     }
 

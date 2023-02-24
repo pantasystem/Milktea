@@ -8,10 +8,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.common.throwIfHasError
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.InstanceInfoType
 import javax.inject.Inject
@@ -19,8 +16,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val instancesInfosAPIBuilder: InstanceInfoAPIBuilder,
-    private val instanceInfoService: InstanceInfoService
+    private val instanceInfoService: InstanceInfoService,
+    loggerFactory: Logger.Factory,
 ) : ViewModel() {
+    
+    private val logger by lazy {
+        loggerFactory.create("SignUpViewModel")
+    }
 
     @OptIn(FlowPreview::class)
     private val instancesInfosResponse = suspend {
@@ -29,7 +31,9 @@ class SignUpViewModel @Inject constructor(
                 .throwIfHasError()
                 .body()
         )
-    }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    }.asFlow().catch { 
+        logger.error("インスタンス情報の取得に失敗", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private var _keyword = MutableStateFlow("")
     val keyword = _keyword.asStateFlow()
