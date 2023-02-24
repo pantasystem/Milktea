@@ -77,10 +77,14 @@ class AutoCollapsingLayout : FrameLayout {
             maxHeight = limitedMaxPxHeight.toInt()
             if (expandedButton != null) {
                 measureChildWithMargins(expandedButton, widthMeasureSpec, 0, heightMeasureSpec, 0)
-                expandedButton.isVisible = true
+                if (!expandedButton.isVisible) {
+                    expandedButton.isVisible = true
+                }
             }
         } else {
-            expandedButton?.isVisible = false
+            if (expandedButton?.isVisible == true) {
+                expandedButton.isVisible = false
+            }
         }
 
         setMeasuredDimension(
