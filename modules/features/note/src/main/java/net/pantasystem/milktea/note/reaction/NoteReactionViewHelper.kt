@@ -17,12 +17,11 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 object NoteReactionViewHelper {
 
     @JvmStatic
-    @BindingAdapter("reactionTextTypeView", "reactionImageTypeView", "reaction", "note")
-    fun LinearLayout.setReactionCount(
+    @BindingAdapter("reactionTextTypeView", "reactionImageTypeView", "reaction")
+    fun LinearLayout.bindReactionCount(
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
         reaction: ReactionViewData,
-        note: PlaneNoteViewData
     ) {
         setReactionCount(reactionTextTypeView, reactionImageTypeView, reaction)
     }
