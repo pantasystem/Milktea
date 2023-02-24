@@ -74,7 +74,9 @@ fun Note.onEmojiReacted(account: Account, e: EmojiReaction): Note {
         else -> (this.emojis ?: emptyList()) + emoji
     }
     return this.copy(
-        reactionCounts = list,
+        reactionCounts = list.filter {
+            it.count > 0
+        },
         myReaction = e.myReaction(account.remoteId),
         emojis = emojis
     )
