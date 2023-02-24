@@ -9,7 +9,6 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
@@ -24,7 +23,9 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
@@ -322,18 +323,9 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            mViewModel.errors.collect {
-                withResumed {
-                    Toast.makeText(
-                        this@UserDetailActivity,
-                        getString(R.string.error_s, it),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-
+        mViewModel.errors.onEach {
+            UserDetailErrorHandler(this@UserDetailActivity)(it)
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
     }
 
