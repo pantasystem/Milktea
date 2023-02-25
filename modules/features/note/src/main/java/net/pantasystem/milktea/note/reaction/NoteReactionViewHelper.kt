@@ -23,15 +23,6 @@ object NoteReactionViewHelper {
         reactionImageTypeView: ImageView,
         reaction: ReactionViewData,
     ) {
-        setReactionCount(reactionTextTypeView, reactionImageTypeView, reaction)
-    }
-
-    @JvmStatic
-    fun setReactionCount(
-        reactionTextTypeView: TextView,
-        reactionImageTypeView: ImageView,
-        reaction: ReactionViewData,
-    ) {
         val textReaction = reaction.reaction
 
         val emoji = reaction.emoji
@@ -52,8 +43,8 @@ object NoteReactionViewHelper {
 //                .fitCenter()
                 .into(reactionImageTypeView)
         }
-
     }
+    
 
     @JvmStatic
     fun setReactionCount(
