@@ -117,22 +117,21 @@ class UserRepositoryImpl @Inject constructor(
     ) = runCancellableCatching<Unit> {
         withContext(ioDispatcher) {
             val ac = accountRepository.get(accountId).getOrThrow()
-            val i = ac.token
-            val api = misskeyAPIProvider.get(ac)
 
-            val results = SearchByUserAndHost(api)
-                .search(
-                    RequestUser(
-                        userName = userName,
-                        host = host,
-                        i = i
+            when(val result = userApiAdapter.search(accountId, userName, host)) {
+                is SearchResult.Mastodon -> {
+                    userDataSource.addAll(
+                        result.users.map {
+                            it.toModel(ac)
+                        }
                     )
-                )
-                .throwIfHasError()
-
-            results.body()!!.forEach {
-                userDTOEntityConverter.convert(ac, it, true).also { u ->
-                    userDataSource.add(u)
+                }
+                is SearchResult.Misskey -> {
+                    result.users.forEach {
+                        userDTOEntityConverter.convert(ac, it, true).also { u ->
+                            userDataSource.add(u)
+                        }
+                    }
                 }
             }
         }
