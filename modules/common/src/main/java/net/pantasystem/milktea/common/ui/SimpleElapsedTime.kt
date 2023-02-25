@@ -21,12 +21,12 @@ object SimpleElapsedTime {
         val nowEpoch = (now ?: Clock.System.now()).toEpochMilliseconds()
 
         return when (val elapsedMilliTime = nowEpoch - epoch) {
-            in Long.MIN_VALUE until 5 * 1000 -> {
-                // 5秒未満
+            in Long.MIN_VALUE until 0 -> {
+                // 0秒未満
                 TimeUnit.Future
             }
-            in 5 * 1000 until 10 * 1000 -> {
-                // 5秒以上 10秒未満
+            in 0 until 10 * 1000 -> {
+                // 0秒以上 10秒未満
                 TimeUnit.Now
             }
             in 10 * 1000 until 6 * 10 * 1000 -> {

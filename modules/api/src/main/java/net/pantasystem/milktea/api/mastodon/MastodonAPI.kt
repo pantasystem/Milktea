@@ -17,6 +17,7 @@ import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.api.mastodon.search.SearchResponse
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
@@ -241,4 +242,17 @@ interface MastodonAPI {
 
     @PUT("api/v1/media/{mediaId}")
     suspend fun updateMediaAttachment(@Path("mediaId") mediaId: String, @Body body: UpdateMediaAttachment): Response<TootMediaAttachment>
+
+    @GET("api/v2/search")
+    suspend fun search(
+        @Query("q") q: String,
+        @Query("resolve") resolve: Boolean = true,
+        @Query("following") following: Boolean = false,
+        @Query("account_id") accountId: String? = null,
+        @Query("exclude_unreviewed") excludeUnreviewed: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null
+    ): Response<SearchResponse>
 }

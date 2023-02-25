@@ -12,10 +12,10 @@ import kotlin.time.Duration.Companion.seconds
 class SimpleElapsedTimeTest {
 
     @Test
-    fun give4SecondsAgoReturnsFuture() {
+    fun giveMinusSecondsAgoReturnsFuture() {
         val now = Clock.System.now()
 
-        val result = SimpleElapsedTime(now.minus(4.seconds), now)
+        val result = SimpleElapsedTime(now.minus((-1).seconds), now)
         Assertions.assertEquals(TimeUnit.Future, result)
     }
 

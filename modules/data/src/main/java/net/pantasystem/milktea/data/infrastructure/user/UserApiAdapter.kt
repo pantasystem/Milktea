@@ -1,10 +1,13 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MuteAccountRequest
 import net.pantasystem.milktea.api.misskey.users.CreateMuteUserRequest
 import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -182,11 +185,47 @@ class UserApiAdapter @Inject constructor(
             }
         }
     }
+
+    suspend fun search(
+        accountId: Long,
+        userName: String,
+        host: String?
+    ): SearchResult {
+        val account = accountRepository.get(accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                val api = misskeyAPIProvider.get(account)
+                val body = requireNotNull(SearchByUserAndHost(api)
+                    .search(
+                        RequestUser(
+                            userName = userName,
+                            host = host,
+                            i = account.token
+                        )
+                    ).body()
+                )
+                SearchResult.Misskey(body)
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = requireNotNull(
+                    mastodonAPIProvider.get(account).search(
+                        if (host == null) userName else "$userName@$host"
+                    ).throwIfHasError().body()
+                ).accounts
+                SearchResult.Mastodon(body)
+            }
+        }
+    }
 }
 
 sealed interface UserActionResult {
     object Misskey : UserActionResult
     data class Mastodon(val relationship: MastodonAccountRelationshipDTO) : UserActionResult
+}
+
+sealed interface SearchResult {
+    data class Misskey(val users: List<UserDTO>) : SearchResult
+    data class Mastodon(val users: List<MastodonAccountDTO>) : SearchResult
 }
 
 typealias UnMuteResult = UserActionResult

@@ -5,7 +5,6 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
-import java.lang.ref.WeakReference
 import kotlin.math.min
 
 abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
@@ -14,13 +13,7 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
         private val drawableSizeCache = mutableMapOf<Any, EmojiSizeCache>()
     }
 
-    private var _imageDrawable: WeakReference<Drawable?>? = null
-    var imageDrawable: Drawable?
-        get() = _imageDrawable?.get()
-        set(value) {
-            _imageDrawable = WeakReference(value)
-        }
-
+    var imageDrawable: Drawable? = null
 
     /**
      * imageDrawableにDrawableが代入されている時にupdateImageDrawableSizeが呼び出されるとここに絵文字のサイズが代入される。
