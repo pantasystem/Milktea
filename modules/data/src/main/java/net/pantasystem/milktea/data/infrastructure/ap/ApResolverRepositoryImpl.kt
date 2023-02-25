@@ -31,11 +31,11 @@ class ApResolverRepositoryImpl @Inject constructor(
     override suspend fun resolve(accountId: Long, uri: String): Result<ApResolver> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(accountId)
-            val result = apiProvider.get(account).resolve(ApResolveRequest(i = account.token, uri = uri))
-                .throwIfHasError()
-                .body()!!
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> {
+                    val result = apiProvider.get(account).resolve(ApResolveRequest(i = account.token, uri = uri))
+                        .throwIfHasError()
+                        .body()!!
                     when(result) {
                         is ApResolveResult.TypeNote -> {
                             val note = noteDataSourceAdder.addNoteDtoToDataSource(account, result.note)
