@@ -3,17 +3,18 @@ package net.pantasystem.milktea.data.infrastructure.user
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
-import net.pantasystem.milktea.model.user.FollowRequestRepository
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.user.*
 import javax.inject.Inject
 
 class FollowRequestRepositoryImpl @Inject constructor(
     private val userRepository: UserRepository,
     private val userDataSource: UserDataSource,
     private val followRequestApiAdapter: FollowRequestApiAdapter,
+    private val accountRepository: AccountRepository,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ): FollowRequestRepository {
 
@@ -72,4 +73,49 @@ class FollowRequestRepositoryImpl @Inject constructor(
             }
             true
         }
+
+    override suspend fun find(
+        accountId: Long,
+        sinceId: String?,
+        untilId: String?
+    ): FollowRequestsResult {
+        return withContext(ioDispatcher) {
+            val account = accountRepository.get(accountId).getOrThrow()
+            when(val result = followRequestApiAdapter.findFollowRequests(
+                accountId = accountId,
+                sinceId = sinceId,
+                untilId = untilId
+            )) {
+                is FindFollowRequestsResult.Mastodon -> {
+                    val users = result.accounts.map {
+                        it.toModel(account)
+                    }
+                    userDataSource.addAll(users)
+                    FollowRequestsResult(
+                        users = users,
+                        sinceId = result.minId,
+                        untilId = result.maxId,
+                    )
+                }
+                is FindFollowRequestsResult.Misskey -> {
+                    val first = result.userDTOs.firstOrNull()
+                    val last = result.userDTOs.lastOrNull()
+                    val users = result.userDTOs.map {
+                        it.follower
+                    }.distinctBy {
+                        it.id
+                    }.map {
+                        userDTOEntityConverter.convert(account, it, false)
+                    }
+                    userDataSource.addAll(users)
+
+                    FollowRequestsResult(
+                        users = users,
+                        sinceId = if (sinceId == null) first?.id else last?.id,
+                        untilId = if (sinceId == null) last?.id else first?.id
+                    )
+                }
+            }
+        }
+    }
 }

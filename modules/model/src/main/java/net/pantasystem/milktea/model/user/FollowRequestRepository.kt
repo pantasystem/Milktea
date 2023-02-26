@@ -14,7 +14,7 @@ interface FollowRequestRepository {
 }
 
 data class FollowRequestsResult(
-    val users: List<User.Detail>,
+    val users: List<User>,
     val sinceId: String? = null,
     val untilId: String? = null,
 )
