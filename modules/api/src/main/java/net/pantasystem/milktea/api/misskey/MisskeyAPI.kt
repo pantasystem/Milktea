@@ -103,6 +103,9 @@ interface MisskeyAPI {
 
     @POST("api/following/requests/reject")
     suspend fun rejectFollowRequest(@Body rejectFollowRequest: RejectFollowRequest) : Response<Unit>
+
+    @POST("api/following/requests/list")
+    suspend fun getFollowRequestsList(@Body body: GetFollowRequest): Response<List<FollowRequestDTO>>
     //account
     @POST("api/i/favorites")
     suspend fun favorites(@Body noteRequest: NoteRequest): Response<List<Favorite>?>
