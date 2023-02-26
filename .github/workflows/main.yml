@@ -1,22 +1,26 @@
-name: CI
+name: Android CI
 on:
   push:
     branches:
-      - develop
       - master
+      - develop
   pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
           java-version: '17'
+          distribution: zulu
+          cache: gradle
 
       - name: Generate secret.properties
         env:
@@ -27,14 +31,13 @@ jobs:
           echo "push_to_fcm.server_base_url=${PUSH_TO_FCM_SERVER_BASE_URL}" >> ./secret.properties
           echo "push_to_fcm.public_key=${PUSH_TO_FCM_PUBLIC_KEY}" >> ./secret.properties
           echo "push_to_fcm.auth=${PUSH_TO_FCM_AUTH}" >> ./secret.properties
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-      - name: unit-test
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Run unit-test
         run: ./gradlew lint testDebug --continue
-      - name: build
+      - name: Build with Gradle
         run: ./gradlew assembleRelease
       - uses: actions/upload-artifact@v3
         with:
           name: outputs
           path: app/build/outputs/
-
