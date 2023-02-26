@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.note.timeline
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -17,7 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
@@ -141,11 +141,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _linearLayoutManager = LinearLayoutManager(this.requireContext())
+        val lm = LinearLayoutManager(this.requireContext())
+        _linearLayoutManager = lm
         val adapter = TimelineListAdapter(
             viewLifecycleOwner,
             onRefreshAction = {
@@ -171,11 +171,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             ).onAction(it)
         }
 
-        mBinding.listView.layoutManager = layoutManager
-
-        mBinding.listView.addOnScrollListener(mScrollListener)
-        mBinding.listView.layoutManager = layoutManager
-
+        mBinding.listView.layoutManager = lm
 
         mBinding.refresh.setOnRefreshListener {
             mViewModel.loadNew()
@@ -191,39 +187,27 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         mBinding.listView.adapter = adapter
         mBinding.listView.setItemViewCacheSize(15)
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mViewModel.timelineListState.collect { state ->
-                    adapter.submitList(state)
-                }
-            }
+        mViewModel.timelineListState.onEach { state ->
+            adapter.submitList(state)
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
-        }
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mViewModel.errorEvent.collect { error ->
-                    TimelineErrorHandler(requireContext())(error)
-                }
-            }
-        }
+        mViewModel.errorEvent.onEach { error ->
+            TimelineErrorHandler(requireContext())(error)
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                scrollToTopViewModel.scrollToTopEvent
-                    .collect {
-                        mBinding.listView.smoothScrollToPosition(0)
-                    }
-            }
 
-        }
+        scrollToTopViewModel.scrollToTopEvent.onEach {
+                mBinding.listView.smoothScrollToPosition(0)
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
 
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 if (mViewModel.timelineStore.latestReceiveNoteId() != null && positionStart == 0 && mFirstVisibleItemPosition == 0 && isShowing && itemCount == 1) {
-                    layoutManager.scrollToPosition(0)
+                    lm.scrollToPosition(0)
                 }
             }
         })
@@ -257,6 +241,28 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 }
             }
         }
+
+        mBinding.listView.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                    mFirstVisibleItemPosition = firstVisibleItemPosition
+                    mViewModel.position = firstVisibleItemPosition
+                }
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+
+                    val endVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                    val itemCount = layoutManager.itemCount
+
+                    if (endVisibleItemPosition == (itemCount - 1)) {
+                        mViewModel.loadOld()
+                    }
+                }
+            }
+        )
     }
 
 
@@ -278,35 +284,11 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         super.onPause()
         isShowing = false
         mViewModel.onPause()
-        Log.d("TimelineFragment", "onPause")
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _linearLayoutManager = null
     }
-
-    @ExperimentalCoroutinesApi
-    private val mScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
-            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-            mFirstVisibleItemPosition = firstVisibleItemPosition
-            mViewModel.position = firstVisibleItemPosition
-        }
-
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
-
-            val endVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-            val itemCount = layoutManager.itemCount
-
-            if (endVisibleItemPosition == (itemCount - 1)) {
-                mViewModel.loadOld()
-            }
-
-        }
-    }
-
 
 }
