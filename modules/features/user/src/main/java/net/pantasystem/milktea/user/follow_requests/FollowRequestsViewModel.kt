@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.user.FollowRequestRepository
@@ -47,6 +48,19 @@ class FollowRequestsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PageableState.Loading.Init())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState = combine(accountWatcher.account, state, users) { ac, state, users ->
+        FollowRequestsUiState(
+            ac,
+            users,
+            state
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        FollowRequestsUiState(null, emptyList(), PageableState.Loading.Init())
+    )
+
     fun refresh() {
         viewModelScope.launch {
             pagingStore.clear()
@@ -81,3 +95,9 @@ class FollowRequestsViewModel @Inject constructor(
     }
 
 }
+
+data class FollowRequestsUiState(
+    val currentAccount: Account?,
+    val users: List<User>,
+    val pagingState: PageableState<List<User>>,
+)
