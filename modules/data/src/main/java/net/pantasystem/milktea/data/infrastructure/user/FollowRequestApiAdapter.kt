@@ -1,8 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.misskey.users.AcceptFollowRequest
+import net.pantasystem.milktea.api.misskey.users.FollowRequestDTO
+import net.pantasystem.milktea.api.misskey.users.GetFollowRequest
 import net.pantasystem.milktea.api.misskey.users.RejectFollowRequest
+import net.pantasystem.milktea.common.MastodonLinkHeaderDecoder
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
@@ -24,7 +28,7 @@ class FollowRequestApiAdapter @Inject constructor(
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when(account.instanceType) {
             Account.InstanceType.MISSKEY -> {
-                val res = misskeyAPIProvider.get(account)
+                misskeyAPIProvider.get(account)
                     .acceptFollowRequest(
                         AcceptFollowRequest(
                             i = account.token,
@@ -62,8 +66,41 @@ class FollowRequestApiAdapter @Inject constructor(
             }
         }
     }
+
+    suspend fun findFollowRequests(accountId: Long, sinceId: String? = null, untilId: String? = null): FindFollowRequestsResult {
+        val account = accountRepository.get(accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                val body = misskeyAPIProvider.get(account).getFollowRequestsList(
+                    GetFollowRequest(
+                        i = account.token,
+                        sinceId = sinceId,
+                        untilId = untilId,
+                    )
+                ).throwIfHasError().body()
+                FindFollowRequestsResult.Misskey(
+                    requireNotNull(body)
+                )
+            }
+            Account.InstanceType.MASTODON -> {
+                val res = mastodonAPIProvider.get(account).getFollowRequests(
+                    maxId = untilId,
+                    minId = sinceId,
+                ).throwIfHasError()
+                FindFollowRequestsResult.Mastodon(
+                    accounts = requireNotNull(res.body()),
+                    maxId = MastodonLinkHeaderDecoder(res.headers()["link"]).getMaxId(),
+                    minId = MastodonLinkHeaderDecoder(res.headers()["link"]).getMinId(),
+                )
+            }
+        }
+    }
 }
 
+sealed interface FindFollowRequestsResult {
+    data class Mastodon(val accounts: List<MastodonAccountDTO>, val maxId: String?, val minId: String? = null) : FindFollowRequestsResult
+    data class Misskey(val userDTOs: List<FollowRequestDTO>) : FindFollowRequestsResult
+}
 sealed interface FollowRequestResult {
     data class Mastodon(val relationshipDTO: MastodonAccountRelationshipDTO) : FollowRequestResult
     object Misskey : FollowRequestResult

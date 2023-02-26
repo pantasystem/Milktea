@@ -261,4 +261,7 @@ interface MastodonAPI {
 
     @POST("api/v1/follow_requests/{accountId}/reject")
     suspend fun rejectFollowRequest(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
+    @GET("api/v1/follow_requests")
+    suspend fun getFollowRequests(@Query("max_id") maxId: String? = null, @Query("min_id") minId: String? = null): Response<List<MastodonAccountDTO>>
 }
