@@ -28,6 +28,7 @@ import net.pantasystem.milktea.user.R
 fun FollowRequestItem(
     currentAccount: Account?,
     user: User,
+    isUserNameDefault: Boolean,
     onAccept: (User.Id) -> Unit,
     onReject: (User.Id) -> Unit,
     onAvatarClicked: (User.Id) -> Unit,
@@ -62,8 +63,14 @@ fun FollowRequestItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = currentAccount?.getHost(), sourceHost = user.host, fontSize = 16.sp)
-                Text(text = user.displayUserName, fontSize = 14.sp)
+                if (isUserNameDefault) {
+                    Text(text = user.displayUserName, fontSize = 16.sp)
+                    CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = currentAccount?.getHost(), sourceHost = user.host, fontSize = 14.sp)
+                } else {
+                    CustomEmojiText(text = user.displayName, emojis = user.emojis, accountHost = currentAccount?.getHost(), sourceHost = user.host, fontSize = 16.sp)
+                    Text(text = user.displayUserName, fontSize = 14.sp)
+                }
+
             }
             Spacer(modifier = Modifier.width(4.dp))
             Row {
@@ -89,6 +96,7 @@ fun FollowRequestItem(
 fun Preview_FollowRequestItem() {
     FollowRequestItem(
         currentAccount = Account(remoteId = "", instanceDomain = "", userName = "", instanceType = Account.InstanceType.MISSKEY, token = ""),
+        isUserNameDefault = true,
         user = User.Simple(
             id = User.Id(accountId = 0, id = ""),
             userName = "Panta",

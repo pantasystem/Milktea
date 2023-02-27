@@ -39,11 +39,12 @@ fun FollowRequestsScreen(
         LazyColumn(modifier) {
             when(val content = uiState.pagingState.content) {
                 is StateContent.Exist -> {
-                    if (!content.rawContent.isEmpty()) {
+                    if (content.rawContent.isNotEmpty()) {
                         items(content.rawContent) { item ->
                             FollowRequestItem(
                                 currentAccount = uiState.currentAccount,
                                 user = item,
+                                isUserNameDefault = uiState.config.isUserNameDefault,
                                 onAccept = onAccept,
                                 onReject = onReject,
                                 onAvatarClicked = onAvatarClicked

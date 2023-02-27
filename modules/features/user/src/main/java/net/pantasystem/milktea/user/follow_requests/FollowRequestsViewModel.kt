@@ -13,6 +13,9 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.setting.Config
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -23,6 +26,7 @@ import javax.inject.Inject
 class FollowRequestsViewModel @Inject constructor(
     accountRepository: AccountRepository,
     followRequestPagingStoreFactory: FollowRequestPagingStore.Factory,
+    configRepository: LocalConfigRepository,
     private val accountStore: AccountStore,
     private val userDataSource: UserDataSource,
     private val followRequestRepository: FollowRequestRepository,
@@ -48,16 +52,27 @@ class FollowRequestsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PageableState.Loading.Init())
 
-    val uiState = combine(accountStore.observeCurrentAccount.filterNotNull(), state, users) { ac, state, users ->
+    val uiState = combine(
+        accountStore.observeCurrentAccount.filterNotNull(),
+        state,
+        users,
+        configRepository.observe()
+    ) { ac, state, users, config ->
         FollowRequestsUiState(
             ac,
             users,
-            state
+            state,
+            config
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        FollowRequestsUiState(null, emptyList(), PageableState.Loading.Init())
+        FollowRequestsUiState(
+            null,
+            emptyList(),
+            PageableState.Loading.Init(),
+            DefaultConfig.config,
+        )
     )
 
     init {
@@ -105,4 +120,5 @@ data class FollowRequestsUiState(
     val currentAccount: Account?,
     val users: List<User>,
     val pagingState: PageableState<List<User>>,
+    val config: Config,
 )
