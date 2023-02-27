@@ -10,6 +10,7 @@ import net.pantasystem.milktea.api_streaming.mastodon.Event
 import net.pantasystem.milktea.data.streaming.ChannelAPIWithAccountProvider
 import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.page.CanOnlyMedia
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteStreaming
@@ -105,6 +106,16 @@ class NoteStreamingImpl @Inject constructor(
                     }
                 }
                 else -> throw IllegalStateException("Global, Hybrid, Local, Homeは以外のStreamは対応していません。")
+            }
+        }.filter {
+            if (pageable is CanOnlyMedia<*>) {
+                if (pageable.getOnlyMedia()) {
+                    !it.fileIds.isNullOrEmpty()
+                } else {
+                    true
+                }
+            } else {
+                true
             }
         }
     }
