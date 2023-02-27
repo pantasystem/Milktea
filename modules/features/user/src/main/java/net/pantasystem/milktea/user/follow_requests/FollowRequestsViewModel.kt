@@ -7,12 +7,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -23,21 +23,21 @@ import javax.inject.Inject
 class FollowRequestsViewModel @Inject constructor(
     accountRepository: AccountRepository,
     followRequestPagingStoreFactory: FollowRequestPagingStore.Factory,
+    private val accountStore: AccountStore,
     private val userDataSource: UserDataSource,
     private val followRequestRepository: FollowRequestRepository,
 ) : ViewModel() {
 
     private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val accountWatcher = CurrentAccountWatcher(null, accountRepository)
     private val pagingStore = followRequestPagingStoreFactory.create {
-        accountWatcher.getAccount()
+        accountRepository.getCurrentAccount().getOrThrow()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val users = pagingStore.state.map { state ->
         (state.content as? StateContent.Exist)?.rawContent ?: emptyList()
     }.flatMapLatest { ids ->
-        accountWatcher.account.flatMapLatest { account ->
+        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
             userDataSource.observeIn(account.accountId, ids.map { it.id })
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -48,8 +48,7 @@ class FollowRequestsViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PageableState.Loading.Init())
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val uiState = combine(accountWatcher.account, state, users) { ac, state, users ->
+    val uiState = combine(accountStore.observeCurrentAccount.filterNotNull(), state, users) { ac, state, users ->
         FollowRequestsUiState(
             ac,
             users,

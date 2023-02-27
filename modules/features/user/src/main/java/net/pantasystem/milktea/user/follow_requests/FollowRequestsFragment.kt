@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.common_android_ui.user.FollowRequestsFragmentFactory
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import javax.inject.Inject
@@ -57,5 +58,11 @@ class FollowRequestsFragment : Fragment() {
                 }
             }
         }
+    }
+}
+
+class FollowRequestFragmentFactoryImpl @Inject constructor() : FollowRequestsFragmentFactory {
+    override fun create(): Fragment {
+        return FollowRequestsFragment()
     }
 }

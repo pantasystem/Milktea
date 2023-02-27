@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -24,6 +25,9 @@ fun FollowRequestsScreen(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LaunchedEffect(null) {
+        onRefresh()
+    }
     SwipeRefresh(
         state = rememberSwipeRefreshState(
             isRefreshing = uiState.pagingState is PageableState.Loading.Init
