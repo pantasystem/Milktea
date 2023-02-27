@@ -33,6 +33,8 @@ class FollowRequestsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _errors = MutableSharedFlow<Throwable>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val errors = _errors.asSharedFlow()
+
     private val pagingStore = followRequestPagingStoreFactory.create {
         accountRepository.getCurrentAccount().getOrThrow()
     }
