@@ -57,11 +57,11 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = false,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(2, pages.size)
+        assertEquals(3, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.SOCIAL, PageType.HOME).sorted(), types)
+        assertEquals(listOf(PageType.SOCIAL, PageType.SOCIAL, PageType.HOME).sorted(), types)
     }
 
     @Test
@@ -72,11 +72,11 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = true,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(2, pages.size)
+        assertEquals(3, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.GLOBAL, PageType.HOME).sorted(), types)
+        assertEquals(listOf(PageType.GLOBAL, PageType.HOME, PageType.HOME).sorted(), types)
     }
 
     @Test
@@ -87,11 +87,11 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = true,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(1, pages.size)
+        assertEquals(2, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.HOME), types)
+        assertEquals(listOf(PageType.HOME, PageType.HOME), types)
     }
 
     @Test
@@ -102,11 +102,11 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = false,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(3, pages.size)
+        assertEquals(4, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.HOME, PageType.SOCIAL, PageType.GLOBAL).sorted(), types)
+        assertEquals(listOf(PageType.HOME, PageType.SOCIAL, PageType.GLOBAL, PageType.SOCIAL).sorted(), types)
     }
 
     @Test
