@@ -12,5 +12,6 @@
     <string name="is_stop_note_capture_when_background">不要在后台捕捉笔记</string>
     <string name="enable_automic_updates">启用自动更新</string>
     <string name="please_login">请登录</string>
+    <string name="settings_edit_tab_only_media">Only Media</string>
 
 </resources>

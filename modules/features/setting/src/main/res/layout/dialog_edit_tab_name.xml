@@ -15,12 +15,20 @@
                 android:layout_marginBottom="8dp"
                 android:text="@string/edit_tab_name"
                 />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/toggleOnlyMedia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/titleView"
+                android:text="@string/settings_edit_tab_only_media"/>
+
         <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tabNameInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_below="@id/titleView"
+                android:layout_below="@id/toggleOnlyMedia"
                 >
             <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTabName"
@@ -30,22 +38,22 @@
                     android:singleLine="true"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tabNameInput"
                 android:id="@+id/cancelButton"
                 android:layout_toStartOf="@id/okButton"
                 android:layout_marginEnd="8dp"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:text="@android:string/cancel"/>
-        <Button
+        <com.google.android.material.button.MaterialButton
                 android:id="@+id/okButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tabNameInput"
                 android:layout_alignParentEnd="true"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:text="@android:string/ok"/>
     </RelativeLayout>
 </layout>

@@ -4,14 +4,17 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatDialogFragment
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
+import net.pantasystem.milktea.model.account.page.CanOnlyMedia
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.setting.databinding.DialogEditTabNameBinding
 import net.pantasystem.milktea.setting.viewmodel.page.PageSettingViewModel
 
 @AndroidEntryPoint
-class EditTabNameDialog : AppCompatDialogFragment(){
+class EditTabSettingDialog : AppCompatDialogFragment(){
 
     private val pageSettingViewModel: PageSettingViewModel by activityViewModels()
 
@@ -29,10 +32,31 @@ class EditTabNameDialog : AppCompatDialogFragment(){
         }
         binding.editTabName.setText(page.title)
 
+         when(val pageable = page.pageable()) {
+            is CanOnlyMedia<*> -> {
+                binding.toggleOnlyMedia.isVisible = true
+                binding.toggleOnlyMedia.isChecked = pageable.getOnlyMedia()
+            }
+            else -> {
+                binding.toggleOnlyMedia.isVisible = false
+            }
+        }
+
+
+
         binding.okButton.setOnClickListener {
             val name = binding.editTabName.text?.toString()
             if(name?.isNotBlank() == true){
-                val updated = page.copy(title = name)
+                var target = page
+                when(val pageable = target.pageable()) {
+                    is CanOnlyMedia<*> -> {
+                        target = target.copy(
+                            pageParams = (pageable.setOnlyMedia(binding.toggleOnlyMedia.isChecked) as Pageable).toParams()
+                        )
+                    }
+                    else -> Unit
+                }
+                val updated = target.copy(title = name)
                 pageSettingViewModel.updatePage(updated)
             }
             dismiss()

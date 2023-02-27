@@ -17,7 +17,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.account.page.PageType
-import net.pantasystem.milktea.setting.EditTabNameDialog
+import net.pantasystem.milktea.setting.EditTabSettingDialog
 import net.pantasystem.milktea.setting.PageSettingActionDialog
 import net.pantasystem.milktea.setting.compose.tab.TabItemsListScreen
 import net.pantasystem.milktea.setting.compose.tab.rememberDragDropListState
@@ -62,7 +62,7 @@ class PageSettingActivity : AppCompatActivity() {
         }
 
         mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
-            EditTabNameDialog().show(supportFragmentManager, "ETD")
+            EditTabSettingDialog().show(supportFragmentManager, "ETD")
         }
 //
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
