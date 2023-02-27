@@ -456,6 +456,7 @@
     <string name="settings_hide_media_when_mobile_network">モバイル ネットワーク時にメディアを非表示にする</string>
     <string name="notes_media_click_to_load_image">クリックして画像を読み込み</string>
     <string name="notifications_follow_requests">フォローリクエスト</string>
+    <string name="content_not_exists_message">何もありません</string>
 
 
 </resources>
