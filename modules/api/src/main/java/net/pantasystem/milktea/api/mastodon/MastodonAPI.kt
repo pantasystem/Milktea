@@ -61,7 +61,8 @@ interface MastodonAPI {
     suspend fun getHashtagTimeline(
         @Path("tag") tag: String,
         @Query("min_id") minId: String? = null,
-        @Query("max_id") maxId: String? = null
+        @Query("max_id") maxId: String? = null,
+        @Query("only_media") onlyMedia: Boolean = false,
     ): Response<List<TootStatusDTO>>
 
     /**
