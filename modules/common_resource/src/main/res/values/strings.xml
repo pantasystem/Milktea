@@ -446,5 +446,7 @@
     <string name="settings_visible_instance_domain_in_toolbar">Show the instance\'s domain in the toolbar</string>
     <string name="settings_hide_media_when_mobile_network">Hide media when mobile network</string>
     <string name="notes_media_click_to_load_image">Click to load Image</string>
+    <string name="notifications_follow_requests">Follow request</string>
+    <string name="content_not_exists_message">No content</string>
 
 </resources>

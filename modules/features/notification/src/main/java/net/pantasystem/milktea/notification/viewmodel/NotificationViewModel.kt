@@ -18,7 +18,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.notification.*
-import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
 
@@ -26,9 +26,9 @@ import javax.inject.Inject
 @HiltViewModel
 class NotificationViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val userRepository: UserRepository,
     private val groupRepository: GroupRepository,
     private val notificationStreaming: NotificationStreaming,
+    private val followRequestRepository: FollowRequestRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
@@ -125,7 +125,7 @@ class NotificationViewModel @Inject constructor(
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch {
                 runCancellableCatching {
-                    userRepository.acceptFollowRequest(notification.userId)
+                    followRequestRepository.accept(notification.userId)
                 }.onSuccess {
                     loadInit()
                 }.onFailure {
@@ -141,7 +141,7 @@ class NotificationViewModel @Inject constructor(
         if (notification is ReceiveFollowRequestNotification) {
             viewModelScope.launch(Dispatchers.IO) {
                 runCancellableCatching {
-                    userRepository.rejectFollowRequest(notification.userId)
+                    followRequestRepository.reject(notification.userId)
                 }.onSuccess {
                     loadInit()
                 }.onFailure {

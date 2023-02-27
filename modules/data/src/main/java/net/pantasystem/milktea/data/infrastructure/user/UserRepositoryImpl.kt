@@ -247,61 +247,7 @@ class UserRepositoryImpl @Inject constructor(
         isSuccessful
     }
 
-    override suspend fun acceptFollowRequest(userId: User.Id): Boolean =
-        withContext(ioDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val user = find(userId, true) as User.Detail
-            if (user.related?.hasPendingFollowRequestToYou != true) {
-                return@withContext false
-            }
-            val res = misskeyAPIProvider.get(account)
-                .acceptFollowRequest(
-                    AcceptFollowRequest(
-                        i = account.token,
-                        userId = userId.id
-                    )
-                )
-                .throwIfHasError()
-            if (res.isSuccessful) {
-                userDataSource.add(
-                    user.copy(
-                        related = user.related?.copy(
-                            hasPendingFollowRequestToYou = false,
-                            isFollower = true
-                        )
-                    )
-                )
-            }
-            return@withContext res.isSuccessful
 
-        }
-
-    override suspend fun rejectFollowRequest(userId: User.Id): Boolean =
-        withContext(ioDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val user = find(userId, true) as User.Detail
-            if (user.related?.hasPendingFollowRequestToYou != true) {
-                return@withContext false
-            }
-            val res = misskeyAPIProvider.get(account).rejectFollowRequest(
-                RejectFollowRequest(
-                    i = account.token,
-                    userId = userId.id
-                )
-            )
-                .throwIfHasError()
-            if (res.isSuccessful) {
-                userDataSource.add(
-                    user.copy(
-                        related = user.related?.copy(
-                            hasPendingFollowRequestToYou = false,
-                            isFollower = false
-                        )
-                    )
-                )
-            }
-            return@withContext res.isSuccessful
-        }
 
     private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
         val user = find(userId, true) as User.Detail
