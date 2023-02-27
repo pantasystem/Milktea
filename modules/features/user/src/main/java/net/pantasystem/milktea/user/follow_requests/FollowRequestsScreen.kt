@@ -10,11 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.user.R
 
 @Composable
 fun FollowRequestsScreen(
@@ -37,11 +39,7 @@ fun FollowRequestsScreen(
         LazyColumn(modifier) {
             when(val content = uiState.pagingState.content) {
                 is StateContent.Exist -> {
-                    if (content.rawContent.isEmpty()) {
-                        item {
-                            ContentNone()
-                        }
-                    } else {
+                    if (!content.rawContent.isEmpty()) {
                         items(content.rawContent) { item ->
                             FollowRequestItem(
                                 currentAccount = uiState.currentAccount,
@@ -53,32 +51,36 @@ fun FollowRequestsScreen(
                         }
                     }
                 }
-                is StateContent.NotExist -> {
-                    item {
-                        ContentNone()
-                    }
-                }
+                is StateContent.NotExist -> Unit
             }
-            if (uiState.pagingState is PageableState.Loading) {
-                item {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
+
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when(uiState.pagingState) {
+                        is PageableState.Error -> {
+                            Text(stringResource(id = R.string.error_s, uiState.pagingState.throwable.localizedMessage ?: ""))
+                        }
+                        is PageableState.Fixed -> {
+                            val showMessage = when(val content = uiState.pagingState.content) {
+                                is StateContent.Exist -> {
+                                    content.rawContent.isEmpty()
+                                }
+                                is StateContent.NotExist -> true
+                            }
+                            if (showMessage) {
+                                Text(stringResource(id = R.string.content_not_exists_message))
+                            }
+                        }
+                        is PageableState.Loading -> {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
+
             }
         }
-    }
-}
-
-@Composable
-private fun ContentNone() {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text("Follow requests not exists.")
     }
 }
