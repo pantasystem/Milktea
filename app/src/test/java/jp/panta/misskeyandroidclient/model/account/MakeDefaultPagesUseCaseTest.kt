@@ -6,6 +6,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
 import net.pantasystem.milktea.model.account.PageDefaultStringsJp
 import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -57,11 +58,17 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = false,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(2, pages.size)
+        assertEquals(3, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.SOCIAL, PageType.HOME).sorted(), types)
+        assertEquals(listOf(PageType.SOCIAL, PageType.SOCIAL, PageType.HOME).sorted(), types)
+        assertEquals(
+            listOf(Pageable.HomeTimeline(), Pageable.HybridTimeline(), Pageable.HybridTimeline(withFiles = true)),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
@@ -72,11 +79,17 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = true,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(2, pages.size)
+        assertEquals(3, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.GLOBAL, PageType.HOME).sorted(), types)
+        assertEquals(listOf(PageType.GLOBAL, PageType.HOME, PageType.HOME).sorted(), types)
+        assertEquals(
+            listOf(Pageable.HomeTimeline(), Pageable.HomeTimeline(withFiles = true), Pageable.GlobalTimeline()),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
@@ -87,11 +100,17 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = true,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(1, pages.size)
+        assertEquals(2, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.HOME), types)
+        assertEquals(listOf(PageType.HOME, PageType.HOME), types)
+        assertEquals(
+            listOf(Pageable.HomeTimeline(), Pageable.HomeTimeline(withFiles = true)),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
@@ -102,11 +121,22 @@ class MakeDefaultPagesUseCaseTest {
             disableLocalTimeline = false,
         )
         val pages = makeDefaultPagesUseCase(account, meta)
-        assertEquals(3, pages.size)
+        assertEquals(4, pages.size)
         val types = pages.map {
             it.pageParams.type
         }.sorted()
-        assertEquals(listOf(PageType.HOME, PageType.SOCIAL, PageType.GLOBAL).sorted(), types)
+        assertEquals(listOf(PageType.HOME, PageType.SOCIAL, PageType.GLOBAL, PageType.SOCIAL).sorted(), types)
+        assertEquals(
+            listOf(
+                Pageable.HomeTimeline(),
+                Pageable.HybridTimeline(),
+                Pageable.HybridTimeline(withFiles = true),
+                Pageable.GlobalTimeline()
+            ),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test

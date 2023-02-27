@@ -13,6 +13,7 @@ interface PageDefaultStrings {
     val globalTimeline: String
     val localTimeline: String
     val recommendedTimeline: String
+    val media: String
 }
 
 
@@ -28,6 +29,9 @@ class PageDefaultStringsJp : PageDefaultStrings {
         get() = "ローカル"
     override val recommendedTimeline: String
         get() = "一押し"
+
+    override val media: String
+        get() = "メディア"
 }
 
 class MakeDefaultPagesUseCase(
@@ -46,6 +50,11 @@ class MakeDefaultPagesUseCase(
                 defaultPages.add(PageableTemplate(account).homeTimeline(pageDefaultStrings.homeTimeline))
                 if (isLocalEnabled) {
                     defaultPages.add(PageableTemplate(account).hybridTimeline(pageDefaultStrings.hybridThrowable))
+                }
+                if (isLocalEnabled) {
+                    defaultPages.add(PageableTemplate(account).hybridTimeline(pageDefaultStrings.media, withFiles = true))
+                } else {
+                    defaultPages.add(PageableTemplate(account).homeTimeline(pageDefaultStrings.media, withFiles = true))
                 }
                 if (isGlobalEnabled) {
                     defaultPages.add(PageableTemplate(account).globalTimeline(pageDefaultStrings.globalTimeline))

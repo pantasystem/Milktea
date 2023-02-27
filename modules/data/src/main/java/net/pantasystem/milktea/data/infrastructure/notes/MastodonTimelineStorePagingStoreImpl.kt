@@ -54,7 +54,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
             )
             Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 minId = getSinceId(),
-                visibilities = getVisibilitiesParameter(getAccount())
+                visibilities = getVisibilitiesParameter(getAccount()),
             )
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
                 minId = getSinceId(),
@@ -63,11 +63,13 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
                 minId = getSinceId(),
-                visibilities = getVisibilitiesParameter(getAccount())
+                visibilities = getVisibilitiesParameter(getAccount()),
+                onlyMedia = pageableTimeline.getOnlyMedia()
             )
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
                 minId = getSinceId(),
-                visibilities = getVisibilitiesParameter(getAccount())
+                visibilities = getVisibilitiesParameter(getAccount()),
+                onlyMedia = pageableTimeline.getOnlyMedia()
             )
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
@@ -119,7 +121,8 @@ internal class MastodonTimelineStorePagingStoreImpl(
         when (pageableTimeline) {
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
-                maxId = maxId
+                maxId = maxId,
+                onlyMedia = pageableTimeline.getOnlyMedia()
             )
             Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 maxId = maxId,
@@ -132,11 +135,13 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
                 maxId = maxId,
-                visibilities = getVisibilitiesParameter(getAccount())
+                visibilities = getVisibilitiesParameter(getAccount()),
+                onlyMedia = pageableTimeline.getOnlyMedia()
             )
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
                 maxId = maxId,
-                visibilities = getVisibilitiesParameter(getAccount())
+                visibilities = getVisibilitiesParameter(getAccount()),
+                onlyMedia = pageableTimeline.getOnlyMedia()
             )
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
