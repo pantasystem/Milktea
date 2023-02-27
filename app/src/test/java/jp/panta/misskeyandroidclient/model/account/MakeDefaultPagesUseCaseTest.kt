@@ -6,6 +6,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
 import net.pantasystem.milktea.model.account.PageDefaultStringsJp
 import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -62,6 +63,12 @@ class MakeDefaultPagesUseCaseTest {
             it.pageParams.type
         }.sorted()
         assertEquals(listOf(PageType.SOCIAL, PageType.SOCIAL, PageType.HOME).sorted(), types)
+        assertEquals(
+            listOf(Pageable.HomeTimeline(), Pageable.HybridTimeline(), Pageable.HybridTimeline(withFiles = true)),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
@@ -77,6 +84,12 @@ class MakeDefaultPagesUseCaseTest {
             it.pageParams.type
         }.sorted()
         assertEquals(listOf(PageType.GLOBAL, PageType.HOME, PageType.HOME).sorted(), types)
+        assertEquals(
+            listOf(Pageable.HomeTimeline(), Pageable.HomeTimeline(withFiles = true), Pageable.GlobalTimeline()),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
@@ -92,6 +105,12 @@ class MakeDefaultPagesUseCaseTest {
             it.pageParams.type
         }.sorted()
         assertEquals(listOf(PageType.HOME, PageType.HOME), types)
+        assertEquals(
+            listOf(Pageable.HomeTimeline(), Pageable.HomeTimeline(withFiles = true)),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
@@ -107,6 +126,17 @@ class MakeDefaultPagesUseCaseTest {
             it.pageParams.type
         }.sorted()
         assertEquals(listOf(PageType.HOME, PageType.SOCIAL, PageType.GLOBAL, PageType.SOCIAL).sorted(), types)
+        assertEquals(
+            listOf(
+                Pageable.HomeTimeline(),
+                Pageable.HybridTimeline(),
+                Pageable.HybridTimeline(withFiles = true),
+                Pageable.GlobalTimeline()
+            ),
+            pages.map {
+                it.pageable()
+            }
+        )
     }
 
     @Test
