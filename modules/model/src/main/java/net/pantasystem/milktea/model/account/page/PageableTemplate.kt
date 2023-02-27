@@ -9,13 +9,13 @@ class PageableTemplate(val account: Account?) {
     fun globalTimeline(title: String): Page {
         return Page(account?.accountId?: - 1, title, 0, Pageable.GlobalTimeline())
     }
-    fun hybridTimeline(title: String) =
-        Page(account?.accountId?: - 1, title, 0, Pageable.HybridTimeline())
+    fun hybridTimeline(title: String, withFiles: Boolean? = null) =
+        Page(account?.accountId?: - 1, title, 0, Pageable.HybridTimeline(withFiles = withFiles))
 
     fun localTimeline(title: String) =
         Page(account?.accountId?: - 1, title, 0, Pageable.LocalTimeline())
 
-    fun homeTimeline(title: String) = Page(account?.accountId?: - 1, title, 0, Pageable.HomeTimeline())
+    fun homeTimeline(title: String, withFiles: Boolean? = null) = Page(account?.accountId?: - 1, title, 0, Pageable.HomeTimeline(withFiles = withFiles))
 
     fun userListTimeline(listId: String) = Pageable.UserListTimeline(listId = listId)
 
