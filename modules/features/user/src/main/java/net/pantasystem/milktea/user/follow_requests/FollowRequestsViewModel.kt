@@ -60,6 +60,12 @@ class FollowRequestsViewModel @Inject constructor(
         FollowRequestsUiState(null, emptyList(), PageableState.Loading.Init())
     )
 
+    init {
+        accountStore.observeCurrentAccount.distinctUntilChanged().onEach {
+            refresh()
+        }.launchIn(viewModelScope)
+    }
+
     fun refresh() {
         viewModelScope.launch {
             pagingStore.clear()
