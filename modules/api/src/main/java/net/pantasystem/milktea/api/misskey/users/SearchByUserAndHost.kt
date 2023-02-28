@@ -2,6 +2,7 @@ package net.pantasystem.milktea.api.misskey.users
 
 import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.v12.MisskeyAPIV12
+import net.pantasystem.milktea.common.throwIfHasError
 import retrofit2.Response
 
 class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){
@@ -14,10 +15,10 @@ class SearchByUserAndHost(val misskeyAPI: MisskeyAPI){
             host = reqUser.host?: ""
         )
         return if(misskeyAPI is MisskeyAPIV12){
-            misskeyAPI.searchByUserNameAndHost(requestUser)
+            misskeyAPI.searchByUserNameAndHost(requestUser).throwIfHasError()
         }else{
 
-            misskeyAPI.searchUser(requestUser.copy(host = "", userName = null, query = requestUser.userName))
+            misskeyAPI.searchUser(requestUser.copy(host = "", userName = null, query = requestUser.userName)).throwIfHasError()
         }
     }
 

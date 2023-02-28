@@ -1,7 +1,10 @@
 package jp.panta.misskeyandroidclient.ui.main
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
@@ -12,6 +15,7 @@ import androidx.work.WorkInfo
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import jp.panta.misskeyandroidclient.MainActivity
+import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.ActivityMainBinding
 import jp.panta.misskeyandroidclient.ui.main.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -20,9 +24,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.auth.JoinMilkteaActivity
 import net.pantasystem.milktea.common_android_ui.report.ReportViewModel
-import net.pantasystem.milktea.common_navigation.AuthorizationArgs
-import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
+import net.pantasystem.milktea.common_viewmodel.CurrentPageType
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.notification.notificationMessageScope
@@ -38,11 +43,11 @@ internal class MainActivityEventHandler(
     val reportViewModel: ReportViewModel,
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     val accountStore: AccountStore,
-    val authorizationNavigation: AuthorizationNavigation,
     val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>,
     val changeNavMenuVisibilityFromAPIVersion: ChangeNavMenuVisibilityFromAPIVersion,
     private val configStore: SettingStore,
     private val draftNoteService: DraftNoteService,
+    private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel,
 ) {
 
 
@@ -67,6 +72,7 @@ internal class MainActivityEventHandler(
         collectConfirmGoogleAnalyticsState()
         collectRequestPostNotificationState()
         collectDraftNoteSavedEvent()
+        collectCurrentPageableState()
     }
 
     private fun collectCrashlyticsCollectionState() {
@@ -144,6 +150,8 @@ internal class MainActivityEventHandler(
                 }
             }
         }
+        val audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
         lifecycleScope.launch {
             lifecycleOwner.whenResumed {
                 // NOTE: 通知音を再生する
@@ -151,7 +159,10 @@ internal class MainActivityEventHandler(
                     if (ringtone.isPlaying) {
                         ringtone.stop()
                     }
-                    if (configStore.configState.value.isEnableNotificationSound) {
+                    if (
+                        configStore.configState.value.isEnableNotificationSound
+                            && audioManager.ringerMode == AudioManager.RINGER_MODE_NORMAL
+                    ) {
                         ringtone.play()
                     }
                 }
@@ -184,7 +195,10 @@ internal class MainActivityEventHandler(
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
                         "CURRENT_INSTANCE_DOMAIN",
                         state.currentAccount?.let {
-                            it.instanceDomain.substring(0, 36.coerceAtMost(it.instanceDomain.length))
+                            it.instanceDomain.substring(
+                                0,
+                                36.coerceAtMost(it.instanceDomain.length)
+                            )
                         }
                     )
                     FirebaseAnalytics.getInstance(activity).setUserProperty(
@@ -195,7 +209,7 @@ internal class MainActivityEventHandler(
                     )
                     if (state.isUnauthorized) {
                         activity.startActivity(
-                            authorizationNavigation.newIntent(AuthorizationArgs.New)
+                            Intent(activity, JoinMilkteaActivity::class.java)
                         )
                         activity.finish()
                     }
@@ -248,5 +262,21 @@ internal class MainActivityEventHandler(
             binding.appBarMain.simpleNotification,
             createNoteWorkerExecutor,
         )(state)
+    }
+
+    private fun collectCurrentPageableState() {
+        currentPageableTimelineViewModel.currentType.onEach {
+            binding.appBarMain.fab.setImageResource(
+                when (it) {
+                    CurrentPageType.Account -> {
+                        R.drawable.ic_person_add_black_24dp
+                    }
+                    is CurrentPageType.Page -> {
+                        R.drawable.ic_edit_black_24dp
+                    }
+                }
+            )
+
+        }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
     }
 }

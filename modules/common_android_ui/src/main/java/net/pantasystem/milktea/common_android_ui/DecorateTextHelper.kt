@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.common_android_ui
 
 import android.app.Activity
+import android.graphics.drawable.AnimatedImageDrawable
+import android.os.Build
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
@@ -14,9 +16,8 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.github.penfeizhou.animation.apng.APNGDrawable
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
-import jp.panta.misskeyandroidclient.mfm.Root
-import net.pantasystem.milktea.common_android.TextType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
@@ -32,7 +33,8 @@ object DecorateTextHelper {
         node ?: return
         this.movementMethod = LinkMovementMethod.getInstance()
         stopDrawableAnimations(this)
-        this.text = MFMDecorator.decorate(this, node)
+        val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
+        this.text = MFMDecorator.decorate(this, lazy)
     }
 
     fun stopDrawableAnimations(textView: TextView) {
@@ -43,11 +45,27 @@ object DecorateTextHelper {
                 when (val imageDrawable = it.imageDrawable) {
                     is GifDrawable -> {
                         imageDrawable.stop()
+                        imageDrawable.clearAnimationCallbacks()
                     }
                     is APNGDrawable -> {
                         imageDrawable.stop()
+                        imageDrawable.clearAnimationCallbacks()
+                    }
+                    else -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            if (imageDrawable is AnimatedImageDrawable) {
+                                imageDrawable.stop()
+                                imageDrawable.clearAnimationCallbacks()
+                            }
+                        }
                     }
                 }
+                it.imageDrawable?.callback = null
+                it.imageDrawable = null
+                it.adapter = null
+                // NOTE: 不要になった画像リソースを解放している
+                // NOTE: MFMDecoratorの仕様上現状はEmojiSpanを使いまわさないのでここでリソース破棄をしてしまっても問題ない。
+//                Glide.with(textView).clear(it.target)
             }
         }
     }
@@ -98,8 +116,7 @@ object DecorateTextHelper {
             }
             is TextType.Misskey -> {
                 this.movementMethod = LinkMovementMethod.getInstance()
-                val node = textType.root ?: return
-                this.text = MFMDecorator.decorate(this, node)
+                this.text = MFMDecorator.decorate(this, textType.lazyDecorateResult)
             }
         }
 
@@ -115,7 +132,8 @@ object DecorateTextHelper {
         val node = MFMParser.parse(sourceText, emojis, accountHost = account.getHost(), userHost = host)
             ?: return
         this.movementMethod = LinkMovementMethod.getInstance()
-        this.text = MFMDecorator.decorate(this, node)
+        val lazy = MFMDecorator.decorate(node, LazyDecorateSkipElementsHolder())
+        this.text = MFMDecorator.decorate(this, lazy)
     }
 }
 

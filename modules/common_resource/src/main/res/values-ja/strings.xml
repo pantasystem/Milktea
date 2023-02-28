@@ -422,5 +422,41 @@
     <string name="visibility_personal">自分限定</string>
     <string name="visibility_limited">サークル</string>
     <string name="visibility_mutual">相互フォロー</string>
+    <string name="calckey_recomended_timeline">一押し</string>
+    <string name="notification_favorited_by">%sさんにお気に入りにされました</string>
+    <string name="notification_posted_by">%sさんが投稿しました</string>
+    <string name="clip">クリップ</string>
+
+    <string name="server_error">サーバーエラー</string>
+    <string name="bot_error">サーバに人間であることを疑われています</string>
+    <string name="auth_error">認証エラー</string>
+    <string name="parameter_error">パラメーターエラー</string>
+    <string name="unauthorized_error">未認証エラー</string>
+    <string name="rate_limit_error">時間をおいてから再度お試してください(レートリミットエラー)</string>
+    <string name="not_found_error">404 見つからないエラー</string>
+    <string name="show_more_reactions">もっとリアクションを見る</string>
+    <string name="pick_file_from_device">端末からファイルを選択</string>
+    <string name="note_editor_file_max_size_validation_error_message">%d個を超えるファイルを添付できません</string>
+    <string name="auth_sign_up">登録する</string>
+    <string name="auth_join_milktea_title">Milkteaで\\nMisskeyをはじめよう</string>
+    <string name="auth_sign_in">連携する(ログイン)</string>
+    <string name="auth_sign_up_button">アカウントを作成する</string>
+    <string name="auth_find_instance">サーバを見つける</string>
+    <string name="auth_find_instance_next_button_text">次へ</string>
+    <string name="auth_find_instance_show_in_web_browser_message">ブラウザに登録画面が表示されます。</string>
+    <string name="settings_note">ノート</string>
+    <string name="settings_note_divider">ノートに横区切り線を表示する</string>
+    <string name="auth_qr_code_message">別のデバイスで認証する</string>
+
+    <string name="settings_show_bottom_menu">下部メニューを表示</string>
+    <string name="settings_app_restart_required">アプリの再起動が必要です</string>
+
+    <string name="note_editor_poll_choice_n">候補%d</string>
+    <string name="settings_visible_instance_domain_in_toolbar">ツールバーにインスタンスのドメインを表示する</string>
+    <string name="settings_hide_media_when_mobile_network">モバイル ネットワーク時にメディアを非表示にする</string>
+    <string name="notes_media_click_to_load_image">クリックして画像を読み込み</string>
+    <string name="notifications_follow_requests">フォローリクエスト</string>
+    <string name="content_not_exists_message">何もありません</string>
+
 
 </resources>

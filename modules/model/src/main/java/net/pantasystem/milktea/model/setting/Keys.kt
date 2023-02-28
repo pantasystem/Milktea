@@ -23,6 +23,12 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsEnableInstanceTicker,
         Keys.IsDriveUsingGridView,
         Keys.IsEnableNotificationSound,
+        Keys.IsStopStreamingApiWhenBackground,
+        Keys.IsStopNoteCaptureWhenBackground,
+        Keys.IsEnableStreamingAPIAndNoteCapture,
+        Keys.IsEnableNoteDivider,
+        Keys.IsVisibleInstanceUrlInToolbar,
+        Keys.IsHideMediaWhenMobileNetwork,
     )
 }
 
@@ -64,6 +70,18 @@ sealed interface Keys {
 
     object IsEnableNotificationSound : Keys
 
+    object IsStopStreamingApiWhenBackground : Keys
+
+    object IsStopNoteCaptureWhenBackground : Keys
+
+    object IsEnableStreamingAPIAndNoteCapture : Keys
+
+    object IsEnableNoteDivider: Keys
+
+    object IsVisibleInstanceUrlInToolbar : Keys
+
+    object IsHideMediaWhenMobileNetwork : Keys
+
     companion object
 }
 
@@ -90,5 +108,11 @@ fun Keys.str(): String {
         is Keys.IsEnableInstanceTicker -> "IsEnableInstanceTicker"
         is Keys.IsDriveUsingGridView -> "IsDriveUsingGridView"
         is Keys.IsEnableNotificationSound -> "IsEnableNotificationSound"
+        is Keys.IsStopNoteCaptureWhenBackground -> "IsStopNoteCaptureWhenBackground"
+        is Keys.IsStopStreamingApiWhenBackground -> "IsStopStreamingApiWhenBackground"
+        is Keys.IsEnableStreamingAPIAndNoteCapture -> "IsEnableStreamingAPIAndNoteCapture"
+        is Keys.IsEnableNoteDivider -> "IsEnableNoteDivider"
+        is Keys.IsVisibleInstanceUrlInToolbar -> "IsVisibleInstanceUrlInToolbar"
+        is Keys.IsHideMediaWhenMobileNetwork -> "IsHideMediaWhenMobileNetwork"
     }
 }

@@ -30,6 +30,7 @@ data class PageParams(
     var host: String? = null,
     val antennaId: String? = null,
     val channelId: String? = null,
+    val clipId: String? = null,
 ) : Serializable, Parcelable {
 
 
@@ -170,6 +171,22 @@ data class PageParams(
                 MASTODON_LIST_TIMELINE -> {
                     Pageable.Mastodon.ListTimeline(
                         listId = requireNotNull(listId),
+                    )
+                }
+                MASTODON_USER_TIMELINE -> {
+                    Pageable.Mastodon.UserTimeline(
+                        userId = requireNotNull(userId),
+                        isOnlyMedia = withFiles,
+                        excludeReblogs = includeMyRenotes?.not(),
+                        excludeReplies = includeReplies?.not()
+                    )
+                }
+                CALCKEY_RECOMMENDED_TIMELINE -> {
+                    Pageable.CalckeyRecommendedTimeline
+                }
+                CLIP_NOTES -> {
+                    Pageable.ClipNotes(
+                        clipId = requireNotNull(clipId)
                     )
                 }
             }

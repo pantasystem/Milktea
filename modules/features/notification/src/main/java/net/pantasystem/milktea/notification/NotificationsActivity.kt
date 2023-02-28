@@ -61,8 +61,9 @@ class NotificationsActivity : AppCompatActivity(), ToolbarSetter {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun setToolbar(toolbar: Toolbar) {
+    override fun setToolbar(toolbar: Toolbar, visibleTitle: Boolean) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(visibleTitle)
     }
 }

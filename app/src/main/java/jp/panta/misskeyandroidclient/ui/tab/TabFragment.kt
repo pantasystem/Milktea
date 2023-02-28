@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager.widget.PagerAdapter
@@ -20,17 +21,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.panta.misskeyandroidclient.R
 import jp.panta.misskeyandroidclient.databinding.FragmentTabBinding
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common.ui.ScrollableTop
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
+class TabFragment : Fragment(R.layout.fragment_tab) {
 
     companion object {
         private const val PAGES = "pages"
@@ -115,6 +117,19 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
                 }
             }
         }
+
+        mTabViewModel.visibleInstanceInfo.onEach {
+            when(it) {
+                CurrentAccountInstanceInfoUrl.Invisible -> {
+                    binding.currentInstanceHostView.visibility = View.GONE
+                }
+                is CurrentAccountInstanceInfoUrl.Visible -> {
+                    binding.currentInstanceHostView.visibility = View.VISIBLE
+                    binding.currentInstanceHostView.text = it.host
+                }
+            }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -133,76 +148,58 @@ class TabFragment : Fragment(R.layout.fragment_tab), ScrollableTop {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mPagerAdapter.onDestroy()
+    }
+}
 
-    class TimelinePagerAdapter(
-        fragmentManager: FragmentManager,
-        val pageableFragmentFactory: PageableFragmentFactory,
-        list: List<Page>,
-    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        private var requestBaseList: List<Page> = list
-        private var oldRequestBaseSetting = requestBaseList
+internal class TimelinePagerAdapter(
+    fragmentManager: FragmentManager,
+    private val pageableFragmentFactory: PageableFragmentFactory,
+    list: List<Page>,
+) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    private var requestBaseList: List<Page> = list
+    private var oldRequestBaseSetting = requestBaseList
 
+    private val mFragments = ArrayList<Fragment>()
 
-        val scrollableTopFragments = ArrayList<ScrollableTop>()
-        private val mFragments = ArrayList<Fragment>()
-
-        override fun getCount(): Int {
-            return requestBaseList.size
-        }
-
-        override fun getItem(position: Int): Fragment {
-            val item = requestBaseList[position]
-            val fragment = pageableFragmentFactory.create(item)
-
-            if (fragment is ScrollableTop) {
-                scrollableTopFragments.add(fragment)
-            }
-            mFragments.add(fragment)
-            return fragment
-        }
-
-
-        override fun getPageTitle(position: Int): String {
-            val page = requestBaseList[position]
-            return page.title
-        }
-
-        override fun getItemPosition(any: Any): Int {
-            val target = any as Fragment
-            if (mFragments.contains(target)) {
-                return PagerAdapter.POSITION_UNCHANGED
-            }
-            return PagerAdapter.POSITION_NONE
-        }
-
-
-        fun setList(list: List<Page>) {
-            mFragments.clear()
-            oldRequestBaseSetting = requestBaseList
-            requestBaseList = list
-            if (requestBaseList != oldRequestBaseSetting) {
-                notifyDataSetChanged()
-            }
-
-        }
-
-
+    override fun getCount(): Int {
+        return requestBaseList.size
     }
 
-    override fun showTop() {
-        showTopCurrentFragment()
-    }
-
-    private fun showTopCurrentFragment() {
-        try {
-            mPagerAdapter.scrollableTopFragments.forEach {
-                it.showTop()
-            }
-        } catch (_: UninitializedPropertyAccessException) {
-
-        }
-
+    override fun getItem(position: Int): Fragment {
+        val item = requestBaseList[position]
+        val fragment = pageableFragmentFactory.create(item)
+        mFragments.add(fragment)
+        return fragment
     }
 
 
+    override fun getPageTitle(position: Int): String {
+        val page = requestBaseList[position]
+        return page.title
+    }
+
+
+    override fun getItemPosition(any: Any): Int {
+        val target = any as Fragment
+        if (mFragments.contains(target)) {
+            return PagerAdapter.POSITION_UNCHANGED
+        }
+        return PagerAdapter.POSITION_NONE
+    }
+
+    fun setList(list: List<Page>) {
+        mFragments.clear()
+        oldRequestBaseSetting = requestBaseList
+        requestBaseList = list
+        if (requestBaseList != oldRequestBaseSetting) {
+            notifyDataSetChanged()
+        }
+    }
+
+    fun onDestroy() {
+        mFragments.clear()
+    }
 }

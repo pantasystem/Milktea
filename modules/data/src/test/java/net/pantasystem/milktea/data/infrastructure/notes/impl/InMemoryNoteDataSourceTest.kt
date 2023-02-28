@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.runBlocking
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
@@ -10,7 +11,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun get_ThrowsNoteDeletedExceptionGiveDeletedNote(): Unit = runBlocking {
-        val noteDataSource = InMemoryNoteDataSource()
+        val noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
         val id = Note.Id(0L, "testId")
         noteDataSource.delete(id)
         val result = noteDataSource.get(id)
@@ -22,7 +23,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun get_ThrowsNoteRemovedExceptionGiveRemovedNote(): Unit = runBlocking {
-        val noteDataSource = InMemoryNoteDataSource()
+        val noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
         val id = Note.Id(0L, "testId")
         noteDataSource.remove(id)
         val result = noteDataSource.get(id)
@@ -34,7 +35,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun get_ThrowsNoteNotFoundExceptionGiveNotExistsNote(): Unit = runBlocking {
-        val noteDataSource = InMemoryNoteDataSource()
+        val noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
         val id = Note.Id(0L, "testId")
         val result = noteDataSource.get(id)
         Assertions.assertThrows(NoteNotFoundException::class.java) {
@@ -44,7 +45,7 @@ class InMemoryNoteDataSourceTest {
 
     @Test
     fun get_ReturnsNoteGiveExistsNote(): Unit = runBlocking {
-        val noteDataSource = InMemoryNoteDataSource()
+        val noteDataSource = InMemoryNoteDataSource(MemoryCacheCleaner())
         val id = Note.Id(0L, "testId")
         val testNote = Note.make(id, User.Id(0L, "testUserId"))
         noteDataSource.add(testNote)

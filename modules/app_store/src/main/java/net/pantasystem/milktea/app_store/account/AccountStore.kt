@@ -61,6 +61,7 @@ class AccountStore @Inject constructor(
             saveDefaultPages(newAccount)
             val updatedAccount = accountRepository.get(newAccount.accountId).getOrThrow()
             setCurrent(updatedAccount)
+            initialize()
         } catch (e: Exception) {
             logger.error("アカウントの追加に失敗しました。", e)
         }
@@ -119,7 +120,7 @@ class AccountStore @Inject constructor(
                 return
             }
 
-            logger.debug("accountId:${current.accountId}, account:$current")
+            logger.debug { "accountId:${current.accountId}, account:$current" }
             if (current.pages.isEmpty()) {
                 saveDefaultPages(current)
                 accounts = accountRepository.findAll().getOrThrow()

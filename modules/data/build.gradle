@@ -91,7 +91,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+    implementation libs.kotlin.serialization
 
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
@@ -103,7 +103,7 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
-    implementation platform('com.google.firebase:firebase-bom:30.5.0')
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
     implementation 'com.google.firebase:firebase-messaging'
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
 

@@ -6,19 +6,16 @@ import android.view.MenuItem
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -30,14 +27,13 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyTheme
-import net.pantasystem.milktea.common_compose.SwitchTile
 import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.setting.R
-import net.pantasystem.milktea.setting.SettingTitleTile
+import net.pantasystem.milktea.setting.SettingSection
+import net.pantasystem.milktea.setting.compose.SettingSwitchTile
 import javax.inject.Inject
-
 
 
 @AndroidEntryPoint
@@ -93,24 +89,23 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }
                             },
                             title = {
-                                Text(stringResource(id = R.string.app_name))
+                                Text(stringResource(id = R.string.movement))
                             }
                         )
                     },
                 ) { padding ->
-                    LazyColumn(
+
+                    Column(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
                             .padding(padding)
+                            .verticalScroll(
+                                rememberScrollState()
+                            )
                     ) {
 
-                        item {
-                            SettingTitleTile(text = stringResource(id = R.string.timeline))
-
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                        SettingSection(title = stringResource(id = R.string.timeline)) {
+                            SettingSwitchTile(
                                 checked = currentConfigState.isIncludeLocalRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -119,10 +114,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 Text(text = stringResource(id = R.string.include_local_renotes))
                             }
 
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                            SettingSwitchTile(
                                 checked = currentConfigState.isIncludeRenotedMyNotes,
                                 onChanged = {
                                     currentConfigState =
@@ -131,10 +123,7 @@ class SettingMovementActivity : AppCompatActivity() {
                                 Text(text = stringResource(id = R.string.include_renoted_my_notes))
                             }
 
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
+                            SettingSwitchTile(
                                 checked = currentConfigState.isIncludeMyRenotes,
                                 onChanged = {
                                     currentConfigState =
@@ -142,37 +131,13 @@ class SettingMovementActivity : AppCompatActivity() {
                                 }) {
                                 Text(text = stringResource(id = R.string.include_my_renotes))
                             }
-                            SettingTitleTile(text = stringResource(id = R.string.auto_note_folding))
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                            ) {
-                                Text(text = stringResource(id = R.string.height_limit))
-                                TextField(
-                                    placeholder = { Text(text = stringResource(id = R.string.height_limit)) },
-                                    value = currentConfigState.noteExpandedHeightSize.toString(),
-                                    keyboardOptions = KeyboardOptions
-                                        .Default.copy(keyboardType = KeyboardType.Number),
-                                    onValueChange = {
-                                        currentConfigState = currentConfigState.copy(
-                                            noteExpandedHeightSize = it.toIntOrNull()
-                                                ?: DefaultConfig.config.noteExpandedHeightSize
-                                        )
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
                         }
 
+
+
                         if (currentAccount != null) {
-                            item {
-                                SettingTitleTile(text = stringResource(id = R.string.learn_note_visibility))
-                                SwitchTile(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
+                            SettingSection(title = stringResource(id = R.string.learn_note_visibility)) {
+                                SettingSwitchTile(
                                     checked = rv is RememberVisibility.Remember,
                                     onChanged = {
                                         val config = if (it) {
@@ -190,21 +155,64 @@ class SettingMovementActivity : AppCompatActivity() {
                                     )
                                 }
                             }
+
                         }
 
-                        item {
-                            SettingTitleTile(text = stringResource(id = R.string.notification_sound))
-                            SwitchTile(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                checked = currentConfigState.isEnableNotificationSound, onChanged = {
-                                    currentConfigState = currentConfigState.copy(isEnableNotificationSound = it)
+
+                        SettingSection(title = stringResource(id = R.string.notification_sound)) {
+                            SettingSwitchTile(
+                                checked = currentConfigState.isEnableNotificationSound,
+                                onChanged = {
+                                    currentConfigState =
+                                        currentConfigState.copy(isEnableNotificationSound = it)
                                 }) {
                                 Text(stringResource(id = R.string.inapp_notification_sound))
                             }
+
+                        }
+
+                        SettingSection(title = stringResource(id = R.string.streaming)) {
+                            SettingSwitchTile(
+                                checked = currentConfigState.isEnableStreamingAPIAndNoteCapture,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(
+                                        isEnableStreamingAPIAndNoteCapture = it
+                                    )
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.enable_automic_updates))
+                            }
+                            if (currentConfigState.isEnableStreamingAPIAndNoteCapture) {
+                                SettingSwitchTile(
+                                    checked = currentConfigState.isStopStreamingApiWhenBackground,
+                                    onChanged = {
+                                        currentConfigState =
+                                            currentConfigState.copy(isStopStreamingApiWhenBackground = it)
+                                    }) {
+                                    Text(stringResource(id = R.string.is_stop_timeline_streaming_when_background))
+                                }
+                                SettingSwitchTile(
+                                    checked = currentConfigState.isStopNoteCaptureWhenBackground,
+                                    onChanged = {
+                                        currentConfigState =
+                                            currentConfigState.copy(isStopNoteCaptureWhenBackground = it)
+                                    }) {
+                                    Text(stringResource(id = R.string.is_stop_note_capture_when_background))
+                                }
+                            }
+                        }
+                        SettingSection(title = stringResource(id = R.string.media)) {
+                            SettingSwitchTile(
+                                checked = currentConfigState.isHideMediaWhenMobileNetwork,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(isHideMediaWhenMobileNetwork = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.settings_hide_media_when_mobile_network))
+                            }
                         }
                     }
+
                 }
             }
         }

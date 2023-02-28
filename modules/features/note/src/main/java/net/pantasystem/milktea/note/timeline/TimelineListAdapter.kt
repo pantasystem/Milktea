@@ -13,15 +13,16 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
-import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineEmptyBinding
 import net.pantasystem.milktea.note.databinding.ItemTimelineErrorBinding
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.reaction.ReactionViewData
 import net.pantasystem.milktea.note.timeline.viewmodel.TimelineListItem
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
@@ -57,6 +58,12 @@ class TimelineListAdapter(
 
     val cardActionListener = NoteCardActionListenerAdapter(onAction)
 
+    private val reactionCounterRecyclerViewPool = RecyclerView.RecycledViewPool().apply {
+        setMaxRecycledViews(0, 30)
+    }
+    private val urlPreviewListRecyclerViewPool = RecyclerView.RecycledViewPool()
+    private val manyFilePreviewListViewRecyclerViewPool = RecyclerView.RecycledViewPool()
+
     sealed class TimelineListItemViewHolderBase(view: View) : RecyclerView.ViewHolder(view)
 
     sealed class NoteViewHolderBase<out T: ViewDataBinding>(view: View) : TimelineListItemViewHolderBase(view){
@@ -71,15 +78,16 @@ class TimelineListAdapter(
             val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
             flexBoxLayoutManager.alignItems = AlignItems.STRETCH
             reactionCountsView.layoutManager = flexBoxLayoutManager
+            flexBoxLayoutManager.recycleChildrenOnDetach = true
             flexBoxLayoutManager
         }
 
         @Suppress("ObjectLiteralToLambda")
-        private val reactionCountsObserver = object : Observer<List<ReactionCount>> {
-            override fun onChanged(counts: List<ReactionCount>?) {
-
+        private val reactionCountsObserver = object : Observer<List<ReactionViewData>> {
+            override fun onChanged(counts: List<ReactionViewData>?) {
                 if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
-                    bindReactionCountVisibility()
+
+                    bindReactionCountVisibility(counts)
 
                     reactionCountAdapter?.submitList(counts) {
                         reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
@@ -109,38 +117,32 @@ class TimelineListAdapter(
         }
 
         private fun unbind() {
-            mCurrentNote?.reactionCounts?.removeObserver(reactionCountsObserver)
+            mCurrentNote?.reactionCountsViewData?.removeObserver(reactionCountsObserver)
             mCurrentNote = null
         }
 
         private fun bindReactionCounter() {
             val note = mCurrentNote!!
-            val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-            reactionCountAdapter = if(reactionCountAdapter != null && reactionCountAdapter?.note?.id == note.id){
-                reactionCountAdapter!!
-            }else{
-                ReactionCountAdapter(lifecycleOwner) {
-                    noteCardActionListenerAdapter.onReactionCountAction(it)
-                }
+            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
+            reactionCountAdapter = ReactionCountAdapter(lifecycleOwner) {
+                noteCardActionListenerAdapter.onReactionCountAction(it)
             }
             reactionCountAdapter?.note = note
+            reactionCountsView.layoutManager = flexBoxLayoutManager
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.isNestedScrollingEnabled = false
             reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
             reactionCountAdapter?.submitList(reactionList) {
                 reactionCountsView.itemAnimator = DefaultItemAnimator()
             }
-            note.reactionCounts.observe(lifecycleOwner, reactionCountsObserver)
-            reactionCountsView.layoutManager = flexBoxLayoutManager
+            note.reactionCountsViewData.observe(lifecycleOwner, reactionCountsObserver)
         }
         
-        private fun bindReactionCountVisibility() {
-            val note = mCurrentNote!!
-            val reactionList = note.reactionCounts.value?.toList()?: emptyList()
-            reactionCountsView.visibility = if(reactionList.isNotEmpty()){
-                View.VISIBLE
-            }else{
+        private fun bindReactionCountVisibility(reactionCounts: List<ReactionViewData>?) {
+            reactionCountsView.visibility = if(reactionCounts.isNullOrEmpty()){
                 View.GONE
+            }else{
+                View.VISIBLE
             }
         }
     }
@@ -261,10 +263,16 @@ class TimelineListAdapter(
         return when(ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
+                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
+                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteViewHolder(binding)
             }
             ViewHolderType.HasReplyToNote -> {
                 val binding = DataBindingUtil.inflate<ItemHasReplyToNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_has_reply_to_note, p0, false)
+                binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
+                binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
+                binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 HasReplyToNoteViewHolder(binding)
             }
             ViewHolderType.Loading -> {
@@ -282,7 +290,37 @@ class TimelineListAdapter(
     }
 
 
+    override fun onViewRecycled(holder: TimelineListItemViewHolderBase) {
+        super.onViewRecycled(holder)
+        val simpleNote = when(holder) {
+            is EmptyViewHolder -> return
+            is ErrorViewHolder -> return
+            is LoadingViewHolder -> return
+            is HasReplyToNoteViewHolder -> {
+                holder.binding.simpleNote
+            }
+            is NoteViewHolder -> {
+                holder.binding.simpleNote
+            }
+        }
+        val imageViews = listOf(
+            simpleNote.avatarIcon,
+            simpleNote.mediaPreview.thumbnailTopLeft,
+            simpleNote.mediaPreview.thumbnailTopRight,
+            simpleNote.mediaPreview.thumbnailBottomLeft,
+            simpleNote.mediaPreview.thumbnailBottomRight,
+            simpleNote.subAvatarIcon,
+            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
+            simpleNote.subNoteMediaPreview.thumbnailBottomLeft,
+            simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
+        )
+
+        imageViews.map {
+            Glide.with(simpleNote.avatarIcon).clear(it)
+        }
+    }
 
 
 }

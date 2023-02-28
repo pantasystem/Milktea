@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -15,6 +16,7 @@ import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import java.util.*
 import javax.inject.Inject
 
@@ -34,6 +36,8 @@ class AppAuthViewModel @Inject constructor(
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
     private val instanceInfoRepository: InstanceInfoRepository,
+    private val syncMetaExecutor: SyncMetaExecutor,
+    private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -65,23 +69,54 @@ class AppAuthViewModel @Inject constructor(
     private val instances = instanceInfoRepository.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    @OptIn(FlowPreview::class)
+    private val misskeyInstances = suspend {
+        runCancellableCatching {
+            withContext(Dispatchers.IO) {
+                requireNotNull(
+                    instancesInfoAPIBuilder.build().getInstances()
+                        .throwIfHasError()
+                        .body()
+                )
+            }
+        }
+    }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     private val isPrivacyPolicyAgreement = MutableStateFlow(false)
     private val isTermsOfServiceAgreement = MutableStateFlow(false)
+
+    private val isAcceptMastodonAlphaTest = MutableStateFlow(false)
+
+    private val checkBoxes = combine(
+        isPrivacyPolicyAgreement,
+        isTermsOfServiceAgreement,
+        isAcceptMastodonAlphaTest,
+    ) { privacyPolicy, termsOfService, isAcceptMastodonAlphaTest ->
+        CheckBoxes(
+            isPrivacyPolicyAgreement = privacyPolicy,
+            isTermsOfServiceAgreement = termsOfService,
+            isAcceptMastodonAlphaTest = isAcceptMastodonAlphaTest
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        CheckBoxes()
+    )
 
     private val authUserInputState = combine(
         instanceDomain,
         appName,
         password,
-        isPrivacyPolicyAgreement,
-        isTermsOfServiceAgreement
-    ) { domain, name, password, privacyPolicy, termsOfService ->
+        checkBoxes,
+    ) { domain, name, password, checkBoxes ->
         AuthUserInputState(
             instanceDomain = authService.toEnableUrl(domain),
             appName = name,
             rawInputInstanceDomain = domain,
             password = password,
-            isPrivacyPolicyAgreement = privacyPolicy,
-            isTermsOfServiceAgreement = termsOfService,
+            isPrivacyPolicyAgreement = checkBoxes.isPrivacyPolicyAgreement,
+            isTermsOfServiceAgreement = checkBoxes.isTermsOfServiceAgreement,
+            isAcceptMastodonAlphaTest = checkBoxes.isAcceptMastodonAlphaTest,
         )
     }.stateIn(
         viewModelScope,
@@ -92,7 +127,8 @@ class AppAuthViewModel @Inject constructor(
             "Milktea",
             "",
             isTermsOfServiceAgreement = false,
-            isPrivacyPolicyAgreement = false
+            isPrivacyPolicyAgreement = false,
+            isAcceptMastodonAlphaTest = false,
         )
     )
 
@@ -128,7 +164,7 @@ class AppAuthViewModel @Inject constructor(
                         is InstanceType.Mastodon -> "https://${info.instance.uri}"
                         is InstanceType.Misskey -> info.instance.uri
                     }
-                    logger.debug("instanceBaseUrl: $instanceBase")
+                    logger.debug { "instanceBaseUrl: $instanceBase" }
                     authService.createWaiting4Approval(
                         instanceBase,
                         authService.createApp(
@@ -166,6 +202,8 @@ class AppAuthViewModel @Inject constructor(
             authService.createAccount(it)
         }.onFailure {
             logger.error("アカウント登録処理失敗", it)
+        }.onSuccess {
+            syncMetaExecutor(it.account.normalizedInstanceDomain)
         }.getOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
@@ -182,7 +220,8 @@ class AppAuthViewModel @Inject constructor(
         instanceInfo,
         combineStates,
         instances,
-    ) { formState, (waiting4Approve, approved, finished, result), instances ->
+        misskeyInstances,
+    ) { formState, (waiting4Approve, approved, finished, result), instances, misskeyInstances ->
         AuthUiState(
             formState = formState.inputState,
             metaState = formState.meta,
@@ -195,7 +234,8 @@ class AppAuthViewModel @Inject constructor(
             },
             waiting4ApproveState = waiting4Approve,
             clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
-            instances = instances
+            instances = instances,
+            misskeyInstanceInfosResponse = misskeyInstances?.getOrNull()
         )
     }.stateIn(
         viewModelScope,
@@ -203,7 +243,8 @@ class AppAuthViewModel @Inject constructor(
         AuthUiState(
             formState = authUserInputState.value,
             metaState = metaState.value,
-            stateType = Authorization.BeforeAuthentication
+            stateType = Authorization.BeforeAuthentication,
+            misskeyInstanceInfosResponse = null,
         )
     )
 
@@ -308,6 +349,10 @@ class AppAuthViewModel @Inject constructor(
         isPrivacyPolicyAgreement.value = value
     }
 
+    fun onToggleAcceptMastodonAlphaTest(value: Boolean) {
+        isAcceptMastodonAlphaTest.value = value
+    }
+
 
 }
 
@@ -316,4 +361,10 @@ private data class CombineStates(
     val approved: Authorization.Approved? = null,
     val finished: Authorization.Finish? = null,
     val generateTokenResult: GenerateTokenResult = GenerateTokenResult.Fixed
+)
+
+private data class CheckBoxes(
+    val isPrivacyPolicyAgreement: Boolean = false,
+    val isTermsOfServiceAgreement: Boolean = false,
+    val isAcceptMastodonAlphaTest: Boolean = false,
 )

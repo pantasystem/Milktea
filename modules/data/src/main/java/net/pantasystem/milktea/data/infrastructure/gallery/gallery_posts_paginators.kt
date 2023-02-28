@@ -12,14 +12,12 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toEntity
+import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.gallery.GalleryDataSource
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.instance.IllegalVersionException
-import net.pantasystem.milktea.model.user.UserDataSource
 import retrofit2.Response
 import net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost as GalleryPostDTO
 
@@ -27,13 +25,18 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.GalleryPost as GalleryPostDT
 interface GetGalleryPostsStateFlow {
     fun getFlow(): Flow<PageableState<List<GalleryPost.Id>>>
 }
+
 /**
  * EntityはDataSourceが保持しているので、ここではタイムラインの順番を保持する
  */
-class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, GetGalleryPostsStateFlow {
+class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>,
+    GetGalleryPostsStateFlow {
 
-    private val _state = MutableStateFlow<PageableState<List<GalleryPost.Id>>>(PageableState.Fixed(
-        StateContent.NotExist()))
+    private val _state = MutableStateFlow<PageableState<List<GalleryPost.Id>>>(
+        PageableState.Fixed(
+            StateContent.NotExist()
+        )
+    )
     override val state: Flow<PageableState<List<GalleryPost.Id>>> = _state
 
     override fun getFlow(): Flow<PageableState<List<GalleryPost.Id>>> {
@@ -41,8 +44,9 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, Get
     }
 
     private fun getList(): List<GalleryPost.Id> {
-        return (_state.value.content as? StateContent.Exist)?.rawContent?: emptyList()
+        return (_state.value.content as? StateContent.Exist)?.rawContent ?: emptyList()
     }
+
     override suspend fun getSinceId(): String? {
         return getList().firstOrNull()?.galleryId
     }
@@ -63,29 +67,30 @@ class GalleryPostsState : PaginationState<GalleryPost.Id>, IdGetter<String>, Get
 }
 
 class GalleryPostsConverter(
-    private val getAccount: suspend ()-> Account,
-    private val filePropertyDataSource: FilePropertyDataSource,
-    private val userDataSource: UserDataSource,
-    private val galleryDataSource: GalleryDataSource
+    private val getAccount: suspend () -> Account,
+    private val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
+    private val galleryDataSource: GalleryDataSource,
 ) : EntityConverter<GalleryPostDTO, GalleryPost.Id> {
 
     override suspend fun convertAll(list: List<GalleryPostDTO>): List<GalleryPost.Id> {
-        return list.map {
-            it.toEntity(getAccount.invoke(), filePropertyDataSource, userDataSource).also { post ->
-                galleryDataSource.add(post)
-            }.id
+        val posts = list.map {
+            galleryPostDTOEntityConverter.convert(it, getAccount.invoke())
+        }
+        galleryDataSource.addAll(posts)
+        return posts.map {
+            it.id
         }
     }
 }
 
-class GalleryPostsLoader (
+class GalleryPostsLoader(
     private val pageable: Pageable.Gallery,
     private val idGetter: IdGetter<String>,
     private val apiProvider: MisskeyAPIProvider,
     private val getAccount: suspend () -> Account,
 ) : FutureLoader<GalleryPostDTO>, PreviousLoader<GalleryPostDTO> {
-    init{
-        if(pageable is Pageable.Gallery.ILikedPosts){
+    init {
+        if (pageable is Pageable.Gallery.ILikedPosts) {
             throw IllegalArgumentException("${pageable::class.simpleName}は対応していません。")
         }
     }
@@ -103,20 +108,23 @@ class GalleryPostsLoader (
     }
 
 
-    suspend fun api(sinceId: String? = null, untilId: String? = null) : suspend ()-> Response<List<GalleryPostDTO>>{
+    suspend fun api(
+        sinceId: String? = null,
+        untilId: String? = null
+    ): suspend () -> Response<List<GalleryPostDTO>> {
         val i = getAccount.invoke().token
         val api = apiProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
             ?: throw IllegalVersionException()
-        when(pageable) {
+        when (pageable) {
             is Pageable.Gallery.MyPosts -> {
                 return {
                     api.myGalleryPosts(
                         GetPosts(
-                        i,
-                        sinceId = sinceId,
-                        untilId = untilId,
-                        limit = 20,
-                    )
+                            i,
+                            sinceId = sinceId,
+                            untilId = untilId,
+                            limit = 20,
+                        )
                     )
                 }
             }
@@ -125,7 +133,15 @@ class GalleryPostsLoader (
             }
             is Pageable.Gallery.User -> {
                 return {
-                    api.userPosts(GetPosts(i, sinceId = sinceId, untilId = untilId, limit = 20, userId = pageable.userId))
+                    api.userPosts(
+                        GetPosts(
+                            i,
+                            sinceId = sinceId,
+                            untilId = untilId,
+                            limit = 20,
+                            userId = pageable.userId
+                        )
+                    )
                 }
             }
             is Pageable.Gallery.Posts -> {

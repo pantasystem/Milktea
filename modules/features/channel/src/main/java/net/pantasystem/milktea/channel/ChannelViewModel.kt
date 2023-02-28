@@ -3,13 +3,10 @@ package net.pantasystem.milktea.channel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
@@ -29,7 +26,7 @@ class ChannelViewModel @Inject constructor(
     val accountStore: AccountStore,
     private val channelRepository: ChannelRepository,
     private val accountRepository: AccountRepository,
-    channelPagingModelFactory: ChannelPagingModel.ModelAssistedFactory,
+    channelPagingModelFactory: ChannelPagingModel.Factory,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
@@ -37,22 +34,46 @@ class ChannelViewModel @Inject constructor(
         loggerFactory.create("ChannelViewModel")
     }
 
-    private val channelPagingModelHolder = ChannelPagingModelHolder(channelPagingModelFactory)
 
-
-    @OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    fun getObservable(key: PagingModelKey): Flow<PageableState<List<Channel>>> {
-        return suspend {
-            channelPagingModelHolder.get(key)
-        }.asFlow().flatMapLatest {
-            it.observeChannels()
+    private val featuredChannelPagingModel =
+        channelPagingModelFactory.create(ChannelListType.FEATURED) {
+            accountRepository.getCurrentAccount().getOrThrow()
         }
+
+    private val followedChannelPagingModel =
+        channelPagingModelFactory.create(ChannelListType.FOLLOWED) {
+            accountRepository.getCurrentAccount().getOrThrow()
+        }
+
+    private val ownedChannelPagingModel = channelPagingModelFactory.create(ChannelListType.OWNED) {
+        accountRepository.getCurrentAccount().getOrThrow()
     }
 
+    val uiState = combine(
+        featuredChannelPagingModel.observeChannels(),
+        followedChannelPagingModel.observeChannels(),
+        ownedChannelPagingModel.observeChannels()
+    ) { featured, followed, owned ->
+        ChannelListUiState(
+            featuredChannels = featured,
+            followedChannels = followed,
+            ownedChannels = owned,
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ChannelListUiState()
+    )
 
-    fun clearAndLoad(key: PagingModelKey) {
+
+
+    fun clearAndLoad(type: ChannelListType) {
         viewModelScope.launch {
-            val model = channelPagingModelHolder.get(key)
+            val model = when(type) {
+                ChannelListType.OWNED -> ownedChannelPagingModel
+                ChannelListType.FOLLOWED -> followedChannelPagingModel
+                ChannelListType.FEATURED -> featuredChannelPagingModel
+            }
             model.clear()
             PreviousPagingController(
                 model,
@@ -104,24 +125,17 @@ class ChannelViewModel @Inject constructor(
     }
 }
 
-data class PagingModelKey(val accountId: Long, val type: ChannelListType)
-
-class ChannelPagingModelHolder(
-    private val channelPagingModelFactory: ChannelPagingModel.ModelAssistedFactory,
+data class ChannelListUiState(
+    val featuredChannels: PageableState<List<Channel>> = PageableState.Loading.Init(),
+    val followedChannels: PageableState<List<Channel>> = PageableState.Loading.Init(),
+    val ownedChannels: PageableState<List<Channel>> = PageableState.Loading.Init(),
 ) {
-
-    private val lock = Mutex()
-    private var modelMap = mapOf<PagingModelKey, ChannelPagingModel>()
-    suspend fun get(key: PagingModelKey): ChannelPagingModel {
-        lock.withLock {
-            var model = modelMap[key]
-            if (model == null) {
-                model = channelPagingModelFactory.create(key.accountId, key.type)
-                modelMap = modelMap.toMutableMap().also {
-                    it[key] = model
-                }
-            }
-            return model
+    fun getByType(type: ChannelListType): PageableState<List<Channel>> {
+        return when(type) {
+            ChannelListType.OWNED -> ownedChannels
+            ChannelListType.FOLLOWED -> followedChannels
+            ChannelListType.FEATURED -> featuredChannels
         }
     }
 }
+

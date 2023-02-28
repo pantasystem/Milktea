@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.notes.reaction.RequestReactionHistoryDTO
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistory
 import net.pantasystem.milktea.model.notes.reaction.ReactionHistoryDataSource
@@ -22,14 +22,16 @@ class ReactionHistoryPaginatorImpl(
     private val reactionHistoryDataSource: ReactionHistoryDataSource,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val accountRepository: AccountRepository,
-    private val userDataSource: UserDataSource
+    private val userDataSource: UserDataSource,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
 ) : ReactionHistoryPaginator {
 
     class Factory @Inject constructor(
         private val reactionHistoryDataSource: ReactionHistoryDataSource,
         private val misskeyAPIProvider: MisskeyAPIProvider,
         private val accountRepository: AccountRepository,
-        private val userDataSource: UserDataSource
+        private val userDataSource: UserDataSource,
+        private val userDTOEntityConverter: UserDTOEntityConverter,
     ) : ReactionHistoryPaginator.Factory {
         override fun create(reactionHistoryRequest: ReactionHistoryRequest) : ReactionHistoryPaginator {
             return ReactionHistoryPaginatorImpl(
@@ -37,7 +39,8 @@ class ReactionHistoryPaginatorImpl(
                 reactionHistoryDataSource,
                 misskeyAPIProvider,
                 accountRepository,
-                userDataSource
+                userDataSource,
+                userDTOEntityConverter,
             )
         }
     }
@@ -68,7 +71,7 @@ class ReactionHistoryPaginatorImpl(
                     offset += res.size
                 }
                 val reactionHistories = res.map {
-                    val user = it.user.toUser(account)
+                    val user = userDTOEntityConverter.convert(account, it.user)
                     userDataSource.add(user)
                     ReactionHistory(
                         ReactionHistory.Id(it.id, account.accountId),

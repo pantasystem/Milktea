@@ -25,7 +25,7 @@ import net.pantasystem.milktea.model.notes.Note
 import retrofit2.Response
 
 
-class TimelinePagingStoreImpl(
+internal class TimelinePagingStoreImpl(
     private val pageableTimeline: Pageable,
     private val noteAdder: NoteDataSourceAdder,
     private val getAccount: suspend () -> Account,
@@ -127,6 +127,8 @@ class TimelinePagingStoreImpl(
                 is Pageable.SearchByTag -> api::searchByTag
                 is Pageable.Featured -> api::featured
                 is Pageable.Mention -> api::mentions
+                is Pageable.CalckeyRecommendedTimeline -> api::getCalckeyRecommendedTimeline
+                is Pageable.ClipNotes -> api::getClipNotes
                 is Pageable.Antenna -> {
                     if (api is MisskeyAPIV12) {
                         (api)::antennasNotes

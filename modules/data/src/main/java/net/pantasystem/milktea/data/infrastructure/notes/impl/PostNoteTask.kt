@@ -8,8 +8,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploader
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.notes.*
@@ -26,7 +26,7 @@ class PostNoteTask(
 
 
     private val logger = loggerFactory.create("PostNoteTask")
-    private var filesIds: List<String>? = null
+    private var filesIds: List<FileProperty.Id>? = null
 
 
     
@@ -52,7 +52,7 @@ class PostNoteTask(
                 replyId = createNote.replyId?.noteId,
                 renoteId = createNote.renoteId?.noteId,
                 poll = createNote.poll,
-                fileIds = filesIds,
+                fileIds = filesIds?.map { it.fileId },
                 channelId = createNote.channelId?.channelId,
                 )
         }else{
@@ -71,18 +71,16 @@ class PostNoteTask(
                         when(it) {
                             is AppFile.Remote -> {
                                 if (account.accountId == it.id.accountId) {
-                                    it.id.fileId
+                                    it.id
                                 } else {
                                     val result = fileUploader.upload(UploadSource.OtherAccountFile(
                                         filePropertyDataSource.find(it.id).getOrThrow()
                                     ), true)
-                                    filePropertyDataSource.add(result.toFileProperty(account))
                                     result.id
                                 }
                             }
                             is AppFile.Local -> {
                                 val result = fileUploader.upload(UploadSource.LocalFile(it), true)
-                                filePropertyDataSource.add(result.toFileProperty(account))
                                 result.id
                             }
                         }

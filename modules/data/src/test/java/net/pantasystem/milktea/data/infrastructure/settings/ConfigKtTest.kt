@@ -115,6 +115,30 @@ class ConfigKtTest {
                     config.isEnableNotificationSound,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.IsStopNoteCaptureWhenBackground -> Assertions.assertEquals(
+                    config.isStopNoteCaptureWhenBackground,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsStopStreamingApiWhenBackground -> Assertions.assertEquals(
+                    config.isStopStreamingApiWhenBackground,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsEnableStreamingAPIAndNoteCapture -> Assertions.assertEquals(
+                    config.isEnableStreamingAPIAndNoteCapture,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsEnableNoteDivider -> Assertions.assertEquals(
+                    config.isEnableNoteDivider,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsVisibleInstanceUrlInToolbar -> Assertions.assertEquals(
+                    config.isVisibleInstanceUrlInToolbar,
+                    (u as PrefType.BoolPref).value
+                )
+                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
+                    config.isHideMediaWhenMobileNetwork,
+                    (u as PrefType.BoolPref).value
+                )
             }
         }
     }

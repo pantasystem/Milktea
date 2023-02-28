@@ -17,7 +17,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_navigation.*
 import net.pantasystem.milktea.common_navigation.SearchAndSelectUserNavigation.Companion.EXTRA_SELECTED_USER_CHANGED_DIFF
 import net.pantasystem.milktea.model.account.page.PageType
-import net.pantasystem.milktea.setting.EditTabNameDialog
+import net.pantasystem.milktea.setting.EditTabSettingDialog
 import net.pantasystem.milktea.setting.PageSettingActionDialog
 import net.pantasystem.milktea.setting.compose.tab.TabItemsListScreen
 import net.pantasystem.milktea.setting.compose.tab.rememberDragDropListState
@@ -48,6 +48,9 @@ class PageSettingActivity : AppCompatActivity() {
     @Inject
     lateinit var userListNavigation: UserListNavigation
 
+    @Inject
+    lateinit var clipListNavigation: ClipListNavigation
+
     private val mPageSettingViewModel: PageSettingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,12 +62,12 @@ class PageSettingActivity : AppCompatActivity() {
         }
 
         mPageSettingViewModel.pageOnUpdateEvent.observe(this) {
-            EditTabNameDialog().show(supportFragmentManager, "ETD")
+            EditTabSettingDialog().show(supportFragmentManager, "ETD")
         }
 //
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
             when (pt) {
-                PageType.SEARCH, PageType.SEARCH_HASH -> startActivity(
+                PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_HASHTAG_TIMELINE -> startActivity(
                     searchNavigation.newIntent(SearchNavType.SearchScreen())
                 )
                 PageType.USER -> {
@@ -76,9 +79,16 @@ class PageSettingActivity : AppCompatActivity() {
                         )
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
-                PageType.USER_LIST -> startActivity(userListNavigation.newIntent(UserListArgs()))
+                PageType.USER_LIST, PageType.MASTODON_LIST_TIMELINE -> startActivity(
+                    userListNavigation.newIntent(UserListArgs())
+                )
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
+                PageType.CLIP_NOTES -> startActivity(
+                    clipListNavigation.newIntent(
+                        ClipListNavigationArgs(mode = ClipListNavigationArgs.Mode.AddToTab)
+                    )
+                )
                 PageType.USERS_GALLERY_POSTS -> {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(
@@ -104,13 +114,14 @@ class PageSettingActivity : AppCompatActivity() {
                 val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
                 val list by mPageSettingViewModel.selectedPages.collectAsState()
                 val scope = rememberCoroutineScope()
-                val dragAndDropState = rememberDragDropListState(scope = scope, onMove = { from, to ->
-                    val tmp = list[to]
-                    val mutable = list.toMutableList()
-                    mutable[to] = mutable[from]
-                    mutable[from] = tmp
-                    mPageSettingViewModel.setList(mutable)
-                })
+                val dragAndDropState =
+                    rememberDragDropListState(scope = scope, onMove = { from, to ->
+                        val tmp = list[to]
+                        val mutable = list.toMutableList()
+                        mutable[to] = mutable[from]
+                        mutable[from] = tmp
+                        mPageSettingViewModel.setList(mutable)
+                    })
 
                 TabItemsListScreen(
                     pageTypes = pageTypes,

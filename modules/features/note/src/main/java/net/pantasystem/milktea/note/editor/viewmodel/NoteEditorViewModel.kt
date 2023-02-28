@@ -25,10 +25,11 @@ import net.pantasystem.milktea.model.drive.UpdateFileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
+import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
+import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.InstanceInfoRepository
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.instance.Version
+import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
@@ -48,7 +49,7 @@ class NoteEditorViewModel @Inject constructor(
     accountStore: AccountStore,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
-    private val metaRepository: MetaRepository,
+    private val instanceInfoService: InstanceInfoService,
     private val driveFileRepository: DriveFileRepository,
     private val draftNoteService: DraftNoteService,
     private val draftNoteRepository: DraftNoteRepository,
@@ -60,8 +61,10 @@ class NoteEditorViewModel @Inject constructor(
     private val createNoteWorkerExecutor: CreateNoteWorkerExecutor,
     private val accountRepository: AccountRepository,
     private val localConfigRepository: LocalConfigRepository,
+    private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
     private val instanceInfoRepository: InstanceInfoRepository,
+    private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -82,6 +85,14 @@ class NoteEditorViewModel @Inject constructor(
         NoteEditorSavedStateKey.PickedFiles.name,
         emptyList()
     )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val instanceInfoType = currentAccount.filterNotNull().flatMapLatest {
+        instanceInfoService.observe(it.normalizedInstanceDomain)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val isSensitiveMedia =
+        savedStateHandle.getStateFlow<Boolean?>(NoteEditorSavedStateKey.IsSensitive.name, null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val driveFiles = files.flatMapLatest { files ->
@@ -129,9 +140,10 @@ class NoteEditorViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
         currentAccount.filterNotNull().flatMapLatest { account ->
-            metaRepository.observe(account.normalizedInstanceDomain).filterNotNull().map { meta ->
-                meta.maxNoteTextLength ?: 1500
-            }
+            instanceInfoService.observe(account.normalizedInstanceDomain).filterNotNull()
+                .map { meta ->
+                    meta.maxNoteTextLength
+                }
         }.stateIn(
             viewModelScope + Dispatchers.IO,
             started = SharingStarted.Lazily,
@@ -139,20 +151,19 @@ class NoteEditorViewModel @Inject constructor(
         )
 
 
+    val enableFeatures = currentAccount.filterNotNull().map {
+        featureEnables.enableFeatures(it.normalizedInstanceDomain)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
+
     val maxFileCount = currentAccount.filterNotNull().mapNotNull {
-        metaRepository.get(it.normalizedInstanceDomain)?.getVersion()
-    }.map {
-        if (it >= Version("12.100.2")) {
-            16
-        } else {
-            4
-        }
+        instanceInfoService.find(it.normalizedInstanceDomain).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val instanceInfo = currentAccount.filterNotNull().flatMapLatest {
         instanceInfoRepository.observeByHost(it.getHost())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
 
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
         NoteEditorSavedStateKey.Visibility.name,
@@ -184,13 +195,15 @@ class NoteEditorViewModel @Inject constructor(
         null
     )
 
-    private val noteEditorFormState = combine(text, cw, hasCw) { text, cw, hasCw ->
-        NoteEditorFormState(
-            text = text,
-            cw = cw,
-            hasCw = hasCw
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
+    private val noteEditorFormState =
+        combine(text, cw, hasCw, isSensitiveMedia) { text, cw, hasCw, sensitive ->
+            NoteEditorFormState(
+                text = text,
+                cw = cw,
+                hasCw = hasCw,
+                isSensitive = sensitive ?: false,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteEditorFormState())
 
     val address = visibility.map {
         it as? Visibility.Specified
@@ -330,6 +343,15 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setRenoteTo(noteId: Note.Id?) {
         savedStateHandle.setRenoteId(noteId)
+        if (noteId == null) {
+            return
+        }
+        viewModelScope.launch {
+            noteRepository.find(noteId).onSuccess { note ->
+                savedStateHandle.setVisibility(note.visibility)
+                savedStateHandle.setChannelId(note.channelId)
+            }
+        }
     }
 
     fun setReplyTo(noteId: Note.Id?) {
@@ -444,6 +466,9 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun toggleNsfw(appFile: AppFile) {
+        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+            return
+        }
         when (appFile) {
             is AppFile.Local -> {
                 savedStateHandle.setFiles(files.value.toggleFileSensitiveStatus(appFile))
@@ -459,6 +484,22 @@ class NoteEditorViewModel @Inject constructor(
             }
         }
 
+    }
+
+    fun toggleSensitive() {
+        val sensitive = savedStateHandle.getSensitive()
+        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+            viewModelScope.launch {
+                savedStateHandle.setFiles(
+                    savedStateHandle.getFiles().mapNotNull { appFile ->
+                        updateSensitiveUseCase(appFile, !sensitive).onFailure {
+                            logger.error("ファイルのセンシティブの状態の更新に失敗しました", it)
+                        }.getOrNull()
+                    }
+                )
+            }
+        }
+        savedStateHandle.setSensitive(!sensitive)
     }
 
     fun updateFileName(appFile: AppFile, name: String) {
@@ -566,7 +607,11 @@ class NoteEditorViewModel @Inject constructor(
 
     fun enablePoll() {
         val poll =
-            if (savedStateHandle.getPoll() == null) PollEditingState(emptyList(), false) else null
+            if (savedStateHandle.getPoll() == null) PollEditingState(listOf(
+                PollChoiceState("", UUID.randomUUID()),
+                PollChoiceState("", UUID.randomUUID()),
+                PollChoiceState("", UUID.randomUUID())
+            ), false) else null
         savedStateHandle.setPoll(poll)
     }
 

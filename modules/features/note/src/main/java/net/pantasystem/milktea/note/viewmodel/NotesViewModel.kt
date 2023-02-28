@@ -4,26 +4,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
-import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.model.notes.DeleteAndEditUseCase
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.bookmark.BookmarkRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNote
-import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
-import net.pantasystem.milktea.model.notes.draft.toDraftNote
 import net.pantasystem.milktea.model.notes.favorite.FavoriteRepository
 import net.pantasystem.milktea.model.notes.favorite.ToggleFavoriteUseCase
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ToggleReactionUseCase
 import net.pantasystem.milktea.model.user.report.Report
+import net.pantasystem.milktea.note.R
 import javax.inject.Inject
 
 
@@ -33,33 +35,35 @@ class NotesViewModel @Inject constructor(
     private val toggleReactionUseCase: ToggleReactionUseCase,
     private val favoriteRepository: FavoriteRepository,
     val accountStore: AccountStore,
-    val draftNoteRepository: DraftNoteRepository,
     private val translationStore: NoteTranslationStore,
     private val bookmarkRepository: BookmarkRepository,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val deleteAndEditUseCase: DeleteAndEditUseCase,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
     private val logger by lazy {
         loggerFactory.create("NotesViewModel")
     }
 
-    val statusMessage = EventBus<String>()
+    private val _statusMessage = MutableSharedFlow<StringSource>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    val statusMessage = _statusMessage.asSharedFlow()
 
-    val quoteRenoteTarget = EventBus<Note>()
+    val quoteRenoteTarget = MutableSharedFlow<Note>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val confirmDeletionEvent = EventBus<NoteRelation>()
+    val confirmDeletionEvent = MutableSharedFlow<NoteRelation?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val confirmDeleteAndEditEvent = EventBus<NoteRelation>()
+    val confirmDeleteAndEditEvent = MutableSharedFlow<NoteRelation?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val confirmReportEvent = EventBus<Report>()
+    val confirmReportEvent = MutableSharedFlow<Report?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
 
-    val openNoteEditor = EventBus<DraftNote?>()
+    private val _openNoteEditorEvent = MutableSharedFlow<DraftNote?>(onBufferOverflow = BufferOverflow.DROP_OLDEST, extraBufferCapacity = 10)
+    val openNoteEditorEvent = _openNoteEditorEvent.asSharedFlow()
 
     fun showQuoteNoteEditor(noteId: Note.Id) {
         viewModelScope.launch {
             recursiveSearchHasContentNote(noteId).onSuccess { note ->
                 withContext(Dispatchers.Main) {
-                    quoteRenoteTarget.event = note
+                    quoteRenoteTarget.tryEmit(note)
                 }
             }
 
@@ -97,9 +101,9 @@ class NotesViewModel @Inject constructor(
     fun addFavorite(noteId: Note.Id) {
         viewModelScope.launch {
             favoriteRepository.create(noteId).onSuccess {
-                statusMessage.event = "お気に入りに追加しました"
+                _statusMessage.tryEmit(StringSource(R.string.successfully_added_to_favorites))
             }.onFailure {
-                statusMessage.event = "お気に入りにへの追加に失敗しました"
+                _statusMessage.tryEmit(StringSource(R.string.failed_to_add_to_favorites))
             }
         }
     }
@@ -107,11 +111,11 @@ class NotesViewModel @Inject constructor(
     fun deleteFavorite(noteId: Note.Id) {
         viewModelScope.launch {
             val result = favoriteRepository.delete(noteId).getOrNull() != null
-            statusMessage.event = if (result) {
-                "お気に入りから削除しました"
+            _statusMessage.tryEmit(if (result) {
+                StringSource(R.string.removed_from_favorites)
             } else {
-                "お気に入りの削除に失敗しました"
-            }
+                StringSource(R.string.failed_to_delete_favorites)
+            })
         }
     }
 
@@ -135,7 +139,7 @@ class NotesViewModel @Inject constructor(
     fun removeNote(noteId: Note.Id) {
         viewModelScope.launch {
             noteRepository.delete(noteId).onSuccess {
-                statusMessage.event = "削除に成功しました"
+                _statusMessage.tryEmit(StringSource(R.string.successfully_deleted))
             }.onFailure {
                 logger.error("ノート削除に失敗", it)
             }
@@ -145,14 +149,10 @@ class NotesViewModel @Inject constructor(
 
     fun removeAndEditNote(note: NoteRelation) {
         viewModelScope.launch {
-            runCancellableCatching {
-                val dn = draftNoteRepository.save(note.toDraftNote()).getOrThrow()
-                noteRepository.delete(note.note.id).getOrThrow()
-                dn
-            }.onSuccess {
-                openNoteEditor.event = it
-            }.onFailure { t ->
-                logger.error("削除に失敗しました", t)
+            deleteAndEditUseCase(note.note.id).onSuccess {
+                _openNoteEditorEvent.tryEmit(it)
+            }.onFailure {
+                logger.error("削除に失敗しました", it)
             }
         }
 

@@ -7,10 +7,15 @@ class EmojiAdapter (view: View){
 
     private val weakReference = WeakReference(view)
 
+    private  var beforeExecute: Long = System.nanoTime()
 
+    fun update(invalidateForce: Boolean = true){
+        val now = System.nanoTime()
+        if ((now - beforeExecute) > 60000 || invalidateForce) {
+            weakReference.get()?.invalidate()
 
-    fun update(){
-        weakReference.get()?.invalidate()
+        }
+        beforeExecute = now
     }
 
 

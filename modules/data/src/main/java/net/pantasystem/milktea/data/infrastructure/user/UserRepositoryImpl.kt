@@ -11,7 +11,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -32,6 +32,7 @@ class UserRepositoryImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     val loggerFactory: Logger.Factory,
     val userApiAdapter: UserApiAdapter,
+    val userDTOEntityConverter: UserDTOEntityConverter,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
@@ -95,7 +96,7 @@ class UserRepositoryImpl @Inject constructor(
         res.throwIfHasError()
 
         res.body()?.let {
-            val user = it.toUser(account, detail)
+            val user = userDTOEntityConverter.convert(account, it, detail)
             userDataSource.add(user)
             return@withContext userDataSource.get(user.id).getOrThrow()
         }
@@ -116,22 +117,21 @@ class UserRepositoryImpl @Inject constructor(
     ) = runCancellableCatching<Unit> {
         withContext(ioDispatcher) {
             val ac = accountRepository.get(accountId).getOrThrow()
-            val i = ac.token
-            val api = misskeyAPIProvider.get(ac)
 
-            val results = SearchByUserAndHost(api)
-                .search(
-                    RequestUser(
-                        userName = userName,
-                        host = host,
-                        i = i
+            when(val result = userApiAdapter.search(accountId, userName, host)) {
+                is SearchResult.Mastodon -> {
+                    userDataSource.addAll(
+                        result.users.map {
+                            it.toModel(ac)
+                        }
                     )
-                )
-                .throwIfHasError()
-
-            results.body()!!.forEach {
-                it.toUser(ac, true).also { u ->
-                    userDataSource.add(u)
+                }
+                is SearchResult.Misskey -> {
+                    result.users.forEach {
+                        userDTOEntityConverter.convert(ac, it, true).also { u ->
+                            userDataSource.add(u)
+                        }
+                    }
                 }
             }
         }
@@ -247,61 +247,7 @@ class UserRepositoryImpl @Inject constructor(
         isSuccessful
     }
 
-    override suspend fun acceptFollowRequest(userId: User.Id): Boolean =
-        withContext(ioDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val user = find(userId, true) as User.Detail
-            if (user.related?.hasPendingFollowRequestToYou != true) {
-                return@withContext false
-            }
-            val res = misskeyAPIProvider.get(account)
-                .acceptFollowRequest(
-                    AcceptFollowRequest(
-                        i = account.token,
-                        userId = userId.id
-                    )
-                )
-                .throwIfHasError()
-            if (res.isSuccessful) {
-                userDataSource.add(
-                    user.copy(
-                        related = user.related?.copy(
-                            hasPendingFollowRequestToYou = false,
-                            isFollower = true
-                        )
-                    )
-                )
-            }
-            return@withContext res.isSuccessful
 
-        }
-
-    override suspend fun rejectFollowRequest(userId: User.Id): Boolean =
-        withContext(ioDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val user = find(userId, true) as User.Detail
-            if (user.related?.hasPendingFollowRequestToYou != true) {
-                return@withContext false
-            }
-            val res = misskeyAPIProvider.get(account).rejectFollowRequest(
-                RejectFollowRequest(
-                    i = account.token,
-                    userId = userId.id
-                )
-            )
-                .throwIfHasError()
-            if (res.isSuccessful) {
-                userDataSource.add(
-                    user.copy(
-                        related = user.related?.copy(
-                            hasPendingFollowRequestToYou = false,
-                            isFollower = false
-                        )
-                    )
-                )
-            }
-            return@withContext res.isSuccessful
-        }
 
     private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
         val user = find(userId, true) as User.Detail
@@ -341,7 +287,7 @@ class UserRepositoryImpl @Inject constructor(
             val res = misskeyAPIProvider.get(account).getUsers(request)
                 .throwIfHasError()
             res.body()?.map {
-                it.toUser(account, true)
+                userDTOEntityConverter.convert(account, it, true)
             }?.onEach {
                 userDataSource.add(it)
             } ?: emptyList()
@@ -375,7 +321,7 @@ class UserRepositoryImpl @Inject constructor(
                             )
                         ).throwIfHasError()
                         .body()!!.map {
-                            it.toUser(account, true)
+                            userDTOEntityConverter.convert(account, it, true)
                         }
                     userDataSource.addAll(users)
                     users.map { it.id }

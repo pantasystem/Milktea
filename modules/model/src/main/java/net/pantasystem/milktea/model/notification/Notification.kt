@@ -82,6 +82,31 @@ data class MentionNotification(
     }
 }
 
+data class StatusNotification(
+    override val id: Id,
+
+    override val createdAt: Instant,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
+    override val isRead: Boolean
+
+) : Notification(), HasNote, HasUser {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
+
+data class FavoriteNotification(
+    override val id: Id,
+    override val createdAt: Instant,
+    override val userId: User.Id,
+    override val noteId: Note.Id,
+    override val isRead: Boolean
+) : Notification(), HasNote, HasUser {
+    override fun read(): Notification {
+        return copy(isRead = true)
+    }
+}
 
 data class ReplyNotification(
     override val id: Id,

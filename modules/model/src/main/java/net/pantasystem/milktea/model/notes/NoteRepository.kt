@@ -5,7 +5,7 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 
 interface NoteRepository {
 
-    suspend fun delete(noteId: Note.Id): Result<Unit>
+    suspend fun delete(noteId: Note.Id): Result<Note>
 
     suspend fun create(createNote: CreateNote): Result<Note>
 

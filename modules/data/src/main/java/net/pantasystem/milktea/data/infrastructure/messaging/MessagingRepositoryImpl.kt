@@ -6,8 +6,8 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toGroup
-import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.messaging.MessageRelation
@@ -22,6 +22,7 @@ class MessagingRepositoryImpl @Inject constructor(
     private val groupDataSource: GroupDataSource,
     private val userDataSource: UserDataSource,
     private val messageAdder: MessageAdder,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessagingRepository {
 
@@ -42,7 +43,7 @@ class MessagingRepositoryImpl @Inject constructor(
                     groupDataSource.add(groupDTO.toGroup(account.accountId))
                 }
                 it.recipient?.let { userDTO ->
-                    userDataSource.add(userDTO.toUser(account))
+                    userDataSource.add(userDTOEntityConverter.convert(account, userDTO))
                 }
                 messageAdder.add(account, it)
             }

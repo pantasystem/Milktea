@@ -82,7 +82,7 @@ class TimelineStoreImpl(
         get() = willAddNoteQueue
 
 
-    val pageableStore: TimelinePagingBase by lazy {
+    internal val pageableStore: TimelinePagingBase by lazy {
         when (pageableTimeline) {
             is Pageable.Favorite -> {
                 FavoriteNoteTimelinePagingStoreImpl(
@@ -111,9 +111,12 @@ class TimelineStoreImpl(
     override val timelineState: Flow<PageableState<List<Note.Id>>>
         get() = pageableStore.state.distinctUntilChanged()
 
-    var latestReceiveId: Note.Id? = null
+    private var latestReceiveId: Note.Id? = null
 
-    var initialLoadQuery: InitialLoadQuery? = null
+    private var initialLoadQuery: InitialLoadQuery? = null
+
+    override var isActiveStreaming: Boolean = true
+        private set
 
     init {
         coroutineScope.launch(Dispatchers.IO) {
@@ -135,7 +138,7 @@ class TimelineStoreImpl(
 
 
     override suspend fun loadFuture(): Result<Unit> {
-        return runCancellableCatching {
+        return runCancellableCatching<Unit> {
             val addedCount = when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     FuturePagingController(
@@ -164,13 +167,14 @@ class TimelineStoreImpl(
             }
             if (addedCount.getOrElse { Int.MAX_VALUE } < LIMIT) {
                 initialLoadQuery = null
+                isActiveStreaming = true
             }
             latestReceiveId = null
         }
     }
 
     override suspend fun loadPrevious(): Result<Unit> {
-        return runCancellableCatching {
+        return runCancellableCatching<Unit> {
             when (val store = pageableStore) {
                 is TimelinePagingStoreImpl -> {
                     PreviousPagingController(
@@ -205,6 +209,7 @@ class TimelineStoreImpl(
     override suspend fun clear(initialLoadQuery: InitialLoadQuery?) {
         pageableStore.mutex.withLock {
             this.initialLoadQuery = initialLoadQuery
+            isActiveStreaming = true
             pageableStore.setState(PageableState.Loading.Init())
         }
     }
@@ -218,11 +223,18 @@ class TimelineStoreImpl(
         return latestReceiveId
     }
 
+    override fun suspendStreaming() {
+        isActiveStreaming = false
+    }
+
     private suspend fun appendStreamEventNote(noteId: Note.Id) {
         val store = pageableStore
         if (store is StreamingReceivableStore) {
             store.mutex.withLock {
                 if (initialLoadQuery != null) {
+                    return@withLock
+                }
+                if (!isActiveStreaming) {
                     return@withLock
                 }
                 val content = store.getState().content
@@ -260,6 +272,6 @@ class TimelineStoreImpl(
 
 }
 
-sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
+internal sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker
 
 interface StreamingReceivableStore : StateLocker

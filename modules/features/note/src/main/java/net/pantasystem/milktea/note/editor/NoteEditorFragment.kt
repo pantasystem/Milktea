@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.editor
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -12,8 +13,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.app.TaskStackBuilder
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -45,6 +49,7 @@ import net.pantasystem.milktea.model.confirm.ResultType
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.toAppFile
+import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
@@ -238,21 +243,21 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.accountViewModel = accountViewModel
         noteEditorToolbar.accountViewModel = accountViewModel
         noteEditorToolbar.viewModel = noteEditorViewModel
-        accountViewModel.switchAccount.observe(viewLifecycleOwner) {
+
+        accountViewModel.switchAccountEvent.onEach {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
-        }
-        accountViewModel.showProfile.observe(viewLifecycleOwner) {
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
+        accountViewModel.showProfileEvent.onEach {
             val intent = userDetailNavigation.newIntent(
                 UserDetailNavigationArgs.UserId(
                     User.Id(it.accountId, it.remoteId)
                 )
             )
-
             intent.putActivity(Activities.ACTIVITY_IN_APP)
-
-
             startActivity(intent)
-        }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
             metaRepository.observe(it.normalizedInstanceDomain)
@@ -281,7 +286,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
         noteEditorViewModel.setReplyTo(replyToNoteId)
         noteEditorViewModel.setRenoteTo(quoteToNoteId)
-        noteEditorViewModel.setChannelId(channelId)
+        if (channelId != null) {
+            noteEditorViewModel.setChannelId(channelId)
+        }
         if (draftNoteId != null && savedInstanceState == null) {
             noteEditorViewModel.setDraftNoteId(draftNoteId!!)
         }
@@ -301,17 +308,51 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                             requireActivity().startActivity(intent)
                         },
                         onEditFileCaptionSelectionClicked = {
-                            EditFileCaptionDialog.newInstance(it.file, it.comment ?: "").show(childFragmentManager, "editCaption")
+                            EditFileCaptionDialog.newInstance(it.file, it.comment ?: "")
+                                .show(childFragmentManager, "editCaption")
                         },
                         onEditFileNameSelectionClicked = {
-                            EditFileNameDialog.newInstance(it.file, it.name).show(childFragmentManager, "editFileName")
+                            EditFileNameDialog.newInstance(it.file, it.name)
+                                .show(childFragmentManager, "editFileName")
                         }
                     )
                 }
 
             }
         }
-
+        binding.noteEditorUserActionMenu.setContent {
+            MdcTheme {
+                val state by noteEditorViewModel.enableFeatures.collectAsState()
+                val uiState by noteEditorViewModel.uiState.collectAsState()
+                NoteEditorUserActionMenuLayout(
+                    iconColor = getColor(color = R.attr.normalIconTint),
+                    isEnableDrive = state.contains(FeatureType.Drive),
+                    isCw = uiState.formState.hasCw,
+                    isPoll = uiState.poll != null,
+                    onPickFileFromDriveButtonClicked = {
+                        showDriveFileSelector()
+                    },
+                    onPickFileFromLocalButtonCLicked = {
+                        showFileManager()
+                    },
+                    onPickImageFromLocalButtonClicked = {
+                        showMultipleImagePicker()
+                    },
+                    onTogglePollButtonClicked = {
+                        noteEditorViewModel.enablePoll()
+                    },
+                    onSelectMentionUsersButtonClicked = {
+                        startMentionToSearchAndSelectUser()
+                    },
+                    onSelectEmojiButtonClicked = {
+                        CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+                    },
+                    onToggleCwButtonClicked = {
+                        noteEditorViewModel.changeCwEnabled()
+                    }
+                )
+            }
+        }
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 noteEditorViewModel.poll.distinctUntilChangedBy {
@@ -367,25 +408,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             onSelect(it)
         }
 
-
-        binding.selectFileFromDrive.setOnClickListener {
-            showDriveFileSelector()
-        }
-
-        binding.selectFileFromLocal.setOnClickListener {
-            showFileManager()
-        }
-
         binding.addAddress.setOnClickListener {
             startSearchAndSelectUser()
-        }
-
-        binding.mentionButton.setOnClickListener {
-            startMentionToSearchAndSelectUser()
-        }
-
-        binding.showEmojisButton.setOnClickListener {
-            CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
         }
 
         binding.reservationAtPickDateButton.setOnClickListener {
@@ -410,8 +434,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-
-        confirmViewModel.confirmedEvent.observe(viewLifecycleOwner) {
+        confirmViewModel.confirmedEvent.onEach {
             when (it.eventType) {
                 CONFIRM_SAVE_AS_DRAFT_OR_DELETE -> {
                     if (it.resultType == ResultType.POSITIVE) {
@@ -421,11 +444,12 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     }
                 }
             }
-        }
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
-        confirmViewModel.confirmEvent.observe(viewLifecycleOwner) {
-            ConfirmDialog().show(childFragmentManager, "confirm")
-        }
+        confirmViewModel.confirmEvent.onEach {
+            ConfirmDialog.newInstance(it).show(childFragmentManager, "confirm")
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
 
         noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
             Handler(Looper.getMainLooper()).post {
@@ -581,11 +605,23 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.type = "*/*"
             intent.addCategory(Intent.CATEGORY_OPENABLE)
-            openLocalStorageResult.launch(intent)
+            openLocalStorageResult.launch(arrayOf("*/*"))
         } else {
             requestPermission()
         }
 
+    }
+
+    private fun showMultipleImagePicker() {
+        if (checkPermission()) {
+            if (ActivityResultContracts.PickVisualMedia.isPhotoPickerAvailable()) {
+                pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
+            } else {
+                openLocalStorageResult.launch(arrayOf("image/*", "video/*"))
+            }
+        } else {
+            requestPermission()
+        }
     }
 
     private fun startSearchAndSelectUser() {
@@ -611,14 +647,15 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private fun finishOrConfirmSaveAsDraftOrDelete() {
         if (noteEditorViewModel.canSaveDraft()) {
-            confirmViewModel.confirmEvent.event = ConfirmCommand(
-                getString(R.string.save_draft),
-                getString(R.string.save_the_note_as_a_draft),
-                eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE,
-                args = "",
-                positiveButtonText = getString(R.string.save),
-                negativeButtonText = getString(R.string.delete)
-
+            confirmViewModel.confirmEvent.tryEmit(
+                ConfirmCommand(
+                    getString(R.string.save_draft),
+                    getString(R.string.save_the_note_as_a_draft),
+                    eventType = CONFIRM_SAVE_AS_DRAFT_OR_DELETE,
+                    args = "",
+                    positiveButtonText = getString(R.string.save),
+                    negativeButtonText = getString(R.string.delete)
+                )
             )
         } else {
             upTo()
@@ -657,27 +694,12 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-    private val openLocalStorageResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-            val uri = result?.data?.data
-            if (uri != null) {
-                // NOTE: 選択したファイルに対して永続的なアクセス権を得るようにしている
-                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
-
-                val size = noteEditorViewModel.fileTotal()
-
-                if (size > noteEditorViewModel.maxFileCount.value) {
-                    logger.debug("失敗しました")
-                } else {
-                    val file = uri.toAppFile(requireContext())
-                    noteEditorViewModel.add(file)
-                    logger.debug("成功しました")
-                }
-
-            }
+    private val openLocalStorageResult = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        uris?.map { uri ->
+            appendFile(uri)
         }
+    }
+
 
     private val requestReadStoragePermissionResult =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -733,4 +755,20 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
+    private val pickMultipleMedia =
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+            uris?.map {
+                appendFile(it)
+            }
+        }
+
+    private fun appendFile(uri: Uri) {
+        // NOTE: 選択したファイルに対して永続的なアクセス権を得るようにしている
+        val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
+
+
+        val file = uri.toAppFile(requireContext())
+        noteEditorViewModel.add(file)
+    }
 }

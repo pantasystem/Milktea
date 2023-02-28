@@ -21,6 +21,7 @@ import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -118,16 +119,28 @@ class UserDetailViewModel @AssistedInject constructor(
             ) && (user.info.isPublicReactions || user.id == User.Id(
                 account.accountId, account.remoteId
             ))
-        listOfNotNull(
-            UserDetailTabType.UserTimeline(user.id),
-            UserDetailTabType.UserTimelineWithReplies(user.id),
-            UserDetailTabType.PinNote(user.id),
-            UserDetailTabType.Media(user.id),
-            if (isEnableGallery) UserDetailTabType.Gallery(
-                user.id, accountId = account.accountId
-            ) else null,
-            if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
-        )
+        when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                listOfNotNull(
+                    UserDetailTabType.UserTimeline(user.id),
+                    UserDetailTabType.UserTimelineWithReplies(user.id),
+                    UserDetailTabType.PinNote(user.id),
+                    UserDetailTabType.Media(user.id),
+                    if (isEnableGallery) UserDetailTabType.Gallery(
+                        user.id, accountId = account.accountId
+                    ) else null,
+                    if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
+                )
+            }
+            Account.InstanceType.MASTODON -> {
+                listOf(
+                    UserDetailTabType.MastodonUserTimeline(user.id),
+                    UserDetailTabType.MastodonUserTimelineWithReplies(user.id),
+                    UserDetailTabType.MastodonMedia(user.id)
+                )
+            }
+        }
+
     }.catch {
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -344,4 +357,8 @@ sealed class UserDetailTabType(
 
     data class Reactions(val userId: User.Id) : UserDetailTabType(R.string.reaction)
     data class Media(val userId: User.Id) : UserDetailTabType(R.string.media)
+
+    data class MastodonUserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
+    data class MastodonUserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+    data class MastodonMedia(val userId: User.Id) : UserDetailTabType(R.string.media)
 }

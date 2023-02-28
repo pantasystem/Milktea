@@ -15,7 +15,6 @@ import net.pantasystem.milktea.messaging.MessagingListActivity
 import net.pantasystem.milktea.notification.NotificationsActivity
 import net.pantasystem.milktea.search.SearchActivity
 import net.pantasystem.milktea.setting.activities.PageSettingActivity
-import net.pantasystem.milktea.setting.activities.SettingsActivity
 
 internal class MainActivityMenuProvider(
     val activity: MainActivity,
@@ -38,7 +37,6 @@ internal class MainActivityMenuProvider(
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         val idAndActivityMap = mapOf(
-            R.id.action_settings to SettingsActivity::class.java,
             R.id.action_tab_setting to PageSettingActivity::class.java,
             R.id.action_notification to NotificationsActivity::class.java,
             R.id.action_messaging to MessagingListActivity::class.java,

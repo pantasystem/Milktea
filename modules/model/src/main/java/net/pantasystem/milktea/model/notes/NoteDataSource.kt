@@ -53,6 +53,8 @@ interface NoteDataSource {
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id) : Result<Note>
 
+    suspend fun exists(noteId: Note.Id) : Boolean
+
     /**
      * @param noteId 削除対象のNoteのId
      * キャッシュ上のノートを削除する。

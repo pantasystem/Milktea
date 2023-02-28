@@ -76,6 +76,30 @@ class KeysKtTest {
                     "IsEnableNotificationSound",
                     key.str()
                 )
+                Keys.IsStopNoteCaptureWhenBackground -> Assertions.assertEquals(
+                    "IsStopNoteCaptureWhenBackground",
+                    key.str()
+                )
+                Keys.IsStopStreamingApiWhenBackground -> Assertions.assertEquals(
+                    "IsStopStreamingApiWhenBackground",
+                    key.str()
+                )
+                Keys.IsEnableStreamingAPIAndNoteCapture -> Assertions.assertEquals(
+                    "IsEnableStreamingAPIAndNoteCapture",
+                    key.str()
+                )
+                Keys.IsEnableNoteDivider -> Assertions.assertEquals(
+                    "IsEnableNoteDivider",
+                    key.str()
+                )
+                Keys.IsVisibleInstanceUrlInToolbar -> Assertions.assertEquals(
+                    "IsVisibleInstanceUrlInToolbar",
+                    key.str()
+                )
+                Keys.IsHideMediaWhenMobileNetwork -> Assertions.assertEquals(
+                    "IsHideMediaWhenMobileNetwork",
+                    key.str()
+                )
             }
         }
     }
@@ -83,8 +107,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(21, Keys.allKeys.size)
-        Assertions.assertEquals(21, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(27, Keys.allKeys.size)
+        Assertions.assertEquals(27, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

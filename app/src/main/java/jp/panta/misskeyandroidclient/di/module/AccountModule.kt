@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jp.panta.misskeyandroidclient.impl.PageDefaultStringsOnAndroid
 import net.pantasystem.milktea.model.account.MakeDefaultPagesUseCase
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import javax.inject.Singleton
 
 @Module
@@ -18,10 +19,12 @@ object AccountModule {
     @Provides
     @Singleton
     fun provideMakeDefaultPagesUseCase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        nodeInfoRepository: NodeInfoRepository,
     ) : MakeDefaultPagesUseCase {
         return MakeDefaultPagesUseCase(
-            PageDefaultStringsOnAndroid(context)
+            PageDefaultStringsOnAndroid(context),
+            nodeInfoRepository,
         )
     }
 }

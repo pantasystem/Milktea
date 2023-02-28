@@ -1,11 +1,7 @@
 package jp.panta.misskeyandroidclient.streaming
 
-import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.api_streaming.ChannelBody
 import net.pantasystem.milktea.api_streaming.ChannelEvent
 import net.pantasystem.milktea.api_streaming.StreamingEvent
@@ -15,73 +11,7 @@ import org.junit.jupiter.api.Test
 
 class StreamingEventTest {
 
-    @Test
-    fun testParseReceiveNote() {
 
-        val noteDTO = NoteDTO(
-            "piyo22",
-            Clock.System.now(),
-            "hogehoge",
-            null,
-            "piyo",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            0,
-            null,
-            null,
-            0,
-            user = UserDTO(
-                "piyo",
-                "",
-                "",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                false,
-                isCat = false,
-                pinnedNoteIds = null,
-                pinnedNotes = null,
-                twoFactorEnabled = null,
-                isAdmin = null,
-                avatarUrl = null,
-                bannerUrl = null,
-                emojis = null,
-                isFollowing = null,
-                isFollowed = null,
-                isBlocking = null,
-                isMuted = null,
-                url = null
-            ),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-
-
-        )
-        val se: StreamingEvent =
-            ChannelEvent(
-                ChannelBody.ReceiveNote(
-                    id = "hoge",
-                    body = noteDTO
-                )
-            )
-        println(Json.encodeToString(se))
-        assertTrue(true)
-    }
 
     @Test
     fun testDecodeJson() {

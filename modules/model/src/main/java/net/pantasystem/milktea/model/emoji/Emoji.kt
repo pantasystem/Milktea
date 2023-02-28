@@ -12,7 +12,6 @@ data class Emoji(
     val type: String? = null,
     val category: String? = null,
     val aliases: List<String>? = null
-
 ): Serializable{
 
     constructor(name: String) : this(null, name, null, null, null, null, null)

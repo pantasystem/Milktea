@@ -1,9 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.emoji
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
@@ -15,8 +13,23 @@ import javax.inject.Inject
 
 class UserEmojiConfigRepositoryImpl @Inject constructor(
     val reactionUserSettingDao: ReactionUserSettingDao,
+    private val userEmojiConfigCache: UserEmojiConfigCache,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ): UserEmojiConfigRepository {
+
+    override suspend fun save(config: UserEmojiConfig): Result<Unit> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            reactionUserSettingDao.insert(
+                ReactionUserSetting(
+                    reaction = config.reaction,
+                    instanceDomain = config.instanceDomain,
+                    weight = config.weight
+                )
+            )
+            userEmojiConfigCache.put(config.instanceDomain, findByInstanceDomain(instanceDomain = config.instanceDomain))
+        }
+    }
+
     override suspend fun saveAll(configs: List<UserEmojiConfig>): Result<Unit> = runCancellableCatching{
         withContext(ioDispatcher) {
             reactionUserSettingDao.insertAll(configs.map {
@@ -26,6 +39,12 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
                     weight = it.weight
                 )
             })
+            val domains = configs.map {
+                it.instanceDomain
+            }.distinct()
+            domains.map {
+                userEmojiConfigCache.put(it, findByInstanceDomain(it))
+            }
         }
     }
 
@@ -38,6 +57,8 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
                     weight = it.weight
                 )
             } ?: emptyList()
+        }.also {
+            userEmojiConfigCache.put(instanceDomain, it)
         }
     }
 
@@ -49,6 +70,12 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
                 weight = it.weight
             )
         })
+        val domains = settings.map {
+            it.instanceDomain
+        }.distinct()
+        domains.map {
+            userEmojiConfigCache.put(it, findByInstanceDomain(it))
+        }
     }
 
     override suspend fun delete(setting: UserEmojiConfig): Result<Unit> = runCancellableCatching {
@@ -59,6 +86,7 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
                 weight = setting.weight
             ))
         }
+        userEmojiConfigCache.put(setting.instanceDomain, findByInstanceDomain(setting.instanceDomain))
     }
 
     override fun observeByInstanceDomain(instanceDomain: String): Flow<List<UserEmojiConfig>> {
@@ -69,6 +97,12 @@ class UserEmojiConfigRepositoryImpl @Inject constructor(
                     instanceDomain = it.instanceDomain,
                     weight = it.weight
                 )
+            }
+        }.onEach {
+            userEmojiConfigCache.put(instanceDomain, it)
+        }.onStart {
+            userEmojiConfigCache.get(instanceDomain)?.let {
+                emit(it)
             }
         }.flowOn(ioDispatcher)
     }

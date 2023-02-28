@@ -8,6 +8,8 @@ interface Logger {
     val defaultTag: String
     fun debug(msg: String, tag: String = defaultTag, e: Throwable? = null)
 
+    fun debug(tag: String = defaultTag, e: Throwable? = null, message: () -> String)
+
     fun error(msg: String, e: Throwable? = null, tag: String = defaultTag)
 
     fun info(msg: String, tag: String = defaultTag, e: Throwable? = null)

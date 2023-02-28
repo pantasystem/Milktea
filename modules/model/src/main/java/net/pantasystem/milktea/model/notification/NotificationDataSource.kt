@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notification
 
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.AddResult
 
 
@@ -23,6 +24,9 @@ interface NotificationDataSource {
     suspend fun add(notification: Notification): Result<AddResult>
     suspend fun remove(notificationId: Notification.Id) : Result<Boolean>
     suspend fun addAll(notifications: Collection<Notification>): Result<List<AddResult>>
+
+    fun observeOne(notificationId: Notification.Id): Flow<Notification?>
+    fun observeIn(notificationIds: List<Notification.Id>): Flow<List<Notification>>
 
 
 }

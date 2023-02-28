@@ -1,9 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure.channel
 
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -15,42 +11,52 @@ import net.pantasystem.milktea.api.misskey.v12.channel.FindPageable
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelStateModel
+import javax.inject.Inject
 
 enum class ChannelListType {
     OWNED, FOLLOWED, FEATURED
 }
 
-class ChannelPagingModel @AssistedInject constructor(
-    val encryption: Encryption,
+class ChannelPagingModel(
     private val channelStateModel: ChannelStateModel,
     val misskeyAPIProvider: MisskeyAPIProvider,
     val accountRepository: AccountRepository,
     val loggerFactory: Logger.Factory,
-    @Assisted val accountId: Long,
-    @Assisted val type: ChannelListType,
+    val type: ChannelListType,
+    val getAccount: suspend () -> Account,
 ) : EntityConverter<ChannelDTO, Channel.Id>, PreviousLoader<ChannelDTO>,
     IdGetter<Channel.Id>, StateLocker, PaginationState<Channel.Id> {
 
+    class Factory @Inject constructor(
+        private val channelStateModel: ChannelStateModel,
+        val misskeyAPIProvider: MisskeyAPIProvider,
+        val accountRepository: AccountRepository,
+        val loggerFactory: Logger.Factory,
+    ) {
+        fun create(type: ChannelListType, getAccount: suspend () -> Account): ChannelPagingModel {
+            return ChannelPagingModel(
+                channelStateModel,
+                misskeyAPIProvider,
+                accountRepository,
+                loggerFactory,
+                type,
+                getAccount
+            )
+        }
+    }
     val logger: Logger by lazy {
         loggerFactory.create("ChannelPagingModel")
-    }
-
-    @AssistedFactory
-    interface ModelAssistedFactory {
-        fun create(accountId: Long, type: ChannelListType): ChannelPagingModel
     }
 
     override val mutex: Mutex = Mutex()
 
 
     private val _state = MutableStateFlow<PageableState<List<Channel.Id>>>(
-        PageableState.Fixed(
-            StateContent.NotExist()
-        )
+        PageableState.Loading.Init()
     )
     override val state: Flow<PageableState<List<Channel.Id>>>
         get() = _state
@@ -74,7 +80,7 @@ class ChannelPagingModel @AssistedInject constructor(
     }
 
     override suspend fun convertAll(list: List<ChannelDTO>): List<Channel.Id> {
-        val account = accountRepository.get(accountId).getOrThrow()
+        val account = accountRepository.get(getAccount().accountId).getOrThrow()
         return channelStateModel.addAll(list.map { it.toModel(account) }).map { it.id }
     }
 //    NOTE: MisskeyのAPIがバグってるのか正常に動かない（Postmanからもチェック済み）
@@ -107,15 +113,11 @@ class ChannelPagingModel @AssistedInject constructor(
 //    }
 
     override suspend fun loadPrevious(): Result<List<ChannelDTO>> {
-        val account = accountRepository.get(accountId).getOrThrow()
+        val account = accountRepository.get(getAccount().accountId).getOrThrow()
         val api = (misskeyAPIProvider.get(account) as MisskeyAPIV12)
         val i = account.token
         val res = when (type) {
             ChannelListType.FOLLOWED -> {
-                logger.debug("loadPrevious:${_state.value}")
-                if (getUntilId() != null) {
-                    throw IllegalStateException()
-                }
                 api.followedChannels(
                     FindPageable(
                         i = i,
@@ -127,10 +129,6 @@ class ChannelPagingModel @AssistedInject constructor(
                 )
             }
             ChannelListType.OWNED -> {
-                if (getUntilId() != null) {
-                    // TODO: APIのページネーションが修正されたら修正する
-                    throw IllegalStateException()
-                }
                 api.ownedChannels(
                     FindPageable(
                         i = i,
@@ -149,7 +147,7 @@ class ChannelPagingModel @AssistedInject constructor(
                 api.featuredChannels(I(i))
             }
         }
-        logger.debug("loadPrevious res:${res.code()}")
+        logger.debug { "loadPrevious res:${res.code()}" }
         return runCancellableCatching {
             res.throwIfHasError().body()!!
         }

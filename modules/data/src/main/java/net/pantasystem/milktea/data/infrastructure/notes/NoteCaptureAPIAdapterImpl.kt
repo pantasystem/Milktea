@@ -1,17 +1,20 @@
 package net.pantasystem.milktea.data.infrastructure.notes
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.Event
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
+import net.pantasystem.milktea.model.notes.NoteNotFoundException
 
 /**
  * Noteの更新イベントをWebSocket経由でキャプチャーして
@@ -45,13 +48,13 @@ class NoteCaptureAPIAdapterImpl(
     /**
      * mastodonのStreaming APIから流れてきたEventがここに入る
      */
-    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>()
+    private val streamingEventDispatcher = MutableSharedFlow<Pair<Account, Event>>(extraBufferCapacity = 1000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     /**
      * Noteのキャプチャーによって発生したイベントのQueue。
      * ここから順番にイベントを取り出し、キャッシュに反映させるなどをしている。
      */
-    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>()
+    private val noteUpdatedDispatcher = MutableSharedFlow<Pair<Account, NoteUpdated.Body>>(extraBufferCapacity = 1000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
 //    /**
 //     * 使用されなくなったNoteのリソースが順番に入れられるQueue。
@@ -159,7 +162,7 @@ class NoteCaptureAPIAdapterImpl(
 //                noteResourceReleaseEvent.tryEmit(id)
 //            }
         }
-    }.shareIn(coroutineScope, replay = 1, started = SharingStarted.WhileSubscribed())
+    }
 
 
     /**
@@ -214,6 +217,9 @@ class NoteCaptureAPIAdapterImpl(
     private suspend fun handleRemoteEvent(account: Account, e: NoteUpdated.Body) {
         val noteId = Note.Id(account.accountId, e.id)
         try {
+            if (!noteDataSource.exists(noteId)) {
+                return
+            }
             val note = noteDataSource.get(noteId).getOrThrow()
             when (e) {
                 is NoteUpdated.Body.Deleted -> {
@@ -249,10 +255,18 @@ class NoteCaptureAPIAdapterImpl(
                 }
                 is Event.Reaction -> {
                     val noteId = Note.Id(account.accountId, e.reaction.statusId)
-                    val note = noteDataSource.get(noteId).getOrThrow()
-                    noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+
+                    noteDataSource.get(noteId).mapCancellableCatching { note ->
+                        noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+                    }.getOrThrow()
+
+                }
+                is Event.StatusUpdated -> {
+                    noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, e.status)
                 }
             }
+        } catch (_: NoteNotFoundException) {
+            return
         } catch (e: Exception) {
             logger.warning("更新対称のノートが存在しませんでした", e = e)
         }

@@ -7,30 +7,30 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
-import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
 import net.pantasystem.milktea.common_android.ui.text.EmojiAdapter
-import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.user.User
+import kotlin.math.min
 
 object InstanceInfoHelper {
 
     @JvmStatic
-    @BindingAdapter("instanceInfo")
-    fun TextView.setInstanceInfo(info: User.InstanceInfo?) {
-        val provider = EntryPointAccessors.fromApplication(this.context.applicationContext, BindingProvider::class.java)
+    @BindingAdapter("instanceInfo", "isEnable")
+    fun TextView.setInstanceInfo(info: User.InstanceInfo?, isEnable: Boolean? = null) {
+
+
 
         val enable = info?.name != null
                 && info.faviconUrl != null
-                && provider.settingStore().configState.value.isEnableInstanceTicker
+                && isEnable == true
         this.isVisible = enable
         if (enable) {
             val emojiAdapter = EmojiAdapter(this)
 
-            val iconDrawable = DrawableEmojiSpan(emojiAdapter)
+            val iconDrawable = DrawableEmojiSpan(emojiAdapter, info?.faviconUrl)
             Glide.with(this)
                 .load(info!!.faviconUrl)
-                .override(this.textSize.toInt())
+                .override(min(this.textSize.toInt(), 640))
                 .into(iconDrawable.target)
             text =  SpannableStringBuilder(":${info.faviconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.faviconUrl}:".length, 0)

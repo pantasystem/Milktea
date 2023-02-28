@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.api_streaming.mastodon
 
 import kotlinx.serialization.SerialName
+import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.model.emoji.Emoji
 
@@ -8,8 +9,9 @@ sealed interface Event {
 
     data class Update(val status: TootStatusDTO) : Event
     data class Delete(val id: String) : Event
-    data class Notification(val tmp: String) : Event
+    data class Notification(val notification: MstNotificationDTO) : Event
     data class Reaction(val reaction: EmojiReaction) : Event
+    data class StatusUpdated(val status: TootStatusDTO) : Event
 }
 
 // {

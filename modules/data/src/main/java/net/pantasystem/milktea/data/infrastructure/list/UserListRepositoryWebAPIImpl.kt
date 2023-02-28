@@ -14,8 +14,10 @@ import net.pantasystem.milktea.api.misskey.list.UpdateList
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.toEntity
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.list.UserListMember
@@ -28,6 +30,7 @@ import javax.inject.Singleton
 @Singleton
 class UserListRepositoryWebAPIImpl @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
+    val mastodonAPIProvider: MastodonAPIProvider,
     val accountRepository: AccountRepository,
     private val userListDao: UserListDao,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
@@ -35,13 +38,26 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun findByAccountId(accountId: Long): List<UserList> {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
-            val api = misskeyAPIProvider.get(account)
-            val body = api.userList(I(account.token))
-                .throwIfHasError()
-                .body()
-            body!!.map {
-                it.toEntity(account)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val api = misskeyAPIProvider.get(account)
+                    val body = api.userList(I(account.token))
+                        .throwIfHasError()
+                        .body()
+                    body!!.map {
+                        it.toEntity(account)
+                    }
+                }
+                Account.InstanceType.MASTODON -> {
+                    val body = mastodonAPIProvider.get(account).getMyLists()
+                        .throwIfHasError()
+                        .body()
+                    body!!.map {
+                        it.toModel(account)
+                    }
+                }
             }
+
         }
     }
 
@@ -119,10 +135,20 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
     override suspend fun findOne(userListId: UserList.Id): UserList {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(userListId.accountId).getOrThrow()
-            val misskeyAPI = misskeyAPIProvider.get(account)
-            val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
-                .throwIfHasError()
-            res.body()!!.toEntity(account)
+            when(account.instanceType) {
+                Account.InstanceType.MISSKEY -> {
+                    val misskeyAPI = misskeyAPIProvider.get(account)
+                    val res = misskeyAPI.showList(ListId(account.token, userListId.userListId))
+                        .throwIfHasError()
+                    res.body()!!.toEntity(account)
+                }
+                Account.InstanceType.MASTODON -> {
+                    val res = mastodonAPIProvider.get(account).getList(userListId.userListId)
+                        .throwIfHasError()
+                    requireNotNull(res.body()).toModel(account)
+                }
+            }
+
         }
     }
 
@@ -145,49 +171,8 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
 
     override suspend fun syncByAccountId(accountId: Long): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
-
             val source = findByAccountId(accountId)
-            val beforeInsertRecords = source.map { ul ->
-                UserListRecord(
-                    serverId = ul.id.userListId,
-                    accountId = ul.id.accountId,
-                    createdAt = ul.createdAt,
-                    name = ul.name,
-                )
-            }
-
-            val resultIds = userListDao.insertAll(beforeInsertRecords)
-            val localLists =
-                userListDao.findUserListWhereIn(accountId, source.map { it.id.userListId })
-
-            val ids = resultIds.mapIndexed { index, resultId ->
-                if (resultId == -1L) {
-                    localLists[index].id
-                } else {
-                    resultId
-                }
-            }
-            resultIds.forEachIndexed { index, l ->
-                if (l == -1L) {
-                    val id = ids[index]
-                    val updateTarget = beforeInsertRecords[index]
-                    userListDao.update(updateTarget.copy(id = id))
-                }
-            }
-
-
-
-            ids.forEachIndexed { index, l ->
-                userListDao.detachUserIds(l)
-                userListDao.attachMemberIds(
-                    source[index].userIds.map {
-                        UserListMemberIdRecord(
-                            userId = it.id,
-                            userListId = l
-                        )
-                    }
-                )
-            }
+            upInsertAll(accountId, source)
         }
     }
 
@@ -248,5 +233,48 @@ class UserListRepositoryWebAPIImpl @Inject constructor(
                 )
             }
         )
+    }
+
+    private suspend fun upInsertAll(accountId: Long, source: List<UserList>) {
+        val beforeInsertRecords = source.map { ul ->
+            UserListRecord(
+                serverId = ul.id.userListId,
+                accountId = ul.id.accountId,
+                createdAt = ul.createdAt,
+                name = ul.name,
+            )
+        }
+        val resultIds = userListDao.insertAll(beforeInsertRecords)
+        val localLists =
+            userListDao.findUserListWhereIn(accountId, source.map { it.id.userListId })
+
+        val ids = resultIds.mapIndexed { index, resultId ->
+            if (resultId == -1L) {
+                localLists[index].id
+            } else {
+                resultId
+            }
+        }
+        resultIds.forEachIndexed { index, l ->
+            if (l == -1L) {
+                val id = ids[index]
+                val updateTarget = beforeInsertRecords[index]
+                userListDao.update(updateTarget.copy(id = id))
+            }
+        }
+
+
+
+        ids.forEachIndexed { index, l ->
+            userListDao.detachUserIds(l)
+            userListDao.attachMemberIds(
+                source[index].userIds.map {
+                    UserListMemberIdRecord(
+                        userId = it.id,
+                        userListId = l
+                    )
+                }
+            )
+        }
     }
 }

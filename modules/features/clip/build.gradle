@@ -1,0 +1,79 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    namespace 'net.pantasystem.milktea.clip'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = compose_version
+    }
+}
+
+dependencies {
+
+    implementation libs.androidx.core.ktx
+    implementation libs.appcompat.appcompat
+    implementation libs.android.material.material
+    implementation project(path: ':modules:model')
+    implementation project(path: ':modules:app_store')
+    implementation project(path: ':modules:common')
+    implementation project(path: ':modules:data')
+    implementation project(path: ':modules:common_navigation')
+    implementation project(path: ':modules:common_android_ui')
+    implementation project(path: ':modules:common_viewmodel')
+    implementation project(path: ':modules:common_compose')
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.test.espresso.core
+
+    // hilt
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
+    androidTestImplementation  libs.hilt.android.testing
+    kaptAndroidTest libs.hilt.compiler
+    testImplementation libs.hilt.android.testing
+    kaptTest libs.hilt.compiler
+
+    // compose
+    implementation libs.bundles.compose.ui
+    implementation libs.bundles.compose.foundation
+    implementation libs.bundles.compose.material
+    androidTestImplementation libs.compose.ui.ui.test.junit4
+    implementation libs.compose.runtime.runtime.livedata
+    implementation libs.android.material.compose.theme.adapter
+    implementation libs.accompanist.swiperefresh
+    implementation libs.activity.compose
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+    implementation libs.coil.compose
+}

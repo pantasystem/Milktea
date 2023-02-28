@@ -34,6 +34,7 @@ fun UserDetailCardList(
     pageableState: ResultState<List<User.Id>>,
     users: List<User.Detail>,
     accountHost: String?,
+    myId: String?,
     isUserNameMain: Boolean,
     onAction: (UserDetailCardListAction) -> Unit,
 ) {
@@ -54,10 +55,11 @@ fun UserDetailCardList(
                         UserDetailCard(
                             userDetail = users[i],
                             isUserNameMain = isUserNameMain,
+                            accountHost = accountHost,
+                            myId = myId,
                             onAction = {
                                 onAction(UserDetailCardListAction.CardAction(it))
                             },
-                            accountHost = accountHost,
                         )
                     }
                 }

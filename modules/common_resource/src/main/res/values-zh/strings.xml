@@ -419,5 +419,41 @@
     <string name="visibility_personal">自我限制</string>
     <string name="visibility_limited">圆圈</string>
     <string name="visibility_mutual">相互关注</string>
+    <string name="calckey_recomended_timeline">推荐的</string>
+    <string name="notification_favorited_by">被 %s 收藏</string>
+    <string name="notification_posted_by">发布者 %s</string>
+    <string name="clip">夹子</string>
+
+    <string name="server_error">服务器错误</string>
+    <string name="bot_error">你是人类吗？</string>
+    <string name="auth_error">用户身份验证错误</string>
+    <string name="parameter_error">参数错误</string>
+    <string name="unauthorized_error">未认证错误（Unauthorized）</string>
+    <string name="rate_limit_error">速率限制错误</string>
+    <string name="not_found_error">404 未找到错误</string>
+    <string name="show_more_reactions">显示更多反应</string>
+    <string name="pick_file_from_device">从设备中选择文件</string>
+    <string name="note_editor_file_max_size_validation_error_message">不能附加超过 %d 个文件</string>
+    <string name="auth_sign_up">报名</string>
+    <string name="auth_join_milktea_title">让我们从Milktea开始Misskey</string>
+    <string name="auth_sign_up_button">报名</string>
+    <string name="auth_sign_in">登入</string>
+    <string name="auth_find_instance">找服务器</string>
+    <string name="auth_find_instance_next_button_text">下一个</string>
+    <string name="auth_find_instance_show_in_web_browser_message">注册屏幕将出现在您的浏览器中</string>
+    <string name="settings_note_divider">在笔记中显示水平分隔线</string>
+    <string name="settings_note">笔记</string>
+    <string name="auth_qr_code_message">在另一台设备上进行身份验证</string>
+
+    <string name="settings_show_bottom_menu">显示底部菜单</string>
+    <string name="settings_app_restart_required">需要重新启动应用程序。</string>
+
+    <string name="note_editor_poll_choice_n">选择%d</string>
+    <string name="settings_visible_instance_domain_in_toolbar">在工具栏中显示实例的域</string>
+    <string name="settings_hide_media_when_mobile_network">移动网络时隐藏媒体</string>
+    <string name="notes_media_click_to_load_image">点击加载图片</string>
+    <string name="notifications_follow_requests">按照要求</string>
+    <string name="content_not_exists_message">无内容</string>
+
 
 </resources>

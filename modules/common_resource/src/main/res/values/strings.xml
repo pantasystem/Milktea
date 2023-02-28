@@ -86,7 +86,7 @@
     <string name="auto_load_when_stopped" tools:ignore="Typos">Automatically look for notes notes when the instance\'s server is stopped</string>
     <string name="sync">Sync</string>
 
-    <string name="movement">Syncing</string>
+    <string name="movement">Movement</string>
     <string name="remove_note">Delete notes</string>
 
     <string name="hide_removed_note">Hide deleted notes</string>
@@ -412,5 +412,41 @@
     <string name="visibility_personal">Personal</string>
     <string name="visibility_limited">Circle</string>
     <string name="visibility_mutual">Mutual Follow</string>
+    <string name="calckey_recomended_timeline">Recommended</string>
+    <string name="notification_favorited_by">Favorited by %s</string>
+    <string name="notification_posted_by">Posted by %s</string>
+    <string name="clip">Clip</string>
+
+
+    <string name="server_error">Server error</string>
+    <string name="bot_error">Are you human?</string>
+    <string name="auth_error">Authentication error</string>
+    <string name="parameter_error">Parameter error</string>
+    <string name="unauthorized_error">Unauthorized error</string>
+    <string name="rate_limit_error">Rate limit error</string>
+    <string name="not_found_error">404 Not found error</string>
+    <string name="show_more_reactions">Show more Reactions</string>
+    <string name="pick_file_from_device">Pick file from device</string>
+    <string name="note_editor_file_max_size_validation_error_message">Cannot attach more than %d files</string>
+    <string name="auth_sign_up">Sign up</string>
+    <string name="auth_sign_up_button">Sign up</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_join_milktea_title">Let\'s start Misskey with Milktea</string>
+    <string name="auth_find_instance">Find a server</string>
+    <string name="auth_find_instance_next_button_text">Next</string>
+    <string name="auth_find_instance_show_in_web_browser_message">A registration screen will appear in your browser.</string>
+    <string name="settings_note">Note</string>
+    <string name="settings_note_divider">Show horizontal separator lines in notes</string>
+    <string name="auth_qr_code_message">Authenticate on another device</string>
+
+    <string name="settings_show_bottom_menu">Show bottom menu</string>
+    <string name="settings_app_restart_required">App restart required.</string>
+
+    <string name="note_editor_poll_choice_n">Choice %d</string>
+    <string name="settings_visible_instance_domain_in_toolbar">Show the instance\'s domain in the toolbar</string>
+    <string name="settings_hide_media_when_mobile_network">Hide media when mobile network</string>
+    <string name="notes_media_click_to_load_image">Click to load Image</string>
+    <string name="notifications_follow_requests">Follow request</string>
+    <string name="content_not_exists_message">No content</string>
 
 </resources>

@@ -6,10 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
-import net.pantasystem.milktea.data.infrastructure.user.FollowFollowerPagingStoreImpl
-import net.pantasystem.milktea.data.infrastructure.user.MediatorUserDataSource
-import net.pantasystem.milktea.data.infrastructure.user.UserReactionPagingStoreImpl
-import net.pantasystem.milktea.data.infrastructure.user.UserRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.*
+import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Singleton
@@ -39,4 +37,10 @@ abstract class UserModule {
     abstract fun provideUserReactionPagingStoreFactory(
         impl: UserReactionPagingStoreImpl.Factory
     ) : UserReactionPagingStore.Factory
+
+    @Binds
+    @Singleton
+    abstract fun bindFollowRequestRepository(
+        impl: FollowRequestRepositoryImpl
+    ): FollowRequestRepository
 }

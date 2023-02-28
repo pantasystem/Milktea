@@ -99,7 +99,8 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         toggleNavigationDrawerDelegate = ToggleNavigationDrawerDelegate(this, binding.drawerLayout)
 
         binding.navView.setNavigationItemSelectedListener { item ->
-            StartActivityFromNavDrawerItems(this).showNavDrawersActivityBy(item)
+            MainActivityNavigationDrawerMenuItemClickListener(this, mAccountViewModel)
+                .onSelect(item)
             binding.drawerLayout.closeDrawerWhenOpened()
             false
         }
@@ -131,7 +132,6 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         MainActivityEventHandler(
             activity = this,
             accountStore = accountStore,
-            authorizationNavigation = authorizationNavigation,
             binding = binding,
             lifecycleOwner = this,
             lifecycleScope = lifecycleScope,
@@ -142,6 +142,7 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
             changeNavMenuVisibilityFromAPIVersion = ChangeNavMenuVisibilityFromAPIVersion(binding.navView, featureEnables),
             configStore = settingStore,
             draftNoteService = draftNoteService,
+            currentPageableTimelineViewModel = currentPageableTimelineViewModel
         ).setup()
 
         RenoteResultHandler(
@@ -158,9 +159,10 @@ class MainActivity : AppCompatActivity(), ToolbarSetter {
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this)
     }
 
-    override fun setToolbar(toolbar: Toolbar) {
+    override fun setToolbar(toolbar: Toolbar, visibleTitle: Boolean) {
         setSupportActionBar(toolbar)
         toggleNavigationDrawerDelegate.updateToolbar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(visibleTitle)
     }
 
     override fun onResume() {

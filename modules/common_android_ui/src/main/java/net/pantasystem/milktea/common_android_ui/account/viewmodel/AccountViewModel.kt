@@ -5,17 +5,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.Logger
-import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.instance.Meta
-import net.pantasystem.milktea.model.instance.MetaRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -30,7 +30,7 @@ class AccountViewModel @Inject constructor(
     private val userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
-    private val metaRepository: MetaRepository,
+    private val instanceInfoService: InstanceInfoService,
     private val signOutUseCase: SignOutUseCase,
     private val syncMetaExecutor: SyncMetaExecutor,
 ) : ViewModel() {
@@ -50,7 +50,7 @@ class AccountViewModel @Inject constructor(
 
     private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
         val flows = accounts.map {
-            metaRepository.observe(it.normalizedInstanceDomain).flowOn(Dispatchers.IO)
+            instanceInfoService.observe(it.normalizedInstanceDomain).flowOn(Dispatchers.IO)
         }
         combine(flows) {
             it.toList()
@@ -98,13 +98,18 @@ class AccountViewModel @Inject constructor(
         }
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val switchAccount = EventBus<Int>()
+    private val _switchAccountEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val switchAccountEvent = _switchAccountEvent.asSharedFlow()
 
 
-    val showFollowers = EventBus<User.Id>()
-    val showFollowings = EventBus<User.Id>()
+    private val _showFollowersEvent = MutableSharedFlow<User.Id>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val showFollowersEvent = _showFollowersEvent.asSharedFlow()
 
-    val showProfile = EventBus<Account>()
+    private val _showFollowingsEvent = MutableSharedFlow<User.Id>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val showFollowingsEvent = _showFollowingsEvent.asSharedFlow()
+
+    private val _showProfileEvent = MutableSharedFlow<Account>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val showProfileEvent = _showProfileEvent.asSharedFlow()
 
 
     init {
@@ -125,27 +130,27 @@ class AccountViewModel @Inject constructor(
     }
 
     fun showSwitchDialog() {
-        switchAccount.event = switchAccount.event
+        _switchAccountEvent.tryEmit(Unit)
     }
 
     fun showFollowers(userId: User.Id?) {
         userId?.let {
-            showFollowers.event = userId
+            _showFollowersEvent.tryEmit(it)
         }
     }
 
     fun showFollowings(userId: User.Id?) {
         userId?.let {
-            showFollowings.event = userId
+            _showFollowingsEvent.tryEmit(it)
         }
     }
 
     fun showProfile(account: Account?) {
         if (account == null) {
-            logger.debug("showProfile account未取得のためキャンセル")
+            logger.debug { "showProfile account未取得のためキャンセル" }
             return
         }
-        showProfile.event = account
+        _showProfileEvent.tryEmit(account)
     }
 
 
@@ -182,7 +187,7 @@ class AccountViewModel @Inject constructor(
 data class AccountInfo(
     val account: Account,
     val user: User?,
-    val instanceMeta: Meta?,
+    val instanceMeta: InstanceInfoType?,
     val isCurrentAccount: Boolean
 )
 

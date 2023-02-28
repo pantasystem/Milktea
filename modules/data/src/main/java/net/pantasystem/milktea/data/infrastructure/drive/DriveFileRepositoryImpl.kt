@@ -10,7 +10,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
+import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -25,6 +25,7 @@ class DriveFileRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val driveFileDataSource: FilePropertyDataSource,
     private val driveFileUploaderProvider: FileUploaderProvider,
+    private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : DriveFileRepository {
     override suspend fun find(id: FileProperty.Id): FileProperty {
@@ -37,8 +38,8 @@ class DriveFileRepositoryImpl @Inject constructor(
             val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
             val response = api.showFile(ShowFile(fileId = id.fileId, i = account.token))
                 .throwIfHasError()
-            val fp = response.body()!!.toFileProperty(account)
-            driveFileDataSource.add(fp)    
+            val fp = filePropertyDTOEntityConverter.convert(response.body()!!, account)
+            driveFileDataSource.add(fp)
             return@withContext fp
         }
     }
@@ -59,7 +60,12 @@ class DriveFileRepositoryImpl @Inject constructor(
                 )
             ).throwIfHasError()
 
-            driveFileDataSource.add(result.body()!!.toFileProperty(account))
+            driveFileDataSource.add(
+                filePropertyDTOEntityConverter.convert(
+                    result.body()!!,
+                    account
+                )
+            )
         }
     }
 
@@ -68,7 +74,6 @@ class DriveFileRepositoryImpl @Inject constructor(
             withContext(ioDispatcher) {
                 val property = driveFileUploaderProvider.get(getAccount.get(accountId))
                     .upload(UploadSource.LocalFile(file), true)
-                    .toFileProperty(getAccount.get(accountId))
                 driveFileDataSource.add(property).getOrThrow()
                 driveFileDataSource.find(property.id).getOrThrow()
             }
@@ -92,15 +97,19 @@ class DriveFileRepositoryImpl @Inject constructor(
     override suspend fun update(updateFileProperty: UpdateFileProperty): Result<FileProperty> {
         return runCancellableCatching {
             withContext(ioDispatcher) {
-                val res = misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
-                    .updateFile(
-                        UpdateFileDTO.from(
-                            getAccount.get(updateFileProperty.fileId.accountId).token,
-                            updateFileProperty,
-                        )
-                    ).throwIfHasError()
-                    .body()!!
-                res.toFileProperty(getAccount.get(updateFileProperty.fileId.accountId)).also {
+                val res =
+                    misskeyAPIProvider.get(getAccount.get(updateFileProperty.fileId.accountId))
+                        .updateFile(
+                            UpdateFileDTO.from(
+                                getAccount.get(updateFileProperty.fileId.accountId).token,
+                                updateFileProperty,
+                            )
+                        ).throwIfHasError()
+                        .body()!!
+                filePropertyDTOEntityConverter.convert(
+                    res,
+                    getAccount.get(updateFileProperty.fileId.accountId)
+                ).also {
                     driveFileDataSource.add(it)
                 }
             }

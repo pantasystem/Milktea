@@ -1,5 +1,7 @@
 package net.pantasystem.milktea.model.nodeinfo
 
+import net.pantasystem.milktea.model.instance.Version
+
 
 data class NodeInfo(
     val host: String,
@@ -24,6 +26,11 @@ data class NodeInfo(
             data class Calckey(
                 override val name: String,
                 override val version: String,
+            ) : Misskey
+
+            data class Meisskey(
+                override val name: String,
+                override val version: String
             ) : Misskey
         }
 
@@ -51,6 +58,11 @@ data class NodeInfo(
         "misskey" -> SoftwareType.Misskey.Normal(version = software.version, name = software.name)
         "mastodon" -> SoftwareType.Mastodon.Normal(version = software.version, name = software.name)
         "fedibird" -> SoftwareType.Mastodon.Fedibird(version = software.version, name = software.name)
+        "meisskey" -> SoftwareType.Misskey.Meisskey(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
+}
+
+fun NodeInfo.SoftwareType.getVersion(): Version {
+    return Version(this.version)
 }

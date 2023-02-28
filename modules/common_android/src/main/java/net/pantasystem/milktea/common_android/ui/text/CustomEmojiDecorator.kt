@@ -2,13 +2,14 @@ package net.pantasystem.milktea.common_android.ui.text
 
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.view.View
+import android.widget.TextView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
 import net.pantasystem.milktea.model.instance.HostWithVersion
+import kotlin.math.min
 
 class CustomEmojiDecorator {
 
@@ -17,7 +18,7 @@ class CustomEmojiDecorator {
         sourceHost: String?,
         emojis: List<Emoji>?,
         text: String,
-        view: View,
+        view: TextView,
     ): Spanned {
 
         val emojiAdapter = EmojiAdapter(view)
@@ -32,10 +33,11 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             HostWithVersion.isOverV13(accountHost)  || it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter)
+            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
+                .override(min(view.textSize.toInt(), 640))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
         }
@@ -44,7 +46,7 @@ class CustomEmojiDecorator {
         return builder
     }
 
-    fun decorate(accountHost: String?, result: CustomEmojiParsedResult, view: View): Spanned {
+    fun decorate(accountHost: String?, result: CustomEmojiParsedResult, view: TextView): Spanned {
 
         val emojiAdapter = EmojiAdapter(view)
         val builder = SpannableStringBuilder(result.text)
@@ -52,9 +54,10 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter)
+            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
+                .override(min(view.textSize.toInt(), 640))
                 .load(it.result.getUrl(accountHost))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
@@ -64,7 +67,7 @@ class CustomEmojiDecorator {
         return builder
     }
 
-    fun decorate(spanned: Spanned, accountHost: String?, result: CustomEmojiParsedResult, view: View): Spanned {
+    fun decorate(spanned: Spanned, accountHost: String?, result: CustomEmojiParsedResult, view: TextView): Spanned {
 
         val emojiAdapter = EmojiAdapter(view)
         val builder = SpannableStringBuilder(spanned)
@@ -72,10 +75,11 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter)
+            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
+                .override(min(view.textSize.toInt(), 640))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
         }

@@ -19,6 +19,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.list.UserList
 import net.pantasystem.milktea.model.user.User
@@ -31,6 +32,7 @@ fun UserListDetailScreen(
     userList: UserList?,
     users: List<User>,
     accountHost: String?,
+    instanceType: Account.InstanceType?,
     isAddedTab: Boolean,
     onNavigateUp: () -> Unit,
     fragmentManager: FragmentManager,
@@ -125,7 +127,10 @@ fun UserListDetailScreen(
                         },
                         update = { frameLayout ->
                             val fragment = pageableFragmentFactory.create(
-                                Pageable.UserListTimeline(listId = listId.userListId)
+                                when(instanceType) {
+                                    Account.InstanceType.MASTODON -> Pageable.Mastodon.ListTimeline(listId.userListId)
+                                    else -> Pageable.UserListTimeline(listId = listId.userListId)
+                                }
                             )
                             val transaction = fragmentManager.beginTransaction()
                             transaction.replace(frameLayout.id, fragment)

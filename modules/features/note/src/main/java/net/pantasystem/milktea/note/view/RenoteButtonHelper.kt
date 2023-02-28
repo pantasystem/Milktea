@@ -45,7 +45,7 @@ object RenoteButtonHelper {
                     this.imageTintList = ColorStateList.valueOf(normalTintColor)
                 }
             }
-            Note.Type.Misskey -> {
+            is Note.Type.Misskey -> {
                 this.imageTintList = ColorStateList.valueOf(normalTintColor)
             }
         }

@@ -11,6 +11,7 @@
                 type="net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel" />
         <import type="android.view.View"/>
         <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
+        <import type="net.pantasystem.milktea.model.instance.FeatureType" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -175,99 +176,17 @@
                 android:id="@+id/bottomToolbarBase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@id/linearLayout2"
+                app:layout_constraintBottom_toTopOf="@id/noteEditorUserActionMenu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
-        <LinearLayout
-                android:id="@+id/linearLayout2"
+        <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/noteEditorUserActionMenu"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-            <ImageButton
-                    android:id="@+id/selectFileFromLocal"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_menu_gallery"
-                    android:adjustViewBounds="true"
-                    tools:ignore="ContentDescription"
-                    android:layout_margin="4dp"
-                    app:tint="?attr/normalIconTint" />
-
-            <ImageButton
-                    android:id="@+id/selectFileFromDrive"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_cloud_black_24dp"
-                    android:adjustViewBounds="true"
-                    tools:ignore="ContentDescription"
-                    android:layout_margin="4dp"
-                    app:tint="?attr/normalIconTint" />
-
-            <ImageButton
-                    android:id="@+id/makePoll"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_poll_black_24dp"
-                    android:onClick="@{()-> viewModel.enablePoll()}"
-                    android:adjustViewBounds="true"
-                    tools:ignore="ContentDescription"
-                    android:layout_margin="4dp"
-                    app:tint="?attr/normalIconTint" />
-
-            <ImageButton
-                    android:id="@+id/setCw"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_visibility_off_black_24dp"
-                    android:onClick="@{()-> viewModel.changeCwEnabled() }"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    tools:ignore="ContentDescription"
-                    android:layout_margin="4dp"
-                    app:tint="?attr/normalIconTint" />
-            <ImageButton
-                    android:id="@+id/mentionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    tools:ignore="ContentDescription"
-                    app:srcCompat="@drawable/ic_mention"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:padding="12dp"
-                    android:layout_margin="4dp"
-
-                    app:tint="?attr/normalIconTint" />
-            <ImageButton
-                    android:id="@+id/showEmojisButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    tools:ignore="ContentDescription"
-                    app:srcCompat="@drawable/ic_insert_emoticon_black_24dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:padding="12dp"
-                    android:layout_margin="4dp"
-                    app:tint="?attr/normalIconTint" />
-
-
-        </LinearLayout>
-
+                app:layout_constraintStart_toStartOf="parent" />
         <androidx.compose.ui.platform.ComposeView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

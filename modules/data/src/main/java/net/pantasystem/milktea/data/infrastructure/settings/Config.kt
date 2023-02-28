@@ -99,7 +99,25 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: DefaultConfig.config.isDriveUsingGridView,
         isEnableNotificationSound = map.getValue<PrefType.BoolPref>(
             Keys.IsEnableNotificationSound
-        )?.value ?: DefaultConfig.config.isEnableNotificationSound
+        )?.value ?: DefaultConfig.config.isEnableNotificationSound,
+        isStopStreamingApiWhenBackground = map.getValue<PrefType.BoolPref>(
+            Keys.IsStopStreamingApiWhenBackground
+        )?.value ?: DefaultConfig.config.isStopStreamingApiWhenBackground,
+        isStopNoteCaptureWhenBackground = map.getValue<PrefType.BoolPref>(
+            Keys.IsStopNoteCaptureWhenBackground
+        )?.value ?: DefaultConfig.config.isStopNoteCaptureWhenBackground,
+        isEnableStreamingAPIAndNoteCapture = map.getValue<PrefType.BoolPref>(
+            Keys.IsEnableStreamingAPIAndNoteCapture
+        )?.value ?: DefaultConfig.config.isEnableStreamingAPIAndNoteCapture,
+        isEnableNoteDivider = map.getValue<PrefType.BoolPref>(
+            Keys.IsEnableNoteDivider
+        )?.value ?: DefaultConfig.config.isEnableNoteDivider,
+        isVisibleInstanceUrlInToolbar = map.getValue<PrefType.BoolPref>(
+            Keys.IsVisibleInstanceUrlInToolbar
+        )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar,
+        isHideMediaWhenMobileNetwork = map.getValue<PrefType.BoolPref>(
+            Keys.IsHideMediaWhenMobileNetwork
+        )?.value ?: DefaultConfig.config.isHideMediaWhenMobileNetwork
     )
 }
 
@@ -177,6 +195,24 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsEnableNotificationSound -> {
             PrefType.BoolPref(isEnableNotificationSound)
+        }
+        Keys.IsStopNoteCaptureWhenBackground -> {
+            PrefType.BoolPref(isStopNoteCaptureWhenBackground)
+        }
+        Keys.IsStopStreamingApiWhenBackground -> {
+            PrefType.BoolPref(isStopStreamingApiWhenBackground)
+        }
+        Keys.IsEnableStreamingAPIAndNoteCapture -> {
+            PrefType.BoolPref(isEnableStreamingAPIAndNoteCapture)
+        }
+        Keys.IsEnableNoteDivider -> {
+            PrefType.BoolPref(isEnableNoteDivider)
+        }
+        Keys.IsVisibleInstanceUrlInToolbar -> {
+            PrefType.BoolPref(isVisibleInstanceUrlInToolbar)
+        }
+        Keys.IsHideMediaWhenMobileNetwork -> {
+            PrefType.BoolPref(isHideMediaWhenMobileNetwork)
         }
     }
 }

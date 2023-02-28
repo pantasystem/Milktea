@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.view
 
+import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.user.User
@@ -59,6 +60,10 @@ class NoteCardActionListenerAdapter(
         onAction(NoteCardAction.OnFavoriteButtonClicked(note))
     }
 
+    fun onChannelButtonClicked(channelId: Channel.Id) {
+        onAction(NoteCardAction.OnChannelButtonClicked(channelId))
+    }
+
 }
 
 
@@ -76,4 +81,5 @@ sealed interface NoteCardAction {
     data class OnNoteCardClicked(val note: Note) : NoteCardAction
     data class OnUserClicked(val user: User) : NoteCardAction
     data class OnFavoriteButtonClicked(val note: Note) : NoteCardAction
+    data class OnChannelButtonClicked(val channelId: Channel.Id) : NoteCardAction
 }

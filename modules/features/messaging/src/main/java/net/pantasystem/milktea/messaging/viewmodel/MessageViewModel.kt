@@ -50,7 +50,7 @@ class MessageViewModel @Inject constructor(
             }.asReversed()
         }
     }.flowOn(Dispatchers.IO).catch {
-        logger.debug("message error", e = it)
+        logger.debug(e = it) { "message error" }
     }.stateIn(viewModelScope, SharingStarted.Lazily, PageableState.Loading.Init())
 
 

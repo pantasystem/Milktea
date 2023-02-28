@@ -24,7 +24,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:id="@+id/leftMediaBase"
-                android:visibility="@{ media.fileOne != null || media.fileThree != null ? View.VISIBLE : View.GONE }"
+                memoVisibility="@{ media.fileOne != null || media.fileThree != null ? View.VISIBLE : View.GONE }"
                 >
 
             <FrameLayout
@@ -39,7 +39,7 @@
                     previewAbleFile="@{media.fileOne}"
 
                     android:onClick="@{()-> media.show(0) }"
-                    android:visibility="@{ media.fileOne == null ? View.GONE : View.VISIBLE }"
+                    memoVisibility="@{ media.fileOne == null ? View.GONE : View.VISIBLE }"
                     >
 
                 <ImageView
@@ -49,7 +49,7 @@
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-
+                        config="@{media.config}"
                         thumbnailView="@{ media.fileOne }"
                         />
                 <ImageButton
@@ -60,7 +60,7 @@
                         style="?android:attr/borderlessButtonStyle"
                         android:src="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
-                        android:visibility="@{media.fileOne.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                        memoVisibility="@{media.fileOne.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
                         app:tint="?attr/colorAccent" />
 
                 <TextView
@@ -69,9 +69,14 @@
                         android:layout_height="wrap_content"
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
-                        android:visibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
+                        memoVisibility="@{SafeUnbox.unbox(media.fileOne.isHiding) ? View.VISIBLE : View.GONE }"
+                        hideImageMessageImageSource="@{media.fileOne}"
+                        config="@{media.config}"
                         android:text="@string/sensitive_content"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -96,7 +101,7 @@
                     previewAbleFile="@{media.fileThree}"
                     android:onClick="@{()-> media.show(2)}"
                     android:layout_marginTop="4dp"
-                    android:visibility="@{ media.fileThree == null ? View.GONE : View.VISIBLE }"
+                    memoVisibility="@{ media.fileThree == null ? View.GONE : View.VISIBLE }"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomLeft"
@@ -105,7 +110,7 @@
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-
+                        config="@{media.config}"
                         thumbnailView="@{ media.fileThree }"
                         />
 
@@ -117,7 +122,7 @@
                         android:contentDescription="@string/play_media"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_play_circle_outline_black_24dp"
-                        android:visibility="@{ media.fileThree.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                        memoVisibility="@{ media.fileThree.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
 
                         app:tint="?attr/colorAccent" />
 
@@ -125,10 +130,14 @@
                         android:id="@+id/nsfwMessageBottomLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sensitive_content"
+                        hideImageMessageImageSource="@{media.fileThree}"
+                        config="@{media.config}"
                         android:layout_gravity="center"
-                        android:visibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
+                        memoVisibility="@{ SafeUnbox.unbox(media.fileThree.isHiding) ? View.VISIBLE : View.GONE }"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -151,7 +160,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:orientation="vertical"
-                android:visibility="@{ media.fileTwo != null || media.fileFour != null ? View.VISIBLE : View.GONE }">
+                memoVisibility="@{ media.fileTwo != null || media.fileFour != null ? View.VISIBLE : View.GONE }">
 
             <FrameLayout
                     android:id="@+id/baseFrameTopRight"
@@ -166,7 +175,7 @@
                     previewAbleFile="@{media.fileTwo}"
                     previewAbleFileList="@{media.files}"
                     android:onClick="@{()-> media.show(1) }"
-                    android:visibility="@{ media.fileTwo == null ? View.GONE : View.VISIBLE }"
+                    memoVisibility="@{ media.fileTwo == null ? View.GONE : View.VISIBLE }"
 
                     >
                 <ImageView
@@ -176,7 +185,7 @@
                         android:contentDescription="@string/thumbnail"
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
-
+                        config="@{media.config}"
                         thumbnailView="@{media.fileTwo}"
                         />
                 <ImageButton
@@ -187,7 +196,7 @@
                         style="?android:attr/borderlessButtonStyle"
                         android:src="@drawable/ic_play_circle_outline_black_24dp"
                         android:scaleType="fitCenter"
-                        android:visibility="@{media.fileTwo.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                        memoVisibility="@{media.fileTwo.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
 
                         app:tint="?attr/colorAccent" />
                 <TextView
@@ -196,9 +205,13 @@
                         android:layout_height="wrap_content"
                         tools:text="クリックで表示"
                         android:layout_gravity="center"
-                        android:visibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
-                        android:text="@string/sensitive_content"
+                        memoVisibility="@{SafeUnbox.unbox(media.fileTwo.isHiding) ? View.VISIBLE : View.GONE }"
+                        hideImageMessageImageSource="@{media.fileTwo}"
+                        config="@{media.config}"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"
@@ -225,7 +238,7 @@
                     previewAbleFile="@{media.fileFour}"
                     android:onClick="@{()-> media.show(3) }"
                     android:layout_marginTop="4dp"
-                    android:visibility="@{ media.fileFour == null ? View.GONE : View.VISIBLE }"
+                    memoVisibility="@{ media.fileFour == null ? View.GONE : View.VISIBLE }"
                     >
                 <ImageView
                         android:id="@+id/thumbnailBottomRight"
@@ -235,6 +248,8 @@
                         android:scaleType="centerCrop"
                         tools:srcCompat="@drawable/ic_baseline_hide_image_24"
                         thumbnailView="@{ media.fileFour }"
+                        config="@{media.config}"
+
                         />
                 <ImageButton
                         android:id="@+id/actionButtonBottomRight"
@@ -245,7 +260,7 @@
                         android:src="@drawable/ic_play_circle_outline_black_24dp"
 
                         android:scaleType="fitCenter"
-                        android:visibility="@{ media.fileFour.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
+                        memoVisibility="@{ media.fileFour.visiblePlayButton == true ? View.VISIBLE : View.GONE }"
                         app:tint="?attr/colorAccent" />
 
                 <TextView
@@ -253,9 +268,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="@string/sensitive_content"
-                        android:visibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
+                        hideImageMessageImageSource="@{media.fileFour}"
+                        config="@{media.config}"
+                        memoVisibility="@{ SafeUnbox.unbox(media.fileFour.isHiding) ? View.VISIBLE : View.GONE}"
                         app:emojiCompatEnabled="false"
+                        android:background="@drawable/shape_media_message_background"
+                        android:padding="4dp"
+                        android:textColor="@android:color/white"
                         />
                 <ImageButton
                         android:layout_width="40dp"

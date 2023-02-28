@@ -4,11 +4,7 @@
     <string name="show_error">Show Error</string>
 
     <string name="timeout_error">Timeout</string>
-    <string name="server_error">Server error</string>
-    <string name="bot_error">Are you human?</string>
-    <string name="auth_error">Authentication error</string>
-    <string name="parameter_error">Parameter error</string>
-    <string name="timeline_unauthorized_error">Unauthorized error</string>
+
     <string name="reauthenticate">Reauthenticate</string>
     <string name="expand">Expand</string>
 
@@ -17,4 +13,12 @@
     <string name="file_size_warning_dialo_positive_button">Continue</string>
     <string name="file_size_warning_dialog_negative_button">Cancel attachment</string>
 
+    <string name="mark_media_as_sensitive">Mark media as sensitive</string>
+    <string name="successfully_added_to_favorites">Successfully added to Favorites</string>
+    <string name="failed_to_add_to_favorites">Failed to add to favorites</string>
+    <string name="removed_from_favorites">Removed from Favorites</string>
+    <string name="failed_to_delete_favorites">Failed to delete favorites</string>
+    <string name="successfully_deleted">Successfully deleted</string>
+    <string name="dialog_add_emoji_to_user_settings_title">Add emoji to settings</string>
+    <string name="dialog_add_emoji_to_user_settings_message">Add %s to user emoji settings.</string>
 </resources>

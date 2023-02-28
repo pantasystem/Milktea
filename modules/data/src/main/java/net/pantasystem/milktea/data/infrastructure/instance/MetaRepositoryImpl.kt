@@ -76,8 +76,8 @@ class MetaRepositoryImpl @Inject constructor(
                 emojis = runCancellableCatching {
                     fetchEmojis(instanceDomain)?.map {
                         it.copy(
-                            url = V13EmojiUrlResolver.resolve(it, instanceDomain),
-                            uri = V13EmojiUrlResolver.resolve(it, instanceDomain),
+                            url = if (it.url == null) V13EmojiUrlResolver.resolve(it, instanceDomain) else it.url,
+                            uri = if (it.uri == null) V13EmojiUrlResolver.resolve(it, instanceDomain) else it.uri,
                         )
                     }
                 }.getOrNull()

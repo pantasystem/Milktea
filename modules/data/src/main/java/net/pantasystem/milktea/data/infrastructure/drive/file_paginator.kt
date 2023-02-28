@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common.paginator.*
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
+import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.drive.Directory
@@ -25,6 +25,7 @@ import javax.inject.Inject
 class FilePropertyPagingStoreImpl @Inject constructor(
     misskeyAPIProvider: MisskeyAPIProvider,
     filePropertyDataSource: FilePropertyDataSource,
+    filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
 ) : FilePropertyPagingStore {
 
     private var currentDirectoryId: String? = null
@@ -35,6 +36,7 @@ class FilePropertyPagingStoreImpl @Inject constructor(
     private val filePropertyPagingImpl = FilePropertyPagingImpl(
         misskeyAPIProvider,
         filePropertyDataSource,
+        filePropertyDTOEntityConverter,
         {
             currentAccount?: throw UnauthorizedException()
         },
@@ -94,6 +96,7 @@ class FilePropertyPagingStoreImpl @Inject constructor(
 class FilePropertyPagingImpl(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val filePropertyDataSource: FilePropertyDataSource,
+    private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
     private val getAccount: suspend () -> Account,
     private val getCurrentFolderId: () -> String?,
 ) : PaginationState<FileProperty.Id>,
@@ -142,7 +145,7 @@ class FilePropertyPagingImpl(
 
     override suspend fun convertAll(list: List<FilePropertyDTO>): List<FileProperty.Id> {
         val entities = list.map {
-            it.toFileProperty(getAccount.invoke())
+            filePropertyDTOEntityConverter.convert(it, getAccount())
         }
         filePropertyDataSource.addAll(entities)
         return entities.map {

@@ -3,30 +3,9 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         >
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeBase"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_width="match_parent">
-
-        <com.google.android.material.appbar.AppBarLayout
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:stateListAnimator="@null"
-                android:id="@+id/appBar"
-                android:background="#FFFFFF"
-                >
-            <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_scrollFlags="scroll|enterAlways"
-                    android:elevation="0dp"
-                    />
-        </com.google.android.material.appbar.AppBarLayout>
-        <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/composeBase"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </layout>

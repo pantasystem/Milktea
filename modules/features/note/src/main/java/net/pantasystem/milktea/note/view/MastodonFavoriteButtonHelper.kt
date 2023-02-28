@@ -33,7 +33,7 @@ object MastodonFavoriteButtonHelper {
                     this.imageTintList = ColorStateList.valueOf(normalTintColor)
                 }
             }
-            Note.Type.Misskey -> {
+            is Note.Type.Misskey -> {
                 this.visibility = View.GONE
             }
         }

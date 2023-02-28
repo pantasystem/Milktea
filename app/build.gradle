@@ -106,7 +106,9 @@ dependencies {
     implementation project(path: ':modules:features:notification')
     implementation project(path: ':modules:features:search')
     implementation project(path: ':modules:features:favorite')
+    implementation project(path: ':modules:features:account')
     implementation project(path: ':modules:worker')
+    implementation project(path: ':modules:features:clip')
 
 
     testImplementation project(path: ':modules:api_streaming')
@@ -199,12 +201,12 @@ dependencies {
 
 
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+    implementation libs.kotlin.serialization
 
     implementation libs.wada811.databinding
 
     implementation libs.fragment.ktx
-    implementation platform('com.google.firebase:firebase-bom:31.0.2')
+    implementation platform('com.google.firebase:firebase-bom:31.2.0')
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics-ktx'
@@ -272,6 +274,8 @@ dependencies {
 
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 }
 
 kapt {

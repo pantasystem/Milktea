@@ -3,32 +3,39 @@ package net.pantasystem.milktea.note.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common_android.getTextType
 import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.getTextType
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.media.viewmodel.MediaViewData
+import net.pantasystem.milktea.note.reaction.ReactionViewData
 
 open class PlaneNoteViewData(
     val note: NoteRelation,
     val account: Account,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val noteTranslationStore: NoteTranslationStore,
     private val instanceEmojis: List<Emoji>,
+    noteDataSource: NoteDataSource,
+    configRepository: LocalConfigRepository,
+    emojiRepository: CustomEmojiRepository,
+    coroutineScope: CoroutineScope,
 ) : NoteViewData {
 
     val id = note.note.id
@@ -42,8 +49,11 @@ open class PlaneNoteViewData(
             }
         }
 
-    private val _currentNote = MutableLiveData(toShowNote.note)
-    val currentNote: LiveData<Note> = _currentNote
+    val currentNote: LiveData<Note> = noteDataSource.observeOne(toShowNote.note.id).map {
+        it ?: toShowNote.note
+    }.onStart {
+        emit(toShowNote.note)
+    }.asLiveData(coroutineScope.coroutineContext)
 
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
@@ -91,7 +101,7 @@ open class PlaneNoteViewData(
     }?.filter {
         it.aboutMediaType == AboutMediaType.IMAGE || it.aboutMediaType == AboutMediaType.VIDEO
     } ?: emptyList()
-    val media = MediaViewData(previewableFiles)
+    val media = MediaViewData(previewableFiles, configRepository.get().getOrNull())
 
     val isOnlyVisibleRenoteStatusMessage = MutableLiveData<Boolean>(false)
 
@@ -121,7 +131,9 @@ open class PlaneNoteViewData(
     val replyCount = MutableLiveData(toShowNote.note.repliesCount)
 
 
-    val renoteCount = MutableLiveData(toShowNote.note.renoteCount)
+    val renoteCount: LiveData<Int> = Transformations.map(currentNote) {
+        it?.renoteCount ?: 0
+    }
 
     val favoriteCount = Transformations.map(currentNote) {
         (it.type as? Note.Type.Mastodon?)?.favoriteCount
@@ -131,17 +143,28 @@ open class PlaneNoteViewData(
         it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
     }
 
-    val reactionCounts = MutableLiveData(toShowNote.note.reactionCounts)
+    val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
-    val reactionCount = Transformations.map(reactionCounts) {
-        var sum = 0
-        it?.forEach { count ->
-            sum += count.count
+    val reactionCountsViewData: LiveData<List<ReactionViewData>> = currentNote.switchMap { n ->
+        reactionCountsExpanded.map {
+            val reactions = if (it == true) {
+                n.reactionCounts
+            } else {
+                n.getShortReactionCounts(note.note.isRenoteOnly())
+            }
+            ReactionViewData.from(reactions, n, emojiRepository.getAndConvertToMap(account.getHost()))
         }
-        return@map sum
     }
 
-    val myReaction = MutableLiveData<String?>(toShowNote.note.myReaction)
+    val reactionCount = currentNote.map { note ->
+        note.reactionCounts.sumOf {
+            it.count
+        }
+    }
+
+    val myReaction: LiveData<String?> = Transformations.map(currentNote) {
+        it.myReaction
+    }
 
     val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
@@ -170,8 +193,27 @@ open class PlaneNoteViewData(
     val subNoteFiles = subNote?.files ?: emptyList()
     val subNoteMedia = MediaViewData(subNote?.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
-    } ?: emptyList())
+    } ?: emptyList(), configRepository.get().getOrNull())
 
+    val channelInfo: LiveData<Note.Type.Misskey.SimpleChannelInfo?> = currentNote.map {
+        (it.type as? Note.Type.Misskey)?.channel
+    }
+
+    val isVisibleNoteDivider = configRepository.observe().map {
+        it.isEnableNoteDivider
+    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+
+    val isVisibleInstanceTicker = configRepository.observe().map {
+        it.isEnableInstanceTicker
+    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+
+    val isUserNameDefault = configRepository.observe().map {
+        it.isUserNameDefault
+    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+
+    val isVisibleSubNoteMediaPreview = subContentFolding.map { folding ->
+        !(folding || subNoteFiles.isEmpty() || subNoteMedia.isOver4Files)
+    }
 
     fun changeContentFolding() {
         val isFolding = contentFolding.value ?: return
@@ -198,23 +240,20 @@ open class PlaneNoteViewData(
             it.name to it
         } ?: emptyList())
         emojis = emojiMap.values.toList() + instanceEmojis
-        renoteCount.postValue(note.renoteCount)
-
-        myReaction.postValue(note.myReaction)
-        reactionCounts.postValue(note.reactionCounts)
         note.poll?.let {
             poll.postValue(it)
         }
-        _currentNote.postValue(note)
     }
 
-
-    val eventFlow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-        if (it is NoteDataSource.Event.Updated) {
-            update(it.note)
+    fun capture(job: (Flow<NoteDataSource.Event>) -> Job) {
+        val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
+            if (it is NoteDataSource.Event.Updated) {
+                update(it.note)
+            }
+        }.catch { e ->
+            Log.d("PlaneNoteViewData", "error", e)
         }
-    }.catch { e ->
-        Log.d("PlaneNoteViewData", "error", e)
+        this.job = job(flow)
     }
 
     var job: Job? = null
@@ -231,6 +270,10 @@ open class PlaneNoteViewData(
     fun expand() {
         Log.d("PlaneNoteViewData", "expand")
         expanded.value = true
+    }
+
+    fun expandReactions() {
+        reactionCountsExpanded.value = true
     }
 
 }

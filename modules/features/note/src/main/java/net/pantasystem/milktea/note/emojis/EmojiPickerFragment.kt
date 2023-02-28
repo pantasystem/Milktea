@@ -111,17 +111,41 @@ class EmojiSelectionBinder(
     }
 
     fun bind() {
-        val searchedReactionAdapter = EmojiChoicesAdapter {
-            onReactionSelected(it.toTextReaction())
-        }
+        val searchedReactionAdapter = EmojiChoicesAdapter(
+            onEmojiSelected = {
+                onReactionSelected(it.toTextReaction())
+            },
+            onEmojiLongClicked = { emojiType ->
+                val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
+                if (!exists) {
+                    AddEmojiToUserConfigDialog.newInstance(emojiType)
+                        .show(fragmentManager, "AddEmojiToUserConfigDialog")
+                    true
+                } else {
+                    false
+                }
+            }
+        )
         searchSuggestionListView.adapter = searchedReactionAdapter
         searchSuggestionListView.layoutManager = flexBoxLayoutManager
 
         val layoutManager = LinearLayoutManager(context)
 
-        val choicesAdapter = EmojiChoicesListAdapter {
-            onReactionSelected(it.toTextReaction())
-        }
+        val choicesAdapter = EmojiChoicesListAdapter(
+            onEmojiLongClicked = { emojiType ->
+                val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
+                if (!exists) {
+                    AddEmojiToUserConfigDialog.newInstance(emojiType)
+                        .show(fragmentManager, "AddEmojiToUserConfigDialog")
+                    true
+                } else {
+                    false
+                }
+            },
+            onEmojiSelected = {
+                onReactionSelected(it.toTextReaction())
+            }
+        )
         recyclerView.adapter = choicesAdapter
 
         recyclerView.layoutManager = layoutManager

@@ -14,7 +14,6 @@
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0.5dp"
             app:cardUseCompatPadding="false"
             app:cardCornerRadius="0dp"
             android:elevation="0dp"
@@ -65,6 +64,7 @@
                             android:layout_marginEnd="8dp"
                             tools:ignore="ContentDescription"
                             app:transitionDestinationUser="@{hasReplyToNote.replyTo.toShowNote.user}"
+                            android:scaleType="centerCrop"
                             />
 
                     <TextView
@@ -142,7 +142,11 @@
                     />
 
 
-
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/note_divider_height"
+                    android:background="?android:attr/listDivider"
+                    android:visibility="@{ hasReplyToNote.isVisibleNoteDivider ? View.VISIBLE : View.GONE}" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

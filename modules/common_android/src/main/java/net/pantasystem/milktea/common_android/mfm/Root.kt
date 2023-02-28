@@ -1,9 +1,9 @@
-package jp.panta.misskeyandroidclient.mfm
+package net.pantasystem.milktea.common_android.mfm
 
-import net.pantasystem.milktea.common_android.mfm.ElementType
+import jp.panta.misskeyandroidclient.mfm.Node
 
 class Root(
-    val sourceText: String
+    val sourceText: String,
 ) : Node(0, sourceText.length, 0, sourceText.length, ElementType.ROOT){
     override val elementType: ElementType = ElementType.ROOT
     override val start: Int = 0
@@ -17,7 +17,9 @@ class Root(
             if(el is Node){
                 getUrls(urls, el)
             }else if(el is Link){
-                urls.add(el.url)
+                if (el.skipOgpLink == null || !el.skipOgpLink) {
+                    urls.add(el.rawUrl)
+                }
             }
         }
         return urls.toList()

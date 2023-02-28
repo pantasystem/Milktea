@@ -7,11 +7,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.notes.InitialLoadQuery
@@ -21,6 +18,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_android.resource.StringSource
+import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
@@ -28,6 +26,7 @@ import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -43,6 +42,7 @@ class TimelineViewModel @AssistedInject constructor(
     private val accountStore: AccountStore,
     private val wordFilterConfigRepository: WordFilterConfigRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
+    private val configRepository: LocalConfigRepository,
     @Assisted val account: Account?,
     @Assisted val accountId: Long? = account?.accountId,
     @Assisted val pageable: Pageable,
@@ -112,6 +112,17 @@ class TimelineViewModel @AssistedInject constructor(
         viewModelScope
     )
 
+    private val noteStreamingCollector = NoteStreamingCollector(
+        accountStore = accountStore,
+        timelineStore = timelineStore,
+        coroutineScope = viewModelScope,
+        logger = logger,
+        currentAccountWatcher = currentAccountWatcher,
+        noteStreaming = noteStreaming,
+        pageable = pageable,
+    )
+    private var isActive = true
+
     init {
 
         viewModelScope.launch {
@@ -124,14 +135,20 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
 
-        accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
-            noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
-        }.map {
-            timelineStore.onReceiveNote(it.id)
-        }.catch {
-            logger.error("receive not error", it)
-        }.launchIn(viewModelScope + Dispatchers.IO)
-
+        viewModelScope.launch {
+            (0..Int.MAX_VALUE).asFlow().map {
+                delay(1_000)
+            }.filter {
+                this@TimelineViewModel.isActive && !timelineStore.isActiveStreaming
+            }.map {
+                logger.debug { "active state isActive:${isActive}, isActiveStreaming:${timelineStore.isActiveStreaming}" }
+                timelineStore.loadFuture().onFailure {
+                    if (it is APIError.ToManyRequestsException) {
+                        delay(10_000)
+                    }
+                }
+            }.collect()
+        }
     }
 
 
@@ -167,6 +184,43 @@ class TimelineViewModel @AssistedInject constructor(
     }
 
 
+
+    fun onResume() {
+        isActive = true
+        viewModelScope.launch {
+            val config = configRepository.get().getOrNull()
+            if (config?.isEnableStreamingAPIAndNoteCapture == false) {
+                // NOTE: 自動更新が無効であればNoteのCaptureとStreaming APIを停止している
+                timelineStore.suspendStreaming()
+                noteStreamingCollector.onSuspend()
+                cache.suspendNoteCapture()
+            } else {
+                // NOTE: 自動更新が有効なのでNote CaptureとStreaming APIを再開している
+                noteStreamingCollector.onResume()
+                cache.captureNotes()
+            }
+
+            if (config?.isStopStreamingApiWhenBackground == true) {
+                loadNew()
+            }
+        }
+    }
+
+    fun onPause() {
+        isActive = false
+        viewModelScope.launch {
+            val config = configRepository.get().getOrNull()
+            if (config?.isStopStreamingApiWhenBackground == true) {
+                timelineStore.suspendStreaming()
+                noteStreamingCollector.onSuspend()
+            }
+
+            if (config?.isStopNoteCaptureWhenBackground == true) {
+                cache.suspendNoteCapture()
+            }
+        }
+    }
+
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -194,20 +248,11 @@ sealed interface TimelineListItem {
                 is IOException -> {
                     StringSource(R.string.timeout_error)
                 }
-                is APIError.AuthenticationException -> {
-                    StringSource(R.string.auth_error)
-                }
-                is APIError.IAmAIException -> {
-                    StringSource(R.string.bot_error)
-                }
-                is APIError.InternalServerException -> {
-                    StringSource(R.string.server_error)
-                }
-                is APIError.ClientException -> {
-                    StringSource(R.string.parameter_error)
+                is APIError -> {
+                    APIErrorStringConverter()(throwable)
                 }
                 is UnauthorizedException -> {
-                    StringSource(R.string.timeline_unauthorized_error)
+                    StringSource(R.string.unauthorized_error)
                 }
                 else -> {
                     StringSource("error:$throwable")
@@ -248,5 +293,42 @@ fun PageableState<List<PlaneNoteViewData>>.toList(): List<TimelineListItem> {
                 }
             )
         }
+    }
+}
+
+class NoteStreamingCollector(
+    val coroutineScope: CoroutineScope,
+    val timelineStore: TimelineStore,
+    val accountStore: AccountStore,
+    val noteStreaming: NoteStreaming,
+    val logger: Logger,
+    val pageable: Pageable,
+    val currentAccountWatcher: CurrentAccountWatcher,
+) {
+
+    private var job: Job? = null
+
+    fun onSuspend() {
+        synchronized(this) {
+            job?.cancel()
+            job = null
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun onResume() {
+        synchronized(this) {
+            if (job != null) {
+                return
+            }
+            job = accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
+                noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
+            }.map {
+                timelineStore.onReceiveNote(it.id)
+            }.catch {
+                logger.error("receive not error", it)
+            }.launchIn(coroutineScope + Dispatchers.IO)
+        }
+
     }
 }

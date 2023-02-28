@@ -88,6 +88,7 @@ class ExploreFragment : Fragment() {
                                             userDetail = content.rawContent[i],
                                             isUserNameMain = false,
                                             accountHost = account?.getHost(),
+                                            myId = account?.remoteId,
                                             onAction = ::onAction
                                         )
                                     }

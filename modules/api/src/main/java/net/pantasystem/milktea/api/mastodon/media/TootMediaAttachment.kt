@@ -6,8 +6,8 @@ import kotlinx.serialization.SerialName
 data class TootMediaAttachment(
     val id: String,
     val type: String,
-    val url: String,
-    @SerialName("preview_url") val previewUrl: String,
+    val url: String?,
+    @SerialName("preview_url") val previewUrl: String? = null,
     @SerialName("remote_url") val remoteUrl: String? = null,
     val description: String? = null,
     val blurhash: String? = null,

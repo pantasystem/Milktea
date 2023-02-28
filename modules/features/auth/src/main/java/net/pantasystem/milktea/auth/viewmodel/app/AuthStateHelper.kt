@@ -4,7 +4,6 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
-import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
@@ -12,19 +11,20 @@ import net.pantasystem.milktea.api.misskey.auth.SignInRequest
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
-import net.pantasystem.milktea.common.BuildConfig
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.account.newAccount
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.AccessToken
 import net.pantasystem.milktea.data.infrastructure.auth.custom.CustomAuthStore
 import net.pantasystem.milktea.data.infrastructure.auth.custom.createAuth
-import net.pantasystem.milktea.data.infrastructure.toUser
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.app.AppType
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -36,6 +36,7 @@ import java.net.URL
 import java.util.regex.Pattern
 import javax.inject.Inject
 
+val urlPattern: Pattern = Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
 
 class AuthStateHelper @Inject constructor(
     private val mastodonAPIProvider: MastodonAPIProvider,
@@ -48,9 +49,10 @@ class AuthStateHelper @Inject constructor(
     val subscriptionRegistration: SubscriptionRegistration,
     val userDataSource: UserDataSource,
     val nodeInfoRepository: NodeInfoRepository,
-    ) {
-    private val urlPattern =
-        Pattern.compile("""(https?)(://)([-_.!~*'()\[\]a-zA-Z0-9;/?:@&=+${'$'},%#]+)""")
+    val mastodonInstanceInfoRepository: MastodonInstanceInfoRepository,
+    val userDTOEntityConverter: UserDTOEntityConverter
+) {
+
 
     suspend fun createWaiting4Approval(
         instanceBase: String,
@@ -130,7 +132,7 @@ class AuthStateHelper @Inject constructor(
             val nodeInfo = nodeInfoRepository.find(URL(url).host).getOrNull()
 
             val misskey: Meta?
-            val mastodon: Instance?
+            val mastodon: MastodonInstanceInfo?
 
             suspend fun fetchMeta(): Meta? {
                 return withContext(Dispatchers.IO) {
@@ -140,18 +142,12 @@ class AuthStateHelper @Inject constructor(
                 }
             }
 
-            suspend fun fetchInstance(): Instance? {
+            suspend fun fetchInstance(): MastodonInstanceInfo? {
                 return withContext(Dispatchers.IO) {
-                    if (!BuildConfig.DEBUG) {
-                        return@withContext null
-                    }
-                    runCancellableCatching {
-                        mastodonAPIProvider.get(url)
-                            .getInstance()
-                    }.getOrNull()
+                    mastodonInstanceInfoRepository.find(url).getOrNull()
                 }
             }
-            when(nodeInfo?.type) {
+            when (nodeInfo?.type) {
                 is NodeInfo.SoftwareType.Mastodon -> {
                     mastodon = fetchInstance()
                     misskey = null
@@ -174,9 +170,6 @@ class AuthStateHelper @Inject constructor(
                 return InstanceType.Misskey(misskey)
             }
             if (mastodon != null) {
-                if (!BuildConfig.DEBUG) {
-                    throw IllegalArgumentException("Mastodon does not support.")
-                }
                 return InstanceType.Mastodon(mastodon)
             }
             throw IllegalArgumentException()
@@ -208,14 +201,16 @@ class AuthStateHelper @Inject constructor(
                 (a.accessToken as AccessToken.Mastodon).account.toModel(account)
             }
             is AccessToken.Misskey -> {
-                (a.accessToken as AccessToken.Misskey).user.toUser(
+                userDTOEntityConverter.convert(
                     account,
+                    (a.accessToken as AccessToken.Misskey).user,
                     true
                 ) as User.Detail
             }
             is AccessToken.MisskeyIdAndPassword -> {
-                (a.accessToken as AccessToken.MisskeyIdAndPassword).user.toUser(
+                userDTOEntityConverter.convert(
                     account,
+                    (a.accessToken as AccessToken.MisskeyIdAndPassword).user,
                     true
                 ) as User.Detail
             }
@@ -227,29 +222,34 @@ class AuthStateHelper @Inject constructor(
         return Authorization.Finish(account, user)
     }
 
-    suspend fun signIn(formState: AuthUserInputState): Result<AccessToken.MisskeyIdAndPassword> = runCancellableCatching {
-        withContext(Dispatchers.IO) {
+    suspend fun signIn(formState: AuthUserInputState): Result<AccessToken.MisskeyIdAndPassword> =
+        runCancellableCatching {
+            withContext(Dispatchers.IO) {
 
-            val baseUrl = toEnableUrl(requireNotNull(formState.host))
-            val api = misskeyAPIServiceBuilder.buildAuthAPI(baseUrl)
-            require(formState.isIdPassword) {
-                "入力がid, passwordのパターンと異なります"
+                val baseUrl = toEnableUrl(requireNotNull(formState.host))
+                val api = misskeyAPIServiceBuilder.buildAuthAPI(baseUrl)
+                require(formState.isIdPassword) {
+                    "入力がid, passwordのパターンと異なります"
+                }
+                val res = api.signIn(
+                    SignInRequest(
+                        username = requireNotNull(formState.username),
+                        password = formState.password,
+                    )
+                ).throwIfHasError().body()
+                requireNotNull(res)
+                val userDTO = misskeyAPIProvider.get(baseUrl).i(
+                    I(
+                        res.i
+                    )
+                ).throwIfHasError().body()
+                AccessToken.MisskeyIdAndPassword(
+                    baseUrl = baseUrl,
+                    accessToken = res.i,
+                    user = requireNotNull(userDTO)
+                )
             }
-            val res = api.signIn(SignInRequest(
-                username = requireNotNull(formState.username),
-                password = formState.password,
-            )).throwIfHasError().body()
-            requireNotNull(res)
-            val userDTO = misskeyAPIProvider.get(baseUrl).i(I(
-                res.i
-            )).throwIfHasError().body()
-            AccessToken.MisskeyIdAndPassword(
-                baseUrl = baseUrl,
-                accessToken = res.i,
-                user = requireNotNull(userDTO)
-            )
         }
-    }
 
     fun checkUrlPattern(url: String): Boolean {
         return urlPattern.matcher(url).find()

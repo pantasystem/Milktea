@@ -32,9 +32,9 @@ dependencyResolutionManagement {
             library("coil-compose", "io.coil-kt:coil-compose:2.2.2")
             library("compose-constraintlayout", "androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
-            library("hilt-android", "com.google.dagger:hilt-android:2.44")
-            library("hilt-compiler", "com.google.dagger:hilt-compiler:2.43.2")
-            library("hilt-android-testing", "com.google.dagger:hilt-android-testing:2.44")
+            library("hilt-android", "com.google.dagger:hilt-android:2.45")
+            library("hilt-compiler", "com.google.dagger:hilt-compiler:2.45")
+            library("hilt-android-testing", "com.google.dagger:hilt-android-testing:2.45")
 
             library("lifecycle-extenstions", "androidx.lifecycle:lifecycle-extensions:2.2.0")
             library("lifecycle-viewmodel", "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
@@ -53,7 +53,7 @@ dependencyResolutionManagement {
             library('appcompat-appcompat', 'androidx.appcompat:appcompat:1.6.0-rc01')
             library('android-material-material', 'com.google.android.material:material:1.6.1')
             library('androidx-core-ktx', 'androidx.core:core-ktx:1.9.0')
-            library('fragment-ktx', 'androidx.fragment:fragment-ktx:1.5.2')
+            library('fragment-ktx', 'androidx.fragment:fragment-ktx:1.5.5')
             library('activity-ktx', 'androidx.activity:activity-ktx:1.5.0')
 
             def emoji2_version = "1.2.0"
@@ -84,6 +84,8 @@ dependencyResolutionManagement {
             library("junit-jupiter-engine", "org.junit.jupiter:junit-jupiter-engine:5.7.0")
 
             library("okhttp-sse", "com.squareup.okhttp3:okhttp-sse:4.10.0")
+
+            library("kotlin-serialization", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
         }
     }
 }
@@ -117,3 +119,5 @@ include ':modules:features:notification'
 include ':modules:features:search'
 include ':modules:features:favorite'
 include ':modules:worker'
+include ':modules:features:clip'
+include ':modules:features:account'

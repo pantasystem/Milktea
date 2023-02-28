@@ -5,19 +5,16 @@ import net.pantasystem.milktea.api.misskey.v12_75_0.*
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
+import net.pantasystem.milktea.data.converters.GalleryPostDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.drive.FileUploaderProvider
 import net.pantasystem.milktea.data.infrastructure.drive.UploadSource
-import net.pantasystem.milktea.data.infrastructure.toEntity
-import net.pantasystem.milktea.data.infrastructure.toFileProperty
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.gallery.*
 import net.pantasystem.milktea.model.gallery.GalleryPost
 import net.pantasystem.milktea.model.instance.IllegalVersionException
-import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 import net.pantasystem.milktea.api.misskey.v12_75_0.CreateGallery as CreateGalleryDTO
 
@@ -26,9 +23,8 @@ class GalleryRepositoryImpl @Inject constructor(
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val galleryDataSource: GalleryDataSource,
     private val fileUploaderProvider: FileUploaderProvider,
-    private val userDataSource: UserDataSource,
-    private val filePropertyDataSource: FilePropertyDataSource,
     private val accountRepository: AccountRepository,
+    private val galleryPostDTOEntityConverter: GalleryPostDTOEntityConverter,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GalleryRepository {
 
@@ -42,11 +38,7 @@ class GalleryRepositoryImpl @Inject constructor(
                             is AppFile.Remote -> it.id
                             is AppFile.Local -> {
                                 fileUploaderProvider.get(createGalleryPost.author)
-                                    .upload(UploadSource.LocalFile(it), true).let {
-                                        it.toFileProperty(createGalleryPost.author).also { entity ->
-                                            filePropertyDataSource.add(entity)
-                                        }
-                                    }.id
+                                    .upload(UploadSource.LocalFile(it), true).id
                             }
                         }
                     }
@@ -66,8 +58,7 @@ class GalleryRepositoryImpl @Inject constructor(
             ).throwIfHasError().body()
             requireNotNull(created)
 
-            val gallery =
-                created.toEntity(createGalleryPost.author, filePropertyDataSource, userDataSource)
+            val gallery = galleryPostDTOEntityConverter.convert(created, createGalleryPost.author)
             galleryDataSource.add(gallery)
             gallery
         }
@@ -102,7 +93,7 @@ class GalleryRepositoryImpl @Inject constructor(
             ).throwIfHasError()
             val body = res.body()
             requireNotNull(body)
-            val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
+            val gallery = galleryPostDTOEntityConverter.convert(body, account)
             galleryDataSource.add(gallery)
             gallery
         }
@@ -145,12 +136,10 @@ class GalleryRepositoryImpl @Inject constructor(
                 updateGalleryPost.files.map {
                     async {
                         when (it) {
-                            is AppFile.Remote -> it.id.fileId
+                            is AppFile.Remote -> it.id
                             is AppFile.Local -> {
                                 fileUploaderProvider.get(account)
-                                    .upload(UploadSource.LocalFile(it), true).also {
-                                        filePropertyDataSource.add(it.toFileProperty(account))
-                                    }.id
+                                    .upload(UploadSource.LocalFile(it), true).id
                             }
                         }
                     }
@@ -162,12 +151,12 @@ class GalleryRepositoryImpl @Inject constructor(
                     postId = updateGalleryPost.id.galleryId,
                     description = updateGalleryPost.description,
                     title = updateGalleryPost.title,
-                    fileIds = files,
+                    fileIds = files.map { it.fileId },
                     isSensitive = updateGalleryPost.isSensitive
                 )
             ).throwIfHasError().body()
             requireNotNull(body)
-            val gallery = body.toEntity(account, filePropertyDataSource, userDataSource)
+            val gallery = galleryPostDTOEntityConverter.convert(body, account)
             galleryDataSource.add(gallery)
             gallery
         }

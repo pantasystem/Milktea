@@ -16,7 +16,7 @@ import net.pantasystem.milktea.model.notes.Note
 
 
 
-class FavoriteNoteTimelinePagingStoreImpl(
+internal class FavoriteNoteTimelinePagingStoreImpl(
     val pageableTimeline: Pageable.Favorite,
     val noteAdder: NoteDataSourceAdder,
     val getAccount: suspend () -> Account,

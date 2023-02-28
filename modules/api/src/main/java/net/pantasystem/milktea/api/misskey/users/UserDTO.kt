@@ -4,6 +4,8 @@ package net.pantasystem.milktea.api.misskey.users
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
@@ -34,7 +36,9 @@ data class UserDTO(
     val isAdmin: Boolean? = null,
     val avatarUrl: String? = null,
     val bannerUrl: String? = null,
-    val emojis: List<Emoji>? = null,
+
+    @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
+    @SerialName("emojis") val rawEmojis: EmojisType? = null,
 
     val isFollowing: Boolean? = null,
     val isFollowed: Boolean? = null,
@@ -49,6 +53,7 @@ data class UserDTO(
     val instance: InstanceInfo? = null,
     val fields: List<FieldDTO>? = null,
 
+    @kotlinx.serialization.Transient
     val birthday: LocalDate? = null,
 
     val createdAt: Instant? = null,
@@ -67,17 +72,16 @@ data class UserDTO(
         val themeColor: String? = null,
     )
 
+    val emojiList: List<Emoji>? = when(rawEmojis) {
+        EmojisType.None -> null
+        is EmojisType.TypeArray -> rawEmojis.emojis
+        is EmojisType.TypeObject -> rawEmojis.emojis.map {
+            Emoji(name = it.key, url = it.value, uri = it.value)
+        }
+        null -> null
+    }
+
     @kotlinx.serialization.Serializable
     data class FieldDTO(val name: String, val value: String)
-
-    val displayUserName: String
-        get() = "@" + this.userName + if (this.host == null) {
-            ""
-        } else {
-            "@" + this.host
-        }
-
-    val displayName: String
-        get() = name ?: userName
 
 }

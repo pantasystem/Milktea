@@ -3,8 +3,8 @@ package net.pantasystem.milktea.api.misskey
 import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
 import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
 import net.pantasystem.milktea.api.misskey.app.CreateApp
-import net.pantasystem.milktea.api.misskey.app.ShowApp
 import net.pantasystem.milktea.api.misskey.auth.App
+import net.pantasystem.milktea.api.misskey.clip.*
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
 import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
@@ -25,6 +25,8 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
 import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
+import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
+import net.pantasystem.milktea.api.misskey.register.WebClientRegistries
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
@@ -45,11 +47,6 @@ interface MisskeyAPI {
     @POST("api/app/create")
     suspend fun createApp(@Body createApp: CreateApp): Response<App>
 
-    @POST("api/my/apps")
-    suspend fun myApps(@Body i: I) : Response<List<App>>
-
-    @POST("api/app/show")
-    suspend fun showApp(@Body showApp: ShowApp) : Response<App>
 
     @POST("api/blocking/create")
     suspend fun blockUser(@Body requestUser: RequestUser): Response<Unit>
@@ -106,6 +103,9 @@ interface MisskeyAPI {
 
     @POST("api/following/requests/reject")
     suspend fun rejectFollowRequest(@Body rejectFollowRequest: RejectFollowRequest) : Response<Unit>
+
+    @POST("api/following/requests/list")
+    suspend fun getFollowRequestsList(@Body body: GetFollowRequest): Response<List<FollowRequestDTO>>
     //account
     @POST("api/i/favorites")
     suspend fun favorites(@Body noteRequest: NoteRequest): Response<List<Favorite>?>
@@ -183,7 +183,8 @@ interface MisskeyAPI {
     @POST("api/notes/mentions")
     suspend fun mentions(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
-
+    @POST("api/notes/recommended-timeline")
+    suspend fun getCalckeyRecommendedTimeline(@Body noteRequest: NoteRequest): Response<List<NoteDTO>?>
 
     //drive
     @POST("api/drive/files")
@@ -267,4 +268,38 @@ interface MisskeyAPI {
 
     @POST("api/emojis")
     suspend fun getEmojis(@Body req: EmptyRequest) : Response<EmojisResponse>
+
+    @POST("api/i/registry/get-all")
+    suspend fun getReactionsFromGetAll(@Body req: WebClientBaseRequest): Response<WebClientRegistries>
+
+    @POST("api/clips/create")
+    suspend fun createClip(@Body req: CreateClipRequest): Response<ClipDTO>
+
+    @POST("api/clips/update")
+    suspend fun updateClip(@Body req: UpdateClipRequest): Response<ClipDTO>
+
+    @POST("api/clips/delete")
+    suspend fun deleteClip(@Body req: DeleteClipRequest): Response<Unit>
+
+    @POST("api/users/clips")
+    suspend fun findByUsersClip(@Body req: FindUsersClipRequest): Response<List<ClipDTO>>
+
+    @POST("api/notes/clips")
+    suspend fun findByNotesClip(@Body req: FindNotesClip): Response<List<ClipDTO>>
+
+
+    @POST("api/clips/add-note")
+    suspend fun addNoteToClip(@Body req: AddNoteToClipRequest): Response<Unit>
+
+    @POST("api/clips/remove-note")
+    suspend fun removeNoteToClip(@Body req: RemoveNoteToClipRequest): Response<Unit>
+
+    @POST("api/clips/show")
+    suspend fun showClip(@Body req: ShowClipRequest): Response<ClipDTO>
+
+    @POST("api/clips/list")
+    suspend fun findMyClips(@Body req: I): Response<List<ClipDTO>>
+
+    @POST("api/clips/notes")
+    suspend fun getClipNotes(@Body req: NoteRequest): Response<List<NoteDTO>?>
 }

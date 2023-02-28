@@ -18,6 +18,7 @@ interface TimelineStore {
     val timelineState: Flow<PageableState<List<Note.Id>>>
     val relatedNotes: Flow<PageableState<List<NoteRelation>>>
     val receiveNoteQueue: SharedFlow<Note.Id>
+    val isActiveStreaming: Boolean
 
 
     suspend fun loadPrevious(): Result<Unit>
@@ -35,6 +36,9 @@ interface TimelineStore {
     fun onReceiveNote(noteId: Note.Id)
 
     fun latestReceiveNoteId(): Note.Id?
+
+    fun suspendStreaming()
+
 }
 
 sealed interface InitialLoadQuery {

@@ -17,6 +17,9 @@ import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecord
 import net.pantasystem.milktea.data.infrastructure.drive.DriveFileRecordDao
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojiDTO
 import net.pantasystem.milktea.data.infrastructure.emoji.Utf8EmojisDAO
+import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiAliasRecord
+import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
+import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupDao
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberIdRecord
 import net.pantasystem.milktea.data.infrastructure.group.GroupMemberView
@@ -37,6 +40,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterCond
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionRegexRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConditionWordRecord
 import net.pantasystem.milktea.data.infrastructure.notes.wordmute.WordFilterConfigDao
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecord
+import net.pantasystem.milktea.data.infrastructure.notification.db.NotificationJsonCacheRecordDAO
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotification
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.infrastructure.search.SearchHistoryDao
@@ -92,8 +97,15 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         UserInfoStateRecord::class,
         UserRelatedStateRecord::class,
         NodeInfoRecord::class,
+
+        MastodonInstanceInfoRecord::class,
+
+        CustomEmojiRecord::class,
+        CustomEmojiAliasRecord::class,
+
+        NotificationJsonCacheRecord::class
     ],
-    version = 34,
+    version = 39,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -119,6 +131,11 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 31, to = 32),
         AutoMigration(from = 32, to = 33),
         AutoMigration(from = 33, to = 34),
+        AutoMigration(from = 34, to = 35),
+        AutoMigration(from = 35, to = 36),
+        AutoMigration(from = 36, to = 37),
+        AutoMigration(from = 37, to = 38),
+        AutoMigration(from = 38, to = 39),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -173,4 +190,10 @@ abstract class DataBase : RoomDatabase() {
     abstract fun searchHistoryDao(): SearchHistoryDao
 
     abstract fun nodeInfoDao(): NodeInfoDao
+
+    abstract fun mastodonInstanceInfoDao(): MastodonInstanceInfoDAO
+
+    abstract fun customEmojiDao(): CustomEmojiDAO
+
+    abstract fun notificationJsonCacheRecordDAO(): NotificationJsonCacheRecordDAO
 }

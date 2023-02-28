@@ -45,7 +45,9 @@
                 android:contentDescription="@string/avataricon"
                 app:transitionDestinationUser="@{note.toShowNote.user}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:scaleType="centerCrop"
+                />
 
         <TextView
                 android:layout_width="wrap_content"
@@ -62,6 +64,7 @@
                 android:layout_marginStart="@dimen/note_avatar_icon_right_margin_size"
                 app:layout_constraintEnd_toStartOf="@id/elapsedTime"
                 app:layout_constraintHorizontal_bias="0"
+
                 />
 
         <TextView
@@ -145,6 +148,7 @@
                         android:gravity="center_vertical"
                         android:padding="2dp"
                         instanceInfo="@{note.toShowNote.user.instance}"
+                        isEnable="@{note.isVisibleInstanceTicker}"
                         android:singleLine="true"
                         />
                 <TextView
@@ -266,7 +270,9 @@
                                 android:contentDescription="@string/avataricon"
                                 app:transitionDestinationUser="@{note.subNote.user}"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"/>
+                                app:layout_constraintTop_toTopOf="parent"
+                                android:scaleType="centerCrop"
+                                />
 
                         <TextView
                                 android:layout_width="wrap_content"

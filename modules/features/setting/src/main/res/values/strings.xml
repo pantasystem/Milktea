@@ -7,4 +7,10 @@
     <string name="overwrite_save">Overwrite save</string>
     <string name="notification_sound">Notification Sound</string>
     <string name="inapp_notification_sound">Enable In-app notification sound</string>
+    <string name="streaming">Automatic updating</string>
+    <string name="is_stop_timeline_streaming_when_background">Do not update timeline when in background</string>
+    <string name="is_stop_note_capture_when_background">Do not capture notes in background</string>
+    <string name="enable_automic_updates">Enable automatic updates</string>
+    <string name="please_login">Please login</string>
+    <string name="settings_edit_tab_only_media">Only Media</string>
 </resources>

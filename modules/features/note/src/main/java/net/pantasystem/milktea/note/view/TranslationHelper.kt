@@ -8,6 +8,7 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.mfm.MFMParser
+import net.pantasystem.milktea.common_android_ui.LazyDecorateSkipElementsHolder
 import net.pantasystem.milktea.common_android_ui.MFMDecorator
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Translation
@@ -43,7 +44,8 @@ object TranslationHelper {
 
         val text = context.getString(R.string.translated_from_s, translation.sourceLang) + translation.text
         val root = MFMParser.parse(text, emojis)!!
-        this.text = MFMDecorator.decorate(this, root)
+        val lazy = MFMDecorator.decorate(root, LazyDecorateSkipElementsHolder())
+        this.text = MFMDecorator.decorate(this, lazy)
 
     }
 

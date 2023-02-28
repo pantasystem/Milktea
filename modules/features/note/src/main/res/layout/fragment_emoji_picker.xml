@@ -10,6 +10,7 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             >
 
         <com.google.android.material.textfield.TextInputLayout
@@ -39,29 +40,39 @@
                 app:tabMode="scrollable"
                 app:tabTextColor="?attr/normalIconTint"
                 android:elevation="0dp"
-                android:layout_below="@id/searchReactionInputLayout"
                 style="@style/Widget.MaterialComponents.Toolbar.Surface"
                 android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                android:layout_below="@id/searchReactionInputLayout"
                 >
 
 
         </com.google.android.material.tabs.TabLayout>
-
-
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reaction_choices_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/reaction_choices_tab"
                 android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.GONE : View.VISIBLE }"
+                android:layout_below="@id/reaction_choices_tab"
                 />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/searchSuggestionsView"
+        <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/reaction_choices_tab"
                 android:visibility="@{ emojiPickerViewModel.uiState.isSearchMode ? View.VISIBLE : View.GONE }"
-                />
+                android:layout_below="@id/reaction_choices_tab"
+                >
+            <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/searchSuggestionsView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.core.widget.NestedScrollView>
+
     </RelativeLayout>
 </layout>

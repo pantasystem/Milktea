@@ -1,14 +1,17 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MuteAccountRequest
 import net.pantasystem.milktea.api.misskey.users.CreateMuteUserRequest
 import net.pantasystem.milktea.api.misskey.users.RequestUser
+import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
+import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
-import net.pantasystem.milktea.data.infrastructure.toUser
+import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -19,14 +22,15 @@ import javax.inject.Singleton
 
 @Singleton
 class UserApiAdapter @Inject constructor(
-    val accountRepository: AccountRepository,
-    val misskeyAPIProvider: MisskeyAPIProvider,
-    val mastodonAPIProvider: MastodonAPIProvider,
-){
+    private val accountRepository: AccountRepository,
+    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val mastodonAPIProvider: MastodonAPIProvider,
+    private val userDTOEntityConverter: UserDTOEntityConverter,
+) {
 
     suspend fun show(userId: User.Id, detail: Boolean): User {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 val res = misskeyAPIProvider.get(account).showUser(
                     RequestUser(
@@ -35,7 +39,11 @@ class UserApiAdapter @Inject constructor(
                         detail = detail,
                     )
                 )
-                requireNotNull(res.throwIfHasError().body()).toUser(account, detail)
+                userDTOEntityConverter.convert(
+                    account,
+                    requireNotNull(res.throwIfHasError().body()),
+                    detail
+                )
             }
             Account.InstanceType.MASTODON -> {
                 val res = mastodonAPIProvider.get(account).getAccount(userId.id)
@@ -57,7 +65,7 @@ class UserApiAdapter @Inject constructor(
 
     suspend fun follow(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 misskeyAPIProvider.get(account).followUser(
                     RequestUser(userId = userId.id, i = account.token)
@@ -71,7 +79,7 @@ class UserApiAdapter @Inject constructor(
 
     suspend fun unfollow(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> misskeyAPIProvider.get(account)
                 .unFollowUser(RequestUser(userId = userId.id, i = account.token))
                 .throwIfHasError()
@@ -84,7 +92,7 @@ class UserApiAdapter @Inject constructor(
 
     suspend fun muteUser(createMute: CreateMute): UserActionResult {
         val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 require(createMute.notifications == null) {
                     "Misskey does not support notifications mute account parameter"
@@ -115,12 +123,14 @@ class UserApiAdapter @Inject constructor(
 
     suspend fun unmuteUser(userId: User.Id): UnMuteResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).unmuteUser(RequestUser(
-                    i = account.token,
-                    userId = userId.id,
-                )).throwIfHasError()
+                misskeyAPIProvider.get(account).unmuteUser(
+                    RequestUser(
+                        i = account.token,
+                        userId = userId.id,
+                    )
+                ).throwIfHasError()
                 UserActionResult.Misskey
             }
             Account.InstanceType.MASTODON -> {
@@ -134,12 +144,14 @@ class UserApiAdapter @Inject constructor(
 
     suspend fun blockUser(userId: User.Id): BlockUserResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).blockUser(RequestUser(
-                    i = account.token,
-                    userId = userId.id,
-                ))
+                misskeyAPIProvider.get(account).blockUser(
+                    RequestUser(
+                        i = account.token,
+                        userId = userId.id,
+                    )
+                )
                     .throwIfHasError()
                 UserActionResult.Misskey
             }
@@ -154,12 +166,14 @@ class UserApiAdapter @Inject constructor(
 
     suspend fun unblockUser(userId: User.Id): UnBlockUserResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).unblockUser(RequestUser(
-                    i = account.token,
-                    userId = userId.id,
-                ))
+                misskeyAPIProvider.get(account).unblockUser(
+                    RequestUser(
+                        i = account.token,
+                        userId = userId.id,
+                    )
+                )
                     .throwIfHasError()
                 UserActionResult.Misskey
             }
@@ -171,11 +185,47 @@ class UserApiAdapter @Inject constructor(
             }
         }
     }
+
+    suspend fun search(
+        accountId: Long,
+        userName: String,
+        host: String?
+    ): SearchResult {
+        val account = accountRepository.get(accountId).getOrThrow()
+        return when(account.instanceType) {
+            Account.InstanceType.MISSKEY -> {
+                val api = misskeyAPIProvider.get(account)
+                val body = requireNotNull(SearchByUserAndHost(api)
+                    .search(
+                        RequestUser(
+                            userName = userName,
+                            host = host,
+                            i = account.token
+                        )
+                    ).body()
+                )
+                SearchResult.Misskey(body)
+            }
+            Account.InstanceType.MASTODON -> {
+                val body = requireNotNull(
+                    mastodonAPIProvider.get(account).search(
+                        if (host == null) userName else "$userName@$host"
+                    ).throwIfHasError().body()
+                ).accounts
+                SearchResult.Mastodon(body)
+            }
+        }
+    }
 }
 
 sealed interface UserActionResult {
     object Misskey : UserActionResult
     data class Mastodon(val relationship: MastodonAccountRelationshipDTO) : UserActionResult
+}
+
+sealed interface SearchResult {
+    data class Misskey(val users: List<UserDTO>) : SearchResult
+    data class Mastodon(val users: List<MastodonAccountDTO>) : SearchResult
 }
 
 typealias UnMuteResult = UserActionResult

@@ -1,11 +1,12 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
-import net.pantasystem.milktea.api.mastodon.instance.Instance
+import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.model.instance.InstanceInfo
+import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
 
 
@@ -16,6 +17,7 @@ data class AuthUserInputState(
     val password: String,
     val isPrivacyPolicyAgreement: Boolean,
     val isTermsOfServiceAgreement: Boolean,
+    val isAcceptMastodonAlphaTest: Boolean,
 ) {
     val isIdPassword: Boolean by lazy {
         userNameRegex.matches(rawInputInstanceDomain)
@@ -42,7 +44,7 @@ data class BeforeAuthState(
 
 
 sealed interface InstanceType {
-    data class Mastodon(val instance: Instance) : InstanceType
+    data class Mastodon(val instance: MastodonInstanceInfo) : InstanceType
     data class Misskey(val instance: Meta) : InstanceType
 }
 
@@ -60,13 +62,17 @@ data class AuthUiState(
     val metaState: ResultState<InstanceType>,
     val stateType: Authorization,
     val waiting4ApproveState: ResultState<Authorization.Waiting4UserAuthorization> = ResultState.Fixed(
-        StateContent.NotExist()),
+        StateContent.NotExist()
+    ),
     val clientId: String = "",
     val instances: List<InstanceInfo> = emptyList(),
+    val misskeyInstanceInfosResponse: InstanceInfosResponse?
 ) {
     val isProgress by lazy {
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
     }
 
-
+    val isMastodon by lazy {
+        (metaState.content as? StateContent.Exist)?.rawContent is InstanceType.Mastodon
+    }
 }

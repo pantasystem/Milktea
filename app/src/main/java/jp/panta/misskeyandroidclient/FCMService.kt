@@ -22,6 +22,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notification.PushNotification
 import net.pantasystem.milktea.model.notification.toPushNotification
+import net.pantasystem.milktea.model.sw.register.DeviceTokenRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.user.activity.UserDetailActivity
@@ -40,12 +41,14 @@ const val GROUP_KEY_MISSKEY_NOTIFICATION = "jp.panta.misskeyandroidclient.notifi
 class FCMService : FirebaseMessagingService() {
 
 
-    @Inject lateinit var accountStore: AccountStore
+    @Inject internal lateinit var accountStore: AccountStore
 
+    @Inject internal lateinit var deviceTokenRepository: DeviceTokenRepository
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
+        deviceTokenRepository.save(token)
         val subscriptionRegistrationWorker =
             OneTimeWorkRequestBuilder<SubscriptionRegistrationWorker>()
 

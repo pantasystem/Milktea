@@ -12,7 +12,6 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
-import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.*
@@ -218,7 +217,7 @@ sealed interface RenoteActionResultEvent {
         val accounts: List<Long>
     ) : RenoteActionResultEvent
 
-    data class UnRenote(val result: Result<Unit>, val noteId: Note.Id) : RenoteActionResultEvent
+    data class UnRenote(val result: Result<Note>, val noteId: Note.Id) : RenoteActionResultEvent
 }
 
 private fun NoteRelation.canRenote(account: Account, user: User): Boolean {

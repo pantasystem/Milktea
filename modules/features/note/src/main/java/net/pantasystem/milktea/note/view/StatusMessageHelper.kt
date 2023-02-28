@@ -14,6 +14,7 @@ import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.NoteStatusMessageTextGenerator
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import kotlin.math.min
 
 
 object StatusMessageHelper {
@@ -58,11 +59,12 @@ object StatusMessageHelper {
         this.text = if (icon != null) {
             SpannableStringBuilder(text).apply {
                 insert(0, "icon")
-                val span = DrawableEmojiSpan(EmojiAdapter(this@setStatusMessage))
+                val span = DrawableEmojiSpan(EmojiAdapter(this@setStatusMessage), icon)
                 val drawable = ContextCompat.getDrawable(context, icon)
                 drawable?.setTint(currentTextColor)
                 Glide.with(context)
                     .load(drawable)
+                    .override(min(textSize.toInt(), 640))
                     .into(span.target)
 
                 setSpan(span, 0, "icon".length, 0)

@@ -7,8 +7,19 @@ import net.pantasystem.milktea.api.mastodon.apps.AccessToken
 import net.pantasystem.milktea.api.mastodon.apps.App
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
+import net.pantasystem.milktea.api.mastodon.context.ContextDTO
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
+import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
+import net.pantasystem.milktea.api.mastodon.list.ListDTO
+import net.pantasystem.milktea.api.mastodon.list.RemoveAccountsFromList
+import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
+import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
+import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
+import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.api.mastodon.search.SearchResponse
+import net.pantasystem.milktea.api.mastodon.status.CreateStatus
+import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import retrofit2.Response
 import retrofit2.http.*
@@ -43,14 +54,15 @@ interface MastodonAPI {
         @Query("since_id") sinceId: String? = null,
         @Query("min_id") minId: String? = null,
         @Query("limit") limit: Int = 20,
-        @Query("visibilities") visibilities: List<String>? = null,
+        @Query("visibilities[]", encoded = true) visibilities: List<String>? = null,
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/tag/{tag}")
     suspend fun getHashtagTimeline(
         @Path("tag") tag: String,
         @Query("min_id") minId: String? = null,
-        @Query("max_id") maxId: String? = null
+        @Query("max_id") maxId: String? = null,
+        @Query("only_media") onlyMedia: Boolean = false,
     ): Response<List<TootStatusDTO>>
 
     /**
@@ -60,7 +72,7 @@ interface MastodonAPI {
     suspend fun getHomeTimeline(
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
-        @Query("visibilities") visibilities: List<String>? = null
+        @Query("visibilities[]", encoded = true) visibilities: List<String>? = null
     ): Response<List<TootStatusDTO>>
 
     @GET("api/v1/timelines/list/{listId}")
@@ -98,7 +110,12 @@ interface MastodonAPI {
     suspend fun getAccount(@Path("accountId") accountId: String): Response<MastodonAccountDTO>
 
     @GET("api/v1/accounts/relationships")
-    suspend fun getAccountRelationships(@Query("id[]") ids: List<String>): Response<List<MastodonAccountRelationshipDTO>>
+    suspend fun getAccountRelationships(
+        @Query(
+            "id[]",
+            encoded = true
+        ) ids: List<String>
+    ): Response<List<MastodonAccountRelationshipDTO>>
 
     @POST("api/v1/accounts/{accountId}/follow")
     suspend fun follow(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
@@ -149,6 +166,103 @@ interface MastodonAPI {
     suspend fun unblockAccount(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
 
 
+    @GET("api/v1/notifications")
+    suspend fun getNotifications(
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("since_id") sinceId: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("types[]", encoded = true) types: List<String>? = null,
+        @Query("exclude_types[]", encoded = true) excludeTypes: List<String>? = null,
+        @Query("account_id") accountId: String? = null,
+    ): Response<List<MstNotificationDTO>>
+
+    @POST("api/v1/statuses")
+    suspend fun createStatus(
+        @Body body: CreateStatus
+    ): Response<TootStatusDTO>
+
+    @POST("api/v1/status")
+    suspend fun createScheduledStatus(
+        @Body body: CreateStatus,
+    ): Response<ScheduledStatus>
 
 
+    @GET("api/v1/statuses/{statusId}")
+    suspend fun getStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @DELETE("api/v1/statuses/{statusId}")
+    suspend fun deleteStatus(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/polls/{pollId}/votes")
+    suspend fun voteOnPoll(
+        @Path("pollId") pollId: String,
+        @Field("choices[]", encoded = true) choices: List<Int>
+    ): Response<TootPollDTO>
+
+    @POST("api/v1/statuses/{statusId}/mute")
+    suspend fun muteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+    @POST("api/v1/statuses/{statusId}/unmute")
+    suspend fun unmuteConversation(@Path("statusId") statusId: String): Response<TootStatusDTO>
+
+
+    @GET("api/v1/accounts/{accountId}/statuses")
+    suspend fun getAccountTimeline(
+        @Path("accountId") accountId: String,
+        @Query("only_media") onlyMedia: Boolean? = false,
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int = 20,
+        @Query("exclude_reblogs") excludeReblogs: Boolean? = null,
+        @Query("exclude_replies") excludeReplies: Boolean? = null,
+    ): Response<List<TootStatusDTO>>
+
+
+    @GET("api/v1/lists")
+    suspend fun getMyLists(): Response<List<ListDTO>>
+
+    @GET("api/v1/lists/{listId}")
+    suspend fun getList(@Path("listId") listId: String): Response<ListDTO>
+
+    @POST("api/v1/lists/{listId}/accounts")
+    suspend fun addAccountsToList(@Path("listId") listId: String, @Body body: AddAccountsToList): Response<Unit>
+
+    @DELETE("api/v1/lists/{listId}/accounts")
+    suspend fun removeAccountsFromList(@Path("listId") listId: String, @Body body: RemoveAccountsFromList): Response<Unit>
+
+    @GET("api/v1/lists/{listId}")
+    suspend fun getAccountsInList(
+        @Path("listId") listId: String,
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null
+    ): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/statuses/{statusId}/context")
+    suspend fun getStatusesContext(@Path("statusId") statusId: String): Response<ContextDTO>
+
+    @PUT("api/v1/media/{mediaId}")
+    suspend fun updateMediaAttachment(@Path("mediaId") mediaId: String, @Body body: UpdateMediaAttachment): Response<TootMediaAttachment>
+
+    @GET("api/v2/search")
+    suspend fun search(
+        @Query("q") q: String,
+        @Query("resolve") resolve: Boolean = true,
+        @Query("following") following: Boolean = false,
+        @Query("account_id") accountId: String? = null,
+        @Query("exclude_unreviewed") excludeUnreviewed: String? = null,
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null
+    ): Response<SearchResponse>
+
+    @POST("api/v1/follow_requests/{accountId}/authorize")
+    suspend fun acceptFollowRequest(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
+    @POST("api/v1/follow_requests/{accountId}/reject")
+    suspend fun rejectFollowRequest(@Path("accountId") accountId: String): Response<MastodonAccountRelationshipDTO>
+
+    @GET("api/v1/follow_requests")
+    suspend fun getFollowRequests(@Query("max_id") maxId: String? = null, @Query("min_id") minId: String? = null): Response<List<MastodonAccountDTO>>
 }

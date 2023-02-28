@@ -13,6 +13,7 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
+import kotlin.math.min
 import java.io.Serializable as JSerializable
 
 data class Note(
@@ -55,7 +56,12 @@ data class Note(
 
 
     sealed interface Type {
-        object Misskey : Type
+        data class Misskey(
+            val channel: SimpleChannelInfo? = null,
+        ) : Type {
+            data class SimpleChannelInfo(val id: Channel.Id, val name: String)
+        }
+
         data class Mastodon(
             val reblogged: Boolean?,
             val favorited: Boolean?,
@@ -65,7 +71,10 @@ data class Note(
             val tags: List<Tag>,
             val mentions: List<Mention>,
             val isFedibirdQuote: Boolean,
-        ) : Type {
+            val pollId: String?,
+            val isSensitive: Boolean?,
+            val pureText: String?,
+            ) : Type {
             data class Tag(
                 val name: String,
                 val url: String,
@@ -79,12 +88,31 @@ data class Note(
         }
     }
 
-    companion object
+    companion object {
+        const val SHORT_REACTION_COUNT_MAX_SIZE = 16
+        const val SHORT_RENOTE_REACTION_COUNT_MAX_SIZE = 8
+    }
 
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
 
     val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+
+    fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
+        return if (isRenote) {
+            if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
+                reactionCounts
+            } else {
+                reactionCounts.subList(0, min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE))
+            }
+        } else {
+            if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
+                reactionCounts
+            } else {
+                reactionCounts.subList(0, min(reactionCounts.size, SHORT_REACTION_COUNT_MAX_SIZE))
+            }
+        }
+    }
 
     /**
      * 引用リノートであるか
@@ -140,7 +168,7 @@ data class Note(
         return when (type) {
             is Type.Mastodon -> visibility is Visibility.Public
                     || visibility is Visibility.Home
-            Type.Misskey -> id.accountId == userId.accountId
+            is Type.Misskey -> id.accountId == userId.accountId
                     && (visibility is Visibility.Public
                     || visibility is Visibility.Home
                     || ((visibility is Visibility.Specified || visibility is Visibility.Followers) && this.userId == userId)
@@ -191,7 +219,7 @@ fun Note.Companion.make(
     myReaction: String? = null,
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
-    type: Note.Type = Note.Type.Misskey,
+    type: Note.Type = Note.Type.Misskey(),
     nodeInfo: NodeInfo? = null,
 ): Note {
     return Note(

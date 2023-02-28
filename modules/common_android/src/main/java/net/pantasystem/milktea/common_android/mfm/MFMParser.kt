@@ -26,6 +26,8 @@ object MFMParser {
     private val spaceCRLFPattern = Pattern.compile("""\s""")
     private val hashTagPattern = Pattern.compile("""#[^\s.,!?'"#:/\[\]【】@]+""")
 
+    private val idPattern = Pattern.compile("""^([a-zA-Z0-9]+)$""")
+
 
     fun parse(
         text: String?,
@@ -376,7 +378,9 @@ object MFMParser {
                 end = position + matcher.end(),
                 insideStart = position + matcher.start(1),
                 insideEnd = position + matcher.end(1),
-                url = url + matcher.group(3)
+                url = url + matcher.group(3),
+                rawUrl = url + matcher.group(3),
+                skipOgpLink = targetText.startsWith("?")
             )
         }
 
@@ -414,7 +418,7 @@ object MFMParser {
 
             return EmojiElement(
                 emoji,
-                subStr,
+                matcher.group(),
                 start = position + matcher.start(),
                 end = position + matcher.end(),
                 insideStart = position + matcher.start(),
@@ -487,16 +491,29 @@ object MFMParser {
                     position + matcher.end(),
                     position + matcher.start(),
                     position + matcher.end(),
-                    matcher.group()
+                    matcher.group(),
+                    rawUrl = matcher.group()
                 )
             } else {
+
+                var parsedUrl: String = matcher.group()
+
+                convertAppNoteUriIfGiveNoteUrl(accountHost, parsedUrl)?.let {
+                    parsedUrl = it
+                }
+
+                convertAppChannelUriIfGiveChannelUrl(accountHost, parsedUrl)?.let {
+                    parsedUrl = it
+                }
+
                 Link(
                     decodeUrl(matcher.nullableGroup(3) ?: matcher.group()),
                     position + matcher.start(),
                     position + matcher.end(),
                     position + (matcher.nullableStart(3) ?: matcher.start()),
                     position + (matcher.nullableEnd(3) ?: matcher.end()),
-                    url = matcher.group()
+                    url = parsedUrl,
+                    rawUrl = matcher.group()
                 )
             }
         }
@@ -581,5 +598,29 @@ object MFMParser {
         return hostInMentionText
     }
 
+    fun convertAppChannelUriIfGiveChannelUrl(accountHost: String?, url: String): String? {
+        accountHost?: return null
+        val startsPattern = "https://$accountHost/channels/"
+        if (url.startsWith(startsPattern)) {
+            val id = url.substring(startsPattern.length, url.length)
+            val matcher = idPattern.matcher(id)
+            if (matcher.find()) {
+                return "milktea://channels/${matcher.group()}"
+            }
+        }
+        return null
+    }
 
+    fun convertAppNoteUriIfGiveNoteUrl(accountHost: String?, url: String): String? {
+        accountHost?: return null
+        val startsPattern = "https://$accountHost/notes/"
+        if (url.startsWith(startsPattern)) {
+            val id = url.substring(startsPattern.length, url.length)
+            val matcher = idPattern.matcher(id)
+            if (matcher.find()) {
+                return "milktea://$accountHost/notes/${matcher.group()}"
+            }
+        }
+        return null
+    }
 }

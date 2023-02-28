@@ -14,8 +14,10 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
@@ -27,6 +29,8 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val noteTranslationStore: NoteTranslationStore,
     val metaRepository: MetaRepository,
     private val noteDataSource: NoteDataSource,
+    private val configRepository: LocalConfigRepository,
+    private val emojiRepository: CustomEmojiRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
@@ -92,7 +96,11 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList()
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
+                        viewModelScope,
+                        noteDataSource,
+                        emojiRepository,
+                        configRepository,
                     ).also {
                         it.capture()
                         cache.put(it)
@@ -112,7 +120,11 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList()
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
+                        noteDataSource,
+                        configRepository,
+                        emojiRepository,
+                        viewModelScope,
                     ).also {
                         it.capture()
                         cache.put(it)
@@ -189,8 +201,8 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     private fun <T : PlaneNoteViewData> T.capture(): T {
         val self = this
-        viewModelScope.launch(Dispatchers.IO) {
-            self.eventFlow.collect()
+        self.capture {
+            it.launchIn(viewModelScope + Dispatchers.IO)
         }
         return this
     }

@@ -12,6 +12,33 @@ sealed interface PollExpiresAt : java.io.Serializable {
     object Infinity : PollExpiresAt
     data class DateAndTime(val expiresAt: Date) : PollExpiresAt {
         constructor(expiresAt: Instant) : this(Date(expiresAt.toEpochMilliseconds()))
+        val year = expiresAt.let {
+            val cal = Calendar.getInstance()
+            cal.time = it
+            cal.get(Calendar.YEAR)
+        }
+        val month = expiresAt.let {
+            val cal = Calendar.getInstance()
+            cal.time = it
+            cal.get(Calendar.MONTH) + 1
+        }
+        val dayOfMonth = expiresAt.let {
+            val cal = Calendar.getInstance()
+            cal.time = it
+            cal.get(Calendar.DAY_OF_MONTH)
+        }
+
+        val hour = expiresAt.let {
+            val cal = Calendar.getInstance()
+            cal.time = it
+            cal.get(Calendar.HOUR_OF_DAY)
+        }
+
+        val minutes = expiresAt.let {
+            val cal = Calendar.getInstance()
+             cal.time = it
+            cal.get(Calendar.MINUTE)
+        }
     }
 
     fun asDate(): Date? {
@@ -77,6 +104,7 @@ fun List<AppFile>.toggleFileSensitiveStatus(appFile: AppFile.Local): List<AppFil
         }
     }
 }
+
 
 fun List<AppFile>.updateFileName(appFile: AppFile.Local, name: String): List<AppFile> {
     return this.map {

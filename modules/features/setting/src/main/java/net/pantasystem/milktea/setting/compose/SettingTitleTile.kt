@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.setting
+package net.pantasystem.milktea.setting.compose
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text

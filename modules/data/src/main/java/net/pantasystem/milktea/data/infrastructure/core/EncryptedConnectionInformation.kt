@@ -2,10 +2,6 @@ package net.pantasystem.milktea.data.infrastructure.core
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
-import androidx.room.ForeignKey.NO_ACTION
-import androidx.room.Ignore
-import net.pantasystem.milktea.common.Encryption
 import java.util.*
 
 /**
@@ -17,7 +13,7 @@ import java.util.*
 @Suppress("DEPRECATION")
 @Entity(
     tableName = "connection_information",
-    foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = CASCADE, onUpdate = NO_ACTION)],
+    foreignKeys = [ForeignKey(childColumns = ["accountId"], parentColumns = ["id"], entity = Account::class, onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.NO_ACTION)],
     primaryKeys = ["accountId", "encryptedI", "instanceBaseUrl"]
 )
 @Deprecated("model.accountへ移行")
@@ -28,14 +24,7 @@ data class EncryptedConnectionInformation(
     val viaName: String?,
     val createdAt: Date = Date(),
     val isDirect: Boolean = false
-){
+) {
     var updatedAt: Date = Date()
-
-    @Ignore
-    fun getI(encryption: Encryption): String?{
-        return encryption.decrypt(accountId, encryptedI)
-    }
-
-
 
 }

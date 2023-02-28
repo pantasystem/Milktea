@@ -16,6 +16,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common_android.platform.activeNetworkFlow
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.streaming.ChannelAPIMainEventDispatcherAdapter
 import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDispatcher
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
@@ -73,6 +74,9 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    internal lateinit var memoryCacheCleaner: MemoryCacheCleaner
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -100,7 +104,7 @@ class MiApplication : Application(), Configuration.Provider {
         }
 
         activeNetworkFlow().distinctUntilChanged().onEach {
-            logger.debug("接続状態が変化:${if (it) "接続" else "未接続"}")
+            logger.debug { "接続状態が変化:${if (it) "接続" else "未接続"}" }
             mSocketWithAccountProvider.all().forEach { socket ->
                 if (it) {
                     socket.onNetworkActive()
@@ -145,6 +149,23 @@ class MiApplication : Application(), Configuration.Provider {
         return Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+
+        when (level) {
+            TRIM_MEMORY_RUNNING_CRITICAL, TRIM_MEMORY_RUNNING_MODERATE, TRIM_MEMORY_MODERATE, TRIM_MEMORY_RUNNING_LOW -> {
+                applicationScope.launch {
+                    memoryCacheCleaner.clean()
+                }
+            }
+            TRIM_MEMORY_BACKGROUND -> Unit
+            TRIM_MEMORY_UI_HIDDEN -> Unit
+            TRIM_MEMORY_COMPLETE -> Unit
+
+
+        }
     }
 
     private fun enqueueWorkManagers() {

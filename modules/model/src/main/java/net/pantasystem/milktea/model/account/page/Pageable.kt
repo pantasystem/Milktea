@@ -11,9 +11,23 @@ sealed class Pageable : Serializable {
 
         var withFiles: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<GlobalTimeline> {
         override fun toParams(): PageParams {
             return PageParams(withFiles = withFiles, type = PageType.GLOBAL)
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): GlobalTimeline {
+            // NOTE: Misskeyの場合falseを指定してしまうとファイルを除外してしまう
+            // NOTE: setMediaOnlyなのにファイルを除外してしまう挙動をしてしまうのは不自然なのでfalseの場合はnullを指定している
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -22,9 +36,21 @@ sealed class Pageable : Serializable {
         var withFiles: Boolean? = null,
         var excludeNsfw: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<LocalTimeline> {
         override fun toParams(): PageParams {
             return PageParams(PageType.LOCAL, withFiles = withFiles, excludeNsfw = excludeNsfw)
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): LocalTimeline {
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -35,7 +61,7 @@ sealed class Pageable : Serializable {
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HybridTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 type = PageType.SOCIAL,
@@ -44,6 +70,18 @@ sealed class Pageable : Serializable {
                 includeMyRenotes = includeMyRenotes,
                 includeRenotedMyRenotes = includeRenotedMyRenotes
             )
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): HybridTimeline {
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -54,7 +92,7 @@ sealed class Pageable : Serializable {
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<HomeTimeline> {
 
         override fun toParams(): PageParams {
             return PageParams(
@@ -64,6 +102,18 @@ sealed class Pageable : Serializable {
                 includeLocalRenotes = includeLocalRenotes,
                 includeMyRenotes = includeMyRenotes
             )
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): HomeTimeline {
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -75,7 +125,7 @@ sealed class Pageable : Serializable {
         var includeMyRenotes: Boolean? = null,
         var includeRenotedMyRenotes: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<UserListTimeline> {
 
         override fun toParams(): PageParams {
             return PageParams(
@@ -86,6 +136,18 @@ sealed class Pageable : Serializable {
                 includeMyRenotes = includeMyRenotes,
                 includeRenotedMyRenotes = includeRenotedMyRenotes
             )
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): UserListTimeline {
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -135,7 +197,7 @@ sealed class Pageable : Serializable {
         var withFiles: Boolean? = null,
         var poll: Boolean? = null
 
-    ) : Pageable(), UntilPaginate, SincePaginate {
+    ) : Pageable(), UntilPaginate, SincePaginate, CanOnlyMedia<SearchByTag> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.SEARCH_HASH,
@@ -145,6 +207,18 @@ sealed class Pageable : Serializable {
                 withFiles = withFiles,
                 poll = poll
             )
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): SearchByTag {
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -183,7 +257,7 @@ sealed class Pageable : Serializable {
         var includeMyRenotes: Boolean? = true,
         var withFiles: Boolean? = null
 
-    ) : Pageable(), SincePaginate, UntilPaginate {
+    ) : Pageable(), SincePaginate, UntilPaginate, CanOnlyMedia<UserTimeline> {
         override fun toParams(): PageParams {
             return PageParams(
                 PageType.USER,
@@ -192,6 +266,18 @@ sealed class Pageable : Serializable {
                 withFiles = withFiles,
                 userId = userId
             )
+        }
+
+        override fun setOnlyMedia(isOnlyMedia: Boolean): UserTimeline {
+            return copy(
+                withFiles = isOnlyMedia.takeIf {
+                    it
+                }
+            )
+        }
+
+        override fun getOnlyMedia(): Boolean {
+            return withFiles ?: false
         }
     }
 
@@ -221,6 +307,17 @@ sealed class Pageable : Serializable {
             return PageParams(
                 PageType.ANTENNA,
                 antennaId = antennaId
+            )
+        }
+    }
+
+    data class ClipNotes(
+        val clipId: String
+    ) : Pageable(), UntilPaginate, SincePaginate {
+        override fun toParams(): PageParams {
+            return PageParams(
+                PageType.CLIP_NOTES,
+                clipId = clipId
             )
         }
     }
@@ -272,34 +369,64 @@ sealed class Pageable : Serializable {
     sealed class Mastodon : Pageable() {
         data class PublicTimeline(
             val isOnlyMedia: Boolean? = null
-        ) : Mastodon() {
+        ) : Mastodon(), CanOnlyMedia<PublicTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_PUBLIC_TIMELINE,
                     withFiles = isOnlyMedia
                 )
             }
+
+            override fun setOnlyMedia(isOnlyMedia: Boolean): PublicTimeline {
+                return copy(
+                    isOnlyMedia = isOnlyMedia
+                )
+            }
+
+            override fun getOnlyMedia(): Boolean {
+                return isOnlyMedia ?: false
+            }
         }
 
         data class LocalTimeline(
             val isOnlyMedia: Boolean? = null
-        ) : Mastodon() {
+        ) : Mastodon(), CanOnlyMedia<LocalTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_LOCAL_TIMELINE,
                     withFiles = isOnlyMedia,
                 )
             }
+
+            override fun setOnlyMedia(isOnlyMedia: Boolean): LocalTimeline {
+                return copy(
+                    isOnlyMedia = isOnlyMedia
+                )
+            }
+
+            override fun getOnlyMedia(): Boolean {
+                return isOnlyMedia ?: false
+            }
         }
 
         data class HashTagTimeline(val hashtag: String, val isOnlyMedia: Boolean? = null) :
-            Mastodon() {
+            Mastodon(), CanOnlyMedia<HashTagTimeline> {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_HASHTAG_TIMELINE,
                     tag = hashtag,
                     withFiles = isOnlyMedia
                 )
+            }
+
+            override fun setOnlyMedia(isOnlyMedia: Boolean): HashTagTimeline {
+                return copy(
+                    isOnlyMedia = isOnlyMedia
+                )
+            }
+
+            override fun getOnlyMedia(): Boolean {
+                return isOnlyMedia ?: false
             }
         }
 
@@ -320,10 +447,55 @@ sealed class Pageable : Serializable {
             }
         }
 
+        data class UserTimeline(
+            val userId: String,
+            val isOnlyMedia: Boolean? = null,
+            val excludeReplies: Boolean? = null,
+            val excludeReblogs: Boolean? = null,
+        ) : Mastodon(), CanOnlyMedia<UserTimeline> {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_USER_TIMELINE,
+                    withFiles = isOnlyMedia,
+                    includeReplies = excludeReplies?.not(),
+                    includeMyRenotes = excludeReblogs?.not(),
+                    userId = userId
+                )
+            }
+
+            override fun setOnlyMedia(isOnlyMedia: Boolean): UserTimeline {
+                return copy(isOnlyMedia = isOnlyMedia)
+            }
+
+            override fun getOnlyMedia(): Boolean {
+                return isOnlyMedia ?: false
+            }
+        }
+
+    }
+
+    object CalckeyRecommendedTimeline : Pageable(), UntilPaginate, SincePaginate {
+        override fun toParams(): PageParams {
+            return PageParams(
+                type = PageType.CALCKEY_RECOMMENDED_TIMELINE,
+            )
+        }
     }
 
 
     abstract fun toParams(): PageParams
 
 
+}
+
+/**
+ * リクエスト時にwithFiles(Misskey)の指定が可能なタイムライン種別であることを表すためのインターフェース
+ * これを継承したPageableはメディアのみ、あるいはメディアを除外したリクエストを送信することができる。
+ * 注意点がありMisskeyの場合デフォルトがundefined(null)になるがMastodonではfalseがデフォルトになる。
+ * またMisskeyの場合trueを指定するとファイルが添付されたノートのみになり、
+ * falseを指定するとファイルが添付されていないノートのみになる。
+ */
+interface CanOnlyMedia<T> {
+    fun setOnlyMedia(isOnlyMedia: Boolean): T
+    fun getOnlyMedia(): Boolean
 }

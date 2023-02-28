@@ -33,13 +33,22 @@ class CurrentPageableTimelineViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _currentType = MutableStateFlow<Pageable>(
-        Pageable.HomeTimeline())
+    private val _currentType = MutableStateFlow<CurrentPageType>(
+        CurrentPageType.Page(Pageable.HomeTimeline()))
 
-    val currentType: StateFlow<Pageable> = _currentType
+    val currentType: StateFlow<CurrentPageType> = _currentType
 
     fun setCurrentPageable(pageable: Pageable) {
-        _currentType.value = pageable
+        _currentType.value = CurrentPageType.Page(pageable)
     }
 
+    fun setCurrentPageType(type: CurrentPageType) {
+        _currentType.value = type
+    }
+
+}
+
+sealed interface CurrentPageType {
+    data class Page(val pageable: Pageable) : CurrentPageType
+    object Account : CurrentPageType
 }

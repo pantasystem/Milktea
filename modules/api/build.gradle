@@ -52,7 +52,7 @@ dependencies {
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.androidx.test.espresso.core
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+    implementation libs.kotlin.serialization
     implementation libs.kotlin.datetime
 
 

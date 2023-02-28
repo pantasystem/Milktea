@@ -71,6 +71,8 @@ class ReactionHistoryViewModel @AssistedInject constructor(
 
     private val noteAuthor = note.filterNotNull().map {
         userRepository.find(it.userId)
+    }.catch {
+        logger.error("ノートの作者情報の取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val noteInfo = combine(note, noteAuthor) { n, author ->

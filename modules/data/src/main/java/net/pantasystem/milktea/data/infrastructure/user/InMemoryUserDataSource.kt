@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
@@ -12,7 +13,9 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import javax.inject.Inject
 
-class InMemoryUserDataSource @Inject constructor() : UserDataSource {
+class InMemoryUserDataSource @Inject constructor(
+    memoryCacheCleaner: MemoryCacheCleaner,
+) : UserDataSource, MemoryCacheCleaner.Cleanable {
 
     private var userMap = mapOf<User.Id, User>()
 
@@ -22,6 +25,9 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
     val state: StateFlow<UsersState>
         get() = _state
 
+    init {
+        memoryCacheCleaner.register(this)
+    }
 
     override suspend fun add(user: User): Result<AddResult> = runCancellableCatching {
         return@runCancellableCatching createOrUpdate(user).also {
@@ -183,6 +189,13 @@ class InMemoryUserDataSource @Inject constructor() : UserDataSource {
         }.filter {
             host == null || it.host == host
         }
+    }
+
+    override suspend fun clean() {
+        usersLock.withLock {
+            userMap = emptyMap()
+        }
+        publish()
     }
 
     private fun publish() {

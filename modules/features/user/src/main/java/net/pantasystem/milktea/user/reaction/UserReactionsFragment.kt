@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
@@ -46,6 +47,9 @@ class UserReactionsFragment : Fragment(R.layout.fragment_user_reactions) {
     @Inject
     lateinit var userDetailNavigation: UserDetailNavigation
 
+    @Inject
+    lateinit var channelDetailNavigation: ChannelDetailNavigation
+
     private val binding: FragmentUserReactionsBinding by dataBinding()
     private val viewModel by viewModels<UserReactionsViewModel>()
     private val notesViewModel by activityViewModels<NotesViewModel>()
@@ -63,7 +67,8 @@ class UserReactionsFragment : Fragment(R.layout.fragment_user_reactions) {
                     requireActivity() as AppCompatActivity,
                     notesViewModel,
                     settingStore,
-                    userDetailNavigation
+                    userDetailNavigation,
+                    channelDetailNavigation,
                 ).onAction(it)
             }
         )

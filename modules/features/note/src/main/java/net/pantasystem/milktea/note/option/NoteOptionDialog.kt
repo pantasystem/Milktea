@@ -20,6 +20,8 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.report.toReport
 import net.pantasystem.milktea.note.NoteDetailActivity
 import net.pantasystem.milktea.note.R
+import net.pantasystem.milktea.note.clip.ToggleAddNoteToClipDialog
+import net.pantasystem.milktea.note.reaction.history.ReactionHistoryPagerDialog
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 
 @AndroidEntryPoint
@@ -99,17 +101,17 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onDeleteAndEditButtonClicked = {
-                            notesViewModel.confirmDeleteAndEditEvent.event = it
+                            notesViewModel.confirmDeleteAndEditEvent.tryEmit(it)
                             dismiss()
                         },
                         onDeleteButtonClicked = {
-                            notesViewModel.confirmDeletionEvent.event = it
+                            notesViewModel.confirmDeletionEvent.tryEmit(it)
                             dismiss()
                         },
                         onReportButtonClicked ={
                             val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
                             val report = it?.toReport(baseUrl!!)
-                            notesViewModel.confirmReportEvent.event = report
+                            notesViewModel.confirmReportEvent.tryEmit(report)
                             dismiss()
                         },
                         onCreateThreadMuteButtonClicked = {
@@ -127,6 +129,14 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                         onDeleteBookmarkButtonClicked = {
                             notesViewModel.removeBookmark(it)
                             dismiss()
+                        },
+                        onShowReactionHistoryButtonClicked = {
+                            dismiss()
+                            ReactionHistoryPagerDialog.newInstance(it).show(parentFragmentManager, "ReactionHistoryPagerDialog")
+                        },
+                        onToggleAddNoteToClipButtonClicked = {
+                            dismiss()
+                            ToggleAddNoteToClipDialog.newInstance(it).show(parentFragmentManager, "ToggleAddNoteToClipDialog")
                         }
                     )
                 }

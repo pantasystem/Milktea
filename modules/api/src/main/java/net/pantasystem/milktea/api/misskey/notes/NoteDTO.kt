@@ -6,6 +6,8 @@ import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
+import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -31,6 +33,10 @@ data class NoteDTO(
     @SerialName("visibleUserIds")
     val visibleUserIds: List<String>? = null,
 
+    @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
+    @SerialName("reactionEmojis")
+    val rawReactionEmojis: EmojisType? = null,
+
     val url: String? = null,
     val uri: String? = null,
 
@@ -39,7 +45,8 @@ data class NoteDTO(
     @SerialName("reactions")
     val reactionCounts: LinkedHashMap<String, Int>? = null,
 
-    @SerialName("emojis") val emojis: List<Emoji>? = null,
+    @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
+    @SerialName("emojis") val rawEmojis: EmojisType? = null,
 
     @SerialName("repliesCount")
     val replyCount: Int,
@@ -63,8 +70,33 @@ data class NoteDTO(
     val promotionId: String? = null,
     val channelId: String? = null,
 
-    val app: App? = null
-) : Serializable
+    val app: App? = null,
+    val channel: ChannelInfo? = null,
+) : Serializable {
+
+    @kotlinx.serialization.Serializable
+    data class ChannelInfo(
+        val id: String,
+        val name: String,
+    ) : Serializable
+
+    val reactionEmojiList = when(val emojis = rawReactionEmojis) {
+        EmojisType.None -> emptyList()
+        is EmojisType.TypeArray -> emojis.emojis
+        is EmojisType.TypeObject -> emojis.emojis.map {
+            Emoji(name = it.key, url = it.value)
+        }
+        null -> emptyList()
+    }
+    val emojiList: List<Emoji> = when(rawEmojis) {
+        EmojisType.None -> emptyList()
+        is EmojisType.TypeArray -> rawEmojis.emojis
+        is EmojisType.TypeObject -> (rawEmojis.emojis).map {
+            Emoji(name = it.key, url = it.value, uri = it.value)
+        }
+        null -> emptyList()
+    } + reactionEmojiList
+}
 
 
 @kotlinx.serialization.Serializable(with = NoteVisibilityTypeSerializer::class)
@@ -73,5 +105,3 @@ enum class NoteVisibilityType {
 }
 
 object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibilityType>(NoteVisibilityType.values(), NoteVisibilityType.Public)
-
-
