@@ -99,7 +99,7 @@
         <item name="tabStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface</item>
         <item name="colorSelectedReactionCounterBackground">#FFCA28</item>
-        <item name="colorNormalReactionCounterBackground">#A6A6A6</item>
+        <item name="colorNormalReactionCounterBackground">#EAE691</item>
         <item name="android:navigationBarColor">@color/colorBreadPrimary</item>
 
     </style>

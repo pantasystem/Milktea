@@ -121,6 +121,9 @@ class TimelineViewModel @AssistedInject constructor(
         noteStreaming = noteStreaming,
         pageable = pageable,
     )
+
+    private val pagingCoroutineScope = PagingLoaderScopeController(viewModelScope)
+
     private var isActive = true
 
     init {
@@ -142,18 +145,20 @@ class TimelineViewModel @AssistedInject constructor(
                 this@TimelineViewModel.isActive && !timelineStore.isActiveStreaming
             }.map {
                 logger.debug { "active state isActive:${isActive}, isActiveStreaming:${timelineStore.isActiveStreaming}" }
-                timelineStore.loadFuture().onFailure {
-                    if (it is APIError.ToManyRequestsException) {
-                        delay(10_000)
+                pagingCoroutineScope.launch {
+                    timelineStore.loadFuture().onFailure {
+                        if (it is APIError.ToManyRequestsException) {
+                            delay(10_000)
+                        }
                     }
-                }
+                }.join()
             }.collect()
         }
     }
 
 
     fun loadNew() {
-        viewModelScope.launch {
+        pagingCoroutineScope.launch {
             timelineStore.loadFuture().onFailure {
                 logger.error("load future timeline failed", it)
             }
@@ -161,7 +166,7 @@ class TimelineViewModel @AssistedInject constructor(
     }
 
     fun loadOld() {
-        viewModelScope.launch {
+        pagingCoroutineScope.launch {
             timelineStore.loadPrevious().onFailure {
                 logger.error("load previous timeline failed", it)
             }
@@ -169,7 +174,8 @@ class TimelineViewModel @AssistedInject constructor(
     }
 
     fun loadInit(initialUntilDate: Instant? = null) {
-        viewModelScope.launch {
+        pagingCoroutineScope.cancel()
+        pagingCoroutineScope.launch {
             cache.clear()
             timelineStore.clear(initialUntilDate?.let {
                 InitialLoadQuery.UntilDate(it)
@@ -331,4 +337,25 @@ class NoteStreamingCollector(
         }
 
     }
+}
+
+class PagingLoaderScopeController(private val coroutineScope: CoroutineScope) {
+
+    private var jobs = listOf<Job>()
+
+    fun launch(block: suspend CoroutineScope.() -> Unit): Job {
+        val job = coroutineScope.launch {
+            block.invoke(coroutineScope)
+        }
+        jobs = jobs + job
+        return job
+    }
+
+    fun cancel() {
+        jobs.forEach {
+            it.cancel()
+        }
+        jobs = emptyList()
+    }
+
 }
