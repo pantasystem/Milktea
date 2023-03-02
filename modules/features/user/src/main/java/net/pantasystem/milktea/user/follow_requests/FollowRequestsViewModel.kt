@@ -45,6 +45,8 @@ class FollowRequestsViewModel @Inject constructor(
     }.flatMapLatest { ids ->
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { account ->
             userDataSource.observeIn(account.accountId, ids.map { it.id })
+        }.onStart {
+            emit(emptyList())
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
