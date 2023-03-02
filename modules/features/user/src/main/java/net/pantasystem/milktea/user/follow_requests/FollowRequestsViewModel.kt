@@ -79,11 +79,11 @@ class FollowRequestsViewModel @Inject constructor(
 
     init {
         accountStore.observeCurrentAccount.distinctUntilChanged().onEach {
-            refresh()
+            onRefresh()
         }.launchIn(viewModelScope)
     }
 
-    fun refresh() {
+    fun onRefresh() {
         viewModelScope.launch {
             pagingStore.clear()
             pagingStore.loadPrevious().onFailure {
@@ -92,26 +92,26 @@ class FollowRequestsViewModel @Inject constructor(
         }
     }
 
-    fun accept(userId: User.Id) {
+    fun onAccept(userId: User.Id) {
         viewModelScope.launch {
             runCancellableCatching {
                 followRequestRepository.accept(userId)
             }.onFailure {
                 _errors.tryEmit(it)
             }.onSuccess {
-                refresh()
+                onRefresh()
             }
         }
     }
 
-    fun reject(userId: User.Id) {
+    fun onReject(userId: User.Id) {
         viewModelScope.launch {
             runCancellableCatching {
                 followRequestRepository.reject(userId)
             }.onFailure {
                 _errors.tryEmit(it)
             }.onSuccess {
-                refresh()
+                onRefresh()
             }
         }
     }
