@@ -117,7 +117,8 @@ class AuthStateHelper @Inject constructor(
                         appName,
                         "misskey android application",
                         CALL_BACK_URL,
-                        permission = Permissions.getPermission(version)
+                        permission = Permissions.getPermission(instanceType.softwareType)
+                            ?: Permissions.getPermission(version)
                     )
                 ).throwIfHasError().body()
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
@@ -167,10 +168,10 @@ class AuthStateHelper @Inject constructor(
             }
 
             if (misskey != null) {
-                return InstanceType.Misskey(misskey)
+                return InstanceType.Misskey(misskey, nodeInfo?.type as? NodeInfo.SoftwareType.Misskey)
             }
             if (mastodon != null) {
-                return InstanceType.Mastodon(mastodon)
+                return InstanceType.Mastodon(mastodon, nodeInfo?.type as? NodeInfo.SoftwareType.Mastodon)
             }
             throw IllegalArgumentException()
         } else {
