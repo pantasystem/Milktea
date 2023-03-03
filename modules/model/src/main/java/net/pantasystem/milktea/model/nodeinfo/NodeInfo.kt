@@ -32,6 +32,11 @@ data class NodeInfo(
                 override val name: String,
                 override val version: String
             ) : Misskey
+
+            data class Foundkey(
+                override val name: String,
+                override val version: String
+            ) : Misskey
         }
 
         sealed interface Mastodon : SoftwareType {
@@ -59,6 +64,7 @@ data class NodeInfo(
         "mastodon" -> SoftwareType.Mastodon.Normal(version = software.version, name = software.name)
         "fedibird" -> SoftwareType.Mastodon.Fedibird(version = software.version, name = software.name)
         "meisskey" -> SoftwareType.Misskey.Meisskey(version = software.version, name = software.name)
+        "foundkey" -> SoftwareType.Misskey.Foundkey(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
 }
