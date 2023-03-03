@@ -8,6 +8,7 @@ import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 
 
 data class AuthUserInputState(
@@ -44,8 +45,17 @@ data class BeforeAuthState(
 
 
 sealed interface InstanceType {
-    data class Mastodon(val instance: MastodonInstanceInfo) : InstanceType
-    data class Misskey(val instance: Meta) : InstanceType
+    val softwareType: NodeInfo.SoftwareType?
+
+    data class Mastodon(
+        val instance: MastodonInstanceInfo,
+        override val softwareType: NodeInfo.SoftwareType.Mastodon?,
+    ) : InstanceType
+
+    data class Misskey(
+        val instance: Meta,
+        override val softwareType: NodeInfo.SoftwareType.Misskey?,
+    ) : InstanceType
 }
 
 sealed interface GenerateTokenResult {
