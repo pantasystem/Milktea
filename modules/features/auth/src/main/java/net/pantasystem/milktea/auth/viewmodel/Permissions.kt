@@ -1,6 +1,8 @@
 package net.pantasystem.milktea.auth.viewmodel
 
 import net.pantasystem.milktea.model.instance.Version
+import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.getVersion
 
 object Permissions{
     private val defaultPermission = listOf(
@@ -53,6 +55,26 @@ object Permissions{
                 V_12_75_0
             }
             version >= Version("12.47.0") -> {
+                V_12_47_0
+            }
+            else -> {
+                defaultPermission
+            }
+        }
+    }
+
+    fun getPermission(softwareType: NodeInfo.SoftwareType.Misskey?): List<String>? {
+        return when {
+            softwareType == null -> {
+                null
+            }
+            softwareType is NodeInfo.SoftwareType.Misskey.Foundkey -> {
+                V_12_47_0
+            }
+            softwareType.getVersion() >= Version("12.75.0") -> {
+                V_12_75_0
+            }
+            softwareType.getVersion() >= Version("12.47.0") -> {
                 V_12_47_0
             }
             else -> {
