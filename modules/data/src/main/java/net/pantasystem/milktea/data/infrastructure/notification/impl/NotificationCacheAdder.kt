@@ -10,6 +10,8 @@ import net.pantasystem.milktea.data.infrastructure.toModel
 import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
+import net.pantasystem.milktea.model.markers.MarkerRepository
+import net.pantasystem.milktea.model.markers.MarkerType
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notification.NotificationDataSource
@@ -28,6 +30,7 @@ class NotificationCacheAdder @Inject constructor(
     private val nodeInfoRepository: NodeInfoRepository,
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val notificationDTOEntityConverter: NotificationDTOEntityConverter,
+    private val markerRepository: MarkerRepository,
 ) {
     suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO, skipExists: Boolean = false): NotificationRelation {
         val user = notificationDTO.user?.let {
@@ -61,12 +64,17 @@ class NotificationCacheAdder @Inject constructor(
     }
 
     suspend fun addConvert(account: Account, mstNotificationDTO: MstNotificationDTO, skipExists: Boolean = false): NotificationRelation {
+        val lastReadId = markerRepository.find(account.accountId, listOf(MarkerType.Notifications)).map {
+            it.notifications?.lastReadId ?: ""
+        }.getOrElse {
+            ""
+        }
         val user = mstNotificationDTO.account.toModel(account)
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val noteRelation = mstNotificationDTO.status?.toNote(account, nodeInfo)?.let {
             noteRelationGetter.get(it)
         }
-        val notification = mstNotificationDTO.toModel(account, isRead = true)
+        val notification = mstNotificationDTO.toModel(account, isRead = lastReadId >= mstNotificationDTO.id)
         mstNotificationDTO.status?.let {
             noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it, skipExists)
         }
