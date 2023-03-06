@@ -24,4 +24,12 @@ abstract class UnreadNotificationDAO {
 
     @Query("DELETE FROM unread_notifications_table WHERE accountId = :accountId")
     abstract suspend fun deleteWhereAccountId(accountId: Long)
+
+    @Query("""
+        SELECT * FROM unread_notifications_table
+            WHERE accountId = :accountId
+            ORDER BY notificationId DESC
+            LIMIT 1
+    """)
+    abstract suspend fun getLatestUnreadId(accountId: Long): UnreadNotification?
 }
