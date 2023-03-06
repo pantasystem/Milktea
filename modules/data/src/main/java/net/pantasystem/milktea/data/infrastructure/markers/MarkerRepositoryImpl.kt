@@ -18,7 +18,7 @@ import javax.inject.Inject
 class MarkerRepositoryImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val mastodonAPIProvider: MastodonAPIProvider,
-    val cache: MarkerCache,
+    private val cache: MarkerCache,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher
 ) : MarkerRepository {
 
@@ -33,7 +33,7 @@ class MarkerRepositoryImpl @Inject constructor(
                 Account.InstanceType.MISSKEY -> throw IllegalArgumentException("Not support markers feature when use misskey.")
                 Account.InstanceType.MASTODON -> {
                     val body = mastodonAPIProvider.get(account).getMarkers(types.map {
-                        it.name
+                        it.name.lowercase()
                     }).throwIfHasError().body()
                     val markers = Markers(
                         home = requireNotNull(body).home?.toModel(),
