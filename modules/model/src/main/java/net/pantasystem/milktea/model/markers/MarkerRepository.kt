@@ -4,9 +4,9 @@ import kotlinx.datetime.Instant
 
 interface MarkerRepository {
 
-    fun find(accountId: Long, types: List<MarkerType>): Result<Markers>
+    suspend fun find(accountId: Long, types: List<MarkerType>): Result<Markers>
 
-    fun save(accountId: Long, params: SaveMarkerParams)
+    suspend fun save(accountId: Long, params: SaveMarkerParams): Result<Markers>
 
 }
 
