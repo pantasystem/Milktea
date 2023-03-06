@@ -20,7 +20,7 @@ data class Markers(
 )
 
 data class Marker(
-    val latestReadId: String,
+    val lastReadId: String,
     val version: Long,
     val updatedAt: Instant
 )
