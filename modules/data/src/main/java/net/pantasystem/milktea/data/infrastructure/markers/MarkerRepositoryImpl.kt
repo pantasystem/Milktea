@@ -14,16 +14,20 @@ import net.pantasystem.milktea.model.markers.MarkerType
 import net.pantasystem.milktea.model.markers.Markers
 import net.pantasystem.milktea.model.markers.SaveMarkerParams
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class MarkerRepositoryImpl @Inject constructor(
     val accountRepository: AccountRepository,
     val mastodonAPIProvider: MastodonAPIProvider,
+    val cache: MarkerCache,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher
 ) : MarkerRepository {
 
     override suspend fun find(accountId: Long, types: List<MarkerType>): Result<Markers> = runCancellableCatching{
         withContext(coroutineDispatcher) {
+            when(val marker = cache.get(MarkerCache.Key(accountId, types))) {
+                null -> Unit
+                else -> return@withContext marker
+            }
             val account = accountRepository.get(accountId).getOrThrow()
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> throw IllegalArgumentException("Not support markers feature when use misskey.")
@@ -31,10 +35,12 @@ class MarkerRepositoryImpl @Inject constructor(
                     val body = mastodonAPIProvider.get(account).getMarkers(types.map {
                         it.name
                     }).throwIfHasError().body()
-                    Markers(
+                    val markers = Markers(
                         home = requireNotNull(body).home?.toModel(),
                         notifications = body.notifications?.toModel()
                     )
+                    cache.put(MarkerCache.Key(accountId, types), markers)
+                    markers
                 }
             }
         }
@@ -52,10 +58,15 @@ class MarkerRepositoryImpl @Inject constructor(
                             notifications = params.notifications
                         )
                     ).throwIfHasError().body()
-                    Markers(
+                    val markers = Markers(
                         home = requireNotNull(body).home?.toModel(),
                         notifications = body.notifications?.toModel()
                     )
+                    cache.put(MarkerCache.Key(accountId, listOfNotNull(
+                        if (params.home == null) null else MarkerType.Home,
+                        if (params.notifications == null) null else MarkerType.Notifications
+                    )), markers)
+                    markers
                 }
             }
         }
