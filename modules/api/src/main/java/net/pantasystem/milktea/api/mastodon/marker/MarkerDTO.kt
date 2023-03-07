@@ -27,6 +27,11 @@ data class MarkersDTO(
 
 @kotlinx.serialization.Serializable
 data class SaveMarkersRequest(
-    val home: String? = null,
-    val notifications: String? = null,
-)
+    val home: SaveParams? = null,
+    val notifications: SaveParams? = null,
+) {
+    @kotlinx.serialization.Serializable
+    data class SaveParams(
+        @SerialName("last_read_id") val lastReadId: String
+    )
+}

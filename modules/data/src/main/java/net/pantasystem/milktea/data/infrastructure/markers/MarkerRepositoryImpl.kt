@@ -54,8 +54,12 @@ class MarkerRepositoryImpl @Inject constructor(
                 Account.InstanceType.MASTODON -> {
                     val body = mastodonAPIProvider.get(account).saveMarkers(
                         markers = SaveMarkersRequest(
-                            home = params.home,
-                            notifications = params.notifications
+                            home = params.home?.let {
+                                SaveMarkersRequest.SaveParams(it)
+                            },
+                            notifications = params.notifications?.let {
+                                SaveMarkersRequest.SaveParams(it)
+                            }
                         )
                     ).throwIfHasError().body()
                     val markers = Markers(
