@@ -65,7 +65,6 @@ class NotificationStoreImpl(
             Account.InstanceType.MASTODON -> {
                 MstNotificationEntityLoader(
                     account = account,
-                    idGetter = this,
                     mastodonAPIProvider = mastodonAPIProvider,
                 )
             }
