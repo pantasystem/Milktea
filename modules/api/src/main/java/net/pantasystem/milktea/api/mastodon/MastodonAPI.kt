@@ -13,6 +13,8 @@ import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
 import net.pantasystem.milktea.api.mastodon.list.ListDTO
 import net.pantasystem.milktea.api.mastodon.list.RemoveAccountsFromList
+import net.pantasystem.milktea.api.mastodon.marker.MarkersDTO
+import net.pantasystem.milktea.api.mastodon.marker.SaveMarkersRequest
 import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
@@ -265,4 +267,14 @@ interface MastodonAPI {
 
     @GET("api/v1/follow_requests")
     suspend fun getFollowRequests(@Query("max_id") maxId: String? = null, @Query("min_id") minId: String? = null): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/markers")
+    suspend fun getMarkers(
+        @Query("timeline[]", encoded = true) timeline: List<String>
+    ): Response<MarkersDTO>
+
+    @POST("api/v1/markers")
+    suspend fun saveMarkers(
+        @Body markers: SaveMarkersRequest
+    ): Response<MarkersDTO>
 }

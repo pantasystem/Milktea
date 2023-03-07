@@ -2,8 +2,13 @@ package net.pantasystem.milktea.notification
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -21,6 +26,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
+import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common_navigation.AuthorizationArgs
 import net.pantasystem.milktea.common_navigation.AuthorizationNavigation
 import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
@@ -62,6 +68,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
     @Inject
     lateinit var accountStore: AccountStore
+
+    @Inject
+    lateinit var applyMenuTint: ApplyMenuTint
 
     private val mBinding: FragmentNotificationBinding by dataBinding()
 
@@ -125,6 +134,23 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
                 }
             }
         }
+
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.notification_menu, menu)
+                applyMenuTint(requireActivity(), menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when(menuItem.itemId) {
+                    R.id.mark_as_all_read_notifications -> {
+                        mViewModel.onMarkAsReadAllNotifications()
+                        return true
+                    }
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
 

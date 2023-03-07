@@ -119,6 +119,9 @@ interface MisskeyAPI {
     @POST("api/i/notifications")
     suspend fun notification(@Body notificationRequest: NotificationRequest): Response<List<NotificationDTO>?>
 
+    @POST("api/notifications/mark-all-as-read")
+    suspend fun markAllAsReadNotifications(i: I): Response<Unit>
+
     @POST("api/notes/create")
     suspend fun create(@Body createNote: CreateNote): Response<CreateNote.Response>
 
