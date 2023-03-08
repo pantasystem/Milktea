@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.antenna.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -38,40 +37,14 @@ class AntennaEditorViewModel @Inject constructor(
     private val _antennaId = MutableStateFlow<Antenna.Id?>(null)
 
 
-    private val mAntenna = MutableStateFlow<Antenna?>(null).apply {
-        viewModelScope.launch {
-            runCancellableCatching {
-                fetch()
-            }.onFailure {
-                logger.debug("アンテナ取得エラー", e = it)
-            }.onSuccess {
-                logger.debug("取得成功:$it")
-                value = it
-            }
-        }
-    }
+    private val mAntenna = MutableStateFlow<Antenna?>(null)
 
-    val antenna = MutableLiveData<Antenna?>().apply {
-        mAntenna.filterNotNull().onEach {
-            postValue(it)
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
+    val antenna = mAntenna.asLiveData()
 
 
-    val name = MediatorLiveData<String>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.name?: ""
-        }
-    }
-    val source = MediatorLiveData<AntennaSource>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){ a ->
-            Log.d("AntennaEditorVM", "antenna:$a")
-            this.value = AntennaSource.values().firstOrNull {
-                a?.src ==  it
-            }?: AntennaSource.All
-        }
-    }
+    val name = MediatorLiveData<String>()
 
+    val source = MediatorLiveData<AntennaSource>()
 
 
     val isList = Transformations.map(source) {
@@ -86,39 +59,28 @@ class AntennaEditorViewModel @Inject constructor(
         it is AntennaSource.Users
     }
 
-    val keywords = MediatorLiveData<String>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = setupKeywords(it?.keywords)
-        }
-    }
+    val keywords = MediatorLiveData<String>()
 
-    val excludeKeywords = MediatorLiveData<String>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = setupKeywords(it?.excludeKeywords)
-        }
-    }
+    val excludeKeywords = MediatorLiveData<String>()
 
-    private val userNames = MutableStateFlow<List<String>>(emptyList()).apply {
-        mAntenna.filterNotNull().onEach {
-            value = it.users
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
+    private val userNames = MutableStateFlow<List<String>>(emptyList())
 
     @ExperimentalCoroutinesApi
     private val mUsers = userNames.map { list ->
-        list.map { userName: String ->
+        list.filterNot {
+            it.isBlank()
+        }.map { userName: String ->
             val userNameAndHost = userName.split("@").filterNot { it == "" }
             userViewDataFactory.create(userNameAndHost[0], userNameAndHost.getOrNull(1), getAccount().getOrThrow().accountId, viewModelScope, Dispatchers.IO)
-
         }
     }
 
     @ExperimentalCoroutinesApi
-    val users = MutableStateFlow<List<UserViewData>>(emptyList()).apply {
-        mUsers.onEach { list ->
-            value = list
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
+    val users: StateFlow<List<UserViewData>> = mUsers.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
 
     val userListList = MediatorLiveData<List<UserList>>().apply{
@@ -165,38 +127,21 @@ class AntennaEditorViewModel @Inject constructor(
     /**
      * 新しいノートを通知します
      */
-    val notify = MediatorLiveData<Boolean?>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.notify?: false
-        }
-    }
+    val notify = MediatorLiveData<Boolean?>()
 
     /**
      * ファイルが添付されたノートのみ
      */
-    val withFile =  MediatorLiveData<Boolean?>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.withFile?: false
-        }
-    }
+    val withFile =  MediatorLiveData<Boolean?>()
 
     /**
      * 大文字と小文字を区別します
      */
-    val caseSensitive =  MediatorLiveData<Boolean?>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.caseSensitive?: false
-        }
-    }
-
+    val caseSensitive =  MediatorLiveData<Boolean?>()
     /**
      * 返信を含める
      */
-    val withReplies = MediatorLiveData<Boolean>().apply{
-        addSource(this@AntennaEditorViewModel.antenna){
-            this.value = it?.withReplies?: false
-        }
-    }
+    val withReplies = MediatorLiveData<Boolean>()
 
     val antennaAddedStateEvent = EventBus<Boolean>()
     
@@ -236,8 +181,6 @@ class AntennaEditorViewModel @Inject constructor(
                     antennaAddedStateEvent.event = false
                 }
             }
-
-
         }
 
     }
@@ -292,11 +235,25 @@ class AntennaEditorViewModel @Inject constructor(
 
     fun setAntennaId(antennaId: Antenna.Id) {
         _antennaId.value = antennaId
-    }
-
-    private suspend fun fetch(): Antenna? {
-        return _antennaId.value?.let{ antennaId ->
-            antennaRepository.find(antennaId).getOrNull()
+        viewModelScope.launch {
+            antennaRepository.find(antennaId).onSuccess { antenna ->
+                name.postValue(antenna.name)
+                source.postValue(
+                    AntennaSource.values().firstOrNull {
+                        antenna.src ==  it
+                    }?: AntennaSource.All
+                )
+                keywords.postValue(setupKeywords(antenna.keywords))
+                excludeKeywords.postValue(setupKeywords(antenna.excludeKeywords))
+                userNames.value = antenna.users
+                notify.postValue(antenna.notify)
+                withFile.postValue(antenna.withFile)
+                caseSensitive.postValue(antenna.caseSensitive)
+                withReplies.postValue(antenna.withReplies)
+                mAntenna.value = antenna
+            }.onFailure {
+                logger.error("fetch antenna filed", it)
+            }
         }
     }
 
