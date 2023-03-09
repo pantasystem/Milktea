@@ -3,7 +3,6 @@ package net.pantasystem.milktea.data.infrastructure.instance
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.MetaRepository
@@ -15,7 +14,6 @@ import java.net.URL
 import javax.inject.Inject
 
 class FeatureEnablesImpl @Inject constructor(
-    val misskeyAPIProvider: MisskeyAPIProvider,
     val metaRepository: MetaRepository,
     val nodeInfoRepository: NodeInfoRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
