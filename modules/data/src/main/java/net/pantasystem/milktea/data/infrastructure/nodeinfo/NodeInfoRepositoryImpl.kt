@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure.nodeinfo
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,9 +7,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.activitypub.NodeInfoDTO
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.api.NodeInfoAPIBuilder
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoRecord
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -18,7 +15,7 @@ import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import javax.inject.Inject
 
 class NodeInfoRepositoryImpl @Inject constructor(
-    private val nodeInfoAPIBuilder: NodeInfoAPIBuilder,
+    private val fetcher: NodeInfoFetcher,
     private val cache: NodeInfoCache,
     private val nodeInfoDao: NodeInfoDao,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
@@ -38,7 +35,7 @@ class NodeInfoRepositoryImpl @Inject constructor(
                 }
             }
 
-            val fetched = requireNotNull(fetch(host)).toModel(host)
+            val fetched = requireNotNull(fetcher.fetch(host)).toModel(host)
             upInsert(fetched)
             cache.put(host, fetched)
             fetched
@@ -73,7 +70,7 @@ class NodeInfoRepositoryImpl @Inject constructor(
 
     override suspend fun sync(host: String): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val nodeInfo = requireNotNull(fetch(host)).toModel(host)
+            val nodeInfo = requireNotNull(fetcher.fetch(host)).toModel(host)
             cache.put(host, nodeInfo)
             upInsert(nodeInfo)
         }
@@ -88,21 +85,6 @@ class NodeInfoRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun fetch(host: String): NodeInfoDTO? {
-        try {
-            val nodeInfoUrl = nodeInfoAPIBuilder.buildWellKnown("https://$host")
-                .getWellKnownNodeInfo()
-                .throwIfHasError()
-                .body()?.links?.firstOrNull {
-                    it.rel.contains("2.0")
-                }?.href ?: "https://$host/nodeinfo/2.0"
-            Log.d("NodeInfoRepositoryImpl", "nodeInfoUrl:$nodeInfoUrl")
-            return nodeInfoAPIBuilder.build().getNodeInfo(nodeInfoUrl).throwIfHasError().body()
-        } catch(e: Throwable) {
-            Log.e("NodeInfoRepositoryImpl", "error", e)
-            throw e
-        }
-    }
 
 }
 
