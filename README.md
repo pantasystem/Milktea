@@ -2,24 +2,23 @@
 
 <img src="https://github.com/Kinoshita0623/MisskeyAndroidClient/blob/master/app/src/main/ic_launcher-web.png?raw=true" width="100px">
 <br>
-MisskeyにMilkteaはいかが？<br>
-MisskeyのAndroidクライアント<br>
+FedivierseにMilkteaはいかが？<br>
+Misskey, MastodonのAndroidクライアント<br>
 
 ## 説明
-Milkteaは[Misskey](https://github.com/misskey-dev/misskey)のためのAndroidクライアントアプリケーションです。<br>
+MilkteaはMastodonと[Misskey](https://github.com/misskey-dev/misskey)のためのAndroidクライアントアプリケーションです。<br>
 
 ## 目標
 Milkteaでは以下のことを達成することを目標とし開発をしました。
 - AndroidらしいUIで提供すること
-- Misskeyの機能をできるだけ多くサポートすること
 - 競合サービスから移住してきても違和感なく触れるUIであること
 - 独自機能を追加してより使いやすくすること
-- Misskeyをより多くの人に使ってもらうこと
 - 継続的な開発ができること
+- Fedivierseの存在を意識せずにFediverse lifeを送れるようにすること
 
 ## 機能
 ### タイムライン
-Misskeyから流れてきたタイムラインを、<br>
+Mastodon, Misskeyから流れてきたタイムラインを、<br>
 リアルタイムで表示することができます。<br>
 
 ### タイムラインタブ機能
