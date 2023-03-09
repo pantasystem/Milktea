@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.note.timeline
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
