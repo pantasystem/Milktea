@@ -34,9 +34,11 @@ internal class NodeInfoRepositoryImplTest {
     @Test
     fun find_WhenHasDiskCache() = runTest {
         val nodeInfo = NodeInfo("misskey.io", "", NodeInfo.Software("", ""))
+        val cache = NodeInfoCache()
+        assertNull(cache.get("misskey.io"))
         val impl = NodeInfoRepositoryImpl(
             nodeInfoAPIBuilder = NodeInfoAPIBuilder(DefaultOkHttpClientProvider()),
-            cache = NodeInfoCache(),
+            cache = cache,
             nodeInfoDao = mock() {
                 onBlocking {
                     find(any())
@@ -45,6 +47,7 @@ internal class NodeInfoRepositoryImplTest {
             ioDispatcher = Dispatchers.Default
         )
         assertEquals(nodeInfo, impl.find("misskey.io").getOrThrow())
+        assertEquals(nodeInfo, cache.get("misskey.io"))
     }
 
 
