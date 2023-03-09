@@ -3,9 +3,8 @@ package net.pantasystem.milktea.data.infrastructure.nodeinfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
-import net.pantasystem.milktea.data.api.NodeInfoAPIBuilder
-import net.pantasystem.milktea.data.api.NodeInfoAPIBuilderImpl
+import net.pantasystem.milktea.api.activitypub.NodeInfoDTO
+import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoRecord
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import org.junit.jupiter.api.Assertions.*
@@ -23,7 +22,7 @@ internal class NodeInfoRepositoryImplTest {
         val nodeInfo = NodeInfo("misskey.io", "", NodeInfo.Software("", ""))
         cache.put("misskey.io", nodeInfo)
         val impl = NodeInfoRepositoryImpl(
-            nodeInfoAPIBuilder = mock(),
+            fetcher = mock(),
             cache = cache,
             nodeInfoDao = mock(),
             ioDispatcher = Dispatchers.Default
@@ -38,7 +37,7 @@ internal class NodeInfoRepositoryImplTest {
         val cache = NodeInfoCache()
         assertNull(cache.get("misskey.io"))
         val impl = NodeInfoRepositoryImpl(
-            nodeInfoAPIBuilder = mock(),
+            fetcher = mock(),
             cache = cache,
             nodeInfoDao = mock() {
                 onBlocking {
@@ -51,5 +50,39 @@ internal class NodeInfoRepositoryImplTest {
         assertEquals(nodeInfo, cache.get("misskey.io"))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun find_WhenNoCache() = runTest {
+        val nodeInfo = NodeInfo("misskey.io", "", NodeInfo.Software("", ""))
+        val cache = NodeInfoCache()
+        assertNull(cache.get("misskey.io"))
+
+        val nodeInfoDao: NodeInfoDao = mock() {
+            onBlocking {
+                find(any())
+            } doReturn null
+
+            onBlocking {
+                insert(any())
+            } doReturn 1
+
+            onBlocking {
+                update(any())
+            }
+        }
+        val impl = NodeInfoRepositoryImpl(
+            fetcher = object : NodeInfoFetcher {
+                override suspend fun fetch(host: String): NodeInfoDTO {
+                    return NodeInfoDTO("", NodeInfoDTO.SoftwareDTO("", ""))
+                }
+            },
+            cache = cache,
+            nodeInfoDao = nodeInfoDao,
+            ioDispatcher = Dispatchers.Default
+        )
+        assertEquals(nodeInfo, impl.find("misskey.io").getOrThrow())
+        assertEquals(nodeInfo, cache.get("misskey.io"))
+
+    }
 
 }
