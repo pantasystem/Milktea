@@ -2,6 +2,8 @@ package net.pantasystem.milktea.data.infrastructure.nodeinfo
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import net.pantasystem.milktea.api.activitypub.NodeInfoDTO
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoDao
@@ -35,15 +37,21 @@ internal class NodeInfoRepositoryImplTest {
     fun find_WhenHasDiskCache() = runTest {
         val nodeInfo = NodeInfo("misskey.io", "", NodeInfo.Software("", ""))
         val cache = NodeInfoCache()
+        val nodeInfoDao: NodeInfoDao = object : NodeInfoDao {
+            override suspend fun insert(nodeInfo: NodeInfoRecord): Long = -1
+            override suspend fun update(nodeInfo: NodeInfoRecord) = Unit
+            override suspend fun delete(nodeInfo: NodeInfoRecord) = Unit
+            override fun observe(host: String): Flow<NodeInfoRecord?> = emptyFlow()
+            override suspend fun find(host: String): NodeInfoRecord {
+                return NodeInfoRecord("misskey.io", "", "", "")
+            }
+            override suspend fun findAll(): List<NodeInfoRecord> = emptyList()
+        }
         assertNull(cache.get("misskey.io"))
         val impl = NodeInfoRepositoryImpl(
             fetcher = mock(),
             cache = cache,
-            nodeInfoDao = mock() {
-                onBlocking {
-                    find(any())
-                } doReturn NodeInfoRecord("misskey.io", "", "", "")
-            },
+            nodeInfoDao = nodeInfoDao,
             ioDispatcher = Dispatchers.Default
         )
         assertEquals(nodeInfo, impl.find("misskey.io").getOrThrow())
