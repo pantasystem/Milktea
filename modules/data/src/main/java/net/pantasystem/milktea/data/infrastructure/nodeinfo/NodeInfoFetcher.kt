@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.nodeinfo
 
-import android.util.Log
 import net.pantasystem.milktea.api.activitypub.NodeInfoDTO
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.NodeInfoAPIBuilder
 import javax.inject.Inject
@@ -11,8 +11,13 @@ interface NodeInfoFetcher {
 }
 
 class NodeInfoFetcherImpl @Inject constructor(
-    private val nodeInfoAPIBuilder: NodeInfoAPIBuilder
+    private val nodeInfoAPIBuilder: NodeInfoAPIBuilder,
+    private val loggerFactory: Logger.Factory
 ): NodeInfoFetcher {
+
+    val logger by lazy {
+        loggerFactory.create("NodeInfoFetcher")
+    }
 
     override suspend fun fetch(host: String): NodeInfoDTO? {
         try {
@@ -22,10 +27,10 @@ class NodeInfoFetcherImpl @Inject constructor(
                 .body()?.links?.firstOrNull {
                     it.rel.contains("2.0")
                 }?.href ?: "https://$host/nodeinfo/2.0"
-            Log.d("NodeInfoRepositoryImpl", "nodeInfoUrl:$nodeInfoUrl")
+            logger.debug("NodeInfoRepositoryImpl", "nodeInfoUrl:$nodeInfoUrl")
             return nodeInfoAPIBuilder.build().getNodeInfo(nodeInfoUrl).throwIfHasError().body()
         } catch(e: Throwable) {
-            Log.e("NodeInfoRepositoryImpl", "error", e)
+            logger.error("error", e)
             throw e
         }
     }
