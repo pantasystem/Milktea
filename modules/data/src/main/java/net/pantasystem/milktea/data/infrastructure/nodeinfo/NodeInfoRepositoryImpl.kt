@@ -77,12 +77,7 @@ class NodeInfoRepositoryImpl @Inject constructor(
     }
 
     private suspend fun upInsert(nodeInfo: NodeInfo) {
-        val exitInfo = nodeInfoDao.find(nodeInfo.host)
-        if (exitInfo == null) {
-            nodeInfoDao.insert(NodeInfoRecord.from(nodeInfo))
-        } else {
-            nodeInfoDao.update(NodeInfoRecord.from(nodeInfo))
-        }
+        nodeInfoDao.upInsert(NodeInfoRecord.from(nodeInfo))
     }
 
 

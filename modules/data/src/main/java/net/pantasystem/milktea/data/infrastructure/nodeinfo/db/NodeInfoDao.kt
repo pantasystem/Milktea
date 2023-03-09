@@ -23,4 +23,14 @@ interface NodeInfoDao {
 
     @Query("select * from nodeinfo")
     suspend fun findAll(): List<NodeInfoRecord>
+
+    @Transaction
+    suspend fun upInsert(nodeInfoRecord: NodeInfoRecord) {
+        val record = find(nodeInfoRecord.host)
+        if (record == null) {
+            insert(nodeInfoRecord)
+        } else {
+            update(nodeInfoRecord)
+        }
+    }
 }
