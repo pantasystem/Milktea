@@ -63,11 +63,7 @@ internal class NodeInfoRepositoryImplTest {
             } doReturn null
 
             onBlocking {
-                insert(any())
-            } doReturn 1
-
-            onBlocking {
-                update(any())
+                upInsert(any())
             }
         }
         val impl = NodeInfoRepositoryImpl(
