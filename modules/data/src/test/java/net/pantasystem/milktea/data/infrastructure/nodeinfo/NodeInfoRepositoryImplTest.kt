@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import net.pantasystem.milktea.api.misskey.DefaultOkHttpClientProvider
 import net.pantasystem.milktea.data.api.NodeInfoAPIBuilder
+import net.pantasystem.milktea.data.api.NodeInfoAPIBuilderImpl
 import net.pantasystem.milktea.data.infrastructure.nodeinfo.db.NodeInfoRecord
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import org.junit.jupiter.api.Assertions.*
@@ -22,7 +23,7 @@ internal class NodeInfoRepositoryImplTest {
         val nodeInfo = NodeInfo("misskey.io", "", NodeInfo.Software("", ""))
         cache.put("misskey.io", nodeInfo)
         val impl = NodeInfoRepositoryImpl(
-            nodeInfoAPIBuilder = NodeInfoAPIBuilder(DefaultOkHttpClientProvider()),
+            nodeInfoAPIBuilder = mock(),
             cache = cache,
             nodeInfoDao = mock(),
             ioDispatcher = Dispatchers.Default
@@ -37,7 +38,7 @@ internal class NodeInfoRepositoryImplTest {
         val cache = NodeInfoCache()
         assertNull(cache.get("misskey.io"))
         val impl = NodeInfoRepositoryImpl(
-            nodeInfoAPIBuilder = NodeInfoAPIBuilder(DefaultOkHttpClientProvider()),
+            nodeInfoAPIBuilder = mock(),
             cache = cache,
             nodeInfoDao = mock() {
                 onBlocking {
