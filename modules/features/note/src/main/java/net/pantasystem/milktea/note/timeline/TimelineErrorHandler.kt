@@ -14,13 +14,15 @@ class TimelineErrorHandler(
 ) {
 
     operator fun invoke(error: Throwable) {
-        Log.e("TimelineErrorHandler", "error", error)
         when (error) {
             is IOException -> {
                 Toast.makeText(context, R.string.network_error, Toast.LENGTH_LONG)
                     .show()
             }
             is APIError -> {
+                if (error is APIError.InternalServerException) {
+                    return
+                }
                 Toast.makeText(context, APIErrorStringConverter()(error).getString(context), Toast.LENGTH_LONG)
                     .show()
             }
@@ -32,9 +34,7 @@ class TimelineErrorHandler(
                     Toast.LENGTH_LONG
                 ).show()
             }
-            else -> {
-                Toast.makeText(context, "error:$error", Toast.LENGTH_SHORT).show()
-            }
+            else -> Unit
 
         }
 
