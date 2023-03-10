@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MastodonFilterDao {
@@ -18,6 +19,11 @@ interface MastodonFilterDao {
         select * from mastodon_word_filters_v1 where accountId = :accountId
     """)
     suspend fun findByAccount(accountId: Long): List<MastodonWordFilterRecord>
+
+    @Query("""
+        select * from mastodon_word_filters_v1 where accountId = :accountId
+    """)
+    fun observeByAccount(accountId: Long): Flow<List<MastodonWordFilterRecord>>
 
     @Query("""
        delete from mastodon_word_filters_v1 where accountId = :accountId
