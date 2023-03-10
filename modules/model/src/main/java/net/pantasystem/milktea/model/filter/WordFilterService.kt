@@ -13,7 +13,8 @@ class WordFilterService @Inject constructor(
     private val mastodonWordFilterRepository: MastodonWordFilterRepository,
     private val wordFilterConfigRepository: WordFilterConfigRepository,
     private val accountRepository: AccountRepository,
-    private val mastodonWordFilterService: MastodonFilterService
+    private val mastodonWordFilterService: MastodonFilterService,
+    private val clientWordFilterService: ClientWordFilterService,
 ) {
     suspend fun isShouldFilterNote(pageable: Pageable, note: Note?): Boolean {
         note ?: return false
@@ -24,17 +25,9 @@ class WordFilterService @Inject constructor(
             return false
         }
         val config = wordFilterConfigRepository.get().getOrNull()
-        if (config != null) {
-            val isMatched = config.checkMatchText(note.text)
-                    || config.checkMatchText(note.cw)
-                    || note.poll?.let { poll ->
-                poll.choices.any { choice ->
-                    config.checkMatchText(choice.text)
-                }
-            } ?: false
-            if (isMatched) {
-                return true
-            }
+        val isMatched = clientWordFilterService.isShouldFilterNote(config, note)
+        if (isMatched) {
+            return true
         }
 
         if (note.type !is Note.Type.Mastodon) {
