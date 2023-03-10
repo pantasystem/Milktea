@@ -7,4 +7,7 @@ interface NotificationRepository {
     suspend fun read(notificationId: Notification.Id)
 
     fun countUnreadNotification(accountId: Long): Flow<Int>
+
+    suspend fun markAsRead(accountId: Long): Result<Unit>
+
 }

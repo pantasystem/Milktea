@@ -10,16 +10,16 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import javax.inject.Inject
 
-class NodeInfoAPIBuilder @Inject constructor(
+class NodeInfoAPIBuilderImpl @Inject constructor(
     val okHttpClientProvider: OkHttpClientProvider,
-) {
+) : NodeInfoAPIBuilder {
 
     val json = Json {
         ignoreUnknownKeys = true
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun build(): NodeInfoAPI {
+    override fun build(): NodeInfoAPI {
         val okHttp = okHttpClientProvider.get()
         return Retrofit.Builder()
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
@@ -30,7 +30,7 @@ class NodeInfoAPIBuilder @Inject constructor(
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun buildWellKnown(baseUrl: String): WellKnownNodeInfoAPI {
+    override fun buildWellKnown(baseUrl: String): WellKnownNodeInfoAPI {
         val okHttp = okHttpClientProvider.get()
         return Retrofit.Builder()
             .baseUrl(baseUrl)
@@ -39,4 +39,10 @@ class NodeInfoAPIBuilder @Inject constructor(
             .build()
             .create(WellKnownNodeInfoAPI::class.java)
     }
+}
+
+interface NodeInfoAPIBuilder {
+    fun buildWellKnown(baseUrl: String): WellKnownNodeInfoAPI
+
+    fun build(): NodeInfoAPI
 }

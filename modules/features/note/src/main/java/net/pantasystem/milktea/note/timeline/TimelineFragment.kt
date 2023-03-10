@@ -246,7 +246,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                    val firstVisibleItemPosition = lm.findFirstVisibleItemPosition()
                     mFirstVisibleItemPosition = firstVisibleItemPosition
                     mViewModel.position = firstVisibleItemPosition
                 }
@@ -254,8 +254,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
 
-                    val endVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-                    val itemCount = layoutManager.itemCount
+                    val endVisibleItemPosition = lm.findLastVisibleItemPosition()
+                    val itemCount = lm.itemCount
 
                     if (endVisibleItemPosition == (itemCount - 1)) {
                         mViewModel.loadOld()

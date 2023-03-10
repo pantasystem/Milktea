@@ -29,6 +29,7 @@ class NotificationViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
     private val notificationStreaming: NotificationStreaming,
     private val followRequestRepository: FollowRequestRepository,
+    private val notificationRepository: NotificationRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
@@ -181,6 +182,19 @@ class NotificationViewModel @Inject constructor(
                     }
             }
 
+        }
+    }
+
+    fun onMarkAsReadAllNotifications() {
+        viewModelScope.launch {
+            accountRepository.getCurrentAccount().mapCancellableCatching {
+                notificationRepository.markAsRead(it.accountId)
+            }.onSuccess {
+                loadInit()
+            }.onFailure {
+                logger.error("failed mark as read", it)
+                _error.tryEmit(it)
+            }
         }
     }
 

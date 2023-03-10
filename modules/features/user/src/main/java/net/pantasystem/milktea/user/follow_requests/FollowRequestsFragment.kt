@@ -55,14 +55,14 @@ class FollowRequestsFragment : Fragment() {
                                 rememberNestedScrollInteropConnection()
                             ),
                         uiState = uiState,
-                        onAccept = viewModel::accept,
-                        onReject = viewModel::reject,
+                        onAccept = viewModel::onAccept,
+                        onReject = viewModel::onReject,
                         onAvatarClicked = {
                             startActivity(
                                 userDetailNavigation.newIntent(UserDetailNavigationArgs.UserId(it))
                             )
                         },
-                        onRefresh = viewModel::refresh
+                        onRefresh = viewModel::onRefresh
                     )
                 }
             }
