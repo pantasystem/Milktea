@@ -5,7 +5,6 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
 import net.pantasystem.milktea.model.user.User
-import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -49,21 +48,3 @@ class WordFilterService @Inject constructor(
     }
 
 }
-
-class FilterPatternCache @Inject constructor() {
-    data class Key(
-        val pageable: Pageable,
-        val filters: List<MastodonWordFilter>,
-    )
-    private val map = mutableMapOf<Key, Pattern>()
-    fun get(pageable: Pageable, filters: List<MastodonWordFilter>): Pattern? {
-        return map[Key(pageable, filters)]
-    }
-
-    fun put(pageable: Pageable, filters: List<MastodonWordFilter>, pattern: Pattern) {
-        synchronized(this) {
-            map[Key(pageable, filters)] = pattern
-        }
-    }
-}
-
