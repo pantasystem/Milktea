@@ -125,4 +125,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideNotificationJsonCacheDao(db: DataBase) = db.notificationJsonCacheRecordDAO()
+
+    @Provides
+    @Singleton
+    fun provideMastodonWordFilterDao(db: DataBase) = db.mastodonFilterDao()
 }

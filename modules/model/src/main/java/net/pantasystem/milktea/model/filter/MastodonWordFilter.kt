@@ -6,7 +6,7 @@ data class MastodonWordFilter(
     val id: Id,
     val phrase: String,
     val context: List<FilterContext>,
-    val isWholeWord: Boolean,
+    val wholeWord: Boolean,
     val expiresAt: Instant?,
     val irreversible: Boolean,
 ) {
