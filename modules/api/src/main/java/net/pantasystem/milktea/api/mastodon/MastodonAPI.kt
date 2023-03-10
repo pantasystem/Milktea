@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.api.mastodon.context.ContextDTO
 import net.pantasystem.milktea.api.mastodon.emojis.TootEmojiDTO
+import net.pantasystem.milktea.api.mastodon.filter.V1FilterDTO
 import net.pantasystem.milktea.api.mastodon.instance.Instance
 import net.pantasystem.milktea.api.mastodon.list.AddAccountsToList
 import net.pantasystem.milktea.api.mastodon.list.ListDTO
@@ -277,4 +278,7 @@ interface MastodonAPI {
     suspend fun saveMarkers(
         @Body markers: SaveMarkersRequest
     ): Response<MarkersDTO>
+
+    @GET("api/v1/filters")
+    suspend fun getFilters(): Response<List<V1FilterDTO>>
 }

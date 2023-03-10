@@ -17,6 +17,7 @@ class WordFilterConfigRepositoryImpl @Inject constructor(
     coroutineScope: CoroutineScope,
     private val wordFilterConfigDao: WordFilterConfigDao,
     loggerFactory: Logger.Factory,
+    private val cache: WordFilterConfigCache,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : WordFilterConfigRepository {
 
@@ -26,11 +27,19 @@ class WordFilterConfigRepositoryImpl @Inject constructor(
         it.toModel()
     }.catch {
         logger.error("observe error", it)
+    }.onEach {
+        cache.put(it)
     }.flowOn(ioDispatcher).stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
 
     override suspend fun get(): Result<WordFilterConfig> = runCancellableCatching{
         withContext(ioDispatcher) {
-            wordFilterConfigDao.findAll().toModel()
+            val inMem = cache.get()
+            if (inMem != null) {
+                return@withContext inMem
+            }
+            val inDb = wordFilterConfigDao.findAll().toModel()
+            cache.put(inDb)
+            inDb
         }
     }
 
@@ -59,6 +68,7 @@ class WordFilterConfigRepositoryImpl @Inject constructor(
                     }
                 }
             }
+            cache.put(config)
             if (BuildConfig.DEBUG) {
                 val dbModel = wordFilterConfigDao.findAll().toModel()
                 require(dbModel == config) {
