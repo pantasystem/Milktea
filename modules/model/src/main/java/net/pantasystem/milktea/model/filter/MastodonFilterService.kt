@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.filter
 
 import android.text.Spanned
-import android.text.TextUtils
 import androidx.core.text.parseAsHtml
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
@@ -42,7 +41,7 @@ class MastodonFilterService @Inject constructor(
         val tokens = contextMatchedFilters
             .map { filterToRegexToken(it) }
 
-        val pattern = Pattern.compile(TextUtils.join("|", tokens), Pattern.CASE_INSENSITIVE)
+        val pattern = Pattern.compile(tokens.joinToString("|"), Pattern.CASE_INSENSITIVE)
         patternCache.put(pageable, filters, pattern)
         return pattern
     }
