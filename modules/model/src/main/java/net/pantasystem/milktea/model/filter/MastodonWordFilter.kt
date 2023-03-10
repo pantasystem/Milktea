@@ -21,4 +21,24 @@ data class MastodonWordFilter(
         Thread,
         Account,
     }
+
+    val isContextHome = context.any {
+        it == FilterContext.Home
+    }
+
+    val isContextNotifications = context.any {
+        it == FilterContext.Notifications
+    }
+
+    val isContextPublic = context.any {
+        it == FilterContext.Public
+    }
+
+    val isContextThread = context.any {
+        it == FilterContext.Thread
+    }
+
+    val isContextAccount = context.any {
+        it == FilterContext.Account
+    }
 }
