@@ -38,5 +38,33 @@ data class MastodonWordFilterRecord(
             )
         )
     }
+
+    companion object {
+        fun from(model: MastodonWordFilter): MastodonWordFilterRecord {
+            return MastodonWordFilterRecord(
+                model.id.accountId,
+                model.id.filterId,
+                phrase = model.phrase,
+                wholeWord = model.wholeWord,
+                expiresAt = model.expiresAt,
+                irreversible = model.irreversible,
+                isContextAccount = model.context.any {
+                    it == MastodonWordFilter.FilterContext.Account
+                },
+                isContextHome = model.context.any {
+                    it == MastodonWordFilter.FilterContext.Home
+                },
+                isContextNotifications = model.context.any {
+                    it == MastodonWordFilter.FilterContext.Notifications
+                },
+                isContextPublic = model.context.any {
+                    it == MastodonWordFilter.FilterContext.Public
+                },
+                isContextThread = model.context.any {
+                    it == MastodonWordFilter.FilterContext.Thread
+                }
+            )
+        }
+    }
 }
 
