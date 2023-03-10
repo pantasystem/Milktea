@@ -3,7 +3,6 @@ package net.pantasystem.milktea.model.filter
 import android.text.Spanned
 import android.text.TextUtils
 import androidx.core.text.parseAsHtml
-import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
@@ -19,6 +18,7 @@ class WordFilterService @Inject constructor(
     private val wordFilterConfigRepository: WordFilterConfigRepository,
     private val patternCache: FilterPatternCache,
     private val accountRepository: AccountRepository,
+    private val getMatchContextFilters: GetMatchContextFilters,
 ) {
     suspend fun isShouldFilterNote(pageable: Pageable, note: Note?): Boolean {
         note ?: return false
@@ -71,10 +71,8 @@ class WordFilterService @Inject constructor(
             return inCache
         }
         if (filters.isEmpty()) return null
-        val contextMatchedFilters = getMatchContextFilters(filters, pageable)
+        val contextMatchedFilters = getMatchContextFilters(pageable, filters)
         if (contextMatchedFilters.isEmpty()) return null
-
-
 
         val tokens = contextMatchedFilters
             .map { filterToRegexToken(it) }
@@ -84,23 +82,7 @@ class WordFilterService @Inject constructor(
         return pattern
     }
 
-    private fun getMatchContextFilters(
-        filters: List<MastodonWordFilter>,
-        pageable: Pageable,
-    ): List<MastodonWordFilter> {
-        val now = Clock.System.now()
-        return filters.filter {
-            it.expiresAt == null || it.expiresAt > now
-        }.filter { filter ->
-            filter.isContextHome && pageable is Pageable.Mastodon.HomeTimeline
-                    || filter.isContextNotifications && pageable is Pageable.Notification
-                    || filter.isContextPublic && pageable is Pageable.Mastodon.PublicTimeline
-                    || filter.isContextPublic && pageable is Pageable.Mastodon.LocalTimeline
-                    || filter.isContextAccount && pageable is Pageable.Mastodon.UserTimeline
-                    || filter.isContextThread && pageable is Pageable.Show
-                    || filter.isContextHome && pageable is Pageable.Mastodon.HomeTimeline
-        }
-    }
+
 
     private fun filterToRegexToken(filter: MastodonWordFilter): String? {
         val phrase = filter.phrase
@@ -116,6 +98,7 @@ class WordFilterService @Inject constructor(
         private val ALPHANUMERIC = Pattern.compile("^\\w+$")
     }
 }
+
 
 
 class FilterPatternCache @Inject constructor() {
