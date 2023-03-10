@@ -16,7 +16,15 @@ class MediatorAccountRepository(
     private val ioDispatcher: CoroutineDispatcher,
 ) : AccountRepository {
 
+    private var mAccountMap: Map<Long, Account> = mapOf()
     private var mAccounts: List<Account> = listOf()
+        set(value) {
+            field = value
+            mAccountMap = value.associateBy {
+                it.accountId
+            }
+        }
+
 
     override suspend fun add(account: Account, isUpdatePages: Boolean): Result<Account> {
         return runCancellableCatching {
@@ -51,6 +59,10 @@ class MediatorAccountRepository(
     override suspend fun get(accountId: Long): Result<Account> {
         return runCancellableCatching {
             withContext(ioDispatcher) {
+                val inMem = mAccountMap[accountId]
+                if (inMem != null) {
+                    return@withContext inMem
+                }
                 findAll().getOrThrow().firstOrNull {
                     it.accountId == accountId
                 }?: throw AccountNotFoundException(accountId)
