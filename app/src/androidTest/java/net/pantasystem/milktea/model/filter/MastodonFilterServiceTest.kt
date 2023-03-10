@@ -315,4 +315,68 @@ class MastodonFilterServiceTest {
         )
         Assert.assertFalse(actual)
     }
+
+    @Test
+    fun isShouldFilterNote_GiveWholeWord() {
+        val service = MastodonFilterService(
+            FilterPatternCache(),
+            GetMatchContextFilters()
+        )
+        val actual = service.isShouldFilterNote(
+            Pageable.Mastodon.HomeTimeline,
+            filters = listOf(
+                MastodonWordFilter(
+                    id = MastodonWordFilter.Id(
+                        accountId = 0,
+                        filterId = ""
+                    ),
+                    phrase = "piyo",
+                    context = listOf(
+                        MastodonWordFilter.FilterContext.Home
+                    ),
+                    wholeWord = true,
+                    expiresAt = null,
+                    irreversible = false
+                )
+            ),
+            note = Note.make(
+                Note.Id(0L, ""),
+                User.Id(0L, ""),
+                text = "hoge piyo fuga"
+            )
+        )
+        Assert.assertTrue(actual)
+    }
+
+    @Test
+    fun isShouldFilterNote_GiveWholeWordNotMatched() {
+        val service = MastodonFilterService(
+            FilterPatternCache(),
+            GetMatchContextFilters()
+        )
+        val actual = service.isShouldFilterNote(
+            Pageable.Mastodon.HomeTimeline,
+            filters = listOf(
+                MastodonWordFilter(
+                    id = MastodonWordFilter.Id(
+                        accountId = 0,
+                        filterId = ""
+                    ),
+                    phrase = "piyo",
+                    context = listOf(
+                        MastodonWordFilter.FilterContext.Home
+                    ),
+                    wholeWord = true,
+                    expiresAt = null,
+                    irreversible = false
+                )
+            ),
+            note = Note.make(
+                Note.Id(0L, ""),
+                User.Id(0L, ""),
+                text = "hogepiyofuga"
+            )
+        )
+        Assert.assertFalse(actual)
+    }
 }
