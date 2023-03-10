@@ -24,6 +24,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.worker.SyncNodeInfoCacheWorker
 import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
+import net.pantasystem.milktea.worker.filter.SyncMastodonFilterWorker
 import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
 import net.pantasystem.milktea.worker.instance.SyncInstanceInfoWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
@@ -196,6 +197,11 @@ class MiApplication : Application(), Configuration.Provider {
                 "syncInstanceInfoWorker",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncInstanceInfoWorker.createPeriodicWorkRequest(),
+            )
+            enqueueUniquePeriodicWork(
+                "syncMastodonWordFilter",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
             )
         }
 
