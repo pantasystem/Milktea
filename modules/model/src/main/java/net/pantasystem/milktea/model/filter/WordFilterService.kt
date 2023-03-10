@@ -4,9 +4,11 @@ import android.text.Spanned
 import android.text.TextUtils
 import androidx.core.text.parseAsHtml
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
+import net.pantasystem.milktea.model.user.User
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,9 +18,16 @@ class WordFilterService @Inject constructor(
     private val mastodonWordFilterRepository: MastodonWordFilterRepository,
     private val wordFilterConfigRepository: WordFilterConfigRepository,
     private val patternCache: FilterPatternCache,
+    private val accountRepository: AccountRepository,
 ) {
     suspend fun isShouldFilterNote(pageable: Pageable, note: Note?): Boolean {
         note ?: return false
+        val account = accountRepository.get(note.id.accountId).getOrNull()
+            ?: return false
+
+        if (note.userId == User.Id(account.accountId, account.remoteId)) {
+            return false
+        }
         val config = wordFilterConfigRepository.get().getOrNull()
         if (config != null) {
             val isMatched = config.checkMatchText(note.text)
