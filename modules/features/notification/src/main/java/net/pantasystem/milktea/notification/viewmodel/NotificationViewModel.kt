@@ -16,6 +16,8 @@ import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.FollowRequestRepository
@@ -30,6 +32,7 @@ class NotificationViewModel @Inject constructor(
     private val notificationStreaming: NotificationStreaming,
     private val followRequestRepository: FollowRequestRepository,
     private val notificationRepository: NotificationRepository,
+    private val noteWordFilterService: WordFilterService,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
@@ -47,7 +50,11 @@ class NotificationViewModel @Inject constructor(
 
     private val notificationPageableState = notificationPagingStore.notifications.map { state ->
         state.suspendConvert { list ->
-            list.map { n ->
+            list.filterNot {
+                noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note?.note)
+                        || noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note?.renote?.note)
+                        || noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note?.reply?.note)
+            }.map { n ->
                 val noteViewData = n.note?.let {
                     planeNoteViewDataCache.get(it)
                 }
