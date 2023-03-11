@@ -83,7 +83,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
         binding.viewPager.adapter = mPagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mTabViewModel.pages.collect { pages ->
                     mPages = pages
@@ -107,7 +107,7 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
                 }
             }
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 mTabViewModel.currentUser.filterNotNull().collect {
                     GlideApp.with(binding.currentAccountView)
@@ -128,7 +128,10 @@ class TabFragment : Fragment(R.layout.fragment_tab) {
                     binding.currentInstanceHostView.text = it.host
                 }
             }
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
     }
 
@@ -194,6 +197,7 @@ internal class TimelinePagerAdapter(
         mFragments.clear()
         oldRequestBaseSetting = requestBaseList
         requestBaseList = list
+        mFragments.clear()
         if (requestBaseList != oldRequestBaseSetting) {
             notifyDataSetChanged()
         }
