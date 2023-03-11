@@ -24,7 +24,6 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
@@ -39,7 +38,7 @@ class TimelineViewModel @AssistedInject constructor(
     accountRepository: AccountRepository,
     loggerFactory: Logger.Factory,
     private val accountStore: AccountStore,
-    private val wordFilterService: WordFilterService,
+    private val timelineFilterServiceFactory: TimelineFilterService.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val configRepository: LocalConfigRepository,
     @Assisted val account: Account?,
@@ -70,17 +69,17 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineStore: TimelineStore =
         timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount)
 
+    private val timelineFilterService by lazy {
+        timelineFilterServiceFactory.create(pageable)
+    }
+
     private val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
             cache.getByIds(list)
         }
     }.map {
         it.suspendConvert { notes ->
-            notes.filterNot { note ->
-                wordFilterService.isShouldFilterNote(pageable, note.note.note)
-                        || wordFilterService.isShouldFilterNote(pageable, note.note.renote?.note)
-                        || wordFilterService.isShouldFilterNote(pageable, note.note.reply?.note)
-            }
+            timelineFilterService.filterNotes(notes)
         }
     }
 
