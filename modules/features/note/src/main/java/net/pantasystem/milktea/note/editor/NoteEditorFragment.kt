@@ -246,7 +246,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         accountViewModel.switchAccountEvent.onEach {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         accountViewModel.showProfileEvent.onEach {
             val intent = userDetailNavigation.newIntent(
@@ -256,7 +259,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             )
             intent.putActivity(Activities.ACTIVITY_IN_APP)
             startActivity(intent)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
@@ -279,7 +285,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 )
             )
             binding.cw.setTokenizer(CustomEmojiTokenizer())
-        }.launchIn(lifecycleScope)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         if (!text.isNullOrBlank() && savedInstanceState == null) {
             noteEditorViewModel.changeText(text)
@@ -353,7 +359,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 )
             }
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 noteEditorViewModel.poll.distinctUntilChangedBy {
                     it == null
@@ -421,7 +427,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 accountStore.state.collect {
                     if (it.isUnauthorized) {
@@ -444,11 +450,17 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     }
                 }
             }
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         confirmViewModel.confirmEvent.onEach {
             ConfirmDialog.newInstance(it).show(childFragmentManager, "confirm")
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         noteEditorViewModel.isSaveNoteAsDraft.observe(viewLifecycleOwner) {
@@ -459,11 +471,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     upTo()
                 }
             }
-
-
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             noteEditorViewModel.textCursorPos.collect {
                 try {
                     binding.inputMain.setText(
@@ -476,7 +486,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             }
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             noteEditorViewModel.fileSizeInvalidEvent.collect {
                 whenStarted {
                     NoteEditorFileSizeWarningDialog.newInstance(

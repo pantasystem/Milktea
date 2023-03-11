@@ -74,7 +74,7 @@ class NotificationMentionFragment : Fragment(R.layout.fragment_notification_ment
 
         accountStore.observeCurrentAccount.filterNotNull().onEach {
             notificationPagerAdapter.notifyDataSetChanged()
-        }.launchIn(lifecycleScope)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
     }
 

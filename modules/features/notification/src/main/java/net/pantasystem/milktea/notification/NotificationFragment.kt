@@ -108,14 +108,20 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
         mViewModel.errors.onEach {
             NotificationErrorHandler(requireContext())(it)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         mBinding.notificationListView.adapter = adapter
         mBinding.notificationListView.layoutManager = mLinearLayoutManager
 
         mViewModel.notifications.onEach {
             adapter.submitList(it)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         mViewModel.isLoading.observe(viewLifecycleOwner) {
@@ -127,7 +133,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         }
         mBinding.notificationListView.addOnScrollListener(mScrollListener)
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 scrollToTopViewModel.scrollToTopEvent.collect {
                     mBinding.notificationListView.smoothScrollToPosition(0)

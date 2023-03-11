@@ -92,7 +92,7 @@ class PinnedNoteFragment : Fragment(R.layout.fragment_pinned_notes) {
         binding.listView.adapter = adapter
         binding.listView.layoutManager = LinearLayoutManager(requireContext())
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 pinnedNotesViewModel.notes.collect {
                     adapter.submitList(it)
