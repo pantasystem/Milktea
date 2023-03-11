@@ -40,6 +40,8 @@ open class PlaneNoteViewData(
 
     val id = note.note.id
 
+    var filterResult: FilterResult = FilterResult.NotExecuted
+
     val toShowNote: NoteRelation
         get() {
             return if (note.note.isRenote() && !note.note.hasContent()) {
@@ -276,5 +278,10 @@ open class PlaneNoteViewData(
         reactionCountsExpanded.value = true
     }
 
+    enum class FilterResult {
+        NotExecuted,
+        ShouldFilterNote,
+        Pass,
+    }
 }
 
