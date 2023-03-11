@@ -15,6 +15,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
+import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -31,6 +32,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val noteDataSource: NoteDataSource,
     private val configRepository: LocalConfigRepository,
     private val emojiRepository: CustomEmojiRepository,
+    private val noteWordFilterService: WordFilterService,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
@@ -43,9 +45,11 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     companion object;
 
-    private val currentAccountWatcher: CurrentAccountWatcher = CurrentAccountWatcher(accountId, accountRepository)
+    private val currentAccountWatcher: CurrentAccountWatcher =
+        CurrentAccountWatcher(accountId, accountRepository)
 
-    private val cache = planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
+    private val cache =
+        planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     private val note = suspend {
@@ -72,31 +76,38 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     val notes = combine(note, conversationNotes, repliesMap) { note, conversation, repliesMap ->
-        val relatedConversation = noteRelationGetter.getIn(conversation.map { it.id }).map {
+        val relatedConversation = noteRelationGetter.getIn(conversation.map { it.id }).filterNot {
+            noteWordFilterService.isShouldFilterNote(show, it)
+        }.map {
             NoteType.Conversation(it)
         }
-        val relatedChildren = noteRelationGetter.getIn((repliesMap[note?.id]?: emptyList()).map {
+        val relatedChildren = noteRelationGetter.getIn((repliesMap[note?.id] ?: emptyList()).map {
             it.id
-        }).map { childNote ->
+        }).filterNot {
+            noteWordFilterService.isShouldFilterNote(show, it)
+        }.map { childNote ->
             NoteType.Children(childNote,
                 noteRelationGetter.getIn(repliesMap[childNote.note.id]?.map { it.id }
                     ?: emptyList())
             )
         }
-        val relatedNote = noteRelationGetter.getIn(if (note == null) emptyList() else listOf(note.id)).map {
-            NoteType.Detail(it)
-        }
+        val relatedNote = noteRelationGetter.getIn(if (note == null) emptyList() else listOf(note.id)).filterNot {
+            noteWordFilterService.isShouldFilterNote(show, it)
+        }.map {
+                NoteType.Detail(it)
+            }
         relatedConversation + relatedNote + relatedChildren
     }.map { notes ->
         notes.map { note ->
-            when(note) {
+            when (note) {
                 is NoteType.Children -> {
                     NoteConversationViewData(
                         note.note,
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis
+                            ?: emptyList(),
                         viewModelScope,
                         noteDataSource,
                         emojiRepository,
@@ -120,7 +131,8 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis ?: emptyList(),
+                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis
+                            ?: emptyList(),
                         noteDataSource,
                         configRepository,
                         emojiRepository,
@@ -132,7 +144,8 @@ class NoteDetailViewModel @AssistedInject constructor(
                 }
             }
         }
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    }.flowOn(Dispatchers.IO)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private fun NoteDataSourceState.repliesMap(): Map<Note.Id, List<Note>> {
         return this.map.values.filterNot {
@@ -142,7 +155,10 @@ class NoteDetailViewModel @AssistedInject constructor(
         }
     }
 
-    private fun NoteDataSourceState.conversation(noteId: Note.Id, notes: List<Note> = emptyList()): List<Note> {
+    private fun NoteDataSourceState.conversation(
+        noteId: Note.Id,
+        notes: List<Note> = emptyList(),
+    ): List<Note> {
         val note = getOrNull(noteId)
             ?: return notes.sortedBy {
                 it.id.noteId
@@ -150,7 +166,7 @@ class NoteDetailViewModel @AssistedInject constructor(
         if (note.replyId != null) {
             val reply = getOrNull(note.replyId!!)?.let {
                 listOf(it)
-            }?: emptyList()
+            } ?: emptyList()
 
             return conversation(note.replyId!!, notes + reply)
         }
@@ -195,8 +211,6 @@ class NoteDetailViewModel @AssistedInject constructor(
         val account = currentAccountWatcher.getAccount()
         return "${account.normalizedInstanceDomain}/notes/${show.noteId}"
     }
-
-
 
 
     private fun <T : PlaneNoteViewData> T.capture(): T {

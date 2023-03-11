@@ -51,9 +51,7 @@ class NotificationViewModel @Inject constructor(
     private val notificationPageableState = notificationPagingStore.notifications.map { state ->
         state.suspendConvert { list ->
             list.filterNot {
-                noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note?.note)
-                        || noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note?.renote?.note)
-                        || noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note?.reply?.note)
+                noteWordFilterService.isShouldFilterNote(Pageable.Notification(), it.note)
             }.map { n ->
                 val noteViewData = n.note?.let {
                     planeNoteViewDataCache.get(it)
