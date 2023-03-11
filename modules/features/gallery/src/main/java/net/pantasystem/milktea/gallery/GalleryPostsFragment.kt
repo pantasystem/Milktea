@@ -130,7 +130,7 @@ class GalleryPostsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.error.collect {
                     if (it is APIError.ClientException && (it.error as? ErrorType.Misskey)?.error?.error?.code == "PERMISSION_DENIED") {

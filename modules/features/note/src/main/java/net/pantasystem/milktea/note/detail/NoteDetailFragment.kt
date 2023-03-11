@@ -119,7 +119,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
                 channelDetailNavigation,
             ).onAction(it)
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 noteDetailViewModel.notes.collect {
                     adapter.submitList(it)
@@ -133,7 +133,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         binding.notesView.layoutManager = LinearLayoutManager(context)
 
         binding.showInBrowser.setOnClickListener {
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 val url = noteDetailViewModel.getUrl()
                 showShareLink(url)
             }

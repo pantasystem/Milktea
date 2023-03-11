@@ -42,7 +42,10 @@ class FollowRequestsFragment : Fragment() {
     ): View {
         viewModel.errors.onEach {
             FollowRequestsErrorHandler(requireContext())(it)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         return ComposeView(requireContext()).apply {
             setContent {

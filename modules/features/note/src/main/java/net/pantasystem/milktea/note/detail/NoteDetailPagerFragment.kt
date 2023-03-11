@@ -52,7 +52,7 @@ class NoteDetailPagerFragment : Fragment(R.layout.fragment_note_detail_pager) {
 
         binding.viewPager.adapter = viewPager
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.noteIds.collect { noteIds ->
                     viewPager.submitList(noteIds)

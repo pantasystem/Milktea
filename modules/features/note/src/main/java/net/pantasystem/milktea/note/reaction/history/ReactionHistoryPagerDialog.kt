@@ -102,7 +102,7 @@ class ReactionHistoryPagerDialog : BottomSheetDialogFragment() {
 
         binding.reactionHistoryTab.setupWithViewPager(binding.reactionHistoryPager)
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 pagerViewModel.uiState.collect { uiState ->
                     val list = uiState.types

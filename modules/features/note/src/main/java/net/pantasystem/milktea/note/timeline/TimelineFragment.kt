@@ -243,7 +243,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             whenResumed {
                 timeMachineEventViewModel.loadEvents.collect {
                     mViewModel.loadInit(it)

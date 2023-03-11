@@ -76,7 +76,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         binding.reactionsView.layoutManager = getFlexBoxLayoutManager(view.context)
 
         reactionPickerDialogViewModel.setCurrentAccountById(noteId.accountId)
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 reactionPickerDialogViewModel.userConfigReactions.collect { reactions ->
                     adapter.submitList(reactions)
@@ -101,7 +101,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
                 notesViewModel.toggleReaction(noteId, reaction)
                 dismiss()
             }
-        }.launchIn(lifecycleScope)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
 
 

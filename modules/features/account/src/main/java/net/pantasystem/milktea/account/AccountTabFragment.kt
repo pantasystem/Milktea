@@ -56,7 +56,10 @@ class AccountTabFragment : Fragment(R.layout.fragment_account_tab) {
 
         viewModel.tabs.onEach {
             adapter.submitList(it)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
     }
 
