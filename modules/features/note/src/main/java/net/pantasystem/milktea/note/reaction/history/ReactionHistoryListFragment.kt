@@ -63,7 +63,7 @@ class ReactionHistoryListFragment : Fragment(R.layout.fragment_reaction_history_
         mLinearLayoutManager = LinearLayoutManager(requireContext())
         binding.historiesView.layoutManager = mLinearLayoutManager
         binding.historiesView.addOnScrollListener(mScrollListener)
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { uiState ->
                     listAdapter.submitList(uiState.items)
