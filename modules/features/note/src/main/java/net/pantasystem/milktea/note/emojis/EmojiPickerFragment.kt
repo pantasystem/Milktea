@@ -50,7 +50,7 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
         binding.emojiPickerViewModel = emojiPickerViewModel
         val binder = EmojiSelectionBinder(
             context = requireContext(),
-            scope = lifecycleScope,
+            scope = viewLifecycleOwner.lifecycleScope,
             fragmentManager = childFragmentManager,
             lifecycleOwner = viewLifecycleOwner,
             searchSuggestionListView = binding.searchSuggestionsView,
