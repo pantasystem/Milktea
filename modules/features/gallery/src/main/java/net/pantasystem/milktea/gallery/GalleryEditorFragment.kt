@@ -117,7 +117,7 @@ class GalleryEditorFragment : Fragment() {
         if (!viewModel.validate()) {
             return
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.save()
             withContext(Dispatchers.Main) {
                 (requireActivity() as? GalleryPostsActivity)?.pop()
