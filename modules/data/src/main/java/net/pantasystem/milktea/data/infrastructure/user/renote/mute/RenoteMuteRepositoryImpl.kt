@@ -25,7 +25,7 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
     private val unPushedRenoteMutesDiffFilter: UnPushedRenoteMutesDiffFilter,
     private val cache: RenoteMuteCache,
-    private val _findOne: RenoteMuteRepositoryImplFindOneDelegate,
+    private val findRenoteMuteAndUpdateMemCache: FindRenoteMuteAndUpdateMemCacheDelegate,
     private val _create: RenoteMuteRepositoryImplCreateDelegate,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : RenoteMuteRepository {
@@ -101,7 +101,7 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(userId: User.Id): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            val existing = _findOne(userId).getOrNull()
+            val existing = findRenoteMuteAndUpdateMemCache(userId).getOrNull()
 
             if (existing != null) {
                 renoteMuteDao.delete(userId.accountId, userId.id)
@@ -115,14 +115,14 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findOne(userId: User.Id): Result<RenoteMute> = _findOne(userId)
+    override suspend fun findOne(userId: User.Id): Result<RenoteMute> = findRenoteMuteAndUpdateMemCache(userId)
 
     override suspend fun create(userId: User.Id): Result<RenoteMute> = _create(userId)
 
     override suspend fun exists(userId: User.Id): Result<Boolean> = runCancellableCatching {
         (cache.exists(userId)
                 && !cache.isNotFound(userId))
-                || _findOne(userId).getOrNull() != null
+                || findRenoteMuteAndUpdateMemCache(userId).getOrNull() != null
     }
 
     override fun observeBy(accountId: Long): Flow<List<RenoteMute>> {
@@ -158,7 +158,7 @@ internal fun RenoteMuteDTO.toModel(accountId: Long): RenoteMute {
     )
 }
 
-internal open class RenoteMuteRepositoryImplFindOneDelegate @Inject constructor(
+internal open class FindRenoteMuteAndUpdateMemCacheDelegate @Inject constructor(
     private val renoteMuteDao: RenoteMuteDao,
     private val cache: RenoteMuteCache,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
@@ -180,7 +180,7 @@ internal open class RenoteMuteRepositoryImplFindOneDelegate @Inject constructor(
 internal open class RenoteMuteRepositoryImplCreateDelegate @Inject constructor(
     private val accountRepository: AccountRepository,
     private val renoteMuteDao: RenoteMuteDao,
-    private val findOne: RenoteMuteRepositoryImplFindOneDelegate,
+    private val findRenoteMuteAndUpdatememCache: FindRenoteMuteAndUpdateMemCacheDelegate,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
     private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher
@@ -188,7 +188,7 @@ internal open class RenoteMuteRepositoryImplCreateDelegate @Inject constructor(
     suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
-            val isNeedPush = when (val exists = findOne(userId).getOrNull()) {
+            val isNeedPush = when (val exists = findRenoteMuteAndUpdatememCache(userId).getOrNull()) {
                 null -> {
                     renoteMuteDao.insert(
                         RenoteMuteRecord.from(
@@ -205,7 +205,7 @@ internal open class RenoteMuteRepositoryImplCreateDelegate @Inject constructor(
                     exists.postedAt == null
                 }
             }
-            val created = findOne(userId).getOrThrow()
+            val created = findRenoteMuteAndUpdatememCache(userId).getOrThrow()
             if (isNeedPush && isSupportRenoteMuteInstance(account.accountId)) {
                 renoteMuteApiAdapter.create(
                     userId
@@ -220,7 +220,7 @@ internal open class RenoteMuteRepositoryImplCreateDelegate @Inject constructor(
                 )
             }
 
-            findOne(userId).getOrThrow()
+            findRenoteMuteAndUpdatememCache(userId).getOrThrow()
         }
     }
 }
