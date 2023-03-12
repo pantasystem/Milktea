@@ -18,7 +18,7 @@ abstract class RenoteMuteModule {
 
     @Binds
     @Singleton
-    abstract fun bindRenoteMuteRepository(impl: RenoteMuteRepositoryImpl): RenoteMuteRepository
+    internal abstract fun bindRenoteMuteRepository(impl: RenoteMuteRepositoryImpl): RenoteMuteRepository
 
     @Binds
     @Singleton

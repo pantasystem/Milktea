@@ -3,7 +3,9 @@ package net.pantasystem.milktea.data.infrastructure.user.renote.mute
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class RenoteMuteCache @Inject constructor() {
 
     private var map = mapOf<User.Id, RenoteMute>()

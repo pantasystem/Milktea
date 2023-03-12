@@ -18,13 +18,15 @@ import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import javax.inject.Inject
 
-class RenoteMuteRepositoryImpl @Inject constructor(
+internal class RenoteMuteRepositoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val renoteMuteDao: RenoteMuteDao,
     private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
     private val unPushedRenoteMutesDiffFilter: UnPushedRenoteMutesDiffFilter,
     private val cache: RenoteMuteCache,
+    private val _findOne: RenoteMuteRepositoryImplFindOneDelegate,
+    private val _create: RenoteMuteRepositoryImplCreateDelegate,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : RenoteMuteRepository {
 
@@ -56,7 +58,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
             coroutineScope {
                 unPushedRenoteMutes.map {
                     async {
-                        create(it.userId)
+                        _create(it.userId)
                     }
                 }
             }.awaitAll()
@@ -99,7 +101,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(userId: User.Id): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            val existing = findOne(userId).getOrNull()
+            val existing = _findOne(userId).getOrNull()
 
             if (existing != null) {
                 renoteMuteDao.delete(userId.accountId, userId.id)
@@ -113,7 +115,55 @@ class RenoteMuteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findOne(userId: User.Id): Result<RenoteMute> = runCancellableCatching {
+    override suspend fun findOne(userId: User.Id): Result<RenoteMute> = _findOne(userId)
+
+    override suspend fun create(userId: User.Id): Result<RenoteMute> = _create(userId)
+
+    override suspend fun exists(userId: User.Id): Result<Boolean> = runCancellableCatching {
+        (cache.exists(userId)
+                && !cache.isNotFound(userId))
+                || _findOne(userId).getOrNull() != null
+    }
+
+    override fun observeBy(accountId: Long): Flow<List<RenoteMute>> {
+        return renoteMuteDao.observeBy(accountId).map { list ->
+            list.map {
+                it.toModel()
+            }
+        }.onEach {
+            cache.clearBy(accountId)
+            cache.addAll(it, true)
+        }.flowOn(coroutineDispatcher)
+    }
+
+    override fun observeOne(userId: User.Id): Flow<RenoteMute?> {
+        return renoteMuteDao.observeByUser(userId.accountId, userId.id).map {
+            it?.toModel()
+        }.onEach {
+            if (it == null) {
+                cache.remove(userId)
+            } else {
+                cache.add(it)
+            }
+        }.flowOn(coroutineDispatcher)
+    }
+
+}
+
+internal fun RenoteMuteDTO.toModel(accountId: Long): RenoteMute {
+    return RenoteMute(
+        User.Id(accountId, muteeId),
+        createdAt = createdAt,
+        postedAt = createdAt,
+    )
+}
+
+internal open class RenoteMuteRepositoryImplFindOneDelegate @Inject constructor(
+    private val renoteMuteDao: RenoteMuteDao,
+    private val cache: RenoteMuteCache,
+    @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
+) {
+    suspend operator fun invoke(userId: User.Id): Result<RenoteMute> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             // NOTE: APIにIdを指定して取得する仕組みがないのでローカルのみから取得する
             val result = renoteMuteDao.findByUser(userId.accountId, userId.id)?.toModel()
@@ -125,8 +175,17 @@ class RenoteMuteRepositoryImpl @Inject constructor(
             result?: throw NoSuchElementException("RenoteMuteは存在しません:$userId")
         }
     }
+}
 
-    override suspend fun create(userId: User.Id): Result<RenoteMute> = runCancellableCatching {
+internal open class RenoteMuteRepositoryImplCreateDelegate @Inject constructor(
+    private val accountRepository: AccountRepository,
+    private val renoteMuteDao: RenoteMuteDao,
+    private val findOne: RenoteMuteRepositoryImplFindOneDelegate,
+    private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
+    private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
+    @IODispatcher private val coroutineDispatcher: CoroutineDispatcher
+) {
+    suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val account = accountRepository.get(userId.accountId).getOrThrow()
             val isNeedPush = when (val exists = findOne(userId).getOrNull()) {
@@ -164,42 +223,4 @@ class RenoteMuteRepositoryImpl @Inject constructor(
             findOne(userId).getOrThrow()
         }
     }
-
-    override suspend fun exists(userId: User.Id): Result<Boolean> = runCancellableCatching {
-        (cache.exists(userId)
-                && !cache.isNotFound(userId))
-                || findOne(userId).getOrNull() != null
-    }
-
-    override fun observeBy(accountId: Long): Flow<List<RenoteMute>> {
-        return renoteMuteDao.observeBy(accountId).map { list ->
-            list.map {
-                it.toModel()
-            }
-        }.onEach {
-            cache.clearBy(accountId)
-            cache.addAll(it, true)
-        }.flowOn(coroutineDispatcher)
-    }
-
-    override fun observeOne(userId: User.Id): Flow<RenoteMute?> {
-        return renoteMuteDao.observeByUser(userId.accountId, userId.id).map {
-            it?.toModel()
-        }.onEach {
-            if (it == null) {
-                cache.remove(userId)
-            } else {
-                cache.add(it)
-            }
-        }.flowOn(coroutineDispatcher)
-    }
-
-}
-
-internal fun RenoteMuteDTO.toModel(accountId: Long): RenoteMute {
-    return RenoteMute(
-        User.Id(accountId, muteeId),
-        createdAt = createdAt,
-        postedAt = createdAt,
-    )
 }
