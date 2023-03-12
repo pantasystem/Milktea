@@ -7,15 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
-import net.pantasystem.milktea.api.misskey.users.renote.mute.CreateRenoteMuteRequest
-import net.pantasystem.milktea.api.misskey.users.renote.mute.DeleteRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
-import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMutesRequest
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -26,14 +21,15 @@ import javax.inject.Inject
 
 class RenoteMuteRepositoryImpl @Inject constructor(
     private val accountRepository: AccountRepository,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
     private val renoteMuteDao: RenoteMuteDao,
+    private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
+    private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : RenoteMuteRepository {
 
     override suspend fun syncBy(accountId: Long): Result<Unit> = runCancellableCatching{
         withContext(coroutineDispatcher) {
-            if (!isSupportRenoteMuteInstance()) {
+            if (!isSupportRenoteMuteInstance(accountId)) {
                 return@withContext
             }
 
@@ -41,12 +37,11 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
             var mutes: List<RenoteMuteDTO> = emptyList()
             while (true) {
-                val res = misskeyAPIProvider.get(account).getRenoteMutes(
-                    RenoteMutesRequest(
-                        i = account.token,
-                        untilId = mutes.lastOrNull()?.id
-                    )
-                ).throwIfHasError().body() ?: emptyList()
+                val res = renoteMuteApiAdapter.findBy(
+                    account.accountId,
+                    untilId = mutes.lastOrNull()?.id
+                )
+
                 mutes = mutes + res
                 if (res.isEmpty() || res.size < 11) {
                     break
@@ -89,7 +84,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
     override suspend fun syncBy(userId: User.Id): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            if (!isSupportRenoteMuteInstance()) {
+            if (!isSupportRenoteMuteInstance(userId.accountId)) {
                 return@withContext
             }
         }
@@ -105,7 +100,6 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
     override suspend fun delete(userId: User.Id): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
             val existing = findOne(userId).getOrNull()
 
             if (existing != null) {
@@ -113,12 +107,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
             }
 
             try {
-                misskeyAPIProvider.get(account).deleteRenoteMute(
-                    DeleteRenoteMuteRequest(
-                        i = account.token,
-                        userId = userId.id,
-                    )
-                ).throwIfHasError().body()
+                renoteMuteApiAdapter.delete(userId)
             } catch (_: APIError.NotFoundException) {}
         }
     }
@@ -152,14 +141,10 @@ class RenoteMuteRepositoryImpl @Inject constructor(
                 }
             }
             val created = findOne(userId).getOrThrow()
-            if (isNeedPush && isSupportRenoteMuteInstance()) {
-                misskeyAPIProvider.get(account).createRenoteMute(
-                    CreateRenoteMuteRequest(
-                        i = account.token,
-                        userId = userId.id,
-                    )
-                ).throwIfHasError()
-
+            if (isNeedPush && isSupportRenoteMuteInstance(account.accountId)) {
+                renoteMuteApiAdapter.create(
+                    userId
+                )
                 // APIへの送信に成功したのでpostedAtに成功した日時を記録する
                 renoteMuteDao.update(
                     RenoteMuteRecord.from(
@@ -186,10 +171,6 @@ class RenoteMuteRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun isSupportRenoteMuteInstance(): Boolean {
-        // TODO: 実装する
-        return false
-    }
 
 
 }
