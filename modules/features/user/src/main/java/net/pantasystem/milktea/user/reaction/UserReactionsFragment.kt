@@ -76,7 +76,7 @@ class UserReactionsFragment : Fragment(R.layout.fragment_user_reactions) {
         layoutManager = LinearLayoutManager(requireContext())
         binding.userReactionsListView.layoutManager = layoutManager
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
                     val list = (it.content as? StateContent.Exist)?.rawContent ?: emptyList()

@@ -355,7 +355,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
 
     override fun goToNormalEditor() {
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
 
             accountStore.currentAccount?.let {
                 draftNoteService.save(mViewModel.uiState.value.toCreateNote(it)).onSuccess {

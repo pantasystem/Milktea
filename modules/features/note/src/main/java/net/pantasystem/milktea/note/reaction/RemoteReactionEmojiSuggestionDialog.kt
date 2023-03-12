@@ -62,7 +62,7 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
         val flexBoxLayoutManager = FlexboxLayoutManager(binding.suggestedEmojis.context)
         flexBoxLayoutManager.alignItems = AlignItems.STRETCH
         binding.suggestedEmojis.layoutManager = flexBoxLayoutManager
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.filteredEmojis.collect { state ->
                     when (state) {

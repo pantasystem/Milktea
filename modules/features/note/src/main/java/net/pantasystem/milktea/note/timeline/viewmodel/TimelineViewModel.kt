@@ -25,7 +25,6 @@ import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteStreaming
-import net.pantasystem.milktea.model.notes.muteword.WordFilterConfigRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -33,14 +32,13 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class TimelineViewModel @AssistedInject constructor(
     timelineStoreFactory: TimelineStore.Factory,
     noteStreaming: NoteStreaming,
     accountRepository: AccountRepository,
     loggerFactory: Logger.Factory,
     private val accountStore: AccountStore,
-    private val wordFilterConfigRepository: WordFilterConfigRepository,
+    private val timelineFilterServiceFactory: TimelineFilterService.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val configRepository: LocalConfigRepository,
     @Assisted val account: Account?,
@@ -71,20 +69,17 @@ class TimelineViewModel @AssistedInject constructor(
     val timelineStore: TimelineStore =
         timelineStoreFactory.create(pageable, viewModelScope, currentAccountWatcher::getAccount)
 
+    private val timelineFilterService by lazy {
+        timelineFilterServiceFactory.create(pageable)
+    }
+
     private val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
             cache.getByIds(list)
         }
-    }.flatMapLatest { state ->
-        wordFilterConfigRepository.observe().distinctUntilChanged().map { config ->
-            state.suspendConvert { notes ->
-                notes.filterNot {
-                    config.checkMatchText(it.text)
-                            || config.checkMatchText(it.cw)
-                            || config.checkMatchText(it.subNote?.note?.text)
-                            || config.checkMatchText(it.subNote?.note?.cw)
-                }
-            }
+    }.map {
+        it.suspendConvert { notes ->
+            timelineFilterService.filterNotes(notes)
         }
     }
 

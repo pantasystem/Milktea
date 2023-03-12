@@ -189,17 +189,26 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
         mViewModel.timelineListState.onEach { state ->
             adapter.submitList(state)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         mViewModel.errorEvent.onEach { error ->
             TimelineErrorHandler(requireContext())(error)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         scrollToTopViewModel.scrollToTopEvent.onEach {
                 mBinding.listView.smoothScrollToPosition(0)
-        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+        }.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -234,7 +243,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             whenResumed {
                 timeMachineEventViewModel.loadEvents.collect {
                     mViewModel.loadInit(it)

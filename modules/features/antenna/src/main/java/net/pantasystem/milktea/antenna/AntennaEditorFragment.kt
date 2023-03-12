@@ -88,7 +88,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         }
 
 
-        viewModel.userListList.observe( viewLifecycleOwner) { list ->
+        viewModel.userListList.observe(viewLifecycleOwner) { list ->
             val userListListAdapter =
                 ArrayAdapter(view.context, android.R.layout.simple_spinner_dropdown_item, list.map {
                     it.name
@@ -168,7 +168,7 @@ class AntennaEditorFragment : Fragment(R.layout.fragment_antenna_editor){
         binding.specifiedUserListView.adapter = userChipAdapter
         binding.specifiedUserListView.applyFlexBoxLayout(requireContext())
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.users.collect {
                 userChipAdapter.submitList(it)
             }
