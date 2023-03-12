@@ -11,3 +11,10 @@ data class RenoteMuteDTO(
     @SerialName("mutee") val mutee: UserDTO,
     @SerialName("muteeId") val muteeId: String,
 )
+
+@kotlinx.serialization.Serializable
+data class RenoteMutesRequest(
+    @SerialName("i") val i: String,
+    @SerialName("sinceId") val sinceId: String? = null,
+    @SerialName("untilId") val untilId: String? = null,
+)
