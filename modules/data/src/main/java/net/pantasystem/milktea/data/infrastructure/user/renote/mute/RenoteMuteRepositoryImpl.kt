@@ -33,9 +33,10 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
     override suspend fun syncBy(accountId: Long): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
+            // NOTE: キャッシュを更新しておく
+            findBy(accountId).getOrThrow()
+
             if (!isSupportRenoteMuteInstance(accountId)) {
-                // NOTE: キャッシュを更新しておく
-                findBy(accountId).getOrThrow()
                 return@withContext
             }
 
