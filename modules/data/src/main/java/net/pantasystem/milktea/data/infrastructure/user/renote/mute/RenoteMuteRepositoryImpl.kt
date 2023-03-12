@@ -34,6 +34,8 @@ class RenoteMuteRepositoryImpl @Inject constructor(
     override suspend fun syncBy(accountId: Long): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             if (!isSupportRenoteMuteInstance(accountId)) {
+                // NOTE: キャッシュを更新しておく
+                findBy(accountId).getOrThrow()
                 return@withContext
             }
 
@@ -76,7 +78,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
                     RenoteMuteRecord.from(it)
                 }
             )
-            cache.addAll(newModels)
+            cache.addAll(newModels, true)
 
         }
     }
@@ -96,7 +98,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
                     it.toModel()
                 }.also {
                     cache.clearBy(accountId)
-                    cache.addAll(it)
+                    cache.addAll(it, true)
                 }
             }
         }
@@ -182,13 +184,19 @@ class RenoteMuteRepositoryImpl @Inject constructor(
             }
         }.onEach {
             cache.clearBy(accountId)
-            cache.addAll(it)
+            cache.addAll(it, true)
         }.flowOn(coroutineDispatcher)
     }
 
     override fun observeOne(userId: User.Id): Flow<RenoteMute?> {
         return renoteMuteDao.observeByUser(userId.accountId, userId.id).map {
             it?.toModel()
+        }.onEach {
+            if (it == null) {
+                cache.remove(userId)
+            } else {
+                cache.add(it)
+            }
         }.flowOn(coroutineDispatcher)
     }
 
