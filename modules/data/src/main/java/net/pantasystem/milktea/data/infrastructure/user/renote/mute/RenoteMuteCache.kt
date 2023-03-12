@@ -11,12 +11,15 @@ class RenoteMuteCache @Inject constructor() {
 
     fun clearBy(accountId: Long) {
         synchronized(this) {
-            map = map.filterNot {
+            val newMap = map.filterNot {
                 it.key.accountId == accountId
             }
-            notFounds = notFounds.filterNot {
+            notFounds = notFounds + map.map {
+                it.key
+            }.filter {
                 it.accountId == accountId
-            }.toSet()
+            }
+            map = newMap
         }
     }
 
