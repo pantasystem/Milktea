@@ -29,4 +29,6 @@ interface RenoteMuteRepository {
 
     fun observeBy(accountId: Long): Flow<List<RenoteMute>>
 
+    fun observeOne(userId: User.Id): Flow<RenoteMute?>
+
 }

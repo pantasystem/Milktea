@@ -259,6 +259,10 @@ class UserDetailActivity : AppCompatActivity() {
             }
         }
 
+        mViewModel.renoteMuteState.onEach {
+            invalidateOptionsMenu()
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
+
         invalidateOptionsMenu()
 
 
@@ -388,6 +392,12 @@ class UserDetailActivity : AppCompatActivity() {
                     putExtra(Intent.EXTRA_TEXT, url)
                 }
                 startActivity(Intent.createChooser(intent, getString(R.string.share)))
+            }
+            R.id.renoteUnmute -> {
+                mViewModel.unMuteRenotes()
+            }
+            R.id.renoteMute -> {
+                mViewModel.muteRenotes()
             }
             else -> return false
 

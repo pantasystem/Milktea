@@ -38,6 +38,14 @@ class UserDetailActivityMenuBinder(
             report?.isVisible = false
         }
 
+        if (userDetailViewModel.renoteMuteState.value == null) {
+            menu.findItem(R.id.renoteMute).isVisible = true
+            menu.findItem(R.id.renoteUnmute).isVisible = false
+        } else {
+            menu.findItem(R.id.renoteMute).isVisible = false
+            menu.findItem(R.id.renoteUnmute).isVisible = true
+        }
+
         val tab = menu.findItem(R.id.nav_add_to_tab)
         val page = accountStore.currentAccount?.pages?.firstOrNull {
             val pageable = it.pageable()

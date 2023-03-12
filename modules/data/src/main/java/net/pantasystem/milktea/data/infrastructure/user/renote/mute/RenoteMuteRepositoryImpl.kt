@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
@@ -182,7 +183,13 @@ class RenoteMuteRepositoryImpl @Inject constructor(
         }.onEach {
             cache.clearBy(accountId)
             cache.addAll(it)
-        }
+        }.flowOn(coroutineDispatcher)
+    }
+
+    override fun observeOne(userId: User.Id): Flow<RenoteMute?> {
+        return renoteMuteDao.observeByUser(userId.accountId, userId.id).map {
+            it?.toModel()
+        }.flowOn(coroutineDispatcher)
     }
 
 }
