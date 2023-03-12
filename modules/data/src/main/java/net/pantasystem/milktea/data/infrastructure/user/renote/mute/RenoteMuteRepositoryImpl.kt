@@ -1,13 +1,10 @@
 package net.pantasystem.milktea.data.infrastructure.user.renote.mute
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
 import net.pantasystem.milktea.common.APIError
@@ -62,7 +59,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
                         create(it.userId)
                     }
                 }
-            }
+            }.awaitAll()
 
             renoteMuteDao.deleteBy(account.accountId)
             cache.clearBy(account.accountId)
