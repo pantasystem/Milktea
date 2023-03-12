@@ -66,7 +66,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
             val newModels = mutes.map {
                 RenoteMute(
-                    User.Id(accountId, it.id),
+                    User.Id(accountId, it.muteeId),
                     createdAt = it.createdAt,
                     postedAt = it.createdAt
                 )
