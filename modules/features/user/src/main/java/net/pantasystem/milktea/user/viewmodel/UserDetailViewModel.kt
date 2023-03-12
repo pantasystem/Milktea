@@ -35,6 +35,7 @@ import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
+import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import net.pantasystem.milktea.user.R
 
 class UserDetailViewModel @AssistedInject constructor(
@@ -43,6 +44,7 @@ class UserDetailViewModel @AssistedInject constructor(
     private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
     private val settingStore: SettingStore,
+    private val renoteMuteRepository: RenoteMuteRepository,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
@@ -144,6 +146,11 @@ class UserDetailViewModel @AssistedInject constructor(
     }.catch {
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val renoteMuteState = userState.filterNotNull().flatMapLatest {
+        renoteMuteRepository.observeOne(it.id)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
@@ -300,6 +307,30 @@ class UserDetailViewModel @AssistedInject constructor(
                 }
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
+    fun muteRenotes() {
+        viewModelScope.launch {
+            runCancellableCatching {
+                getUserId()
+            }.mapCancellableCatching {
+                renoteMuteRepository.create(it)
+            }.onFailure {
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
+    fun unMuteRenotes() {
+        viewModelScope.launch {
+            runCancellableCatching {
+                getUserId()
+            }.mapCancellableCatching {
+                renoteMuteRepository.delete(it)
+            }.onFailure {
                 _errors.tryEmit(it)
             }
         }

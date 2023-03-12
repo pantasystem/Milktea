@@ -53,6 +53,8 @@ import net.pantasystem.milktea.data.infrastructure.url.db.UrlPreviewRecord
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDAO
 import net.pantasystem.milktea.data.infrastructure.user.UserNicknameDTO
 import net.pantasystem.milktea.data.infrastructure.user.db.*
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
 
 @Database(
     entities = [
@@ -108,8 +110,10 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         NotificationJsonCacheRecord::class,
 
         MastodonWordFilterRecord::class,
+
+        RenoteMuteRecord::class,
     ],
-    version = 40,
+    version = 41,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
@@ -141,6 +145,7 @@ import net.pantasystem.milktea.data.infrastructure.user.db.*
         AutoMigration(from = 37, to = 38),
         AutoMigration(from = 38, to = 39),
         AutoMigration(from = 39, to = 40),
+        AutoMigration(from = 40, to = 41),
     ],
     views = [UserView::class, GroupMemberView::class, UserListMemberView::class]
 )
@@ -203,4 +208,6 @@ abstract class DataBase : RoomDatabase() {
     abstract fun notificationJsonCacheRecordDAO(): NotificationJsonCacheRecordDAO
 
     abstract fun mastodonFilterDao(): MastodonFilterDao
+
+    abstract fun renoteMuteDao(): RenoteMuteDao
 }

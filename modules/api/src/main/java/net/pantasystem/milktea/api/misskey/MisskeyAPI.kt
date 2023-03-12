@@ -28,6 +28,10 @@ import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
 import net.pantasystem.milktea.api.misskey.register.WebClientRegistries
 import net.pantasystem.milktea.api.misskey.users.*
+import net.pantasystem.milktea.api.misskey.users.renote.mute.CreateRenoteMuteRequest
+import net.pantasystem.milktea.api.misskey.users.renote.mute.DeleteRenoteMuteRequest
+import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
+import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMutesRequest
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
 import net.pantasystem.milktea.model.drive.Directory
@@ -305,4 +309,13 @@ interface MisskeyAPI {
 
     @POST("api/clips/notes")
     suspend fun getClipNotes(@Body req: NoteRequest): Response<List<NoteDTO>?>
+
+    @POST("api/renote-mute/list")
+    suspend fun getRenoteMutes(@Body req: RenoteMutesRequest): Response<List<RenoteMuteDTO>>
+
+    @POST("api/renote-mute/create")
+    suspend fun createRenoteMute(@Body req: CreateRenoteMuteRequest): Response<Unit>
+
+    @POST("api/renote-mute/delete")
+    suspend fun deleteRenoteMute(@Body req: DeleteRenoteMuteRequest): Response<Unit>
 }

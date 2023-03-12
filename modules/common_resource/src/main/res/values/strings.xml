@@ -448,5 +448,7 @@
     <string name="notes_media_click_to_load_image">Click to load Image</string>
     <string name="notifications_follow_requests">Follow request</string>
     <string name="content_not_exists_message">No content</string>
+    <string name="user_detail_mute_renotes">Mute Renotes</string>
+    <string name="user_detail_unmute_renotes">Unmute renotes</string>
 
 </resources>

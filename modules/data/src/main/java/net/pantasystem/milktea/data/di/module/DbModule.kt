@@ -129,4 +129,8 @@ object DbModule {
     @Provides
     @Singleton
     fun provideMastodonWordFilterDao(db: DataBase) = db.mastodonFilterDao()
+
+    @Provides
+    @Singleton
+    fun provideRenoteMuteDao(db: DataBase) = db.renoteMuteDao()
 }

@@ -458,5 +458,8 @@
     <string name="notifications_follow_requests">フォローリクエスト</string>
     <string name="content_not_exists_message">何もありません</string>
 
+    <string name="user_detail_mute_renotes">リノートを表示しない</string>
+    <string name="user_detail_unmute_renotes">リノートを表示する</string>
+
 
 </resources>
