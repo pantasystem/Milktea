@@ -20,24 +20,24 @@ class RenoteMuteCache @Inject constructor() {
         }
     }
 
-    fun put(userId: User.Id, renoteMute: RenoteMute) {
+    fun add(renoteMute: RenoteMute) {
         synchronized(this) {
             notFounds = notFounds.toMutableSet().also {
-                it.remove(userId)
+                it.remove(renoteMute.userId)
             }
             map = map.toMutableMap().also {
-                it[userId] = renoteMute
+                it[renoteMute.userId] = renoteMute
             }
         }
     }
 
-    fun putAll(list: List<Pair<User.Id, RenoteMute>>) {
+    fun addAll(list: List<RenoteMute>) {
         synchronized(this) {
             val mutableNotFounds = notFounds.toMutableSet()
             val cache = map.toMutableMap()
             for (el in list) {
-                mutableNotFounds.remove(el.first)
-                cache[el.first] = el.second
+                mutableNotFounds.remove(el.userId)
+                cache[el.userId] = el
             }
             map = cache
             notFounds = mutableNotFounds
@@ -49,6 +49,10 @@ class RenoteMuteCache @Inject constructor() {
             return false
         }
         return map[userId] != null
+    }
+
+    fun isNotFound(userId: User.Id): Boolean {
+        return notFounds.contains(userId)
     }
 
     fun remove(userId: User.Id) {
