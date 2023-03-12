@@ -74,8 +74,10 @@ class RenoteMuteCache @Inject constructor() {
 
     fun remove(userId: User.Id) {
         synchronized(this) {
-            notFounds = notFounds.toMutableSet().also {
-                it.add(userId)
+            if (!latestStateAccountIds.contains(userId.accountId)) {
+                notFounds = notFounds.toMutableSet().also {
+                    it.add(userId)
+                }
             }
             map = map.toMutableMap().also {
                 it.remove(userId)
