@@ -170,8 +170,8 @@ class RenoteMuteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun exists(userId: User.Id): Result<Boolean> = runCancellableCatching {
-        cache.exists(userId)
-                || !cache.isNotFound(userId)
+        (cache.exists(userId)
+                && !cache.isNotFound(userId))
                 || findOne(userId).getOrNull() != null
     }
 
