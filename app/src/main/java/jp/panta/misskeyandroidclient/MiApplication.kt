@@ -30,6 +30,7 @@ import net.pantasystem.milktea.worker.instance.SyncInstanceInfoWorker
 import net.pantasystem.milktea.worker.meta.SyncMetaWorker
 import net.pantasystem.milktea.worker.sw.RegisterAllSubscriptionRegistration
 import net.pantasystem.milktea.worker.user.SyncLoggedInUserInfoWorker
+import net.pantasystem.milktea.worker.user.renote.mute.SyncRenoteMutesWorker
 import javax.inject.Inject
 
 //基本的な情報はここを返して扱われる
@@ -202,6 +203,9 @@ class MiApplication : Application(), Configuration.Provider {
                 "syncMastodonWordFilter",
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
+            )
+            enqueue(
+                SyncRenoteMutesWorker.createOneTimeWorkRequest()
             )
         }
 
