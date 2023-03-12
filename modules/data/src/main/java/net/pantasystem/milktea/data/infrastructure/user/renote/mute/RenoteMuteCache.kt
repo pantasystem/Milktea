@@ -54,6 +54,13 @@ class RenoteMuteCache @Inject constructor() {
                 notFounds = notFounds.filterNot {
                     latestStateAccountIds.contains(it.accountId)
                 }.toSet()
+            } else {
+                val accountIds = list.map {
+                    it.userId.accountId
+                }
+                latestStateAccountIds = latestStateAccountIds.filterNot {
+                    accountIds.contains(it)
+                }.toSet()
             }
         }
     }
