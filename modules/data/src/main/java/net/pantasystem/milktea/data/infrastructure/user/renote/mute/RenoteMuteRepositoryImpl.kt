@@ -13,6 +13,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
@@ -35,18 +36,10 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
             val account = accountRepository.get(accountId).getOrThrow()
 
-            var mutes: List<RenoteMuteDTO> = emptyList()
-            while (true) {
-                val res = renoteMuteApiAdapter.findBy(
-                    account.accountId,
-                    untilId = mutes.lastOrNull()?.id
-                )
-
-                mutes = mutes + res
-                if (res.isEmpty() || res.size < 11) {
-                    break
-                }
-            }
+            val mutes: List<RenoteMuteDTO> = FindAllRemoteRenoteMutes(
+                account,
+                renoteMuteApiAdapter
+            ).invoke()
 
             val unPushedRenoteMutes = renoteMuteDao.findByUnPushed(account.accountId)
                 .map {
@@ -171,6 +164,27 @@ class RenoteMuteRepositoryImpl @Inject constructor(
         }
     }
 
+}
 
+internal class FindAllRemoteRenoteMutes(
+    val account: Account,
+    private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
+) {
+
+    suspend operator fun invoke(): List<RenoteMuteDTO> {
+        var mutes: List<RenoteMuteDTO> = emptyList()
+        while (true) {
+            val res = renoteMuteApiAdapter.findBy(
+                account.accountId,
+                untilId = mutes.lastOrNull()?.id
+            )
+
+            mutes = mutes + res
+            if (res.isEmpty() || res.size < 11) {
+                break
+            }
+        }
+        return mutes
+    }
 
 }

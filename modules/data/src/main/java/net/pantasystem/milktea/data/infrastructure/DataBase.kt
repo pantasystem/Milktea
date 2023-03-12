@@ -113,7 +113,7 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 
         RenoteMuteRecord::class,
     ],
-    version = 40,
+    version = 41,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 11, to = 12),
