@@ -65,11 +65,7 @@ class RenoteMuteRepositoryImpl @Inject constructor(
             cache.clearBy(account.accountId)
 
             val newModels = mutes.map {
-                RenoteMute(
-                    User.Id(accountId, it.muteeId),
-                    createdAt = it.createdAt,
-                    postedAt = it.createdAt
-                )
+                it.toModel(account.accountId)
             }
             renoteMuteDao.insertAll(
                 newModels.map {
@@ -200,3 +196,10 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
 }
 
+internal fun RenoteMuteDTO.toModel(accountId: Long): RenoteMute {
+    return RenoteMute(
+        User.Id(accountId, muteeId),
+        createdAt = createdAt,
+        postedAt = createdAt,
+    )
+}
