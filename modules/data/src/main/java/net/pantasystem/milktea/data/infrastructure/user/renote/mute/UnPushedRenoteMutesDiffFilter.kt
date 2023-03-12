@@ -10,7 +10,9 @@ import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 class UnPushedRenoteMutesDiffFilter {
 
     operator fun invoke(mutes: List<RenoteMuteDTO>, locals: List<RenoteMute>): List<RenoteMute> {
-        return locals.filterNot { mute ->
+        return locals.filter {
+            it.postedAt == null
+        }.filterNot { mute ->
             mutes.any { dto ->
                 mute.userId.id == dto.muteeId
             }
