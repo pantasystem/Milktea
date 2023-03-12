@@ -62,6 +62,26 @@ internal class RenoteMuteCacheTest {
     }
 
     @Test
+    fun addAll_GiveIsAllArgs() {
+        val cache = RenoteMuteCache()
+        val d1 = RenoteMute(User.Id(0L, "user1"), Clock.System.now(), null)
+        val d2 = RenoteMute(User.Id(0L, "user2"), Clock.System.now(), null)
+        val d3 = RenoteMute(User.Id(0L, "user3"), Clock.System.now(), null)
+        val d4 = RenoteMute(User.Id(0L, "user4"), Clock.System.now(), null)
+        val data = listOf(d1, d2, d3, d4)
+        cache.addAll(data, true)
+        Assertions.assertTrue(cache.exists(d1.userId))
+        Assertions.assertTrue(cache.exists(d2.userId))
+        Assertions.assertTrue(cache.exists(d3.userId))
+        Assertions.assertTrue(cache.exists(d4.userId))
+
+        Assertions.assertFalse(cache.isNotFound(d1.userId))
+        Assertions.assertFalse(cache.isNotFound(d2.userId))
+        Assertions.assertFalse(cache.isNotFound(d3.userId))
+        Assertions.assertFalse(cache.isNotFound(d4.userId))
+    }
+
+    @Test
     fun clearByAccount() {
         val cache = RenoteMuteCache()
         val d1 = RenoteMute(User.Id(0L, "user1"), Clock.System.now(), null)

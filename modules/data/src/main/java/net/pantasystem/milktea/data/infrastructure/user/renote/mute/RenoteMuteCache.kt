@@ -8,6 +8,7 @@ class RenoteMuteCache @Inject constructor() {
 
     private var map = mapOf<User.Id, RenoteMute>()
     private var notFounds = setOf<User.Id>()
+    private var latestStateAccountIds = setOf<Long>()
 
     fun clearBy(accountId: Long) {
         synchronized(this) {
@@ -34,7 +35,7 @@ class RenoteMuteCache @Inject constructor() {
         }
     }
 
-    fun addAll(list: List<RenoteMute>) {
+    fun addAll(list: List<RenoteMute>, isAll: Boolean = false) {
         synchronized(this) {
             val mutableNotFounds = notFounds.toMutableSet()
             val cache = map.toMutableMap()
@@ -44,6 +45,16 @@ class RenoteMuteCache @Inject constructor() {
             }
             map = cache
             notFounds = mutableNotFounds
+
+            if (isAll) {
+                val accountIds = list.map {
+                    it.userId.accountId
+                }
+                latestStateAccountIds = accountIds.toSet()
+                notFounds = notFounds.filterNot {
+                    latestStateAccountIds.contains(it.accountId)
+                }.toSet()
+            }
         }
     }
 
@@ -55,6 +66,9 @@ class RenoteMuteCache @Inject constructor() {
     }
 
     fun isNotFound(userId: User.Id): Boolean {
+        if (latestStateAccountIds.contains(userId.accountId)) {
+            return !exists(userId)
+        }
         return notFounds.contains(userId)
     }
 
