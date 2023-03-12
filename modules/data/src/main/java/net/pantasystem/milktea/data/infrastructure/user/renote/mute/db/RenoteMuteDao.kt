@@ -33,8 +33,19 @@ interface RenoteMuteDao {
     suspend fun delete(accountId: Long, userId: String)
 
     @Query("""
+        delete from renote_mute_users where accountId = :accountId
+    """)
+    suspend fun deleteBy(accountId: Long)
+
+    @Query("""
         select * from renote_mute_users where accountId = :accountId
     """)
     fun observeBy(accountId: Long): Flow<List<RenoteMuteRecord>>
+
+    @Query("""
+        select * from renote_mute_users where accountId = :accountId
+            and postedAt is null
+    """)
+    suspend fun findByUnPushed(accountId: Long): List<RenoteMuteRecord>
 
 }
