@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.user.renote.mute
 
+import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.model.user.User
 
 interface RenoteMuteRepository {
@@ -18,12 +19,14 @@ interface RenoteMuteRepository {
 
     suspend fun findBy(accountId: Long): Result<List<RenoteMute>>
 
+    suspend fun findOne(userId: User.Id): Result<RenoteMute>
+
     suspend fun delete(userId: User.Id): Result<Unit>
 
     suspend fun create(userId: User.Id): Result<RenoteMute>
 
     suspend fun exists(userId: User.Id): Result<Boolean>
 
-    fun observeBy(accountId: Long): Result<List<RenoteMute>>
+    fun observeBy(accountId: Long): Flow<List<RenoteMute>>
 
 }
