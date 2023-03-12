@@ -50,7 +50,7 @@ class WordFilterConfigRepositoryImplTest {
                 }
             }
 
-        }, Dispatchers.Default)
+        }, WordFilterConfigCache(), Dispatchers.Default)
     }
 
     @Test
