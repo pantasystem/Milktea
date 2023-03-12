@@ -26,7 +26,7 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
     private val unPushedRenoteMutesDiffFilter: UnPushedRenoteMutesDiffFilter,
     private val cache: RenoteMuteCache,
     private val findRenoteMuteAndUpdateMemCache: FindRenoteMuteAndUpdateMemCacheDelegate,
-    private val _create: RenoteMuteRepositoryImplCreateDelegate,
+    private val createAndPushToRemote: CreateRenoteMuteAndPushToRemoteDelegate,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : RenoteMuteRepository {
 
@@ -58,7 +58,7 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
             coroutineScope {
                 unPushedRenoteMutes.map {
                     async {
-                        _create(it.userId)
+                        createAndPushToRemote(it.userId)
                     }
                 }
             }.awaitAll()
@@ -117,7 +117,7 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
 
     override suspend fun findOne(userId: User.Id): Result<RenoteMute> = findRenoteMuteAndUpdateMemCache(userId)
 
-    override suspend fun create(userId: User.Id): Result<RenoteMute> = _create(userId)
+    override suspend fun create(userId: User.Id): Result<RenoteMute> = createAndPushToRemote(userId)
 
     override suspend fun exists(userId: User.Id): Result<Boolean> = runCancellableCatching {
         (cache.exists(userId)
@@ -177,7 +177,7 @@ internal open class FindRenoteMuteAndUpdateMemCacheDelegate @Inject constructor(
     }
 }
 
-internal open class RenoteMuteRepositoryImplCreateDelegate @Inject constructor(
+internal open class CreateRenoteMuteAndPushToRemoteDelegate @Inject constructor(
     private val accountRepository: AccountRepository,
     private val renoteMuteDao: RenoteMuteDao,
     private val findRenoteMuteAndUpdatememCache: FindRenoteMuteAndUpdateMemCacheDelegate,
