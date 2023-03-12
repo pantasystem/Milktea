@@ -24,10 +24,11 @@ class RenoteMuteRepositoryImpl @Inject constructor(
     private val renoteMuteDao: RenoteMuteDao,
     private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
+    private val unPushedRenoteMutesDiffFilter: UnPushedRenoteMutesDiffFilter,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : RenoteMuteRepository {
 
-    override suspend fun syncBy(accountId: Long): Result<Unit> = runCancellableCatching{
+    override suspend fun syncBy(accountId: Long): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             if (!isSupportRenoteMuteInstance(accountId)) {
                 return@withContext
@@ -40,15 +41,14 @@ class RenoteMuteRepositoryImpl @Inject constructor(
                 renoteMuteApiAdapter
             ).invoke()
 
-            val unPushedRenoteMutes = renoteMuteDao.findByUnPushed(account.accountId)
-                .map {
-                    it.toModel()
-                }
-                .filterNot { mute ->
-                    mutes.any { dto ->
-                        mute.userId.id == dto.muteeId
+            val unPushedRenoteMutes = unPushedRenoteMutesDiffFilter(
+                mutes,
+                renoteMuteDao.findByUnPushed(account.accountId)
+                    .map {
+                        it.toModel()
                     }
-                }
+            )
+
 
             coroutineScope {
                 unPushedRenoteMutes.map {
@@ -82,13 +82,14 @@ class RenoteMuteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findBy(accountId: Long): Result<List<RenoteMute>> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
-            renoteMuteDao.findByAccount(accountId).map {
-                it.toModel()
+    override suspend fun findBy(accountId: Long): Result<List<RenoteMute>> =
+        runCancellableCatching {
+            withContext(coroutineDispatcher) {
+                renoteMuteDao.findByAccount(accountId).map {
+                    it.toModel()
+                }
             }
         }
-    }
 
     override suspend fun delete(userId: User.Id): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
@@ -100,7 +101,8 @@ class RenoteMuteRepositoryImpl @Inject constructor(
 
             try {
                 renoteMuteApiAdapter.delete(userId)
-            } catch (_: APIError.NotFoundException) {}
+            } catch (_: APIError.NotFoundException) {
+            }
         }
     }
 
@@ -164,3 +166,4 @@ class RenoteMuteRepositoryImpl @Inject constructor(
     }
 
 }
+
