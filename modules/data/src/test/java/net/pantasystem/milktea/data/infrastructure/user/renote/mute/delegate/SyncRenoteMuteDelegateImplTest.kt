@@ -471,20 +471,6 @@ internal class SyncRenoteMuteDelegateImplTest {
 
     }
 
-    // キャッシュは存在している　
-    // キャッシュは全てPush済み　
-    // リモートにはキャッシュには存在しないRenoteMuteが存在している
-    @Test
-    fun existsInCacheAndPushedHasManyInRemote() {
-
-    }
-
-    // キャッシュは存在していない　
-    // リモートにはRenoteMuteが存在している
-    @Test
-    fun notExistsInCacheAndNotExistsInRemote() {
-
-    }
 
 
 }
