@@ -2,20 +2,20 @@ package net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.IsSupportRenoteMuteInstance
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.RenoteMuteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 
 internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
 
@@ -25,21 +25,36 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
     @Test
     fun notExistsCacheAndSupportRenoteMute() = runTest {
 
-        val dao: RenoteMuteDao = mock() {
-            onBlocking {
-                insert(any())
-            } doReturn 1
-
-            onBlocking {
-                update(any())
-            }
-        }
-
         val expect = RenoteMute(
             User.Id(0L, "user-1"),
             createdAt = Clock.System.now(),
             postedAt = null,
         )
+
+        var actualByUpdated: RenoteMuteRecord? = null
+        var actualByInserted: RenoteMuteRecord? = null
+        val dao: RenoteMuteDao = object : RenoteMuteDao {
+            override suspend fun insert(renoteMuteRecord: RenoteMuteRecord): Long {
+                actualByInserted = renoteMuteRecord
+                return 1
+            }
+
+            override suspend fun update(renoteMuteRecord: RenoteMuteRecord) {
+                actualByUpdated = renoteMuteRecord
+            }
+
+            override suspend fun insertAll(records: List<RenoteMuteRecord>): List<Long> = emptyList()
+            override suspend fun findByAccount(accountId: Long): List<RenoteMuteRecord> = emptyList()
+            override suspend fun findByUser(accountId: Long, userId: String): RenoteMuteRecord? = null
+            override fun observeByUser(accountId: Long, userId: String): Flow<RenoteMuteRecord?> = emptyFlow()
+            override suspend fun delete(accountId: Long, userId: String) = Unit
+            override suspend fun deleteBy(accountId: Long) = Unit
+            override fun observeBy(accountId: Long): Flow<List<RenoteMuteRecord>> = emptyFlow()
+            override suspend fun findByUnPushed(accountId: Long): List<RenoteMuteRecord> = emptyList()
+
+        }
+
+
 
         val delegate = CreateRenoteMuteAndPushToRemoteDelegate(
             getAccount = {
@@ -89,7 +104,9 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
             result
         )
 
-
+        Assertions.assertNotNull(actualByInserted)
+        Assertions.assertNotNull(actualByUpdated)
+        Assertions.assertNotNull(actualByUpdated?.postedAt)
     }
 
 
