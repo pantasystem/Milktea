@@ -9,23 +9,23 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.IsSupportRen
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.RenoteMuteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import javax.inject.Inject
 
 internal open class CreateRenoteMuteAndPushToRemoteDelegate @Inject constructor(
-    private val accountRepository: AccountRepository,
+    private val getAccount: GetAccount,
     private val renoteMuteDao: RenoteMuteDao,
-    private val findRenoteMuteAndUpdatememCache: FindRenoteMuteAndUpdateMemCacheDelegate,
+    private val findRenoteMuteAndUpdateMemCache: FindRenoteMuteAndUpdateMemCacheDelegate,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
     private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) {
-    suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
+    open suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
         withContext(coroutineDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val isNeedPush = when (val exists = findRenoteMuteAndUpdatememCache(userId).getOrNull()) {
+            val account = getAccount.get(userId.accountId)
+            val isNeedPush = when (val exists = findRenoteMuteAndUpdateMemCache(userId).getOrNull()) {
                 null -> {
                     renoteMuteDao.insert(
                         RenoteMuteRecord.from(
@@ -42,7 +42,7 @@ internal open class CreateRenoteMuteAndPushToRemoteDelegate @Inject constructor(
                     exists.postedAt == null
                 }
             }
-            val created = findRenoteMuteAndUpdatememCache(userId).getOrThrow()
+            val created = findRenoteMuteAndUpdateMemCache(userId).getOrThrow()
             if (isNeedPush && isSupportRenoteMuteInstance(account.accountId)) {
                 renoteMuteApiAdapter.create(
                     userId
@@ -57,7 +57,7 @@ internal open class CreateRenoteMuteAndPushToRemoteDelegate @Inject constructor(
                 )
             }
 
-            findRenoteMuteAndUpdatememCache(userId).getOrThrow()
+            findRenoteMuteAndUpdateMemCache(userId).getOrThrow()
         }
     }
 }

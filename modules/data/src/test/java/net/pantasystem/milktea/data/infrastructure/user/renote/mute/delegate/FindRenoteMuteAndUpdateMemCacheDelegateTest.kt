@@ -21,7 +21,7 @@ internal class FindRenoteMuteAndUpdateMemCacheDelegateTest {
     fun whenExists() = runTest {
         val now = Clock.System.now()
         val cache = RenoteMuteCache()
-        val delegate = FindRenoteMuteAndUpdateMemCacheDelegate(
+        val delegate = FindRenoteMuteAndUpdateMemCacheDelegateImpl(
             renoteMuteDao = mock() {
                 onBlocking {
                     findByUser(any(), any())
@@ -47,7 +47,7 @@ internal class FindRenoteMuteAndUpdateMemCacheDelegateTest {
     @Test
     fun whenNotExists() = runTest {
         val cache = RenoteMuteCache()
-        val delegate = FindRenoteMuteAndUpdateMemCacheDelegate(
+        val delegate = FindRenoteMuteAndUpdateMemCacheDelegateImpl(
             renoteMuteDao = mock() {
                 onBlocking {
                     findByUser(any(), any())

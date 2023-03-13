@@ -10,12 +10,16 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import javax.inject.Inject
 
-internal open class FindRenoteMuteAndUpdateMemCacheDelegate @Inject constructor(
+internal interface FindRenoteMuteAndUpdateMemCacheDelegate {
+    suspend operator fun invoke(userId: User.Id): Result<RenoteMute>
+}
+
+internal class FindRenoteMuteAndUpdateMemCacheDelegateImpl @Inject constructor(
     private val renoteMuteDao: RenoteMuteDao,
     private val cache: RenoteMuteCache,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
-) {
-    suspend operator fun invoke(userId: User.Id): Result<RenoteMute> = runCancellableCatching {
+) : FindRenoteMuteAndUpdateMemCacheDelegate {
+    override suspend operator fun invoke(userId: User.Id): Result<RenoteMute> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             // NOTE: APIにIdを指定して取得する仕組みがないのでローカルのみから取得する
             val result = renoteMuteDao.findByUser(userId.accountId, userId.id)?.toModel()
