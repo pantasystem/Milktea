@@ -5,13 +5,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMuteDTO
 import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.CreateRenoteMuteAndPushToRemoteDelegate
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.FindRenoteMuteAndUpdateMemCacheDelegate
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
@@ -158,69 +159,3 @@ internal fun RenoteMuteDTO.toModel(accountId: Long): RenoteMute {
     )
 }
 
-internal open class FindRenoteMuteAndUpdateMemCacheDelegate @Inject constructor(
-    private val renoteMuteDao: RenoteMuteDao,
-    private val cache: RenoteMuteCache,
-    @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
-) {
-    suspend operator fun invoke(userId: User.Id): Result<RenoteMute> = runCancellableCatching {
-        withContext(coroutineDispatcher) {
-            // NOTE: APIにIdを指定して取得する仕組みがないのでローカルのみから取得する
-            val result = renoteMuteDao.findByUser(userId.accountId, userId.id)?.toModel()
-            if (result == null) {
-                cache.remove(userId)
-            } else {
-                cache.add(result)
-            }
-            result?: throw NoSuchElementException("RenoteMuteは存在しません:$userId")
-        }
-    }
-}
-
-internal open class CreateRenoteMuteAndPushToRemoteDelegate @Inject constructor(
-    private val accountRepository: AccountRepository,
-    private val renoteMuteDao: RenoteMuteDao,
-    private val findRenoteMuteAndUpdatememCache: FindRenoteMuteAndUpdateMemCacheDelegate,
-    private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
-    private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
-    @IODispatcher private val coroutineDispatcher: CoroutineDispatcher
-) {
-    suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
-        withContext(coroutineDispatcher) {
-            val account = accountRepository.get(userId.accountId).getOrThrow()
-            val isNeedPush = when (val exists = findRenoteMuteAndUpdatememCache(userId).getOrNull()) {
-                null -> {
-                    renoteMuteDao.insert(
-                        RenoteMuteRecord.from(
-                            RenoteMute(
-                                userId,
-                                createdAt = Clock.System.now(),
-                                postedAt = null,
-                            )
-                        )
-                    )
-                    true
-                }
-                else -> {
-                    exists.postedAt == null
-                }
-            }
-            val created = findRenoteMuteAndUpdatememCache(userId).getOrThrow()
-            if (isNeedPush && isSupportRenoteMuteInstance(account.accountId)) {
-                renoteMuteApiAdapter.create(
-                    userId
-                )
-                // APIへの送信に成功したのでpostedAtに成功した日時を記録する
-                renoteMuteDao.update(
-                    RenoteMuteRecord.from(
-                        created.copy(
-                            postedAt = Clock.System.now()
-                        )
-                    )
-                )
-            }
-
-            findRenoteMuteAndUpdatememCache(userId).getOrThrow()
-        }
-    }
-}
