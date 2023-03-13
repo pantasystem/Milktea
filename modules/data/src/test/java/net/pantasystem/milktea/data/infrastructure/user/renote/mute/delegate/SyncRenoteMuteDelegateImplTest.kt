@@ -347,8 +347,127 @@ internal class SyncRenoteMuteDelegateImplTest {
     // キャッシュは存在している
     // キャッシュは一度もPushしたことがない
     // APIはRenoteMuteに対応していない
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun existsInCacheAndNotPushedNotSupportApi() {
+    fun existsInCacheAndNotPushedNotSupportApi() = runTest {
+        val cacheCreatedAt = Clock.System.now() - 1.days
+        val postedAt = Clock.System.now()
+
+        val currentAccount = Account(
+            remoteId = "",
+            instanceDomain = "",
+            userName = "",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = ""
+        )
+        val unPushedLocalData = listOf(
+            RenoteMuteRecord(
+                currentAccount.accountId,
+                userId = "user-1",
+                createdAt = cacheCreatedAt,
+                postedAt = null,
+            ),
+            RenoteMuteRecord(
+                currentAccount.accountId,
+                userId = "user-2",
+                createdAt = cacheCreatedAt,
+                postedAt = null,
+            ),
+            RenoteMuteRecord(
+                currentAccount.accountId,
+                userId = "user-3",
+                createdAt = cacheCreatedAt,
+                postedAt = null,
+            ),
+            RenoteMuteRecord(
+                currentAccount.accountId,
+                userId = "user-4",
+                createdAt = cacheCreatedAt,
+                postedAt = null,
+            ),
+            RenoteMuteRecord(
+                currentAccount.accountId,
+                userId = "user-5",
+                createdAt = cacheCreatedAt,
+                postedAt = null,
+            )
+        )
+
+        var insertAllActualData: List<RenoteMuteRecord>? = null
+        var callPushArgsActualData: List<User.Id> = emptyList()
+        var isDeleteByAccountCalled = false
+
+        val delegate = SyncRenoteMuteDelegateImpl(
+            getAccount = {
+                currentAccount
+            },
+            cache = RenoteMuteCache(),
+            renoteMuteDao = object : RenoteMuteDao {
+                override suspend fun insert(renoteMuteRecord: RenoteMuteRecord): Long = 1L
+                override suspend fun insertAll(records: List<RenoteMuteRecord>): List<Long> {
+                    insertAllActualData = records
+                    return emptyList()
+                }
+                override suspend fun update(renoteMuteRecord: RenoteMuteRecord) = Unit
+                override suspend fun findByAccount(accountId: Long): List<RenoteMuteRecord> {
+                    return unPushedLocalData
+                }
+                override suspend fun findByUser(
+                    accountId: Long,
+                    userId: String,
+                ): RenoteMuteRecord? = null
+
+                override fun observeByUser(
+                    accountId: Long,
+                    userId: String,
+                ): Flow<RenoteMuteRecord?> = emptyFlow()
+
+                override suspend fun delete(accountId: Long, userId: String) = Unit
+
+                override suspend fun deleteBy(accountId: Long) {
+                    isDeleteByAccountCalled = true
+                }
+
+                override fun observeBy(accountId: Long): Flow<List<RenoteMuteRecord>> = emptyFlow()
+
+                override suspend fun findByUnPushed(accountId: Long): List<RenoteMuteRecord> {
+                    return unPushedLocalData
+                }
+
+            },
+            createAndPushToRemote = object : CreateRenoteMuteAndPushToRemoteDelegate {
+                override suspend fun invoke(userId: User.Id): Result<RenoteMute> {
+                    callPushArgsActualData = callPushArgsActualData + userId
+                    return Result.success(
+                        unPushedLocalData.first {
+                            it.userId == userId.id
+                        }.toModel().copy(
+                            postedAt = postedAt
+                        )
+                    )
+                }
+            },
+            unPushedRenoteMutesDiffFilter = UnPushedRenoteMutesDiffFilter(),
+            isSupportRenoteMuteInstance = object : IsSupportRenoteMuteInstance {
+                override suspend fun invoke(accountId: Long): Boolean {
+                    return false
+                }
+            },
+            findAllRemoteRenoteMutesDelegate = object : FindAllRemoteRenoteMutesDelegate {
+                override suspend fun invoke(account: Account): List<RenoteMuteDTO> {
+                    return emptyList()
+                }
+            },
+            coroutineDispatcher = Dispatchers.Default
+        )
+
+        delegate.invoke(currentAccount.accountId).getOrThrow()
+
+        Assertions.assertEquals(0, callPushArgsActualData.size)
+
+        Assertions.assertNull(insertAllActualData)
+
+        Assertions.assertFalse(isDeleteByAccountCalled)
 
     }
 
