@@ -18,6 +18,7 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.time.Duration.Companion.days
 
 internal class SyncRenoteMuteDelegateImplTest {
     // キャッシュが存在している　
@@ -27,7 +28,9 @@ internal class SyncRenoteMuteDelegateImplTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun existsInCacheAndNotPushedAndSupportApiAndNotExistsInRemote() = runTest {
-        val cacheCreatedAt = Clock.System.now()
+        val cacheCreatedAt = Clock.System.now() - 1.days
+        val postedAt = Clock.System.now()
+
         val currentAccount = Account(
             remoteId = "",
             instanceDomain = "",
@@ -116,7 +119,9 @@ internal class SyncRenoteMuteDelegateImplTest {
                     return Result.success(
                         unPushedLocalData.first {
                             it.userId == userId.id
-                        }.toModel()
+                        }.toModel().copy(
+                            postedAt = postedAt
+                        )
                     )
                 }
             },
@@ -150,6 +155,19 @@ internal class SyncRenoteMuteDelegateImplTest {
             insertAllActualData?.map {
                 it.toModel().userId
             }?.toSet()
+        )
+
+        Assertions.assertEquals(
+            unPushedLocalData.map {
+                it.toModel().copy(postedAt = postedAt)
+            }.sortedBy {
+                it.userId.id
+            },
+            insertAllActualData?.map {
+                it.toModel()
+            }?.sortedBy {
+                it.userId.id
+            }
         )
 
         Assertions.assertTrue(isDeleteByAccountCalled)
