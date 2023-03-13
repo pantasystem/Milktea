@@ -46,14 +46,7 @@ class FindAllRemoteRenoteMutesTest {
             page1.last().id to page2,
             page2.last().id to page3,
         )
-        val target = FindAllRemoteRenoteMutes(
-            account = Account(
-                remoteId = "",
-                instanceDomain = "",
-                userName = "",
-                instanceType = Account.InstanceType.MISSKEY,
-                token = ""
-            ),
+        val target = FindAllRemoteRenoteMutesDelegateImpl(
             renoteMuteApiAdapter = object : RenoteMuteApiAdapter {
                 override suspend fun create(userId: User.Id) = Unit
                 override suspend fun delete(userId: User.Id) = Unit
@@ -70,7 +63,14 @@ class FindAllRemoteRenoteMutesTest {
                 }
             }
         )
-        val actual = target.invoke()
+        val account = Account(
+            remoteId = "",
+            instanceDomain = "",
+            userName = "",
+            instanceType = Account.InstanceType.MISSKEY,
+            token = ""
+        )
+        val actual = target.invoke(account)
         val expect = page1 + page2 + page3
 
         Assertions.assertEquals(expect, actual)
