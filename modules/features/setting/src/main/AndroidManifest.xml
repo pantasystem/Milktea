@@ -6,7 +6,7 @@
 
     <application>
         <activity
-            android:name=".ReactionMuteSettingActivity"
+            android:name=".activities.RenoteMuteSettingActivity"
             android:exported="false" />
         <activity
             android:name=".activities.AccountSettingActivity"
