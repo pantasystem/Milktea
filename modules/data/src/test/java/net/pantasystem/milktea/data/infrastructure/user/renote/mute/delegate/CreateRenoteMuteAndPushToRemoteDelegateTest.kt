@@ -57,7 +57,7 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
 
 
 
-        val delegate = CreateRenoteMuteAndPushToRemoteDelegate(
+        val delegate = CreateRenoteMuteAndPushToRemoteDelegateImpl(
             getAccount = {
                 Account(
                     remoteId = "",
@@ -147,7 +147,7 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
 
 
 
-        val delegate = CreateRenoteMuteAndPushToRemoteDelegate(
+        val delegate = CreateRenoteMuteAndPushToRemoteDelegateImpl(
             getAccount = {
                 Account(
                     remoteId = "",
@@ -237,7 +237,7 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
 
 
 
-        val delegate = CreateRenoteMuteAndPushToRemoteDelegate(
+        val delegate = CreateRenoteMuteAndPushToRemoteDelegateImpl(
             getAccount = {
                 Account(
                     remoteId = "",
@@ -329,7 +329,7 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
             override suspend fun findByUnPushed(accountId: Long): List<RenoteMuteRecord> = emptyList()
         }
 
-        val delegate = CreateRenoteMuteAndPushToRemoteDelegate(
+        val delegate = CreateRenoteMuteAndPushToRemoteDelegateImpl(
             getAccount = {
                 Account(
                     remoteId = "",
@@ -420,7 +420,7 @@ internal class CreateRenoteMuteAndPushToRemoteDelegateTest {
             override suspend fun findByUnPushed(accountId: Long): List<RenoteMuteRecord> = emptyList()
         }
 
-        val delegate = CreateRenoteMuteAndPushToRemoteDelegate(
+        val delegate = CreateRenoteMuteAndPushToRemoteDelegateImpl(
             getAccount = {
                 Account(
                     remoteId = "",

@@ -13,14 +13,14 @@ import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMut
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.CreateRenoteMuteAndPushToRemoteDelegate
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.FindRenoteMuteAndUpdateMemCacheDelegate
-import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import javax.inject.Inject
 
 internal class RenoteMuteRepositoryImpl @Inject constructor(
-    private val accountRepository: AccountRepository,
+    private val getAccount: GetAccount,
     private val renoteMuteDao: RenoteMuteDao,
     private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
@@ -40,7 +40,7 @@ internal class RenoteMuteRepositoryImpl @Inject constructor(
                 return@withContext
             }
 
-            val account = accountRepository.get(accountId).getOrThrow()
+            val account = getAccount.get(accountId)
 
             val mutes: List<RenoteMuteDTO> = FindAllRemoteRenoteMutes(
                 account,

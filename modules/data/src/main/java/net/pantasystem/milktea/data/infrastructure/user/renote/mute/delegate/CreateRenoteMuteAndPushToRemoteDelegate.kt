@@ -14,15 +14,19 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
 import javax.inject.Inject
 
-internal open class CreateRenoteMuteAndPushToRemoteDelegate @Inject constructor(
+interface CreateRenoteMuteAndPushToRemoteDelegate {
+    suspend operator fun invoke(userId: User.Id): Result<RenoteMute>
+}
+
+internal class CreateRenoteMuteAndPushToRemoteDelegateImpl @Inject constructor(
     private val getAccount: GetAccount,
     private val renoteMuteDao: RenoteMuteDao,
     private val findRenoteMuteAndUpdateMemCache: FindRenoteMuteAndUpdateMemCacheDelegate,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
     private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher
-) {
-    open suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
+) : CreateRenoteMuteAndPushToRemoteDelegate {
+    override suspend operator fun invoke(userId: User.Id) = runCancellableCatching {
         withContext(coroutineDispatcher) {
             val account = getAccount.get(userId.accountId)
             val isNeedPush = when (val exists = findRenoteMuteAndUpdateMemCache(userId).getOrNull()) {
