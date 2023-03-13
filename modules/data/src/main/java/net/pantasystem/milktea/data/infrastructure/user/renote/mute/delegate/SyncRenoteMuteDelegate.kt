@@ -52,13 +52,15 @@ internal class SyncRenoteMuteDelegateImpl @Inject constructor(
                     }
             )
 
-            coroutineScope {
+            val pushed = coroutineScope {
                 unPushedRenoteMutes.map {
                     async {
                         createAndPushToRemote(it.userId)
                     }
                 }
-            }.awaitAll()
+            }.awaitAll().map {
+                it.getOrThrow()
+            }
 
             renoteMuteDao.deleteBy(account.accountId)
             cache.clearBy(account.accountId)
@@ -66,7 +68,7 @@ internal class SyncRenoteMuteDelegateImpl @Inject constructor(
             // FIXME: remote < localの場合データの不整合が発生してしまう可能性がある
             val newModels = mutes.map {
                 it.toModel(account.accountId)
-            }
+            } + pushed
             renoteMuteDao.insertAll(
                 newModels.map {
                     RenoteMuteRecord.from(it)
