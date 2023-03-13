@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.RenoteMuteCache
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteDao
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.db.RenoteMuteRecord
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 
 internal class FindRenoteMuteAndUpdateMemCacheDelegateTest {
 
@@ -21,12 +23,14 @@ internal class FindRenoteMuteAndUpdateMemCacheDelegateTest {
     fun whenExists() = runTest {
         val now = Clock.System.now()
         val cache = RenoteMuteCache()
+
+        val dao = mock<RenoteMuteDao>() {
+            onBlocking {
+                findByUser(any(), any())
+            } doReturn RenoteMuteRecord(0L, "user-1", now, null)
+        }
         val delegate = FindRenoteMuteAndUpdateMemCacheDelegateImpl(
-            renoteMuteDao = mock() {
-                onBlocking {
-                    findByUser(any(), any())
-                } doReturn RenoteMuteRecord(0L, "user-1", now, null)
-            },
+            renoteMuteDao = dao,
             cache = cache,
             Dispatchers.Default
         )
@@ -41,18 +45,20 @@ internal class FindRenoteMuteAndUpdateMemCacheDelegateTest {
         )
         Assertions.assertTrue(cache.exists(User.Id(0L, "user-1")))
         Assertions.assertFalse(cache.isNotFound(User.Id(0L, "user-1")))
+        reset(dao)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun whenNotExists() = runTest {
         val cache = RenoteMuteCache()
+        val dao = mock<RenoteMuteDao>() {
+            onBlocking {
+                findByUser(any(), any())
+            } doReturn null
+        }
         val delegate = FindRenoteMuteAndUpdateMemCacheDelegateImpl(
-            renoteMuteDao = mock() {
-                onBlocking {
-                    findByUser(any(), any())
-                } doReturn null
-            },
+            renoteMuteDao = dao,
             cache = cache,
             Dispatchers.Default
         )
@@ -60,5 +66,7 @@ internal class FindRenoteMuteAndUpdateMemCacheDelegateTest {
         Assertions.assertTrue(result.isFailure)
         Assertions.assertFalse(cache.exists(User.Id(0L, "user-1")))
         Assertions.assertTrue(cache.isNotFound(User.Id(0L, "user-1")))
+
+        reset(dao)
     }
 }
