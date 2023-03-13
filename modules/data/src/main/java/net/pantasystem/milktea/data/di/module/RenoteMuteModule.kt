@@ -36,4 +36,8 @@ abstract class RenoteMuteModule {
     @Binds
     @Singleton
     internal abstract fun bindSyncRenoteMuteDelegate(impl: SyncRenoteMuteDelegateImpl): SyncRenoteMuteDelegate
+
+    @Binds
+    @Singleton
+    internal abstract fun bindFindALlRemoteRenoteMutesDelegate(impl: FindAllRemoteRenoteMutesDelegateImpl): FindAllRemoteRenoteMutesDelegate
 }

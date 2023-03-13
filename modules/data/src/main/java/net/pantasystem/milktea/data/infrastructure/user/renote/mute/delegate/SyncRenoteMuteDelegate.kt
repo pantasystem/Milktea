@@ -18,10 +18,10 @@ internal class SyncRenoteMuteDelegateImpl @Inject constructor(
     private val getAccount: GetAccount,
     private val cache: RenoteMuteCache,
     private val renoteMuteDao: RenoteMuteDao,
-    private val renoteMuteApiAdapter: RenoteMuteApiAdapter,
     private val createAndPushToRemote: CreateRenoteMuteAndPushToRemoteDelegate,
     private val unPushedRenoteMutesDiffFilter: UnPushedRenoteMutesDiffFilter,
     private val isSupportRenoteMuteInstance: IsSupportRenoteMuteInstance,
+    private val findAllRemoteRenoteMutesDelegate: FindAllRemoteRenoteMutesDelegate,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : SyncRenoteMuteDelegate {
     override suspend fun invoke(accountId: Long): Result<Unit> = runCancellableCatching {
@@ -40,10 +40,9 @@ internal class SyncRenoteMuteDelegateImpl @Inject constructor(
 
             val account = getAccount.get(accountId)
 
-            val mutes: List<RenoteMuteDTO> = FindAllRemoteRenoteMutes(
+            val mutes: List<RenoteMuteDTO> = findAllRemoteRenoteMutesDelegate(
                 account,
-                renoteMuteApiAdapter
-            ).invoke()
+            )
 
             val unPushedRenoteMutes = unPushedRenoteMutesDiffFilter(
                 mutes,
@@ -64,6 +63,7 @@ internal class SyncRenoteMuteDelegateImpl @Inject constructor(
             renoteMuteDao.deleteBy(account.accountId)
             cache.clearBy(account.accountId)
 
+            // FIXME: remote < localの場合データの不整合が発生してしまう可能性がある
             val newModels = mutes.map {
                 it.toModel(account.accountId)
             }
