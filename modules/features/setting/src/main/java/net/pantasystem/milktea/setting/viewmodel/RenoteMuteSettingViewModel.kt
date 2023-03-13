@@ -8,6 +8,9 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -41,11 +44,25 @@ class RenoteMuteSettingViewModel @Inject constructor(
             userDataSource.observeIn(it.account.accountId, it.userIds)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    private val refreshEvent = MutableSharedFlow<Account>(extraBufferCapacity = 5)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val syncState = refreshEvent.flatMapLatest {
+        suspend {
+            renoteMuteRepository.syncBy(it.accountId)
+        }.asLoadingStateFlow()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ResultState.Loading(StateContent.NotExist())
+    )
+
     val uiState = combine(
         currentAccount,
         renoteMutes,
-        relatedUsers
-    ) { account, renoteMutes, users ->
+        relatedUsers,
+        syncState,
+    ) { account, renoteMutes, users, syncState ->
         RenoteMuteSettingUiState(
             currentAccount = account,
             renoteMutes = renoteMutes.map { renoteMute ->
@@ -61,7 +78,7 @@ class RenoteMuteSettingViewModel @Inject constructor(
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        RenoteMuteSettingUiState(null, emptyList())
+        RenoteMuteSettingUiState()
     )
 
     private val _errors = MutableSharedFlow<Throwable>(
@@ -78,12 +95,17 @@ class RenoteMuteSettingViewModel @Inject constructor(
             }
         }
     }
+
+    fun onRefresh(account: Account) {
+        refreshEvent.tryEmit(account)
+    }
 }
 
 
 data class RenoteMuteSettingUiState(
-    val currentAccount: Account?,
-    val renoteMutes: List<RenoteMuteWithUser>,
+    val currentAccount: Account? = null,
+    val renoteMutes: List<RenoteMuteWithUser> = emptyList(),
+    val syncState: ResultState<Unit> = ResultState.Fixed(StateContent.NotExist()),
 )
 
 data class RenoteMuteWithUser(
