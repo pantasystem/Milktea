@@ -5,10 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.user.renote.mute.*
-import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.CreateRenoteMuteAndPushToRemoteDelegate
-import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.CreateRenoteMuteAndPushToRemoteDelegateImpl
-import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.FindRenoteMuteAndUpdateMemCacheDelegate
-import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.FindRenoteMuteAndUpdateMemCacheDelegateImpl
+import net.pantasystem.milktea.data.infrastructure.user.renote.mute.delegate.*
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import javax.inject.Singleton
 
@@ -36,4 +33,7 @@ abstract class RenoteMuteModule {
     @Singleton
     internal abstract fun bindCreateRenoteMuteAndPushToRemoteDelegate(impl: CreateRenoteMuteAndPushToRemoteDelegateImpl): CreateRenoteMuteAndPushToRemoteDelegate
 
+    @Binds
+    @Singleton
+    internal abstract fun bindSyncRenoteMuteDelegate(impl: SyncRenoteMuteDelegateImpl): SyncRenoteMuteDelegate
 }
