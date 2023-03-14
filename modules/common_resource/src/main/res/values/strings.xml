@@ -450,5 +450,6 @@
     <string name="content_not_exists_message">No content</string>
     <string name="user_detail_mute_renotes">Mute Renotes</string>
     <string name="user_detail_unmute_renotes">Unmute renotes</string>
+    <string name="settings_renote_mute_title">Renote mutes</string>
 
 </resources>
