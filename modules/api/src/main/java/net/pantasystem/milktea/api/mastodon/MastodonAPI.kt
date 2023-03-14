@@ -221,6 +221,13 @@ interface MastodonAPI {
         @Query("exclude_replies") excludeReplies: Boolean? = null,
     ): Response<List<TootStatusDTO>>
 
+    @GET("api/v1/bookmarks")
+    suspend fun getBookmarks(
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int = 20,
+    ): Response<List<TootStatusDTO>>
+
 
     @GET("api/v1/lists")
     suspend fun getMyLists(): Response<List<ListDTO>>
