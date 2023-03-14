@@ -457,6 +457,7 @@
     <string name="user_detail_mute_renotes">Mute Renotes</string>
     <string name="user_detail_unmute_renotes">Unmute renotes</string>
     <string name="settings_renote_mute_title">远程静音</string>
+    <string name="bookmark">书签</string>
 
 
 </resources>
