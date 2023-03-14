@@ -41,6 +41,7 @@ object PageTypeHelper{
             MASTODON_USER_TIMELINE -> context.getString(R.string.user)
             CALCKEY_RECOMMENDED_TIMELINE -> context.getString(R.string.calckey_recomended_timeline)
             CLIP_NOTES -> context.getString(R.string.clip)
+            MASTODON_BOOKMARK_TIMELINE -> context.getString(R.string.bookmark)
         }
     }
 }
