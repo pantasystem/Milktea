@@ -29,7 +29,7 @@ enum class PageType(val defaultName: String){
     MASTODON_HASHTAG_TIMELINE("MastodonHashtagTimeline"),
     MASTODON_LIST_TIMELINE("MastodonListTimeline"),
     MASTODON_USER_TIMELINE("MastodonUserTimeline"),
-
+    MASTODON_BOOKMARK_TIMELINE("MastodonBookmarkTimeline"),
     CALCKEY_RECOMMENDED_TIMELINE("CalckeyRecommendedTimeline"),
 
     CLIP_NOTES("ClipNotes"),

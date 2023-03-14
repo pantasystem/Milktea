@@ -461,6 +461,7 @@
     <string name="user_detail_mute_renotes">リノートを表示しない</string>
     <string name="user_detail_unmute_renotes">リノートを表示する</string>
     <string name="settings_renote_mute_title">リノート非表示ユーザ</string>
+    <string name="bookmark">ブックマーク</string>
 
 
 </resources>
