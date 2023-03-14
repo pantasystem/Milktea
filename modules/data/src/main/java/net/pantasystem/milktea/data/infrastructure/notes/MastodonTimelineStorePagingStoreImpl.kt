@@ -42,8 +42,9 @@ internal class MastodonTimelineStorePagingStoreImpl(
 
     override suspend fun loadFuture(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
-        if (getSinceId() == null && (pageableTimeline is Pageable.Mastodon.UserTimeline)) {
-            if (!(getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()) {
+        val minId = getSinceId()
+        if (minId == null && isShouldUseLinkHeader()) {
+            if (!isEmpty()) {
                 return@runCancellableCatching emptyList()
             }
         }
@@ -86,22 +87,43 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     }
                 }
             }
+            Pageable.Mastodon.BookmarkTimeline -> {
+                api.getBookmarks(
+                    minId = minId
+                ).throwIfHasError().also {
+                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
+                    this@MastodonTimelineStorePagingStoreImpl.minId = decoder.getMinId()
+//                    if (this@MastodonTimelineStorePagingStoreImpl.maxId == null) {
+//                        maxId = decoder.getMaxId()
+//                    }
+                }
+            }
         }.throwIfHasError().body()!!
     }
 
     override suspend fun getSinceId(): String? {
-        return minId ?: (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
+        if (isShouldUseLinkHeader()) {
+            return minId
+        }
+        return (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
             it.noteId
         }?.noteId
     }
 
     override suspend fun getUntilId(): String? {
-        return maxId ?: (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
+        if (isShouldUseLinkHeader()) {
+            return maxId
+        }
+        return (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
             it.noteId
         }?.noteId
     }
 
     override fun setState(state: PageableState<List<Note.Id>>) {
+        if (state is PageableState.Loading.Init) {
+            maxId = null
+            minId = null
+        }
         _state.value = state
     }
 
@@ -113,11 +135,13 @@ internal class MastodonTimelineStorePagingStoreImpl(
     override suspend fun loadPrevious(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
         val maxId = getUntilId()
-        if (maxId == null && (pageableTimeline is Pageable.Mastodon.UserTimeline)) {
-            if (!(getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()) {
+
+        if (maxId == null && isShouldUseLinkHeader()) {
+            if (!isEmpty()) {
                 return@runCancellableCatching emptyList()
             }
         }
+
         when (pageableTimeline) {
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
@@ -158,6 +182,17 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     }
                 }
             }
+            Pageable.Mastodon.BookmarkTimeline -> {
+                api.getBookmarks(
+                    maxId = maxId,
+                ).throwIfHasError().also {
+                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
+                    this@MastodonTimelineStorePagingStoreImpl.maxId = decoder.getMaxId()
+//                    if (this@MastodonTimelineStorePagingStoreImpl.minId == null) {
+//                        minId = decoder.getMinId()
+//                    }
+                }
+            }
         }.throwIfHasError().body()!!
     }
 
@@ -170,4 +205,15 @@ internal class MastodonTimelineStorePagingStoreImpl(
         }
     }
 
+    private fun isEmpty(): Boolean {
+        return when(val content = _state.value.content) {
+            is StateContent.Exist -> content.rawContent.isEmpty()
+            is StateContent.NotExist -> true
+        }
+    }
+
+    private fun isShouldUseLinkHeader(): Boolean {
+        return pageableTimeline is Pageable.Mastodon.BookmarkTimeline
+                || pageableTimeline is Pageable.Mastodon.UserTimeline
+    }
 }
