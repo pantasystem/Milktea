@@ -1,8 +1,9 @@
 package net.pantasystem.milktea.note.reaction
 
-import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -41,17 +42,21 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
 
     val viewModel: RemoteReactionEmojiSuggestionViewModel by activityViewModels()
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.dialog_remote_reaction_emoji_suggestion, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val binding = DialogRemoteReactionEmojiSuggestionBinding.bind(view)
 
         val reaction = requireArguments().getString(EXTRA_REACTION)!!
         val noteId = requireArguments().getString(EXTRA_NOTE_ID)!!
         val accountId = requireArguments().getLong(EXTRA_ACCOUNT_ID)
-
-        val view = View.inflate(context, R.layout.dialog_remote_reaction_emoji_suggestion, null)
-        val binding = DialogRemoteReactionEmojiSuggestionBinding.bind(view)
-        dialog.setContentView(view)
-
         viewModel.setReaction(accountId, reaction = reaction, noteId = noteId)
 
         val adapter = ReactionChoicesAdapter {
@@ -95,6 +100,5 @@ class RemoteReactionEmojiSuggestionDialog : AppCompatDialogFragment() {
                 }
             }
         }
-        return dialog
     }
 }
