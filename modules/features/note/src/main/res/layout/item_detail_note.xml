@@ -227,7 +227,7 @@
                         android:layout_below="@+id/url_preview_list"
                         android:layout_marginTop="3dp"
                         android:background="@drawable/shape_rounded_square_line"
-                        android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(note.toShowNote.note)}"
+                        android:onClick="@{()-> noteCardActionListener.onNoteCardClicked(note.subNote.note)}"
                         android:padding="8dp"
                         android:visibility='@{note.subNote != null ? View.VISIBLE : View.GONE}'
                         app:mainNameView="@{subNoteMainName}"
