@@ -5,30 +5,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.EmptyRequest
 import net.pantasystem.milktea.common.runCancellableCatching
-import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.common_android.emoji.V13EmojiUrlResolver
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiAliasRecord
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.db.toRecord
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.instance.RequestMeta
-import net.pantasystem.milktea.model.instance.Version
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
-import net.pantasystem.milktea.model.nodeinfo.getVersion
 import javax.inject.Inject
 
-class CustomEmojiRepositoryImpl @Inject constructor(
+internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val nodeInfoRepository: NodeInfoRepository,
     private val customEmojiDAO: CustomEmojiDAO,
-    private val mastodonAPIProvider: MastodonAPIProvider,
-    private val misskeyAPIProvider: MisskeyAPIProvider,
+    private val customEmojiApiAdapter: CustomEmojiApiAdapter,
     private val customEmojiCache: CustomEmojiCache,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CustomEmojiRepository {
@@ -79,40 +70,7 @@ class CustomEmojiRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetch(nodeInfo: NodeInfo): Result<List<Emoji>> = runCancellableCatching {
-        when (nodeInfo.type) {
-            is NodeInfo.SoftwareType.Mastodon -> {
-                val emojis = mastodonAPIProvider.get("https://${nodeInfo.host}").getCustomEmojis()
-                    .throwIfHasError()
-                    .body()
-                emojis?.map {
-                    it.toEmoji()
-                }
-            }
-            is NodeInfo.SoftwareType.Misskey -> {
-                if (
-                    nodeInfo.type.getVersion() >= Version("13")
-                    && nodeInfo.type !is NodeInfo.SoftwareType.Misskey.Calckey
-                ) {
-                    val emojis =
-                        misskeyAPIProvider.get("https://${nodeInfo.host}").getEmojis(EmptyRequest)
-                            .throwIfHasError()
-                            .body()
-                    emojis?.emojis?.map {
-                        it.copy(
-                            url = if (it.url == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.url,
-                            uri = if (it.uri == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.uri,
-                        )
-                    }
-                } else {
-                    misskeyAPIProvider.get("https://${nodeInfo.host}")
-                        .getMeta(RequestMeta(detail = true))
-                        .throwIfHasError()
-                        .body()
-                        ?.emojis
-                }
-            }
-            is NodeInfo.SoftwareType.Other -> throw IllegalStateException()
-        } ?: throw IllegalArgumentException()
+        customEmojiApiAdapter.fetch(nodeInfo)
     }
 
     override fun get(host: String): List<Emoji>? {
