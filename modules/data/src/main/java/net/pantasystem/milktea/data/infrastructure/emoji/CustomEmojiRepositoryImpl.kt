@@ -161,6 +161,16 @@ class CustomEmojiRepositoryImpl @Inject constructor(
                     record.emoji.id
                 }
             } else {
+                emojis[index].aliases?.filterNot {
+                    it.isBlank()
+                }?.map {
+                    CustomEmojiAliasRecord(
+                        emojiId = id,
+                        it
+                    )
+                }?.let {
+                    customEmojiDAO.insertAliases(it)
+                }
                 id
             }
         }
