@@ -21,6 +21,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val customEmojiDAO: CustomEmojiDAO,
     private val customEmojiApiAdapter: CustomEmojiApiAdapter,
     private val customEmojiCache: CustomEmojiCache,
+    private val upInsert: CustomEmojiUpInsertDelegate,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CustomEmojiRepository {
 
@@ -97,7 +98,12 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         return customEmojiCache.getMap(host)
     }
 
-    private suspend fun upInsert(host: String, emojis: List<Emoji>) {
+}
+
+internal class CustomEmojiUpInsertDelegate @Inject constructor(
+    private val customEmojiDAO: CustomEmojiDAO,
+) {
+    suspend operator fun invoke(host: String, emojis: List<Emoji>) {
         val record = emojis.map {
             it.toRecord(host)
         }
@@ -133,5 +139,4 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
         }
     }
-
 }
