@@ -12,6 +12,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
+import retrofit2.Response
 
 
 internal class MastodonTimelineStorePagingStoreImpl(
@@ -80,25 +81,23 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     excludeReblogs = pageableTimeline.excludeReblogs,
                     minId = getSinceId()
                 ).throwIfHasError().also {
-                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
-                    this@MastodonTimelineStorePagingStoreImpl.minId = decoder.getMinId()
-                    if (this@MastodonTimelineStorePagingStoreImpl.maxId == null) {
-                        decoder.getMaxId()
-                    }
+                    updateMinIdFrom(it)
                 }
             }
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     minId = minId
                 ).throwIfHasError().also {
-                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
-                    this@MastodonTimelineStorePagingStoreImpl.minId = decoder.getMinId()
-//                    if (this@MastodonTimelineStorePagingStoreImpl.maxId == null) {
-//                        maxId = decoder.getMaxId()
-//                    }
+                    updateMinIdFrom(it)
                 }
             }
-        }.throwIfHasError().body()!!
+        }.throwIfHasError().body()!!.let { list ->
+            if (isShouldUseLinkHeader()) {
+                filterNotExistsStatuses(list)
+            } else {
+                list
+            }
+        }
     }
 
     override suspend fun getSinceId(): String? {
@@ -175,25 +174,23 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     excludeReblogs = pageableTimeline.excludeReblogs,
                     maxId = maxId,
                 ).throwIfHasError().also {
-                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
-                    this@MastodonTimelineStorePagingStoreImpl.maxId = decoder.getMaxId()
-                    if (this@MastodonTimelineStorePagingStoreImpl.minId == null) {
-                        decoder.getMinId()
-                    }
+                    updateMaxIdFrom(it)
                 }
             }
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     maxId = maxId,
                 ).throwIfHasError().also {
-                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
-                    this@MastodonTimelineStorePagingStoreImpl.maxId = decoder.getMaxId()
-//                    if (this@MastodonTimelineStorePagingStoreImpl.minId == null) {
-//                        minId = decoder.getMinId()
-//                    }
+                    updateMaxIdFrom(it)
                 }
             }
-        }.throwIfHasError().body()!!
+        }.throwIfHasError().body()!!.let { list ->
+            if (isShouldUseLinkHeader()) {
+                filterNotExistsStatuses(list)
+            } else {
+                list
+            }
+        }
     }
 
     private suspend fun getVisibilitiesParameter(account: Account): List<String>? {
@@ -215,5 +212,60 @@ internal class MastodonTimelineStorePagingStoreImpl(
     private fun isShouldUseLinkHeader(): Boolean {
         return pageableTimeline is Pageable.Mastodon.BookmarkTimeline
                 || pageableTimeline is Pageable.Mastodon.UserTimeline
+    }
+
+    /**
+     * 重複をフィルタする
+     */
+    private fun filterNotExistsStatuses(statuses: List<TootStatusDTO>): List<TootStatusDTO> {
+        val data = (_state.value.content as? StateContent.Exist)?.rawContent
+        if (data.isNullOrEmpty()) {
+            return statuses
+        }
+        return statuses.filterNot { status ->
+            data.any {
+                it.noteId == status.id
+            }
+        }
+    }
+
+    /**
+     * responseを元にmaxIdを更新するための関数
+     * responseのmaxIdがnullの場合は更新がキャンセルされる
+     * minIdがnullの場合はresponseのminIdが指定される
+     */
+    private fun updateMaxIdFrom(response: Response<List<TootStatusDTO>>) {
+        val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
+
+        // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
+        when(val nextId = decoder.getMaxId()) {
+            null -> Unit
+            else -> {
+                maxId = nextId
+            }
+        }
+        if (minId == null) {
+            minId = decoder.getMinId()
+        }
+    }
+
+    /**
+     * responseを元にminIdを得るための関数
+     * responseのminIdがnullの場合は更新がキャンセルされる
+     * maxIdがnullの場合はresponseのmaxIdが指定される
+     */
+    private fun updateMinIdFrom(response: Response<List<TootStatusDTO>>) {
+        val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
+
+        // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
+        when(val nextId = decoder.getMinId()) {
+            null -> Unit
+            else -> {
+                minId = nextId
+            }
+        }
+        if (maxId == null) {
+            maxId = decoder.getMaxId()
+        }
     }
 }
