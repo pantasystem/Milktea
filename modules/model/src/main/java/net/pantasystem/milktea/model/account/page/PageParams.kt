@@ -189,6 +189,9 @@ data class PageParams(
                         clipId = requireNotNull(clipId)
                     )
                 }
+                MASTODON_BOOKMARK_TIMELINE -> {
+                    Pageable.Mastodon.BookmarkTimeline
+                }
             }
         } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")

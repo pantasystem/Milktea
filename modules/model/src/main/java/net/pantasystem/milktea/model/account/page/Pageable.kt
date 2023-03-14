@@ -472,6 +472,14 @@ sealed class Pageable : Serializable {
             }
         }
 
+        object BookmarkTimeline : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_BOOKMARK_TIMELINE
+                )
+            }
+        }
+
     }
 
     object CalckeyRecommendedTimeline : Pageable(), UntilPaginate, SincePaginate {
