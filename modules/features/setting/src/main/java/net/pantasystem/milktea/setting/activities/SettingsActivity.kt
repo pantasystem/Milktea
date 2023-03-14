@@ -132,6 +132,20 @@ class SettingsActivity : AppCompatActivity() {
                                 startActivity(
                                     Intent(
                                         this@SettingsActivity,
+                                        RenoteMuteSettingActivity::class.java,
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.settings_renote_mute_title))
+                        }
+
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
                                         ReactionSettingActivity::class.java,
                                     )
                                 )
