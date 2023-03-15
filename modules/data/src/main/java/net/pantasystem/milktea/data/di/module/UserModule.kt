@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.data.infrastructure.user.*
-import net.pantasystem.milktea.data.infrastructure.user.block.MuteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.mute.MuteRepositoryImpl
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository

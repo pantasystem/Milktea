@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.data.infrastructure.user.block
+package net.pantasystem.milktea.data.infrastructure.user.mute
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
