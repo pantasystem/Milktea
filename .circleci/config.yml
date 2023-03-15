@@ -7,6 +7,7 @@ jobs:
   build-and-test:
     executor:
       name: android/android-machine
+      memory: 4GB
 
     steps:
       - checkout
