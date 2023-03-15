@@ -15,16 +15,30 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
+internal interface UserApiAdapter {
 
+    suspend fun show(userId: User.Id, detail: Boolean): User
+
+    suspend fun follow(userId: User.Id): Boolean
+
+    suspend fun unfollow(userId: User.Id): Boolean
+
+    suspend fun search(
+        accountId: Long,
+        userName: String,
+        host: String?
+    ): SearchResult
+
+}
 @Singleton
-class UserApiAdapter @Inject constructor(
+internal class UserApiAdapterImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val mastodonAPIProvider: MastodonAPIProvider,
     private val userDTOEntityConverter: UserDTOEntityConverter,
-) {
+) : UserApiAdapter {
 
-    suspend fun show(userId: User.Id, detail: Boolean): User {
+    override suspend fun show(userId: User.Id, detail: Boolean): User {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
@@ -59,7 +73,7 @@ class UserApiAdapter @Inject constructor(
         }
     }
 
-    suspend fun follow(userId: User.Id): Boolean {
+    override suspend fun follow(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
@@ -73,7 +87,7 @@ class UserApiAdapter @Inject constructor(
         }.throwIfHasError().isSuccessful
     }
 
-    suspend fun unfollow(userId: User.Id): Boolean {
+    override suspend fun unfollow(userId: User.Id): Boolean {
         val account = accountRepository.get(userId.accountId).getOrThrow()
         return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> misskeyAPIProvider.get(account)
@@ -86,7 +100,7 @@ class UserApiAdapter @Inject constructor(
         }
     }
 
-    suspend fun search(
+    override suspend fun search(
         accountId: Long,
         userName: String,
         host: String?

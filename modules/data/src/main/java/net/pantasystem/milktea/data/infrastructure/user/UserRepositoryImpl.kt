@@ -23,7 +23,7 @@ import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
-class UserRepositoryImpl @Inject constructor(
+internal class UserRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,

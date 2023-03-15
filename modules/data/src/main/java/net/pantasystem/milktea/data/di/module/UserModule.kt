@@ -30,7 +30,7 @@ abstract class UserModule {
 
     @Binds
     @Singleton
-    abstract fun userRepository(
+    internal abstract fun userRepository(
         impl: UserRepositoryImpl
     ): UserRepository
 
@@ -67,5 +67,9 @@ abstract class UserModule {
     @Binds
     @Singleton
     internal abstract fun bindBlockApiAdapter(impl: BlockApiAdapterImpl): BlockApiAdapter
+
+    @Binds
+    @Singleton
+    internal abstract fun bindUserApiAdapter(impl: UserApiAdapterImpl): UserApiAdapter
 
 }
