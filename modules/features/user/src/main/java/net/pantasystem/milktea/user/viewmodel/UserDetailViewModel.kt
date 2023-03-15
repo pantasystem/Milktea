@@ -32,7 +32,9 @@ import net.pantasystem.milktea.model.user.Acct
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
+import net.pantasystem.milktea.model.user.mute.MuteRepository
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
 import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
@@ -45,6 +47,8 @@ class UserDetailViewModel @AssistedInject constructor(
     private val accountRepository: AccountRepository,
     private val settingStore: SettingStore,
     private val renoteMuteRepository: RenoteMuteRepository,
+    private val blockRepository: BlockRepository,
+    private val muteRepository: MuteRepository,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
@@ -209,7 +213,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
-                    userRepository.mute(CreateMute(it.id, expiredAt))
+                    muteRepository.create(CreateMute(it.id, expiredAt))
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
@@ -223,7 +227,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
-                    userRepository.unmute(it.id)
+                    muteRepository.delete(it.id)
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
@@ -237,7 +241,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
-                    userRepository.block(it.id)
+                    blockRepository.create(it.id)
                     userRepository.sync(it.id)
                 }.onFailure {
                     logger.error("block failed", it)
@@ -251,7 +255,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userState.value?.let {
                 runCancellableCatching {
-                    userRepository.unblock(it.id)
+                    blockRepository.delete(it.id)
                     userRepository.sync(it.id).getOrThrow()
                 }.onFailure {
                     logger.info("unblock failed", e = it)
