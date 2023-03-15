@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.model.user
 
-import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 import net.pantasystem.milktea.model.user.report.Report
 
@@ -17,14 +16,6 @@ interface UserRepository {
     suspend fun follow(userId: User.Id): Boolean
 
     suspend fun unfollow(userId: User.Id): Boolean
-
-    suspend fun mute(createMute: CreateMute): Boolean
-
-    suspend fun unmute(userId: User.Id): Boolean
-
-    suspend fun block(userId: User.Id): Boolean
-
-    suspend fun unblock(userId: User.Id): Boolean
 
     suspend fun report(report: Report) : Boolean
 

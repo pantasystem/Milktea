@@ -7,9 +7,17 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.data.infrastructure.user.*
+import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapter
+import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapterImpl
+import net.pantasystem.milktea.data.infrastructure.user.block.BlockRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapter
+import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapterImpl
+import net.pantasystem.milktea.data.infrastructure.user.mute.MuteRepositoryImpl
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.block.BlockRepository
+import net.pantasystem.milktea.model.user.mute.MuteRepository
 import javax.inject.Singleton
 
 @Module
@@ -22,7 +30,7 @@ abstract class UserModule {
 
     @Binds
     @Singleton
-    abstract fun userRepository(
+    internal abstract fun userRepository(
         impl: UserRepositoryImpl
     ): UserRepository
 
@@ -43,4 +51,28 @@ abstract class UserModule {
     abstract fun bindFollowRequestRepository(
         impl: FollowRequestRepositoryImpl
     ): FollowRequestRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindMuteRepository(impl: MuteRepositoryImpl): MuteRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindMuteApiAdapter(impl: MuteApiAdapterImpl): MuteApiAdapter
+
+    @Binds
+    @Singleton
+    internal abstract fun bindBlockRepository(impl: BlockRepositoryImpl): BlockRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindBlockApiAdapter(impl: BlockApiAdapterImpl): BlockApiAdapter
+
+    @Binds
+    @Singleton
+    internal abstract fun bindUserApiAdapter(impl: UserApiAdapterImpl): UserApiAdapter
+
+    @Binds
+    @Singleton
+    internal abstract fun bindUserCacheUpdater(impl: UserCacheUpdaterFromUserActionResultImpl): UserCacheUpdaterFromUserActionResult
 }
