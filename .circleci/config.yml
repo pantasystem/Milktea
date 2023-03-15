@@ -26,10 +26,6 @@ jobs:
           test-command: ./gradlew connectedDebugAndroidTest --no-daemon
           system-image: system-images;android-25;google_apis;x86
 
-      - run:
-          name: Assemble release build
-          command: |
-            ./gradlew assembleRelease --no-daemon
 
   release-and-publish:
     executor:
