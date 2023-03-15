@@ -107,7 +107,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging'
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
 
-    androidTestImplementation "androidx.room:room-testing:2.4.3"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
 
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
