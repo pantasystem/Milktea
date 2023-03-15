@@ -8,6 +8,8 @@ import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.data.infrastructure.user.*
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapter
+import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteRepositoryImpl
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -54,5 +56,10 @@ abstract class UserModule {
 
     @Binds
     @Singleton
+    internal abstract fun bindMuteApiAdapter(impl: MuteApiAdapterImpl): MuteApiAdapter
+
+    @Binds
+    @Singleton
     internal abstract fun bindBlockRepository(impl: BlockRepositoryImpl): BlockRepository
+
 }

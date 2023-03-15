@@ -7,7 +7,6 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.data.infrastructure.user.UserActionResult
-import net.pantasystem.milktea.data.infrastructure.user.UserApiAdapter
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -16,7 +15,7 @@ import net.pantasystem.milktea.model.user.mute.MuteRepository
 import javax.inject.Inject
 
 internal class MuteRepositoryImpl @Inject constructor(
-    private val userApiAdapter: UserApiAdapter,
+    private val muteApiAdapter: MuteApiAdapter,
     private val userDataSource: UserDataSource,
     private val userRepository: UserRepository,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
@@ -30,7 +29,7 @@ internal class MuteRepositoryImpl @Inject constructor(
     override suspend fun create(createMute: CreateMute): Result<Unit> {
         return runCancellableCatching {
             withContext(coroutineDispatcher) {
-                updateCacheFrom(createMute.userId, userApiAdapter.muteUser(createMute)) {
+                updateCacheFrom(createMute.userId, muteApiAdapter.muteUser(createMute)) {
                     it.copy(
                         related = it.related?.copy(
                             isMuting = true
@@ -46,7 +45,7 @@ internal class MuteRepositoryImpl @Inject constructor(
     override suspend fun delete(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
             withContext(coroutineDispatcher) {
-                updateCacheFrom(userId, userApiAdapter.unmuteUser(userId)) {
+                updateCacheFrom(userId, muteApiAdapter.unmuteUser(userId)) {
                     it.copy(
                         related = it.related?.copy(
                             isMuting = false

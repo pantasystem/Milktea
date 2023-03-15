@@ -1,10 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
-import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
-import net.pantasystem.milktea.api.mastodon.accounts.MuteAccountRequest
-import net.pantasystem.milktea.api.misskey.users.CreateMuteUserRequest
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -16,7 +13,6 @@ import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.mute.CreateMute
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -90,57 +86,6 @@ class UserApiAdapter @Inject constructor(
         }
     }
 
-    suspend fun muteUser(createMute: CreateMute): UserActionResult {
-        val account = accountRepository.get(createMute.userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                require(createMute.notifications == null) {
-                    "Misskey does not support notifications mute account parameter"
-                }
-                misskeyAPIProvider.get(account).muteUser(
-                    CreateMuteUserRequest(
-                        i = account.token,
-                        userId = createMute.userId.id,
-                        expiresAt = createMute.expiresAt?.toEpochMilliseconds()
-                    )
-                ).throwIfHasError()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                val body = mastodonAPIProvider.get(account).muteAccount(
-                    createMute.userId.id,
-                    MuteAccountRequest(
-                        duration = createMute.expiresAt?.let {
-                            Clock.System.now().epochSeconds - it.epochSeconds
-                        } ?: 0,
-                        notifications = createMute.notifications ?: true
-                    )
-                ).throwIfHasError().body()
-                UserActionResult.Mastodon(requireNotNull(body))
-            }
-        }
-    }
-
-    suspend fun unmuteUser(userId: User.Id): UnMuteResult {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).unmuteUser(
-                    RequestUser(
-                        i = account.token,
-                        userId = userId.id,
-                    )
-                ).throwIfHasError()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                val body = mastodonAPIProvider.get(account).unmuteAccount(userId.id)
-                    .throwIfHasError()
-                    .body()
-                UserActionResult.Mastodon(requireNotNull(body))
-            }
-        }
-    }
 
     suspend fun blockUser(userId: User.Id): BlockUserResult {
         val account = accountRepository.get(userId.accountId).getOrThrow()
@@ -228,7 +173,7 @@ sealed interface SearchResult {
     data class Mastodon(val users: List<MastodonAccountDTO>) : SearchResult
 }
 
-typealias UnMuteResult = UserActionResult
+
 
 typealias BlockUserResult = UserActionResult
 
