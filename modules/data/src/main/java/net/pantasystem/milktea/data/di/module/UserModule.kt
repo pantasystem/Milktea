@@ -72,4 +72,7 @@ abstract class UserModule {
     @Singleton
     internal abstract fun bindUserApiAdapter(impl: UserApiAdapterImpl): UserApiAdapter
 
+    @Binds
+    @Singleton
+    internal abstract fun bindUserCacheUpdater(impl: UserCacheUpdaterFromUserActionResultImpl): UserCacheUpdaterFromUserActionResult
 }

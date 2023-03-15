@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
-import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountRelationshipDTO
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -15,6 +14,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
+
 internal interface UserApiAdapter {
 
     suspend fun show(userId: User.Id, detail: Boolean): User
@@ -132,10 +132,6 @@ internal class UserApiAdapterImpl @Inject constructor(
     }
 }
 
-sealed interface UserActionResult {
-    object Misskey : UserActionResult
-    data class Mastodon(val relationship: MastodonAccountRelationshipDTO) : UserActionResult
-}
 
 sealed interface SearchResult {
     data class Misskey(val users: List<UserDTO>) : SearchResult

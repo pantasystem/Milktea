@@ -5,18 +5,14 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
-import net.pantasystem.milktea.data.infrastructure.toUserRelated
-import net.pantasystem.milktea.data.infrastructure.user.UserActionResult
+import net.pantasystem.milktea.data.infrastructure.user.UserCacheUpdaterFromUserActionResult
 import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.block.BlockRepository
 import javax.inject.Inject
 
 internal class BlockRepositoryImpl @Inject constructor(
-    private val userRepository: UserRepository,
     private val blockApiAdapter: BlockApiAdapter,
-    private val userDataSource: UserDataSource,
+    private val updateCacheFrom: UserCacheUpdaterFromUserActionResult,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
 ) : BlockRepository {
@@ -55,18 +51,4 @@ internal class BlockRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
-        val user = userRepository.find(userId, true) as User.Detail
-        val updated = when(result) {
-            is UserActionResult.Mastodon -> {
-                user.copy(
-                    related = result.relationship.toUserRelated()
-                )
-            }
-            UserActionResult.Misskey -> {
-                reducer(user)
-            }
-        }
-        userDataSource.add(updated)
-    }
 }
