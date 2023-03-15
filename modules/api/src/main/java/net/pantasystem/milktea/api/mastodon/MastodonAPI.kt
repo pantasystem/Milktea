@@ -20,6 +20,9 @@ import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.api.mastodon.report.CreateReportRequest
+import net.pantasystem.milktea.api.mastodon.report.MstReportDTO
+import net.pantasystem.milktea.api.mastodon.rule.RuleDTO
 import net.pantasystem.milktea.api.mastodon.search.SearchResponse
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
@@ -288,4 +291,10 @@ interface MastodonAPI {
 
     @GET("api/v1/filters")
     suspend fun getFilters(): Response<List<V1FilterDTO>>
+
+    @POST("api/v1/reports")
+    suspend fun createReport(request: CreateReportRequest): Response<MstReportDTO>
+
+    @GET("api/v1/instance/rules")
+    suspend fun getRules(): Response<List<RuleDTO>>
 }
