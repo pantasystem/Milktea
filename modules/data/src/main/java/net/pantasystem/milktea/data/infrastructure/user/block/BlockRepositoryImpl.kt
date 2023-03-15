@@ -7,7 +7,6 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.data.infrastructure.user.UserActionResult
-import net.pantasystem.milktea.data.infrastructure.user.UserApiAdapter
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
@@ -16,7 +15,7 @@ import javax.inject.Inject
 
 internal class BlockRepositoryImpl @Inject constructor(
     private val userRepository: UserRepository,
-    private val userApiAdapter: UserApiAdapter,
+    private val blockApiAdapter: BlockApiAdapter,
     private val userDataSource: UserDataSource,
     @IODispatcher private val coroutineDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
@@ -29,7 +28,7 @@ internal class BlockRepositoryImpl @Inject constructor(
     override suspend fun create(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
             withContext(coroutineDispatcher) {
-                updateCacheFrom(userId, userApiAdapter.blockUser(userId)) { user ->
+                updateCacheFrom(userId, blockApiAdapter.blockUser(userId)) { user ->
                     user.copy(
                         related = user.related?.copy(
                             isBlocking = true
@@ -45,7 +44,7 @@ internal class BlockRepositoryImpl @Inject constructor(
     override suspend fun delete(userId: User.Id): Result<Unit> {
         return runCancellableCatching {
             withContext(coroutineDispatcher) {
-                updateCacheFrom(userId, userApiAdapter.unblockUser(userId)) { user ->
+                updateCacheFrom(userId, blockApiAdapter.unblockUser(userId)) { user ->
                     user.copy(
                         related = user.related?.copy(isBlocking = false)
                     )

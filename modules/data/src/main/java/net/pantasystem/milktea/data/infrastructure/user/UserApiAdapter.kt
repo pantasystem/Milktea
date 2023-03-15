@@ -86,51 +86,6 @@ class UserApiAdapter @Inject constructor(
         }
     }
 
-
-    suspend fun blockUser(userId: User.Id): BlockUserResult {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).blockUser(
-                    RequestUser(
-                        i = account.token,
-                        userId = userId.id,
-                    )
-                )
-                    .throwIfHasError()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                val body = mastodonAPIProvider.get(account).blockAccount(userId.id)
-                    .throwIfHasError()
-                    .body()
-                UserActionResult.Mastodon(requireNotNull(body))
-            }
-        }
-    }
-
-    suspend fun unblockUser(userId: User.Id): UnBlockUserResult {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).unblockUser(
-                    RequestUser(
-                        i = account.token,
-                        userId = userId.id,
-                    )
-                )
-                    .throwIfHasError()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                val body = mastodonAPIProvider.get(account).unblockAccount(userId.id)
-                    .throwIfHasError()
-                    .body()
-                UserActionResult.Mastodon(requireNotNull(body))
-            }
-        }
-    }
-
     suspend fun search(
         accountId: Long,
         userName: String,
@@ -173,8 +128,3 @@ sealed interface SearchResult {
     data class Mastodon(val users: List<MastodonAccountDTO>) : SearchResult
 }
 
-
-
-typealias BlockUserResult = UserActionResult
-
-typealias UnBlockUserResult = UserActionResult

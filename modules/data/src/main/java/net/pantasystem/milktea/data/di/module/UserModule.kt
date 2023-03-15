@@ -7,6 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
 import net.pantasystem.milktea.data.infrastructure.user.*
+import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapter
+import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapterImpl
@@ -61,5 +63,9 @@ abstract class UserModule {
     @Binds
     @Singleton
     internal abstract fun bindBlockRepository(impl: BlockRepositoryImpl): BlockRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindBlockApiAdapter(impl: BlockApiAdapterImpl): BlockApiAdapter
 
 }
