@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.app_store.user.FollowFollowerPagingStore
 import net.pantasystem.milktea.app_store.user.UserReactionPagingStore
+import net.pantasystem.milktea.data.infrastructure.report.ReportRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.user.*
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapterImpl
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.MuteRepository
+import net.pantasystem.milktea.model.user.report.ReportRepository
 import javax.inject.Singleton
 
 @Module
@@ -75,4 +77,8 @@ abstract class UserModule {
     @Binds
     @Singleton
     internal abstract fun bindUserCacheUpdater(impl: UserCacheUpdaterFromUserActionResultImpl): UserCacheUpdaterFromUserActionResult
+
+    @Binds
+    @Singleton
+    internal abstract fun bindReportRepository(impl: ReportRepositoryImpl): ReportRepository
 }

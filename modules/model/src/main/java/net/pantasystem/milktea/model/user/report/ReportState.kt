@@ -1,10 +1,12 @@
 package net.pantasystem.milktea.model.user.report
 
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 
 sealed interface ReportState {
     data class Specify(
         val userId: User.Id,
+        val noteIds: List<Note.Id>,
         val comment: String
     ) : ReportState {
         val canSend: Boolean

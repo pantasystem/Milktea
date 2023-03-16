@@ -9,7 +9,7 @@ data class CreateReportRequest(
     @SerialName("comment") val comment: String? = null,
     @SerialName("forward") val forward: Boolean = false,
     @SerialName("category") val category: Category = Category.Other,
-    @SerialName("rule_ids") val ruleIds: List<String>,
+    @SerialName("rule_ids") val ruleIds: List<String>? = null,
 ) {
 
     @kotlinx.serialization.Serializable

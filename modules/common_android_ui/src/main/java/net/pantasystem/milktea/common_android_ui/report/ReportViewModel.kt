@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.report.ReportState
 import net.pantasystem.milktea.model.user.report.SendReportUseCase
@@ -54,8 +55,8 @@ class ReportViewModel @Inject constructor(
         _state.value = ReportState.None
     }
 
-    fun newState(userId: User.Id, comment: String?) {
-        _state.value = ReportState.Specify(userId, comment ?: "")
+    fun newState(userId: User.Id, comment: String?, noteIds: List<Note.Id>) {
+        _state.value = ReportState.Specify(userId, noteIds,comment ?: "")
     }
 
     fun submit() {

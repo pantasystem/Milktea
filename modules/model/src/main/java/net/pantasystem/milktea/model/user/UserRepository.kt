@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.user
 
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
-import net.pantasystem.milktea.model.user.report.Report
 
 interface UserRepository {
 
@@ -16,8 +15,6 @@ interface UserRepository {
     suspend fun follow(userId: User.Id): Boolean
 
     suspend fun unfollow(userId: User.Id): Boolean
-
-    suspend fun report(report: Report) : Boolean
 
     suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User>
 

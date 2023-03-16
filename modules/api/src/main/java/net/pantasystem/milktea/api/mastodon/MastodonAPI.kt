@@ -293,7 +293,7 @@ interface MastodonAPI {
     suspend fun getFilters(): Response<List<V1FilterDTO>>
 
     @POST("api/v1/reports")
-    suspend fun createReport(request: CreateReportRequest): Response<MstReportDTO>
+    suspend fun createReport(@Body request: CreateReportRequest): Response<MstReportDTO>
 
     @GET("api/v1/instance/rules")
     suspend fun getRules(): Response<List<RuleDTO>>
