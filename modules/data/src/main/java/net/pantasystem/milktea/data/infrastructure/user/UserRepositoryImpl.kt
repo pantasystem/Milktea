@@ -3,9 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.user
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.*
-import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
@@ -19,7 +17,6 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
-import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -191,23 +188,6 @@ internal class UserRepositoryImpl @Inject constructor(
         isSuccessful
     }
 
-
-    override suspend fun report(report: Report): Boolean {
-        return withContext(ioDispatcher) {
-            val account = accountRepository.get(report.userId.accountId).getOrThrow()
-            val api = report.userId.getMisskeyAPI()
-            val res = api.report(
-                ReportDTO(
-                    i = account.token,
-                    comment = report.comment,
-                    userId = report.userId.id
-                )
-            )
-            res.throwIfHasError()
-            res.isSuccessful
-        }
-    }
-
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
@@ -258,7 +238,4 @@ internal class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
-        return misskeyAPIProvider.get(accountRepository.get(accountId).getOrThrow())
-    }
 }
