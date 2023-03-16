@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.common.runCancellableCatching
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,11 +30,9 @@ class SendReportUseCase @Inject constructor(
                         state.noteIds,
                         state.comment
                     )
-                    runCancellableCatching {
-                        reportRepository.create(
-                            r
-                        )
-                    }.onSuccess {
+                    reportRepository.create(
+                        r
+                    ).onSuccess {
                         emit(ReportState.Sending.Success(state.userId, state.comment))
                     }.onFailure {
                         emit(ReportState.Sending.Failed(state.userId, state.comment))
