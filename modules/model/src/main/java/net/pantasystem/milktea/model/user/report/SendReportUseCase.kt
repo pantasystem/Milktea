@@ -28,6 +28,7 @@ class SendReportUseCase @Inject constructor(
                     }
                     val r = Report(
                         state.userId,
+                        state.noteIds,
                         state.comment
                     )
                     runCancellableCatching {

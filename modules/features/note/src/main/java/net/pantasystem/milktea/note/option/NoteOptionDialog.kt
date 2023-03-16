@@ -109,9 +109,11 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onReportButtonClicked ={
-                            val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
-                            val report = it?.toReport(baseUrl!!)
-                            notesViewModel.confirmReportEvent.tryEmit(report)
+                            if (it != null) {
+                                val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
+                                val report = it.toReport(baseUrl!!)
+                                notesViewModel.confirmReportEvent.tryEmit(report)
+                            }
                             dismiss()
                         },
                         onCreateThreadMuteButtonClicked = {
