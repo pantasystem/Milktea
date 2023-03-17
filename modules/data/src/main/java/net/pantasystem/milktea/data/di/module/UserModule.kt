@@ -11,6 +11,7 @@ import net.pantasystem.milktea.data.infrastructure.user.*
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.follow.FollowRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteRepositoryImpl
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.block.BlockRepository
+import net.pantasystem.milktea.model.user.follow.FollowRepository
 import net.pantasystem.milktea.model.user.mute.MuteRepository
 import net.pantasystem.milktea.model.user.report.ReportRepository
 import javax.inject.Singleton
@@ -81,4 +83,8 @@ abstract class UserModule {
     @Binds
     @Singleton
     internal abstract fun bindReportRepository(impl: ReportRepositoryImpl): ReportRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindFollowRepository(impl: FollowRepositoryImpl): FollowRepository
 }
