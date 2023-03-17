@@ -29,6 +29,7 @@ import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.model.account.page.Page
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -162,10 +163,15 @@ internal class TimelinePagerAdapter(
     private val pageableFragmentFactory: PageableFragmentFactory,
     list: List<Page>,
 ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    companion object {
+        const val FRAGMENT_TAG = "TimelinePagerAdapter.FRAGMENT_TAG"
+    }
+
     private var requestBaseList: List<Page> = list
     private var oldRequestBaseSetting = requestBaseList
 
-    private val mFragments = ArrayList<Fragment>()
+    private val fragmentIds = mutableSetOf<String>()
 
     override fun getCount(): Int {
         return requestBaseList.size
@@ -174,7 +180,19 @@ internal class TimelinePagerAdapter(
     override fun getItem(position: Int): Fragment {
         val item = requestBaseList[position]
         val fragment = pageableFragmentFactory.create(item)
-        mFragments.add(fragment)
+        val fragmentId = UUID.randomUUID().toString()
+        when(val args = fragment.arguments) {
+            null -> {
+                val bundle = Bundle()
+                bundle.putString(FRAGMENT_TAG, fragmentId)
+                fragment.arguments = bundle
+            }
+            else -> {
+                args.putString(FRAGMENT_TAG, fragmentId)
+            }
+        }
+        fragmentIds.add(fragmentId)
+//        mFragments.add(fragment)
         return fragment
     }
 
@@ -187,23 +205,24 @@ internal class TimelinePagerAdapter(
 
     override fun getItemPosition(any: Any): Int {
         val target = any as Fragment
-        if (mFragments.contains(target)) {
+        val fragmentId = target.arguments?.getString(FRAGMENT_TAG)
+        if (fragmentId != null && fragmentIds.contains(fragmentId)) {
             return PagerAdapter.POSITION_UNCHANGED
         }
+
         return PagerAdapter.POSITION_NONE
     }
 
     fun setList(list: List<Page>) {
-        mFragments.clear()
         oldRequestBaseSetting = requestBaseList
         requestBaseList = list
-        mFragments.clear()
+        fragmentIds.clear()
         if (requestBaseList != oldRequestBaseSetting) {
             notifyDataSetChanged()
         }
     }
 
     fun onDestroy() {
-        mFragments.clear()
+        fragmentIds.clear()
     }
 }
