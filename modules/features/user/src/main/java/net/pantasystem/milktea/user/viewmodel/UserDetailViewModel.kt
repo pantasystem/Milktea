@@ -28,10 +28,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.user.Acct
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.*
 import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.mute.MuteRepository
@@ -53,6 +50,7 @@ class UserDetailViewModel @AssistedInject constructor(
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     private val featureEnables: FeatureEnables,
+    private val toggleFollowUseCase: ToggleFollowUseCase,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -183,14 +181,8 @@ class UserDetailViewModel @AssistedInject constructor(
 
     fun changeFollow() {
         viewModelScope.launch {
-            userState.value?.let {
-                runCancellableCatching {
-                    val user = userRepository.find(it.id) as User.Detail
-                    if (user.related?.isFollowing == true || user.related?.hasPendingFollowRequestFromYou == true) {
-                        userRepository.unfollow(user.id)
-                    } else {
-                        userRepository.follow(user.id)
-                    }
+            userState.value?.let { user ->
+                toggleFollowUseCase(user.id).mapCancellableCatching {
                     userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute failed", e = it)
