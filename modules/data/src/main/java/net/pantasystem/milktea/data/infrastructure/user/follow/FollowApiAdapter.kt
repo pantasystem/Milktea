@@ -11,7 +11,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 
-interface FollowApiAdapter {
+internal interface FollowApiAdapter {
 
     suspend fun follow(userId: User.Id): UserActionResult
 
@@ -21,7 +21,7 @@ interface FollowApiAdapter {
 
 }
 
-class FollowApiAdapterImpl @Inject constructor(
+internal class FollowApiAdapterImpl @Inject constructor(
     private val accountRepository: AccountRepository,
     private val misskeyAPIProvider: MisskeyAPIProvider,
     private val mastodonAPIProvider: MastodonAPIProvider,

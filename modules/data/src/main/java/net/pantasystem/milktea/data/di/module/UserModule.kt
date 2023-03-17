@@ -11,6 +11,8 @@ import net.pantasystem.milktea.data.infrastructure.user.*
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockApiAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.user.block.BlockRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.user.follow.FollowApiAdapter
+import net.pantasystem.milktea.data.infrastructure.user.follow.FollowApiAdapterImpl
 import net.pantasystem.milktea.data.infrastructure.user.follow.FollowRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapter
 import net.pantasystem.milktea.data.infrastructure.user.mute.MuteApiAdapterImpl
@@ -87,4 +89,8 @@ abstract class UserModule {
     @Binds
     @Singleton
     internal abstract fun bindFollowRepository(impl: FollowRepositoryImpl): FollowRepository
+
+    @Binds
+    @Singleton
+    internal abstract fun bindFollowApiAdapter(impl: FollowApiAdapterImpl): FollowApiAdapter
 }

@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.user
 
 import net.pantasystem.milktea.api.mastodon.accounts.MastodonAccountDTO
-import net.pantasystem.milktea.api.misskey.users.CancelFollow
 import net.pantasystem.milktea.api.misskey.users.RequestUser
 import net.pantasystem.milktea.api.misskey.users.SearchByUserAndHost
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -19,12 +18,6 @@ import javax.inject.Singleton
 internal interface UserApiAdapter {
 
     suspend fun show(userId: User.Id, detail: Boolean): User
-
-    suspend fun follow(userId: User.Id): UserActionResult
-
-    suspend fun cancelFollowRequest(userId: User.Id): UserActionResult
-
-    suspend fun unfollow(userId: User.Id): UserActionResult
 
     suspend fun search(
         accountId: Long,
@@ -77,65 +70,7 @@ internal class UserApiAdapterImpl @Inject constructor(
         }
     }
 
-    override suspend fun follow(userId: User.Id): UserActionResult {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).followUser(
-                    RequestUser(userId = userId.id, i = account.token)
-                ).throwIfHasError()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                mastodonAPIProvider.get(account).follow(userId.id)
-                    .throwIfHasError().body().let {
-                        UserActionResult.Mastodon(requireNotNull(it))
-                    }
-            }
-        }
-    }
 
-    override suspend fun unfollow(userId: User.Id): UserActionResult {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account)
-                    .unFollowUser(RequestUser(userId = userId.id, i = account.token))
-                    .throwIfHasError()
-                    .body()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                mastodonAPIProvider.get(account).unfollow(userId.id)
-                    .throwIfHasError()
-                    .body().let {
-                        UserActionResult.Mastodon(requireNotNull(it))
-                    }
-
-            }
-        }
-    }
-
-    override suspend fun cancelFollowRequest(userId: User.Id): UserActionResult {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).cancelFollowRequest(
-                    CancelFollow(
-                        i = account.token,
-                        userId = userId.id
-                    )
-                ).throwIfHasError()
-                UserActionResult.Misskey
-            }
-            Account.InstanceType.MASTODON -> {
-                mastodonAPIProvider.get(account).unfollow(userId.id).throwIfHasError()
-                    .body().let {
-                        UserActionResult.Mastodon(requireNotNull(it))
-                    }
-            }
-        }
-    }
 
     override suspend fun search(
         accountId: Long,

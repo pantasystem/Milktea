@@ -12,7 +12,6 @@ interface UserRepository {
 
     suspend fun searchByNameOrUserName(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null, host: String? = null): List<User>
 
-
     suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User>
 
     suspend fun sync(userId: User.Id): Result<Unit>
