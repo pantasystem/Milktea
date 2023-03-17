@@ -19,17 +19,14 @@ internal interface UserApiAdapter {
 
     suspend fun show(userId: User.Id, detail: Boolean): User
 
-    suspend fun follow(userId: User.Id): Boolean
-
-    suspend fun unfollow(userId: User.Id): Boolean
-
     suspend fun search(
         accountId: Long,
         userName: String,
-        host: String?
+        host: String?,
     ): SearchResult
 
 }
+
 @Singleton
 internal class UserApiAdapterImpl @Inject constructor(
     private val accountRepository: AccountRepository,
@@ -73,50 +70,26 @@ internal class UserApiAdapterImpl @Inject constructor(
         }
     }
 
-    override suspend fun follow(userId: User.Id): Boolean {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                misskeyAPIProvider.get(account).followUser(
-                    RequestUser(userId = userId.id, i = account.token)
-                )
-            }
-            Account.InstanceType.MASTODON -> {
-                mastodonAPIProvider.get(account).follow(userId.id)
-            }
-        }.throwIfHasError().isSuccessful
-    }
 
-    override suspend fun unfollow(userId: User.Id): Boolean {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        return when (account.instanceType) {
-            Account.InstanceType.MISSKEY -> misskeyAPIProvider.get(account)
-                .unFollowUser(RequestUser(userId = userId.id, i = account.token))
-                .throwIfHasError()
-                .isSuccessful
-            Account.InstanceType.MASTODON -> mastodonAPIProvider.get(account).unfollow(userId.id)
-                .throwIfHasError()
-                .isSuccessful
-        }
-    }
 
     override suspend fun search(
         accountId: Long,
         userName: String,
-        host: String?
+        host: String?,
     ): SearchResult {
         val account = accountRepository.get(accountId).getOrThrow()
-        return when(account.instanceType) {
+        return when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 val api = misskeyAPIProvider.get(account)
-                val body = requireNotNull(SearchByUserAndHost(api)
-                    .search(
-                        RequestUser(
-                            userName = userName,
-                            host = host,
-                            i = account.token
-                        )
-                    ).body()
+                val body = requireNotNull(
+                    SearchByUserAndHost(api)
+                        .search(
+                            RequestUser(
+                                userName = userName,
+                                host = host,
+                                i = account.token
+                            )
+                        ).body()
                 )
                 SearchResult.Misskey(body)
             }
