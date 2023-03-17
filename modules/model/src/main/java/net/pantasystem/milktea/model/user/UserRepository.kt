@@ -12,9 +12,6 @@ interface UserRepository {
 
     suspend fun searchByNameOrUserName(accountId: Long, keyword: String, limit: Int = 100, nextId: String? = null, host: String? = null): List<User>
 
-    suspend fun follow(userId: User.Id): Boolean
-
-    suspend fun unfollow(userId: User.Id): Boolean
 
     suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User>
 

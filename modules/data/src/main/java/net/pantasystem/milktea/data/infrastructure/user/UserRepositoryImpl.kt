@@ -144,50 +144,6 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        val user = find(userId, true) as User.Detail
-        val isSuccessful = userApiAdapter.follow(userId)
-        if (isSuccessful) {
-            val updated = (find(userId, true) as User.Detail).copy(
-                related = (if (user.info.isLocked) user.related?.isFollowing else true)?.let {
-                    (if (user.info.isLocked) true else user.related?.hasPendingFollowRequestFromYou)?.let { it1 ->
-                        user.related?.copy(
-                            isFollowing = it,
-                            hasPendingFollowRequestFromYou = it1
-                        )
-                    }
-                }
-            )
-            userDataSource.add(updated)
-        }
-        isSuccessful
-    }
-
-    override suspend fun unfollow(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        val user = find(userId, true) as User.Detail
-        val isSuccessful = if (user.info.isLocked) {
-            misskeyAPIProvider.get(account)
-                .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.token))
-                .throwIfHasError()
-                .isSuccessful
-        } else {
-            userApiAdapter.unfollow(userId)
-        }
-        if (isSuccessful) {
-            val updated = user.copy(
-                related = user.related?.let{
-                    it.copy(
-                        isFollowing = if (user.info.isLocked) it.isFollowing else false,
-                        hasPendingFollowRequestFromYou = if (user.info.isLocked) false else it.hasPendingFollowRequestFromYou
-                    )
-                }
-            )
-            userDataSource.add(updated)
-        }
-        isSuccessful
-    }
-
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
