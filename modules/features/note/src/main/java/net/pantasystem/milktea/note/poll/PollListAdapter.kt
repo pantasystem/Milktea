@@ -2,13 +2,11 @@ package net.pantasystem.milktea.note.poll
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemChoiceBinding
 
 class PollListAdapter(
@@ -24,22 +22,29 @@ class PollListAdapter(
         return oldItem == newItem
     }
 }){
-    class ChoiceHolder(val binding: ItemChoiceBinding) : RecyclerView.ViewHolder(binding.root)
+    class ChoiceHolder(val binding: ItemChoiceBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun onBind(choice: Poll.Choice, noteId: Note.Id, poll: Poll, onVoteSelected: (OnVoted) -> Unit) {
+            binding.radioChoice.setOnClickListener {
+                onVoteSelected(OnVoted(noteId, choice, poll))
+            }
+
+            binding.radioChoice.text = choice.text
+            binding.radioChoice.isEnabled = poll.canVote
+            binding.radioChoice.isChecked = choice.isVoted
+
+            binding.progressBar.max = poll.totalVoteCount
+            binding.progressBar.progress = choice.votes
+        }
+    }
 
 
     override fun onBindViewHolder(holder: ChoiceHolder, position: Int) {
-        holder.binding.poll = poll
-        holder.binding.choice = poll.choices[position]
-        holder.binding.radioChoice.setOnClickListener {
-            onVoteSelected(OnVoted(noteId, poll.choices[position], poll))
-        }
-        holder.binding.noteId = noteId
-        holder.binding.executePendingBindings()
+        holder.onBind(getItem(position), noteId, poll, onVoteSelected)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChoiceHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = DataBindingUtil.inflate<ItemChoiceBinding>(inflater, R.layout.item_choice, parent, false)
+        val binding = ItemChoiceBinding.inflate(inflater, parent, false)
         return ChoiceHolder(binding)
     }
 }
