@@ -3,12 +3,10 @@ package net.pantasystem.milktea.note.reaction
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
 import net.pantasystem.milktea.note.reaction.NoteReactionViewHelper.bindReactionCount
 import net.pantasystem.milktea.note.reaction.ReactionHelper.applyBackgroundColor
@@ -17,10 +15,10 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 class ReactionCountAdapter(
     val lifecycleOwner: LifecycleOwner,
     val reactionCountActionListener: (ReactionCountAction) -> Unit
-) : ListAdapter<ReactionViewData, ReactionCountAdapter.ReactionHolder>(
+) : ListAdapter<ReactionViewData, ReactionHolder>(
     reactionDiffUtilItemCallback
 ) {
-    class ReactionHolder(val binding: ItemReactionBinding) : RecyclerView.ViewHolder(binding.root)
+
 
     companion object {
         private val reactionDiffUtilItemCallback = object : DiffUtil.ItemCallback<ReactionViewData>() {
@@ -44,48 +42,12 @@ class ReactionCountAdapter(
     var note: PlaneNoteViewData? = null
 
     override fun onBindViewHolder(holder: ReactionHolder, position: Int) {
-        val item = getItem(position)
-        if (note == null) {
-            Log.w("ReactionCountAdapter", "noteがNullです。正常に処理が行われない可能性があります。")
-        }
-        holder.binding.reactionLayout.applyBackgroundColor(item, note?.toShowNote?.note?.nodeInfo)
-        holder.binding.reactionLayout.bindReactionCount(
-            holder.binding.reactionText,
-            holder.binding.reactionImage,
-            item
-        )
-
-        holder.binding.reactionCounter.text = item.reactionCount.count.toString()
-
-        holder.binding.root.setOnLongClickListener {
-            val id = note?.toShowNote?.note?.id
-            if (id != null) {
-                note?.let {
-                    reactionCountActionListener(
-                        ReactionCountAction.OnLongClicked(
-                            it,
-                            item.reaction
-                        )
-                    )
-                }
-                true
-            } else {
-                false
-            }
-        }
-        holder.binding.root.setOnClickListener {
-            note?.let {
-                reactionCountActionListener(ReactionCountAction.OnClicked(it, item.reaction))
-            }
-
-        }
-        holder.binding.executePendingBindings()
+        holder.onBind(getItem(position), note, reactionCountActionListener)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReactionHolder {
-        val binding = DataBindingUtil.inflate<ItemReactionBinding>(
+        val binding = ItemReactionBinding.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.item_reaction,
             parent,
             false
         )
@@ -93,6 +55,43 @@ class ReactionCountAdapter(
     }
 
 
+}
+
+class ReactionHolder(val binding: ItemReactionBinding) : RecyclerView.ViewHolder(binding.root) {
+    fun onBind(viewData: ReactionViewData, note: PlaneNoteViewData?, reactionCountActionListener: (ReactionCountAction) -> Unit) {
+
+        if (note == null) {
+            Log.w("ReactionCountAdapter", "noteがNullです。正常に処理が行われない可能性があります。")
+        }
+        binding.reactionLayout.applyBackgroundColor(viewData, note?.toShowNote?.note?.nodeInfo)
+        binding.reactionLayout.bindReactionCount(
+            binding.reactionText,
+            binding.reactionImage,
+            viewData
+        )
+
+        binding.reactionCounter.text = viewData.reactionCount.count.toString()
+        binding.root.setOnLongClickListener {
+            val id = note?.toShowNote?.note?.id
+            if (id != null) {
+                reactionCountActionListener(
+                    ReactionCountAction.OnLongClicked(
+                        note,
+                        viewData.reaction
+                    )
+                )
+                true
+            } else {
+                false
+            }
+        }
+        binding.root.setOnClickListener {
+            note?.let {
+                reactionCountActionListener(ReactionCountAction.OnClicked(note, viewData.reaction))
+            }
+
+        }
+    }
 }
 
 sealed interface ReactionCountAction {
