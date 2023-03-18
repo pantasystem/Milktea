@@ -101,7 +101,7 @@ class TimelineListAdapter(
 
         @Suppress("ObjectLiteralToLambda")
         private fun bindReactionCounter() {
-            val reactionCountAdapter = ReactionCountAdapter(lifecycleOwner) {
+            val reactionCountAdapter = ReactionCountAdapter {
                 noteCardActionListenerAdapter.onReactionCountAction(it)
             }
             val note = mCurrentNote!!

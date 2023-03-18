@@ -143,7 +143,7 @@ class NotificationViewHolder(
     private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView) {
 
         val reactionList = note.reactionCountsViewData.value?.toList() ?: emptyList()
-        val adapter = ReactionCountAdapter(lifecycleOwner) {
+        val adapter = ReactionCountAdapter {
             noteCardActionListenerAdapter.onReactionCountAction(it)
         }
         adapter.note = note

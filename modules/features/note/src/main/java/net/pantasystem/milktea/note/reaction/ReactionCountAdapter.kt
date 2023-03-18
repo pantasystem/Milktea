@@ -3,7 +3,6 @@ package net.pantasystem.milktea.note.reaction
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +12,6 @@ import net.pantasystem.milktea.note.reaction.ReactionHelper.applyBackgroundColor
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class ReactionCountAdapter(
-    val lifecycleOwner: LifecycleOwner,
     val reactionCountActionListener: (ReactionCountAction) -> Unit
 ) : ListAdapter<ReactionViewData, ReactionHolder>(
     reactionDiffUtilItemCallback
