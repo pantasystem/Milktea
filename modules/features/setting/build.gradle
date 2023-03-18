@@ -109,7 +109,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 
     implementation libs.flexbox
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation libs.recyclerview
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation libs.kotlin.serialization
 

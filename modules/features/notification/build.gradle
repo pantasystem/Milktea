@@ -83,7 +83,7 @@ dependencies {
 
     implementation libs.lifecycle.livedata
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation libs.recyclerview
     implementation libs.androidx.constraintlayout
     implementation libs.flexbox
     implementation libs.kotlin.datetime
