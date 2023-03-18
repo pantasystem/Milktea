@@ -3,35 +3,20 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         >
     <data>
-        <variable
-                name="in"
-                type="java.lang.String" />
-        <variable
-                name="reaction"
-                type="net.pantasystem.milktea.note.reaction.ReactionViewData" />
-        <variable
-                name="note"
-                type="net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData" />
 
-
-        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox" />
     </data>
     <LinearLayout
+        android:id="@+id/reactionLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="5dp"
-            reactionImageTypeView="@{reactionImage}"
-            reactionTextTypeView="@{reactionText}"
-            reaction="@{reaction}"
+
             android:layout_marginStart="4dp"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
             tools:background="@drawable/shape_normal_reaction_backgruond"
 
-            myReaction="@{note.myReaction}"
-            reactionBackground="@{reaction}"
-            nodeInfo="@{note.toShowNote.note.nodeInfo}"
 
 
             >
@@ -58,7 +43,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="20"
-                android:text='@{String.valueOf(SafeUnbox.unboxInt(reaction.reactionCount.count))}'
                 android:layout_gravity="center"
                 android:textSize="15sp"
 

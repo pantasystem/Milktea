@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
+import net.pantasystem.milktea.note.reaction.NoteReactionViewHelper.bindReactionCount
+import net.pantasystem.milktea.note.reaction.ReactionHelper.applyBackgroundColor
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class ReactionCountAdapter(
@@ -46,8 +48,15 @@ class ReactionCountAdapter(
         if (note == null) {
             Log.w("ReactionCountAdapter", "noteがNullです。正常に処理が行われない可能性があります。")
         }
-        holder.binding.reaction = item
-        holder.binding.note = note
+        holder.binding.reactionLayout.applyBackgroundColor(item, note?.toShowNote?.note?.nodeInfo)
+        holder.binding.reactionLayout.bindReactionCount(
+            holder.binding.reactionText,
+            holder.binding.reactionImage,
+            item
+        )
+
+        holder.binding.reactionCounter.text = item.reactionCount.count.toString()
+
         holder.binding.root.setOnLongClickListener {
             val id = note?.toShowNote?.note?.id
             if (id != null) {
@@ -70,7 +79,6 @@ class ReactionCountAdapter(
             }
 
         }
-        holder.binding.lifecycleOwner = lifecycleOwner
         holder.binding.executePendingBindings()
     }
 
