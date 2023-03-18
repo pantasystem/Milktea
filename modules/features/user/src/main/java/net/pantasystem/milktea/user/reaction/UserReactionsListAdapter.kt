@@ -51,7 +51,7 @@ class UserReactionViewHolder(
     fun bind(item: UserReactionBindingModel) {
         val listView = binding.simpleNote.reactionView
         listView.layoutManager = FlexboxLayoutManager(binding.root.context)
-        val adapter = ReactionCountAdapter(lifecycleOwner) {
+        val adapter = ReactionCountAdapter {
             noteCardActionListenerAdapter.onReactionCountAction(it)
         }
         adapter.note = item.note

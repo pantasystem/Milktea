@@ -53,7 +53,7 @@ class NoteChildConversationAdapter(
     private fun setReactionCounter(note: PlaneNoteViewData, reactionView: RecyclerView){
 
         val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
-        val adapter = ReactionCountAdapter(lifecycleOwner) {
+        val adapter = ReactionCountAdapter {
             actionAdapter.onReactionCountAction(it)
         }
         adapter.note = note

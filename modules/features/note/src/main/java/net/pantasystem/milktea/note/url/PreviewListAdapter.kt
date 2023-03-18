@@ -7,17 +7,18 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
+import net.pantasystem.milktea.common_android.ui.CircleOutlineHelper.setCircleOutline
 import net.pantasystem.milktea.common_android_ui.NavigationEntryPointForBinding
 import net.pantasystem.milktea.common_navigation.MediaNavigationArgs
-import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemFilePreviewBinding
 import net.pantasystem.milktea.note.databinding.ItemUrlPreviewBinding
+import net.pantasystem.milktea.note.url.UrlPreviewHelper.setSiteIcon
+import net.pantasystem.milktea.note.url.UrlPreviewHelper.setUrlPreviewThumbnail
 import net.pantasystem.milktea.note.viewmodel.Preview
 
 class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCallback()){
@@ -39,7 +40,6 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
     class ViewHolder(val binding: ItemUrlPreviewBinding) : BaseHolder<Preview.UrlWrapper>(binding.root){
 
         override fun bind(preview: Preview.UrlWrapper) {
-            binding.urlPreview = preview.urlPreview
             val context = this.binding.urlPreviewView.context
             binding.urlPreviewView.setOnClickListener {
                 context?.startActivity(
@@ -49,12 +49,18 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
                 )
             }
 
+            binding.urlPreviewView.setCircleOutline(7)
+            binding.siteThumbnailView.setUrlPreviewThumbnail(preview.urlPreview.thumbnail)
+            binding.siteTitleView.text = preview.urlPreview.title
+            binding.siteDescription.text = preview.urlPreview.description
+            binding.siteIconView.setSiteIcon(preview.urlPreview.icon)
+            binding.siteNameView.text = preview.urlPreview.siteName
+
         }
     }
     class FilePreviewViewHolder(val binding: ItemFilePreviewBinding) : BaseHolder<Preview.FileWrapper>(binding.root){
         @SuppressLint("IntentReset")
         override fun bind(preview: Preview.FileWrapper) {
-            binding.file = preview.file
             val context = this.binding.filePropertyView.context
             binding.filePropertyView.setOnClickListener {
                 if(preview.file.type.startsWith("audio")){
@@ -77,6 +83,10 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
                 }
 
             }
+
+            binding.fileThumbnailView.setUrlPreviewThumbnail(preview.file.thumbnailUrl)
+            binding.fileNameView.text = preview.file.name
+            binding.fileTypeView.text = preview.file.type
 
         }
     }
@@ -106,9 +116,8 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
         return when(viewType){
             0 ->{
                 ViewHolder(
-                    DataBindingUtil.inflate(
+                    ItemUrlPreviewBinding.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.item_url_preview,
                         parent,
                         false
                     )
@@ -116,9 +125,8 @@ class PreviewListAdapter : ListAdapter<Preview, RecyclerView.ViewHolder>(ItemCal
             }
             1 ->{
                 return FilePreviewViewHolder(
-                    DataBindingUtil.inflate(
+                    ItemFilePreviewBinding.inflate(
                         LayoutInflater.from(parent.context),
-                        R.layout.item_file_preview,
                         parent,
                         false
                     )

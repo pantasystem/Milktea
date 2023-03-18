@@ -9,7 +9,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -72,33 +71,9 @@ class TimelineListAdapter(
         abstract val reactionCountsView: RecyclerView
         abstract val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
 
-        private var reactionCountAdapter: ReactionCountAdapter? = null
+//        private var reactionCountAdapter: ReactionCountAdapter? = null
+        private var _reactionCountObserver: Observer<List<ReactionViewData>>? = null
 
-        private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
-            val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
-            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-            reactionCountsView.layoutManager = flexBoxLayoutManager
-            flexBoxLayoutManager.recycleChildrenOnDetach = true
-            flexBoxLayoutManager
-        }
-
-        @Suppress("ObjectLiteralToLambda")
-        private val reactionCountsObserver = object : Observer<List<ReactionViewData>> {
-            override fun onChanged(counts: List<ReactionViewData>?) {
-                if(reactionCountAdapter?.note?.id == mCurrentNote?.id) {
-
-                    bindReactionCountVisibility(counts)
-
-                    reactionCountAdapter?.submitList(counts) {
-                        reactionCountsView.itemAnimator = if(reactionCountsView.itemAnimator == null) {
-                            DefaultItemAnimator()
-                        }else{
-                            reactionCountsView.itemAnimator
-                        }
-                    }
-                }
-            }
-        }
 
         abstract fun onBind(note: PlaneNoteViewData)
 
@@ -117,24 +92,37 @@ class TimelineListAdapter(
         }
 
         private fun unbind() {
-            mCurrentNote?.reactionCountsViewData?.removeObserver(reactionCountsObserver)
+            _reactionCountObserver?.let {
+                mCurrentNote?.reactionCountsViewData?.removeObserver(it)
+            }
+
             mCurrentNote = null
         }
 
+        @Suppress("ObjectLiteralToLambda")
         private fun bindReactionCounter() {
-            val note = mCurrentNote!!
-            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
-            reactionCountAdapter = ReactionCountAdapter(lifecycleOwner) {
+            val reactionCountAdapter = ReactionCountAdapter {
                 noteCardActionListenerAdapter.onReactionCountAction(it)
             }
-            reactionCountAdapter?.note = note
-            reactionCountsView.layoutManager = flexBoxLayoutManager
+            val note = mCurrentNote!!
+            reactionCountAdapter.note = note
+
+            val reactionCountsObserver = object : Observer<List<ReactionViewData>> {
+                override fun onChanged(counts: List<ReactionViewData>?) {
+                    if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
+                        bindReactionCountVisibility(counts)
+                        reactionCountAdapter.submitList(counts)
+                    }
+                }
+            }
+            _reactionCountObserver = reactionCountsObserver
+
+            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
+
+            reactionCountsView.layoutManager = getLayoutManager()
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.isNestedScrollingEnabled = false
-            reactionCountsView.itemAnimator = if(reactionList.isEmpty()) DefaultItemAnimator() else null
-            reactionCountAdapter?.submitList(reactionList) {
-                reactionCountsView.itemAnimator = DefaultItemAnimator()
-            }
+            reactionCountAdapter.submitList(reactionList)
             note.reactionCountsViewData.observe(lifecycleOwner, reactionCountsObserver)
         }
         
@@ -144,6 +132,14 @@ class TimelineListAdapter(
             }else{
                 View.VISIBLE
             }
+        }
+
+        private fun getLayoutManager(): FlexboxLayoutManager {
+            val flexBoxLayoutManager = FlexboxLayoutManager(reactionCountsView.context)
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            reactionCountsView.layoutManager = flexBoxLayoutManager
+            flexBoxLayoutManager.recycleChildrenOnDetach = true
+            return flexBoxLayoutManager
         }
     }
 

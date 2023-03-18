@@ -44,6 +44,10 @@ android {
             useJUnitPlatform()
         }
     }
+
+    viewBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -73,7 +77,7 @@ dependencies {
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation libs.recyclerview
     implementation libs.flexbox
     implementation libs.androidx.swiperefreshlayout
     implementation libs.androidx.viewpager2

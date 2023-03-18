@@ -1,52 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-        xmlns:android="http://schemas.android.com/apk/res/android">
-    <data>
-        <import type="net.pantasystem.milktea.common_android.ui.SafeUnbox"/>
-        <variable
-                name="poll"
-                type="net.pantasystem.milktea.model.notes.poll.Poll" />
-        <variable
-                name="choice"
-                type="net.pantasystem.milktea.model.notes.poll.Poll.Choice" />
-        <variable
-                name="noteId"
-                type="net.pantasystem.milktea.model.notes.Note.Id" />
+<FrameLayout
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
+    >
 
-    </data>
-    <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            >
+    <RadioButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:text="候補１"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_marginBottom="4dp"
+        android:id="@+id/radioChoice"
+        />
 
-
-
-        <RadioButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                tools:text="候補１"
-                android:text='@{choice.text}'
-                android:enabled="@{SafeUnbox.unbox(poll.canVote)}"
-                android:checked="@{SafeUnbox.unbox(choice.isVoted)}"
-                android:textColor="?android:attr/textColorPrimary"
-                android:layout_marginBottom="4dp"
-                android:id="@+id/radioChoice"
-                />
-
-        <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:max="@{SafeUnbox.unboxInt(poll.totalVoteCount)}"
-                android:progress="@{SafeUnbox.unboxInt(choice.votes)}"
-                tools:max="200"
-                tools:progress="50"
-                android:layout_gravity="bottom"
-                />
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:max="200"
+        tools:progress="50"
+        android:layout_gravity="bottom"
+        />
 
 
-    </FrameLayout>
-</layout>
+</FrameLayout>
