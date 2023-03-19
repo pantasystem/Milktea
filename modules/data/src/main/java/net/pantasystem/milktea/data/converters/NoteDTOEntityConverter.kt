@@ -63,11 +63,11 @@ class NoteDTOEntityConverter @Inject constructor() {
                         name = it.name
                     )
                 },
-                reactionAcceptance = when(noteDTO.reactionAcceptance) {
-                    ReactionAcceptanceType.LikeOnly -> Note.Type.Misskey.ReactionAcceptanceType.LikeOnly
-                    ReactionAcceptanceType.LikeOnly4Remote -> Note.Type.Misskey.ReactionAcceptanceType.LikeOnlyForRemote
-                    null -> Note.Type.Misskey.ReactionAcceptanceType.All
-                }
+                isAcceptingOnlyLikeReaction = when(noteDTO.reactionAcceptance){
+                    ReactionAcceptanceType.LikeOnly4Remote -> noteDTO.uri != null
+                    ReactionAcceptanceType.LikeOnly -> true
+                    null -> false
+                },
             ),
             nodeInfo = nodeInfo,
         )

@@ -58,13 +58,10 @@ data class Note(
     sealed interface Type {
         data class Misskey(
             val channel: SimpleChannelInfo? = null,
-            val reactionAcceptance: ReactionAcceptanceType
+            val isAcceptingOnlyLikeReaction: Boolean= false,
         ) : Type {
             data class SimpleChannelInfo(val id: Channel.Id, val name: String)
 
-            enum class ReactionAcceptanceType {
-                All, LikeOnly, LikeOnlyForRemote
-            }
         }
 
         data class Mastodon(
@@ -224,9 +221,7 @@ fun Note.Companion.make(
     myReaction: String? = null,
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
-    type: Note.Type = Note.Type.Misskey(
-        reactionAcceptance = Note.Type.Misskey.ReactionAcceptanceType.All,
-    ),
+    type: Note.Type = Note.Type.Misskey(),
     nodeInfo: NodeInfo? = null,
 ): Note {
     return Note(
