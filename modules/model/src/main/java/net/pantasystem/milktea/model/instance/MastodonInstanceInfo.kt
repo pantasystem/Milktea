@@ -39,5 +39,5 @@ data class MastodonInstanceInfo(
 
     // リアクションを使用可能か？
     val isReactionAvailable: Boolean
-        get() = fedibirdCapabilities?.contains("emoji_reactions") ?: false
+        get() = fedibirdCapabilities?.contains("emoji_reaction") ?: false
 }
