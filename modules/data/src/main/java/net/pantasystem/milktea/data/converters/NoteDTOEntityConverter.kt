@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.converters
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteVisibilityType
 import net.pantasystem.milktea.api.misskey.notes.PollDTO
+import net.pantasystem.milktea.api.misskey.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -61,6 +62,11 @@ class NoteDTOEntityConverter @Inject constructor() {
                         id = Channel.Id(account.accountId, it.id),
                         name = it.name
                     )
+                },
+                reactionAcceptance = when(noteDTO.reactionAcceptance) {
+                    ReactionAcceptanceType.LikeOnly -> Note.Type.Misskey.ReactionAcceptanceType.LikeOnly
+                    ReactionAcceptanceType.LikeOnly4Remote -> Note.Type.Misskey.ReactionAcceptanceType.LikeOnlyForRemote
+                    null -> Note.Type.Misskey.ReactionAcceptanceType.All
                 }
             ),
             nodeInfo = nodeInfo,
