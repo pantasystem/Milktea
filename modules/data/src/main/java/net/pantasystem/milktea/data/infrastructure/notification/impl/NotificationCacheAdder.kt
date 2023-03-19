@@ -3,11 +3,11 @@ package net.pantasystem.milktea.data.infrastructure.notification.impl
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.converters.NotificationDTOEntityConverter
+import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.data.infrastructure.toModel
-import net.pantasystem.milktea.data.infrastructure.toNote
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.markers.MarkerRepository
@@ -31,6 +31,7 @@ class NotificationCacheAdder @Inject constructor(
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val notificationDTOEntityConverter: NotificationDTOEntityConverter,
     private val markerRepository: MarkerRepository,
+    private val tootDTOEntityConverter: TootDTOEntityConverter,
 ) {
     suspend fun addAndConvert(account: Account, notificationDTO: NotificationDTO, skipExists: Boolean = false): NotificationRelation {
         val user = notificationDTO.user?.let {
@@ -71,9 +72,12 @@ class NotificationCacheAdder @Inject constructor(
         }
         val user = mstNotificationDTO.account.toModel(account)
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
-        val noteRelation = mstNotificationDTO.status?.toNote(account, nodeInfo)?.let {
+        val noteRelation = mstNotificationDTO.status?.let {
+            tootDTOEntityConverter.convert(it, account, nodeInfo)
+        }?.let {
             noteRelationGetter.get(it)
         }
+
         val notification = mstNotificationDTO.toModel(account, isRead = lastReadId >= mstNotificationDTO.id)
         mstNotificationDTO.status?.let {
             noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it, skipExists)

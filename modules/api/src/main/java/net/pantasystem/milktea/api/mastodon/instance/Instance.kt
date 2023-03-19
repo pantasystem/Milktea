@@ -12,6 +12,7 @@ data class Instance(
     val version: String,
     val urls: Urls,
     val configuration: Configuration? = null,
+    @SerialName("fedibird_capabilities") val fedibirdCapabilities: List<String>? = null,
 ) {
     @Serializable
     data class Configuration(

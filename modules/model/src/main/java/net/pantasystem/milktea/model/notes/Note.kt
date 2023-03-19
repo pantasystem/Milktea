@@ -76,6 +76,7 @@ data class Note(
             val pollId: String?,
             val isSensitive: Boolean?,
             val pureText: String?,
+            val isReactionAvailable: Boolean
             ) : Type {
             data class Tag(
                 val name: String,
@@ -98,7 +99,7 @@ data class Note(
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
 
-    val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+    val isSupportEmojiReaction: Boolean = type is Type.Misskey || (type is Type.Mastodon && type.isReactionAvailable)
 
     val isAcceptingOnlyLikeReaction: Boolean = type is Type.Misskey && type.isAcceptingOnlyLikeReaction
 

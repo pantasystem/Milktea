@@ -140,7 +140,8 @@ class NoteTest {
                 isFedibirdQuote = true,
                 pollId = null,
                 isSensitive = null,
-                pureText = null
+                pureText = null,
+                isReactionAvailable = true,
             )
         )
         assertTrue(note.isQuote())
@@ -161,7 +162,8 @@ class NoteTest {
                 isFedibirdQuote = false,
                 pollId = null,
                 isSensitive = null,
-                pureText = null
+                pureText = null,
+                isReactionAvailable = true,
             )
         )
         assertFalse(note.isQuote())
@@ -182,7 +184,8 @@ class NoteTest {
                 isFedibirdQuote = false,
                 pollId = null,
                 isSensitive = null,
-                pureText = null
+                pureText = null,
+                isReactionAvailable = true,
             ),
             renoteId = Note.Id(0L, "id")
         )
@@ -206,6 +209,7 @@ class NoteTest {
                 pollId = null,
                 isSensitive = null,
                 pureText = null,
+                isReactionAvailable = true,
             )
         )
         assertFalse(note.hasContent())

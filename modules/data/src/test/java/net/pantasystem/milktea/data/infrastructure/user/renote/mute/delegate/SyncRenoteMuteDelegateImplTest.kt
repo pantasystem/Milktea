@@ -4,6 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.users.UserDTO
@@ -72,6 +74,7 @@ internal class SyncRenoteMuteDelegateImplTest {
         var insertAllActualData: List<RenoteMuteRecord>? = null
         var callPushArgsActualData: List<User.Id> = emptyList()
         var isDeleteByAccountCalled = false
+        val lock = Mutex()
 
         val delegate = SyncRenoteMuteDelegateImpl(
             getAccount = {
@@ -113,7 +116,9 @@ internal class SyncRenoteMuteDelegateImplTest {
             },
             createAndPushToRemote = object : CreateRenoteMuteAndPushToRemoteDelegate {
                 override suspend fun invoke(userId: User.Id): Result<RenoteMute> {
-                    callPushArgsActualData = callPushArgsActualData + userId
+                    lock.withLock {
+                        callPushArgsActualData = callPushArgsActualData + userId
+                    }
                     return Result.success(
                         unPushedLocalData.first {
                             it.userId == userId.id

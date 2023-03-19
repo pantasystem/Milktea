@@ -1,8 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.instance.db
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 
 @Entity(
@@ -44,6 +42,35 @@ data class MastodonInstanceInfoRecord(
 }
 
 
+@Entity(
+    tableName = "mastodon_instance_fedibird_capabilities",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["uri"],
+            childColumns = ["uri"],
+            entity = MastodonInstanceInfoRecord::class,
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [Index("uri")],
+    primaryKeys = ["uri", "type"]
+)
+data class FedibirdCapabilitiesRecord(
+    val type: String,
+    val uri: String
+)
+
+data class MastodonInstanceInfoRelated(
+    @Embedded val info: MastodonInstanceInfoRecord,
+    @Relation(
+        parentColumn = "uri",
+        entityColumn = "uri",
+        entity = FedibirdCapabilitiesRecord::class
+    )
+    val fedibirdCapabilities: List<FedibirdCapabilitiesRecord>?
+)
+
 fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): MastodonInstanceInfoRecord {
     return MastodonInstanceInfoRecord(
         uri = model.uri,
@@ -77,19 +104,20 @@ fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): Mast
     )
 }
 
-fun MastodonInstanceInfoRecord.toModel(): MastodonInstanceInfo {
+
+fun MastodonInstanceInfoRelated.toModel(): MastodonInstanceInfo {
     return MastodonInstanceInfo(
-        uri = uri,
-        title = title,
-        description = description,
-        email = email,
-        urls = urls.let {
+        uri = info.uri,
+        title = info.title,
+        description = info.description,
+        email = info.email,
+        urls = info.urls.let {
             MastodonInstanceInfo.Urls(
                 streamingApi = it.streamingApi
             )
         },
-        version = version,
-        configuration = configuration?.let { config ->
+        version = info.version,
+        configuration = info.configuration?.let { config ->
             MastodonInstanceInfo.Configuration(
                 statuses = config.statuses?.let {
                     MastodonInstanceInfo.Configuration.Statuses(
@@ -106,6 +134,7 @@ fun MastodonInstanceInfoRecord.toModel(): MastodonInstanceInfo {
                     )
                 }
             )
-        }
+        },
+        fedibirdCapabilities = fedibirdCapabilities?.map { it.type }
     )
 }

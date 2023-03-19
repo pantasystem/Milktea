@@ -4,6 +4,7 @@ import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.data.converters.FilePropertyDTOEntityConverter
 import net.pantasystem.milktea.data.converters.NoteDTOEntityConverter
+import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
 import net.pantasystem.milktea.data.infrastructure.NoteRelationEntities
 import net.pantasystem.milktea.data.infrastructure.toEntities
@@ -29,6 +30,7 @@ class NoteDataSourceAdder @Inject constructor(
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val noteDTOEntityConverter: NoteDTOEntityConverter,
     private val filePropertyDTOEntityConverter: FilePropertyDTOEntityConverter,
+    private val tootDTOEntityConverter: TootDTOEntityConverter,
 ) {
 
 
@@ -72,7 +74,7 @@ class NoteDataSourceAdder @Inject constructor(
 
     suspend fun addTootStatusDtoIntoDataSource(account: Account, status: TootStatusDTO, skipExists: Boolean = false): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
-        val entities = status.toEntities(account, nodeInfo)
+        val entities = status.toEntities(tootDTOEntityConverter, account, nodeInfo)
         if (skipExists) {
             userDataSource.addAll(
                 entities.users.filterNot {
