@@ -58,8 +58,10 @@ data class Note(
     sealed interface Type {
         data class Misskey(
             val channel: SimpleChannelInfo? = null,
+            val isAcceptingOnlyLikeReaction: Boolean= false,
         ) : Type {
             data class SimpleChannelInfo(val id: Channel.Id, val name: String)
+
         }
 
         data class Mastodon(
@@ -97,6 +99,8 @@ data class Note(
     val isMisskey: Boolean = type is Type.Misskey
 
     val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+
+    val isAcceptingOnlyLikeReaction: Boolean = type is Type.Misskey && type.isAcceptingOnlyLikeReaction
 
     fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
         return if (isRenote) {

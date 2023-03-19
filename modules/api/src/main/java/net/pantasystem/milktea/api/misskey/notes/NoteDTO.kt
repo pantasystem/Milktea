@@ -72,6 +72,8 @@ data class NoteDTO(
 
     val app: App? = null,
     val channel: ChannelInfo? = null,
+
+    val reactionAcceptance: ReactionAcceptanceType? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
@@ -105,3 +107,9 @@ enum class NoteVisibilityType {
 }
 
 object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibilityType>(NoteVisibilityType.values(), NoteVisibilityType.Public)
+
+@kotlinx.serialization.Serializable
+enum class ReactionAcceptanceType {
+    @SerialName("likeOnly") LikeOnly,
+    @SerialName("likeOnlyForRemote") LikeOnly4Remote,
+}
