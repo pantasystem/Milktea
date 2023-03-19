@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.converters
 
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.toPoll
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
@@ -14,11 +15,19 @@ import javax.inject.Singleton
 
 @Singleton
 class TootDTOEntityConverter @Inject constructor(
-    private val instanceInfoRepository: MastodonInstanceInfoRepository
+    private val instanceInfoRepository: MastodonInstanceInfoRepository,
+    private val loggerFactory: Logger.Factory,
 ) {
+
+    private val logger by lazy {
+        loggerFactory.create("TootDTOEntityConverter")
+    }
 
     suspend fun convert(statusDTO: TootStatusDTO, account: Account, nodeInfo: NodeInfo?): Note {
         val isReactionAvailable = (instanceInfoRepository.find(account.normalizedInstanceDomain)
+            .onFailure {
+                logger.error("Failed to find instance info", it)
+            }
             .getOrNull()?.isReactionAvailable
             ?: false) || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
         return with(statusDTO) {
