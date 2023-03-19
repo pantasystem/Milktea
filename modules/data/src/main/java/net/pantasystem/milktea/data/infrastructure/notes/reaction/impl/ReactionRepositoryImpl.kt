@@ -58,7 +58,9 @@ class ReactionRepositoryImpl @Inject constructor(
                             if (nodeInfoRepository.find(account.getHost())
                                     .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
                             ) {
-                                throw IllegalArgumentException("Mastodon is not support reaction, host:${account.getHost()}, username:${account.userName}")
+                                if (!note.isSupportEmojiReaction) {
+                                    throw IllegalArgumentException("Mastodon is not support reaction, host:${account.getHost()}, username:${account.userName}")
+                                }
                             }
                             val body = mastodonAPIProvider.get(account).reaction(
                                 createReaction.noteId.noteId,
@@ -98,7 +100,9 @@ class ReactionRepositoryImpl @Inject constructor(
                     if (nodeInfoRepository.find(account.getHost())
                             .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
                     ) {
-                        return@withContext false
+                        if (!note.isSupportEmojiReaction) {
+                            return@withContext false
+                        }
                     }
                     val res = mastodonAPIProvider.get(account)
                         .unreaction(noteId.noteId)
