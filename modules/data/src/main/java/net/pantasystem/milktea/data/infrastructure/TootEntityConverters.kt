@@ -289,6 +289,7 @@ fun Instance.toModel(): MastodonInstanceInfo {
                     )
                 }
             )
-        }
+        },
+        fedibirdCapabilities = fedibirdCapabilities,
     )
 }

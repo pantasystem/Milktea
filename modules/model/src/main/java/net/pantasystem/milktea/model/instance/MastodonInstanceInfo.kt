@@ -9,6 +9,7 @@ data class MastodonInstanceInfo(
     val version: String,
     val urls: Urls,
     val configuration: Configuration?,
+    val fedibirdCapabilities: List<String>?,
 ) {
     companion object;
 
@@ -34,4 +35,9 @@ data class MastodonInstanceInfo(
     data class Urls(
         val streamingApi: String?
     )
+
+
+    // リアクションを使用可能か？
+    val isReactionAvailable: Boolean
+        get() = fedibirdCapabilities?.contains("emoji_reactions") ?: false
 }
