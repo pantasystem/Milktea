@@ -7,12 +7,17 @@ import net.pantasystem.milktea.note.R
 object ReactionButtonHelper {
 
     @JvmStatic
-    @BindingAdapter("isReacted")
-    fun ImageButton.setIsReacted(isReacted: Boolean?){
+    @BindingAdapter("isReacted", "isAcceptingOnlyFavoriteReaction")
+    fun ImageButton.setIsReacted(isReacted: Boolean?, isAcceptingOnlyFavoriteReaction: Boolean?){
         if(isReacted == true){
             this.setImageResource(R.drawable.ic_remove_black_24dp)
         }else{
-            this.setImageResource(R.drawable.ic_add_black_24dp)
+            if (isAcceptingOnlyFavoriteReaction == true) {
+                this.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+            } else {
+                this.setImageResource(R.drawable.ic_add_black_24dp)
+            }
+
         }
     }
 }
