@@ -100,6 +100,8 @@ data class Note(
 
     val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
 
+    val isAcceptingOnlyLikeReaction: Boolean = type is Type.Misskey && type.isAcceptingOnlyLikeReaction
+
     fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
         return if (isRenote) {
             if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
