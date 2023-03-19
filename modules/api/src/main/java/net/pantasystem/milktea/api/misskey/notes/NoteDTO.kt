@@ -73,7 +73,6 @@ data class NoteDTO(
     val app: App? = null,
     val channel: ChannelInfo? = null,
 
-    @kotlinx.serialization.Transient
     val reactionAcceptance: ReactionAcceptanceType? = null,
 ) : Serializable {
 
