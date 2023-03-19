@@ -57,6 +57,10 @@ class NoteCardActionHandler(
                     notesViewModel.toggleReaction(action.note.toShowNote.note.id, myReaction)
                     return
                 }
+                if (action.note.toShowNote.note.isAcceptingOnlyLikeReaction) {
+                    notesViewModel.toggleReaction(action.note.toShowNote.note.id, "❤️")
+                    return
+                }
                 when (settingStore.reactionPickerType) {
                     ReactionPickerType.LIST -> {
                         ReactionSelectionDialog.newInstance(action.note.toShowNote.note.id)
