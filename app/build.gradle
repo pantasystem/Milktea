@@ -154,14 +154,15 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
 
 
-    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
     implementation libs.lifecycle.viewmodel
 
 
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation libs.arch.core.testing
 
     implementation libs.recyclerview
 
