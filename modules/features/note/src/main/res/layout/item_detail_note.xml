@@ -427,8 +427,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:singleLine="true"
-                        android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
-                        android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
+                        android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                         />
                 <ImageButton

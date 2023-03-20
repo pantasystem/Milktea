@@ -487,8 +487,8 @@
                     tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
-                    android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
-                    android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                    android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
+                    android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

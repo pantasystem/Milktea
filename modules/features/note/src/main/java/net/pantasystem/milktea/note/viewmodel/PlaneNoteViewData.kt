@@ -134,11 +134,6 @@ open class PlaneNoteViewData(
     //var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
     val replyCount = toShowNote.note.repliesCount
 
-
-    val renoteCount: StateFlow<Int> = currentNote.map {
-        it.renoteCount
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
-
     val favoriteCount = currentNote.map {
         (it.type as? Note.Type.Mastodon?)?.favoriteCount
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
