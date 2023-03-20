@@ -13,13 +13,28 @@ import net.pantasystem.milktea.model.emoji.Emoji
     ]
 )
 data class CustomEmojiRecord(
+    @ColumnInfo(name = "serverId")
     val serverId: String? = null,
+
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "emojiHost")
     val emojiHost: String,
+
+    @ColumnInfo(name = "url")
     val url: String? = null,
+
+    @ColumnInfo(name = "uri")
     val uri: String? = null,
+
+    @ColumnInfo(name = "type")
     val type: String? = null,
+
+    @ColumnInfo(name = "category")
     val category: String? = null,
+
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L
 )
 
@@ -40,7 +55,10 @@ data class CustomEmojiRecord(
     ]
 )
 data class CustomEmojiAliasRecord(
+    @ColumnInfo(name = "emojiId")
     val emojiId: Long,
+
+    @ColumnInfo(name = "value")
     val value: String
 )
 

@@ -31,9 +31,16 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
     ]
 )
 data class DraftFileJunctionRef(
+    @ColumnInfo(name = "draftNoteId")
     val draftNoteId: Long,
+
+    @ColumnInfo(name = "filePropertyId")
     val filePropertyId: Long?,
+
+    @ColumnInfo(name = "localFileId")
     val localFileId: Long?,
+
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L
 ) {
     companion object
@@ -52,7 +59,10 @@ data class DraftLocalFile(
     @ColumnInfo(name = "folder_id") val folderId: String?,
     @ColumnInfo(name = "file_size") val fileSize: Long?,
     @ColumnInfo(name = "comment") val comment: String?,
-    @PrimaryKey(autoGenerate = true) val localFileId: Long = 0L,
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "localFileId")
+    val localFileId: Long = 0L,
 ) {
     companion object
 }

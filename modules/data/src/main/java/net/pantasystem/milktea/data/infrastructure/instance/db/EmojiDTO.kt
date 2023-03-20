@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.instance.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -12,13 +13,28 @@ import net.pantasystem.milktea.model.emoji.Emoji
     indices = [Index("instanceDomain"), Index("name")]
 )
 data class EmojiDTO(
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "instanceDomain")
     val instanceDomain: String,
+
+    @ColumnInfo(name = "host")
     val host: String?,
+
+    @ColumnInfo(name = "url")
     val url: String?,
+
+    @ColumnInfo(name = "uri")
     val uri: String?,
+
+    @ColumnInfo(name = "type")
     val type: String?,
+
+    @ColumnInfo(name = "category")
     val category: String?,
+
+    @ColumnInfo(name = "id")
     val id: String?
 ){
 
@@ -58,7 +74,12 @@ data class EmojiDTO(
     ]
 )
 data class EmojiAlias(
+    @ColumnInfo(name = "alias")
     val alias: String,
+
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "instanceDomain")
     val instanceDomain: String,
 )

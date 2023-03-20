@@ -7,10 +7,20 @@ import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
     tableName = "mastodon_instance_info"
 )
 data class MastodonInstanceInfoRecord(
-    @PrimaryKey(autoGenerate = false) val uri: String,
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "uri")
+    val uri: String,
+
+    @ColumnInfo(name = "title")
     val title: String,
+
+    @ColumnInfo(name = "description")
     val description: String,
+
+    @ColumnInfo(name = "email")
     val email: String,
+
+    @ColumnInfo(name = "version")
     val version: String,
     @Embedded(prefix = "urls_") val urls: Urls,
     @Embedded(prefix = "configuration_") val configuration: Configuration? = null,
@@ -28,15 +38,23 @@ data class MastodonInstanceInfoRecord(
         )
 
         data class Polls(
+            @ColumnInfo(name = "maxOptions")
             val maxOptions: Int? = null,
+
+            @ColumnInfo(name = "maxCharactersPerOption")
             val maxCharactersPerOption: Int? = null,
+
+            @ColumnInfo(name = "minExpiration")
             val minExpiration: Int? = null,
+
+            @ColumnInfo(name = "maxExpiration")
             val maxExpiration: Int? = null,
         )
 
     }
 
     data class Urls(
+        @ColumnInfo(name = "streamingApi")
         val streamingApi: String? = null,
     )
 }
@@ -57,7 +75,10 @@ data class MastodonInstanceInfoRecord(
     primaryKeys = ["uri", "type"]
 )
 data class FedibirdCapabilitiesRecord(
+    @ColumnInfo(name = "type")
     val type: String,
+
+    @ColumnInfo(name = "uri")
     val uri: String
 )
 

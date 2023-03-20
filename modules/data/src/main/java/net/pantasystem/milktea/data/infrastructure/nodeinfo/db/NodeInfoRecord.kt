@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.nodeinfo.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -8,9 +9,17 @@ import net.pantasystem.milktea.model.nodeinfo.NodeInfo
     tableName = "nodeinfo",
 )
 data class NodeInfoRecord(
-    @PrimaryKey(autoGenerate = false) val host: String,
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "host")
+    val host: String,
+
+    @ColumnInfo(name = "nodeInfoVersion")
     val nodeInfoVersion: String,
+
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "version")
     val version: String
 ) {
 

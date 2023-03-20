@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.user.renote.mute.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import kotlinx.datetime.Instant
@@ -17,9 +18,16 @@ import net.pantasystem.milktea.model.user.renote.mute.RenoteMute
     ]
 )
 data class RenoteMuteRecord(
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "userId")
     val userId: String,
+
+    @ColumnInfo(name = "createdAt")
     val createdAt: Instant,
+
+    @ColumnInfo(name = "postedAt")
     val postedAt: Instant?,
 ) {
 

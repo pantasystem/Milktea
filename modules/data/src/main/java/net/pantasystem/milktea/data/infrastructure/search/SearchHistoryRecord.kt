@@ -18,9 +18,15 @@ import net.pantasystem.milktea.model.search.SearchHistory
     ]
 )
 data class SearchHistoryRecord(
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "keyword")
     val keyword: String,
-    @PrimaryKey(autoGenerate = true) val id: Long
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Long
 ) {
 
     @Ignore
