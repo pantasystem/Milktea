@@ -104,7 +104,6 @@ class NoteDetailViewModel @AssistedInject constructor(
                     NoteConversationViewData(
                         note.note,
                         currentAccountWatcher.getAccount(),
-                        noteCaptureAdapter,
                         noteTranslationStore,
                         viewModelScope,
                         noteDataSource,
@@ -127,7 +126,6 @@ class NoteDetailViewModel @AssistedInject constructor(
                     NoteDetailViewData(
                         note.note,
                         currentAccountWatcher.getAccount(),
-                        noteCaptureAdapter,
                         noteTranslationStore,
                         noteDataSource,
                         configRepository,
@@ -211,7 +209,7 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     private fun <T : PlaneNoteViewData> T.capture(): T {
         val self = this
-        self.capture {
+        self.capture(noteCaptureAdapter) {
             it.launchIn(viewModelScope + Dispatchers.IO)
         }
         return this

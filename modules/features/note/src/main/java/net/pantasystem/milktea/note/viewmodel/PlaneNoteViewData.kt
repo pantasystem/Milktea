@@ -30,7 +30,6 @@ import net.pantasystem.milktea.note.reaction.ReactionViewData
 open class PlaneNoteViewData(
     val note: NoteRelation,
     val account: Account,
-    private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
@@ -259,7 +258,7 @@ open class PlaneNoteViewData(
         }
     }
 
-    fun capture(job: (Flow<NoteDataSource.Event>) -> Job) {
+    fun capture(noteCaptureAPIAdapter: NoteCaptureAPIAdapter, job: (Flow<NoteDataSource.Event>) -> Job) {
         val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
             if (it is NoteDataSource.Event.Updated) {
                 update(it.note)

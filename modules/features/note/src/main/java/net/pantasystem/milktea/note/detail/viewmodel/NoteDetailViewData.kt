@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -18,7 +17,6 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 class NoteDetailViewData(
     note: NoteRelation,
     account: Account,
-    noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     translationStore: NoteTranslationStore,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
@@ -27,7 +25,6 @@ class NoteDetailViewData(
 ) : PlaneNoteViewData(
     note,
     account,
-    noteCaptureAPIAdapter,
     translationStore,
     noteDataSource,
     configRepository,

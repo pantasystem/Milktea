@@ -151,7 +151,6 @@ class PlaneNoteViewDataCache(
             PlaneNoteViewData(
                 relation,
                 account,
-                noteCaptureAdapter,
                 translationStore,
                 noteDataSource,
                 configRepository,
@@ -162,7 +161,6 @@ class PlaneNoteViewDataCache(
             HasReplyToNoteViewData(
                 relation,
                 account,
-                noteCaptureAdapter,
                 translationStore,
                 noteDataSource,
                 configRepository,
@@ -191,7 +189,7 @@ class PlaneNoteViewDataCache(
             return
         }
         val scope = coroutineScope + Dispatchers.IO
-        this.capture { flow ->
+        this.capture(noteCaptureAdapter) { flow ->
             flow.onEach {
                 if (it is NoteDataSource.Event.Deleted) {
                     onDeleted(it.noteId)
