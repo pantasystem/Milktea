@@ -1,11 +1,17 @@
 package net.pantasystem.milktea.api.misskey.hashtag
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 class RequestHashTagList(
+    @SerialName("i")
     val i: String?,
+
+    @SerialName("sort")
     val sort: String,
+
+    @SerialName("limit")
     val limit: Int = 30
 ){
 
