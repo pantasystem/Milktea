@@ -87,4 +87,6 @@
 -keep class androidx.viewpager.widget.ViewPager$LayoutParams { int position; }
 -keep class com.google.android.material.bottomsheet.BottomSheetBehavior { *** findScrollingChild(...); }
 
--keep class net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
+-keepclassmembers enum * {
+    public *;
+}
