@@ -10,7 +10,7 @@ data class InstanceInfosResponse(
     @SerialName("date")
     val date: Instant,
 
-    @SerialName("instanceInfos")
+    @SerialName("instancesInfos")
     val instancesInfos: List<InstanceInfo>
 ) {
 
