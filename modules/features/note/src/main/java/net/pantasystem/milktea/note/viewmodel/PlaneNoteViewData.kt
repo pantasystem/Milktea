@@ -32,7 +32,6 @@ open class PlaneNoteViewData(
     val account: Account,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     noteTranslationStore: NoteTranslationStore,
-    private val instanceEmojis: List<Emoji>,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
     emojiRepository: CustomEmojiRepository,
@@ -73,7 +72,9 @@ open class PlaneNoteViewData(
 
     val cw = toShowNote.note.cw
     val cwNode = MFMParser.parse(
-        toShowNote.note.cw, (toShowNote.note.emojis ?: emptyList()) + instanceEmojis,
+        toShowNote.note.cw,
+        (toShowNote.note.emojis ?: emptyList()).associateBy { it.name },
+        instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
         userHost = toShowNote.user
             .host,
         accountHost = account.getHost()
@@ -92,7 +93,7 @@ open class PlaneNoteViewData(
     )
 
 
-    val textNode = getTextType(account, toShowNote, instanceEmojis)
+    val textNode = getTextType(account, toShowNote, emojiRepository.getAndConvertToMap(account.getHost()))
 
     val translateState: StateFlow<ResultState<Translation?>?> =
         noteTranslationStore.state(toShowNote.note.id).stateIn(
@@ -179,13 +180,14 @@ open class PlaneNoteViewData(
 
     val subNoteAvatarUrl = subNote?.user?.avatarUrl
     val subNoteTextNode = subNote?.let {
-        getTextType(account, it, instanceEmojis)
+        getTextType(account, it, emojiRepository.getAndConvertToMap(account.getHost()))
     }
 
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(
         subNote?.note?.cw,
-        (subNote?.note?.emojis ?: emptyList()) + instanceEmojis,
+        emojis = (subNote?.note?.emojis ?: emptyList()).associateBy { it.name },
+        instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
         accountHost = account.getHost(),
         userHost = subNote?.user?.host
     )
@@ -255,7 +257,7 @@ open class PlaneNoteViewData(
         emojiMap.putAll(note.emojis?.map {
             it.name to it
         } ?: emptyList())
-        emojis = emojiMap.values.toList() + instanceEmojis
+        emojis = emojiMap.values.toList()
         note.poll?.let {
             poll.postValue(it)
         }

@@ -106,8 +106,6 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis
-                            ?: emptyList(),
                         viewModelScope,
                         noteDataSource,
                         emojiRepository,
@@ -131,8 +129,6 @@ class NoteDetailViewModel @AssistedInject constructor(
                         currentAccountWatcher.getAccount(),
                         noteCaptureAdapter,
                         noteTranslationStore,
-                        metaRepository.get(currentAccountWatcher.getAccount().normalizedInstanceDomain)?.emojis
-                            ?: emptyList(),
                         noteDataSource,
                         configRepository,
                         emojiRepository,

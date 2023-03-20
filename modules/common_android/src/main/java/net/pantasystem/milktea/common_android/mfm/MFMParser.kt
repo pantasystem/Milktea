@@ -38,11 +38,33 @@ object MFMParser {
         text ?: return null
         //println("textSize:${text.length}")
         val root = Root(text)
+        val emojisMap = emojis?.associate {
+            it.name to it
+        } ?: emptyMap()
         NodeParser(
             text, root,
-            emojis?.associate {
-                it.name to it
-            } ?: emptyMap(),
+            emojisMap,
+            emojisMap,
+            userHost = userHost,
+            accountHost = accountHost,
+        ).parse()
+        return root
+    }
+
+    fun parse(
+        text: String?,
+        emojis: Map<String, Emoji>? = null,
+        instanceEmojis: Map<String, Emoji>? = null,
+        userHost: String? = null,
+        accountHost: String? = null
+    ): Root? {
+        text ?: return null
+        //println("textSize:${text.length}")
+        val root = Root(text)
+        NodeParser(
+            text, root,
+            emojis ?: emptyMap(),
+            instanceEmojiNameMap = instanceEmojis ?: emptyMap(),
             userHost = userHost,
             accountHost = accountHost,
         ).parse()
@@ -62,6 +84,7 @@ object MFMParser {
         private val sourceText: String,
         val parent: Node,
         private val emojiNameMap: Map<String, Emoji>,
+        private val instanceEmojiNameMap: Map<String, Emoji>,
         val start: Int = parent.insideStart,
         val end: Int = parent.insideEnd,
         val userHost: String?,
@@ -154,7 +177,8 @@ object MFMParser {
                                 parent = node,
                                 emojiNameMap = emojiNameMap,
                                 userHost = userHost,
-                                accountHost = accountHost
+                                accountHost = accountHost,
+                                instanceEmojiNameMap = instanceEmojiNameMap,
                             ).parse()
                         }
 
@@ -394,7 +418,7 @@ object MFMParser {
 
             val tagName = matcher.group(1) ?: return null
 
-            var emoji: Emoji? = emojiNameMap[tagName]
+            var emoji: Emoji? = emojiNameMap[tagName] ?: instanceEmojiNameMap[tagName]
 
             // NOTE: v13の絵文字周りの改悪対応
             if (emoji == null) {
