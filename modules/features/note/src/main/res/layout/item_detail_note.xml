@@ -403,7 +403,7 @@
                         android:layout_weight="1"
                         android:singleLine="true"
                         android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
-                        android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
+                        android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
 
                 <ImageButton
                         android:id="@+id/renoteButton"

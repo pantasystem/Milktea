@@ -4,6 +4,7 @@ package net.pantasystem.milktea.note.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
@@ -30,7 +31,7 @@ open class PlaneNoteViewData(
     val note: NoteRelation,
     val account: Account,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    private val noteTranslationStore: NoteTranslationStore,
+    noteTranslationStore: NoteTranslationStore,
     private val instanceEmojis: List<Emoji>,
     noteDataSource: NoteDataSource,
     configRepository: LocalConfigRepository,
@@ -51,11 +52,11 @@ open class PlaneNoteViewData(
             }
         }
 
-    val currentNote: LiveData<Note> = noteDataSource.observeOne(toShowNote.note.id).map {
+    val currentNote: StateFlow<Note> = noteDataSource.observeOne(toShowNote.note.id).map {
         it ?: toShowNote.note
     }.onStart {
         emit(toShowNote.note)
-    }.asLiveData(coroutineScope.coroutineContext)
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), toShowNote.note)
 
     val isRenotedByMe = !note.note.hasContent() && note.user.id.id == account.remoteId
 
@@ -81,16 +82,24 @@ open class PlaneNoteViewData(
     //true　折り畳み
     val text = toShowNote.note.text
 
-    val contentFolding = MutableLiveData(cw != null)
-    val contentFoldingStatusMessage: LiveData<StringSource> = Transformations.map(contentFolding) {
+    val contentFolding = MutableStateFlow(cw != null)
+    val contentFoldingStatusMessage: StateFlow<StringSource> = contentFolding.map {
         CwTextGenerator(toShowNote, it)
-    }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        CwTextGenerator(toShowNote, true)
+    )
 
 
     val textNode = getTextType(account, toShowNote, instanceEmojis)
 
-    val translateState: LiveData<ResultState<Translation?>?> =
-        this.noteTranslationStore.state(toShowNote.note.id).asLiveData()
+    val translateState: StateFlow<ResultState<Translation?>?> =
+        noteTranslationStore.state(toShowNote.note.id).stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5_000),
+            null
+        )
 
     var emojis = toShowNote.note.emojis ?: emptyList()
 
@@ -105,12 +114,12 @@ open class PlaneNoteViewData(
     } ?: emptyList()
     val media = MediaViewData(previewableFiles, configRepository.get().getOrNull())
 
-    val isOnlyVisibleRenoteStatusMessage = MutableLiveData<Boolean>(false)
+    val isOnlyVisibleRenoteStatusMessage = MutableStateFlow<Boolean>(false)
 
 
-    val urlPreviewList = MutableLiveData<List<UrlPreview>>()
+    val urlPreviewList = MutableStateFlow<List<UrlPreview>>(emptyList())
 
-    val previews = MediatorLiveData<List<Preview>>().apply {
+    val previews = urlPreviewList.map {
         val otherFiles = toShowNote.files?.map { file ->
             FilePreviewSource.Remote(AppFile.Remote(file.id), file)
         }?.filterNot { fp ->
@@ -118,55 +127,56 @@ open class PlaneNoteViewData(
         }?.map { file ->
             Preview.FileWrapper(file)
         }
-
-        postValue(otherFiles)
-        this.addSource(urlPreviewList) {
-            val urlPreviews = it?.map { url ->
-                Preview.UrlWrapper(url)
-            } ?: emptyList()
-            postValue((otherFiles ?: emptyList()) + urlPreviews)
-
+        val urlPreviews = it.map { url ->
+            Preview.UrlWrapper(url)
         }
-    }
+        (otherFiles ?: emptyList()) + urlPreviews
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     //var replyCount: String? = if(toShowNote.replyCount > 0) toShowNote.replyCount.toString() else null
-    val replyCount = MutableLiveData(toShowNote.note.repliesCount)
+    val replyCount = toShowNote.note.repliesCount
 
 
-    val renoteCount: LiveData<Int> = Transformations.map(currentNote) {
-        it?.renoteCount ?: 0
-    }
+    val renoteCount: StateFlow<Int> = currentNote.map {
+        it.renoteCount
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
 
-    val favoriteCount = Transformations.map(currentNote) {
+    val favoriteCount = currentNote.map {
         (it.type as? Note.Type.Mastodon?)?.favoriteCount
-    }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
 
-    val canRenote = Transformations.map(currentNote) {
+    val canRenote = currentNote.map {
         it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
-    }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), false)
 
-    val reactionCountsExpanded = MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
+    val reactionCountsExpanded =
+        MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
-    val reactionCountsViewData: LiveData<List<ReactionViewData>> = currentNote.switchMap { n ->
-        reactionCountsExpanded.map {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val reactionCountsViewData: StateFlow<List<ReactionViewData>> = currentNote.flatMapLatest { n ->
+        reactionCountsExpanded.asFlow().map {
             val reactions = if (it == true) {
                 n.reactionCounts
             } else {
                 n.getShortReactionCounts(note.note.isRenoteOnly())
             }
-            ReactionViewData.from(reactions, n, emojiRepository.getAndConvertToMap(account.getHost()))
+            ReactionViewData.from(
+                reactions,
+                n,
+                emojiRepository.getAndConvertToMap(account.getHost())
+            )
         }
-    }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val reactionCount = currentNote.map { note ->
         note.reactionCounts.sumOf {
             it.count
         }
-    }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
 
-    val myReaction: LiveData<String?> = Transformations.map(currentNote) {
+    val myReaction: StateFlow<String?> = currentNote.map {
         it.myReaction
-    }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
@@ -201,22 +211,34 @@ open class PlaneNoteViewData(
 
     val isVisibleNoteDivider = configRepository.observe().map {
         it.isEnableNoteDivider
-    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+    }.distinctUntilChanged().stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        true
+    )
 
     val isVisibleInstanceTicker = configRepository.observe().map {
         it.isEnableInstanceTicker
-    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+    }.distinctUntilChanged().stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        true
+    )
 
     val isUserNameDefault = configRepository.observe().map {
         it.isUserNameDefault
-    }.distinctUntilChanged().asLiveData(coroutineScope.coroutineContext)
+    }.distinctUntilChanged().stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        false
+    )
 
     val isVisibleSubNoteMediaPreview = subContentFolding.map { folding ->
         !(folding || subNoteFiles.isEmpty() || subNoteMedia.isOver4Files)
     }
 
     fun changeContentFolding() {
-        val isFolding = contentFolding.value ?: return
+        val isFolding = contentFolding.value
         contentFolding.value = !isFolding
     }
 
@@ -228,7 +250,7 @@ open class PlaneNoteViewData(
 
     val urlPreviewLoadTaskCallback = object : UrlPreviewLoadTask.Callback {
         override fun accept(list: List<UrlPreview>) {
-            urlPreviewList.postValue(list)
+            urlPreviewList.value = list
         }
     }
 
@@ -260,7 +282,7 @@ open class PlaneNoteViewData(
 
     // NOTE: (Panta) cwの時点で大半が隠されるので折りたたむ必要はない
     // NOTE: (Panta) cwを折りたたんでしまうとcw展開後に自動的に折りたたまれてしまって二度手間になる可能性がある。
-    val expanded = MutableLiveData<Boolean>(cw != null)
+    val expanded = MutableStateFlow(cw != null)
 
 
     init {

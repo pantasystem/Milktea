@@ -4,10 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexboxLayoutManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.user.R
@@ -48,6 +53,8 @@ class UserReactionViewHolder(
     val binding: ItemUserReactionBinding,
     val noteCardActionListenerAdapter: NoteCardActionListenerAdapter,
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    private var job: Job? = null
     fun bind(item: UserReactionBindingModel) {
         val listView = binding.simpleNote.reactionView
         listView.layoutManager = FlexboxLayoutManager(binding.root.context)
@@ -59,9 +66,11 @@ class UserReactionViewHolder(
         binding.noteCardActionListener = noteCardActionListenerAdapter
         binding.bindingModel = item
 
-        item.note.reactionCountsViewData.observe(lifecycleOwner) {
+        job?.cancel()
+        job = item.note.reactionCountsViewData.onEach {
             adapter.submitList(it)
-        }
+        }.flowWithLifecycle(lifecycleOwner.lifecycle).launchIn(lifecycleOwner.lifecycleScope)
+
         binding.lifecycleOwner = lifecycleOwner
         binding.simpleNote.lifecycleOwner = lifecycleOwner
         binding.executePendingBindings()
