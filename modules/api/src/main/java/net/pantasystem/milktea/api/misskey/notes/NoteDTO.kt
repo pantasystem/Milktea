@@ -15,19 +15,35 @@ import java.io.Serializable
 
 @kotlinx.serialization.Serializable
 data class NoteDTO(
+    @SerialName("id")
     val id: String,
     //@JsonProperty("createdAt") @JsonFormat(pattern = REMOTE_DATE_FORMAT) val createdAt: Date,
-    @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class) val createdAt: Instant,
+    @kotlinx.serialization.Serializable(with = InstantIso8601Serializer::class)
+    @SerialName("createdAt")
+    val createdAt: Instant,
+
+    @SerialName("text")
     val text: String? = null,
+
+    @SerialName("cw")
     val cw: String? = null,
+
+    @SerialName("userId")
     val userId: String,
 
+    @SerialName("replyId")
     val replyId: String? = null,
 
+    @SerialName("renoteId")
     val renoteId: String? = null,
 
+    @SerialName("viaMobile")
     val viaMobile: Boolean? = null,
+
+    @SerialName("visibility")
     val visibility: NoteVisibilityType? = null,
+
+    @SerialName("localOnly")
     val localOnly: Boolean? = null,
 
     @SerialName("visibleUserIds")
@@ -37,26 +53,41 @@ data class NoteDTO(
     @SerialName("reactionEmojis")
     val rawReactionEmojis: EmojisType? = null,
 
+    @SerialName("url")
     val url: String? = null,
+
+    @SerialName("uri")
     val uri: String? = null,
 
+    @SerialName("renoteCount")
     val renoteCount: Int,
 
     @SerialName("reactions")
     val reactionCounts: LinkedHashMap<String, Int>? = null,
 
     @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class)
-    @SerialName("emojis") val rawEmojis: EmojisType? = null,
+    @SerialName("emojis")
+    val rawEmojis: EmojisType? = null,
 
     @SerialName("repliesCount")
     val replyCount: Int,
+
+    @SerialName("user")
     val user: UserDTO,
+
+    @SerialName("files")
     val files: List<FilePropertyDTO>? = null,
-    //@JsonProperty("fileIds") val mediaIds: List<String?>? = null,    //v10, v11の互換性が取れない
+
+    @SerialName("fileIds")
     val fileIds: List<String>? = null,
+
+    @SerialName("poll")
     val poll: PollDTO? = null,
+
     @SerialName("renote")
     val reNote: NoteDTO? = null,
+
+    @SerialName("reply")
     val reply: NoteDTO? = null,
 
     @SerialName("myReaction")
@@ -65,20 +96,29 @@ data class NoteDTO(
 
     @SerialName("_featuredId_")
     val tmpFeaturedId: String? = null,
-    @SerialName("_prId_")
 
+    @SerialName("_prId_")
     val promotionId: String? = null,
+
+    @SerialName("channelId")
     val channelId: String? = null,
 
+    @SerialName("app")
     val app: App? = null,
+
+    @SerialName("channel")
     val channel: ChannelInfo? = null,
 
+    @SerialName("reactionAcceptance")
     val reactionAcceptance: ReactionAcceptanceType? = null,
 ) : Serializable {
 
     @kotlinx.serialization.Serializable
     data class ChannelInfo(
+        @SerialName("id")
         val id: String,
+
+        @SerialName("name")
         val name: String,
     ) : Serializable
 
@@ -103,7 +143,10 @@ data class NoteDTO(
 
 @kotlinx.serialization.Serializable(with = NoteVisibilityTypeSerializer::class)
 enum class NoteVisibilityType {
-    @SerialName("public") Public, @SerialName("home") Home, @SerialName("followers") Followers, @SerialName("specified") Specified
+    @SerialName("public") Public,
+    @SerialName("home") Home,
+    @SerialName("followers") Followers,
+    @SerialName("specified") Specified
 }
 
 object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibilityType>(NoteVisibilityType.values(), NoteVisibilityType.Public)
