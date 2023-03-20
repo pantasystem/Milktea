@@ -73,7 +73,7 @@ open class PlaneNoteViewData(
     val cw = toShowNote.note.cw
     val cwNode = MFMParser.parse(
         toShowNote.note.cw,
-        (toShowNote.note.emojis ?: emptyList()).associateBy { it.name },
+        toShowNote.note.emojiNameMap,
         instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
         userHost = toShowNote.user
             .host,
@@ -104,9 +104,7 @@ open class PlaneNoteViewData(
 
     var emojis = toShowNote.note.emojis ?: emptyList()
 
-    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojis?.associate {
-        it.name to it
-    } ?: mapOf())
+    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojiNameMap ?: mapOf())
 
     private val previewableFiles = toShowNote.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
@@ -186,7 +184,7 @@ open class PlaneNoteViewData(
     val subCw = subNote?.note?.cw
     val subCwNode = MFMParser.parse(
         subNote?.note?.cw,
-        emojis = (subNote?.note?.emojis ?: emptyList()).associateBy { it.name },
+        emojis = subNote?.note?.emojiNameMap,
         instanceEmojis = emojiRepository.getAndConvertToMap(account.getHost()),
         accountHost = account.getHost(),
         userHost = subNote?.user?.host
@@ -254,9 +252,7 @@ open class PlaneNoteViewData(
         require(toShowNote.note.id == note.id) {
             "更新として渡されたNote.Idと現在のIdが一致しません。"
         }
-        emojiMap.putAll(note.emojis?.map {
-            it.name to it
-        } ?: emptyList())
+        emojiMap.putAll(note.emojiNameMap ?: emptyMap())
         emojis = emojiMap.values.toList()
         note.poll?.let {
             poll.postValue(it)

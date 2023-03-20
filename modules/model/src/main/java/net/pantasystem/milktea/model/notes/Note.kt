@@ -103,6 +103,10 @@ data class Note(
 
     val isAcceptingOnlyLikeReaction: Boolean = type is Type.Misskey && type.isAcceptingOnlyLikeReaction
 
+    val emojiNameMap = emojis?.associateBy {
+        it.name
+    }
+
     fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
         return if (isRenote) {
             if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
