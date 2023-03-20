@@ -7,16 +7,26 @@ import java.io.Serializable as JSerializable
 
 @Serializable
 data class Subscription(
+    @SerialName("i")
     val i: String,
+
+    @SerialName("endpoint")
     val endpoint: String,
+
+    @SerialName("auth")
     val auth: String,
-    @SerialName("publickey") val publicKey: String
+
+    @SerialName("publickey")
+    val publicKey: String
 ) : JSerializable
 
 
 
 @Serializable
 data class UnSubscription(
+    @SerialName("i")
     val i: String,
+
+    @SerialName("endpoint")
     val endpoint: String
 ) : JSerializable
