@@ -197,9 +197,7 @@ open class PlaneNoteViewData(
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
     } ?: emptyList(), configRepository.get().getOrNull())
 
-    val channelInfo: LiveData<Note.Type.Misskey.SimpleChannelInfo?> = currentNote.map {
-        (it.type as? Note.Type.Misskey)?.channel
-    }
+    val channelInfo = (toShowNote.note.type as? Note.Type.Misskey)?.channel
 
     val isVisibleNoteDivider = configRepository.observe().map {
         it.isEnableNoteDivider
