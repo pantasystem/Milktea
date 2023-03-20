@@ -7,11 +7,22 @@ import net.pantasystem.milktea.model.filter.MastodonWordFilter
 
 @kotlinx.serialization.Serializable
 data class V1FilterDTO(
+    @SerialName("id")
     val id: String,
+
+    @SerialName("phrase")
     val phrase: String,
+
+    @SerialName("context")
     val context: List<FilterContext>,
-    @SerialName("whole_word") val wholeWord: Boolean,
-    @SerialName("expires_at") val expiresAt: Instant? = null,
+
+    @SerialName("whole_word")
+    val wholeWord: Boolean,
+
+    @SerialName("expires_at")
+    val expiresAt: Instant? = null,
+
+    @SerialName("irreversible")
     val irreversible: Boolean,
 ) {
 

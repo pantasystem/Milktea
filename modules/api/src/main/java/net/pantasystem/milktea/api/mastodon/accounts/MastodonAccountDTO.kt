@@ -9,30 +9,47 @@ import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.user.User
 
 @Serializable
-data class MastodonAccountDTO (
+data class MastodonAccountDTO(
+    @SerialName("id")
     val id: String,
+
+    @SerialName("username")
     val username: String,
+
+    @SerialName("acct")
     val acct: String,
 
     @SerialName("display_name")
     val displayName: String,
+
+    @SerialName("locked")
     val locked: Boolean,
+
+    @SerialName("bot")
     val bot: Boolean,
 
     @SerialName("created_at")
     val createdAt: Instant,
 
+    @SerialName("note")
     val note: String,
+
+    @SerialName("url")
     val url: String,
+
+    @SerialName("avatar")
     val avatar: String,
 
     @SerialName("avatar_static")
     val avatarStatic: String,
+
+    @SerialName("header")
     val header: String,
 
     @SerialName("header_static")
     val headerStatic: String,
 
+    @SerialName("emojis")
     val emojis: List<TootEmojiDTO>,
 
     @SerialName("followers_count")
@@ -43,9 +60,7 @@ data class MastodonAccountDTO (
 
     @SerialName("statuses_count")
     val statusesCount: Long,
-
-
-    ) {
+) {
     fun toModel(account: Account, related: User.Related? = null): User {
         return User.Detail(
             User.Id(account.accountId, this.id),
@@ -92,17 +107,43 @@ data class MastodonAccountDTO (
 
 @Serializable
 data class MastodonAccountRelationshipDTO(
+    @SerialName("id")
     val id: String,
+
+    @SerialName("following")
     val following: Boolean,
-    @SerialName("showing_reblogs") val showingReblogs: Boolean? = null,
+
+    @SerialName("showing_reblogs")
+    val showingReblogs: Boolean? = null,
+
+    @SerialName("notifying")
     val notifying: Boolean? = null,
-    @SerialName("followed_by") val followedBy: Boolean,
+
+
+    @SerialName("followed_by")
+    val followedBy: Boolean,
+
+    @SerialName("blocking")
     val blocking: Boolean,
-    @SerialName("blocked_by") val blockedBy: Boolean,
+
+    @SerialName("blocked_by")
+    val blockedBy: Boolean,
+
+    @SerialName("muting")
     val muting: Boolean,
-    @SerialName("muting_notifications") val mutingNotifications: Boolean,
+
+    @SerialName("muting_notifications")
+    val mutingNotifications: Boolean,
+
+    @SerialName("requested")
     val requested: Boolean,
-    @SerialName("domain_blocking") val domainBlocking: Boolean,
+
+    @SerialName("domain_blocking")
+    val domainBlocking: Boolean,
+
+    @SerialName("endorsed")
     val endorsed: Boolean,
+
+    @SerialName("note")
     val note: String,
 )
