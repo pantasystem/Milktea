@@ -1,9 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.account.page.db
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageParams
 
@@ -12,11 +9,20 @@ import net.pantasystem.milktea.model.account.page.PageParams
     indices = [Index("weight"), Index("accountId")]
 )
 data class PageRecord(
+    @ColumnInfo(name = "accountId")
     var accountId: Long,
+
+    @ColumnInfo(name = "title")
     val title: String,
+
+    @ColumnInfo(name = "weight")
     var weight: Int,
+
     @Embedded val pageParams: PageParams,
-    @PrimaryKey(autoGenerate = true) var pageId: Long
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "pageId")
+    var pageId: Long
 ) {
 
     companion object {

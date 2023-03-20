@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.url.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -9,12 +10,24 @@ import net.pantasystem.milktea.model.url.UrlPreview
 @Entity(tableName = "url_preview")
 @Serializable
 data class UrlPreviewRecord(
-    @PrimaryKey(autoGenerate = false) val url: String,
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "url")
+    val url: String,
+
+    @ColumnInfo(name = "title")
     val title: String,
+
+    @ColumnInfo(name = "icon")
     val icon: String?,
+
+    @ColumnInfo(name = "description")
     val description: String?,
+
+    @ColumnInfo(name = "thumbnail")
     val thumbnail: String?,
-    @SerialName("sitename") val siteName: String?
+
+    @SerialName("sitename")
+    val siteName: String?
     //val sensitive: Boolean
     //val player,
 ) {
