@@ -164,12 +164,6 @@ open class PlaneNoteViewData(
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val reactionCount = currentNote.map { note ->
-        note.reactionCounts.sumOf {
-            it.count
-        }
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
-
     val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
     //reNote先

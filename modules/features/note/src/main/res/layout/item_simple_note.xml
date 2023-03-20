@@ -559,8 +559,8 @@
 
             <TextView
                     android:id="@+id/reactionCountView"
-                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
-                    android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
+                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
+                    android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
 
 
                     android:layout_width="0dp"
