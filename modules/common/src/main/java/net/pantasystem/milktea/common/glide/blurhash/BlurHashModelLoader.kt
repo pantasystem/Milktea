@@ -66,7 +66,7 @@ internal class BlurHashTransCoder(val context: Context) : ResourceTranscoder<Blu
     ): Resource<BitmapDrawable> {
         val blurHash = toTranscode.get()
         val (width, height) = scaleToMax(blurHash.width, blurHash.height)
-        val bitmap = BlurHashDecoder.decode(toTranscode.get().hash, width = width, height = height, useCache = false)
+        val bitmap = BlurHashDecoder.decode(toTranscode.get().hash, width = width, height = height)
         return SimpleResource(BitmapDrawable(context.resources, bitmap))
     }
     private fun scaleToMax(width: Int, height: Int): Pair<Int, Int> {
