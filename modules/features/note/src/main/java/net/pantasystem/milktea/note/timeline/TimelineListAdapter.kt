@@ -96,7 +96,7 @@ class TimelineListAdapter(
 
         private var job: Job? = null
 
-        private fun unbind() {
+        fun unbind() {
             job?.cancel()
 
             mCurrentNote = null
@@ -313,6 +313,10 @@ class TimelineListAdapter(
 
         imageViews.map {
             Glide.with(simpleNote.avatarIcon).clear(it)
+        }
+
+        if (holder is NoteViewHolderBase<*>) {
+            holder.unbind()
         }
     }
 
