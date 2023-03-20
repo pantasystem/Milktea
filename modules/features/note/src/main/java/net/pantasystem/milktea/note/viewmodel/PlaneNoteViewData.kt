@@ -145,9 +145,7 @@ open class PlaneNoteViewData(
         (it.type as? Note.Type.Mastodon?)?.favoriteCount
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
 
-    val canRenote = currentNote.map {
-        it.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), false)
+    val canRenote = toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
 
     val reactionCountsExpanded =
         MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
@@ -173,10 +171,6 @@ open class PlaneNoteViewData(
             it.count
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
-
-    val myReaction: StateFlow<String?> = currentNote.map {
-        it.myReaction
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
