@@ -249,6 +249,7 @@
                             android:layout_height="wrap_content"
                             tools:itemCount="1"
                             tools:listitem="@layout/item_url_preview"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:previewList="@{note.previews}" />
 
 
@@ -456,7 +457,7 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:maxLines="1"
-                    android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                    android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
                     app:layout_constraintTop_toBottomOf="@id/reaction_view"
 
                     app:layout_constraintEnd_toStartOf="@+id/renoteButton"
@@ -486,8 +487,8 @@
                     tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
-                    android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
-                    android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                    android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
+                    android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -539,7 +540,7 @@
                     android:id="@+id/toggleReactionButton"
                     android:layout_width="@dimen/note_bottom_action_icon_size"
                     android:layout_height="@dimen/note_bottom_action_icon_size"
-                    app:isReacted="@{note.myReaction != null}"
+                    app:isReacted="@{note.currentNote.myReaction != null}"
                     isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
                     tools:srcCompat="@drawable/ic_add_black_24dp"
                     style="?android:attr/borderlessButtonStyle"
@@ -558,8 +559,8 @@
 
             <TextView
                     android:id="@+id/reactionCountView"
-                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
-                    android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
+                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
+                    android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
 
 
                     android:layout_width="0dp"

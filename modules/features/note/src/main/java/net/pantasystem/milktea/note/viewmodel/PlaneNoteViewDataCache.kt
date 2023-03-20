@@ -107,14 +107,9 @@ class PlaneNoteViewDataCache(
             for (i in 0 until notes.size - 1) {
                 val current = notes[i]
                 val next = notes[i + 1]
-                if (current.note.note.isRenoteOnly()
-                    && next.note.note.isRenoteOnly()
-                    && current.note.note.renoteId == next.note.note.renoteId
-                ) {
-                    current.isOnlyVisibleRenoteStatusMessage.postValue(true)
-                } else {
-                    current.isOnlyVisibleRenoteStatusMessage.postValue(false)
-                }
+                current.isOnlyVisibleRenoteStatusMessage.value = (current.note.note.isRenoteOnly()
+                        && next.note.note.isRenoteOnly()
+                        && current.note.note.renoteId == next.note.note.renoteId)
             }
         }
         return notes
@@ -151,16 +146,12 @@ class PlaneNoteViewDataCache(
 
     private suspend fun createViewData(relation: NoteRelation): PlaneNoteViewData {
         val account = getAccount()
-        val emojis = emojiRepository.findBy(account.getHost()).getOrElse {
-            emptyList()
-        }
+        emojiRepository.findBy(account.getHost())
         return if (relation.reply == null) {
             PlaneNoteViewData(
                 relation,
                 account,
-                noteCaptureAdapter,
                 translationStore,
-                emojis,
                 noteDataSource,
                 configRepository,
                 emojiRepository,
@@ -170,9 +161,7 @@ class PlaneNoteViewDataCache(
             HasReplyToNoteViewData(
                 relation,
                 account,
-                noteCaptureAdapter,
                 translationStore,
-                emojis,
                 noteDataSource,
                 configRepository,
                 emojiRepository,
@@ -200,7 +189,7 @@ class PlaneNoteViewDataCache(
             return
         }
         val scope = coroutineScope + Dispatchers.IO
-        this.capture { flow ->
+        this.capture(noteCaptureAdapter) { flow ->
             flow.onEach {
                 if (it is NoteDataSource.Event.Deleted) {
                     onDeleted(it.noteId)

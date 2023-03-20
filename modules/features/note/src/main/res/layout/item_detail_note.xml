@@ -403,7 +403,7 @@
                         android:layout_weight="1"
                         android:singleLine="true"
                         android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
-                        android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
+                        android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
 
                 <ImageButton
                         android:id="@+id/renoteButton"
@@ -427,8 +427,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:singleLine="true"
-                        android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
-                        android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                        android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
+                        android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                         />
                 <ImageButton
@@ -472,7 +472,7 @@
                         android:onClick="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
-                        app:isReacted="@{note.myReaction != null}"
+                        app:isReacted="@{note.currentNote.myReaction != null}"
                         isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                         android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"
@@ -485,8 +485,8 @@
 
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
-                        android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
-                        android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
+                        android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
+                        android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
 
                         />
 

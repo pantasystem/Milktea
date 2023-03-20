@@ -71,7 +71,8 @@ dependencies {
     implementation project(path: ':modules:app_store')
     implementation project(path: ':modules:common_resource')
 
-    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
     implementation libs.lifecycle.viewmodel
 
     //Kotlin coroutines用ライブラリ(async, await)

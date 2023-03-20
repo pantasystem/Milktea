@@ -76,7 +76,9 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-    implementation libs.lifecycle.extenstions
+
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
     implementation libs.lifecycle.viewmodel
     implementation libs.fragment.ktx
     implementation libs.activity.ktx

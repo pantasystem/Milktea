@@ -84,7 +84,8 @@ dependencies {
 
     implementation libs.wada811.databinding
 
-    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
     implementation libs.lifecycle.viewmodel
 
     implementation libs.kotlin.datetime

@@ -52,7 +52,7 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnReactionButtonClicked -> {
-                val myReaction = action.note.myReaction.value
+                val myReaction = action.note.currentNote.value.myReaction
                 if (myReaction != null) {
                     notesViewModel.toggleReaction(action.note.toShowNote.note.id, myReaction)
                     return

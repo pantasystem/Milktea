@@ -8,13 +8,17 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
@@ -72,7 +76,6 @@ class TimelineListAdapter(
         abstract val noteCardActionListenerAdapter: NoteCardActionListenerAdapter
 
 //        private var reactionCountAdapter: ReactionCountAdapter? = null
-        private var _reactionCountObserver: Observer<List<ReactionViewData>>? = null
 
 
         abstract fun onBind(note: PlaneNoteViewData)
@@ -91,10 +94,10 @@ class TimelineListAdapter(
             binding.executePendingBindings()
         }
 
-        private fun unbind() {
-            _reactionCountObserver?.let {
-                mCurrentNote?.reactionCountsViewData?.removeObserver(it)
-            }
+        private var job: Job? = null
+
+        fun unbind() {
+            job?.cancel()
 
             mCurrentNote = null
         }
@@ -107,23 +110,18 @@ class TimelineListAdapter(
             val note = mCurrentNote!!
             reactionCountAdapter.note = note
 
-            val reactionCountsObserver = object : Observer<List<ReactionViewData>> {
-                override fun onChanged(counts: List<ReactionViewData>?) {
-                    if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
-                        bindReactionCountVisibility(counts)
-                        reactionCountAdapter.submitList(counts)
-                    }
-                }
-            }
-            _reactionCountObserver = reactionCountsObserver
-
-            val reactionList = note.reactionCountsViewData.value?.toList()?: emptyList()
+            val reactionList = note.reactionCountsViewData.value
 
             reactionCountsView.layoutManager = getLayoutManager()
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.isNestedScrollingEnabled = false
             reactionCountAdapter.submitList(reactionList)
-            note.reactionCountsViewData.observe(lifecycleOwner, reactionCountsObserver)
+            job = note.reactionCountsViewData.onEach { counts ->
+                if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
+                    bindReactionCountVisibility(counts)
+                    reactionCountAdapter.submitList(counts)
+                }
+            }.flowWithLifecycle(lifecycleOwner.lifecycle).launchIn(lifecycleOwner.lifecycleScope)
         }
         
         private fun bindReactionCountVisibility(reactionCounts: List<ReactionViewData>?) {
@@ -315,6 +313,10 @@ class TimelineListAdapter(
 
         imageViews.map {
             Glide.with(simpleNote.avatarIcon).clear(it)
+        }
+
+        if (holder is NoteViewHolderBase<*>) {
+            holder.unbind()
         }
     }
 

@@ -175,6 +175,7 @@ class UserDetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.userDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         mParentActivity = intent.getParentActivity()
 
         val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
