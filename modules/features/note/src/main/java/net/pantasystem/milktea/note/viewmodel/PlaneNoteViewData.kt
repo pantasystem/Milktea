@@ -234,21 +234,11 @@ open class PlaneNoteViewData(
         }
     }
 
-    fun update(note: Note) {
-        require(toShowNote.note.id == note.id) {
-            "更新として渡されたNote.Idと現在のIdが一致しません。"
-        }
-    }
-
     fun capture(
         noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
         job: (Flow<NoteDataSource.Event>) -> Job,
     ) {
-        val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-            if (it is NoteDataSource.Event.Updated) {
-                update(it.note)
-            }
-        }.catch { e ->
+        val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).catch { e ->
             Log.d("PlaneNoteViewData", "error", e)
         }
         this.job = job(flow)
