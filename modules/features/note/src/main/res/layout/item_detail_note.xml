@@ -199,11 +199,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/manyFilePreviewListView"
-                        android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                        android:visibility="@{note.currentNote.poll == null ? View.GONE : View.VISIBLE}"
                         tools:itemCount="2"
                         tools:listitem="@layout/item_choice"
                         noteId="@{note.toShowNote.note.id}"
-                        poll="@{note.poll}"
+                        poll="@{note.currentNote.poll}"
                         noteCardActionListenerAdapter="@{noteCardActionListener}"
 
                         />

@@ -155,10 +155,6 @@ open class PlaneNoteViewData(
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val poll = currentNote.map {
-        it.poll
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
-
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote
 

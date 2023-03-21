@@ -236,10 +236,10 @@
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_choice"
                             tools:itemCount="2"
-                            memoVisibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                            memoVisibility="@{note.currentNote.poll == null ? View.GONE : View.VISIBLE}"
 
                             noteId="@{note.toShowNote.note.id}"
-                            poll="@{note.poll}"
+                            poll="@{note.currentNote.poll}"
                             noteCardActionListenerAdapter="@{noteCardActionListener}"
                             />
 
