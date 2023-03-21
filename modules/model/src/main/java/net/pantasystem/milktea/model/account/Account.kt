@@ -36,8 +36,12 @@ data class Account(
                 instanceType
             )
 
-    val normalizedInstanceDomain: String by lazy {
+    val normalizedInstanceDomain: String = getNormalizedDomain()
 
+
+    private var _host: String? = null
+
+    private fun getNormalizedDomain(): String {
         val protocol = getProtocol().ifBlank {
             "https"
         }
@@ -48,10 +52,15 @@ data class Account(
         if (url.port != -1) {
             str += ":${url.port}"
         }
-        str
+        return str
     }
 
     fun getHost(): String {
+        when(val h = _host) {
+            null -> Unit
+            else -> return h
+        }
+
         val protocol = getProtocol()
         val instanceDomain = instanceDomain.trim()
         val protocolLess = getProtocolLess()
@@ -70,12 +79,15 @@ data class Account(
             if (protocolLess.startsWith("@")){
                 val acct = Acct(protocolLess)
                 if (!acct.host.isNullOrBlank()) {
+                    _host = acct.host
                     return acct.host
                 }
             }
         } else {
+            _host = host
             return host
         }
+        _host = protocolLess
         return protocolLess
     }
 
