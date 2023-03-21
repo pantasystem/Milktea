@@ -11,12 +11,17 @@ data class CreateApp(
 
     @SerialName("redirect_uris")
     val redirectUris: String,
+
+    @SerialName("scopes")
     val scopes: String
 )
 
 @Serializable
 data class App(
+    @SerialName("id")
     val id: String,
+
+    @SerialName("name")
     val name: String,
 
     @SerialName("client_id")
@@ -42,12 +47,23 @@ data class App(
 
 @Serializable
 data class ObtainToken(
-    @SerialName("client_id") val clientId: String,
-    @SerialName("client_secret") val clientSecret: String,
-    @SerialName("redirect_uri") val redirectUri: String,
+    @SerialName("client_id")
+    val clientId: String,
+
+    @SerialName("client_secret")
+    val clientSecret: String,
+
+    @SerialName("redirect_uri")
+    val redirectUri: String,
+
+    @SerialName("scope")
     val scope: String,
+
+    @SerialName("code")
     val code: String,
-    @SerialName("grant_type") val grantType: String,
+
+    @SerialName("grant_type")
+    val grantType: String,
 )
 
 @Serializable
@@ -58,7 +74,9 @@ data class AccessToken(
     @SerialName("token_type")
     val tokenType: String,
 
+    @SerialName("scope")
     val scope: String,
+
     @SerialName("created_at")
     val createdAt: Long
 )

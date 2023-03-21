@@ -6,11 +6,16 @@ import net.pantasystem.milktea.model.emoji.Emoji
 
 @Serializable
 data class TootEmojiDTO(
+    @SerialName("shortcode")
     val shortcode: String,
+
+    @SerialName("url")
     val url: String,
 
     @SerialName("static_url")
     val staticUrl: String,
+
+    @SerialName("category")
     val category: String? = null,
 
     @SerialName("visible_in_picker")

@@ -20,23 +20,52 @@ import java.util.*
     indices = [Index("accountId", "text")]
 )
 data class DraftNoteDTO(
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "visibility")
     val visibility: String = "public",
+
+    @ColumnInfo(name = "text")
     val text: String?,
+
+    @ColumnInfo(name = "cw")
     val cw: String? = null,
+
+    @ColumnInfo(name = "viaMobile")
     val viaMobile: Boolean? = null,
+
+    @ColumnInfo(name = "localOnly")
     val localOnly: Boolean? = null,
+
+    @ColumnInfo(name = "noExtractMentions")
     val noExtractMentions: Boolean? = null,
+
+    @ColumnInfo(name = "noExtractHashtags")
     val noExtractHashtags: Boolean? = null,
+
+    @ColumnInfo(name = "noExtractEmojis")
     val noExtractEmojis: Boolean? = null,
+
+    @ColumnInfo(name = "replyId")
     val replyId: String? = null,
+
+    @ColumnInfo(name = "renoteId")
     val renoteId: String? = null,
+
+    @ColumnInfo(name = "channelId")
     val channelId: String? = null,
+
+    @ColumnInfo(name = "scheduleWillPostAt")
     val scheduleWillPostAt: Date? = null,
+
     @Embedded val poll: DraftPollDTO?,
+
     @ColumnInfo(name = "draft_note_id")
     @PrimaryKey(autoGenerate = true)
     var draftNoteId: Long? = null,
+
+    @ColumnInfo(name = "isSensitive")
     val isSensitive: Boolean? = null,
 
 ) {

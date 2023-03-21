@@ -8,34 +8,91 @@ import java.io.Serializable as JavaSerializable
 
 @Serializable
 data class NoteRequest(
+    @SerialName("i")
     val i: String? = null,
+
+    @SerialName("userId")
     val userId: String? = null,
+
+    @SerialName("withFiles")
     val withFiles: Boolean? = null,
+
+    @SerialName("fileType")
     val fileType: String? = null,
+
+    @SerialName("excludeNsfw")
     val excludeNsfw: Boolean? = null,
+
+    @SerialName("limit")
     val limit: Int? = 20,
+
+    @SerialName("sinceId")
     val sinceId: String? = null,
+
+    @SerialName("untilId")
     val untilId: String? = null,
+
+    @SerialName("sinceDate")
     val sinceDate: Long? = null,
+
+    @SerialName("untilDate")
     val untilDate: Long? = null,
+
+    @SerialName("query")
     val query: String? = null,
+
+    @SerialName("tag")
     val tag: String? = null,
+
+    @SerialName("includeLocalRenotes")
     val includeLocalRenotes: Boolean? = null,
+
+    @SerialName("includeMyRenotes")
     val includeMyRenotes: Boolean? = null,
+
+    @SerialName("includeRenotedMyNotes")
     val includeRenotedMyNotes: Boolean? = null,
+
+    @SerialName("noteId")
     val noteId: String? = null,
+
+    @SerialName("antennaId")
     val antennaId: String? = null,
+
+    @SerialName("listId")
     val listId: String? = null,
+
+    @SerialName("following")
     val following: Boolean? = null,
+
+    @SerialName("visibility")
     val visibility: String? = null,
+
+    @SerialName("reply")
     val reply: Boolean? = null,
+
+    @SerialName("renote")
     val renote: Boolean? = null,
+
+    @SerialName("poll")
     val poll: Boolean? = null,
+
+    @SerialName("offset")
     val offset: Int? = null,
+
+    @SerialName("includeReplies")
     val includeReplies: Boolean? = null,
+
+    @SerialName("host")
     val host: String? = null,
+
+    @SerialName("markAsRead")
     val markAsRead: Boolean? = null,
+
+    @SerialName("channelId")
     val channelId: String? = null,
+
+    @SerialName("clipId")
     val clipId: String? = null,
 ) : JavaSerializable {
 

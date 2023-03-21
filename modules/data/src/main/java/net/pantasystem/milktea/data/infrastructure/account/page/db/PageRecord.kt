@@ -1,22 +1,27 @@
 package net.pantasystem.milktea.data.infrastructure.account.page.db
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.PageParams
 
 @Entity(
     tableName = "page_table",
     indices = [Index("weight"), Index("accountId")]
 )
 data class PageRecord(
+    @ColumnInfo(name = "accountId")
     var accountId: Long,
+
+    @ColumnInfo(name = "title")
     val title: String,
+
+    @ColumnInfo(name = "weight")
     var weight: Int,
-    @Embedded val pageParams: PageParams,
-    @PrimaryKey(autoGenerate = true) var pageId: Long
+
+    @Embedded val pageParams: PageRecordParams,
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "pageId")
+    var pageId: Long
 ) {
 
     companion object {
@@ -25,7 +30,7 @@ data class PageRecord(
                 accountId = page.accountId,
                 title = page.title,
                 weight = page.weight,
-                pageParams = page.pageParams,
+                pageParams = PageRecordParams.from(page.pageParams),
                 pageId = page.pageId
             )
         }
@@ -36,7 +41,7 @@ data class PageRecord(
             accountId = accountId,
             title = title,
             weight = weight,
-            pageParams = pageParams,
+            pageParams = pageParams.toParams(),
             pageId = pageId
         )
     }

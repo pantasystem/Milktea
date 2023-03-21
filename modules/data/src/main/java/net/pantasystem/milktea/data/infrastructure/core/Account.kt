@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.core
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
@@ -11,5 +12,6 @@ import java.io.Serializable
 @Entity
 data class Account(
     @PrimaryKey(autoGenerate = false)
+    @ColumnInfo("id")
     val id: String
 ): Serializable

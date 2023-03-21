@@ -25,8 +25,12 @@ data class WordFilterConditionRecord(
     indices = [Index("parentId")]
 )
 data class WordFilterConditionRegexRecord(
+    @ColumnInfo(name = "pattern")
     val pattern: String,
-    @PrimaryKey(autoGenerate = false) val parentId: Long = 0L
+
+    @ColumnInfo(name = "parentId")
+    @PrimaryKey(autoGenerate = false)
+    val parentId: Long = 0L
 )
 
 @Entity(
@@ -43,9 +47,15 @@ data class WordFilterConditionRegexRecord(
     indices = [Index("parentId")]
 )
 data class WordFilterConditionWordRecord(
+    @ColumnInfo(name = "word")
     val word: String,
+
+    @ColumnInfo(name = "parentId")
     val parentId: Long,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
 )
 
 data class WordFilterConditionRelated(

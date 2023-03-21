@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.api.misskey.auth
 
+import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.mastodon.apps.ObtainToken
 import net.pantasystem.milktea.model.app.AppType
 import java.io.Serializable
@@ -7,11 +8,22 @@ import java.net.URLEncoder
 
 @kotlinx.serialization.Serializable
 data class App(
+    @SerialName("id")
     val id: String? = null,
+
+    @SerialName("name")
     val name: String,
+
+    @SerialName("callbackUrl")
     val callbackUrl: String? = null,
+
+    @SerialName("isAuthorized")
     val isAuthorized: Boolean? = null,
+
+    @SerialName("permission")
     val permission: List<String>? = emptyList(),
+
+    @SerialName("secret")
     val secret: String? = null
 ) : Serializable {
     fun toModel(): AppType.Misskey {

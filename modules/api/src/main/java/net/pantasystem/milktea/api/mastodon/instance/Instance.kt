@@ -5,18 +5,36 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Instance(
+    @SerialName("uri")
     val uri: String,
+
+    @SerialName("title")
     val title: String,
+
+    @SerialName("description")
     val description: String,
+
+    @SerialName("email")
     val email: String,
+
+    @SerialName("version")
     val version: String,
+
+    @SerialName("urls")
     val urls: Urls,
+
+    @SerialName("configuration")
     val configuration: Configuration? = null,
-    @SerialName("fedibird_capabilities") val fedibirdCapabilities: List<String>? = null,
+
+    @SerialName("fedibird_capabilities")
+    val fedibirdCapabilities: List<String>? = null,
 ) {
     @Serializable
     data class Configuration(
+        @SerialName("statuses")
         val statuses: Statuses? = null,
+
+        @SerialName("polls")
         val polls: Polls? = null
     ) {
 

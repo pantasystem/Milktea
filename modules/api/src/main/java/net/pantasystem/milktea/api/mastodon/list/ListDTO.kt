@@ -7,9 +7,14 @@ import net.pantasystem.milktea.model.list.UserList
 
 @kotlinx.serialization.Serializable
 data class ListDTO(
+    @SerialName("id")
     val id: String,
+
+    @SerialName("title")
     val title: String,
-    @SerialName("replies_policy") val repliesPolicy: RepliesPolicyType
+
+    @SerialName("replies_policy")
+    val repliesPolicy: RepliesPolicyType
 )  {
     @kotlinx.serialization.Serializable
     enum class RepliesPolicyType {

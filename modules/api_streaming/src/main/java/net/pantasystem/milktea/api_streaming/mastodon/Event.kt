@@ -25,9 +25,15 @@ sealed interface Event {
 // {"name":"🎉","count":1,"account_ids":["109011018797559029"],"status_id":"109724742705742083"}
 @kotlinx.serialization.Serializable
 data class EmojiReaction(
+    @SerialName("name")
     val name: String,
+
+    @SerialName("count")
     val count: Int,
+
+    @SerialName("url")
     val url: String? = null,
+
     @SerialName("static_url") val staticUrl: String? = null,
     @SerialName("domain") val domain: String? = null,
     @SerialName("account_ids") val accountIds: List<String>,

@@ -24,22 +24,51 @@ import net.pantasystem.milktea.model.user.User
     ]
 )
 data class DriveFileRecord(
+    @ColumnInfo(name = "serverId")
     val serverId: String,
+
+    @ColumnInfo(name = "relatedAccountId")
     val relatedAccountId: Long,
+
+    @ColumnInfo(name = "createdAt")
     val createdAt: Instant?,
+
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "type")
     val type: String,
+
+    @ColumnInfo(name = "md5")
     val md5: String?,
+
+    @ColumnInfo(name = "size")
     val size: Int?,
+
+    @ColumnInfo(name = "url")
     val url: String,
+
+    @ColumnInfo(name = "isSensitive")
     val isSensitive: Boolean,
+
+    @ColumnInfo(name = "thumbnailUrl")
     val thumbnailUrl: String?,
+
+    @ColumnInfo(name = "folderId")
     val folderId: String?,
+
+    @ColumnInfo(name = "userId")
     val userId: String?,
+
+    @ColumnInfo(name = "comment")
     val comment: String?,
+
+    @ColumnInfo(name = "blurhash")
     val blurhash: String?,
 
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Long,
 ) {
 
     @Ignore
