@@ -170,7 +170,7 @@
                         layout="@layout/view_translation"
                         android:layout_marginTop="8dp"
 
-                        app:emojis="@{note.emojis}"
+                        app:emojis="@{note.toShowNote.note.emojis}"
                         app:translationState="@{note.translateState}"
                         android:layout_marginBottom="8dp" />
 

@@ -64,7 +64,7 @@ object NoteReactionViewHelper {
         val meta = cache.get(note.account.normalizedInstanceUri)
 
         val r = Reaction(textReaction)
-        val emoji = note.emojiMap[textReaction.replace(":", "")]
+        val emoji = note.toShowNote.note.emojiNameMap?.get(textReaction.replace(":", ""))
             ?: meta?.emojisMap?.get(r.getName())
 
 

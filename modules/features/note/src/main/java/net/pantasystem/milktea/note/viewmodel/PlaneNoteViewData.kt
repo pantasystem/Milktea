@@ -14,7 +14,6 @@ import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.getTextType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
@@ -100,10 +99,6 @@ open class PlaneNoteViewData(
             SharingStarted.WhileSubscribed(5_000),
             null
         )
-
-    var emojis = toShowNote.note.emojis ?: emptyList()
-
-    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojiNameMap ?: mapOf())
 
     private val previewableFiles = toShowNote.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
@@ -247,8 +242,6 @@ open class PlaneNoteViewData(
         require(toShowNote.note.id == note.id) {
             "更新として渡されたNote.Idと現在のIdが一致しません。"
         }
-        emojiMap.putAll(note.emojiNameMap ?: emptyMap())
-        emojis = emojiMap.values.toList()
     }
 
     fun capture(
