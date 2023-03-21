@@ -246,6 +246,20 @@ class AccountTest {
     }
 
     @Test
+    fun getNormalizedInstanceDomain_GiveAcctAndIllegalHost() {
+        val account = Account(
+            instanceDomain = "https://@Panta@MisSkey.io",
+            userName = "",
+            token = "",
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
+        )
+        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceUri)
+    }
+
+
+
+    @Test
     fun getNormalizedInstanceDomain_GiveAcctCase2() {
         val account = Account(
             instanceDomain = "https://@artyom24@misskey.io",

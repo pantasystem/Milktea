@@ -112,7 +112,7 @@ internal object UrlHelper {
             if (protocolLess.startsWith("@")){
                 val acct = Acct(protocolLess)
                 if (!acct.host.isNullOrBlank()) {
-                    return acct.host
+                    return acct.host.lowercase()
                 }
             }
         } else {
