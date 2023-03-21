@@ -118,7 +118,7 @@
                     android:gravity="center_vertical"
                     android:padding="2dp"
                     instanceInfo="@{note.toShowNote.user.instance}"
-                    isEnable="@{note.isVisibleInstanceTicker}"
+                    isEnable="@{note.config.isEnableInstanceTicker}"
                     android:layout_below="@id/avatarIcon"
                     android:layout_marginTop="4dp"
                     />
@@ -507,7 +507,7 @@
                     android:layout_height="@dimen/note_divider_height"
                     android:background="?android:attr/listDivider"
                     android:layout_below="@id/noteActionButtonBaseLayout"
-                    android:visibility="@{ note.isVisibleNoteDivider ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{ note.config.isEnableNoteDivider ? View.VISIBLE : View.GONE}" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 

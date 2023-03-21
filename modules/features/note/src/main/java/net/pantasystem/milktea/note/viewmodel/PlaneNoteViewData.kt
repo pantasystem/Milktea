@@ -18,6 +18,7 @@ import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
@@ -189,28 +190,10 @@ open class PlaneNoteViewData(
 
     val channelInfo = (toShowNote.note.type as? Note.Type.Misskey)?.channel
 
-    val isVisibleNoteDivider = configRepository.observe().map {
-        it.isEnableNoteDivider
-    }.distinctUntilChanged().stateIn(
+    val config = configRepository.observe().stateIn(
         coroutineScope,
         SharingStarted.WhileSubscribed(5_000),
-        true
-    )
-
-    val isVisibleInstanceTicker = configRepository.observe().map {
-        it.isEnableInstanceTicker
-    }.distinctUntilChanged().stateIn(
-        coroutineScope,
-        SharingStarted.WhileSubscribed(5_000),
-        true
-    )
-
-    val isUserNameDefault = configRepository.observe().map {
-        it.isUserNameDefault
-    }.distinctUntilChanged().stateIn(
-        coroutineScope,
-        SharingStarted.WhileSubscribed(5_000),
-        false
+        DefaultConfig.config
     )
 
     val isVisibleSubNoteMediaPreview = subContentFolding.map { folding ->
