@@ -42,16 +42,7 @@ data class Account(
     private var _host: String? = null
 
     private fun getNormalizedDomain(): String {
-        val protocol = getProtocol().ifBlank {
-            "https"
-        }
-
-        val str = "${protocol}://${getHost()}"
-
-        return when(val port = getPort()) {
-            null -> str
-            else -> "$str:$port"
-        }
+        return UrlHelper.getNormalizedDomain(instanceDomain)
     }
 
     fun getHost(): String {
@@ -60,8 +51,31 @@ data class Account(
             else -> return h
         }
 
-        val instanceDomain = instanceDomain.trim()
-        val protocolLess = getProtocolLess().trim()
+        return UrlHelper.getHost(instanceDomain).also {
+            _host = it
+        }
+    }
+
+}
+
+internal object UrlHelper {
+
+    fun getNormalizedDomain(url: String): String {
+        val protocol = getProtocol(url).ifBlank {
+            "https"
+        }
+
+        val str = "${protocol}://${getHost(url)}"
+
+        return when(val port = getPort(url)) {
+            null -> str
+            else -> "$str:$port"
+        }
+    }
+    fun getHost(sourceUrl: String): String {
+
+        val instanceDomain = sourceUrl.trim()
+        val protocolLess = getProtocolLess(sourceUrl).trim()
 
         val host = if (
             instanceDomain.startsWith("https://")
@@ -98,20 +112,32 @@ data class Account(
             if (protocolLess.startsWith("@")){
                 val acct = Acct(protocolLess)
                 if (!acct.host.isNullOrBlank()) {
-                    _host = acct.host
                     return acct.host
                 }
             }
         } else {
-            _host = host
             return host
         }
-        _host = protocolLess
         return protocolLess
     }
 
-    private fun getProtocol(): String {
-        val instanceDomain = instanceDomain.trim()
+    private fun getPort(url: String): String? {
+        val protocolLess = getProtocolLess(url).trim()
+
+        // is ipv6 address
+        if (protocolLess.startsWith("[") && protocolLess.endsWith("]")) {
+            return null
+        }
+
+        val portColon = protocolLess.indexOf(":")
+        if (portColon != -1 && portColon < protocolLess.length - 1) {
+            return protocolLess.substring(portColon + 1, protocolLess.length)
+        }
+        return null
+    }
+
+    private fun getProtocol(url: String): String {
+        val instanceDomain = url.trim()
         if (instanceDomain.startsWith("https://")) {
             return "https"
         } else if (instanceDomain.startsWith("http://")) {
@@ -125,10 +151,9 @@ data class Account(
         }
         return ""
     }
-
-    private fun getProtocolLess(): String {
-        val protocol = getProtocol()
-        val instanceDomain = instanceDomain.trim()
+    private fun getProtocolLess(url: String): String {
+        val protocol = getProtocol(url)
+        val instanceDomain = url.trim()
         var protocolLess = instanceDomain.substring(protocol.length, instanceDomain.length)
         while(protocolLess.startsWith(":")) {
             protocolLess = protocolLess.substring(":".length, protocolLess.length)
@@ -141,20 +166,5 @@ data class Account(
             protocolLess = protocolLess.substring(0, protocolLess.lastIndex)
         }
         return protocolLess
-    }
-
-    private fun getPort(): String? {
-        val protocolLess = getProtocolLess().trim()
-
-        // is ipv6 address
-        if (protocolLess.startsWith("[") && protocolLess.endsWith("]")) {
-            return null
-        }
-
-        val portColon = protocolLess.indexOf(":")
-        if (portColon != -1 && portColon < protocolLess.length - 1) {
-             return protocolLess.substring(portColon + 1, protocolLess.length)
-        }
-        return null
     }
 }
