@@ -37,7 +37,7 @@ sealed class Send {
             @SerialName("id")
             val id: String,
 
-            @SerialName("type")
+            @SerialName("channel")
             val channel: Type,
 
             @SerialName("pong")
