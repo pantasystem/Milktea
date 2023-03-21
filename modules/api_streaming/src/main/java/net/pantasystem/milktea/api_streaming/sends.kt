@@ -1,9 +1,9 @@
 package net.pantasystem.milktea.api_streaming
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.Serializable
 
 /**
  * 注意：decode時やparse時はSendのserializerを使わないとうまくtypeフィールドが追加されない。
@@ -15,6 +15,7 @@ sealed class Send {
     @SerialName("connect")
     @Serializable
     data class Connect(
+        @SerialName("body")
         val body: Body,
         // type(channel)
     ) : Send() {
@@ -32,11 +33,28 @@ sealed class Send {
         }
 
         @Serializable
-        data class Body (val id: String, val channel: Type, val pong: Boolean = false, val params: Params? = null) {
+        data class Body (
+            @SerialName("id")
+            val id: String,
+
+            @SerialName("type")
+            val channel: Type,
+
+            @SerialName("pong")
+            val pong: Boolean = false,
+
+            @SerialName("params")
+            val params: Params? = null,
+        ) {
             @Serializable
             data class Params(
+                @SerialName("listId")
                 val listId: String? = null,
+
+                @SerialName("antennaId")
                 val antennaId: String? = null,
+
+                @SerialName("channelId")
                 val channelId: String? = null,
             )
             init {
@@ -50,6 +68,7 @@ sealed class Send {
     @SerialName("readNotification")
     @Serializable
     data class ReadNotification(
+        @SerialName("body")
         val body: Body
     ) : Send() {
 
@@ -57,7 +76,10 @@ sealed class Send {
          * @param id 通知のId
          */
         @Serializable
-        data class Body(val id: String)
+        data class Body(
+            @SerialName("id")
+            val id: String,
+        )
     }
 
 
@@ -65,15 +87,20 @@ sealed class Send {
     @SerialName("disconnect")
     @Serializable
     data class Disconnect(
+        @SerialName("body")
         val body: Body
     ) : Send(){
         @Serializable
-        data class Body(val id: String)
+        data class Body(
+            @SerialName("id")
+            val id: String,
+        )
     }
 
     @SerialName("subNote")
     @Serializable
     data class SubscribeNote(
+        @SerialName("body")
         val body: Body
     ) : Send() {
 
@@ -86,6 +113,7 @@ sealed class Send {
     @SerialName("sr")
     @Serializable
     data class SubscribeAndReadNote(
+        @SerialName("body")
         val body: Body
     ) : Send() {
 
@@ -98,6 +126,7 @@ sealed class Send {
     @SerialName("un")
     @Serializable
     data class UnSubscribeNote(
+        @SerialName("body")
         val body: Body
     ) : Send(){
         @Serializable
