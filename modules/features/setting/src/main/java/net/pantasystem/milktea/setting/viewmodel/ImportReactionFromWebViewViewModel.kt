@@ -41,11 +41,11 @@ class ImportReactionFromWebViewViewModel @Inject constructor(
             try {
 
                 val account = accountRepository.getCurrentAccount().getOrThrow()
-                reactionUserSettingDao.deleteAll(reactionUserSettingDao.findByInstanceDomain(account.normalizedInstanceDomain) ?: emptyList())
+                reactionUserSettingDao.deleteAll(reactionUserSettingDao.findByInstanceDomain(account.normalizedInstanceUri) ?: emptyList())
                 val settings = reactions.value.mapIndexed { i, reaction ->
                     ReactionUserSetting(
                         reaction,
-                        account.normalizedInstanceDomain,
+                        account.normalizedInstanceUri,
                         i
                     )
                 }

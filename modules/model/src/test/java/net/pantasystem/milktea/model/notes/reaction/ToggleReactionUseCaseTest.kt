@@ -65,7 +65,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
 
@@ -154,7 +154,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
 
@@ -247,7 +247,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
         val checkEmoji = mock<CheckEmoji> {
@@ -329,7 +329,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
 
@@ -410,7 +410,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
 
@@ -491,7 +491,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
 
@@ -576,7 +576,7 @@ class ToggleReactionUseCaseTest {
         }
         val fetchMeta = mock<MetaRepository> {
             onBlocking {
-                find(account.normalizedInstanceDomain)
+                find(account.normalizedInstanceUri)
             } doReturn Result.success(meta)
         }
         val checkEmoji = mock<CheckEmoji> {

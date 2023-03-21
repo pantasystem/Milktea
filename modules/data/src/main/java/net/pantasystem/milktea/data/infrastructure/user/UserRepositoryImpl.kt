@@ -78,7 +78,7 @@ internal class UserRepositoryImpl @Inject constructor(
             return@withContext local
         }
         val account = accountRepository.get(accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+        val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceUri)
         val res = misskeyAPI.showUser(
             RequestUser(
                 i = account.token,

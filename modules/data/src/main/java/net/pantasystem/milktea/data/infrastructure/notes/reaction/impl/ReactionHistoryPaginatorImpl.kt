@@ -56,7 +56,7 @@ class ReactionHistoryPaginatorImpl(
             lock.withLock {
 
                 val account = accountRepository.get(reactionHistoryRequest.noteId.accountId).getOrThrow()
-                val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+                val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceUri)
                 val res = misskeyAPI.reactions(
                     RequestReactionHistoryDTO(
                         i = account.token,

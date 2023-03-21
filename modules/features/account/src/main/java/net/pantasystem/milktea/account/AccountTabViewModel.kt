@@ -23,10 +23,10 @@ class AccountTabViewModel @Inject constructor(
 
     val tabs = accountStore.observeCurrentAccount.filterNotNull().map { account ->
         val isEnableGallery =
-            featureEnables.isEnable(account.normalizedInstanceDomain, FeatureType.Gallery)
+            featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Gallery)
         val userId = User.Id(account.accountId, account.remoteId)
         val isEnableMessaging =
-            featureEnables.isEnable(account.normalizedInstanceDomain, FeatureType.Messaging, false)
+            featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Messaging, false)
         when (account.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 listOfNotNull(

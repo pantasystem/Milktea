@@ -39,7 +39,7 @@ class EmojiPickerUiStateService(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val reactionCount =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceDomain)
+            reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceUri)
         }.catch {
             logger.error("リアクション履歴の取得に失敗", it)
         }.flowOn(Dispatchers.IO)
@@ -47,7 +47,7 @@ class EmojiPickerUiStateService(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val userSetting =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
-            userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain)
+            userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceUri)
         }.catch {
             logger.error("ユーザーリアクション設定情報の取得に失敗", it)
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -74,7 +74,7 @@ class EmojiPickerUiStateService(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val recentlyUsedReactions =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            reactionHistoryRepository.observeRecentlyUsedBy(it.normalizedInstanceDomain, limit = 20)
+            reactionHistoryRepository.observeRecentlyUsedBy(it.normalizedInstanceUri, limit = 20)
         }.catch {
             logger.error("絵文字の直近使用履歴の取得に失敗", it)
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())

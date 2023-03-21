@@ -85,7 +85,7 @@ class ReactionSettingActivity : AppCompatActivity() {
 
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceDomain)
+            metaRepository.observe(it.normalizedInstanceUri)
         }.distinctUntilChanged().mapNotNull {
             it?.emojis
         }.onEach { emojis ->

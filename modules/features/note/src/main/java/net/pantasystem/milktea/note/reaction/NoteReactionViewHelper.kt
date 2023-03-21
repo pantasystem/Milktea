@@ -61,7 +61,7 @@ object NoteReactionViewHelper {
         val cache = entryPoint.metaRepository()
 
         val textReaction = LegacyReaction.reactionMap[reaction] ?: reaction
-        val meta = cache.get(note.account.normalizedInstanceDomain)
+        val meta = cache.get(note.account.normalizedInstanceUri)
 
         val r = Reaction(textReaction)
         val emoji = note.emojiMap[textReaction.replace(":", "")]

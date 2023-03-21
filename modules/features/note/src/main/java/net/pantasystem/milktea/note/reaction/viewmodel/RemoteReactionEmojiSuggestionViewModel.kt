@@ -48,7 +48,7 @@ class RemoteReactionEmojiSuggestionViewModel @Inject constructor(
         } else {
             suspend {
                 val account = accountRepository.get(remoteReaction.currentAccountId).getOrThrow()
-                metaRepository.find(account.normalizedInstanceDomain).getOrThrow().emojis?.filter {
+                metaRepository.find(account.normalizedInstanceUri).getOrThrow().emojis?.filter {
                     it.name == name
                 }
             }.asLoadingStateFlow()

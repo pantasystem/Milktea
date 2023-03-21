@@ -43,7 +43,7 @@ class MastodonOkHttpFileUploader(
 
     private suspend fun upload(file: UploadSource.LocalFile): FileProperty {
         val okHttpClient =
-            mastodonAPIFactory.getOkHttp(account.normalizedInstanceDomain, account.token)
+            mastodonAPIFactory.getOkHttp(account.normalizedInstanceUri, account.token)
         val builder = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart(
@@ -52,7 +52,7 @@ class MastodonOkHttpFileUploader(
                 UriRequestBody(Uri.parse(file.file.path), context)
             )
         val request = Request.Builder()
-            .url(URL("${account.normalizedInstanceDomain}/api/v2/media"))
+            .url(URL("${account.normalizedInstanceUri}/api/v2/media"))
             .post(builder.build()).build()
         val response = okHttpClient.newCall(request).execute()
         throwErrorFromStatusCode(response.code)
@@ -78,9 +78,9 @@ class MastodonOkHttpFileUploader(
 
     private fun checkUploadStatus(fileId: String): Int {
         val okHttpClient =
-            mastodonAPIFactory.getOkHttp(account.normalizedInstanceDomain, account.token)
+            mastodonAPIFactory.getOkHttp(account.normalizedInstanceUri, account.token)
         val request = Request.Builder()
-            .url(URL("${account.normalizedInstanceDomain}/api/v1/media/${fileId}"))
+            .url(URL("${account.normalizedInstanceUri}/api/v1/media/${fileId}"))
             .get()
             .build()
         return okHttpClient.newCall(

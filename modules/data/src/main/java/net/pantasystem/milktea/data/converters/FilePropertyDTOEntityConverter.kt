@@ -22,8 +22,8 @@ class FilePropertyDTOEntityConverter @Inject constructor() {
             folderId = filePropertyDTO.folderId,
             comment = filePropertyDTO.comment,
             isSensitive = filePropertyDTO.isSensitive ?: false,
-            url = filePropertyDTO.getUrl(account.normalizedInstanceDomain),
-            thumbnailUrl = filePropertyDTO.getThumbnailUrl(account.normalizedInstanceDomain),
+            url = filePropertyDTO.getUrl(account.normalizedInstanceUri),
+            thumbnailUrl = filePropertyDTO.getThumbnailUrl(account.normalizedInstanceUri),
             blurhash = filePropertyDTO.blurhash,
             properties = filePropertyDTO.properties?.let {
                 FileProperty.Properties(it.width, it.height)

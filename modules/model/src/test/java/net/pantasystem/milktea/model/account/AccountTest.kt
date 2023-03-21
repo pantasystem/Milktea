@@ -15,6 +15,6 @@ class AccountTest {
             token = "test",
             userName = "Panta"
         )
-        Assertions.assertEquals("https://misskey.pantasystem.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://misskey.pantasystem.com", account.normalizedInstanceUri)
     }
 }

@@ -4,7 +4,7 @@ package net.pantasystem.milktea.model.account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.user.Acct
 import java.io.Serializable
-import java.net.URL
+
 
 data class Account(
     val remoteId: String,
@@ -36,7 +36,7 @@ data class Account(
                 instanceType
             )
 
-    val normalizedInstanceDomain: String = getNormalizedDomain()
+    val normalizedInstanceUri: String = getNormalizedDomain()
 
 
     private var _host: String? = null
@@ -45,14 +45,13 @@ data class Account(
         val protocol = getProtocol().ifBlank {
             "https"
         }
-        var str = "${protocol}://${getProtocolLess()}"
-        val url = URL(str)
 
-        str = "${protocol}://${getHost()}"
-        if (url.port != -1) {
-            str += ":${url.port}"
+        val str = "${protocol}://${getHost()}"
+
+        return when(val port = getPort()) {
+            null -> str
+            else -> "$str:$port"
         }
-        return str
     }
 
     fun getHost(): String {
@@ -61,20 +60,40 @@ data class Account(
             else -> return h
         }
 
-        val protocol = getProtocol()
         val instanceDomain = instanceDomain.trim()
-        val protocolLess = getProtocolLess()
+        val protocolLess = getProtocolLess().trim()
 
-        val host = if (instanceDomain.startsWith("https://")) {
-            URL("$protocol://$protocolLess").host
+        val host = if (
+            instanceDomain.startsWith("https://")
+            || instanceDomain.startsWith("http://")
+            || instanceDomain.indexOf("://") > 0
+        ) {
+            var url = protocolLess.lowercase()
+            while(url.lastOrNull() == '/') {
+                url = url.substring(0, url.lastIndex)
+            }
 
-        } else if (instanceDomain.startsWith("http://")) {
-            URL("$protocol://$protocolLess").host
-        } else if (instanceDomain.indexOf("://") > 0) {
-            URL("$protocol://$protocolLess").host
+            // check ipv6 address
+            if (!url.startsWith("[") || !url.endsWith("]")) {
+                val portColon = url.indexOf(":")
+                if (portColon != -1) {
+                    url = url.substring(0, portColon)
+                }
+            }
+
+            // check domain pattern
+            if (
+                url.contains("@")
+                || url.startsWith("\\d")
+            ) {
+                ""
+            } else {
+                url
+            }
         } else {
             ""
         }
+
         if (host.isBlank()) {
             if (protocolLess.startsWith("@")){
                 val acct = Acct(protocolLess)
@@ -94,11 +113,15 @@ data class Account(
     private fun getProtocol(): String {
         val instanceDomain = instanceDomain.trim()
         if (instanceDomain.startsWith("https://")) {
-            return URL(instanceDomain).protocol
+            return "https"
         } else if (instanceDomain.startsWith("http://")) {
-            return URL(instanceDomain).protocol
+            return "http"
         } else if (instanceDomain.indexOf("://") > 0) {
-            return URL(instanceDomain).protocol
+            var protocol = instanceDomain.substring(0, instanceDomain.indexOf("://"))
+            while(protocol.lastOrNull() == ':') {
+                protocol = protocol.substring(0, protocol.lastIndex)
+            }
+            return protocol.lowercase()
         }
         return ""
     }
@@ -113,7 +136,25 @@ data class Account(
         while(protocolLess.startsWith("/")) {
             protocolLess = protocolLess.substring("/".length, protocolLess.length)
         }
+
+        while(protocolLess.lastOrNull() == '/') {
+            protocolLess = protocolLess.substring(0, protocolLess.lastIndex)
+        }
         return protocolLess
     }
 
+    private fun getPort(): String? {
+        val protocolLess = getProtocolLess().trim()
+
+        // is ipv6 address
+        if (protocolLess.startsWith("[") && protocolLess.endsWith("]")) {
+            return null
+        }
+
+        val portColon = protocolLess.indexOf(":")
+        if (portColon != -1 && portColon < protocolLess.length - 1) {
+             return protocolLess.substring(portColon + 1, protocolLess.length)
+        }
+        return null
+    }
 }

@@ -93,7 +93,7 @@ class RenotesPagingImpl(
             val account = accountRepository.get(targetNoteId.accountId).getOrThrow()
             val i = account.token
 
-            misskeyAPIProvider.get(account.normalizedInstanceDomain)
+            misskeyAPIProvider.get(account.normalizedInstanceUri)
                 .renotes(FindRenotes(i = i, noteId = targetNoteId.noteId, untilId = getUntilId()))
                 .throwIfHasError().body()!!
         }
