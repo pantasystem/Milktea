@@ -19,9 +19,7 @@ data class ReactionViewData(
             note: Note,
             instanceEmojis: Map<String, Emoji>?,
         ): List<ReactionViewData> {
-            val noteEmojis = note.emojis?.associateBy {
-                it.name
-            }
+            val noteEmojis = note.emojiNameMap
             return reactions.map { reactionCount ->
 
                 val textReaction = LegacyReaction.reactionMap[reactionCount.reaction] ?: reactionCount.reaction
