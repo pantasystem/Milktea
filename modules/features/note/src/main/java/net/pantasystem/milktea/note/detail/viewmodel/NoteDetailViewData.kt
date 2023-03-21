@@ -32,6 +32,6 @@ class NoteDetailViewData(
     coroutineScope
 ) {
     init {
-        super.reactionCountsExpanded.postValue(true)
+        super.reactionCountsExpanded.value = true
     }
 }
