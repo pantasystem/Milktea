@@ -222,6 +222,12 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
+    fun onPositionChanged(position: Int) {
+        viewModelScope.launch {
+            timelineStore.releaseUnusedPages(position)
+        }
+    }
+
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -269,6 +269,8 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     if (endVisibleItemPosition == (itemCount - 1)) {
                         mViewModel.loadOld()
                     }
+
+                    mViewModel.onPositionChanged(lm.findFirstVisibleItemPosition())
                 }
             }
         )
