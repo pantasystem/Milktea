@@ -61,7 +61,7 @@ class ReactionHolder(val binding: ItemReactionBinding) : RecyclerView.ViewHolder
         if (note == null) {
             Log.w("ReactionCountAdapter", "noteがNullです。正常に処理が行われない可能性があります。")
         }
-        binding.reactionLayout.applyBackgroundColor(viewData, note?.toShowNote?.note?.nodeInfo)
+        binding.reactionLayout.applyBackgroundColor(viewData, note?.toShowNote?.note?.isMisskey ?: false)
         binding.reactionLayout.bindReactionCount(
             binding.reactionText,
             binding.reactionImage,

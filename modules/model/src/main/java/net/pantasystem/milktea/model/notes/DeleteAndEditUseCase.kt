@@ -16,11 +16,7 @@ class DeleteAndEditUseCase @Inject constructor(
     suspend operator fun invoke(id: Note.Id): Result<DraftNote> = runCancellableCatching {
         val relation = noteRelationGetter.get(id).getOrThrow()
         val result = noteRepository.delete(id).getOrThrow()
-        val draftNote = when(val r = requireNotNull(relation)) {
-            is NoteRelation.Normal -> r.copy(
-                note = result
-            )
-        }.toDraftNote()
+        val draftNote = requireNotNull(relation).copy(note = result).toDraftNote()
         draftNoteRepository.save(draftNote).getOrThrow()
     }
 }

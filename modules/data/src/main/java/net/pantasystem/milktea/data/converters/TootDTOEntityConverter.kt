@@ -7,6 +7,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
+import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
@@ -16,6 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class TootDTOEntityConverter @Inject constructor(
     private val instanceInfoRepository: MastodonInstanceInfoRepository,
+    private val nodeInfoRepository: NodeInfoRepository,
     private val loggerFactory: Logger.Factory,
 ) {
 
@@ -23,7 +25,8 @@ class TootDTOEntityConverter @Inject constructor(
         loggerFactory.create("TootDTOEntityConverter")
     }
 
-    suspend fun convert(statusDTO: TootStatusDTO, account: Account, nodeInfo: NodeInfo?): Note {
+    suspend fun convert(statusDTO: TootStatusDTO, account: Account): Note {
+        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val isReactionAvailable = (instanceInfoRepository.find(account.normalizedInstanceUri)
             .onFailure {
                 logger.error("Failed to find instance info", it)
@@ -92,7 +95,6 @@ class TootDTOEntityConverter @Inject constructor(
                     pureText = text,
                     isReactionAvailable = isReactionAvailable
                 ),
-                nodeInfo = nodeInfo,
             )
         }
 

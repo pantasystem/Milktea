@@ -8,7 +8,6 @@ import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -43,11 +42,9 @@ data class Note(
     val poll: Poll?,
     val myReaction: String?,
 
-
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
     val type: Type,
-    val nodeInfo: NodeInfo?,
 ) : Entity {
     class Id(
         val accountId: Long,
@@ -218,24 +215,13 @@ data class Note(
     }
 }
 
-sealed class NoteRelation : JSerializable {
-    abstract val note: Note
-    abstract val user: User
-    abstract val reply: NoteRelation?
-    abstract val renote: NoteRelation?
-    abstract val files: List<FileProperty>?
-
-    data class Normal(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-    ) : NoteRelation()
-
-
-}
-
+data class NoteRelation(
+    val note: Note,
+    val user: User,
+    val renote: NoteRelation?,
+    val reply: NoteRelation?,
+    val files: List<FileProperty>?,
+) : JSerializable
 fun Note.Companion.make(
     id: Note.Id,
     userId: User.Id,
@@ -260,7 +246,6 @@ fun Note.Companion.make(
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
     type: Note.Type = Note.Type.Misskey(),
-    nodeInfo: NodeInfo? = null,
 ): Note {
     return Note(
         id = id,
@@ -286,6 +271,5 @@ fun Note.Companion.make(
         app = app,
         channelId = channelId,
         type = type,
-        nodeInfo = nodeInfo
     )
 }
