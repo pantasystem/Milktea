@@ -6,11 +6,23 @@ import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.isSensitive
 import net.pantasystem.milktea.model.setting.Config
 
-class MediaViewData(files: List<FilePreviewSource>, val config: Config?, coroutineScope: CoroutineScope) {
+class MediaViewData(
+    files: List<FilePreviewSource>,
+    val config: Config?,
+    coroutineScope: CoroutineScope,
+) {
 
     // NOTE: サイズが変わることは決してない
-    private val _files = MutableStateFlow(files.map{
-        PreviewAbleFile(it, if (it.isSensitive) PreviewAbleFile.VisibleType.SensitiveHide else if (config?.isHideMediaWhenMobileNetwork == true) PreviewAbleFile.VisibleType.HideWhenMobileNetwork else PreviewAbleFile.VisibleType.Visible)
+    private val _files = MutableStateFlow(files.map {
+        PreviewAbleFile(
+            it,
+            if (it.isSensitive)
+                PreviewAbleFile.VisibleType.SensitiveHide
+            else if (config?.isHideMediaWhenMobileNetwork == true)
+                PreviewAbleFile.VisibleType.HideWhenMobileNetwork
+            else
+                PreviewAbleFile.VisibleType.Visible
+        )
     })
     val files: StateFlow<List<PreviewAbleFile>> = _files
 
@@ -34,29 +46,31 @@ class MediaViewData(files: List<FilePreviewSource>, val config: Config?, corouti
     val isVisibleMediaPreviewArea = !(isOver4Files || files.isEmpty())
 
     fun show(index: Int) {
-        val list = _files.value.toMutableList()
-        _files.value = list.mapIndexed { i, previewAbleFile ->
-            if (i == index) {
-                previewAbleFile.copy(visibleType = PreviewAbleFile.VisibleType.Visible)
-            } else {
-                previewAbleFile
+        _files.update { list ->
+            list.mapIndexed { i, previewAbleFile ->
+                if (i == index) {
+                    previewAbleFile.copy(visibleType = PreviewAbleFile.VisibleType.Visible)
+                } else {
+                    previewAbleFile
+                }
             }
         }
     }
 
     fun toggleVisibility(index: Int) {
-        val list = _files.value.toMutableList()
-        _files.value = list.mapIndexed { i, previewAbleFile ->
-            if (i == index) {
-                previewAbleFile.copy(
-                    visibleType = when(previewAbleFile.visibleType) {
-                        PreviewAbleFile.VisibleType.Visible -> PreviewAbleFile.VisibleType.SensitiveHide
-                        PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> PreviewAbleFile.VisibleType.Visible
-                        PreviewAbleFile.VisibleType.SensitiveHide -> PreviewAbleFile.VisibleType.Visible
-                    }
-                )
-            } else {
-                previewAbleFile
+        _files.update {
+            it.toMutableList().mapIndexed { i, previewAbleFile ->
+                if (i == index) {
+                    previewAbleFile.copy(
+                        visibleType = when (previewAbleFile.visibleType) {
+                            PreviewAbleFile.VisibleType.Visible -> PreviewAbleFile.VisibleType.SensitiveHide
+                            PreviewAbleFile.VisibleType.HideWhenMobileNetwork -> PreviewAbleFile.VisibleType.Visible
+                            PreviewAbleFile.VisibleType.SensitiveHide -> PreviewAbleFile.VisibleType.Visible
+                        }
+                    )
+                } else {
+                    previewAbleFile
+                }
             }
         }
     }
