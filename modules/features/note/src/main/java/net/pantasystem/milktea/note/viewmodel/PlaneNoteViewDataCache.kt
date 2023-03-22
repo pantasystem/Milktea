@@ -71,15 +71,20 @@ class PlaneNoteViewDataCache(
         }
     }
 
-    suspend fun getIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
+    private suspend fun useIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
         return lock.withLock {
-            relations.map {
+            val viewDataList = relations.map {
                 getUnThreadSafe(it)
             }
+            cache.clear()
+            cache.putAll(viewDataList.associateBy {
+                it.note.note.id
+            })
+            viewDataList
         }
     }
 
-    suspend fun getByIds(
+    suspend fun useByIds(
         ids: List<Note.Id>,
         isGoneAfterRenotes: Boolean = true
     ): List<PlaneNoteViewData> {
@@ -94,7 +99,7 @@ class PlaneNoteViewDataCache(
             }
         }
         val relations = noteRelationGetter.getIn(notExistsIds)
-        val newList = getIn(relations)
+        val newList = useIn(relations)
         val map = (exists + newList).associateBy {
             it.id
         }
