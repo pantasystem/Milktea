@@ -228,4 +228,16 @@ class PlaneNoteViewDataCache(
         }
     }
 
+    suspend fun captureNotesBy(ids: List<Note.Id>) {
+        lock.withLock {
+            cache.values.filterNot {
+                it.job?.isActive == true
+            }.filter {
+                ids.contains(it.id)
+            }.map {
+                it.captureNotes()
+            }
+        }
+    }
+
 }
