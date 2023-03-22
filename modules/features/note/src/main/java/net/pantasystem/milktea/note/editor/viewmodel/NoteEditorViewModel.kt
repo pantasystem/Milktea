@@ -88,7 +88,7 @@ class NoteEditorViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val instanceInfoType = currentAccount.filterNotNull().flatMapLatest {
-        instanceInfoService.observe(it.normalizedInstanceDomain)
+        instanceInfoService.observe(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val isSensitiveMedia =
@@ -140,7 +140,7 @@ class NoteEditorViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
         currentAccount.filterNotNull().flatMapLatest { account ->
-            instanceInfoService.observe(account.normalizedInstanceDomain).filterNotNull()
+            instanceInfoService.observe(account.normalizedInstanceUri).filterNotNull()
                 .map { meta ->
                     meta.maxNoteTextLength
                 }
@@ -152,11 +152,11 @@ class NoteEditorViewModel @Inject constructor(
 
 
     val enableFeatures = currentAccount.filterNotNull().map {
-        featureEnables.enableFeatures(it.normalizedInstanceDomain)
+        featureEnables.enableFeatures(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
     val maxFileCount = currentAccount.filterNotNull().mapNotNull {
-        instanceInfoService.find(it.normalizedInstanceDomain).getOrNull()?.maxFileCount
+        instanceInfoService.find(it.normalizedInstanceUri).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
     @OptIn(ExperimentalCoroutinesApi::class)

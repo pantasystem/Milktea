@@ -42,7 +42,7 @@ class EmojiEventHandlerImpl @Inject constructor(
         return when(e) {
             is EmojiAdded -> {
                 if (currentAccount != null) {
-                    executor.invoke(requireNotNull(currentAccount).normalizedInstanceDomain)
+                    executor.invoke(requireNotNull(currentAccount).normalizedInstanceUri)
                 }
                 true
             }

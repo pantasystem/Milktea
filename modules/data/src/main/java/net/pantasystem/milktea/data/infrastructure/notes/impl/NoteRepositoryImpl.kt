@@ -298,7 +298,7 @@ class NoteRepositoryImpl @Inject constructor(
             val account = getAccount.get(noteId.accountId)
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> {
-                    misskeyAPIProvider.get(account.normalizedInstanceDomain).noteState(
+                    misskeyAPIProvider.get(account.normalizedInstanceUri).noteState(
                         NoteRequest(
                             i = account.token,
                             noteId = noteId.noteId

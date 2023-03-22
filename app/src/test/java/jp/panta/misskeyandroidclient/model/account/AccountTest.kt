@@ -54,7 +54,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com", account.normalizedInstanceUri)
     }
 
     @Test
@@ -66,7 +66,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com", account.normalizedInstanceUri)
     }
 
     @Test
@@ -78,7 +78,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://example.com:8080", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com:8080", account.normalizedInstanceUri)
     }
 
     @Test
@@ -90,7 +90,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://example.com", account.normalizedInstanceUri)
     }
 
     @Test
@@ -102,7 +102,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://test-example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://test-example.com", account.normalizedInstanceUri)
     }
 
     @Test
@@ -114,7 +114,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://test_example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://test_example.com", account.normalizedInstanceUri)
     }
 
     @Test
@@ -126,7 +126,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://test_example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://test_example.com", account.normalizedInstanceUri)
     }
 
     @Test
@@ -138,8 +138,21 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://www.example.com", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://www.example.com", account.normalizedInstanceUri)
     }
+
+    @Test
+    fun getNormalizedInstanceDomain_GiveSchemaLess2() {
+        val account = Account(
+            instanceDomain = "//www.example.com ",
+            userName = "",
+            token = "",
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
+        )
+        Assertions.assertEquals("https://www.example.com", account.normalizedInstanceUri)
+    }
+
 
     @Test
     fun getNormalizedInstanceDomain_GiveIllegalFormat() {
@@ -150,7 +163,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("http://", account.normalizedInstanceDomain)
+        Assertions.assertEquals("http://", account.normalizedInstanceUri)
     }
 
     @Test
@@ -162,7 +175,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("http://192.168.0.1", account.normalizedInstanceDomain)
+        Assertions.assertEquals("http://192.168.0.1", account.normalizedInstanceUri)
     }
 
     @Test
@@ -176,7 +189,7 @@ class AccountTest {
         )
         Assertions.assertEquals(
             "http://[2001:db8:85a3::8a2e:370:7334]",
-            account.normalizedInstanceDomain
+            account.normalizedInstanceUri
         )
     }
 
@@ -191,7 +204,7 @@ class AccountTest {
         )
         Assertions.assertEquals(
             "ftp://[2001:db8:85a3::8a2e:370:7334]",
-            account.normalizedInstanceDomain
+            account.normalizedInstanceUri
         )
 
     }
@@ -205,7 +218,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceUri)
     }
 
     @Test
@@ -217,7 +230,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://みすきー.com:8080", account.normalizedInstanceUri)
     }
 
     @Test
@@ -229,8 +242,22 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceUri)
     }
+
+    @Test
+    fun getNormalizedInstanceDomain_GiveAcctAndIllegalHost() {
+        val account = Account(
+            instanceDomain = "https://@Panta@MisSkey.io",
+            userName = "",
+            token = "",
+            remoteId = "remoteId",
+            instanceType = Account.InstanceType.MISSKEY
+        )
+        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceUri)
+    }
+
+
 
     @Test
     fun getNormalizedInstanceDomain_GiveAcctCase2() {
@@ -241,7 +268,7 @@ class AccountTest {
             remoteId = "remoteId",
             instanceType = Account.InstanceType.MISSKEY
         )
-        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceDomain)
+        Assertions.assertEquals("https://misskey.io", account.normalizedInstanceUri)
     }
 
     @Test

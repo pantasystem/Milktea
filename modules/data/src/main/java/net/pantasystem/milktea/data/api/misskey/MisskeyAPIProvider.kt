@@ -39,7 +39,7 @@ class MisskeyAPIProvider @Inject constructor(
     }
 
     fun get(account: Account, version: Version? = null): MisskeyAPI {
-        return get(account.normalizedInstanceDomain, version)
+        return get(account.normalizedInstanceUri, version)
     }
 
     fun applyVersion(baseURL: String, version: Version) {

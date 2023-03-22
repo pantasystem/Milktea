@@ -148,7 +148,7 @@ class AccountStore @Inject constructor(
             return
         }
         try {
-            val meta = metaRepository.find(account.normalizedInstanceDomain).getOrNull()
+            val meta = metaRepository.find(account.normalizedInstanceUri).getOrNull()
             val pages = makeDefaultPagesUseCase(account, meta)
             accountRepository.add(account.copy(pages = pages), true)
         } catch (e: Exception) {

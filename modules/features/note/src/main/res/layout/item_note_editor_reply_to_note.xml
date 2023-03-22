@@ -148,7 +148,7 @@
                         android:gravity="center_vertical"
                         android:padding="2dp"
                         instanceInfo="@{note.toShowNote.user.instance}"
-                        isEnable="@{note.isVisibleInstanceTicker}"
+                        isEnable="@{note.config.isEnableInstanceTicker}"
                         android:singleLine="true"
                         />
                 <TextView
@@ -231,10 +231,10 @@
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_choice"
                             tools:itemCount="2"
-                            android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                            android:visibility="@{note.currentNote.poll == null ? View.GONE : View.VISIBLE}"
 
                             noteId="@{note.toShowNote.note.id}"
-                            poll="@{note.poll}"
+                            poll="@{note.currentNote.poll}"
                             noteCardActionListenerAdapter="@{null}"
                             />
 

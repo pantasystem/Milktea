@@ -14,12 +14,11 @@ import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.getTextType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
-import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AboutMediaType
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.poll.Poll
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.url.UrlPreview
 import net.pantasystem.milktea.model.url.UrlPreviewLoadTask
@@ -92,7 +91,8 @@ open class PlaneNoteViewData(
     )
 
 
-    val textNode = getTextType(account, toShowNote, emojiRepository.getAndConvertToMap(account.getHost()))
+    val textNode =
+        getTextType(account, toShowNote, emojiRepository.getAndConvertToMap(account.getHost()))
 
     val translateState: StateFlow<ResultState<Translation?>?> =
         noteTranslationStore.state(toShowNote.note.id).stateIn(
@@ -101,16 +101,12 @@ open class PlaneNoteViewData(
             null
         )
 
-    var emojis = toShowNote.note.emojis ?: emptyList()
-
-    val emojiMap = HashMap<String, Emoji>(toShowNote.note.emojiNameMap ?: mapOf())
-
     private val previewableFiles = toShowNote.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
     }?.filter {
         it.aboutMediaType == AboutMediaType.IMAGE || it.aboutMediaType == AboutMediaType.VIDEO
     } ?: emptyList()
-    val media = MediaViewData(previewableFiles, configRepository.get().getOrNull())
+    val media = MediaViewData(previewableFiles, configRepository.get().getOrNull(), coroutineScope)
 
     val isOnlyVisibleRenoteStatusMessage = MutableStateFlow<Boolean>(false)
 
@@ -138,15 +134,16 @@ open class PlaneNoteViewData(
         (it.type as? Note.Type.Mastodon?)?.favoriteCount
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), 0)
 
-    val canRenote = toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
+    val canRenote =
+        toShowNote.note.canRenote(User.Id(accountId = account.accountId, id = account.remoteId))
 
     val reactionCountsExpanded =
-        MutableLiveData(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
+        MutableStateFlow(toShowNote.note.reactionCounts.size <= Note.SHORT_REACTION_COUNT_MAX_SIZE)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val reactionCountsViewData: StateFlow<List<ReactionViewData>> = currentNote.flatMapLatest { n ->
-        reactionCountsExpanded.asFlow().map {
-            val reactions = if (it == true) {
+        reactionCountsExpanded.map {
+            val reactions = if (it) {
                 n.reactionCounts
             } else {
                 n.getShortReactionCounts(note.note.isRenoteOnly())
@@ -158,8 +155,6 @@ open class PlaneNoteViewData(
             )
         }
     }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    val poll = MutableLiveData<Poll?>(toShowNote.note.poll)
 
     //reNote先
     val subNote: NoteRelation? = toShowNote.renote
@@ -179,45 +174,31 @@ open class PlaneNoteViewData(
     )
 
     //true　折り畳み
-    val subContentFolding = MutableLiveData(subCw != null)
+    val subContentFolding = MutableStateFlow(subCw != null)
 
-    val subContentFoldingStatusMessage = Transformations.map(subContentFolding) { isFolding ->
+    val subContentFoldingStatusMessage = subContentFolding.map { isFolding ->
         CwTextGenerator(subNote, isFolding)
-    }
+    }.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        CwTextGenerator(subNote, subCw != null)
+    )
     val subNoteFiles = subNote?.files ?: emptyList()
     val subNoteMedia = MediaViewData(subNote?.files?.map {
         FilePreviewSource.Remote(AppFile.Remote(it.id), it)
-    } ?: emptyList(), configRepository.get().getOrNull())
+    } ?: emptyList(), configRepository.get().getOrNull(), coroutineScope)
 
     val channelInfo = (toShowNote.note.type as? Note.Type.Misskey)?.channel
 
-    val isVisibleNoteDivider = configRepository.observe().map {
-        it.isEnableNoteDivider
-    }.distinctUntilChanged().stateIn(
+    val config = configRepository.observe().stateIn(
         coroutineScope,
         SharingStarted.WhileSubscribed(5_000),
-        true
-    )
-
-    val isVisibleInstanceTicker = configRepository.observe().map {
-        it.isEnableInstanceTicker
-    }.distinctUntilChanged().stateIn(
-        coroutineScope,
-        SharingStarted.WhileSubscribed(5_000),
-        true
-    )
-
-    val isUserNameDefault = configRepository.observe().map {
-        it.isUserNameDefault
-    }.distinctUntilChanged().stateIn(
-        coroutineScope,
-        SharingStarted.WhileSubscribed(5_000),
-        false
+        DefaultConfig.config
     )
 
     val isVisibleSubNoteMediaPreview = subContentFolding.map { folding ->
         !(folding || subNoteFiles.isEmpty() || subNoteMedia.isOver4Files)
-    }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), true)
 
     fun changeContentFolding() {
         val isFolding = contentFolding.value
@@ -225,7 +206,7 @@ open class PlaneNoteViewData(
     }
 
     fun changeSubContentFolding() {
-        val isFolding = subContentFolding.value ?: return
+        val isFolding = subContentFolding.value
         subContentFolding.value = !isFolding
     }
 
@@ -236,23 +217,11 @@ open class PlaneNoteViewData(
         }
     }
 
-    fun update(note: Note) {
-        require(toShowNote.note.id == note.id) {
-            "更新として渡されたNote.Idと現在のIdが一致しません。"
-        }
-        emojiMap.putAll(note.emojiNameMap ?: emptyMap())
-        emojis = emojiMap.values.toList()
-        note.poll?.let {
-            poll.postValue(it)
-        }
-    }
-
-    fun capture(noteCaptureAPIAdapter: NoteCaptureAPIAdapter, job: (Flow<NoteDataSource.Event>) -> Job) {
-        val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).onEach {
-            if (it is NoteDataSource.Event.Updated) {
-                update(it.note)
-            }
-        }.catch { e ->
+    fun capture(
+        noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
+        job: (Flow<NoteDataSource.Event>) -> Job,
+    ) {
+        val flow = noteCaptureAPIAdapter.capture(toShowNote.note.id).catch { e ->
             Log.d("PlaneNoteViewData", "error", e)
         }
         this.job = job(flow)

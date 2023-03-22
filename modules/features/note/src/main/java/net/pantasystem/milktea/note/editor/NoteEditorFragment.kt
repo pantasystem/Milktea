@@ -266,7 +266,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceDomain)
+            metaRepository.observe(it.normalizedInstanceUri)
         }.mapNotNull {
             it?.emojis
         }.distinctUntilChanged().onEach { emojis ->

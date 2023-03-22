@@ -116,9 +116,9 @@ class UserDetailViewModel @AssistedInject constructor(
         accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()
     ) { account, user ->
         val isEnableGallery =
-            featureEnables.isEnable(account.normalizedInstanceDomain, FeatureType.Gallery)
+            featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Gallery)
         val isPublicReaction = featureEnables.isEnable(
-                account.normalizedInstanceDomain,
+                account.normalizedInstanceUri,
                 FeatureType.UserReactionHistory
             ) && (user.info.isPublicReactions || user.id == User.Id(
                 account.accountId, account.remoteId

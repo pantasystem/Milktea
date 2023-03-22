@@ -124,7 +124,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceDomain)
+            metaRepository.observe(it.normalizedInstanceUri)
         }.mapNotNull {
             it?.emojis
         }.distinctUntilChanged().onEach { emojis ->

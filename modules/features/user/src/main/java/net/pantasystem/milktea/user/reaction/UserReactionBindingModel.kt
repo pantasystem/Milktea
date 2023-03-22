@@ -12,7 +12,7 @@ class UserReactionBindingModel(
     val user: StateFlow<User>,
 ) {
     val emojis
-        get() = note.emojis
+        get() = note.toShowNote.note.emojis
 
     val isCustomEmoji
         get() = Reaction(reaction.type).isCustomEmojiFormat()

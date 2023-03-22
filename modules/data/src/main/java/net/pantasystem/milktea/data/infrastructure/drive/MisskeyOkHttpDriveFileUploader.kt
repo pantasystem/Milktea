@@ -84,7 +84,7 @@ class MisskeyOkHttpDriveFileUploader(
 
             val request =
                 Request.Builder()
-                    .url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
+                    .url(URL("${account.normalizedInstanceUri}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
@@ -147,7 +147,7 @@ class MisskeyOkHttpDriveFileUploader(
 
             val request =
                 Request.Builder()
-                    .url(URL("${account.normalizedInstanceDomain}/api/drive/files/create"))
+                    .url(URL("${account.normalizedInstanceUri}/api/drive/files/create"))
                     .post(requestBody).build()
             val response = client.newCall(request).execute()
             val code = response.code

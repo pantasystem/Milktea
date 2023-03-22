@@ -49,10 +49,37 @@ data class Note(
     val type: Type,
     val nodeInfo: NodeInfo?,
 ) : Entity {
-    data class Id(
+    class Id(
         val accountId: Long,
         val noteId: String
-    ) : EntityId
+    ) : EntityId {
+
+        private var _hashCode: Int? = null
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Id
+
+            if (accountId != other.accountId) return false
+            if (noteId != other.noteId) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            if (_hashCode != null) return _hashCode!!
+            var result = accountId.hashCode()
+            result = 31 * result + noteId.hashCode()
+            _hashCode = result
+            return result
+        }
+
+        override fun toString(): String {
+            return "Id(accountId=$accountId, noteId='$noteId')"
+        }
+
+    }
 
 
     sealed interface Type {

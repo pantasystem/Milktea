@@ -91,7 +91,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         }
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceDomain)
+            metaRepository.observe(it.normalizedInstanceUri)
         }.mapNotNull {
             it?.emojis
         }.onEach { emojis ->

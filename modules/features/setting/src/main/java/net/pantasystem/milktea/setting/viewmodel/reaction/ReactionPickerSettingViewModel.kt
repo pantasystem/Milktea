@@ -50,7 +50,7 @@ class ReactionPickerSettingViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val rawSettings = reactionUserSettingDao
-                    .findByInstanceDomain(account.normalizedInstanceDomain)
+                    .findByInstanceDomain(account.normalizedInstanceUri)
                 mExistingSettingList = rawSettings ?: emptyList()
                 var settingReactions = rawSettings
                     ?: LegacyReaction.defaultReaction.mapIndexed { index, str ->
@@ -117,7 +117,7 @@ class ReactionPickerSettingViewModel @Inject constructor(
         mReactionSettingReactionNameMap[reaction] =
             ReactionUserSetting(
                 reaction,
-                account.normalizedInstanceDomain,
+                account.normalizedInstanceUri,
                 mReactionSettingReactionNameMap.size
             )
         reactionSettingsList.postValue(mReactionSettingReactionNameMap.values.toList())
@@ -143,7 +143,7 @@ class ReactionPickerSettingViewModel @Inject constructor(
     ): ReactionUserSetting {
         return ReactionUserSetting(
             reaction,
-            account.normalizedInstanceDomain,
+            account.normalizedInstanceUri,
             index
         )
     }
