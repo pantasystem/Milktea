@@ -270,7 +270,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                         mViewModel.loadOld()
                     }
 
-                    if (lm.findFirstVisibleItemPosition() == 0) {
+                    if (lm.findFirstVisibleItemPosition() <= 3) {
                         mViewModel.onVisibleFirst()
                     }
 
