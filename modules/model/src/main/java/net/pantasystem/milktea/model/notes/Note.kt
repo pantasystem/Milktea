@@ -188,24 +188,13 @@ data class Note(
     }
 }
 
-sealed class NoteRelation : JSerializable {
-    abstract val note: Note
-    abstract val user: User
-    abstract val reply: NoteRelation?
-    abstract val renote: NoteRelation?
-    abstract val files: List<FileProperty>?
-
-    data class Normal(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-    ) : NoteRelation()
-
-
-}
-
+data class NoteRelation(
+    val note: Note,
+    val user: User,
+    val renote: NoteRelation?,
+    val reply: NoteRelation?,
+    val files: List<FileProperty>?,
+) : JSerializable
 fun Note.Companion.make(
     id: Note.Id,
     userId: User.Id,

@@ -89,7 +89,7 @@ class NoteRelationGetter @Inject constructor(
                 }
             } else null
 
-            return@runCancellableCatching NoteRelation.Normal(
+            return@runCancellableCatching NoteRelation(
                 note = note,
                 user = user,
                 renote = renote?.getOrNull(),
