@@ -73,12 +73,22 @@ class PlaneNoteViewDataCache(
 
     private suspend fun useIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
         return lock.withLock {
+            val ids = relations.map { it.note.id }.toSet()
+
             val viewDataList = relations.map {
                 getUnThreadSafe(it)
             }
+
+            cache.keys.filterNot {
+                ids.contains(it)
+            }.forEach {
+                cache.remove(it)?.job?.cancel()
+            }
+
             cache.putAll(viewDataList.associateBy {
                 it.note.note.id
             })
+
             viewDataList
         }
     }
