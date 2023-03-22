@@ -76,7 +76,6 @@ class PlaneNoteViewDataCache(
             val viewDataList = relations.map {
                 getUnThreadSafe(it)
             }
-            cache.clear()
             cache.putAll(viewDataList.associateBy {
                 it.note.note.id
             })
