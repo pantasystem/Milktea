@@ -113,8 +113,9 @@ class PlaneNoteViewDataCache(
                 val current = notes[i]
                 val next = notes[i + 1]
                 current.isOnlyVisibleRenoteStatusMessage.value = (current.note.note.isRenoteOnly()
-                        && next.note.note.isRenoteOnly()
-                        && current.note.note.renoteId == next.note.note.renoteId)
+                        && (
+                        current.note.note.renoteId == next.note.note.renoteId
+                                || current.note.note.renoteId == next.note.note.id))
             }
         }
         return notes
