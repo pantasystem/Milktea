@@ -203,7 +203,7 @@ class AppAuthViewModel @Inject constructor(
         }.onFailure {
             logger.error("アカウント登録処理失敗", it)
         }.onSuccess {
-            syncMetaExecutor(it.account.normalizedInstanceDomain)
+            syncMetaExecutor(it.account.normalizedInstanceUri)
         }.getOrNull()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 

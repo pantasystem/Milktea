@@ -55,7 +55,7 @@ class ReactionHistoryViewModel @AssistedInject constructor(
     private val emojis = flowOf(noteId).mapNotNull {
         accountRepository.get(it.accountId).getOrNull()
     }.flatMapLatest {
-        metaRepository.observe(it.normalizedInstanceDomain)
+        metaRepository.observe(it.normalizedInstanceUri)
     }.map {
         it?.emojis ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())

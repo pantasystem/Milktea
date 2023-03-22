@@ -211,7 +211,7 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     private fun getMisskeyAPI(account: Account): MisskeyAPIV11 {
-        return misskeyAPIProvider.get(account.normalizedInstanceDomain) as? MisskeyAPIV11
+        return misskeyAPIProvider.get(account.normalizedInstanceUri) as? MisskeyAPIV11
             ?: throw IllegalVersionException()
     }
 }

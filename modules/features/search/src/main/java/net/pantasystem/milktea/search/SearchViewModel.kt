@@ -46,7 +46,7 @@ class SearchViewModel @Inject constructor(
     }.flatMapLatest {
         suspend {
             hashtagRepository.search(
-                currentAccountWatcher.getAccount().normalizedInstanceDomain,
+                currentAccountWatcher.getAccount().normalizedInstanceUri,
                 it
             ).getOrThrow()
         }.asLoadingStateFlow()

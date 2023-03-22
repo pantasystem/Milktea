@@ -27,7 +27,7 @@ class TootDTOEntityConverter @Inject constructor(
 
     suspend fun convert(statusDTO: TootStatusDTO, account: Account): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
-        val isReactionAvailable = (instanceInfoRepository.find(account.normalizedInstanceDomain)
+        val isReactionAvailable = (instanceInfoRepository.find(account.normalizedInstanceUri)
             .onFailure {
                 logger.error("Failed to find instance info", it)
             }

@@ -118,7 +118,7 @@
                     android:gravity="center_vertical"
                     android:padding="2dp"
                     instanceInfo="@{note.toShowNote.user.instance}"
-                    isEnable="@{note.isVisibleInstanceTicker}"
+                    isEnable="@{note.config.isEnableInstanceTicker}"
                     android:layout_below="@id/avatarIcon"
                     android:layout_marginTop="4dp"
                     />
@@ -170,7 +170,7 @@
                         layout="@layout/view_translation"
                         android:layout_marginTop="8dp"
 
-                        app:emojis="@{note.emojis}"
+                        app:emojis="@{note.toShowNote.note.emojis}"
                         app:translationState="@{note.translateState}"
                         android:layout_marginBottom="8dp" />
 
@@ -199,11 +199,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/manyFilePreviewListView"
-                        android:visibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                        android:visibility="@{note.currentNote.poll == null ? View.GONE : View.VISIBLE}"
                         tools:itemCount="2"
                         tools:listitem="@layout/item_choice"
                         noteId="@{note.toShowNote.note.id}"
-                        poll="@{note.poll}"
+                        poll="@{note.currentNote.poll}"
                         noteCardActionListenerAdapter="@{noteCardActionListener}"
 
                         />
@@ -507,7 +507,7 @@
                     android:layout_height="@dimen/note_divider_height"
                     android:background="?android:attr/listDivider"
                     android:layout_below="@id/noteActionButtonBaseLayout"
-                    android:visibility="@{ note.isVisibleNoteDivider ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{ note.config.isEnableNoteDivider ? View.VISIBLE : View.GONE}" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 

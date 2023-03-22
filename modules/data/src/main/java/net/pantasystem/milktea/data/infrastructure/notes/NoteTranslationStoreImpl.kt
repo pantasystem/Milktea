@@ -24,7 +24,6 @@ import javax.inject.Singleton
 
 @Singleton
 class NoteTranslationStoreImpl @Inject constructor(
-    val noteRepository: NoteRepository,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
 ) : NoteTranslationStore {
@@ -50,7 +49,7 @@ class NoteTranslationStoreImpl @Inject constructor(
         runCancellableCatching {
             withContext(Dispatchers.IO) {
                 val account = accountRepository.get(noteId.accountId).getOrThrow()
-                val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+                val api = misskeyAPIProvider.get(account.normalizedInstanceUri)
                 val req = Translate(
                     i = account.token,
                     targetLang = Locale.getDefault().language,

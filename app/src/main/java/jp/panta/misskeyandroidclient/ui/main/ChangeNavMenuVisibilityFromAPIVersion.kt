@@ -11,7 +11,7 @@ internal class ChangeNavMenuVisibilityFromAPIVersion(
     private val featureEnables: FeatureEnables,
 ) {
     suspend operator fun invoke(currentAccount: Account) {
-        val enableFeatures = featureEnables.enableFeatures(currentAccount.normalizedInstanceDomain)
+        val enableFeatures = featureEnables.enableFeatures(currentAccount.normalizedInstanceUri)
         navView.menu.also { menu ->
             menu.findItem(R.id.nav_antenna).isVisible = enableFeatures.contains(FeatureType.Antenna)
             menu.findItem(R.id.nav_channel).isVisible = enableFeatures.contains(FeatureType.Channel)

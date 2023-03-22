@@ -50,7 +50,7 @@ class AccountViewModel @Inject constructor(
 
     private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
         val flows = accounts.map {
-            instanceInfoService.observe(it.normalizedInstanceDomain).flowOn(Dispatchers.IO)
+            instanceInfoService.observe(it.normalizedInstanceUri).flowOn(Dispatchers.IO)
         }
         combine(flows) {
             it.toList()
@@ -73,7 +73,7 @@ class AccountViewModel @Inject constructor(
             AccountInfo(
                 it,
                 userMap[it.accountId],
-                metaMap[it.normalizedInstanceDomain],
+                metaMap[it.normalizedInstanceUri],
                 current?.accountId == it.accountId
             )
         }
@@ -125,7 +125,7 @@ class AccountViewModel @Inject constructor(
     fun setSwitchTargetConnectionInstance(account: Account) {
         viewModelScope.launch {
             accountStore.setCurrent(account)
-            syncMetaExecutor(account.normalizedInstanceDomain)
+            syncMetaExecutor(account.normalizedInstanceUri)
         }
     }
 

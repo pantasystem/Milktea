@@ -40,7 +40,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
 
-                        emojis="@{bindingModel.note.emojis}"
+                        emojis="@{bindingModel.emojis}"
                         reaction="@{bindingModel.reaction.type}"
                         tools:ignore="ContentDescription"
                         android:visibility="@{bindingModel.customEmoji ? View.VISIBLE : View.GONE }"/>
