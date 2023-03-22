@@ -12,7 +12,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.GroupDataSource
 import net.pantasystem.milktea.model.markers.MarkerRepository
 import net.pantasystem.milktea.model.markers.MarkerType
-import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notification.NotificationDataSource
 import net.pantasystem.milktea.model.notification.NotificationRelation
@@ -27,7 +26,6 @@ class NotificationCacheAdder @Inject constructor(
     private val noteRelationGetter: NoteRelationGetter,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val groupDataSource: GroupDataSource,
-    private val nodeInfoRepository: NodeInfoRepository,
     private val userDTOEntityConverter: UserDTOEntityConverter,
     private val notificationDTOEntityConverter: NotificationDTOEntityConverter,
     private val markerRepository: MarkerRepository,
@@ -37,7 +35,6 @@ class NotificationCacheAdder @Inject constructor(
         val user = notificationDTO.user?.let {
             userDTOEntityConverter.convert(account, it)
         }
-        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         if (user != null) {
             if (!skipExists || userDataSource.get(user.id).isFailure) {
                 userDataSource.add(user)
@@ -46,7 +43,7 @@ class NotificationCacheAdder @Inject constructor(
         val noteRelation = notificationDTO.note?.let{
             noteRelationGetter.get(noteDataSourceAdder.addNoteDtoToDataSource(account, it, skipExists))
         }
-        val notification = notificationDTOEntityConverter.convert(notificationDTO, account, nodeInfo)
+        val notification = notificationDTOEntityConverter.convert(notificationDTO, account)
 
         if (!skipExists || notificationDataSource.get(notification.id).isFailure) {
             notificationDataSource.add(notification)
@@ -71,9 +68,8 @@ class NotificationCacheAdder @Inject constructor(
             ""
         }
         val user = mstNotificationDTO.account.toModel(account)
-        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
         val noteRelation = mstNotificationDTO.status?.let {
-            tootDTOEntityConverter.convert(it, account, nodeInfo)
+            tootDTOEntityConverter.convert(it, account)
         }?.let {
             noteRelationGetter.get(it)
         }

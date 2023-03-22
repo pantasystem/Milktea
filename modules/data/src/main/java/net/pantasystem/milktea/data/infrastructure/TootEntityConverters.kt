@@ -11,7 +11,6 @@ import net.pantasystem.milktea.data.converters.TootDTOEntityConverter
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -57,13 +56,14 @@ fun TootMediaAttachment.toFileProperty(account: Account, isSensitive: Boolean): 
 
 suspend fun TootStatusDTO.toEntities(
     converter: TootDTOEntityConverter,
-    account: Account, nodeInfo: NodeInfo?): NoteRelationEntities {
+    account: Account,
+): NoteRelationEntities {
     val users = mutableListOf<User>()
     val notes = mutableListOf<Note>()
     val files = mutableListOf<FileProperty>()
-    pickEntities(converter, account, notes, users, files, nodeInfo)
+    pickEntities(converter, account, notes, users, files)
     return NoteRelationEntities(
-        note = converter.convert(this, account, nodeInfo),
+        note = converter.convert(this, account),
         files = files,
         users = users,
         notes = notes,
@@ -76,9 +76,8 @@ suspend fun TootStatusDTO.pickEntities(
     notes: MutableList<Note>,
     users: MutableList<User>,
     files: MutableList<FileProperty>,
-    nodeInfo: NodeInfo?
 ) {
-    val (note, user) = converter.convert(this, account, nodeInfo) to this.account.toModel(account)
+    val (note, user) = converter.convert(this, account) to this.account.toModel(account)
     notes.add(note)
     users.add(user)
     files.addAll(
@@ -86,8 +85,8 @@ suspend fun TootStatusDTO.pickEntities(
             it.toFileProperty(account, sensitive)
         }
     )
-    this.reblog?.pickEntities(converter, account, notes, users, files, nodeInfo)
-    this.quote?.pickEntities(converter, account, notes, users, files, nodeInfo)
+    this.reblog?.pickEntities(converter, account, notes, users, files)
+    this.quote?.pickEntities(converter, account, notes, users, files)
 }
 
 fun MastodonAccountRelationshipDTO.toUserRelated(): User.Related {

@@ -7,7 +7,6 @@ import net.pantasystem.milktea.api.misskey.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -19,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class NoteDTOEntityConverter @Inject constructor() {
 
-    suspend fun convert(noteDTO: NoteDTO, account: Account, nodeInfo: NodeInfo?): Note {
+    suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
         val visibility = Visibility(
             noteDTO.visibility ?: NoteVisibilityType.Public,
             isLocalOnly = noteDTO.localOnly ?: false,
@@ -69,7 +68,6 @@ class NoteDTOEntityConverter @Inject constructor() {
                     null -> false
                 },
             ),
-            nodeInfo = nodeInfo,
         )
     }
 }

@@ -8,7 +8,6 @@ import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
@@ -43,11 +42,9 @@ data class Note(
     val poll: Poll?,
     val myReaction: String?,
 
-
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
     val type: Type,
-    val nodeInfo: NodeInfo?,
 ) : Entity {
     data class Id(
         val accountId: Long,
@@ -233,7 +230,6 @@ fun Note.Companion.make(
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
     type: Note.Type = Note.Type.Misskey(),
-    nodeInfo: NodeInfo? = null,
 ): Note {
     return Note(
         id = id,
@@ -259,6 +255,5 @@ fun Note.Companion.make(
         app = app,
         channelId = channelId,
         type = type,
-        nodeInfo = nodeInfo
     )
 }
