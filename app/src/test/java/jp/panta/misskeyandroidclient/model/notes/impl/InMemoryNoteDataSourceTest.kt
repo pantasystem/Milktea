@@ -8,7 +8,6 @@ import net.pantasystem.milktea.data.infrastructure.MemoryCacheCleaner
 import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.make
 import net.pantasystem.milktea.model.user.User
@@ -40,13 +39,6 @@ class InMemoryNoteDataSourceTest {
         val note = Note.make(
             Note.Id(0L, ""),
             userId = User.Id(0L, ""),
-            nodeInfo = NodeInfo(
-                host = "", version = "", software = NodeInfo.Software(
-                    name = "misskey",
-                    version = ""
-                )
-
-            )
         )
         runBlocking {
             val result = noteDataSource.add(
