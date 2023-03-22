@@ -81,7 +81,11 @@ class TimelineViewModel @AssistedInject constructor(
         it.suspendConvert { notes ->
             timelineFilterService.filterNotes(notes)
         }
-    }
+    }.stateIn(
+        viewModelScope + Dispatchers.IO,
+        SharingStarted.WhileSubscribed(5_000),
+        PageableState.Loading.Init()
+    )
 
     val timelineListState: StateFlow<List<TimelineListItem>> = timelineState.map { state ->
         state.toList()
@@ -181,6 +185,12 @@ class TimelineViewModel @AssistedInject constructor(
             } else {
                 // NOTE: 自動更新が有効なのでNote CaptureとStreaming APIを再開している
                 noteStreamingCollector.onResume()
+
+                cache.captureNotesBy(
+                    (timelineState.value.content as? StateContent.Exist)?.rawContent?.map {
+                        it.id
+                    } ?: emptyList()
+                )
                 cache.captureNotes()
             }
 
@@ -215,7 +225,7 @@ class TimelineViewModel @AssistedInject constructor(
         viewModelScope.launch {
             if (this@TimelineViewModel.isActive
                 && !timelineStore.isActiveStreaming
-                && timelineStore.timelineState !is PageableState.Loading<*>
+                && timelineState.value !is PageableState.Loading
             ) {
                 timelineStore.loadFuture()
             }
