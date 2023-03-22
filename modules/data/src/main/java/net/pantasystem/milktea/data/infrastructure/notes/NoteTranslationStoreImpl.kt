@@ -16,7 +16,6 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.Translation
 import java.util.*
 import javax.inject.Inject
