@@ -12,6 +12,7 @@ import javax.inject.Singleton
 @Singleton
 class NoteRelationGetter @Inject constructor(
     private val noteRepository: NoteRepository,
+    private val noteDataSource: NoteDataSource,
     private val userDataSource: UserDataSource,
     private val filePropertyDataSource: FilePropertyDataSource,
 ) {
@@ -21,10 +22,16 @@ class NoteRelationGetter @Inject constructor(
         deep: Boolean = true,
         usersMap: Map<User.Id, User> = emptyMap(),
         notesMap: Map<Note.Id, Note> = emptyMap(),
+        skipIfNotExistsInCache: Boolean = false,
     ): Result<NoteRelation?> {
         return runCancellableCatching {
             notesMap.getOrElse(noteId) {
-                noteRepository.find(noteId).getOrThrow()
+                if (skipIfNotExistsInCache) {
+                    noteDataSource.get(noteId).getOrThrow()
+                } else {
+                    noteRepository.find(noteId).getOrThrow()
+                }
+
             }
         }.mapCancellableCatching {
             get(
@@ -44,7 +51,8 @@ class NoteRelationGetter @Inject constructor(
             it.accountId
         }
         val users = acIdAndUserIdMap.map { list ->
-            userDataSource.getIn(list.key, list.value.map { it.id }, isSimple = true).getOrElse { emptyList() }
+            userDataSource.getIn(list.key, list.value.map { it.id }, isSimple = true)
+                .getOrElse { emptyList() }
         }.flatten().associateBy {
             it.id
         }
@@ -80,12 +88,18 @@ class NoteRelationGetter @Inject constructor(
 
             val renote = if (deep) {
                 note.renoteId?.let {
-                    get(it, note.isRenote())
+                    get(it, note.isRenote(), skipIfNotExistsInCache = true)
                 }
             } else null
             val reply = if (deep) {
                 note.replyId?.let {
-                    get(it, false, notesMap = notesMap, usersMap = usersMap)
+                    get(
+                        it,
+                        false,
+                        notesMap = notesMap,
+                        usersMap = usersMap,
+                        skipIfNotExistsInCache = true
+                    )
                 }
             } else null
 
