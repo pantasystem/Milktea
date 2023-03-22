@@ -71,15 +71,16 @@ class PlaneNoteViewDataCache(
         }
     }
 
-    suspend fun getIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
+    private suspend fun useIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
         return lock.withLock {
-            relations.map {
+            val viewDataList = relations.map {
                 getUnThreadSafe(it)
             }
+            viewDataList
         }
     }
 
-    suspend fun getByIds(
+    suspend fun useByIds(
         ids: List<Note.Id>,
         isGoneAfterRenotes: Boolean = true
     ): List<PlaneNoteViewData> {
@@ -94,7 +95,7 @@ class PlaneNoteViewDataCache(
             }
         }
         val relations = noteRelationGetter.getIn(notExistsIds)
-        val newList = getIn(relations)
+        val newList = useIn(relations)
         val map = (exists + newList).associateBy {
             it.id
         }
@@ -108,8 +109,9 @@ class PlaneNoteViewDataCache(
                 val current = notes[i]
                 val next = notes[i + 1]
                 current.isOnlyVisibleRenoteStatusMessage.value = (current.note.note.isRenoteOnly()
-                        && next.note.note.isRenoteOnly()
-                        && current.note.note.renoteId == next.note.note.renoteId)
+                        && (
+                        current.note.note.renoteId == next.note.note.renoteId
+                                || current.note.note.renoteId == next.note.note.id))
             }
         }
         return notes

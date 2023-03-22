@@ -75,7 +75,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     private val timelineState = timelineStore.timelineState.map { pageableState ->
         pageableState.suspendConvert { list ->
-            cache.getByIds(list)
+            cache.useByIds(list)
         }
     }.map {
         it.suspendConvert { notes ->
@@ -133,22 +133,6 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
 
-        viewModelScope.launch {
-            (0..Int.MAX_VALUE).asFlow().map {
-                delay(1_000)
-            }.filter {
-                this@TimelineViewModel.isActive && !timelineStore.isActiveStreaming
-            }.map {
-                logger.debug { "active state isActive:${isActive}, isActiveStreaming:${timelineStore.isActiveStreaming}" }
-                pagingCoroutineScope.launch {
-                    timelineStore.loadFuture().onFailure {
-                        if (it is APIError.ToManyRequestsException) {
-                            delay(10_000)
-                        }
-                    }
-                }.join()
-            }.collect()
-        }
     }
 
 
@@ -183,7 +167,6 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
     }
-
 
 
     fun onResume() {
@@ -222,6 +205,22 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
+    fun onPositionChanged(position: Int) {
+        viewModelScope.launch {
+            timelineStore.releaseUnusedPages(position)
+        }
+    }
+
+    fun onVisibleFirst() {
+        viewModelScope.launch {
+            if (this@TimelineViewModel.isActive
+                && !timelineStore.isActiveStreaming
+                && timelineStore.timelineState !is PageableState.Loading<*>
+            ) {
+                timelineStore.loadFuture()
+            }
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -242,7 +241,7 @@ sealed interface TimelineListItem {
     data class Note(val note: PlaneNoteViewData) : TimelineListItem
     data class Error(val throwable: Throwable) : TimelineListItem {
         fun getErrorMessage(): StringSource {
-            return when(throwable) {
+            return when (throwable) {
                 is SocketTimeoutException -> {
                     StringSource(R.string.timeout_error)
                 }
@@ -267,6 +266,7 @@ sealed interface TimelineListItem {
                     || throwable is UnauthorizedException
         }
     }
+
     object Empty : TimelineListItem
 }
 
@@ -322,9 +322,10 @@ class NoteStreamingCollector(
             if (job != null) {
                 return
             }
-            job = accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged().flatMapLatest {
-                noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
-            }.map {
+            job = accountStore.observeCurrentAccount.filterNotNull().distinctUntilChanged()
+                .flatMapLatest {
+                    noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
+                }.map {
                 timelineStore.onReceiveNote(it.id)
             }.catch {
                 logger.error("receive not error", it)

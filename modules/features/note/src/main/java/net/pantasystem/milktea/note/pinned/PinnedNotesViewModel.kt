@@ -8,13 +8,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_navigation.EXTRA_ACCOUNT_ID
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.notes.FindPinnedNoteUseCase
-import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteRelationGetter
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.user.Acct
@@ -31,8 +29,6 @@ class PinnedNotesViewModel @Inject constructor(
     val userRepository: UserRepository,
     val accountRepository: AccountRepository,
     val userDataSource: UserDataSource,
-    val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
-    val noteTranslationStore: NoteTranslationStore,
     val noteRelationGetter: NoteRelationGetter,
     val noteRepository: NoteRepository,
     val loggerFactory: Logger.Factory,
@@ -81,7 +77,7 @@ class PinnedNotesViewModel @Inject constructor(
         }.asLoadingStateFlow()
     }.map { resultState ->
         resultState.suspendConvert { notes ->
-            cache.getByIds(notes.map { it.id })
+            cache.useByIds(notes.map { it.id })
         }
     }.map { resultState ->
         when(val content = resultState.content) {

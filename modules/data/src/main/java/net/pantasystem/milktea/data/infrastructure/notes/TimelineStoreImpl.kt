@@ -270,6 +270,33 @@ class TimelineStoreImpl(
         }
     }
 
+    override suspend fun releaseUnusedPages(position: Int, offset: Int) {
+        if (pageableStore.mutex.isLocked) {
+            return
+        }
+
+        pageableStore.mutex.withLock {
+            val state = pageableStore.getState()
+            val notes = when(val content = state.content) {
+                is StateContent.Exist -> content.rawContent
+                is StateContent.NotExist -> return@withLock
+            }
+            val end = position + offset
+            if (end >= notes.size) {
+                return@withLock
+            }
+            val diffCount = notes.size - end
+            if (diffCount < 20) {
+                return@withLock
+            }
+            pageableStore.setState(
+                state.convert {
+                    notes.subList(0, end)
+                }
+            )
+        }
+    }
+
 }
 
 internal sealed interface TimelinePagingBase : PaginationState<Note.Id>, StateLocker

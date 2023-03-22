@@ -39,6 +39,8 @@ interface TimelineStore {
 
     fun suspendStreaming()
 
+    suspend fun releaseUnusedPages(position: Int, offset: Int = 50)
+
 }
 
 sealed interface InitialLoadQuery {
