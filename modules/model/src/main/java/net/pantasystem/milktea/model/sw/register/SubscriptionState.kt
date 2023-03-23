@@ -1,9 +1,10 @@
 package net.pantasystem.milktea.model.sw.register
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class SubscriptionState(
-    val state: String,
-    val key: String
+    @SerialName("state") val state: String,
+    @SerialName("key") val key: String
 )
