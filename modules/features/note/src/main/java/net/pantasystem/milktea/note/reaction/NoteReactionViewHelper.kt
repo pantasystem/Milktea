@@ -58,14 +58,14 @@ object NoteReactionViewHelper {
             context.applicationContext,
             BindingProvider::class.java
         )
-        val cache = entryPoint.metaRepository()
+        val cache = entryPoint.customEmojiRepository()
 
         val textReaction = LegacyReaction.reactionMap[reaction] ?: reaction
-        val meta = cache.get(note.account.normalizedInstanceUri)
+        val emojiMap = cache.getAndConvertToMap(note.account.getHost())
 
         val r = Reaction(textReaction)
         val emoji = note.toShowNote.note.emojiNameMap?.get(textReaction.replace(":", ""))
-            ?: meta?.emojisMap?.get(r.getName())
+            ?: emojiMap?.get(r.getName())
 
 
         if (emoji == null) {

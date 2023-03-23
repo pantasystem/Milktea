@@ -9,6 +9,7 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common_navigation.MediaNavigation
 import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.common_navigation.UserDetailNavigation
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.setting.ColorSettingStore
 
@@ -27,5 +28,8 @@ interface BindingProvider {
     fun settingStore(): SettingStore
     fun accountStore(): AccountStore
     fun metaRepository(): MetaRepository
+
+    fun customEmojiRepository(): CustomEmojiRepository
+
     fun colorSettingStore(): ColorSettingStore
 }
