@@ -11,6 +11,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
@@ -22,6 +23,7 @@ class SyncMetaWorker @AssistedInject constructor(
     @Assisted private val params: WorkerParameters,
     private val instanceInfoService: InstanceInfoService,
     private val accountRepository: AccountRepository,
+    private val loggerFactory: Logger.Factory,
 ): CoroutineWorker(context, params) {
 
     companion object {
@@ -30,6 +32,11 @@ class SyncMetaWorker @AssistedInject constructor(
                 .build()
         }
     }
+
+    private val logger by lazy {
+        loggerFactory.create("SyncMetaWorker")
+    }
+
     override suspend fun doWork(): Result {
         return accountRepository.findAll().mapCancellableCatching { accounts ->
             coroutineScope {
@@ -38,8 +45,10 @@ class SyncMetaWorker @AssistedInject constructor(
                         instanceInfoService.sync(it.normalizedInstanceUri)
                     }
                 }.awaitAll()
-            }.forEach {
-                it.getOrThrow()
+            }.forEach { result ->
+                result.onFailure {
+                    logger.error("Fetch instance info failed", it)
+                }.getOrThrow()
             }
         }.fold(
             onSuccess = {
