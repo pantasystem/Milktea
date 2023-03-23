@@ -46,7 +46,7 @@ class InstanceInfoService @Inject constructor(
                 }
                 is NodeInfo.SoftwareType.Misskey -> {
                     metaRepository.sync(instanceDomain)
-                    customEmojiRepository.sync(it.host)
+                    customEmojiRepository.sync(it.host).getOrThrow()
                 }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }
