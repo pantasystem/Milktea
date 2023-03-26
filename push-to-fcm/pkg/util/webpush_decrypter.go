@@ -162,7 +162,7 @@ func (r Decrypter) GenerateSharedKey(keyId []byte) ([]byte, error) {
 
 	x, y := elliptic.Unmarshal(p256, keyId)
 	if x == nil || y == nil {
-		return nil, fmt.Errorf("Invalid keyId")
+		return nil, fmt.Errorf("invalid keyId")
 	}
 	fmt.Printf("x:%s, y:%s\n", x, y)
 	return generic.ComputeSecret(r.receiverPrivate, ecdh.Point{X: x, Y: y}), nil
