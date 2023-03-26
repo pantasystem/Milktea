@@ -36,3 +36,8 @@ func (r *SWSubscription) Subscribe(ctx context.Context, req SubscribeReqest) (*S
 	// TODO
 	return nil, nil
 }
+
+func (r *SWSubscription) Unsubscribe(ctx context.Context, endpoint string) error {
+	// TODO
+	return nil
+}
