@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      GOPATH: $HOME/go
+      PATH: $HOME/go/bin:$PATH
 
     steps:
     - uses: actions/checkout@v2
