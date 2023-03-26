@@ -23,14 +23,25 @@ func (r *WellKnown) FindNodeInfo() (*NodeInfo, error) {
 	}
 
 	var wellknown struct {
-		NodeInfoURL string `json:"nodeinfo"`
+		Links []struct {
+			Rel  string `json:"rel"`
+			Href string `json:"href"`
+		} `json:"links"`
 	}
 	err = json.Unmarshal(body, &wellknown)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err = http.Get(wellknown.NodeInfoURL)
+	var nodeinfoURL string
+	for _, link := range wellknown.Links {
+		if link.Rel == "http://nodeinfo.diaspora.software/ns/schema/2.0" {
+			nodeinfoURL = link.Href
+			break
+		}
+	}
+
+	resp, err = http.Get(nodeinfoURL)
 	if err != nil {
 		return nil, err
 	}
