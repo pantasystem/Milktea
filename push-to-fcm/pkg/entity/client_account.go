@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,11 +19,23 @@ type ClientAccount struct {
 }
 
 func (r *ClientAccount) BeforeCreate(tx *gorm.DB) error {
-	uuid, err := uuid.NewRandom()
+	u, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	r.ID = uuid
+	r.ID = u
+
+	t, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+	bt := getSHA256Binary(t.String())
+	r.Token = hex.EncodeToString(bt)
 
 	return nil
+}
+
+func getSHA256Binary(s string) []byte {
+	r := sha256.Sum256([]byte(s))
+	return r[:]
 }
