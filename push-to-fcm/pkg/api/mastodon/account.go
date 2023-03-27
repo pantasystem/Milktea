@@ -57,11 +57,3 @@ type Account struct {
 	FollowingCount int64          `json:"following_count"`
 	StatusesCount  int64          `json:"statuses_count"`
 }
-
-type TootEmojiDTO struct {
-	ShortCode string `json:"shortcode"`
-	URL       string `json:"url"`
-	StaticURL string `json:"static_url"`
-	Category  string `json:"category"`
-	VisibleIn bool   `json:"visible_in_picker"`
-}
