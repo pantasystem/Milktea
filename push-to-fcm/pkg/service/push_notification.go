@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"systems.panta.milktea/push-to-fcm/pkg/api/mastodon"
 	"systems.panta.milktea/push-to-fcm/pkg/api/misskey"
-	wellknown "systems.panta.milktea/push-to-fcm/pkg/api/well_known"
+	"systems.panta.milktea/push-to-fcm/pkg/config"
 	"systems.panta.milktea/push-to-fcm/pkg/entity"
 	"systems.panta.milktea/push-to-fcm/pkg/repository"
 )
@@ -18,6 +18,7 @@ import (
 type PushNotificationService struct {
 	PushNotificationRepository repository.PushNotificationRepository
 	ClientAccountRepository    repository.ClientAccountRepository
+	Config                     *config.Config
 }
 
 func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID uuid.UUID, args SubscribeArgs) (*entity.PushSubscription, error) {
@@ -25,71 +26,77 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 	if err != nil {
 		return nil, err
 	}
-	wcli := &wellknown.WellKnown{
-		BaseUrl: args.InstanceUri,
+	sub, err := s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{
+		Acct:            args.Acct,
+		InstanceUri:     args.InstanceUri,
+		ClientAccountId: ca.ID,
+	})
+	if err != nil {
+		return nil, err
 	}
-	nodeInfo, err := wcli.FindNodeInfo()
+	if sub != nil {
+		return sub, nil
+	}
+
+	keys, err := s.GenerateKey()
 	if err != nil {
 		return nil, err
 	}
 
-	if nodeInfo.IsMisskey() {
-		mk := &misskey.AccountClient{
+	sub, err = s.PushNotificationRepository.Create(ctx, &entity.PushSubscription{
+		Acct:            args.Acct,
+		InstanceUri:     args.InstanceUri,
+		ClientAccountId: ca.ID,
+		PublicKey:       keys.Public,
+		PrivateKey:      keys.Private,
+		Auth:            keys.Auth,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := s.Config.ServerUrl + "/api/subscriptions/" + sub.ID.String() + "/callbacks"
+	switch args.ProviderType {
+	case ProviderTypeMastodon:
+		c := mastodon.NotificationSubscriptionClient{
+			BaseUrl: args.InstanceUri,
+			Token:   ca.Token,
+		}
+		_, err := c.Subscribe(ctx, mastodon.PushSubscriptionRequest{
+			Subscrption: mastodon.Subscrption{
+				Endpoint: endpoint,
+				Keys: mastodon.Keys{
+					Auth:   sub.Auth,
+					P256dh: sub.PublicKey,
+				},
+			},
+			Data: mastodon.Data{
+				Policy: "all",
+			},
+		})
+		if err != nil {
+			s.rollback(ctx, sub)
+			return nil, err
+		}
+
+	case ProviderTypeMisskey:
+		c := misskey.SWSubscription{
 			BaseUrl: args.InstanceUri,
 			Token:   args.Token,
 		}
-		self, err := mk.FindSelf(ctx)
-		if err != nil {
-			return nil, err
-		}
-		sub, err := s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{
-			Acct:            self.UserName,
-			InstanceUri:     args.InstanceUri,
-			ClientAccountId: ca.ID,
+		_, err := c.Subscribe(ctx, misskey.SubscribeRequest{
+			Endpoint:  endpoint,
+			PublicKey: sub.PublicKey,
+			Auth:      sub.Auth,
 		})
 		if err != nil {
+			s.rollback(ctx, sub)
 			return nil, err
 		}
-
-		if sub != nil {
-			return sub, nil
-		}
-		// subcli := &misskey.SWSubscription{
-		// 	BaseUrl: args.InstanceUri,
-		// 	Token:   args.Token,
-		// }
-
-		return nil, nil
 	}
-
-	if nodeInfo.IsMastodon() {
-		ms := &mastodon.AccountClient{
-			BaseUrl: args.InstanceUri,
-			Token:   args.Token,
-		}
-		self, err := ms.VerifyCredentials(ctx)
-		if err != nil {
-			return nil, err
-		}
-		sub, err := s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{
-			Acct:            self.Acct,
-			InstanceUri:     args.InstanceUri,
-			ClientAccountId: ca.ID,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		if sub != nil {
-			return sub, nil
-		}
-
-	}
-
-	s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{})
-	context.TODO()
 	// TODO
-	return nil, nil
+	return sub, nil
 }
 
 func (s *PushNotificationService) GenerateKey() (*Keys, error) {
@@ -118,6 +125,10 @@ func (s *PushNotificationService) GenerateKey() (*Keys, error) {
 
 }
 
+func (s *PushNotificationService) rollback(ctx context.Context, sub *entity.PushSubscription) error {
+	return s.PushNotificationRepository.Delete(ctx, sub.ID)
+}
+
 type Keys struct {
 	Auth    string
 	Public  string
@@ -125,6 +136,15 @@ type Keys struct {
 }
 
 type SubscribeArgs struct {
-	InstanceUri string `json:"instance_uri"`
-	Token       string `json:"token"`
+	InstanceUri  string       `json:"instance_uri"`
+	Token        string       `json:"token"`
+	ProviderType ProviderType `json:"provider_type"`
+	Acct         string       `json:"acct"`
 }
+
+type ProviderType string
+
+const (
+	ProviderTypeMastodon ProviderType = "mastodon"
+	ProviderTypeMisskey  ProviderType = "misskey"
+)

@@ -21,7 +21,7 @@ type SWSubscription struct {
 	Token   string
 }
 
-type SubscribeReqest struct {
+type SubscribeRequest struct {
 	Endpoint  string `json:"endpoint"`
 	Auth      string `json:"auth"`
 	PublicKey string `json:"publicKey"`
@@ -43,7 +43,7 @@ type SubscribeResponse struct {
 	Key   *string `json:"key"`
 }
 
-func (r *SWSubscription) Subscribe(ctx context.Context, req SubscribeReqest) (*SubscribeResponse, error) {
+func (r *SWSubscription) Subscribe(ctx context.Context, req SubscribeRequest) (*SubscribeResponse, error) {
 	rqi := InternalSubscribeRequest{
 		I:         r.Token,
 		Endpoint:  req.Endpoint,
