@@ -6,14 +6,14 @@ type Module struct {
 	RepositoryModule repository.Module
 }
 
-func (r *Module) GetClientAccountService() ClientAccountService {
-	return ClientAccountService{
+func (r *Module) GetClientAccountService() *ClientAccountService {
+	return &ClientAccountService{
 		ClientAccountRepository: r.RepositoryModule.GetClientAccountRepository(),
 	}
 }
 
-func (r *Module) GetPushNotificationService() PushNotificationService {
-	return PushNotificationService{
+func (r *Module) GetPushNotificationService() *PushNotificationService {
+	return &PushNotificationService{
 		PushNotificationRepository: r.RepositoryModule.GetPushNotificationRepository(),
 	}
 }

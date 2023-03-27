@@ -12,4 +12,5 @@ type ClientAccountRepository interface {
 	FindByToken(ctx context.Context, token string) (*entity.ClientAccount, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 	FindById(ctx context.Context, id uuid.UUID) (*entity.ClientAccount, error)
+	Update(ctx context.Context, entity *entity.ClientAccount) (*entity.ClientAccount, error)
 }
