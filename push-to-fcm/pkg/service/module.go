@@ -15,5 +15,6 @@ func (r *Module) GetClientAccountService() *ClientAccountService {
 func (r *Module) GetPushNotificationService() *PushNotificationService {
 	return &PushNotificationService{
 		PushNotificationRepository: r.RepositoryModule.GetPushNotificationRepository(),
+		ClientAccountRepository:    r.RepositoryModule.GetClientAccountRepository(),
 	}
 }

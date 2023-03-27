@@ -7,11 +7,11 @@ import (
 )
 
 type WellKnown struct {
-	Baseurl string
+	BaseUrl string
 }
 
 func (r *WellKnown) FindNodeInfo() (*NodeInfo, error) {
-	resp, err := http.Get(r.Baseurl + "/.well-known/nodeinfo")
+	resp, err := http.Get(r.BaseUrl + "/.well-known/nodeinfo")
 	if err != nil {
 		return nil, err
 	}

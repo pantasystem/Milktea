@@ -25,6 +25,9 @@ func (r *PushSubscriptionRepositoryImpl) FindBy(ctx context.Context, query repos
 	var subscription entity.PushSubscription
 	err := r.DB.Where("acct = ? AND instance_uri = ? AND client_account_id = ?", query.Acct, query.InstanceUri, query.ClientAccountId).First(&subscription).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return &subscription, nil

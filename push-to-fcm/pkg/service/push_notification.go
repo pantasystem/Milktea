@@ -7,15 +7,86 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 
+	"github.com/google/uuid"
+	"systems.panta.milktea/push-to-fcm/pkg/api/mastodon"
+	"systems.panta.milktea/push-to-fcm/pkg/api/misskey"
+	wellknown "systems.panta.milktea/push-to-fcm/pkg/api/well_known"
 	"systems.panta.milktea/push-to-fcm/pkg/entity"
 	"systems.panta.milktea/push-to-fcm/pkg/repository"
 )
 
 type PushNotificationService struct {
 	PushNotificationRepository repository.PushNotificationRepository
+	ClientAccountRepository    repository.ClientAccountRepository
 }
 
-func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID uint, subscription *entity.PushSubscription) (*entity.PushSubscription, error) {
+func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID uuid.UUID, args SubscribeArgs) (*entity.PushSubscription, error) {
+	ca, err := s.ClientAccountRepository.FindById(ctx, clientAccountID)
+	if err != nil {
+		return nil, err
+	}
+	wcli := &wellknown.WellKnown{
+		BaseUrl: args.InstanceUri,
+	}
+	nodeInfo, err := wcli.FindNodeInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	if nodeInfo.IsMisskey() {
+		mk := &misskey.AccountClient{
+			BaseUrl: args.InstanceUri,
+			Token:   args.Token,
+		}
+		self, err := mk.FindSelf(ctx)
+		if err != nil {
+			return nil, err
+		}
+		sub, err := s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{
+			Acct:            self.UserName,
+			InstanceUri:     args.InstanceUri,
+			ClientAccountId: ca.ID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		if sub != nil {
+			return sub, nil
+		}
+		// subcli := &misskey.SWSubscription{
+		// 	BaseUrl: args.InstanceUri,
+		// 	Token:   args.Token,
+		// }
+
+		return nil, nil
+	}
+
+	if nodeInfo.IsMastodon() {
+		ms := &mastodon.AccountClient{
+			BaseUrl: args.InstanceUri,
+			Token:   args.Token,
+		}
+		self, err := ms.VerifyCredentials(ctx)
+		if err != nil {
+			return nil, err
+		}
+		sub, err := s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{
+			Acct:            self.Acct,
+			InstanceUri:     args.InstanceUri,
+			ClientAccountId: ca.ID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		if sub != nil {
+			return sub, nil
+		}
+
+	}
+
+	s.PushNotificationRepository.FindBy(ctx, repository.FindByQuery{})
 	context.TODO()
 	// TODO
 	return nil, nil
@@ -51,4 +122,9 @@ type Keys struct {
 	Auth    string
 	Public  string
 	Private string
+}
+
+type SubscribeArgs struct {
+	InstanceUri string `json:"instance_uri"`
+	Token       string `json:"token"`
 }
