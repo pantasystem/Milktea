@@ -40,7 +40,6 @@ func (r *AccountClient) VerifyCredentials(ctx context.Context) (*Account, error)
 
 type Account struct {
 	ID             string         `json:"id"`
-	Username       string         `json:"username"`
 	Acct           string         `json:"acct"`
 	DisplayName    string         `json:"display_name"`
 	Locked         bool           `json:"locked"`
