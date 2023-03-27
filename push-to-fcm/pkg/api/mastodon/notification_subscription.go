@@ -15,15 +15,46 @@ type NotificationSubscriptionClient struct {
 }
 
 func (r *NotificationSubscriptionClient) Subscribe(ctx context.Context, req PushSubscriptionRequest) (*PushSubscription, error) {
+	rj, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	c := &http.Client{}
+	request, err := http.NewRequest("POST", r.BaseUrl+"/api/v1/push/subscription", bytes.NewReader(rj))
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "application/json")
+	if r.Token != "" {
+		request.Header.Add("Authorization", "Bearer "+r.Token)
+	}
+
+	res, err := c.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode >= 400 {
+		return nil, errors.New(res.Status)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
 	var ps PushSubscription
-	if err := r.doRequest(ctx, "POST", "/api/v1/push/subscription", req, &ps); err != nil {
+
+	err = json.Unmarshal(body, &ps)
+	if err != nil {
 		return nil, err
 	}
 	return &ps, nil
 }
 
 type PushSubscription struct {
-	ID        string `json:"id"`
+	ID        int64  `json:"id"`
 	Endpoint  string `json:"endpoint"`
 	ServerKey string `json:"server_key"`
 	Alerts    struct {
@@ -41,67 +72,34 @@ type PushSubscription struct {
 }
 
 type PushSubscriptionRequest struct {
-	Subscrption struct {
-		Endpoint string `json:"endpoint"`
-		Keys     struct {
-			P256dh string `json:"p256dh"`
-			Auth   string `json:"auth"`
-		} `json:"keys"`
-	} `json:"subscription"`
-
-	Data struct {
-		Alerts struct {
-			Mention       bool `json:"mention,omitempty"`
-			Status        bool `json:"status,omitempty"`
-			Reblog        bool `json:"reblog,omitempty"`
-			Follow        bool `json:"follow,omitempty"`
-			FollowRequest bool `json:"follow_request,omitempty"`
-			Favourite     bool `json:"favourite,omitempty"`
-			Poll          bool `json:"poll,omitempty"`
-			Update        bool `json:"update,omitempty"`
-			AdminSignUp   bool `json:"admin.sign_up,omitempty"`
-			AdminReport   bool `json:"admin.report,omitempty"`
-		} `json:"alerts,omitempty"`
-		Policy string `json:"policy,omitempty"`
-	} `json:"data,omitempty"`
+	Subscrption Subscrption `json:"subscription,omitempty"`
+	Data        Data        `json:"data,omitempty"`
 }
 
-func (r *NotificationSubscriptionClient) doRequest(ctx context.Context, method, path string, payload interface{}, out interface{}) error {
-	url := r.BaseUrl + path
+type Subscrption struct {
+	Endpoint string `json:"endpoint"`
+	Keys     Keys   `json:"keys"`
+}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, nil)
-	if err != nil {
-		return err
-	}
+type Keys struct {
+	P256dh string `json:"p256dh"`
+	Auth   string `json:"auth"`
+}
 
-	if payload != nil {
-		req.Header.Set("Content-Type", "application/json")
-		buf := bytes.NewBuffer(nil)
-		if err := json.NewEncoder(buf).Encode(payload); err != nil {
-			return err
-		}
-		req.Body = io.NopCloser(buf)
-	}
+type Data struct {
+	Alerts *Alerts `json:"alerts,omitempty"`
+	Policy string  `json:"policy,omitempty"`
+}
 
-	if r.Token != "" {
-		req.Header.Set("Authorization", "Bearer "+r.Token)
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 400 {
-		return errors.New(resp.Status)
-	}
-
-	if out != nil {
-		if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
-			return err
-		}
-	}
-
-	return nil
+type Alerts struct {
+	Mention       bool `json:"mention,omitempty"`
+	Status        bool `json:"status,omitempty"`
+	Reblog        bool `json:"reblog,omitempty"`
+	Follow        bool `json:"follow,omitempty"`
+	FollowRequest bool `json:"follow_request,omitempty"`
+	Favourite     bool `json:"favourite,omitempty"`
+	Poll          bool `json:"poll,omitempty"`
+	Update        bool `json:"update,omitempty"`
+	AdminSignUp   bool `json:"admin.sign_up,omitempty"`
+	AdminReport   bool `json:"admin.report,omitempty"`
 }
