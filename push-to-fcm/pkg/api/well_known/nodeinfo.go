@@ -48,3 +48,15 @@ type TotalUsage struct {
 type NodeInfoMeta struct {
 	Peers []string `json:"peers,omitempty"`
 }
+
+func (r *NodeInfo) IsMastodon() bool {
+	return r.Software.Name == "mastodon" ||
+		r.Software.Name == "fedibird"
+}
+
+func (r *NodeInfo) IsMisskey() bool {
+	return r.Software.Name == "misskey" ||
+		r.Software.Name == "meisskey" ||
+		r.Software.Name == "calckey" ||
+		r.Software.Name == "foundkey"
+}

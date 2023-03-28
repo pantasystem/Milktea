@@ -15,7 +15,7 @@ func (r *RepositoryModuleImpl) GetClientAccountRepository() repository.ClientAcc
 	}
 }
 
-func (r *RepositoryModuleImpl) GetPushSubscriptionRepository() repository.PushNotificationRepository {
+func (r *RepositoryModuleImpl) GetPushNotificationRepository() repository.PushNotificationRepository {
 	return &PushSubscriptionRepositoryImpl{
 		DB: r.DB,
 	}

@@ -8,7 +8,7 @@ import (
 
 func TestFindNodeInfo(t *testing.T) {
 	wellknown := WellKnown{
-		Baseurl: "https://misskey.io",
+		BaseUrl: "https://misskey.io",
 	}
 
 	ni, err := wellknown.FindNodeInfo()

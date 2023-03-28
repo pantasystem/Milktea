@@ -45,3 +45,14 @@ func (r *ClientAccountRepositoryImpl) FindById(ctx context.Context, id uuid.UUID
 	}
 	return &clientAccount, nil
 }
+
+func (r *ClientAccountRepositoryImpl) Update(ctx context.Context, e *entity.ClientAccount) (*entity.ClientAccount, error) {
+	result := r.DB.Model(entity.ClientAccount{}).Where("id = ?", e.ID).Updates(map[string]interface{}{
+		"device_token": e.DeviceToken,
+		"lang":         e.Lang,
+	})
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return e, nil
+}
