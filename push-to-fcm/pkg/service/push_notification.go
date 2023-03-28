@@ -54,6 +54,7 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 		PublicKey:       keys.Public,
 		PrivateKey:      keys.Private,
 		Auth:            keys.Auth,
+		ProviderType:    args.ProviderType,
 	})
 
 	if err != nil {
