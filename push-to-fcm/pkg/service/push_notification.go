@@ -70,7 +70,7 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 	case entity.ProviderTypeMastodon:
 		c := mastodon.NotificationSubscriptionClient{
 			BaseUrl: args.InstanceUri,
-			Token:   ca.Token,
+			Token:   args.Token,
 		}
 		_, err := c.Subscribe(ctx, mastodon.PushSubscriptionRequest{
 			Subscrption: mastodon.Subscrption{
