@@ -8,7 +8,7 @@ import (
 )
 
 type PushSubscription struct {
-	ID              uuid.UUID     `json:"id" gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+	ID              uuid.UUID     `json:"id" gorm:"type:uuid;primary_key;"`
 	ProviderType    string        `json:"provider_type" gorm:"type:varchar(255);index"`
 	Acct            string        `json:"acct" gorm:"type:varchar(255);index;unique_index:idx_acct_account_id_instance_uri;"`
 	ClientAccountId uuid.UUID     `json:"client_account_id" gorm:"type:uuid;index;unique_index:idx_acct_account_id_instance_uri;"`

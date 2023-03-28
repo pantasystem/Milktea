@@ -8,6 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"systems.panta.milktea/push-to-fcm/pkg/config"
+	"systems.panta.milktea/push-to-fcm/pkg/entity"
 	"systems.panta.milktea/push-to-fcm/pkg/handler"
 	"systems.panta.milktea/push-to-fcm/pkg/root/impl"
 )
@@ -25,6 +26,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	db.AutoMigrate(
+		&entity.ClientAccount{},
+		&entity.PushSubscription{},
+	)
 
 	rootModule := impl.NewModule(db, config)
 	accountHandler := handler.ClientAccountHandler{
