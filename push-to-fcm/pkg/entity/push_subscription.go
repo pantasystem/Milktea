@@ -9,7 +9,7 @@ import (
 
 type PushSubscription struct {
 	ID              uuid.UUID     `json:"id" gorm:"type:uuid;primary_key;"`
-	ProviderType    string        `json:"provider_type" gorm:"type:varchar(255);index"`
+	ProviderType    ProviderType  `json:"provider_type" gorm:"type:varchar(255);index"`
 	Acct            string        `json:"acct" gorm:"type:varchar(255);index;unique_index:idx_acct_account_id_instance_uri;"`
 	ClientAccountId uuid.UUID     `json:"client_account_id" gorm:"type:uuid;index;unique_index:idx_acct_account_id_instance_uri;"`
 	ClientAccount   ClientAccount `json:"client_account" gorm:"foreignkey:ClientAccountId"`
@@ -20,6 +20,13 @@ type PushSubscription struct {
 	CreatedAt       time.Time     `json:"created_at"`
 	UpdatedAt       time.Time     `json:"updated_at"`
 }
+
+type ProviderType string
+
+const (
+	ProviderTypeMisskey  ProviderType = "misskey"
+	ProviderTypeMastodon ProviderType = "mastodon"
+)
 
 func (r *PushSubscription) BeforeCreate(tx *gorm.DB) error {
 	uuid, err := uuid.NewRandom()

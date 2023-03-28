@@ -35,3 +35,6 @@ func (r *SubscriptionHandler) OnRecieveNotification() gin.HandlerFunc {
 	return func(c *gin.Context) {
 	}
 }
+
+type SubscribeRequest struct {
+}
