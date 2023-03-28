@@ -36,8 +36,13 @@ func main() {
 		ServiceModule:    rootModule.GetServiceModule(),
 		RepositoryModule: rootModule.GetRepositoryModule(),
 	}
+	subscriptionHandler := handler.SubscriptionHandler{
+		ServiceModule:    rootModule.GetServiceModule(),
+		RepositoryModule: rootModule.GetRepositoryModule(),
+	}
 	r := gin.Default()
 	accountHandler.RegisterHandlers(r)
+	subscriptionHandler.RegisterHandlers(r)
 
 	r.Run()
 

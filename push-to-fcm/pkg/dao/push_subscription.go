@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -16,9 +17,10 @@ type PushSubscriptionRepositoryImpl struct {
 func (r *PushSubscriptionRepositoryImpl) Create(ctx context.Context, entity *entity.PushSubscription) (*entity.PushSubscription, error) {
 	err := r.DB.Create(entity).Error
 	if err != nil {
+		fmt.Printf("create subscription error: %v\n", err)
 		return nil, err
 	}
-	return entity, nil
+	return r.FindOne(ctx, entity.ID)
 }
 
 func (r *PushSubscriptionRepositoryImpl) FindBy(ctx context.Context, query repository.FindByQuery) (*entity.PushSubscription, error) {
@@ -39,4 +41,13 @@ func (r *PushSubscriptionRepositoryImpl) Delete(ctx context.Context, id uuid.UUI
 		return err
 	}
 	return nil
+}
+
+func (r *PushSubscriptionRepositoryImpl) FindOne(ctx context.Context, id uuid.UUID) (*entity.PushSubscription, error) {
+	var subscription entity.PushSubscription
+	err := r.DB.First(&subscription, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &subscription, nil
 }

@@ -31,5 +31,6 @@ func (r *RootModuleImpl) GetRepositoryModule() repository.Module {
 func (r *RootModuleImpl) GetServiceModule() service.Module {
 	return service.Module{
 		RepositoryModule: r.GetRepositoryModule(),
+		Config:           r.Config,
 	}
 }

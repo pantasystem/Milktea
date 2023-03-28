@@ -6,8 +6,10 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"systems.panta.milktea/push-to-fcm/pkg/api/mastodon"
 	"systems.panta.milktea/push-to-fcm/pkg/api/misskey"
 	"systems.panta.milktea/push-to-fcm/pkg/config"
@@ -32,7 +34,9 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 		ClientAccountId: ca.ID,
 	})
 	if err != nil {
-		return nil, err
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
 	}
 	if sub != nil {
 		return sub, nil
@@ -56,9 +60,13 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 		return nil, err
 	}
 
+	if sub == nil {
+		return nil, errors.New("failed to create subscription")
+	}
+
 	endpoint := s.Config.ServerUrl + "/api/subscriptions/" + sub.ID.String() + "/callbacks"
 	switch args.ProviderType {
-	case ProviderTypeMastodon:
+	case entity.ProviderTypeMastodon:
 		c := mastodon.NotificationSubscriptionClient{
 			BaseUrl: args.InstanceUri,
 			Token:   ca.Token,
@@ -80,7 +88,7 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 			return nil, err
 		}
 
-	case ProviderTypeMisskey:
+	case entity.ProviderTypeMisskey:
 		c := misskey.SWSubscription{
 			BaseUrl: args.InstanceUri,
 			Token:   args.Token,
@@ -136,15 +144,8 @@ type Keys struct {
 }
 
 type SubscribeArgs struct {
-	InstanceUri  string       `json:"instance_uri"`
-	Token        string       `json:"token"`
-	ProviderType ProviderType `json:"provider_type"`
-	Acct         string       `json:"acct"`
+	InstanceUri  string              `json:"instance_uri"`
+	Token        string              `json:"token"`
+	ProviderType entity.ProviderType `json:"provider_type"`
+	Acct         string              `json:"acct"`
 }
-
-type ProviderType string
-
-const (
-	ProviderTypeMastodon ProviderType = "mastodon"
-	ProviderTypeMisskey  ProviderType = "misskey"
-)

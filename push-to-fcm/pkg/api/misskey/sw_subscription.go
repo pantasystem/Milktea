@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -31,7 +32,7 @@ type InternalSubscribeRequest struct {
 	I         string `json:"i"`
 	Endpoint  string `json:"endpoint"`
 	Auth      string `json:"auth"`
-	PublicKey string `json:"publicKey"`
+	PublicKey string `json:"publickey"`
 }
 
 type InternalUnSubRequest struct {
@@ -65,14 +66,16 @@ func (r *SWSubscription) Subscribe(ctx context.Context, req SubscribeRequest) (*
 		return nil, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode >= 400 {
-		return nil, errors.New(res.Status)
-	}
-
 	rwb, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
+
+	if res.StatusCode >= 400 {
+		fmt.Printf("misskey subscribe error: %s\n", rwb)
+		return nil, errors.New(res.Status)
+	}
+
 	var sr SubscribeResponse
 	err = json.Unmarshal(rwb, &sr)
 	if err != nil {

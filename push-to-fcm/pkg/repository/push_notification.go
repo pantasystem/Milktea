@@ -11,6 +11,7 @@ type PushNotificationRepository interface {
 	FindBy(ctx context.Context, query FindByQuery) (*entity.PushSubscription, error)
 	Create(ctx context.Context, subscription *entity.PushSubscription) (*entity.PushSubscription, error)
 	Delete(ctx context.Context, id uuid.UUID) error
+	FindOne(ctx context.Context, id uuid.UUID) (*entity.PushSubscription, error)
 }
 
 type FindByQuery struct {
