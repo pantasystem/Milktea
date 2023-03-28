@@ -44,6 +44,6 @@ func main() {
 	accountHandler.RegisterHandlers(r)
 	subscriptionHandler.RegisterHandlers(r)
 
-	r.Run()
+	r.Run(fmt.Sprintf(":%d", config.Port))
 
 }
