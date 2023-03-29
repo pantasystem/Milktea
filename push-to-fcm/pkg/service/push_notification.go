@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -66,11 +67,12 @@ func (s *PushNotificationService) Subscribe(ctx context.Context, clientAccountID
 	}
 
 	endpoint := s.Config.ServerUrl + "/api/subscriptions/" + sub.ID.String() + "/callbacks"
+	fmt.Printf("endpoint: %s", endpoint)
 	switch args.ProviderType {
 	case entity.ProviderTypeMastodon:
 		c := mastodon.NotificationSubscriptionClient{
 			BaseUrl: args.InstanceUri,
-			Token:   ca.Token,
+			Token:   args.Token,
 		}
 		_, err := c.Subscribe(ctx, mastodon.PushSubscriptionRequest{
 			Subscrption: mastodon.Subscrption{

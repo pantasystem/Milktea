@@ -1,13 +1,18 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"systems.panta.milktea/push-to-fcm/pkg/entity"
 	"systems.panta.milktea/push-to-fcm/pkg/handler/middleware"
 	"systems.panta.milktea/push-to-fcm/pkg/repository"
 	"systems.panta.milktea/push-to-fcm/pkg/service"
+	"systems.panta.milktea/push-to-fcm/pkg/util"
 )
 
 type SubscriptionHandler struct {
@@ -70,6 +75,49 @@ func (r *SubscriptionHandler) Unsubscribe() gin.HandlerFunc {
 
 func (r *SubscriptionHandler) OnRecieveNotification() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		suuid := c.Params.ByName("id")
+		id, err := uuid.Parse(suuid)
+		if err != nil {
+			c.Status(400)
+			return
+		}
+		sub, err := r.RepositoryModule.GetPushNotificationRepository().FindOne(c, id)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.Status(410)
+				return
+			}
+			c.Status(500)
+		}
+
+		decrypter, err := util.NewDecrypter(sub.Auth, sub.PublicKey, sub.PrivateKey)
+		if err != nil {
+			fmt.Printf("decrypter init failed: %v\n", err)
+			c.Status(500)
+			return
+		}
+		defer c.Request.Body.Close()
+		rbd, err := io.ReadAll(c.Request.Body)
+		if err != nil {
+			fmt.Printf("read body failed: %v\n", err)
+			c.Status(500)
+			return
+		}
+
+		decryptBody, err := decrypter.Decrypt(string(rbd))
+		if err != nil {
+			fmt.Printf("decrypt failed: %v\n", err)
+			c.Status(500)
+			return
+		}
+		fmt.Printf("decrypt body: %s\n", *decryptBody)
+
+		switch sub.ProviderType {
+		case entity.ProviderTypeMisskey:
+		case entity.ProviderTypeMastodon:
+		}
+
+		c.Status(200)
 	}
 }
 
