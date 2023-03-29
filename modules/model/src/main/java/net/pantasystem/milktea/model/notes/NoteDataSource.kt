@@ -53,6 +53,8 @@ interface NoteDataSource {
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id) : Result<Note>
 
+    suspend fun findByReplyId(id: Note.Id): Result<List<Note>>
+
     suspend fun exists(noteId: Note.Id) : Boolean
 
     /**

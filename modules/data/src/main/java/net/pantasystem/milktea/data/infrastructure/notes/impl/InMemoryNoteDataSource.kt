@@ -145,6 +145,14 @@ class InMemoryNoteDataSource @Inject constructor(
         }.distinctUntilChanged()
     }
 
+    override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> {
+        return Result.success(
+            _state.value.map.values.filter {
+                it.replyId == id
+            }
+        )
+    }
+
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return _state.map {
             it.getOrNull(noteId)

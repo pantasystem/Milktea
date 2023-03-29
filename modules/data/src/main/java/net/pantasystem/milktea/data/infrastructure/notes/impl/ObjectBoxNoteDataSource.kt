@@ -90,6 +90,21 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteBox.query().equal(
+                NoteRecord_.replyId,
+                id.noteId,
+                QueryBuilder.StringOrder.CASE_SENSITIVE,
+            ).and().equal(
+                NoteRecord_.accountId,
+                id.accountId
+            ).build().find().mapNotNull {
+                it?.toModel()
+            }
+        }
+    }
+
     override suspend fun exists(noteId: Note.Id): Boolean {
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
