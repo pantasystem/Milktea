@@ -14,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord
@@ -27,7 +28,12 @@ import javax.inject.Inject
 class ObjectBoxNoteDataSource @Inject constructor(
     private val boxStore: BoxStore,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
+    loggerFactory: Logger.Factory
 ) : NoteDataSource {
+
+    private val logger by lazy {
+        loggerFactory.create("ObjectBoxNoteDS")
+    }
 
     private val noteBox: Box<NoteRecord> by lazy {
         boxStore.boxFor()
@@ -237,7 +243,9 @@ class ObjectBoxNoteDataSource @Inject constructor(
             QueryBuilder.StringOrder.CASE_SENSITIVE
         ).build().subscribe().toFlow().map {
             it.firstOrNull()?.toModel()
-        }.flowOn(coroutineDispatcher)
+        }.flowOn(coroutineDispatcher).catch {
+            logger.error("Note observeエラー", it)
+        }
     }
 
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
