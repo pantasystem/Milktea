@@ -35,7 +35,7 @@ data class NoteRecord(
     var renoteId: String? = null,
     var viaMobile: Boolean? = null,
     var visibility: String = "",
-    var circleId: String? = null,
+    var fedibirdCircleId: String? = null,
     var localOnly: Boolean? = null,
 
     var visibleUserIds: MutableList<String>? = null,
@@ -125,7 +125,7 @@ data class NoteRecord(
         pollChoicesIsVoted = model.poll?.choices?.map { it.isVoted.toString() }?.toMutableList()
         myReaction = model.myReaction
         channelId = model.channelId?.channelId
-        circleId = (model.visibility as? Visibility.Limited)?.circleId
+        fedibirdCircleId = (model.visibility as? Visibility.Limited)?.circleId
         type = when (model.type) {
             is Note.Type.Mastodon -> "mastodon"
             is Note.Type.Misskey -> "misskey"
@@ -168,7 +168,7 @@ data class NoteRecord(
             replyId = replyId?.let { Note.Id(accountId, it) },
             renoteId = renoteId?.let { Note.Id(accountId, it) },
             viaMobile = viaMobile,
-            visibility = Visibility(visibility, circleId, localOnly),
+            visibility = Visibility(visibility, fedibirdCircleId, localOnly),
             localOnly = localOnly,
             visibleUserIds = visibleUserIds?.map { User.Id(accountId, it) },
             url = url,
