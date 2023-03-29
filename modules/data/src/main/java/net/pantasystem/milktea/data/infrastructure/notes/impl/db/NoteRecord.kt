@@ -140,7 +140,7 @@ data class NoteRecord(
                 mastodonTagNames = t.tags.map { it.name }.toMutableList()
                 mastodonTagUrls = t.tags.map { it.url }.toMutableList()
                 mastodonMentionIds = t.mentions.map { it.id }.toMutableList()
-                mastodonMentionUserNames = t.mentions.map { it.acct }.toMutableList()
+                mastodonMentionUserNames = t.mentions.map { it.username }.toMutableList()
                 mastodonMentionUrls = t.mentions.map { it.url }.toMutableList()
                 mastodonMentionAccts = t.mentions.map { it.acct }.toMutableList()
                 mastodonIsFedibirdQuote = t.isFedibirdQuote

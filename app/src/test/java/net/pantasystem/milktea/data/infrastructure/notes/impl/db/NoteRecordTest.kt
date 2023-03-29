@@ -128,6 +128,152 @@ internal class NoteRecordTest {
     }
 
     @Test
+    fun applyModel_GiveMastodonType() {
+        val record = NoteRecord()
+        val note = Note.make(
+            Note.Id(0L, "nid1"),
+            User.Id(0L, "uid1"),
+            type = Note.Type.Mastodon(
+                reblogged = false,
+                favorited = true,
+                bookmarked = true,
+                muted = false,
+                favoriteCount = 100000,
+                tags = listOf(
+                    Note.Type.Mastodon.Tag(
+                        name = "name1",
+                        url = "url1",
+                    ),
+                    Note.Type.Mastodon.Tag(
+                        name = "name2",
+                        url = "url2",
+                    ),
+
+                ),
+                mentions = listOf(
+                    Note.Type.Mastodon.Mention(
+                        id = "uid2",
+                        username = "username2",
+                        acct = "acct2",
+                        url = "url2",
+                    ),
+                    Note.Type.Mastodon.Mention(
+                        id = "uid3",
+                        username = "username3",
+                        acct = "acct3",
+                        url = "url3",
+                    ),
+                    Note.Type.Mastodon.Mention(
+                        id = "uid4",
+                        username = "username4",
+                        acct = "acct4",
+                        url = "url4",
+                    ),
+                ),
+                isFedibirdQuote = true,
+                pollId = null,
+                isSensitive = false,
+                pureText = "pureText",
+                isReactionAvailable = false,
+            )
+        )
+        record.applyModel(note)
+
+        Assertions.assertEquals(
+            "mastodon",
+            record.type
+        )
+        Assertions.assertEquals(
+         false,
+            record.mastodonReblogged
+        )
+        Assertions.assertEquals(
+            true,
+            record.mastodonFavourited
+        )
+        Assertions.assertEquals(
+            true,
+            record.mastodonBookmarked
+        )
+        Assertions.assertEquals(
+            false,
+            record.mastodonMuted
+        )
+        Assertions.assertEquals(
+            100000,
+            record.mastodonFavoriteCount
+        )
+        Assertions.assertEquals(
+            mutableListOf(
+                "name1",
+                "name2",
+            ),
+            record.mastodonTagNames
+        )
+        Assertions.assertEquals(
+            mutableListOf(
+                "url1",
+                "url2",
+            ),
+            record.mastodonTagUrls
+        )
+        Assertions.assertEquals(
+            mutableListOf(
+                "uid2",
+                "uid3",
+                "uid4",
+            ),
+            record.mastodonMentionIds
+        )
+        Assertions.assertEquals(
+            mutableListOf(
+                "username2",
+                "username3",
+                "username4",
+            ),
+            record.mastodonMentionUserNames
+        )
+        Assertions.assertEquals(
+            mutableListOf(
+                "acct2",
+                "acct3",
+                "acct4",
+            ),
+            record.mastodonMentionAccts
+        )
+
+        Assertions.assertEquals(
+            mutableListOf(
+                "url2",
+                "url3",
+                "url4",
+            ),
+            record.mastodonMentionUrls
+        )
+        Assertions.assertEquals(
+            true,
+            record.mastodonIsFedibirdQuote
+        )
+        Assertions.assertEquals(
+            null,
+            record.mastodonPollId
+        )
+        Assertions.assertEquals(
+            false,
+            record.mastodonIsSensitive
+        )
+        Assertions.assertEquals(
+            "pureText",
+            record.mastodonPureText
+        )
+        Assertions.assertEquals(
+            false,
+            record.mastodonIsReactionAvailable
+        )
+
+    }
+
+    @Test
     fun generateAccountAndNoteId() {
         val actual = NoteRecord.generateAccountAndNoteId(Note.Id(0L, "note0"))
         Assertions.assertEquals("0-note0", actual)
