@@ -212,6 +212,12 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun clear(): Result<Unit> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            boxStore.removeAllObjects()
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>> {
         val ids = noteIds.map {
