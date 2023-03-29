@@ -1,10 +1,12 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl.db
 
+import kotlinx.datetime.Clock
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.make
+import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
@@ -79,6 +81,50 @@ internal class NoteRecordTest {
         Assertions.assertEquals(10, record.repliesCount)
 
 
+    }
+
+    @Test
+    fun applyModel_GiveHasPollData() {
+        val now = Clock.System.now()
+        val record = NoteRecord()
+        val note = Note.make(
+            Note.Id(0L, "nid1"),
+            User.Id(0L, "uid1"),
+            poll = Poll(
+                expiresAt = now,
+                multiple = true,
+                choices = listOf(
+                    Poll.Choice(0, "choice1", 1, false),
+                    Poll.Choice(1, "choice2", 2, true),
+                    Poll.Choice(2, "choice3", 3, false),
+                )
+            )
+        )
+        record.applyModel(note)
+
+        Assertions.assertEquals(now.toString(), record.pollExpiresAt)
+        Assertions.assertEquals(true, record.pollMultiple)
+        Assertions.assertEquals(mutableListOf(
+            "choice1",
+            "choice2",
+            "choice3",
+        ), record.pollChoices)
+        Assertions.assertEquals(
+            mutableListOf(
+                "false",
+                "true",
+                "false"
+            ),
+            record.pollChoicesIsVoted,
+        )
+        Assertions.assertEquals(
+            mutableListOf(
+                "1",
+                "2",
+                "3"
+            ),
+            record.pollChoicesVotes,
+        )
     }
 
     @Test
