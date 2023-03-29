@@ -62,18 +62,16 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 return@runCancellableCatching emptyList()
             }
             withContext(coroutineDispatcher) {
-                boxStore.awaitCallInTx {
-                    val ids = noteIds.map {
-                        NoteRecord.generateAccountAndNoteId(it)
-                    }
-                    noteBox.query().inValues(
-                        NoteRecord_.accountIdAndNoteId,
-                        ids.toTypedArray(),
-                        QueryBuilder.StringOrder.CASE_SENSITIVE
-                    ).build().find().map {
-                        it.toModel()
-                    }
-                } ?: emptyList()
+                val ids = noteIds.map {
+                    NoteRecord.generateAccountAndNoteId(it)
+                }
+                noteBox.query().inValues(
+                    NoteRecord_.accountIdAndNoteId,
+                    ids.toTypedArray(),
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
+                ).build().find().map {
+                    it.toModel()
+                }
             }
         }
 
@@ -85,13 +83,11 @@ class ObjectBoxNoteDataSource @Inject constructor(
             throw NoteRemovedException(noteId)
         }
         withContext(coroutineDispatcher) {
-            boxStore.awaitCallInTx {
-                noteBox.query().equal(
-                    NoteRecord_.accountIdAndNoteId,
-                    NoteRecord.generateAccountAndNoteId(noteId),
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
-                ).build().findFirst()?.toModel()
-            } ?: throw NoteNotFoundException(noteId)
+            noteBox.query().equal(
+                NoteRecord_.accountIdAndNoteId,
+                NoteRecord.generateAccountAndNoteId(noteId),
+                QueryBuilder.StringOrder.CASE_SENSITIVE
+            ).build().findFirst()?.toModel() ?: throw NoteNotFoundException(noteId)
         }
     }
 
