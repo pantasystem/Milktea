@@ -9,9 +9,11 @@ import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.make
 import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
+import net.pantasystem.milktea.model.notes.type
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.time.Duration.Companion.seconds
 
 internal class NoteRecordTest {
 
@@ -66,19 +68,23 @@ internal class NoteRecordTest {
         Assertions.assertEquals("uri-uri-uri-uri", record.uri)
         Assertions.assertEquals("url-url-url-url", record.url)
         Assertions.assertEquals(9, record.renoteCount)
-        Assertions.assertEquals(mutableMapOf(
-            "like" to "1",
-            "love" to "2",
-            "haha" to "3",
-            "wow" to "4",
-            "sad" to "5",
-            "angry" to "6",
-        ), record.reactionCounts)
-        Assertions.assertEquals(mutableMapOf(
-            "name1" to "url1",
-            "name2" to "url2",
-            "name3" to "url3",
-        ), record.emojis)
+        Assertions.assertEquals(
+            mutableMapOf(
+                "like" to "1",
+                "love" to "2",
+                "haha" to "3",
+                "wow" to "4",
+                "sad" to "5",
+                "angry" to "6",
+            ), record.reactionCounts
+        )
+        Assertions.assertEquals(
+            mutableMapOf(
+                "name1" to "url1",
+                "name2" to "url2",
+                "name3" to "url3",
+            ), record.emojis
+        )
         Assertions.assertEquals(10, record.repliesCount)
 
 
@@ -105,11 +111,13 @@ internal class NoteRecordTest {
 
         Assertions.assertEquals(now.toString(), record.pollExpiresAt)
         Assertions.assertEquals(true, record.pollMultiple)
-        Assertions.assertEquals(mutableListOf(
-            "choice1",
-            "choice2",
-            "choice3",
-        ), record.pollChoices)
+        Assertions.assertEquals(
+            mutableListOf(
+                "choice1",
+                "choice2",
+                "choice3",
+            ), record.pollChoices
+        )
         Assertions.assertEquals(
             mutableListOf(
                 "false",
@@ -150,7 +158,7 @@ internal class NoteRecordTest {
                         url = "url2",
                     ),
 
-                ),
+                    ),
                 mentions = listOf(
                     Note.Type.Mastodon.Mention(
                         id = "uid2",
@@ -185,7 +193,7 @@ internal class NoteRecordTest {
             record.type
         )
         Assertions.assertEquals(
-         false,
+            false,
             record.mastodonReblogged
         )
         Assertions.assertEquals(
@@ -301,6 +309,157 @@ internal class NoteRecordTest {
             "name1",
             record.misskeyChannelName
         )
+    }
+
+    @Test
+    fun toModel_ReturnsNote() {
+        val now = Clock.System.now()
+        val record = NoteRecord(
+            accountId = 1,
+            noteId = "note-id",
+            accountIdAndNoteId = "1-note-id",
+            createdAt = now.toString(),
+            text = "This is a test note",
+            cw = "This is a CW",
+            userId = "user1",
+            replyId = "456",
+            renoteId = "789",
+            viaMobile = false,
+            visibility = Visibility.Public(false).type(),
+            localOnly = false,
+            visibleUserIds = mutableListOf("visible-user-id-1", "visible-user-id-2"),
+            url = "https://example.com/note/123",
+            uri = "example://note/123",
+            renoteCount = 10,
+            reactionCounts = mutableMapOf("like" to "5", "smile" to "3"),
+            emojis = mutableMapOf("smile" to "https://example.com/emoji/smile.png", "heart" to "https://example.com/emoji/heart.png"),
+            repliesCount = 2,
+            fileIds = mutableListOf("file-id-1", "file-id-2"),
+            pollExpiresAt = (now + 60.seconds).toString(),
+            pollMultiple = true,
+            pollChoices = mutableListOf("Choice 1", "Choice 2", "Choice 3"),
+            pollChoicesVotes = mutableListOf("2", "1", "0"),
+            pollChoicesIsVoted = mutableListOf("false", "true", "false"),
+            myReaction = "like",
+            channelId = "channel-id",
+            type = "mastodon",
+            mastodonReblogged = true,
+            mastodonFavourited = false,
+            mastodonBookmarked = true,
+            mastodonMuted = false,
+            mastodonFavoriteCount = 3,
+            mastodonTagNames = mutableListOf("tag1", "tag2"),
+            mastodonTagUrls = mutableListOf("https://example.com/tag1", "https://example.com/tag2"),
+            mastodonMentionIds = mutableListOf("mention-id-1", "mention-id-2"),
+            mastodonMentionUserNames = mutableListOf("mention-username-1", "mention-username-2"),
+            mastodonMentionUrls = mutableListOf("https://example.com/mention/1", "https://example.com/mention/2"),
+            mastodonMentionAccts = mutableListOf("mention-acct-1", "mention-acct-2"),
+            mastodonIsFedibirdQuote = true,
+            mastodonPollId = "poll1",
+            mastodonIsSensitive = false,
+            mastodonPureText = "test note",
+            mastodonIsReactionAvailable = true,
+        )
+        val expectedNote = Note(
+            id = Note.Id(accountId = 1, noteId = "note-id"),
+            createdAt = now,
+            text = "This is a test note",
+            cw = "This is a CW",
+            userId = User.Id(accountId = 1, id = "user1"),
+            replyId = Note.Id(accountId = 1, noteId = "456"),
+            renoteId = Note.Id(accountId = 1, noteId = "789"),
+            viaMobile = false,
+            visibility = Visibility.Public(false),
+            localOnly = false,
+            visibleUserIds = listOf(
+                User.Id(accountId = 1, id = "visible-user-id-1"),
+                User.Id(accountId = 1, id = "visible-user-id-2")
+            ),
+            url = "https://example.com/note/123",
+            uri = "example://note/123",
+            renoteCount = 10,
+            reactionCounts = listOf(
+                ReactionCount(reaction = "like", count = 5),
+                ReactionCount(reaction = "smile", count = 3)
+            ),
+            emojis = listOf(
+                Emoji(name = "smile", url = "https://example.com/emoji/smile.png"),
+                Emoji(name = "heart", url = "https://example.com/emoji/heart.png")
+            ),
+            repliesCount = 2,
+            fileIds = listOf(
+                FileProperty.Id(accountId = 1, fileId = "file-id-1"),
+                FileProperty.Id(accountId = 1, fileId = "file-id-2")
+            ),
+            poll = Poll(
+                expiresAt = now + 60.seconds,
+                multiple = true,
+                choices = listOf(
+                    Poll.Choice(text = "Choice 1", votes = 2, isVoted = false, index = 0),
+                    Poll.Choice(text = "Choice 2", votes = 1, isVoted = true, index = 1),
+                    Poll.Choice(text = "Choice 3", votes = 0, isVoted = false, index = 2),
+                )
+            ),
+            myReaction = "like",
+            channelId = Channel.Id(accountId = 1, channelId = "channel-id"),
+            type = Note.Type.Mastodon(
+                reblogged = true,
+                favorited = false,
+                bookmarked = true,
+                muted = false,
+                favoriteCount = 3,
+                tags = listOf(
+                    Note.Type.Mastodon.Tag(name = "tag1", url = "https://example.com/tag1"),
+                    Note.Type.Mastodon.Tag(name = "tag2", url = "https://example.com/tag2")
+                ),
+                mentions = listOf(
+                    Note.Type.Mastodon.Mention(
+                        id = "mention-id-1",
+                        username = "mention-username-1",
+                        acct = "mention-acct-1",
+                        url = "https://example.com/mention/1"
+                    ),
+                    Note.Type.Mastodon.Mention(
+                        id = "mention-id-2",
+                        username = "mention-username-2",
+                        acct = "mention-acct-2",
+                        url = "https://example.com/mention/2"
+                    )
+                ),
+                isFedibirdQuote = true,
+                pollId = "poll1",
+                isSensitive = false,
+                pureText = "test note",
+                isReactionAvailable = true,
+            ),
+            app = null
+        )
+        val actual =record.toModel()
+        Assertions.assertEquals(expectedNote.id, actual.id)
+        Assertions.assertEquals(expectedNote.createdAt, actual.createdAt)
+        Assertions.assertEquals(expectedNote.text, actual.text)
+        Assertions.assertEquals(expectedNote.cw, actual.cw)
+        Assertions.assertEquals(expectedNote.userId, actual.userId)
+        Assertions.assertEquals(expectedNote.replyId, actual.replyId)
+        Assertions.assertEquals(expectedNote.renoteId, actual.renoteId)
+        Assertions.assertEquals(expectedNote.viaMobile, actual.viaMobile)
+        Assertions.assertEquals(expectedNote.visibility, actual.visibility)
+        Assertions.assertEquals(expectedNote.localOnly, actual.localOnly)
+        Assertions.assertEquals(expectedNote.visibleUserIds, actual.visibleUserIds)
+        Assertions.assertEquals(expectedNote.url, actual.url)
+        Assertions.assertEquals(expectedNote.uri, actual.uri)
+        Assertions.assertEquals(expectedNote.renoteCount, actual.renoteCount)
+        Assertions.assertEquals(expectedNote.reactionCounts, actual.reactionCounts)
+        Assertions.assertEquals(expectedNote.emojis, actual.emojis)
+        Assertions.assertEquals(expectedNote.repliesCount, actual.repliesCount)
+        Assertions.assertEquals(expectedNote.fileIds, actual.fileIds)
+        Assertions.assertEquals(expectedNote.poll, actual.poll)
+        Assertions.assertEquals(expectedNote.myReaction, actual.myReaction)
+        Assertions.assertEquals(expectedNote.channelId, actual.channelId)
+        Assertions.assertEquals(expectedNote.type, actual.type)
+        Assertions.assertEquals(expectedNote.app, actual.app)
+
+
     }
 
     @Test
