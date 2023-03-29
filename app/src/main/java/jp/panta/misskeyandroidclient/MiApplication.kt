@@ -22,6 +22,7 @@ import net.pantasystem.milktea.data.infrastructure.streaming.MediatorMainEventDi
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
+import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.worker.SyncNodeInfoCacheWorker
 import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
 import net.pantasystem.milktea.worker.filter.SyncMastodonFilterWorker
@@ -79,6 +80,8 @@ class MiApplication : Application(), Configuration.Provider {
     @Inject
     internal lateinit var memoryCacheCleaner: MemoryCacheCleaner
 
+    @Inject
+    internal lateinit var noteDataSource: NoteDataSource
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
@@ -136,6 +139,12 @@ class MiApplication : Application(), Configuration.Provider {
             }.distinctUntilChanged().collect {
                 FirebaseAnalytics.getInstance(applicationContext)
                     .setAnalyticsCollectionEnabled(it.isEnabled)
+            }
+        }
+
+        applicationScope.launch {
+            noteDataSource.clear().onFailure {
+                logger.error("NoteDataSourceの初期化に失敗", it)
             }
         }
 

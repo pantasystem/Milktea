@@ -182,6 +182,12 @@ class InMemoryNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun clear(): Result<Unit> = runCancellableCatching {
+        mutex.withLock {
+            notes = emptyMap()
+        }
+    }
+
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
