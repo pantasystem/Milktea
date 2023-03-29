@@ -11,8 +11,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteTranslationStoreImp
 import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
 import net.pantasystem.milktea.data.infrastructure.notes.draft.DraftNoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
-import net.pantasystem.milktea.data.infrastructure.notes.impl.InMemoryNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.impl.NoteRepositoryImpl
+import net.pantasystem.milktea.data.infrastructure.notes.impl.ObjectBoxNoteDataSource
 import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingServiceImpl
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
@@ -28,7 +28,7 @@ abstract class NoteBindModule{
 
     @Binds
     @Singleton
-    abstract fun noteDataSource(inMem: InMemoryNoteDataSource): NoteDataSource
+    abstract fun noteDataSource(inMem: ObjectBoxNoteDataSource): NoteDataSource
 
     @Binds
     @Singleton
