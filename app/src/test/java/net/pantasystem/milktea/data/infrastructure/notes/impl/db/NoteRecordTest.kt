@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.notes.impl.db
 
 import kotlinx.datetime.Clock
+import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.Note
@@ -271,6 +272,35 @@ internal class NoteRecordTest {
             record.mastodonIsReactionAvailable
         )
 
+    }
+
+    @Test
+    fun applyModel_GiveMisskeyType() {
+        val record = NoteRecord()
+        val note = Note.make(
+            Note.Id(0L, "nid1"),
+            User.Id(0L, "uid1"),
+            type = Note.Type.Misskey(
+                channel = Note.Type.Misskey.SimpleChannelInfo(
+                    id = Channel.Id(0L, "ch1"),
+                    name = "name1",
+                ),
+                isAcceptingOnlyLikeReaction = false
+            )
+        )
+        record.applyModel(note)
+        Assertions.assertEquals(
+            "misskey",
+            record.type
+        )
+        Assertions.assertEquals(
+            "ch1",
+            record.misskeyChannelId
+        )
+        Assertions.assertEquals(
+            "name1",
+            record.misskeyChannelName
+        )
     }
 
     @Test
