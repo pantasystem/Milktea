@@ -39,9 +39,7 @@ class ReactionHistoryPagerViewModel @Inject constructor(
 
     private val noteId = MutableStateFlow<Note.Id?>(null)
     val note: StateFlow<Note?> = noteId.filterNotNull().flatMapLatest {
-        noteDataSource.state.map { state ->
-            state.getOrNull(it)
-        }
+        noteDataSource.observeOne(it)
     }.catch { e ->
         logger.warning("ノートの取得に失敗", e = e)
     }.stateIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, null)
