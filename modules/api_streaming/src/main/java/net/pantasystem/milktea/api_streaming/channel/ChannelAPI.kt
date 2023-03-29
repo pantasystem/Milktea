@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.api_streaming.channel
 
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.runBlocking
@@ -56,9 +57,8 @@ class ChannelAPI(
     fun connect(type: Type): Flow<ChannelBody> {
         return channelFlow {
             val callback: (ChannelBody) -> Unit = {
-                val result = trySend(it)
-                if (!result.isSuccess) {
-                    logger.debug { "スルーされたメッセージ: $it" }
+                trySend(it).onFailure {  e ->
+                    logger.error("ChannelAPI Streamingデータの伝達に失敗", e)
                 }
                 //logger.debug("ChannelAPI message:${if(it.toString().length > 50) it.toString().subSequence(0, 50) else it.toString()}")
             }
