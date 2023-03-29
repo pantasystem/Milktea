@@ -116,6 +116,19 @@ fun Visibility(type: String, circleId: String? = null, visibilityEx: String? = n
     }
 }
 
+fun Visibility(type: String, circleId: String?, localOnly: Boolean?): Visibility {
+    return when(type.lowercase(Locale.ROOT)){
+        "public" -> Visibility.Public(localOnly ?: false)
+        "home" -> Visibility.Home(localOnly ?: false)
+        "followers" -> Visibility.Followers(localOnly ?: false)
+        "specified" -> Visibility.Specified(emptyList())
+        "limited" -> Visibility.Limited(circleId)
+        "mutual" -> Visibility.Mutual
+        "personal" -> Visibility.Personal
+        else -> throw IllegalArgumentException("limited, direct, unlisted, private public, home, followers, specified以外許可されていません。与えられたデータ:$type")
+    }
+}
+
 fun Visibility.isLocalOnly(): Boolean {
     return (this as? CanLocalOnly)?.isLocalOnly?: false
 }
