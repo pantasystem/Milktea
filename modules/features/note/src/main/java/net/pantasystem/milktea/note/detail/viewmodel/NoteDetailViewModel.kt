@@ -61,16 +61,20 @@ class NoteDetailViewModel @AssistedInject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val conversationNotes = note.filterNotNull().flatMapLatest { note ->
-        noteDataSource.state.map { state ->
-            state.conversation(note.id)
-        }
+    private val conversationNotes = note.filterNotNull().map { note ->
+        recursiveParentNotes(note.id).getOrThrow()
+    }.flatMapLatest { notes ->
+        noteDataSource.observeIn(notes.map { it.id })
     }.onStart {
         emit(emptyList())
     }
 
-    private val repliesMap = noteDataSource.state.map { state ->
-        state.repliesMap()
+    private val repliesMap = note.filterNotNull().map { current ->
+        recursiveFindReplies(current.id).getOrThrow().filterNot {
+            it.replyId == null
+        }.groupBy {
+            it.replyId
+        }
     }.onStart {
         emit(emptyMap())
     }
@@ -141,34 +145,6 @@ class NoteDetailViewModel @AssistedInject constructor(
     }.flowOn(Dispatchers.IO)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    private fun NoteDataSourceState.repliesMap(): Map<Note.Id, List<Note>> {
-        return this.map.values.filterNot {
-            it.replyId == null
-        }.groupBy {
-            it.replyId!!
-        }
-    }
-
-    private fun NoteDataSourceState.conversation(
-        noteId: Note.Id,
-        notes: List<Note> = emptyList(),
-    ): List<Note> {
-        val note = getOrNull(noteId)
-            ?: return notes.sortedBy {
-                it.id.noteId
-            }
-        if (note.replyId != null) {
-            val reply = getOrNull(note.replyId!!)?.let {
-                listOf(it)
-            } ?: emptyList()
-
-            return conversation(note.replyId!!, notes + reply)
-        }
-
-        return (notes).sortedBy {
-            it.id.noteId
-        }
-    }
 
     init {
         viewModelScope.launch {
@@ -190,15 +166,31 @@ class NoteDetailViewModel @AssistedInject constructor(
     private suspend fun recursiveSync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         coroutineScope {
             noteRepository.syncChildren(noteId).also {
-                noteDataSource.state.value.repliesMap()[noteId]?.map {
+                noteDataSource.findByReplyId(noteId).getOrThrow().map {
                     async {
                         recursiveSync(it.id).getOrNull()
                     }
-                }?.awaitAll()
+                }.awaitAll()
             }
         }
 
 
+    }
+
+    private suspend fun recursiveFindReplies(noteId: Note.Id): Result<List<Note>> = runCancellableCatching {
+        val children = noteDataSource.findByReplyId(noteId).getOrThrow()
+        children + children.map {
+            recursiveFindReplies(it.id).getOrThrow()
+        }.flatten()
+    }
+
+    private suspend fun recursiveParentNotes(noteId: Note.Id?): Result<List<Note>> = runCancellableCatching {
+        noteId ?: return Result.success(emptyList())
+        val current = noteDataSource.get(noteId).getOrNull()
+        when(val replyId = current?.replyId) {
+            null -> return Result.success(emptyList())
+            else -> recursiveParentNotes(replyId).getOrThrow() + current
+        }
     }
 
     suspend fun getUrl(): String {
