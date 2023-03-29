@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl.db
 
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
+import io.objectbox.annotation.Index
 import io.objectbox.annotation.Unique
 import kotlinx.datetime.toInstant
 import net.pantasystem.milktea.model.channel.Channel
@@ -19,17 +20,22 @@ data class NoteRecord(
     @Id
     var id: Long = 0,
 
+    @Index
     var accountId: Long = 0,
 
+    @Index
     var noteId: String = "",
 
     @Unique
+    @Index
     var accountIdAndNoteId: String = "",
 
     var createdAt: String = "",
 
     var text: String? = null,
     var cw: String? = null,
+
+    @Index
     var userId: String = "",
     var replyId: String? = null,
     var renoteId: String? = null,
@@ -79,9 +85,9 @@ data class NoteRecord(
 
     var misskeyChannelId: String? = null,
     var misskeyChannelName: String? = null,
-    var misskeyIsAcceptingOnlyLikeReaction: Boolean = false,
+    var misskeyIsAcceptingOnlyLikeReaction: Boolean = false
 
-    ) {
+) {
 
     companion object {
         fun from(model: Note): NoteRecord {

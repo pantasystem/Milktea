@@ -64,7 +64,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                     noteBox.query().inValues(
                         NoteRecord_.accountIdAndNoteId,
                         ids.toTypedArray(),
-                        QueryBuilder.StringOrder.CASE_INSENSITIVE
+                        QueryBuilder.StringOrder.CASE_SENSITIVE
                     ).build().find().map {
                         it.toModel()
                     }
@@ -84,7 +84,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(noteId),
-                    QueryBuilder.StringOrder.CASE_INSENSITIVE
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
                 ).build().findFirst()?.toModel()
             } ?: throw NoteNotFoundException(noteId)
         }
@@ -94,7 +94,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
             NoteRecord.generateAccountAndNoteId(noteId),
-            QueryBuilder.StringOrder.CASE_INSENSITIVE
+            QueryBuilder.StringOrder.CASE_SENSITIVE
         ).build().findFirst()?.let {
             return true
         } ?: false
@@ -106,7 +106,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(noteId),
-                    QueryBuilder.StringOrder.CASE_INSENSITIVE
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
                 ).build().remove()
             }?.let {
                 it > 0
@@ -127,7 +127,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(noteId),
-                    QueryBuilder.StringOrder.CASE_INSENSITIVE
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
                 ).build().remove()
             }?.let {
                 it > 0
@@ -145,7 +145,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 val exists = noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
                     NoteRecord.generateAccountAndNoteId(note.id),
-                    QueryBuilder.StringOrder.CASE_INSENSITIVE
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
                 ).build().findFirst()
                 if (exists == null) {
                     noteBox.put(NoteRecord.from(note))
@@ -183,7 +183,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         withContext(coroutineDispatcher) {
             boxStore.awaitCallInTx {
                 noteBox.query()
-                    .equal(NoteRecord_.userId, userId.id, QueryBuilder.StringOrder.CASE_INSENSITIVE)
+                    .equal(NoteRecord_.userId, userId.id, QueryBuilder.StringOrder.CASE_SENSITIVE)
                     .and().equal(NoteRecord_.accountId, userId.accountId)
                     .build().remove().toInt()
             } ?: 0
@@ -201,7 +201,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         return noteBox.query().inValues(
             NoteRecord_.accountIdAndNoteId,
             ids.toTypedArray(),
-            QueryBuilder.StringOrder.CASE_INSENSITIVE
+            QueryBuilder.StringOrder.CASE_SENSITIVE
         ).build().subscribe().toFlow().map { list ->
             list.mapNotNull {
                 it?.toModel()
@@ -214,7 +214,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
             NoteRecord.generateAccountAndNoteId(noteId),
-            QueryBuilder.StringOrder.CASE_INSENSITIVE
+            QueryBuilder.StringOrder.CASE_SENSITIVE
         ).build().subscribe().toFlow().map {
             it.firstOrNull()?.toModel()
         }.flowOn(coroutineDispatcher)
