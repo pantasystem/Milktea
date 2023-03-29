@@ -59,7 +59,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             withContext(coroutineDispatcher) {
                 boxStore.awaitCallInTx {
                     val ids = noteIds.map {
-                        NoteRecord.generateAccountIdNoteId(it)
+                        NoteRecord.generateAccountAndNoteId(it)
                     }
                     noteBox.query().inValues(
                         NoteRecord_.accountIdAndNoteId,
@@ -83,7 +83,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             boxStore.awaitCallInTx {
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
-                    NoteRecord.generateAccountIdNoteId(noteId),
+                    NoteRecord.generateAccountAndNoteId(noteId),
                     QueryBuilder.StringOrder.CASE_INSENSITIVE
                 ).build().findFirst()?.toModel()
             } ?: throw NoteNotFoundException(noteId)
@@ -93,7 +93,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     override suspend fun exists(noteId: Note.Id): Boolean {
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
-            NoteRecord.generateAccountIdNoteId(noteId),
+            NoteRecord.generateAccountAndNoteId(noteId),
             QueryBuilder.StringOrder.CASE_INSENSITIVE
         ).build().findFirst()?.let {
             return true
@@ -105,7 +105,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             boxStore.awaitCallInTx {
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
-                    NoteRecord.generateAccountIdNoteId(noteId),
+                    NoteRecord.generateAccountAndNoteId(noteId),
                     QueryBuilder.StringOrder.CASE_INSENSITIVE
                 ).build().remove()
             }?.let {
@@ -126,7 +126,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             boxStore.awaitCallInTx {
                 noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
-                    NoteRecord.generateAccountIdNoteId(noteId),
+                    NoteRecord.generateAccountAndNoteId(noteId),
                     QueryBuilder.StringOrder.CASE_INSENSITIVE
                 ).build().remove()
             }?.let {
@@ -144,7 +144,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
             (boxStore.awaitCallInTx {
                 val exists = noteBox.query().equal(
                     NoteRecord_.accountIdAndNoteId,
-                    NoteRecord.generateAccountIdNoteId(note.id),
+                    NoteRecord.generateAccountAndNoteId(note.id),
                     QueryBuilder.StringOrder.CASE_INSENSITIVE
                 ).build().findFirst()
                 if (exists == null) {
@@ -193,7 +193,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>> {
         val ids = noteIds.map {
-            NoteRecord.generateAccountIdNoteId(it)
+            NoteRecord.generateAccountAndNoteId(it)
         }
         if (ids.isEmpty()) {
             return flowOf(emptyList())
@@ -213,7 +213,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return noteBox.query().equal(
             NoteRecord_.accountIdAndNoteId,
-            NoteRecord.generateAccountIdNoteId(noteId),
+            NoteRecord.generateAccountAndNoteId(noteId),
             QueryBuilder.StringOrder.CASE_INSENSITIVE
         ).build().subscribe().toFlow().map {
             it.firstOrNull()?.toModel()

@@ -90,7 +90,7 @@ data class NoteRecord(
             return r
         }
 
-        fun generateAccountIdNoteId(noteId: Note.Id): String {
+        fun generateAccountAndNoteId(noteId: Note.Id): String {
             return "${noteId.accountId}-${noteId.noteId}"
         }
     }
@@ -99,7 +99,7 @@ data class NoteRecord(
     fun applyModel(model: Note) {
         noteId = model.id.noteId
         accountId = model.id.accountId
-        accountIdAndNoteId = generateAccountIdNoteId(model.id)
+        accountIdAndNoteId = generateAccountAndNoteId(model.id)
         createdAt = model.createdAt.toString()
         text = model.text
         cw = model.cw
