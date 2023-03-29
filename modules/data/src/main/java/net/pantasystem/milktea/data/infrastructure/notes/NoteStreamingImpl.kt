@@ -40,6 +40,7 @@ class NoteStreamingImpl @Inject constructor(
                     || pageable is Pageable.Mastodon.PublicTimeline
                     || pageable is Pageable.Mastodon.ListTimeline
                     || pageable is Pageable.Mastodon.HashTagTimeline
+                    || pageable is Pageable.CalckeyRecommendedTimeline
         }.flatMapLatest { ac ->
             when (pageable) {
                 is Pageable.GlobalTimeline -> {
@@ -75,6 +76,11 @@ class NoteStreamingImpl @Inject constructor(
                 is Pageable.ChannelTimeline -> {
                     requireNotNull(channelAPIProvider.get(ac))
                         .connect(ChannelAPI.Type.Channel(channelId = pageable.channelId))
+                        .convertToNote(getAccount, pageable)
+                }
+                is Pageable.CalckeyRecommendedTimeline -> {
+                    requireNotNull(channelAPIProvider.get(ac))
+                        .connect(ChannelAPI.Type.RecommendedTimeline)
                         .convertToNote(getAccount, pageable)
                 }
                 is Pageable.Mastodon -> {

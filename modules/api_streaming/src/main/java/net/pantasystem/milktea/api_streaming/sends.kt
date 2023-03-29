@@ -30,6 +30,7 @@ sealed class Send {
             @SerialName("userList") USER_LIST,
             @SerialName("antenna") ANTENNA,
             @SerialName("channel") CHANNEL,
+            @SerialName("recommendedTimeline") RECOMMENDED_TIMELINE,
         }
 
         @Serializable
