@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.notes
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
@@ -45,8 +44,6 @@ interface NoteDataSource {
     }
 
     fun addEventListener(listener: Listener)
-
-    val state: StateFlow<NoteDataSourceState>
 
     suspend fun getIn(noteIds: List<Note.Id>) : Result<List<Note>>
 

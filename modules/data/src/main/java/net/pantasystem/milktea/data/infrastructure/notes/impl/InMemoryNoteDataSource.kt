@@ -28,9 +28,6 @@ class InMemoryNoteDataSource @Inject constructor(
     private var deleteNoteIds = mutableSetOf<Note.Id>()
     private var removedNoteIds = mutableSetOf<Note.Id>()
 
-    override val state: StateFlow<NoteDataSourceState>
-        get() = _state
-
     init {
         addEventListener {
             _state.update {

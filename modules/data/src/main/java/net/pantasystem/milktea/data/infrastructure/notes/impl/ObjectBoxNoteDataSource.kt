@@ -47,10 +47,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
     }
 
 
-    override val state: StateFlow<NoteDataSourceState> =
-        MutableStateFlow(NoteDataSourceState(emptyMap()))
-
-
     override suspend fun getIn(noteIds: List<Note.Id>): Result<List<Note>> =
         runCancellableCatching {
             if (noteIds.isEmpty()) {
