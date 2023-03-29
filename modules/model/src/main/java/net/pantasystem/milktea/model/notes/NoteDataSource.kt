@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.model.notes
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.user.User
@@ -46,12 +45,12 @@ interface NoteDataSource {
 
     fun addEventListener(listener: Listener)
 
-    val state: StateFlow<NoteDataSourceState>
-
     suspend fun getIn(noteIds: List<Note.Id>) : Result<List<Note>>
 
     @Throws(NoteNotFoundException::class)
     suspend fun get(noteId: Note.Id) : Result<Note>
+
+    suspend fun findByReplyId(id: Note.Id): Result<List<Note>>
 
     suspend fun exists(noteId: Note.Id) : Boolean
 
@@ -85,5 +84,7 @@ interface NoteDataSource {
     fun observeIn(noteIds: List<Note.Id>): Flow<List<Note>>
 
     fun observeOne(noteId: Note.Id): Flow<Note?>
+
+    fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>>
 
 }

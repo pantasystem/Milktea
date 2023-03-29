@@ -1,0 +1,280 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:4355718382021751829",
+      "lastPropertyId": "49:603475478183588601",
+      "name": "NoteRecord",
+      "properties": [
+        {
+          "id": "1:8272452730188899909",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:9063671629732813236",
+          "name": "accountId",
+          "indexId": "2:1359784589476878204",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:7535868506911901175",
+          "name": "noteId",
+          "indexId": "3:9028601148259908010",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "4:6442096145905059295",
+          "name": "accountIdAndNoteId",
+          "indexId": "1:7288350540838608646",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "5:7710661194467523389",
+          "name": "createdAt",
+          "type": 9
+        },
+        {
+          "id": "6:7628905268626047068",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "7:642718946565483033",
+          "name": "cw",
+          "type": 9
+        },
+        {
+          "id": "8:7875342824717901704",
+          "name": "userId",
+          "indexId": "4:873220635513493863",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "9:2696126269908017727",
+          "name": "replyId",
+          "type": 9
+        },
+        {
+          "id": "10:7671147018644324486",
+          "name": "renoteId",
+          "type": 9
+        },
+        {
+          "id": "11:5925666535923240248",
+          "name": "viaMobile",
+          "type": 1
+        },
+        {
+          "id": "12:7278439925725375992",
+          "name": "visibility",
+          "type": 9
+        },
+        {
+          "id": "13:847812078561538164",
+          "name": "fedibirdCircleId",
+          "type": 9
+        },
+        {
+          "id": "14:8110512460338708921",
+          "name": "localOnly",
+          "type": 1
+        },
+        {
+          "id": "15:4694592880431104676",
+          "name": "visibleUserIds",
+          "type": 30
+        },
+        {
+          "id": "16:1186483322771015101",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "17:2024059859948210103",
+          "name": "uri",
+          "type": 9
+        },
+        {
+          "id": "18:7037620531362936612",
+          "name": "renoteCount",
+          "type": 5
+        },
+        {
+          "id": "19:2236394410735542656",
+          "name": "reactionCounts",
+          "type": 13
+        },
+        {
+          "id": "20:3729529343763408216",
+          "name": "emojis",
+          "type": 13
+        },
+        {
+          "id": "21:6036481626668798700",
+          "name": "repliesCount",
+          "type": 5
+        },
+        {
+          "id": "22:7174160995211405661",
+          "name": "fileIds",
+          "type": 30
+        },
+        {
+          "id": "23:6211678249736176180",
+          "name": "pollExpiresAt",
+          "type": 9
+        },
+        {
+          "id": "24:6669217353719482404",
+          "name": "pollMultiple",
+          "type": 1
+        },
+        {
+          "id": "25:3948737789517340243",
+          "name": "pollChoices",
+          "type": 30
+        },
+        {
+          "id": "26:793339216143089151",
+          "name": "pollChoicesVotes",
+          "type": 30
+        },
+        {
+          "id": "27:6452623503349626204",
+          "name": "pollChoicesIsVoted",
+          "type": 30
+        },
+        {
+          "id": "28:4083832487305389369",
+          "name": "myReaction",
+          "type": 9
+        },
+        {
+          "id": "29:9093239415547628997",
+          "name": "channelId",
+          "type": 9
+        },
+        {
+          "id": "30:3324579080801649916",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "31:3063499869455528735",
+          "name": "mastodonReblogged",
+          "type": 1
+        },
+        {
+          "id": "32:9105231982798534371",
+          "name": "mastodonFavourited",
+          "type": 1
+        },
+        {
+          "id": "33:4399131295653378622",
+          "name": "mastodonBookmarked",
+          "type": 1
+        },
+        {
+          "id": "34:7536084876962986464",
+          "name": "mastodonMuted",
+          "type": 1
+        },
+        {
+          "id": "35:4389185113146110546",
+          "name": "mastodonFavoriteCount",
+          "type": 5
+        },
+        {
+          "id": "36:8245146144562689363",
+          "name": "mastodonTagNames",
+          "type": 30
+        },
+        {
+          "id": "37:4295513395759066524",
+          "name": "mastodonTagUrls",
+          "type": 30
+        },
+        {
+          "id": "38:2078366836220201658",
+          "name": "mastodonMentionIds",
+          "type": 30
+        },
+        {
+          "id": "39:4906798512586853797",
+          "name": "mastodonMentionUserNames",
+          "type": 30
+        },
+        {
+          "id": "40:6815318346139013870",
+          "name": "mastodonMentionUrls",
+          "type": 30
+        },
+        {
+          "id": "41:5034900393433514094",
+          "name": "mastodonMentionAccts",
+          "type": 30
+        },
+        {
+          "id": "42:2432945643631783084",
+          "name": "mastodonIsFedibirdQuote",
+          "type": 1
+        },
+        {
+          "id": "43:8599957524389440622",
+          "name": "mastodonPollId",
+          "type": 9
+        },
+        {
+          "id": "44:918472720106521826",
+          "name": "mastodonIsSensitive",
+          "type": 1
+        },
+        {
+          "id": "45:4691087268272065354",
+          "name": "mastodonPureText",
+          "type": 9
+        },
+        {
+          "id": "46:6038607075476419692",
+          "name": "mastodonIsReactionAvailable",
+          "type": 1
+        },
+        {
+          "id": "47:8695980387794841290",
+          "name": "misskeyChannelId",
+          "type": 9
+        },
+        {
+          "id": "48:8716505910147340998",
+          "name": "misskeyChannelName",
+          "type": 9
+        },
+        {
+          "id": "49:603475478183588601",
+          "name": "misskeyIsAcceptingOnlyLikeReaction",
+          "type": 1
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:4355718382021751829",
+  "lastIndexId": "4:873220635513493863",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

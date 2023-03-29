@@ -126,15 +126,16 @@ class TimelineStoreImpl(
         }
     }
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val relatedNotes: Flow<PageableState<List<NoteRelation>>> =
-        noteDataSource.state.flatMapLatest {
-            timelineState.map { pageableState ->
-                pageableState.suspendConvert { list ->
-                    noteRelationGetter.getIn(list.distinct())
-                }
+    override val relatedNotes: Flow<PageableState<List<NoteRelation>>> = timelineState.flatMapLatest { pageableState ->
+        val ids = (pageableState.content as? StateContent.Exist)?.rawContent ?: emptyList()
+        noteDataSource.observeIn(ids).map {
+            pageableState.suspendConvert { ids ->
+                noteRelationGetter.getIn(ids)
             }
-        }.distinctUntilChanged()
+        }
+    }.distinctUntilChanged()
 
 
     override suspend fun loadFuture(): Result<Unit> {
