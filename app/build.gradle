@@ -8,6 +8,7 @@ plugins {
     id('dagger.hilt.android.plugin')
     id('com.github.triplet.play') version("3.7.0")
     id('com.google.firebase.crashlytics')
+    id('io.objectbox')
 }
 
 
