@@ -279,6 +279,8 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+
+    implementation libs.objectbox.kotlin
 }
 
 kapt {
