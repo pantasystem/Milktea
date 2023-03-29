@@ -21,6 +21,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord_
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
+import java.util.*
 import javax.inject.Inject
 
 class ObjectBoxNoteDataSource @Inject constructor(
@@ -38,6 +39,8 @@ class ObjectBoxNoteDataSource @Inject constructor(
     private val lock = Mutex()
     private var deleteNoteIds = mutableSetOf<Note.Id>()
     private var removedNoteIds = mutableSetOf<Note.Id>()
+
+    private val changedIdFlow = MutableStateFlow<String>("")
 
 
     override fun addEventListener(listener: NoteDataSource.Listener): Unit = runBlocking {
@@ -98,6 +101,12 @@ class ObjectBoxNoteDataSource @Inject constructor(
             ).build().find().mapNotNull {
                 it?.toModel()
             }
+        }
+    }
+
+    override fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>> {
+        return changedIdFlow.map {
+            recursiveFindReplies(noteId).getOrThrow()
         }
     }
 
@@ -237,6 +246,14 @@ class ObjectBoxNoteDataSource @Inject constructor(
                 it.on(ev)
             }
         }
+        changedIdFlow.value = UUID.randomUUID().toString()
+    }
+
+    private suspend fun recursiveFindReplies(noteId: Note.Id): Result<List<Note>> = runCancellableCatching {
+        val children = findByReplyId(noteId).getOrThrow()
+        children + children.map {
+            recursiveFindReplies(it.id).getOrThrow()
+        }.flatten()
     }
 
     private suspend fun onAdded(note: Note) {

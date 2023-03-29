@@ -85,4 +85,6 @@ interface NoteDataSource {
 
     fun observeOne(noteId: Note.Id): Flow<Note?>
 
+    fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>>
+
 }

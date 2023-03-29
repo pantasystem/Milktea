@@ -142,6 +142,12 @@ class InMemoryNoteDataSource @Inject constructor(
         }.distinctUntilChanged()
     }
 
+    override fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>> {
+        return _state.map {
+            it.map.values.toList()
+        }
+    }
+
     override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> {
         return Result.success(
             _state.value.map.values.filter {

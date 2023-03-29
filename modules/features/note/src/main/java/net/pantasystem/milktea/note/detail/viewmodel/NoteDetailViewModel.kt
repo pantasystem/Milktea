@@ -69,11 +69,12 @@ class NoteDetailViewModel @AssistedInject constructor(
         emit(emptyList())
     }
 
-    private val repliesMap = note.filterNotNull().map { current ->
-        recursiveFindReplies(current.id).getOrThrow().filterNot {
-            it.replyId == null
-        }.groupBy {
-            it.replyId
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val repliesMap = note.filterNotNull().flatMapLatest { current ->
+        noteDataSource.observeRecursiveReplies(current.id).map { list ->
+            list.groupBy {
+                it.replyId
+            }
         }
     }.onStart {
         emit(emptyMap())
@@ -95,9 +96,10 @@ class NoteDetailViewModel @AssistedInject constructor(
                     ?: emptyList())
             )
         }
-        val relatedNote = noteRelationGetter.getIn(if (note == null) emptyList() else listOf(note.id)).filterNot {
-            noteWordFilterService.isShouldFilterNote(show, it)
-        }.map {
+        val relatedNote =
+            noteRelationGetter.getIn(if (note == null) emptyList() else listOf(note.id)).filterNot {
+                noteWordFilterService.isShouldFilterNote(show, it)
+            }.map {
                 NoteType.Detail(it)
             }
         relatedConversation + relatedNote + relatedChildren
@@ -177,21 +179,16 @@ class NoteDetailViewModel @AssistedInject constructor(
 
     }
 
-    private suspend fun recursiveFindReplies(noteId: Note.Id): Result<List<Note>> = runCancellableCatching {
-        val children = noteDataSource.findByReplyId(noteId).getOrThrow()
-        children + children.map {
-            recursiveFindReplies(it.id).getOrThrow()
-        }.flatten()
-    }
 
-    private suspend fun recursiveParentNotes(noteId: Note.Id?): Result<List<Note>> = runCancellableCatching {
-        noteId ?: return Result.success(emptyList())
-        val current = noteDataSource.get(noteId).getOrNull()
-        when(val replyId = current?.replyId) {
-            null -> return Result.success(emptyList())
-            else -> recursiveParentNotes(replyId).getOrThrow() + current
+    private suspend fun recursiveParentNotes(noteId: Note.Id?): Result<List<Note>> =
+        runCancellableCatching {
+            noteId ?: return Result.success(emptyList())
+            val current = noteDataSource.get(noteId).getOrNull()
+            when (val replyId = current?.replyId) {
+                null -> return Result.success(emptyList())
+                else -> recursiveParentNotes(replyId).getOrThrow() + current
+            }
         }
-    }
 
     suspend fun getUrl(): String {
         val account = currentAccountWatcher.getAccount()
