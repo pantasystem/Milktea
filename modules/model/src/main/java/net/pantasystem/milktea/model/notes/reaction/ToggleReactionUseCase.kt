@@ -38,16 +38,13 @@ class ToggleReactionUseCase @Inject constructor(
                 ?: return@runCancellableCatching
             val note = noteRepository.find(noteId).getOrThrow()
 
-            val isReacted = note.reactionCounts.any {
-                it.reaction == reaction && it.me
-            }
             // 同一のリアクションを選択した場合は解除して終了する
-            if (isReacted) {
+            if (note.isReactedReaction(reaction)) {
                 reactionRepository.delete(noteId).getOrThrow()
                 return@runCancellableCatching
             }
 
-            if (instanceType.maxReactionsPerAccount == 1) {
+            if (instanceType.canMultipleReaction) {
                 // 他にリアクション済みのリアクションがあればそれを解除する
                 note.reactionCounts.firstOrNull {
                     it.me
@@ -56,7 +53,7 @@ class ToggleReactionUseCase @Inject constructor(
                 }
             } else {
                 // リアクション可能な件数をオーバーしてしまっていた場合はキャンセルする
-                if (getMyReactionCount(note) >= instanceType.maxReactionsPerAccount) {
+                if (note.getMyReactionCount() >= instanceType.maxReactionsPerAccount) {
                     return@runCancellableCatching
                 }
             }
@@ -72,11 +69,6 @@ class ToggleReactionUseCase @Inject constructor(
         }
     }
 
-    internal fun getMyReactionCount(note: Note): Int {
-        return note.reactionCounts.count {
-            it.me
-        }
-    }
 
     internal suspend fun getSendReaction(
         instanceType: InstanceInfoType,
