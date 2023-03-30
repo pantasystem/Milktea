@@ -196,6 +196,18 @@ data class Note(
         return myReaction != null && myReaction == reaction.getName()
     }
 
+    fun isReactedReaction(reaction: String): Boolean {
+        return reactionCounts.any {
+            it.reaction == reaction && it.me
+        }
+    }
+
+    fun getMyReactionCount(): Int {
+        return reactionCounts.count {
+            it.me
+        }
+    }
+
     /**
      * この投稿がRenote可能であるかをチェックしている。
      * 既に取得できた投稿なので少なくともHome, Followers, Specifiedの公開範囲に
