@@ -60,7 +60,8 @@ class TootDTOEntityConverter @Inject constructor(
                 reactionCounts = emojiReactions?.map {
                     ReactionCount(
                         reaction = it.reaction,
-                        count = it.count
+                        count = it.count,
+                        me = it.me ?: false,
                     )
                 } ?: emptyList(),
                 repliesCount = repliesCount,
