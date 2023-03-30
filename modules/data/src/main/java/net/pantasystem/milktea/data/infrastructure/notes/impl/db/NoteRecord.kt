@@ -85,7 +85,9 @@ data class NoteRecord(
 
     var misskeyChannelId: String? = null,
     var misskeyChannelName: String? = null,
-    var misskeyIsAcceptingOnlyLikeReaction: Boolean = false
+    var misskeyIsAcceptingOnlyLikeReaction: Boolean = false,
+
+    var myReactions: MutableList<String>? = null,
 
 ) {
 
@@ -136,6 +138,11 @@ data class NoteRecord(
             is Note.Type.Mastodon -> "mastodon"
             is Note.Type.Misskey -> "misskey"
         }
+        myReactions = model.reactionCounts.filter {
+            it.me
+        }.map {
+            it.reaction
+        }.toMutableList()
         when (val t = model.type) {
             is Note.Type.Mastodon -> {
                 mastodonReblogged = t.reblogged
@@ -180,7 +187,14 @@ data class NoteRecord(
             url = url,
             uri = uri,
             renoteCount = renoteCount,
-            reactionCounts = reactionCounts.map { ReactionCount(it.key, it.value.toInt()) },
+            reactionCounts = reactionCounts.map { entry ->
+                ReactionCount(
+                    entry.key,
+                    entry.value.toInt(),
+                    me = myReactions?.any {
+                        it == entry.key
+                    } ?: false
+                ) },
             emojis = emojis?.map { Emoji(name = it.key, url = it.value) },
             repliesCount = repliesCount,
             fileIds = fileIds?.map { FileProperty.Id(accountId, it) },
