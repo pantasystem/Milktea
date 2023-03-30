@@ -472,7 +472,7 @@
                         android:onClick="@{ ()-> noteCardActionListener.onReactionButtonClicked(note) }"
                         android:padding="@dimen/note_bottom_action_icon_padding_size"
                         android:scaleType="centerCrop"
-                        app:isReacted="@{note.currentNote.myReaction != null}"
+                        app:isReacted="@{note.currentNote.reacted}"
                         isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
                         tools:srcCompat="@drawable/ic_add_circle_outline_black_24dp"
                         android:visibility="@{note.currentNote.supportEmojiReaction ? View.VISIBLE : View.GONE }"

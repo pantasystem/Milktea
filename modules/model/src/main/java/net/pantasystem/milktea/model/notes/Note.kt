@@ -130,6 +130,10 @@ data class Note(
         it.name
     }
 
+    val isReacted: Boolean = reactionCounts.any {
+        it.me
+    }
+
     val reactionsCount = reactionCounts.sumOf {
         it.count
     }
