@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.model.AddResult
@@ -13,7 +14,6 @@ import net.pantasystem.milktea.model.drive.FilePropertyNotFoundException
 import javax.inject.Inject
 
 class MediatorFilePropertyDataSource @Inject constructor(
-    private val inMemoryFilePropertyDataSource: InMemoryFilePropertyDataSource,
     private val driveFileRecordDao: DriveFileRecordDao,
     private val loggerFactory: Logger.Factory,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -23,10 +23,12 @@ class MediatorFilePropertyDataSource @Inject constructor(
         loggerFactory.create("MediatorFilePropertyDataSource")
     }
 
+    val cache = LRUCache<FileProperty.Id, FileProperty>(25)
+
 
     override suspend fun add(fileProperty: FileProperty): Result<AddResult> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val result = inMemoryFilePropertyDataSource.add(fileProperty)
+            cache.put(fileProperty.id, fileProperty)
             val record = runCancellableCatching {
                 driveFileRecordDao.findOne(fileProperty.id.accountId, fileProperty.id.fileId)
             }.getOrNull()
@@ -44,7 +46,7 @@ class MediatorFilePropertyDataSource @Inject constructor(
                 return@withContext AddResult.Canceled
             }
 
-            return@withContext result.getOrThrow()
+            return@withContext AddResult.Canceled
         }
     }
 
@@ -53,7 +55,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
             if (list.isEmpty()) {
                 return@withContext emptyList()
             }
-            val results = inMemoryFilePropertyDataSource.addAll(list)
+            list.forEach {
+                cache.put(it.id, it)
+            }
             val insertResults = driveFileRecordDao.insertAll(list.map {
                 DriveFileRecord.from(it)
             })
@@ -65,7 +69,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
 
             logger.debug("insert結果:$insertResults")
             if (ignored.isEmpty()) {
-                return@withContext results.getOrThrow()
+                return@withContext list.map {
+                    AddResult.Created
+                }
             }
 
             // NOTE: DB上の同一のエンティティを取得する
@@ -79,7 +85,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
             }
 
             if (needUpdates.isEmpty()) {
-                return@withContext results.getOrThrow()
+                return@withContext insertResults.map {
+                    if (it == -1L) AddResult.Canceled else AddResult.Created
+                }
             }
 
             logger.debug("必要更新件数:${needUpdates.size}")
@@ -88,13 +96,21 @@ class MediatorFilePropertyDataSource @Inject constructor(
                 driveFileRecordDao.update(record.update(idAndFileMap.getValue(record.toFilePropertyId())))
             }
 
-            return@withContext results.getOrThrow()
+            return@withContext list.mapIndexed { index, fileProperty ->
+                if (insertResults[index] != -1L) {
+                    AddResult.Created
+                } else if (needUpdates.any { it.equalFileProperty(fileProperty) }) {
+                    AddResult.Updated
+                } else {
+                    AddResult.Canceled
+                }
+            }
         }
     }
 
     override suspend fun find(filePropertyId: FileProperty.Id): Result<FileProperty> = runCancellableCatching {
         withContext(ioDispatcher) {
-            var result = inMemoryFilePropertyDataSource.find(filePropertyId).getOrNull()
+            var result = cache.get(filePropertyId)
             if (result != null) {
                 return@withContext result
             }
@@ -114,7 +130,9 @@ class MediatorFilePropertyDataSource @Inject constructor(
                 true
             } catch (e: Exception) {
                 false
-            } && inMemoryFilePropertyDataSource.remove(fileProperty).getOrThrow()
+            }.also {
+                cache.remove(fileProperty.id)
+            }
         }
     }
 
@@ -149,14 +167,18 @@ class MediatorFilePropertyDataSource @Inject constructor(
             ids.mapNotNull { id ->
                 map[id]
             }
-        }.distinctUntilChanged().onEach {
-            inMemoryFilePropertyDataSource.addAll(it)
+        }.distinctUntilChanged().onEach { list ->
+            list.forEach {
+                cache.put(it.id, it)
+            }
         }.flowOn(ioDispatcher)
     }
 
     override suspend fun findIn(ids: List<FileProperty.Id>): Result<List<FileProperty>> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val inMemories = inMemoryFilePropertyDataSource.findIn(ids).getOrThrow()
+            val inMemories = ids.mapNotNull {
+                cache.get(it)
+            }
             if (inMemories.size == ids.size) {
                 return@withContext inMemories
             }
