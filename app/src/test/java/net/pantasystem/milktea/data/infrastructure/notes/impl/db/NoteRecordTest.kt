@@ -88,7 +88,7 @@ internal class NoteRecordTest {
         )
         Assertions.assertEquals(10, record.repliesCount)
         Assertions.assertEquals(listOf("like", "wow", "sad", "angry"), record.myReactions)
-        Assertions.assertEquals(3, record.maxReactionsPerAccount)
+        Assertions.assertEquals(4, record.maxReactionsPerAccount)
     }
 
     @Test
