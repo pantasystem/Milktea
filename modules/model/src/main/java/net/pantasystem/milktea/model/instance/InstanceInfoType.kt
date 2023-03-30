@@ -42,4 +42,8 @@ sealed interface InstanceInfoType {
             is Misskey -> 1
         }
     }
+
+    val canMultipleReaction: Boolean get() {
+        return maxReactionsPerAccount > 1
+    }
 }
