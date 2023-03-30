@@ -30,7 +30,7 @@ data class ReactionViewData(
                     noteId = note.id,
                     reaction = textReaction,
                     reactionCount = reactionCount,
-                    isMyReaction = note.myReaction == reactionCount.reaction,
+                    isMyReaction = reactionCount.me,
                     emoji = emoji
                 )
             }
