@@ -17,7 +17,7 @@ internal class CustomEmojiUpInsertDelegate @Inject constructor(
 
         ids.mapIndexed { index, id ->
             if (id == -1L) {
-                customEmojiDAO.findBy(host, emojis[index].name)?.let { record ->
+                customEmojiDAO.findBy(host, emojis[index].name).firstOrNull()?.let { record ->
                     customEmojiDAO.update(emojis[index].toRecord(host, record.emoji.id))
                     customEmojiDAO.deleteAliasByEmojiId(record.emoji.id)
                     emojis[index].aliases?.map {

@@ -43,6 +43,14 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun findByName(host: String, name: String): Result<List<Emoji>> = runCancellableCatching {
+        withContext(ioDispatcher) {
+            customEmojiDAO.findBy(host, name).map {
+                it.toModel()
+            }
+        }
+    }
+
     override suspend fun sync(host: String): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val nodeInfo = nodeInfoRepository.find(host).getOrThrow()

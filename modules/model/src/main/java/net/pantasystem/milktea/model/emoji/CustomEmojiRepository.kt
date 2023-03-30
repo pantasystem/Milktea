@@ -8,6 +8,11 @@ interface CustomEmojiRepository {
 
     suspend fun sync(host: String): Result<Unit>
 
+    /**
+     * 完全一致で絵文字を探索する
+     */
+    suspend fun findByName(host: String, name: String): Result<List<Emoji>>
+
     suspend fun addEmojis(host: String, emojis: List<Emoji>): Result<Unit>
 
     suspend fun deleteEmojis(host: String, emojis: List<Emoji>): Result<Unit>
