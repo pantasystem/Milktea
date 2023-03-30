@@ -2,6 +2,7 @@ package net.pantasystem.milktea.model.notes.reaction
 
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
@@ -33,35 +34,8 @@ class ToggleReactionUseCase @Inject constructor(
         return runCancellableCatching {
             val account = getAccount.get(noteId.accountId)
             val instanceType = instanceInfoService.find(account.normalizedInstanceUri).getOrThrow()
-            val reactionObj = Reaction(reaction)
-            val sendReaction = if (checkEmoji.checkEmoji(reaction)) {
-                reaction
-            } else if (LegacyReaction.reactionMap.containsKey(reaction)) {
-                requireNotNull(LegacyReaction.reactionMap[reaction])
-            } else {
-                when(instanceType) {
-                    is InstanceInfoType.Mastodon -> {
-                        val maxCount = instanceType.maxReactionsPerAccount
-                        if (maxCount < 1) {
-                            return@runCancellableCatching
-                        }
-
-                        reactionObj.getNameAndHost()
-                    }
-                    is InstanceInfoType.Misskey -> {
-                        val name = reactionObj.getName()
-                            ?: return@runCancellableCatching
-                        val hitEmojis = customEmojiRepository.findByName(account.getHost(), name).getOrThrow()
-                        val hitEmoji = hitEmojis.firstOrNull()
-                        if (hitEmoji == null) {
-                            "👍"
-                        } else {
-                            reaction
-                        }
-                    }
-                }
-            }
-
+            val sendReaction = getSendReaction(instanceType, account, reaction)
+                ?: return@runCancellableCatching
             val note = noteRepository.find(noteId).getOrThrow()
 
             val isReacted = note.reactionCounts.any {
@@ -101,6 +75,42 @@ class ToggleReactionUseCase @Inject constructor(
     internal fun getMyReactionCount(note: Note): Int {
         return note.reactionCounts.count {
             it.me
+        }
+    }
+
+    internal suspend fun getSendReaction(
+        instanceType: InstanceInfoType,
+        account: Account,
+        reaction: String,
+    ): String? {
+        val reactionObj = Reaction(reaction)
+        return if (checkEmoji.checkEmoji(reaction)) {
+            reaction
+        } else if (LegacyReaction.reactionMap.containsKey(reaction)) {
+            requireNotNull(LegacyReaction.reactionMap[reaction])
+        } else {
+            when (instanceType) {
+                is InstanceInfoType.Mastodon -> {
+                    val maxCount = instanceType.maxReactionsPerAccount
+                    if (maxCount < 1) {
+                        return null
+                    }
+
+                    reactionObj.getNameAndHost()
+                }
+                is InstanceInfoType.Misskey -> {
+                    val name = reactionObj.getName()
+                        ?: return null
+                    val hitEmojis =
+                        customEmojiRepository.findByName(account.getHost(), name).getOrThrow()
+                    val hitEmoji = hitEmojis.firstOrNull()
+                    if (hitEmoji == null) {
+                        "👍"
+                    } else {
+                        reaction
+                    }
+                }
+            }
         }
     }
 
