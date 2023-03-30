@@ -94,7 +94,7 @@ class ReactionRepositoryImpl @Inject constructor(
                         postUnReaction(deleteReaction.noteId)
                                 && (noteCaptureAPIProvider.get(account)
                             ?.isCaptured(deleteReaction.noteId.noteId) == true
-                                || (note.myReaction != null
+                                || (note.reactionCounts.any { it.me }
                                 && noteDataSource.add(note.onIUnReacted())
                             .getOrThrow() != AddResult.Canceled))
                     }
