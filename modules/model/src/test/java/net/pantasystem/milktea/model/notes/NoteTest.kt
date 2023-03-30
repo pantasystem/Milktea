@@ -218,7 +218,7 @@ class NoteTest {
     @Test
     fun shortReactionCounts_GiveOverMaxCountCounts() {
         val counts = (0..(Note.SHORT_REACTION_COUNT_MAX_SIZE)).map {
-            ReactionCount("r$it", 1)
+            ReactionCount("r$it", 1, false)
         }
         val note = Note.make(
             id = Note.Id(0L, ""),
@@ -234,7 +234,7 @@ class NoteTest {
     @Test
     fun shortReactionCounts_GiveUnderMaxCountCounts() {
         val counts = (0 until (Note.SHORT_REACTION_COUNT_MAX_SIZE - 1)).map {
-            ReactionCount("r$it", 1)
+            ReactionCount("r$it", 1, true)
         }
         val note = Note.make(
             id = Note.Id(0L, ""),
@@ -250,7 +250,7 @@ class NoteTest {
     @Test
     fun shortReactionCounts_GiveMaxCountCounts() {
         val counts = (0 until Note.SHORT_REACTION_COUNT_MAX_SIZE).map {
-            ReactionCount("r$it", 1)
+            ReactionCount("r$it", 1, false)
         }
         val note = Note.make(
             id = Note.Id(0L, ""),
@@ -278,7 +278,7 @@ class NoteTest {
     @Test
     fun shortReactionCounts_GiveRenoteAndMaxCounts() {
         val counts = (0 until Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE).map {
-            ReactionCount("r$it", 1)
+            ReactionCount("r$it", 1, false)
         }
         val note = Note.make(
             id = Note.Id(0L, ""),
@@ -307,7 +307,7 @@ class NoteTest {
     @Test
     fun shortReactionCounts_GiveRenoteAndUnderMaxCountCounts() {
         val counts = (0 until (Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1)).map {
-            ReactionCount("r$it", 1)
+            ReactionCount("r$it", 1, false)
         }
         val note = Note.make(
             id = Note.Id(0L, ""),
@@ -324,7 +324,7 @@ class NoteTest {
     @Test
     fun shortReactionCounts_GiveRenoteAndOverMaxCountCounts() {
         val counts = (0..(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE)).map {
-            ReactionCount("r$it", 1)
+            ReactionCount("r$it", 1, false)
         }
         val note = Note.make(
             id = Note.Id(0L, ""),
