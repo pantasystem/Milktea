@@ -135,6 +135,12 @@ interface MastodonAPI {
         @Path("emoji") emoji: String
     ): Response<TootStatusDTO>
 
+    @DELETE("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
+    suspend fun deleteReaction(
+        @Path("statusId") statusId: String,
+        @Path("emoji") emoji: String
+    ): Response<TootStatusDTO>
+
     @POST("api/v1/statuses/{statusId}/emoji_unreaction")
     suspend fun unreaction(@Path("statusId") statusId: String): Response<TootStatusDTO>
 

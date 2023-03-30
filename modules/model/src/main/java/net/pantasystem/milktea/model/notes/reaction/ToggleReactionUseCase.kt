@@ -40,7 +40,12 @@ class ToggleReactionUseCase @Inject constructor(
 
             // 同一のリアクションを選択した場合は解除して終了する
             if (note.isReactedReaction(reaction)) {
-                reactionRepository.delete(noteId).getOrThrow()
+                reactionRepository.delete(
+                    DeleteReaction(
+                        noteId,
+                        reaction
+                    )
+                ).getOrThrow()
                 return@runCancellableCatching
             }
 
@@ -49,7 +54,12 @@ class ToggleReactionUseCase @Inject constructor(
                 note.reactionCounts.firstOrNull {
                     it.me
                 }?.let {
-                    reactionRepository.delete(noteId).getOrThrow()
+                    reactionRepository.delete(
+                        DeleteReaction(
+                            noteId,
+                            it.reaction
+                        )
+                    ).getOrThrow()
                 }
             } else {
                 // リアクション可能な件数をオーバーしてしまっていた場合はキャンセルする

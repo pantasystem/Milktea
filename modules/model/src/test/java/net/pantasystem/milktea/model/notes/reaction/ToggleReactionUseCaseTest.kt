@@ -44,7 +44,7 @@ class ToggleReactionUseCaseTest {
 
         val reactionRepository = mock<ReactionRepository> {
             onBlocking {
-                delete(targetNote.id).getOrThrow()
+                delete(DeleteReaction(targetNote.id, ":kawaii:")).getOrThrow()
             } doReturn true
         }
 
@@ -104,12 +104,12 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionRepository) {
-            delete(targetNote.id)
+            delete(DeleteReaction(targetNote.id, ":kawaii:"))
         }
     }
 
     @Test
-    fun giveCustomEmojiReactionWhenHasOtherMyReaction() {
+    fun giveCustomEmojiReactionWhenHasOtherMyReaction() = runBlocking {
         val targetNote = generateEmptyNote().copy(
             text = "test",
             id = Note.Id(accountId = 0L, "testId"),
@@ -128,7 +128,7 @@ class ToggleReactionUseCaseTest {
 
         val reactionRepository = mock<ReactionRepository> {
             onBlocking {
-                delete(targetNote.id).getOrThrow()
+                delete(DeleteReaction(targetNote.id, ":kawaii:")).getOrThrow()
             } doReturn true
             onBlocking {
                 create(createReactionDTO).getOrThrow()
@@ -185,7 +185,7 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionRepository) {
-            delete(targetNote.id)
+            delete(DeleteReaction(targetNote.id, ":kawaii:"))
             create(createReactionDTO)
         }
 
