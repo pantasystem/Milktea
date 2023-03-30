@@ -229,6 +229,12 @@ fun Instance.toModel(): MastodonInstanceInfo {
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
                     )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfo.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount,
+                    )
                 }
             )
         },

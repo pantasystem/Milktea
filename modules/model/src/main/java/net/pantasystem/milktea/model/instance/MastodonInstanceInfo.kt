@@ -15,7 +15,8 @@ data class MastodonInstanceInfo(
 
     data class Configuration(
         val statuses: Statuses?,
-        val polls: Polls?
+        val polls: Polls?,
+        val emojiReactions: EmojiReactions?,
     ) {
 
         data class Statuses(
@@ -28,6 +29,11 @@ data class MastodonInstanceInfo(
             val maxCharactersPerOption: Int?,
             val minExpiration: Int?,
             val maxExpiration: Int?,
+        )
+
+        data class EmojiReactions(
+            val maxReactions: Int?,
+            val maxReactionsPerAccount: Int?
         )
 
     }

@@ -29,7 +29,8 @@ data class MastodonInstanceInfoRecord(
 
     data class Configuration(
         @Embedded(prefix = "statuses_") val statuses: Statuses? = null,
-        @Embedded(prefix = "polls_")val polls: Polls? = null
+        @Embedded(prefix = "polls_")val polls: Polls? = null,
+        @Embedded(prefix = "emoji_reactions_") val emojiReactions: EmojiReactions? = null,
     ) {
 
         data class Statuses(
@@ -51,6 +52,13 @@ data class MastodonInstanceInfoRecord(
             val maxExpiration: Int? = null,
         )
 
+        data class EmojiReactions(
+            @ColumnInfo(name = "myReactions")
+            val maxReactions: Int? = null,
+
+            @ColumnInfo(name = "maxReactionsPerAccount")
+            val maxReactionsPerAccount: Int? = null,
+        )
     }
 
     data class Urls(
@@ -119,6 +127,12 @@ fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): Mast
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
                     )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfoRecord.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount
+                    )
                 }
             )
         }
@@ -152,6 +166,12 @@ fun MastodonInstanceInfoRelated.toModel(): MastodonInstanceInfo {
                         maxCharactersPerOption = it.maxCharactersPerOption,
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
+                    )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfo.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount
                     )
                 }
             )
