@@ -583,4 +583,110 @@ class ToggleReactionUseCaseTest {
             create(ReactionHistory("kawaii@misskey.io", "https://fedibird.com"))
         }
     }
+
+    @Test
+    fun giveRemoteEmojiWhenMastodonAndCanMultipleReaction() {
+        val targetNote = generateEmptyNote().copy(
+            text = "test",
+            id = Note.Id(accountId = 0L, "testId"),
+            reactionCounts = listOf(
+                ReactionCount(
+                    ":iizo:",
+                    2,
+                    true,
+                ),
+                ReactionCount(
+                    ":dame:",
+                    1,
+                    false,
+                )
+            )
+        )
+        val createReactionDTO = CreateReaction(targetNote.id, "kawaii@misskey.io")
+
+        val noteRepository = mock<NoteRepository> {
+
+            onBlocking {
+                find(targetNote.id).getOrThrow()
+            } doReturn targetNote
+        }
+
+        val reactionRepository = mock<ReactionRepository> {
+            onBlocking {
+                create(createReactionDTO).getOrThrow()
+            } doReturn true
+        }
+
+        val reactionHistoryDao = mock<ReactionHistoryRepository>()
+        val account = Account(
+            "testId",
+            "https://fedibird.com",
+            instanceType = Account.InstanceType.MASTODON,
+            token = "test",
+            userName = "test",
+            accountId = 0L,
+            pages = emptyList(),
+        )
+        val getAccount = mock<GetAccount> {
+            onBlocking {
+                get(any())
+            } doReturn account
+        }
+
+        val checkEmoji = mock<CheckEmoji> {
+            onBlocking {
+                checkEmoji(any())
+            } doReturn true
+        }
+
+
+        val useCase = ToggleReactionUseCase(
+            getAccount = getAccount,
+            noteRepository = noteRepository,
+            reactionHistoryRepository = reactionHistoryDao,
+            checkEmoji = checkEmoji,
+            reactionRepository = reactionRepository,
+            customEmojiRepository = mock() {
+                onBlocking {
+                    findByName(any(), any())
+                } doReturn Result.success(emptyList())
+            },
+            instanceInfoService = mock() {
+                onBlocking {
+                    find(any())
+                } doReturn Result.success(
+                    InstanceInfoType.Mastodon(
+                        MastodonInstanceInfo(
+                            uri = "",
+                            title = "",
+                            description = "",
+                            email = "",
+                            version = "",
+                            urls = MastodonInstanceInfo.Urls(streamingApi = null),
+                            configuration = MastodonInstanceInfo.Configuration(
+                                emojiReactions = MastodonInstanceInfo.Configuration.EmojiReactions(
+                                    maxReactions = 1000,
+                                    maxReactionsPerAccount = 2
+                                ),
+                                polls = null,
+                                statuses = null,
+                            ),
+                            fedibirdCapabilities = listOf("emoji_reaction")
+                        )
+                    )
+                )
+            }
+        )
+
+        runBlocking {
+            useCase(targetNote.id, "kawaii@misskey.io").getOrThrow()
+        }
+        verifyBlocking(reactionRepository) {
+            create(createReactionDTO)
+        }
+
+        verifyBlocking(reactionHistoryDao) {
+            create(ReactionHistory("kawaii@misskey.io", "https://fedibird.com"))
+        }
+    }
 }
