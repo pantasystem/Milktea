@@ -72,6 +72,7 @@ class NoteDTOEntityConverter @Inject constructor() {
                     null -> false
                 },
             ),
+            maxReactionsPerAccount = 1
         )
     }
 }

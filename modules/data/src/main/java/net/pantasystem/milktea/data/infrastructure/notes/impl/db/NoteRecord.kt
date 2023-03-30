@@ -88,6 +88,7 @@ data class NoteRecord(
     var misskeyIsAcceptingOnlyLikeReaction: Boolean = false,
 
     var myReactions: MutableList<String>? = null,
+    var maxReactionsPerAccount: Int = 0,
 
 ) {
 
@@ -143,6 +144,7 @@ data class NoteRecord(
         }.map {
             it.reaction
         }.toMutableList()
+        maxReactionsPerAccount = model.maxReactionsPerAccount
         when (val t = model.type) {
             is Note.Type.Mastodon -> {
                 mastodonReblogged = t.reblogged
@@ -201,6 +203,7 @@ data class NoteRecord(
             poll = getPoll(),
             myReaction = myReaction,
             channelId = channelId?.let { Channel.Id(accountId, it) },
+            maxReactionsPerAccount = maxReactionsPerAccount,
             type = when (type) {
                 "misskey" -> {
                     Note.Type.Misskey(

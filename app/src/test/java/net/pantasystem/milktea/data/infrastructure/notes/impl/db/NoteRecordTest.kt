@@ -53,6 +53,7 @@ internal class NoteRecordTest {
             myReaction = "like",
             app = null,
             channelId = null,
+            maxReactionsPerAccount = 4
         )
         record.applyModel(note)
         Assertions.assertEquals("nid1", record.noteId)
@@ -87,7 +88,7 @@ internal class NoteRecordTest {
         )
         Assertions.assertEquals(10, record.repliesCount)
         Assertions.assertEquals(listOf("like", "wow", "sad", "angry"), record.myReactions)
-
+        Assertions.assertEquals(3, record.maxReactionsPerAccount)
     }
 
     @Test
@@ -359,7 +360,8 @@ internal class NoteRecordTest {
             mastodonIsSensitive = false,
             mastodonPureText = "test note",
             mastodonIsReactionAvailable = true,
-            myReactions = mutableListOf("like")
+            myReactions = mutableListOf("like"),
+            maxReactionsPerAccount = 3
         )
         val expectedNote = Note(
             id = Note.Id(accountId = 1, noteId = "note-id"),
@@ -433,7 +435,8 @@ internal class NoteRecordTest {
                 pureText = "test note",
                 isReactionAvailable = true,
             ),
-            app = null
+            app = null,
+            maxReactionsPerAccount = 3
         )
         val actual =record.toModel()
         Assertions.assertEquals(expectedNote.id, actual.id)
@@ -459,6 +462,7 @@ internal class NoteRecordTest {
         Assertions.assertEquals(expectedNote.channelId, actual.channelId)
         Assertions.assertEquals(expectedNote.type, actual.type)
         Assertions.assertEquals(expectedNote.app, actual.app)
+        Assertions.assertEquals(expectedNote.maxReactionsPerAccount, actual.maxReactionsPerAccount)
 
 
     }

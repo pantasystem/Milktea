@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:4355718382021751829",
-      "lastPropertyId": "49:603475478183588601",
+      "lastPropertyId": "50:4252978610725343033",
       "name": "NoteRecord",
       "properties": [
         {
@@ -261,6 +261,11 @@
           "id": "49:603475478183588601",
           "name": "misskeyIsAcceptingOnlyLikeReaction",
           "type": 1
+        },
+        {
+          "id": "50:4252978610725343033",
+          "name": "myReactions",
+          "type": 30
         }
       ],
       "relations": []

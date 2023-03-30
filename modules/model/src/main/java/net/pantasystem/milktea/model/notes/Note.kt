@@ -44,10 +44,10 @@ data class Note(
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
     val type: Type,
-) : Entity {
+    val maxReactionsPerAccount: Int) : Entity {
     class Id(
         val accountId: Long,
-        val noteId: String
+        val noteId: String,
     ) : EntityId {
 
         private var _hashCode: Int? = null
@@ -81,7 +81,7 @@ data class Note(
     sealed interface Type {
         data class Misskey(
             val channel: SimpleChannelInfo? = null,
-            val isAcceptingOnlyLikeReaction: Boolean= false,
+            val isAcceptingOnlyLikeReaction: Boolean = false,
         ) : Type {
             data class SimpleChannelInfo(val id: Channel.Id, val name: String)
 
@@ -99,12 +99,13 @@ data class Note(
             val pollId: String?,
             val isSensitive: Boolean?,
             val pureText: String?,
-            val isReactionAvailable: Boolean
-            ) : Type {
+            val isReactionAvailable: Boolean,
+        ) : Type {
             data class Tag(
                 val name: String,
                 val url: String,
             )
+
             data class Mention(
                 val id: String,
                 val username: String,
@@ -122,9 +123,11 @@ data class Note(
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
 
-    val isSupportEmojiReaction: Boolean = type is Type.Misskey || (type is Type.Mastodon && type.isReactionAvailable)
+    val isSupportEmojiReaction: Boolean =
+        type is Type.Misskey || (type is Type.Mastodon && type.isReactionAvailable)
 
-    val isAcceptingOnlyLikeReaction: Boolean = type is Type.Misskey && type.isAcceptingOnlyLikeReaction
+    val isAcceptingOnlyLikeReaction: Boolean =
+        type is Type.Misskey && type.isAcceptingOnlyLikeReaction
 
     val emojiNameMap = emojis?.associateBy {
         it.name
@@ -133,6 +136,10 @@ data class Note(
     val isReacted: Boolean = reactionCounts.any {
         it.me
     }
+
+    val canReaction: Boolean = reactionCounts.count {
+        it.me
+    } < maxReactionsPerAccount
 
     val reactionsCount = reactionCounts.sumOf {
         it.count
@@ -143,7 +150,10 @@ data class Note(
             if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
                 reactionCounts
             } else {
-                reactionCounts.subList(0, min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE))
+                reactionCounts.subList(
+                    0,
+                    min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE)
+                )
             }
         } else {
             if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
@@ -233,6 +243,7 @@ data class NoteRelation(
     val reply: NoteRelation?,
     val files: List<FileProperty>?,
 ) : JSerializable
+
 fun Note.Companion.make(
     id: Note.Id,
     userId: User.Id,
@@ -257,6 +268,7 @@ fun Note.Companion.make(
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
     type: Note.Type = Note.Type.Misskey(),
+    maxReactionsPerAccount: Int = 1
 ): Note {
     return Note(
         id = id,
@@ -282,5 +294,6 @@ fun Note.Companion.make(
         app = app,
         channelId = channelId,
         type = type,
+        maxReactionsPerAccount = maxReactionsPerAccount
     )
 }
