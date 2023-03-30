@@ -2,7 +2,6 @@ package net.pantasystem.milktea.model.notes
 
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions.*
@@ -46,23 +45,6 @@ class NoteTest {
         // NOTE: cwだけの場合はcw扱いにならない
         val note = generateEmptyNote().copy(cw = "a")
         assertFalse(note.hasContent())
-    }
-
-    @Test
-    fun isOwnReaction() {
-        val note = generateEmptyNote().copy(
-            myReaction = "kawaii"
-        )
-        assertTrue(note.isOwnReaction(Reaction(":kawaii@.:")))
-        assertTrue(note.isOwnReaction(Reaction(":kawaii:")))
-    }
-
-    @Test
-    fun isOwnReaction_WhenHasNotMyReaction() {
-        val note = generateEmptyNote().copy(
-            myReaction = null
-        )
-        assertFalse(note.isOwnReaction(Reaction(":kawaii:")))
     }
 
     @Test

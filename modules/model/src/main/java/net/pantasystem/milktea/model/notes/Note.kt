@@ -9,7 +9,6 @@ import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import kotlin.math.min
@@ -190,10 +189,6 @@ data class Note(
             return false
         }
         return text != null || !fileIds.isNullOrEmpty() || poll != null
-    }
-
-    fun isOwnReaction(reaction: Reaction): Boolean {
-        return myReaction != null && myReaction == reaction.getName()
     }
 
     fun isReactedReaction(reaction: String): Boolean {
