@@ -42,7 +42,11 @@ class NoteDTOEntityConverter @Inject constructor() {
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
             reactionCounts = noteDTO.reactionCounts?.map {
-                ReactionCount(reaction = it.key, it.value)
+                ReactionCount(
+                    reaction = it.key,
+                    count = it.value,
+                    me = noteDTO.myReaction == it.key
+                )
             } ?: emptyList(),
             renoteCount = noteDTO.renoteCount,
             repliesCount = noteDTO.replyCount,
