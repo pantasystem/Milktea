@@ -540,7 +540,7 @@
                     android:id="@+id/toggleReactionButton"
                     android:layout_width="@dimen/note_bottom_action_icon_size"
                     android:layout_height="@dimen/note_bottom_action_icon_size"
-                    app:isReacted="@{note.currentNote.reacted}"
+                    app:isReacted="@{!note.currentNote.canReaction}"
                     isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
                     tools:srcCompat="@drawable/ic_add_black_24dp"
                     style="?android:attr/borderlessButtonStyle"
