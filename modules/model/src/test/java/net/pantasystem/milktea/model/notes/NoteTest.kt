@@ -5,9 +5,7 @@ import net.pantasystem.milktea.model.notes.poll.Poll
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 
@@ -226,9 +224,9 @@ class NoteTest {
             userId = User.Id(0L, ""),
             reactionCounts = counts,
         )
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE + 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(false).size)
-        Assertions.assertEquals(counts.subList(0, Note.SHORT_REACTION_COUNT_MAX_SIZE), note.getShortReactionCounts(false))
+        assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE + 1, counts.size)
+        assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(false).size)
+        assertEquals(counts.subList(0, Note.SHORT_REACTION_COUNT_MAX_SIZE), note.getShortReactionCounts(false))
     }
 
     @Test
@@ -242,9 +240,9 @@ class NoteTest {
             userId = User.Id(0L, ""),
             reactionCounts = counts,
         )
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, note.getShortReactionCounts(false).size)
-        Assertions.assertEquals(counts, note.getShortReactionCounts(false))
+        assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, counts.size)
+        assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE - 1, note.getShortReactionCounts(false).size)
+        assertEquals(counts, note.getShortReactionCounts(false))
     }
 
     @Test
@@ -258,9 +256,9 @@ class NoteTest {
             userId = User.Id(0L, ""),
             reactionCounts = counts,
         )
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, counts.size)
-        Assertions.assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(false).size, )
-        Assertions.assertEquals(counts, note.getShortReactionCounts(false))
+        assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, counts.size)
+        assertEquals(Note.SHORT_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(false).size, )
+        assertEquals(counts, note.getShortReactionCounts(false))
     }
 
     @Test
@@ -272,7 +270,7 @@ class NoteTest {
             userId = User.Id(0L, ""),
             reactionCounts = emptyList(),
         )
-        Assertions.assertEquals(emptyList<ReactionCount>(), note.getShortReactionCounts(false))
+        assertEquals(emptyList<ReactionCount>(), note.getShortReactionCounts(false))
     }
 
     @Test
@@ -287,9 +285,9 @@ class NoteTest {
             reactionCounts = counts,
             renoteId = Note.Id(0L, "")
         )
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, counts.size)
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(true).size)
-        Assertions.assertEquals(counts, note.getShortReactionCounts(true))
+        assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, counts.size)
+        assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(true).size)
+        assertEquals(counts, note.getShortReactionCounts(true))
     }
 
     @Test
@@ -301,7 +299,7 @@ class NoteTest {
             reactionCounts = emptyList(),
             renoteId = Note.Id(0L, "")
         )
-        Assertions.assertEquals(emptyList<ReactionCount>(), note.getShortReactionCounts(true))
+        assertEquals(emptyList<ReactionCount>(), note.getShortReactionCounts(true))
     }
 
     @Test
@@ -316,9 +314,9 @@ class NoteTest {
             reactionCounts = counts,
             renoteId = Note.Id(0L, "")
         )
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, note.getShortReactionCounts(true).size)
-        Assertions.assertEquals(counts, note.getShortReactionCounts(true))
+        assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, counts.size)
+        assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE - 1, note.getShortReactionCounts(true).size)
+        assertEquals(counts, note.getShortReactionCounts(true))
     }
 
     @Test
@@ -333,9 +331,73 @@ class NoteTest {
             reactionCounts = counts,
             renoteId = Note.Id(0L, "")
         )
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE + 1, counts.size)
-        Assertions.assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(true).size)
-        Assertions.assertEquals(counts.subList(0, Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE), note.getShortReactionCounts(true))
+        assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE + 1, counts.size)
+        assertEquals(Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE, note.getShortReactionCounts(true).size)
+        assertEquals(counts.subList(0, Note.SHORT_RENOTE_REACTION_COUNT_MAX_SIZE), note.getShortReactionCounts(true))
     }
+
+    @Test
+    fun isReactedReaction_GiveReactedReaction() {
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = listOf(
+                ReactionCount(
+                    ":kawaii:",
+                    1,
+                    true,
+                ),
+                ReactionCount(
+                    ":iizo:",
+                    1,
+                    false,
+                )
+            ),
+            renoteId = Note.Id(0L, "")
+        )
+
+        assertFalse(note.isReactedReaction(":iizo:"))
+        assertTrue(note.isReactedReaction(":kawaii:"))
+    }
+
+    @Test
+    fun getMyReactionCount_GiveAnyReactedReactions() {
+        val note = Note.make(
+            id = Note.Id(0L, ""),
+            text = null,
+            userId = User.Id(0L, ""),
+            reactionCounts = listOf(
+                ReactionCount(
+                    ":kawaii:",
+                    1,
+                    true,
+                ),
+                ReactionCount(
+                    ":iizo:",
+                    1,
+                    true,
+                ),
+                ReactionCount(
+                    ":dame:",
+                    1,
+                    false,
+                ),
+                ReactionCount(
+                    ":souiuhimoaru:",
+                    1,
+                    false,
+                ),
+                ReactionCount(
+                    ":angry:",
+                    1,
+                    false,
+                )
+            ),
+            renoteId = Note.Id(0L, "")
+        )
+        assertEquals(2, note.getMyReactionCount())
+    }
+
 
 }
