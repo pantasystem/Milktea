@@ -44,7 +44,7 @@ class ToggleReactionUseCase @Inject constructor(
                 return@runCancellableCatching
             }
 
-            if (instanceType.canMultipleReaction) {
+            if (!instanceType.canMultipleReaction) {
                 // 他にリアクション済みのリアクションがあればそれを解除する
                 note.reactionCounts.firstOrNull {
                     it.me
