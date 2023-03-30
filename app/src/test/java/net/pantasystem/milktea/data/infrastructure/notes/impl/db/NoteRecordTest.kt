@@ -35,12 +35,12 @@ internal class NoteRecordTest {
             url = "url-url-url-url",
             renoteCount = 9,
             reactionCounts = listOf(
-                ReactionCount("like", 1),
-                ReactionCount("love", 2),
-                ReactionCount("haha", 3),
-                ReactionCount("wow", 4),
-                ReactionCount("sad", 5),
-                ReactionCount("angry", 6),
+                ReactionCount("like", 1, me = true),
+                ReactionCount("love", 2, me = false),
+                ReactionCount("haha", 3, me = false),
+                ReactionCount("wow", 4, me = true),
+                ReactionCount("sad", 5, me = true),
+                ReactionCount("angry", 6, me = true),
             ),
             emojis = listOf(
                 Emoji(name = "name1", url = "url1"),
@@ -86,7 +86,7 @@ internal class NoteRecordTest {
             ), record.emojis
         )
         Assertions.assertEquals(10, record.repliesCount)
-
+        Assertions.assertEquals(listOf("like", "wow", "sad", "angry"), record.myReactions)
 
     }
 
@@ -359,6 +359,7 @@ internal class NoteRecordTest {
             mastodonIsSensitive = false,
             mastodonPureText = "test note",
             mastodonIsReactionAvailable = true,
+            myReactions = mutableListOf("like")
         )
         val expectedNote = Note(
             id = Note.Id(accountId = 1, noteId = "note-id"),
@@ -379,8 +380,8 @@ internal class NoteRecordTest {
             uri = "example://note/123",
             renoteCount = 10,
             reactionCounts = listOf(
-                ReactionCount(reaction = "like", count = 5),
-                ReactionCount(reaction = "smile", count = 3)
+                ReactionCount(reaction = "like", count = 5, me = true),
+                ReactionCount(reaction = "smile", count = 3, me = false)
             ),
             emojis = listOf(
                 Emoji(name = "smile", url = "https://example.com/emoji/smile.png"),
