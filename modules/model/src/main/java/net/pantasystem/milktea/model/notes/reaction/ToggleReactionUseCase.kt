@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.model.notes.reaction
 
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
 import net.pantasystem.milktea.model.account.Account
@@ -76,6 +77,8 @@ class ToggleReactionUseCase @Inject constructor(
                     )
                 )
             }
+        }.mapCancellableCatching {
+            noteRepository.sync(noteId).getOrThrow()
         }
     }
 
