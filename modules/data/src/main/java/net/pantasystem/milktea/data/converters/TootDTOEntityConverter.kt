@@ -27,7 +27,8 @@ class TootDTOEntityConverter @Inject constructor(
 
     suspend fun convert(statusDTO: TootStatusDTO, account: Account): Note {
         val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
-        val isReactionAvailable = (instanceInfoRepository.find(account.normalizedInstanceUri)
+        val instanceInfoResult = instanceInfoRepository.find(account.normalizedInstanceUri)
+        val isReactionAvailable = (instanceInfoResult
             .onFailure {
                 logger.error("Failed to find instance info", it)
             }
@@ -60,7 +61,8 @@ class TootDTOEntityConverter @Inject constructor(
                 reactionCounts = emojiReactions?.map {
                     ReactionCount(
                         reaction = it.reaction,
-                        count = it.count
+                        count = it.count,
+                        me = it.me ?: false,
                     )
                 } ?: emptyList(),
                 repliesCount = repliesCount,
@@ -77,6 +79,7 @@ class TootDTOEntityConverter @Inject constructor(
                     FileProperty.Id(account.accountId, it.id)
                 },
                 poll = poll.toPoll(),
+                maxReactionsPerAccount = instanceInfoResult.getOrNull()?.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0,
                 type = Note.Type.Mastodon(
                     favorited = favourited,
                     reblogged = reblogged,

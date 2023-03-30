@@ -35,7 +35,10 @@ data class Instance(
         val statuses: Statuses? = null,
 
         @SerialName("polls")
-        val polls: Polls? = null
+        val polls: Polls? = null,
+
+        @SerialName("emoji_reactions")
+        val emojiReactions: EmojiReactions? = null,
     ) {
 
         @Serializable
@@ -50,6 +53,12 @@ data class Instance(
             @SerialName("max_characters_per_option") val maxCharactersPerOption: Int? = null,
             @SerialName("min_expiration") val minExpiration: Int? = null,
             @SerialName("max_expiration") val maxExpiration: Int? = null,
+        )
+
+        @Serializable
+        data class EmojiReactions(
+            @SerialName("max_reactions") val maxReactions: Int? = null,
+            @SerialName("max_reactions_per_account") val maxReactionsPerAccount: Int? = null,
         )
 
     }

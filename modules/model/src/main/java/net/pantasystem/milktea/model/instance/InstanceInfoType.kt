@@ -35,4 +35,15 @@ sealed interface InstanceInfoType {
             }
         }
     }
+
+    val maxReactionsPerAccount: Int get() {
+        return when(this) {
+            is Mastodon -> info.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0
+            is Misskey -> 1
+        }
+    }
+
+    val canMultipleReaction: Boolean get() {
+        return maxReactionsPerAccount > 1
+    }
 }

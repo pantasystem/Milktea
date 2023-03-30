@@ -8,7 +8,7 @@ interface CustomEmojiDAO {
 
     @Transaction
     @Query("select * from custom_emojis where emojiHost = :host and name = :name")
-    suspend fun findBy(host: String, name: String): CustomEmojiRelated?
+    suspend fun findBy(host: String, name: String): List<CustomEmojiRelated>
 
 
     @Transaction

@@ -1,11 +1,13 @@
 package net.pantasystem.milktea.model.notes.reaction
 
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.UseCase
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
-import net.pantasystem.milktea.model.instance.MetaRepository
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
-import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.reaction.history.ReactionHistory
@@ -24,56 +26,97 @@ class ToggleReactionUseCase @Inject constructor(
     private val reactionRepository: ReactionRepository,
     private val reactionHistoryRepository: ReactionHistoryRepository,
     private val getAccount: GetAccount,
-    private val metaRepository: MetaRepository,
-    private val nodeInfoRepository: NodeInfoRepository,
+    private val instanceInfoService: InstanceInfoService,
+    private val customEmojiRepository: CustomEmojiRepository,
     private val checkEmoji: CheckEmoji,
 ) : UseCase {
 
     suspend operator fun invoke(noteId: Note.Id, reaction: String): Result<Unit> {
         return runCancellableCatching {
             val account = getAccount.get(noteId.accountId)
-            val reactionObj = Reaction(reaction)
-            val sendReaction =
-                if (
-                    checkEmoji.checkEmoji(reaction)
-                    || metaRepository.find(account.normalizedInstanceUri).getOrThrow()
-                        .isOwnEmojiBy(reactionObj)
-                ) {
-                    reaction
-                } else if (LegacyReaction.reactionMap.containsKey(reaction)) {
-                    requireNotNull(LegacyReaction.reactionMap[reaction])
-                } else if (
-                    nodeInfoRepository
-                        .find(account.getHost())
-                        .getOrThrow().type is NodeInfo.SoftwareType.Mastodon.Fedibird
-                ) {
-                    Reaction(reaction).getNameAndHost()
-                } else {
-                    "👍"
-                }
+            val instanceType = instanceInfoService.find(account.normalizedInstanceUri).getOrThrow()
+            val sendReaction = getSendReaction(instanceType, account, reaction)
+                ?: return@runCancellableCatching
             val note = noteRepository.find(noteId).getOrThrow()
-            if (note.myReaction.isNullOrBlank()) {
-                if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
-                    reactionHistoryRepository.create(
-                        ReactionHistory(
-                            sendReaction,
-                            account.normalizedInstanceUri
-                        )
+
+            // 同一のリアクションを選択した場合は解除して終了する
+            if (note.isReactedReaction(reaction)) {
+                reactionRepository.delete(
+                    DeleteReaction(
+                        noteId,
+                        reaction
                     )
-                }
-            } else if (note.myReaction != sendReaction) {
-                reactionRepository.delete(noteId).getOrThrow()
-                if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
-                    reactionHistoryRepository.create(
-                        ReactionHistory(
-                            sendReaction,
-                            account.normalizedInstanceUri
+                ).getOrThrow()
+                return@runCancellableCatching
+            }
+
+            if (!instanceType.canMultipleReaction) {
+                // 他にリアクション済みのリアクションがあればそれを解除する
+                note.reactionCounts.firstOrNull {
+                    it.me
+                }?.let {
+                    reactionRepository.delete(
+                        DeleteReaction(
+                            noteId,
+                            it.reaction
                         )
-                    )
+                    ).getOrThrow()
                 }
             } else {
-                reactionRepository.delete(noteId).getOrThrow()
+                // リアクション可能な件数をオーバーしてしまっていた場合はキャンセルする
+                if (note.getMyReactionCount() >= instanceType.maxReactionsPerAccount) {
+                    return@runCancellableCatching
+                }
+            }
+
+            if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
+                reactionHistoryRepository.create(
+                    ReactionHistory(
+                        sendReaction,
+                        account.normalizedInstanceUri
+                    )
+                )
+            }
+        }.mapCancellableCatching {
+            noteRepository.sync(noteId).getOrThrow()
+        }
+    }
+
+
+    internal suspend fun getSendReaction(
+        instanceType: InstanceInfoType,
+        account: Account,
+        reaction: String,
+    ): String? {
+        val reactionObj = Reaction(reaction)
+        return if (checkEmoji.checkEmoji(reaction)) {
+            reaction
+        } else if (LegacyReaction.reactionMap.containsKey(reaction)) {
+            requireNotNull(LegacyReaction.reactionMap[reaction])
+        } else {
+            when (instanceType) {
+                is InstanceInfoType.Mastodon -> {
+                    val maxCount = instanceType.maxReactionsPerAccount
+                    if (maxCount < 1) {
+                        return null
+                    }
+
+                    reactionObj.getNameAndHost()
+                }
+                is InstanceInfoType.Misskey -> {
+                    val name = reactionObj.getName()
+                        ?: return null
+                    val hitEmojis =
+                        customEmojiRepository.findByName(account.getHost(), name).getOrThrow()
+                    val hitEmoji = hitEmojis.firstOrNull()
+                    if (hitEmoji == null) {
+                        "👍"
+                    } else {
+                        reaction
+                    }
+                }
             }
         }
     }
+
 }

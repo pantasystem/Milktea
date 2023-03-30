@@ -52,9 +52,8 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnReactionButtonClicked -> {
-                val myReaction = action.note.currentNote.value.myReaction
-                if (myReaction != null) {
-                    notesViewModel.toggleReaction(action.note.toShowNote.note.id, myReaction)
+                if (action.note.currentNote.value.isReacted) {
+                    notesViewModel.deleteReactions(action.note.toShowNote.note.id)
                     return
                 }
                 if (action.note.toShowNote.note.isAcceptingOnlyLikeReaction) {
