@@ -453,4 +453,29 @@
     <string name="settings_renote_mute_title">Renote mutes</string>
     <string name="bookmark">Bookmark</string>
 
+    <!-- Authorization Start -->
+    <string name="auth_custom_app_name">App name</string>
+    <string name="auth_app_name">Milktea</string>
+    <string name="auth_successfully_created_the_app">Successfully created the app</string>
+    <string name="auth_warning_s">Warning:%s</string>
+    <string name="auth_error_s">Error %s</string>
+    <string name="auth_continue_auth">Continue</string>
+    <string name="auth_copied_to_clipboard">Copied to clipboard</string>
+    <string name="auth_instance_domain">Instance URL</string>
+    <string name="auth_https">https://</string>
+    <string name="auth_waiting_4_u_to_approve">Waiting for you to approve</string>
+    <string name="auth_i_have_approved">Approved</string>
+    <string name="auth_waiting_4_approval">Waiting for approval</string>
+    <string name="auth_authentication_url">Authentication URL</string>
+    <string name="auth_copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy authentication
+        destination URL to clipboard.
+    </string>
+    <string name="auth_welcome">Welcome</string>
+    <string name="san">-san</string>
+    <string name="auth_open_in_webview">Open in WebView</string>
+
+    <string name="auth_privacy_policy_agreeation">I agree to the Privacy Policy</string>
+    <string name="auth_terms_of_service_agreeation">I agree to the Terms of service</string>
+    <string name="auth_accpet_mastodon_alpha_test">I understand that the features related to Mastodon are still in the alpha stage and there may be features that are not yet implemented or not working, and I agree not to hold the developers responsible for this.</string>
+    <!-- Authorization End -->
 </resources>
