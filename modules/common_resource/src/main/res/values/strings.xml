@@ -29,12 +29,6 @@
     <string name="input_custom_emoji">Emoji</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->

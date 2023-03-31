@@ -29,12 +29,7 @@
     <string name="input_custom_emoji">自定义表情</string>
     <string name="title_activity_settings">设置</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">消息</string>
-    <string name="sync_header">同步</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">你的签名</string>
     <string name="reply_title">默认回复行为</string>
 
     <!-- Sync Preferences -->
