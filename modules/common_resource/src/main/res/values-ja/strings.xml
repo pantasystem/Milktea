@@ -529,4 +529,66 @@
     <string name="messaging_input_message">相手に思いを伝えてください</string>
     <!-- Messaging -->
 
+    <!-- Note -->
+    <string name="time_machine">タイムマシーン</string>
+    <string name="dialog_timemachine_message">表示したいタイムラインの時間を指定してください</string>
+    <string name="show_error">Show Error</string>
+
+    <string name="timeout_error">タイムアウト</string>
+
+    <string name="reauthenticate">再認証する</string>
+    <string name="expand">展開</string>
+    <string name="file_size_warning_dialog_title">ファイルサイズの警告</string>
+    <string name="file_size_warning_dialog_message">%1$sは%2$sより大きなファイルを添付することはできません。続行しますか？</string>
+    <string name="file_size_warning_dialo_positive_button">続行</string>
+    <string name="file_size_warning_dialog_negative_button">取りやめる</string>
+    <string name="mark_media_as_sensitive">メディアを閲覧注意にする</string>
+    <string name="successfully_added_to_favorites">お気に入りに追加しました</string>
+    <string name="failed_to_add_to_favorites">お気に入りに追加できませんでした</string>
+    <string name="removed_from_favorites">お気に入りから削除しました</string>
+    <string name="failed_to_delete_favorites">お気に入りの削除に失敗しました</string>
+    <string name="successfully_deleted">正常に削除されました</string>
+    <string name="dialog_add_emoji_to_user_settings_title">設定に絵文字を追加する</string>
+    <string name="dialog_add_emoji_to_user_settings_message">%sをユーザ絵文字設定に追加する</string>
+    <!-- Note -->
+
+    <!-- Notification -->
+    <string name="no_notifications">通知はありません</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <!-- Notification -->
+
+    <!-- Settings -->
+    <string name="client_word_mute">クライアントワードミュート</string>
+    <string name="client_word_mute_format_description">スペースで区切るとAND指定になり、改行で区切るとOR指定になります。\nキーワードをスラッシュで囲むと正規表現になります。</string>
+    <string name="import_reactions_from_the_web">リアクションをWebから取り込み</string>
+    <string name="import_reactions">取り込み</string>
+    <string name="overwrite_save">上書き保存</string>
+    <string name="notification_sound">通知音</string>
+    <string name="inapp_notification_sound">アプリ内通知音を有効にする</string>
+    <string name="streaming">自動更新</string>
+    <string name="is_stop_timeline_streaming_when_background">バックグラウンドでタイムラインを更新しない</string>
+    <string name="is_stop_note_capture_when_background">バックグラウンドでノートをキャプチャしない</string>
+    <string name="enable_automic_updates">自動更新を有効にする</string>
+    <string name="please_login">ログインしてください</string>
+    <string name="settings_edit_tab_only_media">ファイルが添付されたノートのみ表示する</string>
+    <!-- Settings -->
+
+    <!-- User -->
+    <string name="user_birthday">誕生日: %s</string>
+    <string name="user_registration_date">%sに登録をしました</string>
+    <string name="confirm_user_block_title">確認</string>
+    <string name="confirm_user_block_description">本当に%sさんをブロックしますか？</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15分後</string>
+    <string name="user_mute_specify_time_30_minutes_later">30分後</string>
+    <string name="user_mute_specify_time_1_hours_later">1時間後</string>
+    <string name="user_mute_specify_time_1_day_later">1日後</string>
+    <string name="user_mute_specify_time_1_week_later">1週間後</string>
+    <string name="user_mute_specify_time_1_month_later">1ヶ月後</string>
+    <string name="user_mute_specify_time_indefinite_period">無期限</string>
+    <string name="view_remotely">リモートで表示</string>
+    <string name="follows_you">フォローされています</string>
+    <!-- User -->
+
+
 </resources>

@@ -521,4 +521,65 @@
     <!-- Messaging -->
     <string name="messaging_input_message">什么事?</string>
     <!-- Messaging -->
+
+    <!-- Note -->
+    <string name="time_machine">回到未来</string>
+    <string name="dialog_timemachine_message">请指定您要显示的时间线的时间</string>
+    <string name="show_error">显示错误</string>
+
+    <string name="timeout_error">超时</string>
+    <string name="reauthenticate">重新认证</string>
+    <string name="expand">展開</string>
+    <string name="file_size_warning_dialog_message">%1$s 不允许大于 %2$s 的附件。要继续吗？</string>
+    <string name="file_size_warning_dialog_negative_button">取消附件</string>
+    <string name="file_size_warning_dialo_positive_button">继续</string>
+    <string name="file_size_warning_dialog_title">文件大小警告</string>
+    <string name="mark_media_as_sensitive">将媒体标记为敏感</string>
+    <string name="successfully_added_to_favorites">已成功添加到收藏夹</string>
+    <string name="failed_to_add_to_favorites">添加到收藏夹失败</string>
+    <string name="removed_from_favorites">从收藏夹中删除</string>
+    <string name="failed_to_delete_favorites">删除收藏失败</string>
+    <string name="successfully_deleted">成功删除</string>
+    <string name="dialog_add_emoji_to_user_settings_title">将表情符号添加到设置</string>
+    <string name="dialog_add_emoji_to_user_settings_message">将 %s 添加到用户表情符号设置</string>
+    <!-- Note -->
+
+    <!-- Notification -->
+    <string name="no_notifications">没有通知</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <!-- Notification -->
+
+    <!-- Settings -->
+    <string name="client_word_mute">客户端关键字静音</string>
+    <string name="client_word_mute_format_description">用空格分隔会产生 AND 规范，用换行符分隔会产生 OR 规范。\n关键字周围的斜线使其成为正则表达式。</string>
+    <string name="import_reactions_from_the_web">从网络导入反应</string>
+    <string name="import_reactions">导入反应</string>
+    <string name="overwrite_save">覆盖保存</string>
+    <string name="notification_sound">通知音</string>
+    <string name="inapp_notification_sound">启用应用内通知音</string>
+    <string name="streaming">自動更新</string>
+    <string name="is_stop_timeline_streaming_when_background">在后台不更新时间线</string>
+    <string name="is_stop_note_capture_when_background">不要在后台捕捉笔记</string>
+    <string name="enable_automic_updates">启用自动更新</string>
+    <string name="please_login">请登录</string>
+    <string name="settings_edit_tab_only_media">Only Media</string>
+    <!-- Settings -->
+
+    <!-- User -->
+    <string name="user_birthday">生日: %s</string>
+    <string name="user_registration_date">注册于 %s</string>
+    <string name="confirm_user_block_title">确认</string>
+    <string name="confirm_user_block_description">您确定要拉黑 %s 吗？</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15 分钟后</string>
+    <string name="user_mute_specify_time_30_minutes_later">30 分钟后</string>
+    <string name="user_mute_specify_time_1_hours_later">1 小时后</string>
+    <string name="user_mute_specify_time_1_day_later">1 天后</string>
+    <string name="user_mute_specify_time_1_week_later">1 周后</string>
+    <string name="user_mute_specify_time_1_month_later">1 个月后</string>
+    <string name="user_mute_specify_time_indefinite_period">无限期</string>
+    <string name="view_remotely">远程查看</string>
+    <string name="follows_you">正在关注你</string>
+    <!-- User -->
+
 </resources>

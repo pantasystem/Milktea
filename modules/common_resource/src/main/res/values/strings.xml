@@ -521,4 +521,67 @@
     <string name="messaging_input_message">What\'s up?</string>
     <!-- Messaging -->
 
+    <!-- Note -->
+    <string name="time_machine">Back to the future</string>
+    <string name="dialog_timemachine_message">Please specify the time of the timeline you want to display</string>
+    <string name="show_error">Show Error</string>
+
+    <string name="timeout_error">Timeout</string>
+
+    <string name="reauthenticate">Reauthenticate</string>
+    <string name="expand">Expand</string>
+
+    <string name="file_size_warning_dialog_title">File size warning</string>
+    <string name="file_size_warning_dialog_message">%1$s does not allow attachments larger than %2$s.\nDo you want to continue?</string>
+    <string name="file_size_warning_dialo_positive_button">Continue</string>
+    <string name="file_size_warning_dialog_negative_button">Cancel attachment</string>
+
+    <string name="mark_media_as_sensitive">Mark media as sensitive</string>
+    <string name="successfully_added_to_favorites">Successfully added to Favorites</string>
+    <string name="failed_to_add_to_favorites">Failed to add to favorites</string>
+    <string name="removed_from_favorites">Removed from Favorites</string>
+    <string name="failed_to_delete_favorites">Failed to delete favorites</string>
+    <string name="successfully_deleted">Successfully deleted</string>
+    <string name="dialog_add_emoji_to_user_settings_title">Add emoji to settings</string>
+    <string name="dialog_add_emoji_to_user_settings_message">Add %s to user emoji settings.</string>
+    <!-- Note -->
+
+    <!-- Notification -->
+    <string name="no_notifications">No notifications</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <!-- Notification -->
+
+    <!-- Settings -->
+    <string name="client_word_mute">Client Word mute</string>
+    <string name="client_word_mute_format_description">Delimiting with a space results in an AND specification, and delimiting with a line break results in an OR specification. \nSlashes around the keyword make it a regular expression.</string>
+    <string name="import_reactions_from_the_web">Import reactions from the web</string>
+    <string name="import_reactions">Import reactions</string>
+    <string name="overwrite_save">Overwrite save</string>
+    <string name="notification_sound">Notification Sound</string>
+    <string name="inapp_notification_sound">Enable In-app notification sound</string>
+    <string name="streaming">Automatic updating</string>
+    <string name="is_stop_timeline_streaming_when_background">Do not update timeline when in background</string>
+    <string name="is_stop_note_capture_when_background">Do not capture notes in background</string>
+    <string name="enable_automic_updates">Enable automatic updates</string>
+    <string name="please_login">Please login</string>
+    <string name="settings_edit_tab_only_media">Only Media</string>
+    <!-- Settings -->
+
+    <!-- User -->
+    <string name="user_birthday">Birthday: %s</string>
+    <string name="user_registration_date">Registered on the %s</string>
+    <string name="confirm_user_block_title">Confirmation</string>
+    <string name="confirm_user_block_description">Are you sure you want to block %s?</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15 minutes later</string>
+    <string name="user_mute_specify_time_30_minutes_later">30 minutes later</string>
+    <string name="user_mute_specify_time_1_hours_later">1 hour later</string>
+    <string name="user_mute_specify_time_1_day_later">1 day later</string>
+    <string name="user_mute_specify_time_1_week_later">1 week later</string>
+    <string name="user_mute_specify_time_1_month_later">1 month later</string>
+    <string name="user_mute_specify_time_indefinite_period">Indefinite perio</string>
+    <string name="view_remotely">View remotely</string>
+    <string name="follows_you">Follows you</string>
+    <!-- User -->
+
 </resources>
