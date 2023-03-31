@@ -103,13 +103,13 @@ class UserDetailViewModel @AssistedInject constructor(
     val birthday = userState.map {
         it?.info?.birthday
     }.filterNotNull().map {
-        StringSource(R.string.birthday, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+        StringSource(R.string.user_birthday, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val registrationDate = userState.map {
         it?.info?.createdAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
     }.filterNotNull().map {
-        StringSource(R.string.registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+        StringSource(R.string.user_registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val tabTypes = combine(

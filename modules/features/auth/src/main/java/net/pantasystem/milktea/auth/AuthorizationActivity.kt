@@ -119,7 +119,7 @@ class AuthorizationActivity : AppCompatActivity() {
                                 )
                                 Toast.makeText(
                                     this,
-                                    getString(R.string.copied_to_clipboard),
+                                    getString(R.string.auth_copied_to_clipboard),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }

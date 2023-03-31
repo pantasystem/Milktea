@@ -61,7 +61,7 @@ fun GalleryEditorPage(
                     .weight(1f)
             ) {
                 item {
-                    Text(stringResource(id = R.string.pick_image))
+                    Text(stringResource(id = R.string.gallery_pick_image))
 
                     if (state.pickedImages.isNotEmpty()) {
                         PickedImagePreview(
@@ -77,7 +77,7 @@ fun GalleryEditorPage(
                         Text(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(id = R.string.pick_image_from_device)
+                            text = stringResource(id = R.string.gallery_pick_image_from_device)
                         )
                     }
                     Button(onClick = { onAction.invoke(GalleryEditorPageAction.PickLocalFile) }) {
@@ -85,7 +85,7 @@ fun GalleryEditorPage(
                         Text(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(id = R.string.pick_image_from_drive)
+                            text = stringResource(id = R.string.gallery_pick_image_from_drive)
                         )
                     }
 

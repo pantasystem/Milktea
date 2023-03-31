@@ -29,12 +29,7 @@
     <string name="input_custom_emoji">自定义表情</string>
     <string name="title_activity_settings">设置</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">消息</string>
-    <string name="sync_header">同步</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">你的签名</string>
     <string name="reply_title">默认回复行为</string>
 
     <!-- Sync Preferences -->
@@ -459,5 +454,127 @@
     <string name="settings_renote_mute_title">远程静音</string>
     <string name="bookmark">书签</string>
 
+    <string name="auth_custom_app_name">应用名称</string>
+    <string name="auth_app_name">Milktea</string>
+    <string name="auth_successfully_created_the_app">成功创建应用</string>
+    <string name="auth_warning_s">警告：%s</string>
+    <string name="auth_error_s">发生错误：%s</string>
+    <string name="auth_continue_auth">继续</string>
+    <string name="auth_copied_to_clipboard">已复制到剪贴板</string>
+    <string name="auth_instance_domain">实例 URL</string>
+    <string name="auth_https">https://</string>
+    <string name="auth_waiting_4_u_to_approve">正在等待您的同意</string>
+    <string name="auth_i_have_approved">已同意的</string>
+    <string name="auth_waiting_4_approval">正在等待同意</string>
+    <string name="auth_authentication_url">验证 URL</string>
+    <string name="auth_copy_the_url_of_the_authentication_destination_to_the_clipboard">将身份验证 URL 复制到剪贴板。</string>
+    <string name="auth_welcome">欢迎</string>
+    <string name="san">先生 / 女士</string>
+    <string name="auth_open_in_webview">使用 WebView 打开</string>
+    <string name="auth_terms_of_service_agreeation">我同意服务条款</string>
+    <string name="auth_privacy_policy_agreeation">我同意隐私政策</string>
+    <string name="auth_accpet_mastodon_alpha_test">我明白Mastodon相关的功能仍处于alpha阶段，可能存在尚未实现或无法工作的功能，我同意不对开发人员负责</string>
+
+    <!-- Channel -->
+    <string name="channel_n_people">%d 人</string>
+    <string name="channel_n_posts">%d 帖子</string>
+    <string name="channel_owned">我的</string>
+    <!-- Channel -->
+
+    <!-- Drive -->
+    <string name="drive_undo_nsfw">取消NSFW标签</string>
+    <string name="drive_file_deletion_confirmation">确认删除</string>
+    <string name="drive_do_u_want_2_delete_s">你确定要删除 %s 吗？</string>
+    <string name="drive_mark_as_nsfw">标记为NSFW</string>
+    <string name="drive">网盘</string>
+    <string name="drive_file">文件</string>
+    <string name="drive_folder">文件夹</string>
+    <string name="drive_create_folder">创建文件夹</string>
+    <string name="drive_folder_name">文件夹名称</string>
+    <!-- Drive -->
+
+    <!-- Gallery -->
+    <string name="gallery_sensitive_content">敏感内容</string>
+    <string name="gallery_pick_image">选择图片</string>
+    <string name="gallery_pick_image_from_device">从设备中选取图片</string>
+    <string name="gallery_pick_image_from_drive">从网盘中选取图片</string>
+    <!-- Gallery -->
+
+    <!-- Group -->
+    <string name="group_name">群组名字</string>
+    <string name="create_group">创建群组</string>
+    <string name="edit_group">编辑群组</string>
+    <!-- Group -->
+
+    <!-- Media -->
+    <string name="download">下载</string>
+    <string name="start_downloading_placeholder">开始下载 %s</string>
+    <string name="success_download_file_message">下载成功</string>
+    <string name="failed_download_file_message">下载失败</string>
+    <!-- Media -->
+
+    <!-- Messaging -->
+    <string name="messaging_input_message">什么事?</string>
+    <!-- Messaging -->
+
+    <!-- Note -->
+    <string name="time_machine">回到未来</string>
+    <string name="dialog_timemachine_message">请指定您要显示的时间线的时间</string>
+    <string name="show_error">显示错误</string>
+
+    <string name="timeout_error">超时</string>
+    <string name="reauthenticate">重新认证</string>
+    <string name="expand">展開</string>
+    <string name="file_size_warning_dialog_message">%1$s 不允许大于 %2$s 的附件。要继续吗？</string>
+    <string name="file_size_warning_dialog_negative_button">取消附件</string>
+    <string name="file_size_warning_dialo_positive_button">继续</string>
+    <string name="file_size_warning_dialog_title">文件大小警告</string>
+    <string name="mark_media_as_sensitive">将媒体标记为敏感</string>
+    <string name="successfully_added_to_favorites">已成功添加到收藏夹</string>
+    <string name="failed_to_add_to_favorites">添加到收藏夹失败</string>
+    <string name="removed_from_favorites">从收藏夹中删除</string>
+    <string name="failed_to_delete_favorites">删除收藏失败</string>
+    <string name="successfully_deleted">成功删除</string>
+    <string name="dialog_add_emoji_to_user_settings_title">将表情符号添加到设置</string>
+    <string name="dialog_add_emoji_to_user_settings_message">将 %s 添加到用户表情符号设置</string>
+    <!-- Note -->
+
+    <!-- Notification -->
+    <string name="no_notifications">没有通知</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <!-- Notification -->
+
+    <!-- Settings -->
+    <string name="client_word_mute">客户端关键字静音</string>
+    <string name="client_word_mute_format_description">用空格分隔会产生 AND 规范，用换行符分隔会产生 OR 规范。\n关键字周围的斜线使其成为正则表达式。</string>
+    <string name="import_reactions_from_the_web">从网络导入反应</string>
+    <string name="import_reactions">导入反应</string>
+    <string name="overwrite_save">覆盖保存</string>
+    <string name="notification_sound">通知音</string>
+    <string name="inapp_notification_sound">启用应用内通知音</string>
+    <string name="streaming">自動更新</string>
+    <string name="is_stop_timeline_streaming_when_background">在后台不更新时间线</string>
+    <string name="is_stop_note_capture_when_background">不要在后台捕捉笔记</string>
+    <string name="enable_automic_updates">启用自动更新</string>
+    <string name="please_login">请登录</string>
+    <string name="settings_edit_tab_only_media">Only Media</string>
+    <!-- Settings -->
+
+    <!-- User -->
+    <string name="user_birthday">生日: %s</string>
+    <string name="user_registration_date">注册于 %s</string>
+    <string name="confirm_user_block_title">确认</string>
+    <string name="confirm_user_block_description">您确定要拉黑 %s 吗？</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15 分钟后</string>
+    <string name="user_mute_specify_time_30_minutes_later">30 分钟后</string>
+    <string name="user_mute_specify_time_1_hours_later">1 小时后</string>
+    <string name="user_mute_specify_time_1_day_later">1 天后</string>
+    <string name="user_mute_specify_time_1_week_later">1 周后</string>
+    <string name="user_mute_specify_time_1_month_later">1 个月后</string>
+    <string name="user_mute_specify_time_indefinite_period">无限期</string>
+    <string name="view_remotely">远程查看</string>
+    <string name="follows_you">正在关注你</string>
+    <!-- User -->
 
 </resources>

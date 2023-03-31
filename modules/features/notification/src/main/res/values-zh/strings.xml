@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="no_notifications">没有通知</string>
-    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
-</resources>

@@ -171,7 +171,7 @@ private fun ChannelCardAggregateLabel(modifier: Modifier = Modifier, channel: Ch
                     imageVector = Icons.Default.AccountCircle, contentDescription = "users count"
                 )
                 Spacer(modifier = Modifier.width(2.dp))
-                Text(stringResource(id = R.string.n_people, channel.usersCount))
+                Text(stringResource(id = R.string.channel_n_people, channel.usersCount))
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -180,7 +180,7 @@ private fun ChannelCardAggregateLabel(modifier: Modifier = Modifier, channel: Ch
                     imageVector = Icons.Default.Edit, contentDescription = "posts count"
                 )
                 Spacer(modifier = Modifier.width(2.dp))
-                Text(stringResource(id = R.string.n_posts, channel.notesCount))
+                Text(stringResource(id = R.string.channel_n_posts, channel.notesCount))
             }
         }
     }

@@ -49,7 +49,7 @@ fun AuthScreen(
                             Text("認証完了")
                         }
                         is Authorization.Waiting4UserAuthorization -> {
-                            Text(stringResource(id = R.string.waiting_4_approval))
+                            Text(stringResource(id = R.string.auth_waiting_4_approval))
                         }
                     }
                 }

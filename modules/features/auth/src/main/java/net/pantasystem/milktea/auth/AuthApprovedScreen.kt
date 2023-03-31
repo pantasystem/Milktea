@@ -27,7 +27,7 @@ fun AuthApprovedScreen(
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(id = R.string.welcome), fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.auth_welcome), fontSize = 32.sp, fontWeight = FontWeight.Bold)
         }
 
         Row(Modifier.fillMaxWidth()) {
@@ -39,7 +39,7 @@ fun AuthApprovedScreen(
                     .weight(0.75f)
             ) {
                 Text(
-                    stringResource(id = R.string.continue_auth)
+                    stringResource(id = R.string.auth_continue_auth)
                 )
             }
         }

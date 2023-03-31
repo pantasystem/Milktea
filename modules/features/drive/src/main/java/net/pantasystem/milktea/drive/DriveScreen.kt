@@ -44,8 +44,8 @@ fun DriveScreen(
     onShowLocalFilePicker: () -> Unit,
     onShowCreateDirectoryEditor: () -> Unit,
     tabTitles: List<String> = listOf(
-        stringResource(id = R.string.file),
-        stringResource(id = R.string.folder)
+        stringResource(id = R.string.drive_file),
+        stringResource(id = R.string.drive_folder)
     )
 ) {
     require(tabTitles.size == 2)

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="cancel">取消</string>
-    <string name="save">保存</string>
-    <string name="group_name">群组名字</string>
-    <string name="create_group">创建群组</string>
-    <string name="edit_group">编辑群组</string>
-</resources>

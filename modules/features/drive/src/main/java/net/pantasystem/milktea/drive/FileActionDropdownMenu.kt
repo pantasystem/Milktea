@@ -37,18 +37,18 @@ fun FileActionDropdownMenu(
             if (property.isSensitive) {
                 Icon(
                     Icons.Default.Image,
-                    contentDescription = stringResource(R.string.undo_nsfw),
+                    contentDescription = stringResource(R.string.drive_undo_nsfw),
                     modifier = Modifier.size(24.dp)
 
                 )
-                Text(stringResource(R.string.undo_nsfw))
+                Text(stringResource(R.string.drive_undo_nsfw))
             } else {
                 Icon(
                     Icons.Default.HideImage,
-                    contentDescription = stringResource(R.string.mark_as_nsfw),
+                    contentDescription = stringResource(R.string.drive_mark_as_nsfw),
                     modifier = Modifier.size(24.dp)
                 )
-                Text(stringResource(R.string.mark_as_nsfw))
+                Text(stringResource(R.string.drive_mark_as_nsfw))
             }
         }
 
@@ -104,7 +104,7 @@ fun ConfirmDeleteFilePropertyDialog(
             onDismissRequest = onDismissRequest,
 
             title = {
-                Text(stringResource(R.string.file_deletion_confirmation))
+                Text(stringResource(R.string.drive_file_deletion_confirmation))
             },
             confirmButton = {
                 TextButton(onClick = onConfirmed) {
@@ -112,7 +112,7 @@ fun ConfirmDeleteFilePropertyDialog(
                 }
             },
             text = {
-                Text(stringResource(R.string.do_u_want_2_delete_s, filename))
+                Text(stringResource(R.string.drive_do_u_want_2_delete_s, filename))
             },
             dismissButton = {
                 TextButton(onClick = onDismissRequest) {
