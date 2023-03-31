@@ -41,7 +41,7 @@ fun Waiting4ApproveScreen(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
-            Text(stringResource(id = R.string.waiting_4_u_to_approve), fontSize = 18.sp)
+            Text(stringResource(id = R.string.auth_waiting_4_u_to_approve), fontSize = 18.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -78,7 +78,7 @@ fun Waiting4ApproveScreen(
             shape = RoundedCornerShape(32.dp),
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text(stringResource(id = R.string.i_have_approved))
+            Text(stringResource(id = R.string.auth_i_have_approved))
         }
     }
 }

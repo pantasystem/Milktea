@@ -60,7 +60,7 @@ fun SignUpScreen(
                     .padding(horizontal = 16.dp),
                 maxLines = 1,
                 label = {
-                    Text(stringResource(R.string.instance_domain))
+                    Text(stringResource(R.string.auth_instance_domain))
                 },
                 trailingIcon = {
                     IconButton(
