@@ -405,7 +405,8 @@
                         android:layout_weight="1"
                         android:singleLine="true"
                         android:text='@{String.valueOf(SafeUnbox.unbox(note.replyCount))}'
-                        android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}' />
+                        android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                        android:textSize="@dimen/note_counter_text_size" />
 
                 <ImageButton
                         android:id="@+id/renoteButton"
@@ -431,7 +432,7 @@
                         android:singleLine="true"
                         android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
                         android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
-
+                        android:textSize="@dimen/note_counter_text_size"
                         />
                 <ImageButton
                         android:id="@+id/toggleMastodonFavouriteButton"
@@ -462,6 +463,7 @@
 
                         tools:text="10"
                         app:emojiCompatEnabled="false"
+                        android:textSize="@dimen/note_counter_text_size"
                         />
 
 
@@ -489,7 +491,7 @@
                         android:layout_weight="1"
                         android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
                         android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
-
+                        android:textSize="@dimen/note_counter_text_size"
                         />
 
                 <ImageButton
