@@ -487,4 +487,10 @@
     <string name="auth_accpet_mastodon_alpha_test">Mastodonに関する機能はまだアルファ段階で、まだ実装できていない機能や動作しない機能があることを理解し、開発者に責任を問わないことを承諾します。</string>
     <!-- Authorization機能ここまで -->
 
+    <!-- Channel -->
+    <string name="channel_n_people">%d人</string>
+    <string name="channel_n_posts">%d投稿</string>
+    <string name="channel_owned">私の</string>
+    <!-- Channel -->
+
 </resources>

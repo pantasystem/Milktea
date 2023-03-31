@@ -478,4 +478,10 @@
     <string name="auth_terms_of_service_agreeation">I agree to the Terms of service</string>
     <string name="auth_accpet_mastodon_alpha_test">I understand that the features related to Mastodon are still in the alpha stage and there may be features that are not yet implemented or not working, and I agree not to hold the developers responsible for this.</string>
     <!-- Authorization End -->
+
+    <!-- Channel -->
+    <string name="channel_n_people">%d people</string>
+    <string name="channel_n_posts">%d posts</string>
+    <string name="channel_owned">Owned</string>
+    <!-- Channel -->
 </resources>

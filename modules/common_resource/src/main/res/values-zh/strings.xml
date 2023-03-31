@@ -480,4 +480,10 @@
     <string name="auth_privacy_policy_agreeation">我同意隐私政策</string>
     <string name="auth_accpet_mastodon_alpha_test">我明白Mastodon相关的功能仍处于alpha阶段，可能存在尚未实现或无法工作的功能，我同意不对开发人员负责</string>
 
+    <!-- Channel -->
+    <string name="channel_n_people">%d 人</string>
+    <string name="channel_n_posts">%d 帖子</string>
+    <string name="channel_owned">我的</string>
+    <!-- Channel -->
+
 </resources>
