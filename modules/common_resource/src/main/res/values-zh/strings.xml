@@ -486,4 +486,39 @@
     <string name="channel_owned">我的</string>
     <!-- Channel -->
 
+    <!-- Drive -->
+    <string name="drive_undo_nsfw">取消NSFW标签</string>
+    <string name="drive_file_deletion_confirmation">确认删除</string>
+    <string name="drive_do_u_want_2_delete_s">你确定要删除 %s 吗？</string>
+    <string name="drive_mark_as_nsfw">标记为NSFW</string>
+    <string name="drive">网盘</string>
+    <string name="drive_file">文件</string>
+    <string name="drive_folder">文件夹</string>
+    <string name="drive_create_folder">创建文件夹</string>
+    <string name="drive_folder_name">文件夹名称</string>
+    <!-- Drive -->
+
+    <!-- Gallery -->
+    <string name="gallery_sensitive_content">敏感内容</string>
+    <string name="gallery_pick_image">选择图片</string>
+    <string name="gallery_pick_image_from_device">从设备中选取图片</string>
+    <string name="gallery_pick_image_from_drive">从网盘中选取图片</string>
+    <!-- Gallery -->
+
+    <!-- Group -->
+    <string name="group_name">群组名字</string>
+    <string name="create_group">创建群组</string>
+    <string name="edit_group">编辑群组</string>
+    <!-- Group -->
+
+    <!-- Media -->
+    <string name="download">下载</string>
+    <string name="start_downloading_placeholder">开始下载 %s</string>
+    <string name="success_download_file_message">下载成功</string>
+    <string name="failed_download_file_message">下载失败</string>
+    <!-- Media -->
+
+    <!-- Messaging -->
+    <string name="messaging_input_message">什么事?</string>
+    <!-- Messaging -->
 </resources>

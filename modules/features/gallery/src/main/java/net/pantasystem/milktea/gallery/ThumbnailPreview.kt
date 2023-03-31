@@ -29,7 +29,7 @@ fun ThumbnailPreview(
         contentAlignment = Alignment.Center
     ) {
         if(!isVisible) {
-            Text(stringResource(R.string.sensitive_content))
+            Text(stringResource(R.string.gallery_sensitive_content))
         }
         
 

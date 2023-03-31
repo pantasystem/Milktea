@@ -493,4 +493,40 @@
     <string name="channel_owned">私の</string>
     <!-- Channel -->
 
+    <!-- Drive -->
+    <string name="drive_undo_nsfw">閲覧注意解除</string>
+    <string name="drive_file_deletion_confirmation">ファイル削除の確認</string>
+    <string name="drive_do_u_want_2_delete_s">%sを削除しますか？</string>
+    <string name="drive_mark_as_nsfw">閲覧注意にする</string>
+    <string name="drive">ドライブ</string>
+    <string name="drive_file">ファイル</string>
+    <string name="drive_folder">フォルダー</string>
+    <string name="drive_create_folder">フォルダーを作成</string>
+    <string name="drive_folder_name">フォルダ名</string>
+    <!-- Drive -->
+
+    <!-- Gallery -->
+    <string name="gallery_sensitive_content">Sensitive content</string>
+    <string name="gallery_pick_image">画像を選択</string>
+    <string name="gallery_pick_image_from_device">端末から画像を選択</string>
+    <string name="gallery_pick_image_from_drive">ドライブから画像を選択</string>
+    <!-- Gallery -->
+
+    <!-- Group -->
+    <string name="group_name">グループ名</string>
+    <string name="create_group">グループを作成</string>
+    <string name="edit_group">グループを編集</string>
+    <!-- Group -->
+
+    <!-- Media -->
+    <string name="download">ダウンロード</string>
+    <string name="start_downloading_placeholder">%sのダウンロードを開始します。</string>
+    <string name="success_download_file_message">ファイルのダウンロードに成功にしました</string>
+    <string name="failed_download_file_message">ファイルのダウンロードに失敗しました</string>
+    <!-- Media -->
+
+    <!-- Messaging -->
+    <string name="messaging_input_message">相手に思いを伝えてください</string>
+    <!-- Messaging -->
+
 </resources>

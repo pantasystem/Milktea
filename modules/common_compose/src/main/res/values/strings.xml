@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="show">Show</string>
-    <string name="undo_nsfw">Undo NSFW</string>
-    <string name="mark_as_nsfw">Mark as NSFW</string>
+    <string name="drive_undo_nsfw">Undo NSFW</string>
+    <string name="drive_mark_as_nsfw">Mark as NSFW</string>
     <string name="remove_attachment">Remove attachment</string>
 
 
