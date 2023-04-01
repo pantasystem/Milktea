@@ -82,26 +82,37 @@ class PlaneNoteViewDataCache(
 
     suspend fun useByIds(
         ids: List<Note.Id>,
-        isGoneAfterRenotes: Boolean = true
+        isGoneAfterRenotes: Boolean = true,
+        isReleaseUnUsedResource: Boolean = true,
     ): List<PlaneNoteViewData> {
-        val notExistsIds = lock.withLock {
-            ids.filter {
+        val notExistsIds: List<Note.Id>
+        lock.withLock {
+            notExistsIds = ids.filter {
                 cache[it] == null
             }
         }
-        val exists = lock.withLock {
-            ids.mapNotNull {
-                cache[it]
+
+        val relations = noteRelationGetter.getIn(notExistsIds)
+
+        useIn(relations)
+
+        val notes = ids.mapNotNull {
+            cache[it]
+        }
+
+        if (isReleaseUnUsedResource) {
+            val idHash = ids.toSet()
+            lock.withLock {
+                val removedIds = cache.keys.filterNot {
+                    idHash.contains(it)
+                }
+
+                for (id in removedIds) {
+                    cache.remove(id)?.job?.cancel()
+                }
             }
         }
-        val relations = noteRelationGetter.getIn(notExistsIds)
-        val newList = useIn(relations)
-        val map = (exists + newList).associateBy {
-            it.id
-        }
-        val notes = ids.mapNotNull {
-            map[it]
-        }
+
 
         // NOTE: リノートが連続している場合は、そのコンテンツを省略するフラグを立てる処理
         if (isGoneAfterRenotes) {
