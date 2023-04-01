@@ -63,7 +63,7 @@ class PlaneNoteViewDataCache(
     }
 
     private val lock = Mutex()
-    private var cache = mutableMapOf<Note.Id, PlaneNoteViewData>()
+    private val cache = mutableMapOf<Note.Id, PlaneNoteViewData>()
 
     suspend fun get(relation: NoteRelation): PlaneNoteViewData {
         return lock.withLock {
@@ -85,46 +85,31 @@ class PlaneNoteViewDataCache(
         isGoneAfterRenotes: Boolean = true,
         isReleaseUnUsedResource: Boolean = true,
     ): List<PlaneNoteViewData> {
-        val exists: List<PlaneNoteViewData>
         val notExistsIds: List<Note.Id>
-        val removed: List<PlaneNoteViewData>
         lock.withLock {
-            exists = ids.mapNotNull {
-                cache[it]
-            }
-
             notExistsIds = ids.filter {
                 cache[it] == null
-            }
-
-            val idHash = ids.toSet()
-
-            removed = if (isReleaseUnUsedResource) {
-                cache.filterNot {
-                    idHash.contains(it.key)
-                }.map {
-                    it.value
-                }
-            } else {
-                emptyList()
             }
         }
 
         val relations = noteRelationGetter.getIn(notExistsIds)
-        val newList = useIn(relations)
-        val map = (exists + newList).associateBy {
-            it.id
-        }
+
+        useIn(relations)
+
         val notes = ids.mapNotNull {
-            map[it]
+            cache[it]
         }
 
         if (isReleaseUnUsedResource) {
+            val idHash = ids.toSet()
             lock.withLock {
-                cache = map.toMutableMap()
-            }
-            removed.forEach {
-                it.job?.cancel()
+                val removedIds = cache.keys.filterNot {
+                    idHash.contains(it)
+                }
+
+                for (id in removedIds) {
+                    cache.remove(id)?.job?.cancel()
+                }
             }
         }
 
