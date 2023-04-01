@@ -63,7 +63,7 @@ class PlaneNoteViewDataCache(
     }
 
     private val lock = Mutex()
-    private val cache = mutableMapOf<Note.Id, PlaneNoteViewData>()
+    private var cache = mutableMapOf<Note.Id, PlaneNoteViewData>()
 
     suspend fun get(relation: NoteRelation): PlaneNoteViewData {
         return lock.withLock {
@@ -82,18 +82,34 @@ class PlaneNoteViewDataCache(
 
     suspend fun useByIds(
         ids: List<Note.Id>,
-        isGoneAfterRenotes: Boolean = true
+        isGoneAfterRenotes: Boolean = true,
+        isReleaseUnUsedResource: Boolean = true,
     ): List<PlaneNoteViewData> {
-        val notExistsIds = lock.withLock {
-            ids.filter {
-                cache[it] == null
-            }
-        }
-        val exists = lock.withLock {
-            ids.mapNotNull {
+        val exists: List<PlaneNoteViewData>
+        val notExistsIds: List<Note.Id>
+        val removed: List<PlaneNoteViewData>
+        lock.withLock {
+            exists = ids.mapNotNull {
                 cache[it]
             }
+
+            notExistsIds = ids.filter {
+                cache[it] == null
+            }
+
+            val idHash = ids.toSet()
+
+            removed = if (isReleaseUnUsedResource) {
+                cache.filterNot {
+                    idHash.contains(it.key)
+                }.map {
+                    it.value
+                }
+            } else {
+                emptyList()
+            }
         }
+
         val relations = noteRelationGetter.getIn(notExistsIds)
         val newList = useIn(relations)
         val map = (exists + newList).associateBy {
@@ -102,6 +118,16 @@ class PlaneNoteViewDataCache(
         val notes = ids.mapNotNull {
             map[it]
         }
+
+        if (isReleaseUnUsedResource) {
+            lock.withLock {
+                cache = map.toMutableMap()
+            }
+            removed.forEach {
+                it.job?.cancel()
+            }
+        }
+
 
         // NOTE: リノートが連続している場合は、そのコンテンツを省略するフラグを立てる処理
         if (isGoneAfterRenotes) {
