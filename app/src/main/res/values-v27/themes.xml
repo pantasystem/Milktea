@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorSecondary">#575DAE</item>
+
+        <item name="actionBarSize">53dp</item>
+
+        <item name="colorNormalReactionCounterBackground">@color/colorNormalReaction</item>
+        <item name="colorSelectedReactionCounterBackground">#808EDD</item>
+        <item name="colorBottomNavigationSelected">@color/colorItemSelected</item>
+        <item name="colorBottomNavigationNotSelect">@color/colorItemNotSelected</item>
+
+        <item name="normalIconTint">@color/colorItemNotSelected</item>
+        <item name="colorMessageSelf">#808EDD</item>
+        <item name="colorMessageRecipient">@color/colorMessageRecipient</item>
+
+        <item name="colorSeparator">@color/colorSeparator</item>
+
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.Toolbar</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
+        <item name="tabStyle">@style/TabLayout4Light</item>
+
+
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightNavigationBar">true</item>
+
+        <item name="textInputStyle">@style/TextInputLayoutStyle</item>
+
+
+        <item name="colorDotTabSelected">#575DAE</item>
+        <item name="colorDotTabNormal">@color/colorItemNotSelected</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
