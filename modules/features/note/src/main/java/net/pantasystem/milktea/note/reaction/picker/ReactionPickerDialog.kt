@@ -1,10 +1,11 @@
 package net.pantasystem.milktea.note.reaction.picker
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.activityViewModels
@@ -51,14 +52,18 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
 
     private val reactionPickerDialogViewModel by activityViewModels<ReactionPickerDialogViewModel>()
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.dialog_reaction_picker, container, false)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        val view = View.inflate(dialog.context, R.layout.dialog_reaction_picker, null)
-        dialog.setContentView(view)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val binding = DialogReactionPickerBinding.bind(view)
-
-
         val noteId = Note.Id(
             requireArguments().getLong("ACCOUNT_ID"),
             requireArguments().getString("NOTE_ID")!!,
@@ -86,7 +91,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
         }
 
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
-            metaRepository.observe(it.normalizedInstanceDomain)
+            metaRepository.observe(it.normalizedInstanceUri)
         }.mapNotNull {
             it?.emojis
         }.onEach { emojis ->
@@ -118,9 +123,7 @@ class ReactionPickerDialog : AppCompatDialogFragment(){
             false
         }
         binding.reactionField
-        return dialog
     }
-
     private fun getFlexBoxLayoutManager(context: Context): FlexboxLayoutManager{
         val flexBoxLayoutManager = FlexboxLayoutManager(context)
         flexBoxLayoutManager.flexDirection = FlexDirection.ROW

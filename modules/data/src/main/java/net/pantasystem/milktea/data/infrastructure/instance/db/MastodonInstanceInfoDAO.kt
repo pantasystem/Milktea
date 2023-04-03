@@ -18,11 +18,21 @@ abstract class MastodonInstanceInfoDAO {
     @Query("""
         select * from mastodon_instance_info where uri = :uri
     """)
-    abstract suspend fun findBy(uri: String): MastodonInstanceInfoRecord?
+    @Transaction
+    abstract suspend fun findBy(uri: String): MastodonInstanceInfoRelated?
 
     @Query("""
         select * from mastodon_instance_info where uri = :uri
     """)
-    abstract fun observeBy(uri: String): Flow<MastodonInstanceInfoRecord?>
+    @Transaction
+    abstract fun observeBy(uri: String): Flow<MastodonInstanceInfoRelated?>
+
+    @Query("""
+        delete from mastodon_instance_fedibird_capabilities where uri = :uri
+    """)
+    abstract fun clearFedibirdCapabilities(uri: String)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertFedibirdCapabilities(list: List<FedibirdCapabilitiesRecord>): List<Long>
 
 }

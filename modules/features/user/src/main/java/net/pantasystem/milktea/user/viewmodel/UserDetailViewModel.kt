@@ -28,13 +28,13 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.FeatureType
-import net.pantasystem.milktea.model.user.Acct
-import net.pantasystem.milktea.model.user.User
-import net.pantasystem.milktea.model.user.UserDataSource
-import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.*
+import net.pantasystem.milktea.model.user.block.BlockRepository
 import net.pantasystem.milktea.model.user.mute.CreateMute
+import net.pantasystem.milktea.model.user.mute.MuteRepository
 import net.pantasystem.milktea.model.user.nickname.DeleteNicknameUseCase
 import net.pantasystem.milktea.model.user.nickname.UpdateNicknameUseCase
+import net.pantasystem.milktea.model.user.renote.mute.RenoteMuteRepository
 import net.pantasystem.milktea.user.R
 
 class UserDetailViewModel @AssistedInject constructor(
@@ -43,10 +43,14 @@ class UserDetailViewModel @AssistedInject constructor(
     private val accountStore: AccountStore,
     private val accountRepository: AccountRepository,
     private val settingStore: SettingStore,
+    private val renoteMuteRepository: RenoteMuteRepository,
+    private val blockRepository: BlockRepository,
+    private val muteRepository: MuteRepository,
     userDataSource: UserDataSource,
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     private val featureEnables: FeatureEnables,
+    private val toggleFollowUseCase: ToggleFollowUseCase,
     @Assisted val userId: User.Id?,
     @Assisted private val fqdnUserName: String?,
 ) : ViewModel() {
@@ -99,22 +103,22 @@ class UserDetailViewModel @AssistedInject constructor(
     val birthday = userState.map {
         it?.info?.birthday
     }.filterNotNull().map {
-        StringSource(R.string.birthday, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+        StringSource(R.string.user_birthday, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val registrationDate = userState.map {
         it?.info?.createdAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
     }.filterNotNull().map {
-        StringSource(R.string.registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
+        StringSource(R.string.user_registration_date, "${it.year}/${it.monthNumber}/${it.dayOfMonth}")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val tabTypes = combine(
         accountStore.observeCurrentAccount.filterNotNull(), userState.filterNotNull()
     ) { account, user ->
         val isEnableGallery =
-            featureEnables.isEnable(account.normalizedInstanceDomain, FeatureType.Gallery)
+            featureEnables.isEnable(account.normalizedInstanceUri, FeatureType.Gallery)
         val isPublicReaction = featureEnables.isEnable(
-                account.normalizedInstanceDomain,
+                account.normalizedInstanceUri,
                 FeatureType.UserReactionHistory
             ) && (user.info.isPublicReactions || user.id == User.Id(
                 account.accountId, account.remoteId
@@ -145,6 +149,11 @@ class UserDetailViewModel @AssistedInject constructor(
         logger.error("ユーザープロフィールのタブの取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val renoteMuteState = userState.filterNotNull().flatMapLatest {
+        renoteMuteRepository.observeOne(it.id)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     val showFollowers = EventBus<User?>()
     val showFollows = EventBus<User?>()
 
@@ -172,14 +181,8 @@ class UserDetailViewModel @AssistedInject constructor(
 
     fun changeFollow() {
         viewModelScope.launch {
-            userState.value?.let {
-                runCancellableCatching {
-                    val user = userRepository.find(it.id) as User.Detail
-                    if (user.related?.isFollowing == true || user.related?.hasPendingFollowRequestFromYou == true) {
-                        userRepository.unfollow(user.id)
-                    } else {
-                        userRepository.follow(user.id)
-                    }
+            userState.value?.let { user ->
+                toggleFollowUseCase(user.id).mapCancellableCatching {
                     userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute failed", e = it)
@@ -200,10 +203,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
     fun mute(expiredAt: Instant?) {
         viewModelScope.launch {
-            userState.value?.let {
-                runCancellableCatching {
-                    userRepository.mute(CreateMute(it.id, expiredAt))
-                    userRepository.sync(it.id).getOrThrow()
+            userState.value?.let { user ->
+                muteRepository.create(CreateMute(user.id, expiredAt)).mapCancellableCatching {
+                    userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
                     _errors.tryEmit(it)
@@ -214,10 +216,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
     fun unmute() {
         viewModelScope.launch {
-            userState.value?.let {
-                runCancellableCatching {
-                    userRepository.unmute(it.id)
-                    userRepository.sync(it.id).getOrThrow()
+            userState.value?.let { user ->
+                muteRepository.delete(user.id).mapCancellableCatching{
+                    userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("unmute", e = it)
                     _errors.tryEmit(it)
@@ -228,10 +229,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
     fun block() {
         viewModelScope.launch {
-            userState.value?.let {
-                runCancellableCatching {
-                    userRepository.block(it.id)
-                    userRepository.sync(it.id)
+            userState.value?.let { user ->
+                blockRepository.create(user.id).mapCancellableCatching {
+                    userRepository.sync(user.id)
                 }.onFailure {
                     logger.error("block failed", it)
                     _errors.tryEmit(it)
@@ -242,10 +242,9 @@ class UserDetailViewModel @AssistedInject constructor(
 
     fun unblock() {
         viewModelScope.launch {
-            userState.value?.let {
-                runCancellableCatching {
-                    userRepository.unblock(it.id)
-                    userRepository.sync(it.id).getOrThrow()
+            userState.value?.let { user ->
+                blockRepository.delete(user.id).mapCancellableCatching {
+                    userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.info("unblock failed", e = it)
                     _errors.tryEmit(it)
@@ -300,6 +299,30 @@ class UserDetailViewModel @AssistedInject constructor(
                 }
             }.onFailure {
                 logger.error("toggle user timeline tab failed", it)
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
+    fun muteRenotes() {
+        viewModelScope.launch {
+            runCancellableCatching {
+                getUserId()
+            }.mapCancellableCatching {
+                renoteMuteRepository.create(it)
+            }.onFailure {
+                _errors.tryEmit(it)
+            }
+        }
+    }
+
+    fun unMuteRenotes() {
+        viewModelScope.launch {
+            runCancellableCatching {
+                getUserId()
+            }.mapCancellableCatching {
+                renoteMuteRepository.delete(it)
+            }.onFailure {
                 _errors.tryEmit(it)
             }
         }

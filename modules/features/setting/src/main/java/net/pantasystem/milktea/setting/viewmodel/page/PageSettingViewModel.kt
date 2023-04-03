@@ -88,6 +88,7 @@ class PageSettingViewModel @Inject constructor(
                     PageType.NOTIFICATION,
                     PageType.FAVORITE,
                     PageType.MASTODON_LIST_TIMELINE,
+                    PageType.MASTODON_BOOKMARK_TIMELINE,
 //                    PageType.MASTODON_USER_TIMELINE,
 
                 )
@@ -276,6 +277,12 @@ class PageSettingViewModel @Inject constructor(
             PageType.CALCKEY_RECOMMENDED_TIMELINE -> addPage(
                 account.value!!.newPage(
                     Pageable.CalckeyRecommendedTimeline,
+                    name,
+                )
+            )
+            PageType.MASTODON_BOOKMARK_TIMELINE -> addPage(
+                account.value!!.newPage(
+                    Pageable.Mastodon.BookmarkTimeline,
                     name,
                 )
             )

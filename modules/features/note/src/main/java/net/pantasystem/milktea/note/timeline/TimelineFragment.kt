@@ -185,7 +185,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
 
 
         mBinding.listView.adapter = adapter
-        mBinding.listView.setItemViewCacheSize(15)
+        mBinding.listView.setItemViewCacheSize(8)
 
         mViewModel.timelineListState.onEach { state ->
             adapter.submitList(state)
@@ -269,6 +269,13 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
                     if (endVisibleItemPosition == (itemCount - 1)) {
                         mViewModel.loadOld()
                     }
+
+                    if (lm.findFirstVisibleItemPosition() <= 3) {
+                        mViewModel.onVisibleFirst()
+                    }
+
+                    mViewModel.onPositionChanged(lm.findFirstVisibleItemPosition())
+
                 }
             }
         )

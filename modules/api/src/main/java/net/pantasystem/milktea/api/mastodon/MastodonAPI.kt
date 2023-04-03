@@ -20,6 +20,9 @@ import net.pantasystem.milktea.api.mastodon.media.TootMediaAttachment
 import net.pantasystem.milktea.api.mastodon.media.UpdateMediaAttachment
 import net.pantasystem.milktea.api.mastodon.notification.MstNotificationDTO
 import net.pantasystem.milktea.api.mastodon.poll.TootPollDTO
+import net.pantasystem.milktea.api.mastodon.report.CreateReportRequest
+import net.pantasystem.milktea.api.mastodon.report.MstReportDTO
+import net.pantasystem.milktea.api.mastodon.rule.RuleDTO
 import net.pantasystem.milktea.api.mastodon.search.SearchResponse
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
@@ -132,6 +135,12 @@ interface MastodonAPI {
         @Path("emoji") emoji: String
     ): Response<TootStatusDTO>
 
+    @DELETE("api/v1/statuses/{statusId}/emoji_reactions/{emoji}")
+    suspend fun deleteReaction(
+        @Path("statusId") statusId: String,
+        @Path("emoji") emoji: String
+    ): Response<TootStatusDTO>
+
     @POST("api/v1/statuses/{statusId}/emoji_unreaction")
     suspend fun unreaction(@Path("statusId") statusId: String): Response<TootStatusDTO>
 
@@ -221,6 +230,13 @@ interface MastodonAPI {
         @Query("exclude_replies") excludeReplies: Boolean? = null,
     ): Response<List<TootStatusDTO>>
 
+    @GET("api/v1/bookmarks")
+    suspend fun getBookmarks(
+        @Query("max_id") maxId: String? = null,
+        @Query("min_id") minId: String? = null,
+        @Query("limit") limit: Int = 20,
+    ): Response<List<TootStatusDTO>>
+
 
     @GET("api/v1/lists")
     suspend fun getMyLists(): Response<List<ListDTO>>
@@ -281,4 +297,10 @@ interface MastodonAPI {
 
     @GET("api/v1/filters")
     suspend fun getFilters(): Response<List<V1FilterDTO>>
+
+    @POST("api/v1/reports")
+    suspend fun createReport(@Body request: CreateReportRequest): Response<MstReportDTO>
+
+    @GET("api/v1/instance/rules")
+    suspend fun getRules(): Response<List<RuleDTO>>
 }

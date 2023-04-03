@@ -158,7 +158,7 @@ fun MessageForm(
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = {
-                Text(stringResource(id = R.string.input_message))
+                Text(stringResource(id = R.string.messaging_input_message))
             }
         )
         Row(

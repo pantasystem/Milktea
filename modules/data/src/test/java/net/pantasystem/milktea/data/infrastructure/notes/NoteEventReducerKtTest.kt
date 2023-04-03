@@ -34,7 +34,7 @@ class NoteEventReducerKtTest {
             )
         )
 
-        Assertions.assertEquals(listOf(ReactionCount(":kawaii:", 1)), result.reactionCounts)
+        Assertions.assertEquals(listOf(ReactionCount(":kawaii:", 1, false)), result.reactionCounts)
         Assertions.assertNull(result.myReaction)
     }
 
@@ -57,7 +57,7 @@ class NoteEventReducerKtTest {
             )
         )
 
-        Assertions.assertEquals(listOf(ReactionCount(":kawaii:", 1)), result.reactionCounts)
+        Assertions.assertEquals(listOf(ReactionCount(":kawaii:", 1, true)), result.reactionCounts)
         Assertions.assertEquals(":kawaii:", result.myReaction)
     }
 
@@ -68,8 +68,8 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount(":watasimo:", 1),
-                ReactionCount(":kawaii:", 1)
+                ReactionCount(":watasimo:", 1, false),
+                ReactionCount(":kawaii:", 1, false)
             )
         )
 
@@ -84,7 +84,7 @@ class NoteEventReducerKtTest {
         )
 
         Assertions.assertEquals(
-            listOf(ReactionCount(":watasimo:", 1), ReactionCount(":kawaii:", 2)),
+            listOf(ReactionCount(":watasimo:", 1, false), ReactionCount(":kawaii:", 2, true)),
             result.reactionCounts
         )
         Assertions.assertEquals(":kawaii:", result.myReaction)
@@ -97,7 +97,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount(":watasimo:", 1),
+                ReactionCount(":watasimo:", 1, false),
             )
         )
 
@@ -112,7 +112,7 @@ class NoteEventReducerKtTest {
         )
 
         Assertions.assertEquals(
-            listOf(ReactionCount(":watasimo:", 1), ReactionCount(":kawaii:", 1)),
+            listOf(ReactionCount(":watasimo:", 1, false), ReactionCount(":kawaii:", 1, true)),
             result.reactionCounts
         )
         Assertions.assertEquals(":kawaii:", result.myReaction)
@@ -125,7 +125,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount(":watasimo:", 1),
+                ReactionCount(":watasimo:", 1, false),
             )
         )
         val result = note.onUnReacted(
@@ -147,7 +147,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount(":watasimo:", 1),
+                ReactionCount(":watasimo:", 1, true),
             ),
             myReaction = ":watasimo:"
         )
@@ -170,7 +170,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount(":watasimo:", 2),
+                ReactionCount(":watasimo:", 2, true),
             ),
             myReaction = ":watasimo:"
         )
@@ -185,7 +185,7 @@ class NoteEventReducerKtTest {
         Assertions.assertEquals(":watasimo:", result.myReaction)
         Assertions.assertEquals(
             listOf(
-                ReactionCount(":watasimo:", 1),
+                ReactionCount(":watasimo:", 1, true),
             ), result.reactionCounts
         )
     }
@@ -197,7 +197,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount(":watasimo:", 2),
+                ReactionCount(":watasimo:", 2, true),
             ),
             myReaction = ":watasimo:"
         )
@@ -231,7 +231,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount("watasimo", 1),
+                ReactionCount("watasimo", 1, false),
             ),
             myReaction = null
         )
@@ -248,7 +248,7 @@ class NoteEventReducerKtTest {
         )
         Assertions.assertEquals("watasimo", updated.myReaction)
         Assertions.assertEquals(updated.reactionCounts, listOf(
-            ReactionCount("watasimo", 2)
+            ReactionCount("watasimo", 2, true)
         ))
     }
 
@@ -259,7 +259,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount("watasimo", 2),
+                ReactionCount("watasimo", 2, true),
             ),
             myReaction = "watasimo"
         )
@@ -276,7 +276,7 @@ class NoteEventReducerKtTest {
         )
         Assertions.assertEquals(null, updated.myReaction)
         Assertions.assertEquals(updated.reactionCounts, listOf(
-            ReactionCount("watasimo", 1)
+            ReactionCount("watasimo", 1, false)
         ))
     }
 
@@ -287,7 +287,7 @@ class NoteEventReducerKtTest {
             text = "",
             userId = User.Id(0L, "2"),
             reactionCounts = listOf(
-                ReactionCount("watasimo", 2),
+                ReactionCount("watasimo", 2, true),
             ),
             myReaction = "watasimo"
         )
@@ -304,7 +304,7 @@ class NoteEventReducerKtTest {
         )
         Assertions.assertEquals("watasimo", updated.myReaction)
         Assertions.assertEquals(updated.reactionCounts, listOf(
-            ReactionCount("watasimo", 2)
+            ReactionCount("watasimo", 2, true)
         ))
     }
 }

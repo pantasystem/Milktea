@@ -29,12 +29,6 @@
     <string name="input_custom_emoji">絵文字/カスタム絵文字を入力</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
@@ -438,7 +432,7 @@
     <string name="pick_file_from_device">端末からファイルを選択</string>
     <string name="note_editor_file_max_size_validation_error_message">%d個を超えるファイルを添付できません</string>
     <string name="auth_sign_up">登録する</string>
-    <string name="auth_join_milktea_title">Milkteaで\\nMisskeyをはじめよう</string>
+    <string name="auth_join_milktea_title">Milkteaで\nMisskeyをはじめよう</string>
     <string name="auth_sign_in">連携する(ログイン)</string>
     <string name="auth_sign_up_button">アカウントを作成する</string>
     <string name="auth_find_instance">サーバを見つける</string>
@@ -457,6 +451,138 @@
     <string name="notes_media_click_to_load_image">クリックして画像を読み込み</string>
     <string name="notifications_follow_requests">フォローリクエスト</string>
     <string name="content_not_exists_message">何もありません</string>
+
+    <string name="user_detail_mute_renotes">リノートを表示しない</string>
+    <string name="user_detail_unmute_renotes">リノートを表示する</string>
+    <string name="settings_renote_mute_title">リノート非表示ユーザ</string>
+    <string name="bookmark">ブックマーク</string>
+
+    <!-- Authorization機能 -->
+    <string name="auth_custom_app_name">アプリケーション名</string>
+    <string name="auth_app_name">Milktea</string>
+    <string name="auth_successfully_created_the_app">アプリの作成に成功した</string>
+    <string name="auth_warning_s">警告:%s</string>
+    <string name="auth_error_s">エラー %s</string>
+    <string name="auth_continue_auth">Continue</string>
+    <string name="auth_copied_to_clipboard">クリップボードにコピーしました</string>
+    <string name="auth_instance_domain">インスタンスドメイン</string>
+    <string name="auth_https">https://</string>
+    <string name="auth_waiting_4_u_to_approve">あなたが認可するのを待っています</string>
+    <string name="auth_i_have_approved">私は認可をしました</string>
+    <string name="auth_waiting_4_approval">認可されるのを待っています。</string>
+    <string name="auth_authentication_url">認証URL</string>
+    <string name="auth_copy_the_url_of_the_authentication_destination_to_the_clipboard">認証先のURLをクリップボードにコピーする
+    </string>
+    <string name="auth_welcome">ようこそ</string>
+    <string name="san">さん</string>
+    <string name="auth_open_in_webview">アプリブラウザで開く</string>
+    <string name="auth_privacy_policy_agreeation">プライバシーポリシーに同意する</string>
+    <string name="auth_terms_of_service_agreeation">利用規約に同意する</string>
+    <string name="auth_accpet_mastodon_alpha_test">Mastodonに関する機能はまだアルファ段階で、まだ実装できていない機能や動作しない機能があることを理解し、開発者に責任を問わないことを承諾します。</string>
+    <!-- Authorization機能ここまで -->
+
+    <!-- Channel -->
+    <string name="channel_n_people">%d人</string>
+    <string name="channel_n_posts">%d投稿</string>
+    <string name="channel_owned">私の</string>
+    <!-- Channel -->
+
+    <!-- Drive -->
+    <string name="drive_undo_nsfw">閲覧注意解除</string>
+    <string name="drive_file_deletion_confirmation">ファイル削除の確認</string>
+    <string name="drive_do_u_want_2_delete_s">%sを削除しますか？</string>
+    <string name="drive_mark_as_nsfw">閲覧注意にする</string>
+    <string name="drive">ドライブ</string>
+    <string name="drive_file">ファイル</string>
+    <string name="drive_folder">フォルダー</string>
+    <string name="drive_create_folder">フォルダーを作成</string>
+    <string name="drive_folder_name">フォルダ名</string>
+    <!-- Drive -->
+
+    <!-- Gallery -->
+    <string name="gallery_sensitive_content">Sensitive content</string>
+    <string name="gallery_pick_image">画像を選択</string>
+    <string name="gallery_pick_image_from_device">端末から画像を選択</string>
+    <string name="gallery_pick_image_from_drive">ドライブから画像を選択</string>
+    <!-- Gallery -->
+
+    <!-- Group -->
+    <string name="group_name">グループ名</string>
+    <string name="create_group">グループを作成</string>
+    <string name="edit_group">グループを編集</string>
+    <!-- Group -->
+
+    <!-- Media -->
+    <string name="download">ダウンロード</string>
+    <string name="start_downloading_placeholder">%sのダウンロードを開始します。</string>
+    <string name="success_download_file_message">ファイルのダウンロードに成功にしました</string>
+    <string name="failed_download_file_message">ファイルのダウンロードに失敗しました</string>
+    <!-- Media -->
+
+    <!-- Messaging -->
+    <string name="messaging_input_message">相手に思いを伝えてください</string>
+    <!-- Messaging -->
+
+    <!-- Note -->
+    <string name="time_machine">タイムマシーン</string>
+    <string name="dialog_timemachine_message">表示したいタイムラインの時間を指定してください</string>
+    <string name="show_error">Show Error</string>
+
+    <string name="timeout_error">タイムアウト</string>
+
+    <string name="reauthenticate">再認証する</string>
+    <string name="expand">展開</string>
+    <string name="file_size_warning_dialog_title">ファイルサイズの警告</string>
+    <string name="file_size_warning_dialog_message">%1$sは%2$sより大きなファイルを添付することはできません。続行しますか？</string>
+    <string name="file_size_warning_dialo_positive_button">続行</string>
+    <string name="file_size_warning_dialog_negative_button">取りやめる</string>
+    <string name="mark_media_as_sensitive">メディアを閲覧注意にする</string>
+    <string name="successfully_added_to_favorites">お気に入りに追加しました</string>
+    <string name="failed_to_add_to_favorites">お気に入りに追加できませんでした</string>
+    <string name="removed_from_favorites">お気に入りから削除しました</string>
+    <string name="failed_to_delete_favorites">お気に入りの削除に失敗しました</string>
+    <string name="successfully_deleted">正常に削除されました</string>
+    <string name="dialog_add_emoji_to_user_settings_title">設定に絵文字を追加する</string>
+    <string name="dialog_add_emoji_to_user_settings_message">%sをユーザ絵文字設定に追加する</string>
+    <!-- Note -->
+
+    <!-- Notification -->
+    <string name="no_notifications">通知はありません</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <!-- Notification -->
+
+    <!-- Settings -->
+    <string name="client_word_mute">クライアントワードミュート</string>
+    <string name="client_word_mute_format_description">スペースで区切るとAND指定になり、改行で区切るとOR指定になります。\nキーワードをスラッシュで囲むと正規表現になります。</string>
+    <string name="import_reactions_from_the_web">リアクションをWebから取り込み</string>
+    <string name="import_reactions">取り込み</string>
+    <string name="overwrite_save">上書き保存</string>
+    <string name="notification_sound">通知音</string>
+    <string name="inapp_notification_sound">アプリ内通知音を有効にする</string>
+    <string name="streaming">自動更新</string>
+    <string name="is_stop_timeline_streaming_when_background">バックグラウンドでタイムラインを更新しない</string>
+    <string name="is_stop_note_capture_when_background">バックグラウンドでノートをキャプチャしない</string>
+    <string name="enable_automic_updates">自動更新を有効にする</string>
+    <string name="please_login">ログインしてください</string>
+    <string name="settings_edit_tab_only_media">ファイルが添付されたノートのみ表示する</string>
+    <!-- Settings -->
+
+    <!-- User -->
+    <string name="user_birthday">誕生日: %s</string>
+    <string name="user_registration_date">%sに登録をしました</string>
+    <string name="confirm_user_block_title">確認</string>
+    <string name="confirm_user_block_description">本当に%sさんをブロックしますか？</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15分後</string>
+    <string name="user_mute_specify_time_30_minutes_later">30分後</string>
+    <string name="user_mute_specify_time_1_hours_later">1時間後</string>
+    <string name="user_mute_specify_time_1_day_later">1日後</string>
+    <string name="user_mute_specify_time_1_week_later">1週間後</string>
+    <string name="user_mute_specify_time_1_month_later">1ヶ月後</string>
+    <string name="user_mute_specify_time_indefinite_period">無期限</string>
+    <string name="view_remotely">リモートで表示</string>
+    <string name="follows_you">フォローされています</string>
+    <!-- User -->
 
 
 </resources>

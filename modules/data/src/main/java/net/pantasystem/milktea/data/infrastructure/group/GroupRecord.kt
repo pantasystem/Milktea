@@ -24,12 +24,24 @@ import net.pantasystem.milktea.model.user.User
     ]
 )
 data class GroupRecord(
+    @ColumnInfo(name = "serverId")
     val serverId: String,
+
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "createdAt")
     val createdAt: Instant,
+
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "ownerId")
     val ownerId: String,
-    @PrimaryKey(autoGenerate = true) val id: Long
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Long
 ) {
     companion object {
         fun from(model: Group): GroupRecord {
@@ -62,9 +74,15 @@ data class GroupRecord(
     ]
 )
 data class GroupMemberIdRecord(
+    @ColumnInfo(name = "groupId")
     val groupId: Long,
+
+    @ColumnInfo(name = "userId")
     val userId: String,
-    @PrimaryKey(autoGenerate = true) val id: Long,
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
 )
 
 @DatabaseView(
@@ -79,9 +97,16 @@ data class GroupMemberIdRecord(
     viewName = "group_member_view"
 )
 data class GroupMemberView(
+    @ColumnInfo(name = "groupId")
     val groupId: Long,
+
+    @ColumnInfo(name = "avatarUrl")
     val avatarUrl: String?,
+
+    @ColumnInfo(name = "userId")
     val userId: Long,
+
+    @ColumnInfo(name = "serverId")
     val serverId: String,
 )
 

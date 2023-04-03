@@ -29,12 +29,6 @@
     <string name="input_custom_emoji">Emoji</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
@@ -448,5 +442,140 @@
     <string name="notes_media_click_to_load_image">Click to load Image</string>
     <string name="notifications_follow_requests">Follow request</string>
     <string name="content_not_exists_message">No content</string>
+    <string name="user_detail_mute_renotes">Mute Renotes</string>
+    <string name="user_detail_unmute_renotes">Unmute renotes</string>
+    <string name="settings_renote_mute_title">Renote mutes</string>
+    <string name="bookmark">Bookmark</string>
+
+    <!-- Authorization Start -->
+    <string name="auth_custom_app_name">App name</string>
+    <string name="auth_app_name">Milktea</string>
+    <string name="auth_successfully_created_the_app">Successfully created the app</string>
+    <string name="auth_warning_s">Warning:%s</string>
+    <string name="auth_error_s">Error %s</string>
+    <string name="auth_continue_auth">Continue</string>
+    <string name="auth_copied_to_clipboard">Copied to clipboard</string>
+    <string name="auth_instance_domain">Instance URL</string>
+    <string name="auth_https">https://</string>
+    <string name="auth_waiting_4_u_to_approve">Waiting for you to approve</string>
+    <string name="auth_i_have_approved">Approved</string>
+    <string name="auth_waiting_4_approval">Waiting for approval</string>
+    <string name="auth_authentication_url">Authentication URL</string>
+    <string name="auth_copy_the_url_of_the_authentication_destination_to_the_clipboard">Copy authentication
+        destination URL to clipboard.
+    </string>
+    <string name="auth_welcome">Welcome</string>
+    <string name="san">-san</string>
+    <string name="auth_open_in_webview">Open in WebView</string>
+
+    <string name="auth_privacy_policy_agreeation">I agree to the Privacy Policy</string>
+    <string name="auth_terms_of_service_agreeation">I agree to the Terms of service</string>
+    <string name="auth_accpet_mastodon_alpha_test">I understand that the features related to Mastodon are still in the alpha stage and there may be features that are not yet implemented or not working, and I agree not to hold the developers responsible for this.</string>
+    <!-- Authorization End -->
+
+    <!-- Channel -->
+    <string name="channel_n_people">%d people</string>
+    <string name="channel_n_posts">%d posts</string>
+    <string name="channel_owned">Owned</string>
+    <!-- Channel -->
+
+    <!-- Drive -->
+    <string name="drive_undo_nsfw">Undo NSFW</string>
+    <string name="drive_file_deletion_confirmation">File deletion confirmation</string>
+    <string name="drive_do_u_want_2_delete_s">Do you want to delete %s?</string>
+    <string name="drive_mark_as_nsfw">Mark as NSFW</string>
+    <string name="drive">Drive</string>
+    <string name="drive_file">File</string>
+    <string name="drive_folder">Folder</string>
+    <string name="drive_create_folder">Create folder</string>
+    <string name="drive_folder_name">Folder name</string>
+    <!-- Drive -->
+
+    <!-- Gallery -->
+    <string name="gallery_sensitive_content">Sensitive content</string>
+    <string name="gallery_pick_image">Pick image</string>
+    <string name="gallery_pick_image_from_device">Pick image from device</string>
+    <string name="gallery_pick_image_from_drive">Pick image from drive</string>
+    <!-- Gallery -->
+
+    <!-- Group -->
+    <string name="group_name">Group name</string>
+    <string name="create_group">Create group</string>
+    <string name="edit_group">Edit group</string>
+    <!-- Group -->
+
+    <!-- Media -->
+    <string name="download">Download</string>
+    <string name="start_downloading_placeholder">Start downloading %s</string>
+    <string name="success_download_file_message">Download successful</string>
+    <string name="failed_download_file_message">Download failed</string>
+    <!-- Media -->
+
+    <!-- Messaging -->
+    <string name="messaging_input_message">What\'s up?</string>
+    <!-- Messaging -->
+
+    <!-- Note -->
+    <string name="time_machine">Back to the future</string>
+    <string name="dialog_timemachine_message">Please specify the time of the timeline you want to display</string>
+    <string name="show_error">Show Error</string>
+
+    <string name="timeout_error">Timeout</string>
+
+    <string name="reauthenticate">Reauthenticate</string>
+    <string name="expand">Expand</string>
+
+    <string name="file_size_warning_dialog_title">File size warning</string>
+    <string name="file_size_warning_dialog_message">%1$s does not allow attachments larger than %2$s.\nDo you want to continue?</string>
+    <string name="file_size_warning_dialo_positive_button">Continue</string>
+    <string name="file_size_warning_dialog_negative_button">Cancel attachment</string>
+
+    <string name="mark_media_as_sensitive">Mark media as sensitive</string>
+    <string name="successfully_added_to_favorites">Successfully added to Favorites</string>
+    <string name="failed_to_add_to_favorites">Failed to add to favorites</string>
+    <string name="removed_from_favorites">Removed from Favorites</string>
+    <string name="failed_to_delete_favorites">Failed to delete favorites</string>
+    <string name="successfully_deleted">Successfully deleted</string>
+    <string name="dialog_add_emoji_to_user_settings_title">Add emoji to settings</string>
+    <string name="dialog_add_emoji_to_user_settings_message">Add %s to user emoji settings.</string>
+    <!-- Note -->
+
+    <!-- Notification -->
+    <string name="no_notifications">No notifications</string>
+    <string name="notification_menu_mark_as_all_read_notifications_label">Mark as all read notifications</string>
+    <!-- Notification -->
+
+    <!-- Settings -->
+    <string name="client_word_mute">Client Word mute</string>
+    <string name="client_word_mute_format_description">Delimiting with a space results in an AND specification, and delimiting with a line break results in an OR specification. \nSlashes around the keyword make it a regular expression.</string>
+    <string name="import_reactions_from_the_web">Import reactions from the web</string>
+    <string name="import_reactions">Import reactions</string>
+    <string name="overwrite_save">Overwrite save</string>
+    <string name="notification_sound">Notification Sound</string>
+    <string name="inapp_notification_sound">Enable In-app notification sound</string>
+    <string name="streaming">Automatic updating</string>
+    <string name="is_stop_timeline_streaming_when_background">Do not update timeline when in background</string>
+    <string name="is_stop_note_capture_when_background">Do not capture notes in background</string>
+    <string name="enable_automic_updates">Enable automatic updates</string>
+    <string name="please_login">Please login</string>
+    <string name="settings_edit_tab_only_media">Only Media</string>
+    <!-- Settings -->
+
+    <!-- User -->
+    <string name="user_birthday">Birthday: %s</string>
+    <string name="user_registration_date">Registered on the %s</string>
+    <string name="confirm_user_block_title">Confirmation</string>
+    <string name="confirm_user_block_description">Are you sure you want to block %s?</string>
+
+    <string name="user_mute_specify_time_15_minutes_later">15 minutes later</string>
+    <string name="user_mute_specify_time_30_minutes_later">30 minutes later</string>
+    <string name="user_mute_specify_time_1_hours_later">1 hour later</string>
+    <string name="user_mute_specify_time_1_day_later">1 day later</string>
+    <string name="user_mute_specify_time_1_week_later">1 week later</string>
+    <string name="user_mute_specify_time_1_month_later">1 month later</string>
+    <string name="user_mute_specify_time_indefinite_period">Indefinite perio</string>
+    <string name="view_remotely">View remotely</string>
+    <string name="follows_you">Follows you</string>
+    <!-- User -->
 
 </resources>

@@ -141,7 +141,7 @@ class ImportReactionFromWebViewActivity : AppCompatActivity() {
 
 
     private fun getWebClientTokenFromCookie(account: Account): String? {
-        val rawCookie: String? = CookieManager.getInstance().getCookie(account.normalizedInstanceDomain)
+        val rawCookie: String? = CookieManager.getInstance().getCookie(account.normalizedInstanceUri)
         val cookies = rawCookie?.split(";")?.map { it.trim() }?.mapNotNull {
             val key = it.split("=").getOrNull(0)?.lowercase()
             val value = it.split("=").getOrNull(1)

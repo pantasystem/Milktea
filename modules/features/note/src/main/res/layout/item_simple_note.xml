@@ -32,7 +32,7 @@
             app:subNameView="@{subName}"
             app:user="@{note.toShowNote.user}"
             app:account="@{note.account}"
-            isUserNameDefault="@{note.isUserNameDefault}"
+            isUserNameDefault="@{note.config.isUserNameDefault}"
 
             app:foldingNote="@{note}"
             app:foldingButton="@{contentFoldingButton}"
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/mainName"
                 android:textStyle="bold"
-                android:textSize="15sp"
+                android:textSize="@dimen/note_author_info_text_size"
                 android:maxLines="1"
                 android:ellipsize="end"
                 app:layout_constrainedWidth="true"
@@ -78,7 +78,7 @@
                 android:textStyle="italic"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textSize="15sp"
+                android:textSize="@dimen/note_author_info_text_size"
                 tools:text="ユーザー名awefawefawefawefawefawefwaefwef"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/mainName"
@@ -88,7 +88,7 @@
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="@dimen/note_author_info_text_size"
                 android:layout_toEndOf="@id/subName"
                 android:layout_marginStart="4dp"
                 android:maxLines="1"
@@ -145,7 +145,7 @@
                 <TextView
                         android:id="@+id/instanceInfoLabel"
                         tools:text="Misskey.io"
-                        android:textSize="12sp"
+                        android:textSize="@dimen/note_instance_info_text_size"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         tools:background="#8BC34A"
@@ -153,13 +153,14 @@
                         android:gravity="center_vertical"
                         android:padding="2dp"
                         instanceInfo="@{note.toShowNote.user.instance}"
-                        isEnable="@{note.isVisibleInstanceTicker}"
+                        isEnable="@{note.config.isEnableInstanceTicker}"
                         android:maxLines="1"
                         />
                 <TextView
                         android:id="@+id/cw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textSize="@dimen/note_content_text_size"
                         tools:text="cwcwcwwcwcw"
                         app:textNode="@{note.cwNode}"
                          />
@@ -191,7 +192,7 @@
                             android:id="@id/text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="15sp"
+                            android:textSize="@dimen/note_content_text_size"
                             textTypeSource="@{note.textNode}"
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                             memoVisibility='@{note.text == null ? View.GONE : View.VISIBLE}'
@@ -236,10 +237,10 @@
                             android:layout_height="wrap_content"
                             tools:listitem="@layout/item_choice"
                             tools:itemCount="2"
-                            memoVisibility="@{note.poll == null ? View.GONE : View.VISIBLE}"
+                            memoVisibility="@{note.currentNote.poll == null ? View.GONE : View.VISIBLE}"
 
                             noteId="@{note.toShowNote.note.id}"
-                            poll="@{note.poll}"
+                            poll="@{note.currentNote.poll}"
                             noteCardActionListenerAdapter="@{noteCardActionListener}"
                             />
 
@@ -249,6 +250,7 @@
                             android:layout_height="wrap_content"
                             tools:itemCount="1"
                             tools:listitem="@layout/item_url_preview"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                             app:previewList="@{note.previews}" />
 
 
@@ -263,7 +265,7 @@
                             app:clickedView="@{subNote}"
                             app:subNameView="@{subNoteSubName}"
                             app:mainNameView="@{subNoteMainName}"
-                            isUserNameDefault="@{note.isUserNameDefault}"
+                            isUserNameDefault="@{note.config.isUserNameDefault}"
                             app:user="@{note.subNote.user}"
                             app:account="@{note.account}"
                             android:layout_marginTop="4dp">
@@ -286,7 +288,7 @@
                                 android:layout_toEndOf="@+id/subAvatarIcon"
                                 android:id="@+id/subNoteMainName"
                                 android:textStyle="bold"
-                                android:textSize="15sp"
+                                android:textSize="@dimen/note_author_info_text_size"
                                 app:layout_constraintStart_toEndOf="@id/subAvatarIcon"
                                 android:layout_marginStart="4dp"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -306,7 +308,7 @@
                                 android:layout_height="wrap_content"
                                 android:textStyle="italic"
                                 android:id="@+id/subNoteSubName"
-                                android:textSize="15sp"
+                                android:textSize="@dimen/note_author_info_text_size"
                                 android:maxLines="1"
                                 app:layout_constraintStart_toEndOf="@id/subNoteMainName"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -346,7 +348,7 @@
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="15sp"
+                                android:textSize="@dimen/note_content_text_size"
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                                 textTypeSource="@{note.subNoteTextNode}"
@@ -456,7 +458,7 @@
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:maxLines="1"
-                    android:visibility='@{note.replyCount == null || note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                    android:visibility='@{note.replyCount == 0 ? View.INVISIBLE : View.VISIBLE}'
                     app:layout_constraintTop_toBottomOf="@id/reaction_view"
 
                     app:layout_constraintEnd_toStartOf="@+id/renoteButton"
@@ -464,7 +466,8 @@
                     tools:text="99999999999"
                     app:layout_constraintTop_toTopOf="@id/replyButton"
                     app:layout_constraintBottom_toBottomOf="@id/replyButton"
-                    app:emojiCompatEnabled="false"/>
+                    app:emojiCompatEnabled="false"
+                    android:textSize="@dimen/note_counter_text_size" />
 
 
             <ImageButton
@@ -486,8 +489,8 @@
                     tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
-                    android:text='@{String.valueOf(SafeUnbox.unbox(note.renoteCount))}'
-                    android:visibility='@{note.renoteCount == null || note.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
+                    android:text='@{String.valueOf(SafeUnbox.unbox(note.currentNote.renoteCount))}'
+                    android:visibility='@{note.currentNote.renoteCount == 0 ? View.INVISIBLE : View.VISIBLE}'
 
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -503,6 +506,7 @@
                     app:layout_constraintTop_toTopOf="@id/renoteButton"
                     app:layout_constraintBottom_toBottomOf="@id/renoteButton"
                     app:emojiCompatEnabled="false"
+                    android:textSize="@dimen/note_counter_text_size"
                     />
             <ImageButton
                     android:id="@+id/toggleMastodonFavouriteButton"
@@ -533,13 +537,15 @@
 
                     tools:text="10"
                     app:emojiCompatEnabled="false"
+                    android:textSize="@dimen/note_counter_text_size"
                     />
 
             <ImageButton
                     android:id="@+id/toggleReactionButton"
                     android:layout_width="@dimen/note_bottom_action_icon_size"
                     android:layout_height="@dimen/note_bottom_action_icon_size"
-                    app:isReacted="@{note.myReaction != null}"
+                    app:isReacted="@{!note.currentNote.canReaction}"
+                    isAcceptingOnlyFavoriteReaction="@{note.currentNote.acceptingOnlyLikeReaction}"
                     tools:srcCompat="@drawable/ic_add_black_24dp"
                     style="?android:attr/borderlessButtonStyle"
                     android:padding="@dimen/note_bottom_action_icon_padding_size"
@@ -557,8 +563,8 @@
 
             <TextView
                     android:id="@+id/reactionCountView"
-                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.reactionCount))}'
-                    android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.reactionCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
+                    android:text='@{String.valueOf(SafeUnbox.unboxInt(note.currentNote.reactionsCount))}'
+                    android:visibility="@{note.currentNote.supportEmojiReaction ? SafeUnbox.unboxInt(note.currentNote.reactionsCount) == 0 ? View.INVISIBLE : View.VISIBLE : View.GONE }"
 
 
                     android:layout_width="0dp"
@@ -573,6 +579,7 @@
                     app:layout_constraintTop_toTopOf="@id/toggleReactionButton"
                     app:layout_constraintBottom_toBottomOf="@id/toggleReactionButton"
                     app:emojiCompatEnabled="false"
+                    android:textSize="@dimen/note_counter_text_size"
                     />
 
             <ImageButton

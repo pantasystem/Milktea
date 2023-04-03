@@ -8,13 +8,26 @@ import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
 
 @kotlinx.serialization.Serializable
 data class MstNotificationDTO(
+    @SerialName("id")
     val id: String,
+
+    @SerialName("type")
     val type: NotificationType,
-    @SerialName("created_at") val createdAt: Instant,
+
+    @SerialName("created_at")
+    val createdAt: Instant,
+
+    @SerialName("account")
     val account: MastodonAccountDTO,
+
+    @SerialName("status")
     val status: TootStatusDTO? = null,
+
+    @SerialName("report")
     val report: MstReportDTO? = null,
-    @SerialName("emoji_reaction") val emojiReaction: EmojiReaction? = null,
+
+    @SerialName("emoji_reaction")
+    val emojiReaction: EmojiReaction? = null,
 ) {
     @kotlinx.serialization.Serializable
     enum class NotificationType {
@@ -54,12 +67,23 @@ data class MstNotificationDTO(
 
     @kotlinx.serialization.Serializable
     data class EmojiReaction(
+        @SerialName("name")
         val name: String,
+
+        @SerialName("count")
         val count: Int,
+
+        @SerialName("me")
         val me: Boolean? = null,
+
+        @SerialName("url")
         val url: String? = null,
+
+        @SerialName("domain")
         val domain: String?  = null,
-        @SerialName("static_url") val staticUrl: String? = null,
+
+        @SerialName("static_url")
+        val staticUrl: String? = null,
     ) {
         private val isCustomEmoji = url != null || staticUrl != null
 

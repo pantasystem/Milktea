@@ -18,11 +18,13 @@ sealed interface TextType {
     ) : TextType
 }
 
-fun getTextType(account: Account, note: NoteRelation, instanceEmojis: List<Emoji>): TextType? {
+fun getTextType(account: Account, note: NoteRelation, instanceEmojis: Map<String, Emoji>?): TextType? {
     return when (account.instanceType) {
         Account.InstanceType.MISSKEY -> {
             val root = MFMParser.parse(
-                note.note.text, (note.note.emojis ?: emptyList()) + instanceEmojis,
+                note.note.text,
+                (note.note.emojis?.associateBy { it.name }?.toMap()),
+                instanceEmojis,
                 userHost = note.user
                     .host,
                 accountHost = account.getHost()

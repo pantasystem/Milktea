@@ -1,18 +1,26 @@
 package net.pantasystem.milktea.data.infrastructure.instance.db
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 
 @Entity(
     tableName = "mastodon_instance_info"
 )
 data class MastodonInstanceInfoRecord(
-    @PrimaryKey(autoGenerate = false) val uri: String,
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "uri")
+    val uri: String,
+
+    @ColumnInfo(name = "title")
     val title: String,
+
+    @ColumnInfo(name = "description")
     val description: String,
+
+    @ColumnInfo(name = "email")
     val email: String,
+
+    @ColumnInfo(name = "version")
     val version: String,
     @Embedded(prefix = "urls_") val urls: Urls,
     @Embedded(prefix = "configuration_") val configuration: Configuration? = null,
@@ -21,7 +29,8 @@ data class MastodonInstanceInfoRecord(
 
     data class Configuration(
         @Embedded(prefix = "statuses_") val statuses: Statuses? = null,
-        @Embedded(prefix = "polls_")val polls: Polls? = null
+        @Embedded(prefix = "polls_")val polls: Polls? = null,
+        @Embedded(prefix = "emoji_reactions_") val emojiReactions: EmojiReactions? = null,
     ) {
 
         data class Statuses(
@@ -30,19 +39,66 @@ data class MastodonInstanceInfoRecord(
         )
 
         data class Polls(
+            @ColumnInfo(name = "maxOptions")
             val maxOptions: Int? = null,
+
+            @ColumnInfo(name = "maxCharactersPerOption")
             val maxCharactersPerOption: Int? = null,
+
+            @ColumnInfo(name = "minExpiration")
             val minExpiration: Int? = null,
+
+            @ColumnInfo(name = "maxExpiration")
             val maxExpiration: Int? = null,
         )
 
+        data class EmojiReactions(
+            @ColumnInfo(name = "myReactions")
+            val maxReactions: Int? = null,
+
+            @ColumnInfo(name = "maxReactionsPerAccount")
+            val maxReactionsPerAccount: Int? = null,
+        )
     }
 
     data class Urls(
+        @ColumnInfo(name = "streamingApi")
         val streamingApi: String? = null,
     )
 }
 
+
+@Entity(
+    tableName = "mastodon_instance_fedibird_capabilities",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["uri"],
+            childColumns = ["uri"],
+            entity = MastodonInstanceInfoRecord::class,
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [Index("uri")],
+    primaryKeys = ["uri", "type"]
+)
+data class FedibirdCapabilitiesRecord(
+    @ColumnInfo(name = "type")
+    val type: String,
+
+    @ColumnInfo(name = "uri")
+    val uri: String
+)
+
+data class MastodonInstanceInfoRelated(
+    @Embedded val info: MastodonInstanceInfoRecord,
+    @Relation(
+        parentColumn = "uri",
+        entityColumn = "uri",
+        entity = FedibirdCapabilitiesRecord::class
+    )
+    val fedibirdCapabilities: List<FedibirdCapabilitiesRecord>?
+)
 
 fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): MastodonInstanceInfoRecord {
     return MastodonInstanceInfoRecord(
@@ -71,25 +127,32 @@ fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): Mast
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
                     )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfoRecord.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount
+                    )
                 }
             )
         }
     )
 }
 
-fun MastodonInstanceInfoRecord.toModel(): MastodonInstanceInfo {
+
+fun MastodonInstanceInfoRelated.toModel(): MastodonInstanceInfo {
     return MastodonInstanceInfo(
-        uri = uri,
-        title = title,
-        description = description,
-        email = email,
-        urls = urls.let {
+        uri = info.uri,
+        title = info.title,
+        description = info.description,
+        email = info.email,
+        urls = info.urls.let {
             MastodonInstanceInfo.Urls(
                 streamingApi = it.streamingApi
             )
         },
-        version = version,
-        configuration = configuration?.let { config ->
+        version = info.version,
+        configuration = info.configuration?.let { config ->
             MastodonInstanceInfo.Configuration(
                 statuses = config.statuses?.let {
                     MastodonInstanceInfo.Configuration.Statuses(
@@ -104,8 +167,15 @@ fun MastodonInstanceInfoRecord.toModel(): MastodonInstanceInfo {
                         maxExpiration = it.maxExpiration,
                         minExpiration = it.minExpiration,
                     )
+                },
+                emojiReactions = config.emojiReactions?.let {
+                    MastodonInstanceInfo.Configuration.EmojiReactions(
+                        maxReactions = it.maxReactions,
+                        maxReactionsPerAccount = it.maxReactionsPerAccount
+                    )
                 }
             )
-        }
+        },
+        fedibirdCapabilities = fedibirdCapabilities?.map { it.type }
     )
 }

@@ -21,8 +21,13 @@ import net.pantasystem.milktea.model.account.page.Pageable
     ]
 )
 data class Page(
+    @ColumnInfo(name = "accountId")
     var accountId: String?,
+
+    @ColumnInfo(name = "title")
     var title: String,
+
+    @ColumnInfo(name = "pageNumber")
     var pageNumber: Int?,
     @Embedded(prefix = "global_timeline_") val globalTimeline: GlobalTimeline? = null,
     @Embedded(prefix = "local_timeline_") val localTimeline: LocalTimeline? = null,
@@ -68,7 +73,10 @@ data class Page(
     abstract class Timeline : PageableOld
 
     data class GlobalTimeline(
-        @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
+        @ColumnInfo(name = "with_files")
+        var withFiles: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.GLOBAL
     ) : PageableOld, Timeline() {
         override fun toPageable(): Pageable {
@@ -82,6 +90,8 @@ data class Page(
     data class LocalTimeline(
         @ColumnInfo(name = "with_files") var withFiles: Boolean? = null,
         @ColumnInfo(name = "exclude_nsfw") var excludeNsfw: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.LOCAL
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -98,10 +108,19 @@ data class Page(
      * @param includeRenotedMyRenotes 上記と同じく
      */
     data class HybridTimeline(
+        @ColumnInfo(name = "withFiles")
         var withFiles: Boolean? = null,
+
+        @ColumnInfo(name = "includeLocalRenotes")
         var includeLocalRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "includeMyRenotes")
         var includeMyRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "includeRenotedMyRenotes")
         var includeRenotedMyRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.SOCIAL
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -115,10 +134,19 @@ data class Page(
     }
 
     data class HomeTimeline(
+        @ColumnInfo(name = "withFiles")
         var withFiles: Boolean? = null,
+
+        @ColumnInfo(name = "includeLocalRenotes")
         var includeLocalRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "includeMyRenotes")
         var includeMyRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "includeRenotedMyRenotes")
         var includeRenotedMyRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.HOME
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -133,11 +161,22 @@ data class Page(
     }
 
     data class UserListTimeline(
+        @ColumnInfo(name = "listId")
         val listId: String,
+
+        @ColumnInfo(name = "withFiles")
         var withFiles: Boolean? = null,
+
+        @ColumnInfo(name = "includeLocalRenotes")
         var includeLocalRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "includeMyRenotes")
         var includeMyRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "includeRenotedMyRenotes")
         var includeRenotedMyRenotes: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.USER_LIST
     ) : Timeline() {
 
@@ -153,8 +192,13 @@ data class Page(
     }
 
     data class Mention(
-        val following: Boolean?, val
-        visibility: String? = null,
+        @ColumnInfo(name = "following")
+        val following: Boolean?,
+
+        @ColumnInfo(name = "visibility")
+        val visibility: String? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.MENTION
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -166,7 +210,10 @@ data class Page(
     }
 
     data class Show(
+        @ColumnInfo(name = "noteId")
         val noteId: String,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.DETAIL
     ) : PageableOld {
         override fun toPageable(): Pageable {
@@ -177,11 +224,22 @@ data class Page(
     }
 
     data class SearchByTag(
+        @ColumnInfo(name = "tag")
         val tag: String,
+
+        @ColumnInfo(name = "reply")
         var reply: Boolean? = null,
+
+        @ColumnInfo(name = "renote")
         var renote: Boolean? = null,
+
+        @ColumnInfo(name = "withFiles")
         var withFiles: Boolean? = null,
+
+        @ColumnInfo(name = "poll")
         var poll: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.SEARCH_HASH
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -196,7 +254,10 @@ data class Page(
     }
 
     data class Featured(
+        @ColumnInfo(name = "offset")
         val offset: Int?,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.FEATURED
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -207,8 +268,13 @@ data class Page(
     }
 
     data class Notification(
+        @ColumnInfo(name = "following")
         var following: Boolean? = null,
+
+        @ColumnInfo(name = "markAsRead")
         var markAsRead: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.NOTIFICATION
     ) : PageableOld {
         override fun toPageable(): Pageable {
@@ -220,10 +286,19 @@ data class Page(
     }
 
     data class UserTimeline(
+        @ColumnInfo(name = "userId")
         val userId: String,
+
+        @ColumnInfo(name = "includeReplies")
         var includeReplies: Boolean = true,
+
+        @ColumnInfo(name = "includeMyRenotes")
         var includeMyRenotes: Boolean? = true,
+
+        @ColumnInfo(name = "withFiles")
         var withFiles: Boolean? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.USER
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -237,7 +312,16 @@ data class Page(
     }
 
     data class Search(
-        var query: String, var host: String? = null, var userId: String? = null,
+        @ColumnInfo(name = "query")
+        var query: String,
+
+        @ColumnInfo(name = "host")
+        var host: String? = null,
+
+        @ColumnInfo(name = "userId")
+        var userId: String? = null,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.SEARCH
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -248,7 +332,10 @@ data class Page(
     }
 
     data class Antenna(
+        @ColumnInfo(name = "antennaId")
         val antennaId: String,
+
+        @ColumnInfo(name = "type")
         override val type: PageType = PageType.ANTENNA
     ) : Timeline() {
         override fun toPageable(): Pageable {
@@ -258,7 +345,10 @@ data class Page(
         }
     }
 
-    class Favorite(override val type: PageType = PageType.FAVORITE) : Timeline() {
+    class Favorite(
+        @ColumnInfo(name = "type")
+        override val type: PageType = PageType.FAVORITE
+    ) : Timeline() {
         override fun toPageable(): Pageable {
             return Pageable.Favorite
         }

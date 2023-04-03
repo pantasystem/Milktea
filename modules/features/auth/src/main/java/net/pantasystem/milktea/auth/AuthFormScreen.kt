@@ -64,7 +64,7 @@ fun AuthFormScreen(
                     .fillMaxWidth(),
                 maxLines = 1,
                 label = {
-                    Text(stringResource(R.string.instance_domain))
+                    Text(stringResource(R.string.auth_instance_domain))
                 },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
@@ -184,7 +184,7 @@ private fun AgreementLayout(
         TextButton(
             onClick = onShowTermsOfService
         ) {
-            Text(stringResource(id = R.string.terms_of_service_agreeation))
+            Text(stringResource(id = R.string.auth_terms_of_service_agreeation))
         }
         Switch(
             checked = uiState.formState.isTermsOfServiceAgreement,
@@ -200,7 +200,7 @@ private fun AgreementLayout(
             modifier = Modifier.clickable(onClick = onShowPrivacyPolicy),
             onClick = onShowPrivacyPolicy,
         ) {
-            Text(stringResource(id = R.string.privacy_policy_agreeation))
+            Text(stringResource(id = R.string.auth_privacy_policy_agreeation))
         }
         Switch(
             checked = uiState.formState.isPrivacyPolicyAgreement,
@@ -215,7 +215,7 @@ private fun AgreementLayout(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                stringResource(id = R.string.accpet_mastodon_alpha_test),
+                stringResource(id = R.string.auth_accpet_mastodon_alpha_test),
                 modifier = Modifier
                     .padding(8.dp)
                     .weight(1f)

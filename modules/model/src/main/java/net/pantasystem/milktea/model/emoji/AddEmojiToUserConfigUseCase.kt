@@ -15,8 +15,8 @@ class AddEmojiToUserConfigUseCase @Inject constructor(
         userEmojiConfigRepository.save(
             UserEmojiConfig(
                 reaction = emoji,
-                instanceDomain = account.normalizedInstanceDomain,
-                weight = userEmojiConfigRepository.findByInstanceDomain(account.normalizedInstanceDomain).size
+                instanceDomain = account.normalizedInstanceUri,
+                weight = userEmojiConfigRepository.findByInstanceDomain(account.normalizedInstanceUri).size
             )
         ).getOrThrow()
     }

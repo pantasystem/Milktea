@@ -79,10 +79,10 @@ dependencies {
 
     implementation libs.lifecycle.livedata
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation libs.recyclerview
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.swiperefreshlayout
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation libs.recyclerview
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
 }

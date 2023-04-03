@@ -76,7 +76,8 @@ dependencies {
     implementation libs.accompanist.pager.indicators
     implementation libs.coil.compose
 
-    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
     implementation libs.lifecycle.viewmodel
 
     // hilt

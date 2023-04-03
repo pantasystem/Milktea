@@ -16,7 +16,6 @@ import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.Translation
 import java.util.*
 import javax.inject.Inject
@@ -24,7 +23,6 @@ import javax.inject.Singleton
 
 @Singleton
 class NoteTranslationStoreImpl @Inject constructor(
-    val noteRepository: NoteRepository,
     val accountRepository: AccountRepository,
     val misskeyAPIProvider: MisskeyAPIProvider,
 ) : NoteTranslationStore {
@@ -50,7 +48,7 @@ class NoteTranslationStoreImpl @Inject constructor(
         runCancellableCatching {
             withContext(Dispatchers.IO) {
                 val account = accountRepository.get(noteId.accountId).getOrThrow()
-                val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+                val api = misskeyAPIProvider.get(account.normalizedInstanceUri)
                 val req = Translate(
                     i = account.token,
                     targetLang = Locale.getDefault().language,

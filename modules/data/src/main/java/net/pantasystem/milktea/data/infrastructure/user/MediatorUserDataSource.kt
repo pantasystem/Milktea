@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.collection.LRUCache
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.user.db.*
@@ -16,23 +17,25 @@ import javax.inject.Inject
 
 class MediatorUserDataSource @Inject constructor(
     private val userDao: UserDao,
-    private val inMem: InMemoryUserDataSource,
+//    private val inMem: InMemoryUserDataSource,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
 ) : UserDataSource {
+
+    val memCache = LRUCache<User.Id, User>(250)
 
     val logger = loggerFactory.create("MediatorUserDataSource")
 
     override suspend fun get(userId: User.Id, isSimple: Boolean): Result<User> =
         runCancellableCatching {
             withContext(ioDispatcher) {
-                inMem.get(userId).getOrNull()
+                memCache.get(userId)
                     ?: (if (isSimple) {
                         userDao.getSimple(userId.accountId, userId.id)
                     } else {
                         userDao.get(userId.accountId, userId.id)
                     }?.toModel()?.also {
-                        inMem.add(it).getOrThrow()
+                        memCache.put(it.id, it)
                     } ?: throw UserNotFoundException(userId))
             }
         }
@@ -40,18 +43,17 @@ class MediatorUserDataSource @Inject constructor(
     override suspend fun get(accountId: Long, userName: String, host: String?): Result<User> =
         runCancellableCatching {
             withContext(ioDispatcher) {
-                inMem.get(accountId, userName, host).getOrNull()
-                    ?: (if (host == null) {
-                        userDao.getByUserName(accountId, userName)
-                    } else {
-                        userDao.getByUserName(accountId, userName, host)
-                    })?.toModel()?.also {
-                        inMem.add(it).getOrThrow()
-                    } ?: throw UserNotFoundException(
-                        userName = userName,
-                        host = host,
-                        userId = null
-                    )
+                (if (host == null) {
+                    userDao.getByUserName(accountId, userName)
+                } else {
+                    userDao.getByUserName(accountId, userName, host)
+                })?.toModel()?.also {
+                    memCache.put(it.id, it)
+                } ?: throw UserNotFoundException(
+                    userName = userName,
+                    host = host,
+                    userId = null
+                )
             }
         }
 
@@ -70,8 +72,10 @@ class MediatorUserDataSource @Inject constructor(
                 }.map {
                     it.toModel()
                 }
-            }.flatten().also {
-                inMem.addAll(it).getOrThrow()
+            }.flatten().also { list ->
+                list.associateBy { it.id }.forEach {
+                    memCache.put(it.key, it.value)
+                }
             }
             if (!keepInOrder) {
                 list
@@ -86,16 +90,13 @@ class MediatorUserDataSource @Inject constructor(
 
     override suspend fun add(user: User): Result<AddResult> = runCancellableCatching {
         withContext(ioDispatcher) {
-            val existsUserInMemory = inMem.get(user.id).getOrNull()
+            val existsUserInMemory = memCache.get(user.id)
             if (existsUserInMemory == user) {
                 return@withContext AddResult.Canceled
             }
 
-            val result = inMem.add(user).getOrThrow()
+            memCache.put(user.id, user)
 
-            if (result == AddResult.Canceled) {
-                return@withContext result
-            }
             val newRecord = UserRecord(
                 accountId = user.id.accountId,
                 serverId = user.id.id,
@@ -108,125 +109,116 @@ class MediatorUserDataSource @Inject constructor(
                 userName = user.userName,
                 avatarBlurhash = user.avatarBlurhash,
             )
-            when (result) {
-                AddResult.Canceled -> {
-                    return@withContext result
-                }
-                else -> {
-                    val record = userDao.get(user.id.accountId, user.id.id)
-                    val dbId = if (record == null) {
-                        userDao.insert(newRecord)
-                    } else {
-                        userDao.update(newRecord.copy(id = record.user.id))
-                        record.user.id
-                    }
+            val record = userDao.get(user.id.accountId, user.id.id)
+            val result = if (record == null) AddResult.Created else AddResult.Updated
+            val dbId = if (record == null) {
+                userDao.insert(newRecord)
+            } else {
+                userDao.update(newRecord.copy(id = record.user.id))
+                record.user.id
+            }
 
-                    // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
-                    // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
-                    if (record?.toModel()?.emojis?.toSet() != user.emojis.toSet()) {
-                        // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
-                        if (record != null) {
-                            userDao.detachAllUserEmojis(dbId)
-                        }
-                        userDao.insertEmojis(
-                            user.emojis.map {
-                                UserEmojiRecord(
-                                    userId = dbId,
-                                    name = it.name,
-                                    uri = it.uri,
-                                    url = it.url,
-                                )
-                            }
+            // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
+            // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
+            if (record?.toModel()?.emojis?.toSet() != user.emojis.toSet()) {
+                // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
+                if (record != null) {
+                    userDao.detachAllUserEmojis(dbId)
+                }
+                userDao.insertEmojis(
+                    user.emojis.map {
+                        UserEmojiRecord(
+                            userId = dbId,
+                            name = it.name,
+                            uri = it.uri,
+                            url = it.url,
                         )
                     }
+                )
+            }
 
-                    if (user is User.Detail) {
+            if (user is User.Detail) {
+                userDao.insert(
+                    UserInfoStateRecord(
+                        bannerUrl = user.info.bannerUrl,
+
+                        isLocked = user.info.isLocked,
+
+                        description = user.info.description,
+                        followersCount = user.info.followersCount,
+                        followingCount = user.info.followingCount,
+
+                        hostLower = user.info.hostLower,
+                        notesCount = user.info.notesCount,
+                        url = user.info.url,
+                        userId = dbId,
+                        birthday = user.info.birthday,
+                        createdAt = user.info.createdAt,
+                        updatedAt = user.info.updatedAt,
+                        publicReactions = user.info.isPublicReactions
+                    )
+                )
+                when (val related = user.related) {
+                    null -> {}
+                    else -> {
                         userDao.insert(
-                            UserInfoStateRecord(
-                                bannerUrl = user.info.bannerUrl,
-
-                                isLocked = user.info.isLocked,
-
-                                description = user.info.description,
-                                followersCount = user.info.followersCount,
-                                followingCount = user.info.followingCount,
-
-                                hostLower = user.info.hostLower,
-                                notesCount = user.info.notesCount,
-                                url = user.info.url,
+                            UserRelatedStateRecord(
+                                isMuting = related.isMuting,
+                                isBlocking = related.isBlocking,
+                                isFollower = related.isFollower,
+                                isFollowing = related.isFollowing,
+                                hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
+                                hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
                                 userId = dbId,
-                                birthday = user.info.birthday,
-                                createdAt = user.info.createdAt,
-                                updatedAt = user.info.updatedAt,
-                                publicReactions = user.info.isPublicReactions
                             )
                         )
-                        when (val related = user.related) {
-                            null -> {}
-                            else -> {
-                                userDao.insert(
-                                    UserRelatedStateRecord(
-                                        isMuting = related.isMuting,
-                                        isBlocking = related.isBlocking,
-                                        isFollower = related.isFollower,
-                                        isFollowing = related.isFollowing,
-                                        hasPendingFollowRequestToYou = related.hasPendingFollowRequestToYou,
-                                        hasPendingFollowRequestFromYou = related.hasPendingFollowRequestFromYou,
-                                        userId = dbId,
-                                    )
-                                )
-                            }
-                        }
-
-
-                        // NOTE: 更新の必要性を判定
-                        if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
-                            // NOTE: 更新系の場合は一度削除する
-                            if (record != null) {
-                                userDao.detachAllPinnedNoteIds(dbId)
-                            }
-
-                            if (!user.info.pinnedNoteIds.isNullOrEmpty()) {
-                                userDao.insertPinnedNoteIds(user.info.pinnedNoteIds!!.map {
-                                    PinnedNoteIdRecord(it.noteId, userId = dbId, 0L)
-                                })
-                            }
-
-                        }
-                        if ((record?.toModel() as? User.Detail?)?.info?.fields?.toSet() != user.info.fields.toSet()) {
-                            if (record != null) {
-                                userDao.detachUserFields(dbId)
-                            }
-                            if (user.info.fields.isNotEmpty()) {
-                                userDao.insertUserProfileFields(user.info.fields.map {
-                                    UserProfileFieldRecord(it.name, it.value, dbId)
-                                })
-                            }
-                        }
-                    }
-                    when (val instance = user.instance) {
-                        null -> Unit
-                        else -> {
-                            userDao.insertUserInstanceInfo(
-                                UserInstanceInfoRecord(
-                                    faviconUrl = instance.faviconUrl,
-                                    iconUrl = instance.iconUrl,
-                                    name = instance.name,
-                                    softwareVersion = instance.softwareVersion,
-                                    softwareName = instance.softwareName,
-                                    themeColor = instance.themeColor,
-                                    userId = dbId
-                                )
-                            )
-                        }
                     }
                 }
 
+
+                // NOTE: 更新の必要性を判定
+                if ((record?.toModel() as? User.Detail?)?.info?.pinnedNoteIds?.toSet() != user.info.pinnedNoteIds?.toSet()) {
+                    // NOTE: 更新系の場合は一度削除する
+                    if (record != null) {
+                        userDao.detachAllPinnedNoteIds(dbId)
+                    }
+
+                    if (!user.info.pinnedNoteIds.isNullOrEmpty()) {
+                        userDao.insertPinnedNoteIds(user.info.pinnedNoteIds!!.map {
+                            PinnedNoteIdRecord(it.noteId, userId = dbId, 0L)
+                        })
+                    }
+
+                }
+                if ((record?.toModel() as? User.Detail?)?.info?.fields?.toSet() != user.info.fields.toSet()) {
+                    if (record != null) {
+                        userDao.detachUserFields(dbId)
+                    }
+                    if (user.info.fields.isNotEmpty()) {
+                        userDao.insertUserProfileFields(user.info.fields.map {
+                            UserProfileFieldRecord(it.name, it.value, dbId)
+                        })
+                    }
+                }
+            }
+            when (val instance = user.instance) {
+                null -> Unit
+                else -> {
+                    userDao.insertUserInstanceInfo(
+                        UserInstanceInfoRecord(
+                            faviconUrl = instance.faviconUrl,
+                            iconUrl = instance.iconUrl,
+                            name = instance.name,
+                            softwareVersion = instance.softwareVersion,
+                            softwareName = instance.softwareName,
+                            themeColor = instance.themeColor,
+                            userId = dbId
+                        )
+                    )
+                }
             }
             return@withContext result
         }
-
-
     }
 
     override suspend fun addAll(users: List<User>): Result<List<AddResult>> =
@@ -240,7 +232,7 @@ class MediatorUserDataSource @Inject constructor(
 
     override suspend fun remove(user: User): Result<Boolean> = runCancellableCatching {
         runCancellableCatching {
-            inMem.remove(user).getOrThrow()
+            memCache.remove(user.id)
             userDao.delete(user.id.accountId, user.id.id)
             true
         }.getOrElse {
@@ -273,7 +265,7 @@ class MediatorUserDataSource @Inject constructor(
         return userDao.observe(userId.accountId, userId.id).mapNotNull {
             it?.toModel()
         }.onEach {
-            inMem.add(it)
+            memCache.put(it.id, it)
         }.flowOn(ioDispatcher).distinctUntilChanged().catch {
             logger.error("observe by userId error", it)
             throw it
@@ -291,7 +283,7 @@ class MediatorUserDataSource @Inject constructor(
         }.map {
             it.toModel()
         }.onEach {
-            inMem.add(it)
+            memCache.put(it.id, it)
         }.flowOn(ioDispatcher).distinctUntilChanged().catch {
             logger.error("observe by acct error, acct:$acct", it)
             throw it
@@ -357,8 +349,8 @@ class MediatorUserDataSource @Inject constructor(
 
             }.map {
                 it.toModel()
-            }.also {
-                inMem.addAll(it)
+            }.onEach {
+                memCache.put(it.id, it)
             }
 
         }

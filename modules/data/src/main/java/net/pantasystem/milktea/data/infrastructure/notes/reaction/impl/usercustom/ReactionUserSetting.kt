@@ -9,9 +9,12 @@ import androidx.room.Entity
  */
 @Entity(tableName = "reaction_user_setting", primaryKeys=["reaction", "instance_domain"])
 data class ReactionUserSetting(
+    @ColumnInfo("reaction")
     val reaction: String,
 
     @ColumnInfo(name = "instance_domain")
     val instanceDomain: String,
+
+    @ColumnInfo(name = "weight")
     var weight: Int
 )

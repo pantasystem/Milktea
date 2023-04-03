@@ -9,10 +9,7 @@ import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
-import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoDAO
-import net.pantasystem.milktea.data.infrastructure.instance.db.MastodonInstanceInfoRecord
-import net.pantasystem.milktea.data.infrastructure.instance.db.from
-import net.pantasystem.milktea.data.infrastructure.instance.db.toModel
+import net.pantasystem.milktea.data.infrastructure.instance.db.*
 import net.pantasystem.milktea.data.infrastructure.toModel
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
@@ -77,8 +74,23 @@ class MastodonInstanceInfoRepositoryImpl @Inject constructor(
         val exists = mastodonInstanceInfoDAO.findBy(instanceInfo.uri)
         if (exists == null) {
             mastodonInstanceInfoDAO.insert(MastodonInstanceInfoRecord.from(instanceInfo))
+            instanceInfo.fedibirdCapabilities?.let { capabilities ->
+                mastodonInstanceInfoDAO.insertFedibirdCapabilities(
+                    capabilities.map {
+                        FedibirdCapabilitiesRecord(it, instanceInfo.uri)
+                    }
+                )
+            }
         } else {
             mastodonInstanceInfoDAO.update(MastodonInstanceInfoRecord.from(instanceInfo))
+            mastodonInstanceInfoDAO.clearFedibirdCapabilities(instanceInfo.uri)
+            instanceInfo.fedibirdCapabilities?.let { capabilities ->
+                mastodonInstanceInfoDAO.insertFedibirdCapabilities(
+                    capabilities.map {
+                        FedibirdCapabilitiesRecord(it, instanceInfo.uri)
+                    }
+                )
+            }
         }
     }
 }

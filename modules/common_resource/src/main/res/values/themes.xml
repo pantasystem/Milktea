@@ -24,9 +24,6 @@
         <item name="tabStyle">@style/TabLayout4Light</item>
 
 
-
-        <item name="android:navigationBarColor">#FFFFFF</item>
-
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
 
 

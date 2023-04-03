@@ -32,16 +32,37 @@ import net.pantasystem.milktea.model.user.nickname.UserNickname
     ]
 )
 data class UserRecord(
+    @ColumnInfo(name = "serverId")
     val serverId: String,
+
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "userName")
     val userName: String,
+
+    @ColumnInfo(name = "name")
     val name: String?,
+
+    @ColumnInfo(name = "avatarUrl")
     val avatarUrl: String?,
+
+    @ColumnInfo(name = "isCat")
     val isCat: Boolean?,
+
+    @ColumnInfo(name = "isBot")
     val isBot: Boolean?,
+
+    @ColumnInfo(name = "host")
     val host: String,
+
+    @ColumnInfo(name = "isSameHost")
     val isSameHost: Boolean,
+
+    @ColumnInfo(name = "avatarBlurhash")
     val avatarBlurhash: String?,
+
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 )
 
@@ -61,19 +82,45 @@ data class UserRecord(
     ]
 )
 data class UserInfoStateRecord(
+    @ColumnInfo(name = "description")
     val description: String?,
+
+    @ColumnInfo(name = "followersCount")
     val followersCount: Int?,
+
+    @ColumnInfo(name = "followingCount")
     val followingCount: Int?,
+
+    @ColumnInfo(name = "hostLower")
     val hostLower: String?,
+
+    @ColumnInfo(name = "notesCount")
     val notesCount: Int?,
+
+    @ColumnInfo(name = "bannerUrl")
     val bannerUrl: String?,
+
+    @ColumnInfo(name = "url")
     val url: String?,
+
+    @ColumnInfo(name = "isLocked")
     val isLocked: Boolean,
+
+    @ColumnInfo(name = "birthday")
     val birthday: LocalDate?,
+
+    @ColumnInfo(name = "createdAt")
     val createdAt: Instant?,
+
+    @ColumnInfo(name = "updatedAt")
     val updatedAt: Instant?,
+
+    @ColumnInfo(name = "publicReactions")
     val publicReactions: Boolean?,
-    @PrimaryKey(autoGenerate = false) val userId: Long
+
+    @ColumnInfo(name = "userId")
+    @PrimaryKey(autoGenerate = false)
+    val userId: Long
 )
 
 @Entity(
@@ -92,12 +139,25 @@ data class UserInfoStateRecord(
     ]
 )
 data class UserRelatedStateRecord(
+    @ColumnInfo(name = "isFollowing")
     val isFollowing: Boolean,
+
+    @ColumnInfo(name = "isFollower")
     val isFollower: Boolean,
+
+    @ColumnInfo(name = "isBlocking")
     val isBlocking: Boolean,
+
+    @ColumnInfo(name = "isMuting")
     val isMuting: Boolean,
+
+    @ColumnInfo(name = "hasPendingFollowRequestFromYou")
     val hasPendingFollowRequestFromYou: Boolean,
+
+    @ColumnInfo(name = "hasPendingFollowRequestToYou")
     val hasPendingFollowRequestToYou: Boolean,
+
+    @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
 )
 
@@ -117,24 +177,61 @@ data class UserRelatedStateRecord(
     ]
 )
 data class UserDetailedStateRecord(
+    @ColumnInfo(name = "description")
     val description: String?,
+
+    @ColumnInfo(name = "followersCount")
     val followersCount: Int?,
+
+    @ColumnInfo(name = "followingCount")
     val followingCount: Int?,
+
+    @ColumnInfo(name = "hostLower")
     val hostLower: String?,
+
+    @ColumnInfo(name = "notesCount")
     val notesCount: Int?,
+
+    @ColumnInfo(name = "bannerUrl")
     val bannerUrl: String?,
+
+    @ColumnInfo(name = "url")
     val url: String?,
+
+    @ColumnInfo(name = "isFollowing")
     val isFollowing: Boolean,
+
+    @ColumnInfo(name = "isFollower")
     val isFollower: Boolean,
+
+    @ColumnInfo(name = "isBlocking")
     val isBlocking: Boolean,
+
+    @ColumnInfo(name = "isMuting")
     val isMuting: Boolean,
+
+    @ColumnInfo(name = "hasPendingFollowRequestFromYou")
     val hasPendingFollowRequestFromYou: Boolean,
+
+    @ColumnInfo(name = "hasPendingFollowRequestToYou")
     val hasPendingFollowRequestToYou: Boolean,
+
+    @ColumnInfo(name = "isLocked")
     val isLocked: Boolean,
+
+    @ColumnInfo(name = "birthday")
     val birthday: LocalDate?,
+
+    @ColumnInfo(name = "createdAt")
     val createdAt: Instant?,
+
+    @ColumnInfo(name = "updatedAt")
     val updatedAt: Instant?,
+
+    @ColumnInfo(name = "publicReactions")
     val publicReactions: Boolean?,
+
+    @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
 )
 
@@ -157,10 +254,19 @@ data class UserDetailedStateRecord(
     ]
 )
 data class UserEmojiRecord(
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "url")
     val url: String?,
+
+    @ColumnInfo(name = "uri")
     val uri: String?,
+
+    @ColumnInfo(name = "userId")
     val userId: Long,
+
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
     fun toModel(): Emoji {
@@ -188,12 +294,25 @@ data class UserEmojiRecord(
     ]
 )
 data class UserInstanceInfoRecord(
+    @ColumnInfo(name = "faviconUrl")
     val faviconUrl: String?,
+
+    @ColumnInfo(name = "iconUrl")
     val iconUrl: String?,
+
+    @ColumnInfo(name = "name")
     val name: String?,
+
+    @ColumnInfo(name = "softwareName")
     val softwareName: String?,
+
+    @ColumnInfo(name = "softwareVersion")
     val softwareVersion: String?,
+
+    @ColumnInfo(name = "themeColor")
     val themeColor: String?,
+
+    @ColumnInfo(name = "userId")
     @PrimaryKey(autoGenerate = false) val userId: Long
 )
 
@@ -214,8 +333,13 @@ data class UserInstanceInfoRecord(
     ]
 )
 data class PinnedNoteIdRecord(
+    @ColumnInfo(name = "noteId")
     val noteId: String,
+
+    @ColumnInfo(name = "userId")
     val userId: Long,
+
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long
 )
 
@@ -235,9 +359,16 @@ data class PinnedNoteIdRecord(
     ]
 )
 data class UserProfileFieldRecord(
+    @ColumnInfo(name = "name")
     val name: String,
+
+    @ColumnInfo(name = "value")
     val value: String,
+
+    @ColumnInfo(name = "userId")
     val userId: Long,
+
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L
 )
 
@@ -246,17 +377,40 @@ data class UserProfileFieldRecord(
     viewName = "user_view"
 )
 data class UserView(
+    @ColumnInfo(name = "serverId")
     val serverId: String,
+
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "userName")
     val userName: String,
+
+    @ColumnInfo(name = "name")
     val name: String?,
+
+    @ColumnInfo(name = "avatarUrl")
     val avatarUrl: String?,
+
+    @ColumnInfo(name = "isCat")
     val isCat: Boolean?,
+
+    @ColumnInfo(name = "isBot")
     val isBot: Boolean?,
+
+    @ColumnInfo(name = "host")
     val host: String,
+
+    @ColumnInfo(name = "isSameHost")
     val isSameHost: Boolean,
+
+    @ColumnInfo(name = "id")
     val id: Long,
+
+    @ColumnInfo(name = "nickname")
     val nickname: String?,
+
+    @ColumnInfo(name = "avatarBlurhash")
     val avatarBlurhash: String?
 )
 

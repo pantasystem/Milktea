@@ -7,7 +7,8 @@ import net.pantasystem.milktea.model.user.nickname.UserNickname
     tableName = "nicknames",
     indices = [Index(value = arrayOf("username", "host"), unique = true)]
 )
-data class UserNicknameDTO (
+data class UserNicknameDTO(
+    @ColumnInfo(name = "nickname")
     val nickname: String,
 
     @ColumnInfo(name = "username")
@@ -15,7 +16,10 @@ data class UserNicknameDTO (
 
     @ColumnInfo(name = "host")
     val host: String,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Long = 0L,
 )
 
 @Dao

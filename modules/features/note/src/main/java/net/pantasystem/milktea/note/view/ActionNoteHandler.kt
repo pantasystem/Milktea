@@ -79,7 +79,7 @@ class ActionNoteHandler(
 
         mNotesViewModel.confirmReportEvent.onEach { report ->
             report?.let {
-                ReportDialog.newInstance(report.userId, report.comment)
+                ReportDialog.newInstance(report.userId, report.comment, report.noteIds)
                     .show(activity.supportFragmentManager, "")
             }
         }.flowWithLifecycle(activity.lifecycle, Lifecycle.State.RESUMED)

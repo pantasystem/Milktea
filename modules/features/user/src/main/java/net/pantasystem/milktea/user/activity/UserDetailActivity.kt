@@ -175,6 +175,7 @@ class UserDetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.userDetailToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         mParentActivity = intent.getParentActivity()
 
         val remoteUserId: String? = intent.getStringExtra(EXTRA_USER_ID)
@@ -258,6 +259,10 @@ class UserDetailActivity : AppCompatActivity() {
                 supportActionBar?.title = it?.displayUserName
             }
         }
+
+        mViewModel.renoteMuteState.onEach {
+            invalidateOptionsMenu()
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
         invalidateOptionsMenu()
 
@@ -388,6 +393,12 @@ class UserDetailActivity : AppCompatActivity() {
                     putExtra(Intent.EXTRA_TEXT, url)
                 }
                 startActivity(Intent.createChooser(intent, getString(R.string.share)))
+            }
+            R.id.renoteUnmute -> {
+                mViewModel.unMuteRenotes()
+            }
+            R.id.renoteMute -> {
+                mViewModel.muteRenotes()
             }
             else -> return false
 

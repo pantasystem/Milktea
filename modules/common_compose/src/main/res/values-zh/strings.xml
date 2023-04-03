@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="show">展示</string>
-    <string name="undo_nsfw">取消NSFW标签</string>
-    <string name="mark_as_nsfw">将内容标记为NSFW</string>
+    <string name="drive_undo_nsfw">取消NSFW标签</string>
+    <string name="drive_mark_as_nsfw">将内容标记为NSFW</string>
     <string name="remove_attachment">删除附件</string>
 
     <string name="future">未来</string>

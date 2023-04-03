@@ -96,7 +96,7 @@ class LikedGalleryPostsLoader(
     override suspend fun loadFuture(): Result<List<LikedGalleryPost>> {
         return runCancellableCatching {
             val api =
-                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
+                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceUri) as? MisskeyAPIV1275
                     ?: throw IllegalVersionException()
             api.likedGalleryPosts(
                 GetPosts(
@@ -111,7 +111,7 @@ class LikedGalleryPostsLoader(
     override suspend fun loadPrevious(): Result<List<LikedGalleryPost>> {
         return runCancellableCatching {
             val api =
-                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceDomain) as? MisskeyAPIV1275
+                misskeyAPIProvider.get(getAccount.invoke().normalizedInstanceUri) as? MisskeyAPIV1275
                     ?: throw IllegalVersionException()
             api.likedGalleryPosts(
                 GetPosts(

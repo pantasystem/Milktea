@@ -17,8 +17,11 @@ import androidx.room.Index
     indices = [Index("draft_note_id")]
 )
 data class UserIdDTO(
+    @ColumnInfo(name = "userId")
     val userId: String,
-    @ColumnInfo(name = "draft_note_id") val draftNoteId: Long
+
+    @ColumnInfo(name = "draft_note_id")
+    val draftNoteId: Long
 ){
 
     companion object{

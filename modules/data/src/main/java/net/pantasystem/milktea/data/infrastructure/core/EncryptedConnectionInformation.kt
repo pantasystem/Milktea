@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.core
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import java.util.*
@@ -18,13 +19,26 @@ import java.util.*
 )
 @Deprecated("model.accountへ移行")
 data class EncryptedConnectionInformation(
+    @ColumnInfo("accountId")
     val accountId: String,
+
+    @ColumnInfo("instanceBaseUrl")
     val instanceBaseUrl: String,
+
+    @ColumnInfo("encryptedI")
     val encryptedI: String,
+
+    @ColumnInfo("viaName")
     val viaName: String?,
+
+    @ColumnInfo("createdAt")
     val createdAt: Date = Date(),
+
+    @ColumnInfo("isDirect")
     val isDirect: Boolean = false
 ) {
+
+    @ColumnInfo("updatedAt")
     var updatedAt: Date = Date()
 
 }

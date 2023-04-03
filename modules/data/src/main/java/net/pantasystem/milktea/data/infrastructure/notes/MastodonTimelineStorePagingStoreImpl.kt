@@ -12,6 +12,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import net.pantasystem.milktea.model.notes.Note
+import retrofit2.Response
 
 
 internal class MastodonTimelineStorePagingStoreImpl(
@@ -42,8 +43,9 @@ internal class MastodonTimelineStorePagingStoreImpl(
 
     override suspend fun loadFuture(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
-        if (getSinceId() == null && (pageableTimeline is Pageable.Mastodon.UserTimeline)) {
-            if (!(getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()) {
+        val minId = getSinceId()
+        if (minId == null && isShouldUseLinkHeader()) {
+            if (!isEmpty()) {
                 return@runCancellableCatching emptyList()
             }
         }
@@ -79,29 +81,48 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     excludeReblogs = pageableTimeline.excludeReblogs,
                     minId = getSinceId()
                 ).throwIfHasError().also {
-                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
-                    this@MastodonTimelineStorePagingStoreImpl.minId = decoder.getMinId()
-                    if (this@MastodonTimelineStorePagingStoreImpl.maxId == null) {
-                        decoder.getMaxId()
-                    }
+                    updateMinIdFrom(it)
                 }
             }
-        }.throwIfHasError().body()!!
+            Pageable.Mastodon.BookmarkTimeline -> {
+                api.getBookmarks(
+                    minId = minId
+                ).throwIfHasError().also {
+                    updateMinIdFrom(it)
+                }
+            }
+        }.throwIfHasError().body()!!.let { list ->
+            if (isShouldUseLinkHeader()) {
+                filterNotExistsStatuses(list)
+            } else {
+                list
+            }
+        }
     }
 
     override suspend fun getSinceId(): String? {
-        return minId ?: (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
+        if (isShouldUseLinkHeader()) {
+            return minId
+        }
+        return (getState().content as? StateContent.Exist)?.rawContent?.maxByOrNull {
             it.noteId
         }?.noteId
     }
 
     override suspend fun getUntilId(): String? {
-        return maxId ?: (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
+        if (isShouldUseLinkHeader()) {
+            return maxId
+        }
+        return (getState().content as? StateContent.Exist)?.rawContent?.minByOrNull {
             it.noteId
         }?.noteId
     }
 
     override fun setState(state: PageableState<List<Note.Id>>) {
+        if (state is PageableState.Loading.Init) {
+            maxId = null
+            minId = null
+        }
         _state.value = state
     }
 
@@ -113,11 +134,13 @@ internal class MastodonTimelineStorePagingStoreImpl(
     override suspend fun loadPrevious(): Result<List<TootStatusDTO>> = runCancellableCatching {
         val api = mastodonAPIProvider.get(getAccount())
         val maxId = getUntilId()
-        if (maxId == null && (pageableTimeline is Pageable.Mastodon.UserTimeline)) {
-            if (!(getState().content as? StateContent.Exist)?.rawContent.isNullOrEmpty()) {
+
+        if (maxId == null && isShouldUseLinkHeader()) {
+            if (!isEmpty()) {
                 return@runCancellableCatching emptyList()
             }
         }
+
         when (pageableTimeline) {
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
@@ -151,14 +174,23 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     excludeReblogs = pageableTimeline.excludeReblogs,
                     maxId = maxId,
                 ).throwIfHasError().also {
-                    val decoder = MastodonLinkHeaderDecoder(it.headers()["link"])
-                    this@MastodonTimelineStorePagingStoreImpl.maxId = decoder.getMaxId()
-                    if (this@MastodonTimelineStorePagingStoreImpl.minId == null) {
-                        decoder.getMinId()
-                    }
+                    updateMaxIdFrom(it)
                 }
             }
-        }.throwIfHasError().body()!!
+            Pageable.Mastodon.BookmarkTimeline -> {
+                api.getBookmarks(
+                    maxId = maxId,
+                ).throwIfHasError().also {
+                    updateMaxIdFrom(it)
+                }
+            }
+        }.throwIfHasError().body()!!.let { list ->
+            if (isShouldUseLinkHeader()) {
+                filterNotExistsStatuses(list)
+            } else {
+                list
+            }
+        }
     }
 
     private suspend fun getVisibilitiesParameter(account: Account): List<String>? {
@@ -170,4 +202,70 @@ internal class MastodonTimelineStorePagingStoreImpl(
         }
     }
 
+    private fun isEmpty(): Boolean {
+        return when(val content = _state.value.content) {
+            is StateContent.Exist -> content.rawContent.isEmpty()
+            is StateContent.NotExist -> true
+        }
+    }
+
+    private fun isShouldUseLinkHeader(): Boolean {
+        return pageableTimeline is Pageable.Mastodon.BookmarkTimeline
+                || pageableTimeline is Pageable.Mastodon.UserTimeline
+    }
+
+    /**
+     * 重複をフィルタする
+     */
+    private fun filterNotExistsStatuses(statuses: List<TootStatusDTO>): List<TootStatusDTO> {
+        val data = (_state.value.content as? StateContent.Exist)?.rawContent
+        if (data.isNullOrEmpty()) {
+            return statuses
+        }
+        return statuses.filterNot { status ->
+            data.any {
+                it.noteId == status.id
+            }
+        }
+    }
+
+    /**
+     * responseを元にmaxIdを更新するための関数
+     * responseのmaxIdがnullの場合は更新がキャンセルされる
+     * minIdがnullの場合はresponseのminIdが指定される
+     */
+    private fun updateMaxIdFrom(response: Response<List<TootStatusDTO>>) {
+        val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
+
+        // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
+        when(val nextId = decoder.getMaxId()) {
+            null -> Unit
+            else -> {
+                maxId = nextId
+            }
+        }
+        if (minId == null) {
+            minId = decoder.getMinId()
+        }
+    }
+
+    /**
+     * responseを元にminIdを得るための関数
+     * responseのminIdがnullの場合は更新がキャンセルされる
+     * maxIdがnullの場合はresponseのmaxIdが指定される
+     */
+    private fun updateMinIdFrom(response: Response<List<TootStatusDTO>>) {
+        val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
+
+        // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
+        when(val nextId = decoder.getMinId()) {
+            null -> Unit
+            else -> {
+                minId = nextId
+            }
+        }
+        if (maxId == null) {
+            maxId = decoder.getMaxId()
+        }
+    }
 }

@@ -257,7 +257,7 @@ fun FilePreviewActionDropDown(
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    if (isSensitive) stringResource(id = R.string.undo_nsfw) else stringResource(id = R.string.mark_as_nsfw)
+                    if (isSensitive) stringResource(id = R.string.drive_undo_nsfw) else stringResource(id = R.string.drive_mark_as_nsfw)
                 )
             }
         }

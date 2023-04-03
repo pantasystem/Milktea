@@ -4,7 +4,6 @@ import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.data.infrastructure.toGroup
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.group.InvitationId
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notification.*
 import net.pantasystem.milktea.model.user.User
@@ -18,7 +17,6 @@ class NotificationDTOEntityConverter @Inject constructor(
     suspend fun convert(
         notificationDTO: NotificationDTO,
         account: Account,
-        nodeInfo: NodeInfo?
     ): Notification {
         val id = Notification.Id(account.accountId, notificationDTO.id)
         return when (notificationDTO.type) {
@@ -100,7 +98,7 @@ class NotificationDTOEntityConverter @Inject constructor(
                     "想定しないデータ=$notificationDTO"
                 }
                 require(notificationDTO.note != null)
-                val n = noteDTOEntityConverter.convert(notificationDTO.note!!, account, nodeInfo)
+                val n = noteDTOEntityConverter.convert(notificationDTO.note!!, account)
                 ReactionNotification(
                     id,
                     notificationDTO.createdAt,

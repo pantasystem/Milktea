@@ -8,9 +8,7 @@ import net.pantasystem.milktea.model.app.AppType
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.Emoji
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.poll.Poll
-import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 import net.pantasystem.milktea.model.user.User
 import kotlin.math.min
@@ -43,23 +41,50 @@ data class Note(
     val poll: Poll?,
     val myReaction: String?,
 
-
     val app: AppType.Misskey?,
     val channelId: Channel.Id?,
     val type: Type,
-    val nodeInfo: NodeInfo?,
-) : Entity {
-    data class Id(
+    val maxReactionsPerAccount: Int) : Entity {
+    class Id(
         val accountId: Long,
-        val noteId: String
-    ) : EntityId
+        val noteId: String,
+    ) : EntityId {
+
+        private var _hashCode: Int? = null
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Id
+
+            if (accountId != other.accountId) return false
+            if (noteId != other.noteId) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            if (_hashCode != null) return _hashCode!!
+            var result = accountId.hashCode()
+            result = 31 * result + noteId.hashCode()
+            _hashCode = result
+            return result
+        }
+
+        override fun toString(): String {
+            return "Id(accountId=$accountId, noteId='$noteId')"
+        }
+
+    }
 
 
     sealed interface Type {
         data class Misskey(
             val channel: SimpleChannelInfo? = null,
+            val isAcceptingOnlyLikeReaction: Boolean = false,
         ) : Type {
             data class SimpleChannelInfo(val id: Channel.Id, val name: String)
+
         }
 
         data class Mastodon(
@@ -74,11 +99,13 @@ data class Note(
             val pollId: String?,
             val isSensitive: Boolean?,
             val pureText: String?,
-            ) : Type {
+            val isReactionAvailable: Boolean,
+        ) : Type {
             data class Tag(
                 val name: String,
                 val url: String,
             )
+
             data class Mention(
                 val id: String,
                 val username: String,
@@ -96,14 +123,37 @@ data class Note(
     val isMastodon: Boolean = type is Type.Mastodon
     val isMisskey: Boolean = type is Type.Misskey
 
-    val isSupportEmojiReaction: Boolean = type is Type.Misskey || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+    val isSupportEmojiReaction: Boolean =
+        type is Type.Misskey || (type is Type.Mastodon && type.isReactionAvailable)
+
+    val isAcceptingOnlyLikeReaction: Boolean =
+        type is Type.Misskey && type.isAcceptingOnlyLikeReaction
+
+    val emojiNameMap = emojis?.associateBy {
+        it.name
+    }
+
+    val isReacted: Boolean = reactionCounts.any {
+        it.me
+    }
+
+    val canReaction: Boolean = reactionCounts.count {
+        it.me
+    } < maxReactionsPerAccount
+
+    val reactionsCount = reactionCounts.sumOf {
+        it.count
+    }
 
     fun getShortReactionCounts(isRenote: Boolean): List<ReactionCount> {
         return if (isRenote) {
             if (reactionCounts.size <= SHORT_RENOTE_REACTION_COUNT_MAX_SIZE) {
                 reactionCounts
             } else {
-                reactionCounts.subList(0, min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE))
+                reactionCounts.subList(
+                    0,
+                    min(reactionCounts.size, SHORT_RENOTE_REACTION_COUNT_MAX_SIZE)
+                )
             }
         } else {
             if (reactionCounts.size <= SHORT_REACTION_COUNT_MAX_SIZE) {
@@ -155,8 +205,16 @@ data class Note(
         return text != null || !fileIds.isNullOrEmpty() || poll != null
     }
 
-    fun isOwnReaction(reaction: Reaction): Boolean {
-        return myReaction != null && myReaction == reaction.getName()
+    fun isReactedReaction(reaction: String): Boolean {
+        return reactionCounts.any {
+            it.reaction == reaction && it.me
+        }
+    }
+
+    fun getMyReactionCount(): Int {
+        return reactionCounts.count {
+            it.me
+        }
     }
 
     /**
@@ -178,23 +236,13 @@ data class Note(
     }
 }
 
-sealed class NoteRelation : JSerializable {
-    abstract val note: Note
-    abstract val user: User
-    abstract val reply: NoteRelation?
-    abstract val renote: NoteRelation?
-    abstract val files: List<FileProperty>?
-
-    data class Normal(
-        override val note: Note,
-        override val user: User,
-        override val renote: NoteRelation?,
-        override val reply: NoteRelation?,
-        override val files: List<FileProperty>?,
-    ) : NoteRelation()
-
-
-}
+data class NoteRelation(
+    val note: Note,
+    val user: User,
+    val renote: NoteRelation?,
+    val reply: NoteRelation?,
+    val files: List<FileProperty>?,
+) : JSerializable
 
 fun Note.Companion.make(
     id: Note.Id,
@@ -220,7 +268,7 @@ fun Note.Companion.make(
     app: AppType.Misskey? = null,
     channelId: Channel.Id? = null,
     type: Note.Type = Note.Type.Misskey(),
-    nodeInfo: NodeInfo? = null,
+    maxReactionsPerAccount: Int = 1
 ): Note {
     return Note(
         id = id,
@@ -246,6 +294,6 @@ fun Note.Companion.make(
         app = app,
         channelId = channelId,
         type = type,
-        nodeInfo = nodeInfo
+        maxReactionsPerAccount = maxReactionsPerAccount
     )
 }

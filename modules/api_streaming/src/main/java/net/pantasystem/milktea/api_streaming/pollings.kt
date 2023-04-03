@@ -33,7 +33,9 @@ internal class PollingJob(
                 val sendTime = Clock.System.now()
 
                 if (!socket.send("ping")) {
-                    Log.d("PollingJob", "sendしたらfalse帰ってきた")
+                    if (BuildConfig.DEBUG) {
+                        Log.d("PollingJob", "sendしたらfalse帰ってきた")
+                    }
                 }
                 try {
                     val pong = withTimeout(timeout) {
@@ -44,11 +46,15 @@ internal class PollingJob(
                     val resTime = Clock.System.now()
                     val diff = resTime.toEpochMilliseconds() - sendTime.toEpochMilliseconds()
 
-                    Log.d("PollingJob", "polling成功 msg:$pong, かかった時間(ミリ秒):${diff}")
+                    if (BuildConfig.DEBUG) {
+                        Log.d("PollingJob", "polling成功 msg:$pong, かかった時間(ミリ秒):${diff}")
+                    }
                     // NOTE: pingに成功したらTTLのカウントを初期値に戻す
                     ttl = TTL_COUNT
                 } catch (e: TimeoutCancellationException) {
-                    Log.d("PollingJob", "polling失敗")
+                    if (BuildConfig.DEBUG) {
+                        Log.d("PollingJob", "polling失敗")
+                    }
                     if (--ttl <= 0) {
                         socket.reconnect()
                     }

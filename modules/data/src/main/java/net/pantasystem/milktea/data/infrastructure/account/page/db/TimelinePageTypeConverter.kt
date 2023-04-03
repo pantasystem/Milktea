@@ -7,11 +7,13 @@ class TimelinePageTypeConverter{
 
     @TypeConverter
     fun convert(type: PageType): String{
-        return type.name
+        return type.label
     }
 
     @TypeConverter
     fun convert(type: String): PageType {
-        return PageType.valueOf(type)
+        return PageType.values().first {
+            it.label == type
+        }
     }
 }

@@ -23,6 +23,15 @@
             android:id="@+id/unblock"
             android:title="@string/unblock"
             />
+
+    <item
+            android:id="@+id/renoteMute"
+            android:title="@string/user_detail_mute_renotes"
+        />
+    <item
+            android:id="@+id/renoteUnmute"
+            android:title="@string/user_detail_unmute_renotes"
+        />
     <item
             android:id="@+id/add_list"
             android:title="@string/add_to_list"/>

@@ -17,14 +17,25 @@ import java.io.Serializable
     ]
 )
 data class AccountRecord(
+    @ColumnInfo(name = "remoteId")
     val remoteId: String,
-    val instanceDomain: String,
-    val userName: String,
-    val encryptedToken: String,
-    @Ignore val pages: List<Page>,
-    @ColumnInfo(name = "instanceType", defaultValue = "misskey") val instanceType: Account.InstanceType,
-    @PrimaryKey(autoGenerate = true) var accountId: Long = 0
 
+    @ColumnInfo(name = "instanceDomain")
+    val instanceDomain: String,
+
+    @ColumnInfo(name = "userName")
+    val userName: String,
+
+    @ColumnInfo(name = "encryptedToken")
+    val encryptedToken: String,
+
+    @Ignore val pages: List<Page>,
+    @ColumnInfo(name = "instanceType", defaultValue = "misskey")
+    val instanceType: Account.InstanceType,
+
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "accountId")
+    var accountId: Long = 0
 ) : Serializable {
 
 

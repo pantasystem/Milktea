@@ -73,7 +73,7 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             }
                         },
                         onShareButtonClicked = {
-                            val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
+                            val baseUrl = uiState.currentAccount?.normalizedInstanceUri
                             val url = "$baseUrl/notes/${it?.id?.noteId}"
                             val intent = Intent().apply {
                                 action = ACTION_SEND
@@ -109,9 +109,11 @@ class NoteOptionDialog : BottomSheetDialogFragment() {
                             dismiss()
                         },
                         onReportButtonClicked ={
-                            val baseUrl = uiState.currentAccount?.normalizedInstanceDomain
-                            val report = it?.toReport(baseUrl!!)
-                            notesViewModel.confirmReportEvent.tryEmit(report)
+                            if (it != null) {
+                                val baseUrl = uiState.currentAccount?.normalizedInstanceUri
+                                val report = it.toReport(baseUrl!!)
+                                notesViewModel.confirmReportEvent.tryEmit(report)
+                            }
                             dismiss()
                         },
                         onCreateThreadMuteButtonClicked = {

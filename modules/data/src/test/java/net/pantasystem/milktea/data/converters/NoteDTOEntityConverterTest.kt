@@ -7,7 +7,6 @@ import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteVisibilityType
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
@@ -66,13 +65,7 @@ class NoteDTOEntityConverterTest {
         )
 
         val result = converter.convert(
-            noteDTO, account, NodeInfo(
-                host = "", version = "", software = NodeInfo.Software(
-                    name = "misskey",
-                    version = "13"
-                )
-
-            )
+            noteDTO, account
         )
         Assertions.assertEquals(Note.Id(account.accountId, noteDTO.id), result.id)
         Assertions.assertEquals(noteDTO.cw, result.cw)

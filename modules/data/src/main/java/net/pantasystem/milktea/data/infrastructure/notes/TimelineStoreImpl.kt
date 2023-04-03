@@ -126,15 +126,16 @@ class TimelineStoreImpl(
         }
     }
 
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val relatedNotes: Flow<PageableState<List<NoteRelation>>> =
-        noteDataSource.state.flatMapLatest {
-            timelineState.map { pageableState ->
-                pageableState.suspendConvert { list ->
-                    noteRelationGetter.getIn(list.distinct())
-                }
+    override val relatedNotes: Flow<PageableState<List<NoteRelation>>> = timelineState.flatMapLatest { pageableState ->
+        val ids = (pageableState.content as? StateContent.Exist)?.rawContent ?: emptyList()
+        noteDataSource.observeIn(ids).map {
+            pageableState.suspendConvert { ids ->
+                noteRelationGetter.getIn(ids)
             }
-        }.distinctUntilChanged()
+        }
+    }.distinctUntilChanged()
 
 
     override suspend fun loadFuture(): Result<Unit> {
@@ -267,6 +268,33 @@ class TimelineStoreImpl(
                 }
 
             }
+        }
+    }
+
+    override suspend fun releaseUnusedPages(position: Int, offset: Int) {
+        if (pageableStore.mutex.isLocked) {
+            return
+        }
+
+        pageableStore.mutex.withLock {
+            val state = pageableStore.getState()
+            val notes = when(val content = state.content) {
+                is StateContent.Exist -> content.rawContent
+                is StateContent.NotExist -> return@withLock
+            }
+            val end = position + offset
+            if (end >= notes.size) {
+                return@withLock
+            }
+            val diffCount = notes.size - end
+            if (diffCount < 20) {
+                return@withLock
+            }
+            pageableStore.setState(
+                state.convert {
+                    notes.subList(0, end)
+                }
+            )
         }
     }
 

@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.filter.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.model.filter.MastodonWordFilter
@@ -9,16 +10,37 @@ import net.pantasystem.milktea.model.filter.MastodonWordFilter
     primaryKeys = ["accountId", "filterId"]
 )
 data class MastodonWordFilterRecord(
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "filterId")
     val filterId: String,
+
+    @ColumnInfo(name = "phrase")
     val phrase: String,
+
+    @ColumnInfo(name = "wholeWord")
     val wholeWord: Boolean,
+
+    @ColumnInfo(name = "expiresAt")
     val expiresAt: Instant?,
+
+    @ColumnInfo(name = "irreversible")
     val irreversible: Boolean,
+
+    @ColumnInfo(name = "isContextHome")
     val isContextHome: Boolean,
+
+    @ColumnInfo(name = "isContextNotifications")
     val isContextNotifications: Boolean,
+
+    @ColumnInfo(name = "isContextPublic")
     val isContextPublic: Boolean,
+
+    @ColumnInfo(name = "isContextThread")
     val isContextThread: Boolean,
+
+    @ColumnInfo(name = "isContextAccount")
     val isContextAccount: Boolean,
 ) {
 

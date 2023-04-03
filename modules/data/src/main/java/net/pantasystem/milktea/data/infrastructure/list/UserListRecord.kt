@@ -24,11 +24,21 @@ import net.pantasystem.milktea.model.user.User
     ]
 )
 data class UserListRecord(
+    @ColumnInfo(name = "serverId")
     val serverId: String,
+
+    @ColumnInfo(name = "accountId")
     val accountId: Long,
+
+    @ColumnInfo(name = "createdAt")
     val createdAt: Instant,
+
+    @ColumnInfo(name = "name")
     val name: String,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L
 )
 
 @Entity(
@@ -48,9 +58,15 @@ data class UserListRecord(
     ]
 )
 data class UserListMemberIdRecord(
+    @ColumnInfo(name = "userListId")
     val userListId: Long,
+
+    @ColumnInfo(name = "userId")
     val userId: String,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+
+    @ColumnInfo(name = "id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
 )
 
 @DatabaseView(

@@ -1,13 +1,23 @@
 package net.pantasystem.milktea.api.misskey.app
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreateApp(
+    @SerialName("i")
     val i: String?,
+
+    @SerialName("name")
     val name: String,
+
+    @SerialName("description")
     val description: String,
+
+    @SerialName("callbackUrl")
     val callbackUrl: String,
+
+    @SerialName("permission")
     val permission: List<String>
 )
 

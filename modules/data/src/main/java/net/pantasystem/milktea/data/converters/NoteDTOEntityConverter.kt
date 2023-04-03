@@ -3,10 +3,10 @@ package net.pantasystem.milktea.data.converters
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteVisibilityType
 import net.pantasystem.milktea.api.misskey.notes.PollDTO
+import net.pantasystem.milktea.api.misskey.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class NoteDTOEntityConverter @Inject constructor() {
 
-    suspend fun convert(noteDTO: NoteDTO, account: Account, nodeInfo: NodeInfo?): Note {
+    suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
         val visibility = Visibility(
             noteDTO.visibility ?: NoteVisibilityType.Public,
             isLocalOnly = noteDTO.localOnly ?: false,
@@ -38,11 +38,15 @@ class NoteDTOEntityConverter @Inject constructor() {
             visibility = visibility,
             localOnly = noteDTO.localOnly,
             emojis = noteDTO.emojiList + (noteDTO.reactionEmojiList),
-            app = noteDTO.app?.toModel(),
+            app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
             reactionCounts = noteDTO.reactionCounts?.map {
-                ReactionCount(reaction = it.key, it.value)
+                ReactionCount(
+                    reaction = it.key,
+                    count = it.value,
+                    me = noteDTO.myReaction == it.key
+                )
             } ?: emptyList(),
             renoteCount = noteDTO.renoteCount,
             repliesCount = noteDTO.replyCount,
@@ -61,9 +65,14 @@ class NoteDTOEntityConverter @Inject constructor() {
                         id = Channel.Id(account.accountId, it.id),
                         name = it.name
                     )
-                }
+                },
+                isAcceptingOnlyLikeReaction = when(noteDTO.reactionAcceptance){
+                    ReactionAcceptanceType.LikeOnly4Remote -> noteDTO.uri != null
+                    ReactionAcceptanceType.LikeOnly -> true
+                    null -> false
+                },
             ),
-            nodeInfo = nodeInfo,
+            maxReactionsPerAccount = 1
         )
     }
 }

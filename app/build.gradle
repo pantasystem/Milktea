@@ -8,6 +8,7 @@ plugins {
     id('dagger.hilt.android.plugin')
     id('com.github.triplet.play') version("3.7.0")
     id('com.google.firebase.crashlytics')
+    id('io.objectbox')
 }
 
 
@@ -45,7 +46,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -154,16 +156,17 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
 
 
-    implementation libs.lifecycle.extenstions
+    implementation libs.lifecycle.runtime
+    kapt libs.lifecycle.compiler
     implementation libs.lifecycle.viewmodel
 
 
     //Kotlin coroutines用ライブラリ(async, await)
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation libs.arch.core.testing
 
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation libs.recyclerview
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
@@ -276,6 +279,8 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+
+    implementation libs.objectbox.kotlin
 }
 
 kapt {

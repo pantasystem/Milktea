@@ -28,9 +28,6 @@ class InMemoryNoteDataSource @Inject constructor(
     private var deleteNoteIds = mutableSetOf<Note.Id>()
     private var removedNoteIds = mutableSetOf<Note.Id>()
 
-    override val state: StateFlow<NoteDataSourceState>
-        get() = _state
-
     init {
         addEventListener {
             _state.update {
@@ -145,6 +142,20 @@ class InMemoryNoteDataSource @Inject constructor(
         }.distinctUntilChanged()
     }
 
+    override fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>> {
+        return _state.map {
+            it.map.values.toList()
+        }
+    }
+
+    override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> {
+        return Result.success(
+            _state.value.map.values.filter {
+                it.replyId == id
+            }
+        )
+    }
+
     override fun observeOne(noteId: Note.Id): Flow<Note?> {
         return _state.map {
             it.getOrNull(noteId)
@@ -166,6 +177,12 @@ class InMemoryNoteDataSource @Inject constructor(
     }
 
     override suspend fun clean() {
+        mutex.withLock {
+            notes = emptyMap()
+        }
+    }
+
+    override suspend fun clear(): Result<Unit> = runCancellableCatching {
         mutex.withLock {
             notes = emptyMap()
         }

@@ -21,13 +21,19 @@ data class MarkerDTO(
 
 @kotlinx.serialization.Serializable
 data class MarkersDTO(
+    @SerialName("home")
     val home: MarkerDTO? = null,
+
+    @SerialName("notifications")
     val notifications: MarkerDTO? = null,
 )
 
 @kotlinx.serialization.Serializable
 data class SaveMarkersRequest(
+    @SerialName("home")
     val home: SaveParams? = null,
+
+    @SerialName("notifications")
     val notifications: SaveParams? = null,
 ) {
     @kotlinx.serialization.Serializable

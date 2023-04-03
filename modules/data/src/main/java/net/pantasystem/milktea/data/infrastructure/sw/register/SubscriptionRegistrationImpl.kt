@@ -45,7 +45,7 @@ class SubscriptionRegistrationImpl(
         ).build()
         logger.debug("endpoint:${endpoint}")
 
-        val api = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+        val api = misskeyAPIProvider.get(account.normalizedInstanceUri)
         val res = api.swRegister(
             Subscription(
                 i = account.token,

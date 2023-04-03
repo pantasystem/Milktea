@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.api_streaming.channel
 
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.runBlocking
@@ -22,6 +23,7 @@ class ChannelAPI(
         object Local : Type
         object Hybrid : Type
         object Global : Type
+        object RecommendedTimeline : Type
         data class UserList(
             val userListId: String
         ) : Type
@@ -43,6 +45,7 @@ class ChannelAPI(
         Type.Local to hashSetOf(),
         Type.Hybrid to hashSetOf(),
         Type.Global to hashSetOf(),
+        Type.RecommendedTimeline to hashSetOf(),
     )
 
     private var typeIdMap = mapOf<Type, String>()
@@ -56,9 +59,8 @@ class ChannelAPI(
     fun connect(type: Type): Flow<ChannelBody> {
         return channelFlow {
             val callback: (ChannelBody) -> Unit = {
-                val result = trySend(it)
-                if (!result.isSuccess) {
-                    logger.debug { "スルーされたメッセージ: $it" }
+                trySend(it).onFailure {  e ->
+                    logger.error("ChannelAPI Streamingデータの伝達に失敗", e)
                 }
                 //logger.debug("ChannelAPI message:${if(it.toString().length > 50) it.toString().subSequence(0, 50) else it.toString()}")
             }
@@ -167,6 +169,7 @@ class ChannelAPI(
             is Type.UserList -> Send.Connect.Type.USER_LIST
             is Type.Antenna -> Send.Connect.Type.ANTENNA
             is Type.Channel -> Send.Connect.Type.CHANNEL
+            is Type.RecommendedTimeline -> Send.Connect.Type.RECOMMENDED_TIMELINE
         }
 
         val id = typeIdMap[type] ?: UUID.randomUUID().toString()

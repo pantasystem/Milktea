@@ -3,29 +3,24 @@ package net.pantasystem.milktea.data.infrastructure.user
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import net.pantasystem.milktea.api.misskey.MisskeyAPI
 import net.pantasystem.milktea.api.misskey.users.*
-import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
-import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.mute.CreateMute
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
-import net.pantasystem.milktea.model.user.report.Report
 import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
-class UserRepositoryImpl @Inject constructor(
+internal class UserRepositoryImpl @Inject constructor(
     val userDataSource: UserDataSource,
     val filePropertyDataSource: FilePropertyDataSource,
     val accountRepository: AccountRepository,
@@ -83,7 +78,7 @@ class UserRepositoryImpl @Inject constructor(
             return@withContext local
         }
         val account = accountRepository.get(accountId).getOrThrow()
-        val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceDomain)
+        val misskeyAPI = misskeyAPIProvider.get(account.normalizedInstanceUri)
         val res = misskeyAPI.showUser(
             RequestUser(
                 i = account.token,
@@ -148,137 +143,6 @@ class UserRepositoryImpl @Inject constructor(
             .getOrThrow()
     }
 
-    override suspend fun mute(createMute: CreateMute): Boolean = withContext(ioDispatcher) {
-        runCancellableCatching {
-            updateCacheFrom(createMute.userId, userApiAdapter.muteUser(createMute)) {
-                it.copy(
-                    related = it.related?.copy(
-                        isMuting = true
-                    )
-                )
-            }
-        }.onFailure {
-            logger.error("ユーザーのミュートに失敗", it)
-        }.isSuccess
-    }
-
-    override suspend fun unmute(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        runCancellableCatching {
-            updateCacheFrom(userId, userApiAdapter.unmuteUser(userId)) {
-                it.copy(
-                    related = it.related?.copy(
-                        isMuting = false
-                    )
-                )
-            }
-        }.onFailure {
-            logger.error("unmute failed", it)
-        }.isSuccess
-
-    }
-
-    override suspend fun block(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        runCancellableCatching {
-            updateCacheFrom(userId, userApiAdapter.blockUser(userId)) { user ->
-                user.copy(
-                    related = user.related?.copy(
-                        isBlocking = true
-                    )
-                )
-            }
-        }.onFailure {
-            logger.error("block failed", it)
-        }.isSuccess
-    }
-
-    override suspend fun unblock(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        runCancellableCatching {
-            updateCacheFrom(userId, userApiAdapter.unblockUser(userId)) { user ->
-                user.copy(
-                    related = user.related?.copy(isBlocking = false)
-                )
-            }
-        }.onFailure {
-            logger.error("unblock failed", it)
-        }.isSuccess
-    }
-
-    override suspend fun follow(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        val user = find(userId, true) as User.Detail
-        val isSuccessful = userApiAdapter.follow(userId)
-        if (isSuccessful) {
-            val updated = (find(userId, true) as User.Detail).copy(
-                related = (if (user.info.isLocked) user.related?.isFollowing else true)?.let {
-                    (if (user.info.isLocked) true else user.related?.hasPendingFollowRequestFromYou)?.let { it1 ->
-                        user.related?.copy(
-                            isFollowing = it,
-                            hasPendingFollowRequestFromYou = it1
-                        )
-                    }
-                }
-            )
-            userDataSource.add(updated)
-        }
-        isSuccessful
-    }
-
-    override suspend fun unfollow(userId: User.Id): Boolean = withContext(ioDispatcher) {
-        val account = accountRepository.get(userId.accountId).getOrThrow()
-        val user = find(userId, true) as User.Detail
-        val isSuccessful = if (user.info.isLocked) {
-            misskeyAPIProvider.get(account)
-                .cancelFollowRequest(CancelFollow(userId = userId.id, i = account.token))
-                .throwIfHasError()
-                .isSuccessful
-        } else {
-            userApiAdapter.unfollow(userId)
-        }
-        if (isSuccessful) {
-            val updated = user.copy(
-                related = user.related?.let{
-                    it.copy(
-                        isFollowing = if (user.info.isLocked) it.isFollowing else false,
-                        hasPendingFollowRequestFromYou = if (user.info.isLocked) false else it.hasPendingFollowRequestFromYou
-                    )
-                }
-            )
-            userDataSource.add(updated)
-        }
-        isSuccessful
-    }
-
-
-
-    private suspend fun updateCacheFrom(userId: User.Id, result: UserActionResult, reducer: suspend (User.Detail) -> User.Detail) {
-        val user = find(userId, true) as User.Detail
-        val updated = when(result) {
-            is UserActionResult.Mastodon -> {
-                user.copy(
-                    related = result.relationship.toUserRelated()
-                )
-            }
-            UserActionResult.Misskey -> {
-                reducer(user)
-            }
-        }
-        userDataSource.add(updated)
-    }
-
-    override suspend fun report(report: Report): Boolean {
-        return withContext(ioDispatcher) {
-            val account = accountRepository.get(report.userId.accountId).getOrThrow()
-            val api = report.userId.getMisskeyAPI()
-            val res = api.report(
-                ReportDTO(
-                    i = account.token,
-                    comment = report.comment,
-                    userId = report.userId.id
-                )
-            )
-            res.throwIfHasError()
-            res.isSuccessful
-        }
-    }
 
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
         return withContext(ioDispatcher) {
@@ -330,7 +194,4 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun User.Id.getMisskeyAPI(): MisskeyAPI {
-        return misskeyAPIProvider.get(accountRepository.get(accountId).getOrThrow())
-    }
 }

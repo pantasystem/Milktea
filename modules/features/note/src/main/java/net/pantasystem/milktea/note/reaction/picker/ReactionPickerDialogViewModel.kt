@@ -22,7 +22,7 @@ class ReactionPickerDialogViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userConfigReactions = _currentAccount.filterNotNull().flatMapLatest { ac ->
-        userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceDomain).map { list ->
+        userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceUri).map { list ->
             list.sortedBy {
                 it.weight
             }.map {

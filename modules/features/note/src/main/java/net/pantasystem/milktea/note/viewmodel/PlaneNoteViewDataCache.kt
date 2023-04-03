@@ -71,50 +71,58 @@ class PlaneNoteViewDataCache(
         }
     }
 
-    suspend fun getIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
+    private suspend fun useIn(relations: List<NoteRelation>): List<PlaneNoteViewData> {
         return lock.withLock {
-            relations.map {
+            val viewDataList = relations.map {
                 getUnThreadSafe(it)
             }
+            viewDataList
         }
     }
 
-    suspend fun getByIds(
+    suspend fun useByIds(
         ids: List<Note.Id>,
-        isGoneAfterRenotes: Boolean = true
+        isGoneAfterRenotes: Boolean = true,
+        isReleaseUnUsedResource: Boolean = true,
     ): List<PlaneNoteViewData> {
-        val notExistsIds = lock.withLock {
-            ids.filter {
+        val notExistsIds: List<Note.Id>
+        lock.withLock {
+            notExistsIds = ids.filter {
                 cache[it] == null
             }
         }
-        val exists = lock.withLock {
-            ids.mapNotNull {
-                cache[it]
+
+        val relations = noteRelationGetter.getIn(notExistsIds)
+
+        useIn(relations)
+
+        val notes = ids.mapNotNull {
+            cache[it]
+        }
+
+        if (isReleaseUnUsedResource) {
+            val idHash = ids.toSet()
+            lock.withLock {
+                val removedIds = cache.keys.filterNot {
+                    idHash.contains(it)
+                }
+
+                for (id in removedIds) {
+                    cache.remove(id)?.job?.cancel()
+                }
             }
         }
-        val relations = noteRelationGetter.getIn(notExistsIds)
-        val newList = getIn(relations)
-        val map = (exists + newList).associateBy {
-            it.id
-        }
-        val notes = ids.mapNotNull {
-            map[it]
-        }
+
 
         // NOTE: リノートが連続している場合は、そのコンテンツを省略するフラグを立てる処理
         if (isGoneAfterRenotes) {
             for (i in 0 until notes.size - 1) {
                 val current = notes[i]
                 val next = notes[i + 1]
-                if (current.note.note.isRenoteOnly()
-                    && next.note.note.isRenoteOnly()
-                    && current.note.note.renoteId == next.note.note.renoteId
-                ) {
-                    current.isOnlyVisibleRenoteStatusMessage.postValue(true)
-                } else {
-                    current.isOnlyVisibleRenoteStatusMessage.postValue(false)
-                }
+                current.isOnlyVisibleRenoteStatusMessage.value = (current.note.note.isRenoteOnly()
+                        && (
+                        current.note.note.renoteId == next.note.note.renoteId
+                                || current.note.note.renoteId == next.note.note.id))
             }
         }
         return notes
@@ -151,16 +159,12 @@ class PlaneNoteViewDataCache(
 
     private suspend fun createViewData(relation: NoteRelation): PlaneNoteViewData {
         val account = getAccount()
-        val emojis = emojiRepository.findBy(account.getHost()).getOrElse {
-            emptyList()
-        }
+        emojiRepository.findBy(account.getHost())
         return if (relation.reply == null) {
             PlaneNoteViewData(
                 relation,
                 account,
-                noteCaptureAdapter,
                 translationStore,
-                emojis,
                 noteDataSource,
                 configRepository,
                 emojiRepository,
@@ -170,9 +174,7 @@ class PlaneNoteViewDataCache(
             HasReplyToNoteViewData(
                 relation,
                 account,
-                noteCaptureAdapter,
                 translationStore,
-                emojis,
                 noteDataSource,
                 configRepository,
                 emojiRepository,
@@ -200,7 +202,7 @@ class PlaneNoteViewDataCache(
             return
         }
         val scope = coroutineScope + Dispatchers.IO
-        this.capture { flow ->
+        this.capture(noteCaptureAdapter) { flow ->
             flow.onEach {
                 if (it is NoteDataSource.Event.Deleted) {
                     onDeleted(it.noteId)
@@ -231,6 +233,18 @@ class PlaneNoteViewDataCache(
         lock.withLock {
             cache.values.filterNot {
                 it.job?.isActive == true
+            }.map {
+                it.captureNotes()
+            }
+        }
+    }
+
+    suspend fun captureNotesBy(ids: List<Note.Id>) {
+        lock.withLock {
+            cache.values.filterNot {
+                it.job?.isActive == true
+            }.filter {
+                ids.contains(it.id)
             }.map {
                 it.captureNotes()
             }
