@@ -9,6 +9,7 @@ import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.AppSecret
 import net.pantasystem.milktea.api.misskey.auth.SignInRequest
 import net.pantasystem.milktea.api.misskey.auth.fromDTO
+import net.pantasystem.milktea.api.misskey.auth.fromPleromaDTO
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -68,6 +69,15 @@ class AuthStateHelper @Inject constructor(
                     scope = "read write"
                 )
             }
+            is AppType.Pleroma -> {
+                val authState = app.createAuth(instanceBase, "read write")
+                customAuthStore.setCustomAuthBridge(authState)
+                Authorization.Waiting4UserAuthorization.Pleroma(
+                    instanceBase,
+                    client = app,
+                    scope = "read write"
+                )
+            }
             is AppType.Misskey -> {
                 val secret = app.secret
                 val authApi = misskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
@@ -108,6 +118,19 @@ class AuthStateHelper @Inject constructor(
                     ?: throw IllegalStateException("Appの作成に失敗しました。")
                 return AppType.fromDTO(app)
             }
+            is InstanceType.Pleroma -> {
+                val app = mastodonAPIProvider.get(url)
+                    .createApp(
+                        CreateApp(
+                            clientName = appName,
+                            redirectUris = CALL_BACK_URL,
+                            scopes = "read write"
+                        )
+                    ).throwIfHasError().body()
+                    ?: throw IllegalStateException("Appの作成に失敗しました。")
+
+                return AppType.fromPleromaDTO(app)
+            }
             is InstanceType.Misskey -> {
                 val version = instanceType.instance.getVersion()
                 val misskeyAPI = misskeyAPIProvider.get(url, version)
@@ -134,6 +157,7 @@ class AuthStateHelper @Inject constructor(
 
             val misskey: Meta?
             val mastodon: MastodonInstanceInfo?
+            val pleroma: MastodonInstanceInfo?
 
             suspend fun fetchMeta(): Meta? {
                 return withContext(Dispatchers.IO) {
@@ -152,9 +176,16 @@ class AuthStateHelper @Inject constructor(
                 is NodeInfo.SoftwareType.Mastodon -> {
                     mastodon = fetchInstance()
                     misskey = null
+                    pleroma = null
                 }
                 is NodeInfo.SoftwareType.Misskey -> {
                     misskey = fetchMeta()
+                    mastodon = null
+                    pleroma = null
+                }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    pleroma = fetchInstance()
+                    misskey = null
                     mastodon = null
                 }
                 else -> {
@@ -164,6 +195,7 @@ class AuthStateHelper @Inject constructor(
                     } else {
                         null
                     }
+                    pleroma = null
                 }
             }
 
@@ -172,6 +204,10 @@ class AuthStateHelper @Inject constructor(
             }
             if (mastodon != null) {
                 return InstanceType.Mastodon(mastodon, nodeInfo?.type as? NodeInfo.SoftwareType.Mastodon)
+            }
+
+            if (pleroma != null) {
+                return InstanceType.Pleroma(pleroma, nodeInfo?.type as? NodeInfo.SoftwareType.Pleroma)
             }
             throw IllegalArgumentException()
         } else {
@@ -214,6 +250,9 @@ class AuthStateHelper @Inject constructor(
                     (a.accessToken as AccessToken.MisskeyIdAndPassword).user,
                     true
                 ) as User.Detail
+            }
+            is AccessToken.Pleroma -> {
+                (a.accessToken as AccessToken.Pleroma).account.toModel(account)
             }
         }
         userDataSource.add(user)

@@ -56,6 +56,11 @@ sealed interface InstanceType {
         val instance: Meta,
         override val softwareType: NodeInfo.SoftwareType.Misskey?,
     ) : InstanceType
+
+    data class Pleroma(
+        val instance: MastodonInstanceInfo,
+        override val softwareType: NodeInfo.SoftwareType?
+    ) : InstanceType
 }
 
 sealed interface GenerateTokenResult {

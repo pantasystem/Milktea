@@ -52,6 +52,17 @@ data class NodeInfo(
 
         }
 
+        sealed interface Pleroma : SoftwareType {
+            data class Normal(
+                override val name: String,
+                override val version: String
+            ) : Pleroma
+
+            data class Akkoma(
+                override val name: String,
+                override val version: String
+            ) : Pleroma
+        }
         data class Other(
             override val version: String,
             override val name: String
@@ -65,6 +76,8 @@ data class NodeInfo(
         "fedibird" -> SoftwareType.Mastodon.Fedibird(version = software.version, name = software.name)
         "meisskey" -> SoftwareType.Misskey.Meisskey(version = software.version, name = software.name)
         "foundkey" -> SoftwareType.Misskey.Foundkey(version = software.version, name = software.name)
+        "pleroma" -> SoftwareType.Pleroma.Normal(version = software.version, name = software.name)
+        "akkoma" -> SoftwareType.Pleroma.Akkoma(version = software.version, name = software.name)
         else -> SoftwareType.Other(version = software.version, name = software.name)
     }
 }

@@ -43,6 +43,16 @@ data class App(
             redirectUri = redirectUri,
         )
     }
+
+    fun toPleromaModel() : AppType.Pleroma {
+        return AppType.Pleroma(
+            id = id,
+            name = name,
+            clientSecret = clientSecret,
+            clientId = clientId,
+            redirectUri = redirectUri,
+        )
+    }
 }
 
 @Serializable

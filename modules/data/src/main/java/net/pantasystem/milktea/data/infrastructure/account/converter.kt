@@ -27,6 +27,19 @@ fun AccessToken.Mastodon.newAccount(
     )
 }
 
+fun AccessToken.Pleroma.newAccount(
+    instanceDomain: String
+): Account {
+    return Account(
+        remoteId = this.account.id,
+        userName = this.account.username,
+        instanceDomain = instanceDomain,
+        token = accessToken,
+        instanceType = Account.InstanceType.PLEROMA,
+        pages = emptyList()
+    )
+}
+
 fun AccessToken.MisskeyIdAndPassword.newAccount(instanceDomain: String): Account {
     return this.user.newAccount(
         instanceDomain,
@@ -43,6 +56,9 @@ fun AccessToken.newAccount(instanceDomain: String): Account {
             this.newAccount(instanceDomain)
         }
         is AccessToken.MisskeyIdAndPassword -> {
+            this.newAccount(instanceDomain)
+        }
+        is AccessToken.Pleroma -> {
             this.newAccount(instanceDomain)
         }
     }

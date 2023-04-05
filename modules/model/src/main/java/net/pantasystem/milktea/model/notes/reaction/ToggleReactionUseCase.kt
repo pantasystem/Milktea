@@ -103,6 +103,15 @@ class ToggleReactionUseCase @Inject constructor(
 
                     reactionObj.getNameAndHost()
                 }
+                is InstanceInfoType.Pleroma -> {
+                    val maxCount = instanceType.maxReactionsPerAccount
+                    if (maxCount < 1) {
+                        return null
+                    }
+
+                    // TODO: ユニコード絵文字の場合コロンは不要かもしれない
+                    ":${reactionObj.getNameAndHost()}:"
+                }
                 is InstanceInfoType.Misskey -> {
                     val name = reactionObj.getName()
                         ?: return null
