@@ -136,7 +136,7 @@ class UserDetailViewModel @AssistedInject constructor(
                     if (isPublicReaction) UserDetailTabType.Reactions(user.id) else null,
                 )
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     UserDetailTabType.MastodonUserTimeline(user.id),
                     UserDetailTabType.MastodonUserTimelineWithReplies(user.id),

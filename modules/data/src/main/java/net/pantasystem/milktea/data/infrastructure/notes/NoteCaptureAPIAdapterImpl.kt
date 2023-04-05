@@ -128,7 +128,7 @@ class NoteCaptureAPIAdapterImpl(
                             }.launchIn(coroutineScope)
                         noteIdWithJob[id] = job
                     }
-                    Account.InstanceType.MASTODON -> {
+                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                         val job = requireNotNull(streamingAPIProvider.get(account)).connectUser().catch { e ->
                             logger.error("ノート更新イベント受信中にエラー発生", e = e)
                         }.onEach {

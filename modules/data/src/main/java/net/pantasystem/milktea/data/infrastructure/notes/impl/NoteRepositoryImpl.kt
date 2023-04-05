@@ -52,7 +52,7 @@ class NoteRepositoryImpl @Inject constructor(
                         visibility = n.visibility
                     )).getOrThrow()
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val toot = mastodonAPIProvider.get(account).reblog(noteId.noteId)
                         .throwIfHasError()
                         .body()
@@ -67,7 +67,7 @@ class NoteRepositoryImpl @Inject constructor(
             val account = getAccount.get(noteId.accountId)
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> delete(noteId).getOrThrow()
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val res = mastodonAPIProvider.get(account).unreblog(noteId.noteId)
                         .throwIfHasError()
                         .body()
@@ -216,7 +216,7 @@ class NoteRepositoryImpl @Inject constructor(
                         noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
                         .throwIfHasError()
                         .body()
@@ -247,7 +247,7 @@ class NoteRepositoryImpl @Inject constructor(
                         noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
                         .throwIfHasError()
                         .body()
@@ -314,7 +314,7 @@ class NoteRepositoryImpl @Inject constructor(
                         )
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     find(noteId).mapCancellableCatching {
                         NoteState(
                             isFavorited = (it.type as Note.Type.Mastodon).favorited ?: false,

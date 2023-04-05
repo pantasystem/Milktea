@@ -6,14 +6,12 @@ import net.pantasystem.milktea.api_streaming.Send
 import net.pantasystem.milktea.api_streaming.toJson
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
-import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notification.db.UnreadNotificationDAO
 import net.pantasystem.milktea.data.streaming.SocketWithAccountProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.markers.MarkerRepository
-import net.pantasystem.milktea.model.markers.Markers
 import net.pantasystem.milktea.model.markers.SaveMarkerParams
 import net.pantasystem.milktea.model.notification.Notification
 import net.pantasystem.milktea.model.notification.NotificationDataSource
@@ -40,7 +38,7 @@ class NotificationRepositoryImpl @Inject constructor(
                     )
                 ).throwIfHasError()
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val latest = unreadNotificationDAO.getLatestUnreadId(accountId)
                     ?: return@runCancellableCatching
                 markerRepository.save(

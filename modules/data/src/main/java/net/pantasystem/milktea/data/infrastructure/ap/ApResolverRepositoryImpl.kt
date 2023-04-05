@@ -53,7 +53,7 @@ class ApResolverRepositoryImpl @Inject constructor(
                         }
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     val body = mastodonAPIProvider.get(account).search(
                         q = uri,
                         resolve = true

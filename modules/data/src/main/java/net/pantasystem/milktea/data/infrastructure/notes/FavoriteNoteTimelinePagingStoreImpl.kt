@@ -94,7 +94,7 @@ internal class FavoriteNoteTimelinePagingStoreImpl(
                         FavoriteType.Misskey(it)
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     // NOTE: ページが末端であるかをチェックしている
                     if (getSinceId() == null && !isEmpty()) {
                         return@runCancellableCatching emptyList()
@@ -125,7 +125,7 @@ internal class FavoriteNoteTimelinePagingStoreImpl(
                         FavoriteType.Misskey(it)
                     }
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     // NOTE: ページが末端であるかをチェックしている
                     if (getUntilId() == null && !isEmpty()) {
                         return@runCancellableCatching emptyList()

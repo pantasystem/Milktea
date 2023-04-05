@@ -37,7 +37,7 @@ class FollowRequestApiAdapter @Inject constructor(
                     ).throwIfHasError()
                 FollowRequestResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).acceptFollowRequest(userId.id)
                     .throwIfHasError()
                     .body()
@@ -58,7 +58,7 @@ class FollowRequestApiAdapter @Inject constructor(
                 ).throwIfHasError()
                 FollowRequestResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).rejectFollowRequest(userId.id)
                     .throwIfHasError()
                     .body()
@@ -82,7 +82,7 @@ class FollowRequestApiAdapter @Inject constructor(
                     requireNotNull(body)
                 )
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val res = mastodonAPIProvider.get(account).getFollowRequests(
                     maxId = untilId,
                     minId = sinceId,
