@@ -42,7 +42,7 @@ class AccountTabViewModel @Inject constructor(
                     AccountTabTypes.Reactions(userId),
                 )
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     AccountTabTypes.Account,
                     AccountTabTypes.MastodonUserTimeline(userId),

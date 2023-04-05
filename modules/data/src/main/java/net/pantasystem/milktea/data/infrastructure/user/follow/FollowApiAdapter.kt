@@ -35,7 +35,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
                 ).throwIfHasError()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).follow(userId.id)
                     .throwIfHasError().body().let {
                         UserActionResult.Mastodon(requireNotNull(it))
@@ -54,7 +54,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
                     .body()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).unfollow(userId.id)
                     .throwIfHasError()
                     .body().let {
@@ -77,7 +77,7 @@ internal class FollowApiAdapterImpl @Inject constructor(
                 ).throwIfHasError()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 mastodonAPIProvider.get(account).unfollow(userId.id).throwIfHasError()
                     .body().let {
                         UserActionResult.Mastodon(requireNotNull(it))

@@ -41,7 +41,7 @@ internal class MuteApiAdapterImpl @Inject constructor(
                 ).throwIfHasError()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).muteAccount(
                     createMute.userId.id,
                     MuteAccountRequest(
@@ -68,7 +68,7 @@ internal class MuteApiAdapterImpl @Inject constructor(
                 ).throwIfHasError()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).unmuteAccount(userId.id)
                     .throwIfHasError()
                     .body()

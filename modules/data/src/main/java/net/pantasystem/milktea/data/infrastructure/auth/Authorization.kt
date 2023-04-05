@@ -43,6 +43,16 @@ sealed interface Authorization {
             }
         }
 
+        data class Pleroma(
+            override val instanceBaseURL: String,
+            val client: AppType.Pleroma,
+            val scope: String
+        ) : Waiting4UserAuthorization {
+            override fun generateAuthUrl(): String {
+                return client.generateAuthUrl(instanceBaseURL, scope)
+            }
+        }
+
     }
 
 
@@ -72,6 +82,13 @@ fun Authorization.Waiting4UserAuthorization.Companion.from(state: TemporarilyAut
                 session = state.session,
                 instanceBaseURL = state.instanceDomain,
                 viaName = state.viaName
+            )
+        }
+        is TemporarilyAuthState.Pleroma -> {
+            Authorization.Waiting4UserAuthorization.Pleroma(
+                client = state.app,
+                instanceBaseURL = state.instanceDomain,
+                scope = state.scope
             )
         }
     }

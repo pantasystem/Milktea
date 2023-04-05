@@ -38,7 +38,7 @@ internal class ReportRepositoryImpl @Inject constructor(
                     )
                     res.throwIfHasError()
                 }
-                Account.InstanceType.MASTODON -> {
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                     mastodonAPIProvider.get(account).createReport(
                         CreateReportRequest(
                             accountId = report.userId.id,

@@ -111,6 +111,7 @@ class AccountInstanceTypeConverter {
         return when (type) {
             Account.InstanceType.MISSKEY -> "misskey"
             Account.InstanceType.MASTODON -> "mastodon"
+            Account.InstanceType.PLEROMA -> "pleroma"
         }
     }
 
@@ -120,6 +121,7 @@ class AccountInstanceTypeConverter {
         return when (type) {
             "misskey" -> Account.InstanceType.MISSKEY
             "mastodon" -> Account.InstanceType.MASTODON
+            "pleroma" -> Account.InstanceType.PLEROMA
             else -> throw IllegalArgumentException("未知のアカウント種別です")
         }
     }

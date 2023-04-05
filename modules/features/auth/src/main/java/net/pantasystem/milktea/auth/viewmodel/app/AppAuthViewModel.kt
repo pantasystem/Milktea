@@ -162,6 +162,7 @@ class AppAuthViewModel @Inject constructor(
                 is StateContent.Exist -> {
                     val instanceBase = when (val info = meta.rawContent) {
                         is InstanceType.Mastodon -> "https://${info.instance.uri}"
+                        is InstanceType.Pleroma -> info.instance.uri
                         is InstanceType.Misskey -> info.instance.uri
                     }
                     logger.debug { "instanceBaseUrl: $instanceBase" }
@@ -178,6 +179,8 @@ class AppAuthViewModel @Inject constructor(
                 is StateContent.NotExist -> throw IllegalStateException()
             }
         }.asLoadingStateFlow()
+    }.catch {
+        logger.error("アプリの作成に失敗", it)
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),

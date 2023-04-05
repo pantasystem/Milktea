@@ -55,7 +55,7 @@ class ReactionRepositoryImpl @Inject constructor(
                                 noteDataSource.add(note.onIReacted(createReaction.reaction))
                             }
                         }
-                        Account.InstanceType.MASTODON -> {
+                        Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                             if (nodeInfoRepository.find(account.getHost())
                                     .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
                             ) {
@@ -98,7 +98,7 @@ class ReactionRepositoryImpl @Inject constructor(
                                 && noteDataSource.add(note.onIUnReacted())
                             .getOrThrow() != AddResult.Canceled))
                     }
-                    Account.InstanceType.MASTODON -> {
+                    Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                         if (nodeInfoRepository.find(account.getHost())
                                 .getOrThrow().type !is NodeInfo.SoftwareType.Mastodon.Fedibird
                         ) {

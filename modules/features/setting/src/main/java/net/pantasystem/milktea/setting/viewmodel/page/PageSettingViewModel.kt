@@ -79,7 +79,7 @@ class PageSettingViewModel @Inject constructor(
                     emptyList()
                 }
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     PageType.MASTODON_HOME_TIMELINE,
                     PageType.MASTODON_LOCAL_TIMELINE,

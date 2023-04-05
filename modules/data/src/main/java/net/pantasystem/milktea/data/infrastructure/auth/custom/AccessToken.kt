@@ -27,6 +27,14 @@ sealed interface AccessToken {
         val createdAt: Long,
         val account: MastodonAccountDTO
     ) : AccessToken
+
+    data class Pleroma(
+        override val accessToken: String,
+        val tokenType: String,
+        val scope: String,
+        val createdAt: Long,
+        val account: MastodonAccountDTO
+    ) : AccessToken
 }
 
 
@@ -40,6 +48,16 @@ fun MisskeyAccessToken.toModel(appSecret: String) : AccessToken.Misskey {
 
 fun MastodonAccessToken.toModel(account: MastodonAccountDTO) : AccessToken.Mastodon {
     return AccessToken.Mastodon(
+        accessToken = accessToken,
+        tokenType = tokenType,
+        createdAt = createdAt,
+        scope = scope,
+        account = account
+    )
+}
+
+fun MastodonAccessToken.toPleromaModel(account: MastodonAccountDTO): AccessToken.Pleroma {
+    return AccessToken.Pleroma(
         accessToken = accessToken,
         tokenType = tokenType,
         createdAt = createdAt,

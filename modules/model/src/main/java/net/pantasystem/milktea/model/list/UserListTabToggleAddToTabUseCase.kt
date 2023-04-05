@@ -35,7 +35,7 @@ class UserListTabToggleAddToTabUseCase @Inject constructor(
                         Account.InstanceType.MISSKEY -> Pageable.UserListTimeline(
                             listId.userListId
                         )
-                        Account.InstanceType.MASTODON -> Pageable.Mastodon.ListTimeline(
+                        Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> Pageable.Mastodon.ListTimeline(
                             listId.userListId
                         )
                     }

@@ -32,6 +32,11 @@ open class InstanceInfoService @Inject constructor(
                         metaRepository.find(instanceDomain).getOrThrow()
                     )
                 }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    InstanceInfoType.Pleroma(
+                        mastodonInstanceInfoRepository.find(instanceDomain).getOrThrow()
+                    )
+                }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }
         }
@@ -47,6 +52,10 @@ open class InstanceInfoService @Inject constructor(
                 is NodeInfo.SoftwareType.Misskey -> {
                     metaRepository.sync(instanceDomain)
                     customEmojiRepository.sync(it.host).getOrThrow()
+                }
+                is NodeInfo.SoftwareType.Pleroma -> {
+                    mastodonInstanceInfoRepository.sync(instanceDomain).getOrThrow()
+                    customEmojiRepository.sync(it.host)
                 }
                 is NodeInfo.SoftwareType.Other -> throw NoSuchElementException()
             }

@@ -34,7 +34,7 @@ class BlockApiAdapterImpl @Inject constructor(
                     .throwIfHasError()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).blockAccount(userId.id)
                     .throwIfHasError()
                     .body()
@@ -56,7 +56,7 @@ class BlockApiAdapterImpl @Inject constructor(
                     .throwIfHasError()
                 UserActionResult.Misskey
             }
-            Account.InstanceType.MASTODON -> {
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = mastodonAPIProvider.get(account).unblockAccount(userId.id)
                     .throwIfHasError()
                     .body()
