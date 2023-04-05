@@ -558,6 +558,7 @@
     <string name="enable_automic_updates">启用自动更新</string>
     <string name="please_login">请登录</string>
     <string name="settings_edit_tab_only_media">Only Media</string>
+    <string name="settings_about_milktea">关于Milktea</string>
     <!-- Settings -->
 
     <!-- User -->

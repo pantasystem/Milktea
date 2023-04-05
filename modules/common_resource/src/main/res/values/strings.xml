@@ -559,6 +559,8 @@
     <string name="enable_automic_updates">Enable automatic updates</string>
     <string name="please_login">Please login</string>
     <string name="settings_edit_tab_only_media">Only Media</string>
+    <string name="settings_about_milktea">About Milktea</string>
+
     <!-- Settings -->
 
     <!-- User -->

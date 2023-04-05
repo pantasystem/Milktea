@@ -565,6 +565,7 @@
     <string name="enable_automic_updates">自動更新を有効にする</string>
     <string name="please_login">ログインしてください</string>
     <string name="settings_edit_tab_only_media">ファイルが添付されたノートのみ表示する</string>
+    <string name="settings_about_milktea">Milkteaについて</string>
     <!-- Settings -->
 
     <!-- User -->
