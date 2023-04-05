@@ -26,7 +26,7 @@ class SignOutUseCaseImpl @Inject constructor(
                     subscriptionUnRegistration
                         .unregister(account.accountId)
                 }
-                Account.InstanceType.MASTODON -> {}
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {}
             }
         }.mapCancellableCatching {
             accountRepository.delete(account)
@@ -40,7 +40,7 @@ class SignOutUseCaseImpl @Inject constructor(
                         socketWithAccountProvider.get(account.accountId)?.disconnect()
                     }
                 }
-                Account.InstanceType.MASTODON -> {}
+                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {}
             }
         }.mapCancellableCatching {
             accountStore.initialize()
