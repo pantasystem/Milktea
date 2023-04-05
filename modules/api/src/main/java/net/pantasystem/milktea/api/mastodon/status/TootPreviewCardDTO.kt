@@ -17,29 +17,29 @@ data class TootPreviewCardDTO(
     val description: String,
 
     @SerialName("author_name")
-    val authorName: String,
+    val authorName: String? = null,
 
     @SerialName("author_url")
-    val authorUrl: String,
+    val authorUrl: String? = null,
 
     @SerialName("provider_url")
     val providerUrl: String,
 
     @SerialName("html")
-    val html: String,
+    val html: String? = null,
 
     @SerialName("width")
-    val width: Int,
+    val width: Int? = null,
 
     @SerialName("height")
-    val height: Int,
+    val height: Int? = null,
 
     @SerialName("image")
     val image: String?,
 
     @SerialName("embed_url")
-    val embedUrl: String?,
+    val embedUrl: String? = null,
 
     @SerialName("blurhash")
-    val blurhash: String?
+    val blurhash: String? = null,
 )
