@@ -457,6 +457,12 @@
     <string name="settings_renote_mute_title">リノート非表示ユーザ</string>
     <string name="bookmark">ブックマーク</string>
 
+    <string name="milktea_catchphrase">FediverseライフにMilkteaはいかが?</string>
+    <string name="donation">寄付</string>
+    <string name="privacy_policy">プライバシーポリシー</string>
+    <string name="terms_of_service">利用規約</string>
+
+
     <!-- Authorization機能 -->
     <string name="auth_custom_app_name">アプリケーション名</string>
     <string name="auth_app_name">Milktea</string>
@@ -566,6 +572,7 @@
     <string name="please_login">ログインしてください</string>
     <string name="settings_edit_tab_only_media">ファイルが添付されたノートのみ表示する</string>
     <string name="settings_about_milktea">Milkteaについて</string>
+    <string name="settings_about_milktea_source_code">ソースコード(GitHub)</string>
     <!-- Settings -->
 
     <!-- User -->
