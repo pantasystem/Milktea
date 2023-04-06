@@ -454,6 +454,12 @@
     <string name="settings_renote_mute_title">远程静音</string>
     <string name="bookmark">书签</string>
 
+    <string name="milktea_catchphrase">Would you like Milktea with Fedivierse?</string>
+    <string name="donation">捐款</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_of_service">Terms of service</string>
+
+
     <string name="auth_custom_app_name">应用名称</string>
     <string name="auth_app_name">Milktea</string>
     <string name="auth_successfully_created_the_app">成功创建应用</string>
@@ -558,6 +564,9 @@
     <string name="enable_automic_updates">启用自动更新</string>
     <string name="please_login">请登录</string>
     <string name="settings_edit_tab_only_media">Only Media</string>
+    <string name="settings_about_milktea">关于Milktea</string>
+    <string name="settings_about_milktea_source_code">Source code(GitHub)</string>
+
     <!-- Settings -->
 
     <!-- User -->

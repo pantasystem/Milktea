@@ -447,6 +447,12 @@
     <string name="settings_renote_mute_title">Renote mutes</string>
     <string name="bookmark">Bookmark</string>
 
+    <string name="milktea_catchphrase">Would you like Milktea with Fediverse?</string>
+    <string name="donation">Donation</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_of_service">Terms of service</string>
+
+
     <!-- Authorization Start -->
     <string name="auth_custom_app_name">App name</string>
     <string name="auth_app_name">Milktea</string>
@@ -559,6 +565,9 @@
     <string name="enable_automic_updates">Enable automatic updates</string>
     <string name="please_login">Please login</string>
     <string name="settings_edit_tab_only_media">Only Media</string>
+    <string name="settings_about_milktea">About Milktea</string>
+    <string name="settings_about_milktea_source_code">Source code(GitHub)</string>
+
     <!-- Settings -->
 
     <!-- User -->
