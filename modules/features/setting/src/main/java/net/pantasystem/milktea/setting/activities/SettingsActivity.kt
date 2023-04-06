@@ -174,6 +174,20 @@ class SettingsActivity : AppCompatActivity() {
                                 startActivity(
                                     Intent(
                                         this@SettingsActivity,
+                                        AboutMilkteaActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.settings_about_milktea))
+                        }
+
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
                                         OssLicensesMenuActivity::class.java
                                     )
                                 )
