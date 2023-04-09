@@ -8,6 +8,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
+import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -42,12 +43,24 @@ class SubscriptionUnRegistrationImpl @Inject constructor(
                         endpointBase = endpointBase,
                         auth = auth,
                     ).build()
-                    apiProvider.swUnRegister(
-                        UnSubscription(
-                            i = account.token,
-                            endpoint = endpoint
-                        )
-                    ).throwIfHasError()
+                    try {
+                        apiProvider.swUnRegister(
+                            UnSubscription(
+                                i = account.token,
+                                endpoint = endpoint
+                            )
+                        ).throwIfHasError()
+                    } catch (e: APIError.ForbiddenException) {
+                        return@withContext
+                    }
+                    catch (e: APIError.AuthenticationException) {
+                        return@withContext
+                    } catch (e: APIError.SomethingException) {
+                        if (e.statusCode == 410) {
+                            return@withContext
+                        }
+                        throw e
+                    }
                 }
                 else -> {
 
