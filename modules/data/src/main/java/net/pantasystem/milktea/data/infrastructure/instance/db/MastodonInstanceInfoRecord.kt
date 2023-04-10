@@ -90,6 +90,28 @@ data class FedibirdCapabilitiesRecord(
     val uri: String
 )
 
+@Entity(
+    tableName = "pleroma_metadata_features",
+    foreignKeys = [
+        ForeignKey(
+            parentColumns = ["uri"],
+            childColumns = ["uri"],
+            entity = MastodonInstanceInfoRecord::class,
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE,
+        )
+    ],
+    indices = [Index("uri")],
+    primaryKeys = ["uri", "type"]
+)
+data class PleromaMetadataFeatures(
+    @ColumnInfo(name = "type")
+    val type: String,
+
+    @ColumnInfo(name = "uri")
+    val uri: String
+)
+
 data class MastodonInstanceInfoRelated(
     @Embedded val info: MastodonInstanceInfoRecord,
     @Relation(
@@ -97,7 +119,14 @@ data class MastodonInstanceInfoRelated(
         entityColumn = "uri",
         entity = FedibirdCapabilitiesRecord::class
     )
-    val fedibirdCapabilities: List<FedibirdCapabilitiesRecord>?
+    val fedibirdCapabilities: List<FedibirdCapabilitiesRecord>?,
+
+    @Relation(
+        parentColumn = "uri",
+        entityColumn = "uri",
+        entity = PleromaMetadataFeatures::class
+    )
+    val pleromaMetadataFeatures: List<PleromaMetadataFeatures>?
 )
 
 fun MastodonInstanceInfoRecord.Companion.from(model: MastodonInstanceInfo): MastodonInstanceInfoRecord {
@@ -176,6 +205,15 @@ fun MastodonInstanceInfoRelated.toModel(): MastodonInstanceInfo {
                 }
             )
         },
-        fedibirdCapabilities = fedibirdCapabilities?.map { it.type }
+        fedibirdCapabilities = fedibirdCapabilities?.map { it.type },
+        pleroma = pleromaMetadataFeatures?.let {
+            MastodonInstanceInfo.Pleroma(
+                metadata = MastodonInstanceInfo.Pleroma.Metadata(
+                    features = it.map { feature ->
+                        feature.type
+                    }
+                )
+            )
+        }
     )
 }

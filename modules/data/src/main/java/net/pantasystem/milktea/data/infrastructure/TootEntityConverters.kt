@@ -239,5 +239,14 @@ fun Instance.toModel(): MastodonInstanceInfo {
             )
         },
         fedibirdCapabilities = fedibirdCapabilities,
+        pleroma = pleroma?.let { pleroma ->
+            MastodonInstanceInfo.Pleroma(
+                metadata = pleroma.metadata.let { m ->
+                    MastodonInstanceInfo.Pleroma.Metadata(
+                        features = m.features
+                    )
+                }
+            )
+        }
     )
 }

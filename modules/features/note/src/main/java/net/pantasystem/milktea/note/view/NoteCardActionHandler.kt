@@ -52,7 +52,10 @@ class NoteCardActionHandler(
                 )
             }
             is NoteCardAction.OnReactionButtonClicked -> {
-                if (action.note.currentNote.value.isReacted) {
+                if (
+                    action.note.currentNote.value.isReacted
+                    && !action.note.currentNote.value.canReaction
+                ) {
                     notesViewModel.deleteReactions(action.note.toShowNote.note.id)
                     return
                 }

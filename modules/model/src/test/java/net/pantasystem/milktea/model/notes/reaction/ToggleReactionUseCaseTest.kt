@@ -565,7 +565,8 @@ class ToggleReactionUseCaseTest {
                                 polls = null,
                                 statuses = null,
                             ),
-                            fedibirdCapabilities = listOf("emoji_reaction")
+                            fedibirdCapabilities = listOf("emoji_reaction"),
+                            pleroma = null,
                         )
                     )
                 )
@@ -671,7 +672,8 @@ class ToggleReactionUseCaseTest {
                                 polls = null,
                                 statuses = null,
                             ),
-                            fedibirdCapabilities = listOf("emoji_reaction")
+                            fedibirdCapabilities = listOf("emoji_reaction"),
+                            pleroma = null,
                         )
                     )
                 )
