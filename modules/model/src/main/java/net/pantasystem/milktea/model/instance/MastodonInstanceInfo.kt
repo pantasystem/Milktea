@@ -49,6 +49,11 @@ data class MastodonInstanceInfo(
         get() = (fedibirdCapabilities?.contains("emoji_reaction") ?: false)
                 || (pleroma?.metadata?.features?.contains("pleroma_emoji_reactions") ?: false)
 
+    val maxReactionsPerAccount: Int
+        get() = configuration?.emojiReactions?.maxReactionsPerAccount
+            ?: Int.MAX_VALUE.takeIf {
+                pleroma?.metadata?.features?.contains("pleroma_emoji_reactions") == true
+            } ?: 0
     data class Pleroma(
         val metadata: Metadata,
     ) {

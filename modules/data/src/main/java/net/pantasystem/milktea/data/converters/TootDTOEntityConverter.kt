@@ -79,7 +79,7 @@ class TootDTOEntityConverter @Inject constructor(
                     FileProperty.Id(account.accountId, it.id)
                 },
                 poll = poll.toPoll(),
-                maxReactionsPerAccount = instanceInfoResult.getOrNull()?.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0,
+                maxReactionsPerAccount = instanceInfoResult.getOrNull()?.maxReactionsPerAccount ?: 0,
                 type = Note.Type.Mastodon(
                     favorited = favourited,
                     reblogged = reblogged,
