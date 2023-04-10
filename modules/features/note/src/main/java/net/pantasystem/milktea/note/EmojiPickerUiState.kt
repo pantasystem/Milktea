@@ -149,7 +149,7 @@ data class EmojiPickerUiState(
     }
 
     private val otherEmojis = customEmojis.filter {
-        it.category == null
+        it.category.isNullOrBlank()
     }.map {
         EmojiType.CustomEmoji(it)
     }
