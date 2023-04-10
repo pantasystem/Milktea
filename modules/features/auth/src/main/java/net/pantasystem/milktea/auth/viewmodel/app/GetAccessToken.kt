@@ -1,10 +1,12 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.api.misskey.auth.createObtainToken
+import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
@@ -33,15 +35,7 @@ class GetAccessToken @Inject constructor(
             withContext(Dispatchers.IO) {
                 when (a) {
                     is Authorization.Waiting4UserAuthorization.Misskey -> {
-                        val accessToken =
-                            misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
-                                UserKey(
-                                    appSecret = a.appSecret,
-                                    a.session.token
-                                )
-                            )
-                                .throwIfHasError().body()
-                                ?: throw IllegalStateException("response bodyがありません。")
+                        val accessToken = getMisskeyAccessToken(a)
                         accessToken.toModel(a.appSecret)
                     }
                     is Authorization.Waiting4UserAuthorization.Mastodon -> {
@@ -97,6 +91,23 @@ class GetAccessToken @Inject constructor(
         } catch (e: Exception) {
             logger.warning("AccessToken取得失敗", e = e)
             throw e
+        }
+    }
+
+    private suspend fun getMisskeyAccessToken(a: Authorization.Waiting4UserAuthorization.Misskey, retryCount: Int = 0): net.pantasystem.milktea.api.misskey.auth.AccessToken {
+        return try {
+            misskeyAPIServiceBuilder.buildAuthAPI(a.instanceBaseURL).getAccessToken(
+                UserKey(
+                    appSecret = a.appSecret,
+                    a.session.token
+                )
+            ).throwIfHasError().body()!!
+        } catch (e: APIError) {
+            if (retryCount > 25) {
+                throw e
+            }
+            delay(100)
+            getMisskeyAccessToken(a, retryCount + 1)
         }
     }
 }

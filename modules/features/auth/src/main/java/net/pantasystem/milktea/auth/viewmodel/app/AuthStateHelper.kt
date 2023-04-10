@@ -2,16 +2,15 @@ package net.pantasystem.milktea.auth.viewmodel.app
 
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.api.mastodon.apps.CreateApp
 import net.pantasystem.milktea.api.misskey.I
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
-import net.pantasystem.milktea.api.misskey.auth.AppSecret
-import net.pantasystem.milktea.api.misskey.auth.SignInRequest
-import net.pantasystem.milktea.api.misskey.auth.fromDTO
-import net.pantasystem.milktea.api.misskey.auth.fromPleromaDTO
+import net.pantasystem.milktea.api.misskey.auth.*
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.auth.viewmodel.Permissions
+import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
@@ -80,13 +79,8 @@ class AuthStateHelper @Inject constructor(
             }
             is AppType.Misskey -> {
                 val secret = app.secret
-                val authApi = misskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
-                val session = authApi.generateSession(
-                    AppSecret(
-                        secret!!
-                    )
-                ).body()
-                    ?: throw IllegalStateException("セッションの作成に失敗しました。")
+                val session = generateMisskeySession(instanceBase, secret)
+
                 customAuthStore.setCustomAuthBridge(
                     app.createAuth(instanceBase, session)
                 )
@@ -293,5 +287,22 @@ class AuthStateHelper @Inject constructor(
 
     fun checkUrlPattern(url: String): Boolean {
         return urlPattern.matcher(url).find()
+    }
+
+    private suspend fun generateMisskeySession(instanceBase: String, secret: String?, retryCount: Int = 0): Session {
+        val authApi = misskeyAPIServiceBuilder.buildAuthAPI(instanceBase)
+        try {
+            return authApi.generateSession(
+                AppSecret(
+                    secret!!
+                )
+            ).throwIfHasError().body()!!
+        } catch (e: APIError) {
+            if (retryCount < 100) {
+                delay(100)
+                return generateMisskeySession(instanceBase, secret, retryCount + 1)
+            }
+            throw e
+        }
     }
 }
