@@ -33,7 +33,7 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                 }
             }
             is NodeInfo.SoftwareType.Pleroma -> {
-                val emojis = mastodonAPIProvider.get("https://${nodeInfo.host}").getCustomEmojis()
+                val emojis = mastodonAPIProvider.get(nodeInfo.host).getCustomEmojis()
                     .throwIfHasError()
                     .body()
                 emojis?.map {
