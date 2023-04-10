@@ -10,6 +10,7 @@ data class MastodonInstanceInfo(
     val urls: Urls,
     val configuration: Configuration?,
     val fedibirdCapabilities: List<String>?,
+    val pleroma: Pleroma?,
 ) {
     companion object;
 
@@ -45,5 +46,14 @@ data class MastodonInstanceInfo(
 
     // リアクションを使用可能か？
     val isReactionAvailable: Boolean
-        get() = fedibirdCapabilities?.contains("emoji_reaction") ?: false
+        get() = (fedibirdCapabilities?.contains("emoji_reaction") ?: false)
+                || (pleroma?.metadata?.features?.contains("pleroma_emoji_reactions") ?: false)
+
+    data class Pleroma(
+        val metadata: Metadata,
+    ) {
+        data class Metadata(
+            val features: List<String>
+        )
+    }
 }

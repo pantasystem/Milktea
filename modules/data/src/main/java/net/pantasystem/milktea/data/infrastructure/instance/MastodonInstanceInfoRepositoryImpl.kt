@@ -81,13 +81,34 @@ class MastodonInstanceInfoRepositoryImpl @Inject constructor(
                     }
                 )
             }
+            instanceInfo.pleroma?.let { pleroma ->
+                mastodonInstanceInfoDAO.insertPleromaMetadataFeatures(
+                    pleroma.metadata.features.map {
+                        PleromaMetadataFeatures(
+                            type = it,
+                            uri = instanceInfo.uri,
+                        )
+                    }
+                )
+            }
         } else {
             mastodonInstanceInfoDAO.update(MastodonInstanceInfoRecord.from(instanceInfo))
             mastodonInstanceInfoDAO.clearFedibirdCapabilities(instanceInfo.uri)
+            mastodonInstanceInfoDAO.clearPleromaMetadataFeatures(instanceInfo.uri)
             instanceInfo.fedibirdCapabilities?.let { capabilities ->
                 mastodonInstanceInfoDAO.insertFedibirdCapabilities(
                     capabilities.map {
                         FedibirdCapabilitiesRecord(it, instanceInfo.uri)
+                    }
+                )
+            }
+            instanceInfo.pleroma?.let { pleroma ->
+                mastodonInstanceInfoDAO.insertPleromaMetadataFeatures(
+                    pleroma.metadata.features.map {
+                        PleromaMetadataFeatures(
+                            type = it,
+                            uri = instanceInfo.uri,
+                        )
                     }
                 )
             }
