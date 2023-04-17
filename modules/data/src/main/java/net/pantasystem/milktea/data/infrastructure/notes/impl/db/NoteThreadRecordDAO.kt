@@ -26,7 +26,7 @@ open class NoteThreadRecordDAO @Inject constructor(
         boxStore.boxFor()
     }
 
-    suspend fun add(context: ThreadRecord) {
+    open suspend fun add(context: ThreadRecord) {
         boxStore.awaitCallInTx {
             val exists = noteThreadContextBox.query().equal(
                 ThreadRecord_.targetNoteIdAndAccountId,
@@ -41,7 +41,7 @@ open class NoteThreadRecordDAO @Inject constructor(
 
     }
 
-    suspend fun appendBlank(noteId: Note.Id): ThreadRecord {
+    open suspend fun appendBlank(noteId: Note.Id): ThreadRecord {
         return boxStore.awaitCallInTx {
             val exists = noteThreadContextBox.query().equal(
                 ThreadRecord_.targetNoteIdAndAccountId,
@@ -63,58 +63,37 @@ open class NoteThreadRecordDAO @Inject constructor(
         }!!
     }
 
-    suspend fun appendAncestor(threadTarget: Note.Id, appendTarget: Note.Id) {
-        appendBlank(threadTarget)
-        boxStore.awaitCallInTx {
-            val context = requireNotNull(findBy(threadTarget))
-            context.ancestors.add(requireNotNull(findByNote(appendTarget)))
-        }
-    }
-
-    suspend fun appendDescendant(threadTarget: Note.Id, appendTarget: Note.Id) {
-        appendBlank(threadTarget)
-        boxStore.awaitCallInTx {
-            val context = requireNotNull(findBy(threadTarget))
-            context.descendants.add(requireNotNull(findByNote(appendTarget)))
-        }
-    }
-
-    suspend fun appendDescendants(threadTarget: Note.Id, appendTargets: List<Note.Id>) {
+    open suspend fun appendDescendants(threadTarget: Note.Id, appendTargets: List<Note.Id>) {
         appendBlank(threadTarget)
         boxStore.awaitCallInTx {
             val context = requireNotNull(findBy(threadTarget))
             context.descendants.addAll(findByNotes(appendTargets))
+            noteThreadContextBox.put(context)
         }
     }
 
-    suspend fun appendAncestors(threadTarget: Note.Id, appendTargets: List<Note.Id>) {
+    open suspend fun appendAncestors(threadTarget: Note.Id, appendTargets: List<Note.Id>) {
         appendBlank(threadTarget)
         boxStore.awaitCallInTx {
             val context = requireNotNull(findBy(threadTarget))
             context.ancestors.addAll(findByNotes(appendTargets))
+            noteThreadContextBox.put(context)
         }
     }
 
-    suspend fun clearRelation(targetNote: Note.Id) {
+    open suspend fun clearRelation(targetNote: Note.Id) {
         boxStore.awaitCallInTx {
             findBy(targetNote)?.also {
                 it.ancestors.clear()
                 it.descendants.clear()
+                noteThreadContextBox.put(it)
             }
         }
     }
 
-    fun findBy(noteId: Note.Id): ThreadRecord? {
+    open fun findBy(noteId: Note.Id): ThreadRecord? {
         return noteThreadContextBox.query().equal(
             ThreadRecord_.targetNoteIdAndAccountId,
-            NoteRecord.generateAccountAndNoteId(noteId),
-            QueryBuilder.StringOrder.CASE_SENSITIVE
-        ).build().findFirst()
-    }
-
-    private fun findByNote(noteId: Note.Id): NoteRecord? {
-        return noteBox.query().equal(
-            NoteRecord_.accountIdAndNoteId,
             NoteRecord.generateAccountAndNoteId(noteId),
             QueryBuilder.StringOrder.CASE_SENSITIVE
         ).build().findFirst()
@@ -130,7 +109,7 @@ open class NoteThreadRecordDAO @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeBy(noteId: Note.Id): Flow<List<ThreadRecord>> {
+    open fun observeBy(noteId: Note.Id): Flow<List<ThreadRecord>> {
         return noteThreadContextBox.query().equal(
             ThreadRecord_.targetNoteIdAndAccountId,
             NoteRecord.generateAccountAndNoteId(noteId),
