@@ -74,12 +74,12 @@ class NoteDetailViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteThreadContext(emptyList(), emptyList()))
 
     val notes = combine(note, threadContext) { note, thread ->
-        val relatedConversation = noteRelationGetter.getIn(thread.descendants.map { it.id }).filterNot {
+        val relatedConversation = noteRelationGetter.getIn(thread.ancestors.map { it.id }).filterNot {
             noteWordFilterService.isShouldFilterNote(show, it)
         }.map {
             NoteType.Conversation(it)
         }
-        val repliesMap = thread.ancestors.groupBy {
+        val repliesMap = thread.descendants.groupBy {
             it.replyId
         }
         val relatedChildren = noteRelationGetter.getIn((repliesMap[note?.id] ?: emptyList()).map {

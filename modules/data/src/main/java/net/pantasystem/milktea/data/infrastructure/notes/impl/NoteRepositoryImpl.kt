@@ -210,7 +210,7 @@ class NoteRepositoryImpl @Inject constructor(
             val account = getAccount.get(noteId.accountId)
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> {
-                    val descendants = requireNotNull(
+                    val ancestors = requireNotNull(
                         misskeyAPIProvider.get(account).conversation(
                             NoteRequest(
                                 i = account.token,
@@ -221,7 +221,7 @@ class NoteRepositoryImpl @Inject constructor(
                         noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
                     noteThreadRecordDAO.clearRelation(noteId)
-                    noteThreadRecordDAO.appendDescendants(noteId, descendants.map { it.id })
+                    noteThreadRecordDAO.appendAncestors(noteId, ancestors.map { it.id })
                     syncRecursiveThreadContext4Misskey(noteId, noteId)
                 }
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
@@ -352,16 +352,16 @@ class NoteRepositoryImpl @Inject constructor(
 
     private suspend fun syncRecursiveThreadContext4Misskey(targetNoteId: Note.Id, appendTo: Note.Id) {
         val account = getAccount.get(appendTo.accountId)
-        val ancestors = getMisskeyDescendants(targetNoteId).map {
+        val descendants = getMisskeyDescendants(targetNoteId).map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
-        noteThreadRecordDAO.appendAncestors(appendTo, ancestors.map { it.id })
+        noteThreadRecordDAO.appendDescendants(appendTo, descendants.map { it.id })
         coroutineScope {
-            ancestors.map { note ->
+            descendants.map { note ->
                 async {
                     syncRecursiveThreadContext4Misskey(note.id, appendTo)
                 }
-            }
+            }.awaitAll()
         }
     }
 }
