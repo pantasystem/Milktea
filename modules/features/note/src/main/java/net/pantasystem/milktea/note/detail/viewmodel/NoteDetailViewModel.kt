@@ -10,7 +10,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
-import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -34,6 +34,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val emojiRepository: CustomEmojiRepository,
     private val noteWordFilterService: WordFilterService,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
+    private val loggerFactory: Logger.Factory,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -41,6 +42,10 @@ class NoteDetailViewModel @AssistedInject constructor(
     @AssistedFactory
     interface ViewModelAssistedFactory {
         fun create(show: Pageable.Show, accountId: Long?): NoteDetailViewModel
+    }
+
+    private val logger by lazy {
+        loggerFactory.create("NoteDetailVM")
     }
 
     companion object;
@@ -60,31 +65,22 @@ class NoteDetailViewModel @AssistedInject constructor(
         emit(null)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val conversationNotes = note.filterNotNull().map { note ->
-        recursiveParentNotes(note.id).getOrThrow()
-    }.flatMapLatest { notes ->
-        noteDataSource.observeIn(notes.map { it.id })
-    }.onStart {
-        emit(emptyList())
-    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val repliesMap = note.filterNotNull().flatMapLatest { current ->
-        noteDataSource.observeRecursiveReplies(current.id).map { list ->
-            list.groupBy {
-                it.replyId
-            }
-        }
-    }.onStart {
-        emit(emptyMap())
-    }
+    val threadContext = note.filterNotNull().flatMapLatest {
+        noteRepository.observeThreadContext(it.id)
+    }.catch {
+        logger.error("ThreadContextの取得に失敗", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), NoteThreadContext(emptyList(), emptyList()))
 
-    val notes = combine(note, conversationNotes, repliesMap) { note, conversation, repliesMap ->
-        val relatedConversation = noteRelationGetter.getIn(conversation.map { it.id }).filterNot {
+    val notes = combine(note, threadContext) { note, thread ->
+        val relatedConversation = noteRelationGetter.getIn(thread.ancestors.map { it.id }).filterNot {
             noteWordFilterService.isShouldFilterNote(show, it)
         }.map {
             NoteType.Conversation(it)
+        }
+        val repliesMap = thread.descendants.groupBy {
+            it.replyId
         }
         val relatedChildren = noteRelationGetter.getIn((repliesMap[note?.id] ?: emptyList()).map {
             it.id
@@ -154,8 +150,9 @@ class NoteDetailViewModel @AssistedInject constructor(
                 val account = currentAccountWatcher.getAccount()
                 val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
                     .getOrThrow()
-                noteRepository.syncConversation(note.id).getOrThrow()
-                recursiveSync(note.id).getOrThrow()
+//                noteRepository.syncConversation(note.id).getOrThrow()
+                noteRepository.syncThreadContext(note.id).getOrThrow()
+//                recursiveSync(note.id).getOrThrow()
                 noteRepository.sync(note.id)
             } catch (e: Exception) {
                 Log.w("NoteDetailViewModel", "loadDetail失敗", e)
@@ -163,32 +160,6 @@ class NoteDetailViewModel @AssistedInject constructor(
         }
 
     }
-
-
-    private suspend fun recursiveSync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        coroutineScope {
-            noteRepository.syncChildren(noteId).also {
-                noteDataSource.findByReplyId(noteId).getOrThrow().map {
-                    async {
-                        recursiveSync(it.id).getOrNull()
-                    }
-                }.awaitAll()
-            }
-        }
-
-
-    }
-
-
-    private suspend fun recursiveParentNotes(noteId: Note.Id?): Result<List<Note>> =
-        runCancellableCatching {
-            noteId ?: return Result.success(emptyList())
-            val current = noteDataSource.get(noteId).getOrNull()
-            when (val replyId = current?.replyId) {
-                null -> return Result.success(emptyList())
-                else -> recursiveParentNotes(replyId).getOrThrow() + current
-            }
-        }
 
     suspend fun getUrl(): String {
         val account = currentAccountWatcher.getAccount()

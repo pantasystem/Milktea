@@ -274,11 +274,53 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:2221534449032746185",
+      "lastPropertyId": "4:3861751215772392457",
+      "name": "ThreadRecord",
+      "properties": [
+        {
+          "id": "1:6898596592219565017",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2473069054411856439",
+          "name": "targetNoteId",
+          "type": 9
+        },
+        {
+          "id": "3:2251620119095233921",
+          "name": "accountId",
+          "type": 6
+        },
+        {
+          "id": "4:3861751215772392457",
+          "name": "targetNoteIdAndAccountId",
+          "indexId": "5:7310482946990627063",
+          "type": 9,
+          "flags": 2080
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:5368363319508289421",
+          "name": "ancestors",
+          "targetId": "1:4355718382021751829"
+        },
+        {
+          "id": "2:5971800600708341253",
+          "name": "descendants",
+          "targetId": "1:4355718382021751829"
+        }
+      ]
     }
   ],
-  "lastEntityId": "1:4355718382021751829",
-  "lastIndexId": "4:873220635513493863",
-  "lastRelationId": "0:0",
+  "lastEntityId": "2:2221534449032746185",
+  "lastIndexId": "5:7310482946990627063",
+  "lastRelationId": "2:5971800600708341253",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,

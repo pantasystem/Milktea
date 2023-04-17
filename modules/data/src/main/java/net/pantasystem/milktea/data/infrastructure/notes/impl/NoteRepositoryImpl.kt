@@ -2,12 +2,16 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
+import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
+import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteThreadRecordDAO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -28,6 +32,7 @@ class NoteRepositoryImpl @Inject constructor(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
     private val noteApiAdapter: NoteApiAdapter,
+    private val noteThreadRecordDAO: NoteThreadRecordDAO,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
 
@@ -200,65 +205,59 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncChildren(noteId: Note.Id): Result<Unit> = runCancellableCatching {
+    override suspend fun syncThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = getAccount.get(noteId.accountId)
             when(account.instanceType) {
                 Account.InstanceType.MISSKEY -> {
-                    val dtoList = misskeyAPIProvider.get(account).children(
-                        NoteRequest(
-                            i = account.token,
-                            noteId = noteId.noteId,
-                            limit = 100,
-                        )
-                    ).throwIfHasError().body()!!
-                    dtoList.map {
+                    val ancestors = requireNotNull(
+                        misskeyAPIProvider.get(account).conversation(
+                            NoteRequest(
+                                i = account.token,
+                                noteId = noteId.noteId,
+                            )
+                        ).throwIfHasError().body()
+                    ).map {
                         noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
+                    noteThreadRecordDAO.clearRelation(noteId)
+                    noteThreadRecordDAO.appendAncestors(noteId, ancestors.map { it.id })
+                    syncRecursiveThreadContext4Misskey(noteId, noteId)
                 }
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    val body = mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
-                        .throwIfHasError()
-                        .body()
-                    requireNotNull(body).let {
-                        it.ancestors + it.descendants
-                    }.map {
+                    val body = requireNotNull(
+                        mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
+                            .throwIfHasError()
+                            .body()
+                    )
+                    val ancestors = body.ancestors.map {
                         noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
                     }
+
+                    val descendants = body.descendants.map {
+                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
+                    }
+                    noteThreadRecordDAO.clearRelation(noteId)
+                    noteThreadRecordDAO.appendAncestors(noteId, ancestors.map { it.id })
+                    noteThreadRecordDAO.appendDescendants(noteId, descendants.map { it.id })
                 }
             }
-
         }
     }
 
-    override suspend fun syncConversation(noteId: Note.Id): Result<Unit> = runCancellableCatching {
-        withContext(ioDispatcher) {
-            val account = getAccount.get(noteId.accountId)
-            when(account.instanceType) {
-                Account.InstanceType.MISSKEY -> {
-                    val dtoList = misskeyAPIProvider.get(account).conversation(
-                        NoteRequest(
-                            i = account.token,
-                            noteId = noteId.noteId,
-
-                            )
-                    ).throwIfHasError().body()!!
-                    dtoList.map {
-                        noteDataSourceAdder.addNoteDtoToDataSource(account, it)
-                    }
+    @OptIn(FlowPreview::class)
+    override fun observeThreadContext(noteId: Note.Id): Flow<NoteThreadContext> {
+        return suspend {
+            noteThreadRecordDAO.appendBlank(noteId)
+        }.asFlow().map { record ->
+            NoteThreadContext(
+                descendants = record.descendants.map {
+                    it.toModel()
+                },
+                ancestors = record.ancestors.map {
+                    it.toModel()
                 }
-                Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                    val body = mastodonAPIProvider.get(account).getStatusesContext(noteId.noteId)
-                        .throwIfHasError()
-                        .body()
-                    requireNotNull(body).let {
-                        it.ancestors + it.descendants
-                    }.map {
-                        noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
-                    }
-                }
-            }
-
+            )
         }
     }
 
@@ -340,6 +339,29 @@ class NoteRepositoryImpl @Inject constructor(
         return when(type) {
             is NoteResultType.Mastodon -> noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, type.status)
             is NoteResultType.Misskey -> noteDataSourceAdder.addNoteDtoToDataSource(account, type.note)
+        }
+    }
+
+    private suspend fun getMisskeyDescendants(targetNoteId: Note.Id): List<NoteDTO> {
+        val account = getAccount.get(targetNoteId.accountId)
+        return requireNotNull(misskeyAPIProvider.get(account).children(NoteRequest(
+            i = account.token,
+            noteId = targetNoteId.noteId
+        )).throwIfHasError().body())
+    }
+
+    private suspend fun syncRecursiveThreadContext4Misskey(targetNoteId: Note.Id, appendTo: Note.Id) {
+        val account = getAccount.get(appendTo.accountId)
+        val descendants = getMisskeyDescendants(targetNoteId).map {
+            noteDataSourceAdder.addNoteDtoToDataSource(account, it)
+        }
+        noteThreadRecordDAO.appendDescendants(appendTo, descendants.map { it.id })
+        coroutineScope {
+            descendants.map { note ->
+                async {
+                    syncRecursiveThreadContext4Misskey(note.id, appendTo)
+                }
+            }.awaitAll()
         }
     }
 }
