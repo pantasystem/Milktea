@@ -153,7 +153,7 @@ interface MisskeyAPI {
     suspend fun showNote(@Body requestNote: NoteRequest): Response<NoteDTO>
 
     @POST("api/notes/children")
-    suspend fun children(@Body noteRequest: NoteRequest): Response<List<NoteDTO>>
+    suspend fun children(@Body req: GetNoteChildrenRequest): Response<List<NoteDTO>>
 
     @POST("api/notes/conversation")
     suspend fun conversation(@Body noteRequest: NoteRequest): Response<List<NoteDTO>>
