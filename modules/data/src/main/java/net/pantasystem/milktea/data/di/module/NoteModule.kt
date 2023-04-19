@@ -8,6 +8,7 @@ import net.pantasystem.milktea.app_store.notes.NoteTranslationStore
 import net.pantasystem.milktea.app_store.notes.TimelineStore
 import net.pantasystem.milktea.data.infrastructure.notes.NoteStreamingImpl
 import net.pantasystem.milktea.data.infrastructure.notes.NoteTranslationStoreImpl
+import net.pantasystem.milktea.data.infrastructure.notes.ReplyStreamingImpl
 import net.pantasystem.milktea.data.infrastructure.notes.TimelineStoreImpl
 import net.pantasystem.milktea.data.infrastructure.notes.draft.DraftNoteRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.notes.impl.DraftNoteServiceImpl
@@ -17,6 +18,7 @@ import net.pantasystem.milktea.data.infrastructure.notes.renote.RenotesPagingSer
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notes.NoteRepository
 import net.pantasystem.milktea.model.notes.NoteStreaming
+import net.pantasystem.milktea.model.notes.ReplyStreaming
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
 import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
@@ -53,6 +55,10 @@ abstract class NoteBindModule{
     @Binds
     @Singleton
     abstract fun provideDraftNoteRepository(impl: DraftNoteRepositoryImpl): DraftNoteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReplyStreaming(impl: ReplyStreamingImpl): ReplyStreaming
 
 }
 
