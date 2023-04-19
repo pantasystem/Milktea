@@ -2,8 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 import net.pantasystem.milktea.api.misskey.notes.GetNoteChildrenRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -12,7 +11,6 @@ import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
-import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteThreadRecordDAO
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.GetAccount
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -33,7 +31,6 @@ class NoteRepositoryImpl @Inject constructor(
     val noteDataSourceAdder: NoteDataSourceAdder,
     val getAccount: GetAccount,
     private val noteApiAdapter: NoteApiAdapter,
-    private val noteThreadRecordDAO: NoteThreadRecordDAO,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : NoteRepository {
 
@@ -228,8 +225,11 @@ class NoteRepositoryImpl @Inject constructor(
                     ).map {
                         noteDataSourceAdder.addNoteDtoToDataSource(account, it)
                     }
-                    noteThreadRecordDAO.clearRelation(noteId)
-                    noteThreadRecordDAO.appendAncestors(noteId, ancestors.map { it.id })
+                    noteDataSource.clearNoteThreadContext(noteId)
+                    noteDataSource.addNoteThreadContext(noteId, NoteThreadContext(
+                        ancestors = ancestors,
+                        descendants = emptyList()
+                    ))
                     syncRecursiveThreadContext4Misskey(noteId, noteId)
                 }
                 Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
@@ -245,28 +245,18 @@ class NoteRepositoryImpl @Inject constructor(
                     val descendants = body.descendants.map {
                         noteDataSourceAdder.addTootStatusDtoIntoDataSource(account, it)
                     }
-                    noteThreadRecordDAO.clearRelation(noteId)
-                    noteThreadRecordDAO.appendAncestors(noteId, ancestors.map { it.id })
-                    noteThreadRecordDAO.appendDescendants(noteId, descendants.map { it.id })
+                    noteDataSource.clearNoteThreadContext(noteId)
+                    noteDataSource.addNoteThreadContext(noteId, NoteThreadContext(
+                        ancestors = ancestors,
+                        descendants = descendants
+                    ))
                 }
             }
         }
     }
 
-    @OptIn(FlowPreview::class)
     override fun observeThreadContext(noteId: Note.Id): Flow<NoteThreadContext> {
-        return suspend {
-            noteThreadRecordDAO.appendBlank(noteId)
-        }.asFlow().map { record ->
-            NoteThreadContext(
-                descendants = record.descendants.map {
-                    it.toModel()
-                },
-                ancestors = record.ancestors.map {
-                    it.toModel()
-                }
-            )
-        }
+        return noteDataSource.observeNoteThreadContext(noteId).filterNotNull()
     }
 
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {
@@ -379,7 +369,13 @@ class NoteRepositoryImpl @Inject constructor(
         val descendants = getMisskeyDescendants(targetNoteId).map {
             noteDataSourceAdder.addNoteDtoToDataSource(account, it)
         }
-        noteThreadRecordDAO.appendDescendants(appendTo, descendants.map { it.id })
+        val tc = noteDataSource.findNoteThreadContext(targetNoteId).getOrThrow()
+        noteDataSource.addNoteThreadContext(
+            targetNoteId,
+            tc.copy(
+                descendants = tc.descendants + descendants
+            )
+        )
         coroutineScope {
             descendants.map { note ->
                 async {

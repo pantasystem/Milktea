@@ -75,6 +75,12 @@ interface NoteDataSource {
     suspend fun addAll(notes: List<Note>): Result<List<AddResult>>
     suspend fun clear(): Result<Unit>
 
+    suspend fun addNoteThreadContext(noteId: Note.Id, context: NoteThreadContext): Result<Unit>
+
+    suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit>
+
+    suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext>
+
     /**
      * 投稿者のuserIdに基づいて削除をします
      * @param userId 対称のUser#id
@@ -86,6 +92,7 @@ interface NoteDataSource {
 
     fun observeOne(noteId: Note.Id): Flow<Note?>
 
-    fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>>
+    fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?>
+
 
 }

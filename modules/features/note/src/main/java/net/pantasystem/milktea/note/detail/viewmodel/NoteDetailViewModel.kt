@@ -22,6 +22,7 @@ import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 
+@OptIn(FlowPreview::class)
 class NoteDetailViewModel @AssistedInject constructor(
     accountRepository: AccountRepository,
     private val noteCaptureAdapter: NoteCaptureAPIAdapter,
@@ -35,6 +36,7 @@ class NoteDetailViewModel @AssistedInject constructor(
     private val noteWordFilterService: WordFilterService,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val loggerFactory: Logger.Factory,
+    private val noteReplyStreaming: ReplyStreaming,
     @Assisted val show: Pageable.Show,
     @Assisted val accountId: Long? = null,
 ) : ViewModel() {
@@ -157,6 +159,29 @@ class NoteDetailViewModel @AssistedInject constructor(
             } catch (e: Exception) {
                 Log.w("NoteDetailViewModel", "loadDetail失敗", e)
             }
+        }
+
+        viewModelScope.launch {
+            noteReplyStreaming.connect { currentAccountWatcher.getAccount() }.mapNotNull { reply ->
+                logger.debug {
+                    "reply:${reply.id}"
+                }
+                val account = currentAccountWatcher.getAccount()
+                val note = noteRepository.find(Note.Id(account.accountId, show.noteId))
+                    .getOrThrow()
+                val context = noteDataSource.findNoteThreadContext(note.id).getOrThrow()
+                val isRelatedReply = context.descendants.any {
+                    it.id == reply.id
+                } || note.id == reply.replyId
+                if (isRelatedReply) {
+                    val updatedContext = context.copy(
+                        descendants = context.descendants + reply
+                    )
+                    noteDataSource.addNoteThreadContext(note.id, updatedContext).getOrThrow()
+                }
+            }.catch {
+                logger.error("observe reply error", it)
+            }.collect()
         }
 
     }
