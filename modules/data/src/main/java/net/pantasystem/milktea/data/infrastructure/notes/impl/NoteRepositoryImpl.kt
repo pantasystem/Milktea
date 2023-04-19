@@ -2,8 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.notes.impl
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.filterNotNull
 import net.pantasystem.milktea.api.misskey.notes.GetNoteChildrenRequest
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.api.misskey.notes.NoteRequest
@@ -253,20 +252,8 @@ class NoteRepositoryImpl @Inject constructor(
         }
     }
 
-    @OptIn(FlowPreview::class)
     override fun observeThreadContext(noteId: Note.Id): Flow<NoteThreadContext> {
-        return suspend {
-            noteThreadRecordDAO.appendBlank(noteId)
-        }.asFlow().map { record ->
-            NoteThreadContext(
-                descendants = record.descendants.map {
-                    it.toModel()
-                },
-                ancestors = record.ancestors.map {
-                    it.toModel()
-                }
-            )
-        }
+        return noteDataSource.observeNoteThreadContext(noteId).filterNotNull()
     }
 
     override suspend fun sync(noteId: Note.Id): Result<Unit> = runCancellableCatching {

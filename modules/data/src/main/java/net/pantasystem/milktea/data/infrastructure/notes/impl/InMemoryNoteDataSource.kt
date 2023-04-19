@@ -142,11 +142,6 @@ class InMemoryNoteDataSource @Inject constructor(
         }.distinctUntilChanged()
     }
 
-    override fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>> {
-        return _state.map {
-            it.map.values.toList()
-        }
-    }
 
     override suspend fun findByReplyId(id: Note.Id): Result<List<Note>> {
         return Result.success(
@@ -187,6 +182,21 @@ class InMemoryNoteDataSource @Inject constructor(
             notes = emptyMap()
         }
     }
+
+    override suspend fun addNoteThreadContext(
+        noteId: Note.Id,
+        context: NoteThreadContext
+    ): Result<Unit> = Result.success(Unit)
+
+    override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
+        return emptyFlow()
+    }
+
+    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = Result.success(
+        NoteThreadContext(emptyList(), emptyList())
+    )
+
+    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = Result.success(Unit)
 
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {

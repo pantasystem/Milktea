@@ -7,18 +7,16 @@ import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.inValues
 import io.objectbox.kotlin.toFlow
 import io.objectbox.query.QueryBuilder
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord
 import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteRecord_
+import net.pantasystem.milktea.data.infrastructure.notes.impl.db.NoteThreadRecordDAO
 import net.pantasystem.milktea.model.AddResult
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.user.User
@@ -27,6 +25,7 @@ import javax.inject.Inject
 
 class ObjectBoxNoteDataSource @Inject constructor(
     private val boxStore: BoxStore,
+    private val noteThreadRecordDAO: NoteThreadRecordDAO,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
     loggerFactory: Logger.Factory
 ) : NoteDataSource {
@@ -103,12 +102,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
             ).build().find().mapNotNull {
                 it?.toModel()
             }
-        }
-    }
-
-    override fun observeRecursiveReplies(noteId: Note.Id): Flow<List<Note>> {
-        return changedIdFlow.map {
-            recursiveFindReplies(noteId).getOrThrow()
         }
     }
 
@@ -250,6 +243,55 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
+    @OptIn(FlowPreview::class)
+    override fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?> {
+        return suspend {
+            noteThreadRecordDAO.appendBlank(noteId)
+        }.asFlow().map { record ->
+            NoteThreadContext(
+                descendants = record.descendants.map {
+                    it.toModel()
+                },
+                ancestors = record.ancestors.map {
+                    it.toModel()
+                }
+            )
+        }
+    }
+
+    override suspend fun addNoteThreadContext(
+        noteId: Note.Id,
+        context: NoteThreadContext
+    ): Result<Unit> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteThreadRecordDAO.clearRelation(noteId)
+            noteThreadRecordDAO.appendBlank(noteId)
+            noteThreadRecordDAO.appendAncestors(noteId, context.ancestors.map { it.id })
+            noteThreadRecordDAO.appendDescendants(noteId, context.descendants.map { it.id })
+        }
+    }
+
+    override suspend fun clearNoteThreadContext(noteId: Note.Id): Result<Unit> = runCancellableCatching{
+        withContext(coroutineDispatcher) {
+            noteThreadRecordDAO.clearRelation(noteId)
+        }
+    }
+
+    override suspend fun findNoteThreadContext(noteId: Note.Id): Result<NoteThreadContext> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteThreadRecordDAO.findBy(noteId)?.let { record ->
+                NoteThreadContext(
+                    ancestors = record.ancestors.mapNotNull {
+                        it?.toModel()
+                    },
+                    descendants = record.descendants.mapNotNull {
+                        it?.toModel()
+                    }
+                )
+            } ?: NoteThreadContext(emptyList(), emptyList())
+        }
+    }
+
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
@@ -259,12 +301,6 @@ class ObjectBoxNoteDataSource @Inject constructor(
         changedIdFlow.value = UUID.randomUUID().toString()
     }
 
-    private suspend fun recursiveFindReplies(noteId: Note.Id): Result<List<Note>> = runCancellableCatching {
-        val children = findByReplyId(noteId).getOrThrow()
-        children + children.map {
-            recursiveFindReplies(it.id).getOrThrow()
-        }.flatten()
-    }
 
     private suspend fun onAdded(note: Note) {
         lock.withLock {
