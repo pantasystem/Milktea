@@ -265,9 +265,13 @@ class ObjectBoxNoteDataSource @Inject constructor(
     ): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
             noteThreadRecordDAO.clearRelation(noteId)
-            noteThreadRecordDAO.appendBlank(noteId)
-            noteThreadRecordDAO.appendAncestors(noteId, context.ancestors.map { it.id })
-            noteThreadRecordDAO.appendDescendants(noteId, context.descendants.map { it.id })
+            val record = noteThreadRecordDAO.appendBlank(noteId)
+
+            record.ancestors.clear()
+            record.ancestors.addAll(findByNotes(context.ancestors.map { it.id }))
+            record.descendants.clear()
+            record.descendants.addAll(findByNotes(context.descendants.map { it.id }))
+            noteThreadRecordDAO.update(record)
         }
     }
 
@@ -306,5 +310,14 @@ class ObjectBoxNoteDataSource @Inject constructor(
         lock.withLock {
             deleteNoteIds.remove(note.id)
         }
+    }
+
+    private fun findByNotes(noteIds: List<Note.Id>): List<NoteRecord> {
+        return noteBox.query().inValues(
+            NoteRecord_.accountIdAndNoteId, noteIds.map {
+                NoteRecord.generateAccountAndNoteId(it)
+            }.toTypedArray(),
+            QueryBuilder.StringOrder.CASE_SENSITIVE
+        ).build().find()
     }
 }
