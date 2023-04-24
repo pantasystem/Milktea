@@ -9,8 +9,8 @@ dependencyResolutionManagement {
             library("kotlin-datetime", "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
             // compose libs
-            library("compose-ui-ui", "androidx.compose.ui:ui:1.2.0-beta02")
-            library("compose-ui-ui-tooling", "androidx.compose.ui:ui-tooling:1.2.0-beta02")
+            library("compose-ui-ui", "androidx.compose.ui:ui:1.5.0-alpha03")
+            library("compose-ui-ui-tooling", "androidx.compose.ui:ui-tooling:1.5.0-alpha03")
             bundle("compose-ui", ["compose-ui-ui-tooling", "compose-ui-ui"])
 
             library("compose-foundation-foundation", "androidx.compose.foundation:foundation:1.2.0-beta02")
