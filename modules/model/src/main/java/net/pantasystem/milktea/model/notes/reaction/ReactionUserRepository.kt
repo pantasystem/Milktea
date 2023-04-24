@@ -17,7 +17,7 @@ interface ReactionUserRepository {
      * @param reaction 同期する対象のリアクションでカスタム絵文字の場合は:emoji_type@.:あるいは:emoji_type@host:の形式で与えられる
      * @param noteId 同期する対象のNoteのId
      */
-    suspend fun observeBy(noteId: Note.Id, reaction: String? = null): Flow<List<User>>
+    fun observeBy(noteId: Note.Id, reaction: String? = null): Flow<List<User>>
 
     /**
      * 内部的に保持しているリアクションしたユーザの履歴の現在の状態を参照する

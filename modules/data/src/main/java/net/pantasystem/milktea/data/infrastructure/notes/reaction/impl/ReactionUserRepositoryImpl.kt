@@ -44,7 +44,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
                         ).throwIfHasError().body()
                     )
                     dao.appendAccountIds(noteId, reaction, reactions.map { it.user.id })
-                } while (reactions.isNotEmpty())
+                } while (reactions.isEmpty())
 
             }
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
@@ -56,7 +56,14 @@ class ReactionUserRepositoryImpl @Inject constructor(
                 val emojiReaction = resBody.emojiReactions?.firstOrNull {
                     it.reaction == reaction
                 }
-                val accountIds = emojiReaction?.accountIds?: emptyList()
+                val accountIds = if (reaction == null) {
+                    emojiReaction?.accountIds
+                } else {
+                    resBody.emojiReactions?.map {
+                        it.accountIds
+                    }?.flatten()
+                } ?: emptyList()
+
                 userRepository.syncIn(accountIds.map {
                     User.Id(account.accountId, it)
                 })
@@ -67,7 +74,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun observeBy(noteId: Note.Id, reaction: String?): Flow<List<User>> {
+    override fun observeBy(noteId: Note.Id, reaction: String?): Flow<List<User>> {
         return flow {
             dao.createEmptyIfNotExists(noteId, reaction)
             emit(accountRepository.get(noteId.accountId).getOrThrow())
