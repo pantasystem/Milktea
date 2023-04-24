@@ -26,7 +26,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
     private val dao: ReactionUserDAO,
 ) : ReactionUserRepository {
 
-    override suspend fun syncBy(noteId: Note.Id, reaction: String): Result<Unit> = runCancellableCatching {
+    override suspend fun syncBy(noteId: Note.Id, reaction: String?): Result<Unit> = runCancellableCatching {
         val account = accountRepository.get(noteId.accountId).getOrThrow()
         dao.remove(noteId, reaction)
         dao.createEmptyIfNotExists(noteId, reaction)
@@ -67,7 +67,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun observeBy(noteId: Note.Id, reaction: String): Flow<List<User>> {
+    override suspend fun observeBy(noteId: Note.Id, reaction: String?): Flow<List<User>> {
         return flow {
             dao.createEmptyIfNotExists(noteId, reaction)
             emit(accountRepository.get(noteId.accountId).getOrThrow())
@@ -78,7 +78,7 @@ class ReactionUserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun findBy(noteId: Note.Id, reaction: String): Result<List<User>> = runCancellableCatching {
+    override suspend fun findBy(noteId: Note.Id, reaction: String?): Result<List<User>> = runCancellableCatching {
         val accountIds = dao.findBy(noteId, reaction)?.accountIds ?: emptyList()
         userDataSource.getIn(noteId.accountId, accountIds).getOrThrow()
     }

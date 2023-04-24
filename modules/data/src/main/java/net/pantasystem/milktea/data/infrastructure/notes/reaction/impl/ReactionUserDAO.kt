@@ -21,7 +21,7 @@ class ReactionUserDAO @Inject constructor(
         boxStore.boxFor()
     }
 
-    fun findBy(noteId: Note.Id, reaction: String): ReactionUsersRecord? {
+    fun findBy(noteId: Note.Id, reaction: String?): ReactionUsersRecord? {
         return reactionBox.query().equal(
             ReactionUsersRecord_.accountIdAndNoteIdAndReaction,
             ReactionUsersRecord.generateUniqueId(noteId, reaction),
@@ -29,25 +29,25 @@ class ReactionUserDAO @Inject constructor(
         ).build().findFirst()
     }
 
-    fun update(noteId: Note.Id, reaction: String, accountIds: List<String>) {
+    fun update(noteId: Note.Id, reaction: String?, accountIds: List<String>) {
         val record = createEmptyIfNotExists(noteId, reaction)
         record.accountIds = accountIds.toMutableList()
         reactionBox.put(record)
     }
 
-    fun appendAccountIds(noteId: Note.Id, reaction: String, accountIds: List<String>) {
+    fun appendAccountIds(noteId: Note.Id, reaction: String?, accountIds: List<String>) {
         val record = createEmptyIfNotExists(noteId, reaction)
         record.accountIds.addAll(accountIds)
         reactionBox.put(record)
     }
 
-    fun remove(noteId: Note.Id, reaction: String) {
+    fun remove(noteId: Note.Id, reaction: String?) {
         findBy(noteId, reaction)?.let {
             reactionBox.remove(it)
         }
     }
 
-    fun createEmptyIfNotExists(noteId: Note.Id, reaction: String): ReactionUsersRecord {
+    fun createEmptyIfNotExists(noteId: Note.Id, reaction: String?): ReactionUsersRecord {
         return when (val exists = findBy(noteId, reaction)) {
             null -> {
                 reactionBox.put(
@@ -58,7 +58,7 @@ class ReactionUserDAO @Inject constructor(
                             noteId,
                             reaction
                         ),
-                        reaction = reaction,
+                        reaction = reaction ?: "",
                     )
                 )
                 requireNotNull(findBy(noteId, reaction))
@@ -68,18 +68,18 @@ class ReactionUserDAO @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun observeBy(noteId: Note.Id, reaction: String): Flow<ReactionUsersRecord?> {
+    fun observeBy(noteId: Note.Id, reaction: String?): Flow<ReactionUsersRecord?> {
         return reactionBox.query()
-            .equal(ReactionUsersRecord_.accountId, noteId.accountId)
-            .equal(ReactionUsersRecord_.noteId, noteId.noteId, QueryBuilder.StringOrder.CASE_SENSITIVE)
-            .equal(ReactionUsersRecord_.reaction, reaction, QueryBuilder.StringOrder.CASE_SENSITIVE)
+            .equal(
+                ReactionUsersRecord_.accountIdAndNoteIdAndReaction,
+                ReactionUsersRecord.generateUniqueId(noteId, reaction),
+                QueryBuilder.StringOrder.CASE_SENSITIVE
+            )
             .build()
             .subscribe()
             .toFlow().map {
                 it.firstOrNull()
             }
     }
-
-
 
 }

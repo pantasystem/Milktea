@@ -25,8 +25,13 @@ data class ReactionUsersRecord(
 ) {
 
     companion object {
-        fun generateUniqueId(noteId: Note.Id, reaction: String): String {
-            return "${noteId.accountId}-${noteId.noteId}-$reaction"
+        fun generateUniqueId(noteId: Note.Id, reaction: String?): String {
+            return if (reaction == null) {
+                "${noteId.accountId}-${noteId.noteId}"
+            } else {
+                "${noteId.accountId}-${noteId.noteId}-$reaction"
+            }
+
         }
     }
 }
