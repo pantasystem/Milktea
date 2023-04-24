@@ -57,11 +57,11 @@ class ReactionUserRepositoryImpl @Inject constructor(
                     it.reaction == reaction
                 }
                 val accountIds = if (reaction == null) {
-                    emojiReaction?.accountIds
-                } else {
                     resBody.emojiReactions?.map {
                         it.accountIds
                     }?.flatten()
+                } else {
+                    emojiReaction?.accountIds
                 } ?: emptyList()
 
                 userRepository.syncIn(accountIds.map {
