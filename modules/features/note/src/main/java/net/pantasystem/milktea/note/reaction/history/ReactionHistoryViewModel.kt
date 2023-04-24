@@ -126,7 +126,9 @@ class ReactionHistoryViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             isLoading.value = true
-            reactionUserRepository.syncBy(noteId, type)
+            reactionUserRepository.syncBy(noteId, type).onFailure {
+                logger.error("リアクション履歴の同期に失敗", it)
+            }
             isLoading.value = false
         }
     }
