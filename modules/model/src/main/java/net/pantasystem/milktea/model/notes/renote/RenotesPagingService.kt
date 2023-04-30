@@ -10,7 +10,7 @@ interface RenotesPagingService {
         fun create(noteId: Note.Id): RenotesPagingService
     }
 
-    val state: Flow<PageableState<List<Renote>>>
+    val state: Flow<PageableState<List<RenoteType>>>
     suspend fun next()
     suspend fun refresh()
     suspend fun clear()
