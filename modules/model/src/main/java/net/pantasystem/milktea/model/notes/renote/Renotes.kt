@@ -1,14 +1,18 @@
 package net.pantasystem.milktea.model.notes.renote
 
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.user.User
 
 sealed interface Renote {
-    val noteId: Note.Id
     data class Quote(
-        override val noteId: Note.Id
+        val noteId: Note.Id
     ) : Renote
 
     data class Normal(
-        override val noteId: Note.Id
+        val noteId: Note.Id
+    ) : Renote
+
+    data class Reblog(
+        val userId: User.Id
     ) : Renote
 }
