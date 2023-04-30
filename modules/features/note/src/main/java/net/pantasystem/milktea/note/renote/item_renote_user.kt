@@ -23,21 +23,22 @@ import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
-import net.pantasystem.milktea.model.notes.NoteRelation
 import net.pantasystem.milktea.model.user.User
 
 @ExperimentalCoroutinesApi
 @Composable
 @Stable
 fun ItemRenoteUser(
-    note: NoteRelation,
+    note: RenoteItemType,
     myId: User.Id?,
     accountHost: String?,
     onAction: (ItemRenoteAction) -> Unit,
     isUserNameDefault: Boolean = false
 ) {
 
-    val createdAt = getSimpleElapsedTime(time = note.note.createdAt)
+    val createdAt = (note as? RenoteItemType.Renote)?.let {
+        getSimpleElapsedTime(time = it.note.note.createdAt)
+    }
 
     Card(
         shape = RoundedCornerShape(0.dp),
@@ -96,7 +97,9 @@ fun ItemRenoteUser(
                 }
             }
             Column {
-                Text(createdAt)
+                if (createdAt != null) {
+                    Text(createdAt)
+                }
                 if (note.user.id == myId) {
                     IconButton(onClick = {
                         onAction(ItemRenoteAction.OnDeleteButtonClicked(note))
@@ -113,7 +116,7 @@ fun ItemRenoteUser(
 
 
 sealed interface ItemRenoteAction {
-    data class OnClick(val note: NoteRelation) : ItemRenoteAction
-    data class OnDeleteButtonClicked(val note: NoteRelation): ItemRenoteAction
+    data class OnClick(val note: RenoteItemType) : ItemRenoteAction
+    data class OnDeleteButtonClicked(val note: RenoteItemType): ItemRenoteAction
 }
 
