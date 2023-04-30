@@ -13,7 +13,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.renote.Renote
+import net.pantasystem.milktea.model.notes.renote.RenoteType
 import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -47,11 +47,14 @@ class RenotesViewModel @AssistedInject constructor(
         state.suspendConvert { renotes ->
             renotes.mapNotNull {renote ->
                 when(renote) {
-                    is Renote.Normal -> noteGetter.get(renote.noteId).getOrNull()?.let {
-                        RenoteItemType.Renote(it)
+                    is RenoteType.Renote -> if (renote.isQuote) {
+                        null
+                    } else {
+                        noteGetter.get(renote.noteId).getOrNull()?.let {
+                            RenoteItemType.Renote(it)
+                        }
                     }
-                    is Renote.Quote -> null
-                    is Renote.Reblog -> RenoteItemType.Reblog(userRepository.find(renote.userId))
+                    is RenoteType.Reblog -> RenoteItemType.Reblog(userRepository.find(renote.userId))
                 }
             }
         }
@@ -73,7 +76,7 @@ class RenotesViewModel @AssistedInject constructor(
                 (it.content as? StateContent.Exist)?.rawContent
             }.map { renotes ->
                 renotes.mapNotNull { renote ->
-                    (renote as? Renote.Normal)?.let {
+                    (renote as? RenoteType.Renote)?.let {
                         noteCaptureAPIAdapter.capture(it.noteId)
                     }
                 }
