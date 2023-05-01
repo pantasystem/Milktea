@@ -96,7 +96,8 @@ internal class UserApiAdapterImpl @Inject constructor(
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 val body = requireNotNull(
                     mastodonAPIProvider.get(account).search(
-                        if (host == null) userName else "$userName@$host"
+                        if (host == null) userName else "$userName@$host",
+                        type = "accounts"
                     ).throwIfHasError().body()
                 ).accounts
                 SearchResult.Mastodon(body)
