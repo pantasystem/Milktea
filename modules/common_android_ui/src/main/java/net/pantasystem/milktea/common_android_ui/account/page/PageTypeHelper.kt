@@ -42,6 +42,7 @@ object PageTypeHelper{
             CALCKEY_RECOMMENDED_TIMELINE -> context.getString(R.string.calckey_recomended_timeline)
             CLIP_NOTES -> context.getString(R.string.clip)
             MASTODON_BOOKMARK_TIMELINE -> context.getString(R.string.bookmark)
+            MASTODON_SEARCH_TIMELINE -> context.getString(R.string.search)
         }
     }
 }

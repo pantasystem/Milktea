@@ -192,6 +192,11 @@ data class PageParams(
                 MASTODON_BOOKMARK_TIMELINE -> {
                     Pageable.Mastodon.BookmarkTimeline
                 }
+                MASTODON_SEARCH_TIMELINE -> {
+                    Pageable.Mastodon.SearchTimeline(
+                        requireNotNull(query)
+                    )
+                }
             }
         } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")
