@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.search
 
 import android.app.Activity
