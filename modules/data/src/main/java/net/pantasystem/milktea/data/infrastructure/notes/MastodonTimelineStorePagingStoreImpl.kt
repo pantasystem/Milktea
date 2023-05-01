@@ -94,6 +94,12 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.SearchTimeline -> {
                 return@runCancellableCatching emptyList()
             }
+            is Pageable.Mastodon.TagTimeline -> {
+                api.getHashtagTimeline(
+                    tag = pageableTimeline.tag,
+                    minId = minId,
+                ).throwIfHasError().body()!!
+            }
         }.let { list ->
             if (isShouldUseLinkHeader()) {
                 filterNotExistsStatuses(list)
@@ -196,6 +202,12 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
                 }.body()?.statuses
+            }
+            is Pageable.Mastodon.TagTimeline -> {
+                api.getHashtagTimeline(
+                    tag = pageableTimeline.tag,
+                    maxId = maxId,
+                ).getBodyOrFail()
             }
         }!!.let { list ->
             if (isShouldUseLinkHeader()) {

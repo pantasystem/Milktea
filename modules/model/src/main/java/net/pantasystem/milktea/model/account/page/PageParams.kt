@@ -197,6 +197,11 @@ data class PageParams(
                         requireNotNull(query)
                     )
                 }
+                MASTODON_TAG_TIMELINE -> {
+                    Pageable.Mastodon.TagTimeline(
+                        requireNotNull(tag)
+                    )
+                }
             }
         } catch (e: NullPointerException) {
             throw IllegalStateException("パラメーターに問題があります: $this")

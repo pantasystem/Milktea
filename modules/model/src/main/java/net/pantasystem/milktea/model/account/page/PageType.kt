@@ -31,6 +31,7 @@ enum class PageType(val defaultName: String, val label: String){
     MASTODON_USER_TIMELINE("MastodonUserTimeline", "MASTODON_USER_TIMELINE"),
     MASTODON_BOOKMARK_TIMELINE("MastodonBookmarkTimeline", "MASTODON_BOOKMARK_TIMELINE"),
     MASTODON_SEARCH_TIMELINE("MastodonSearchTimeline", "MASTODON_SEARCH_TIMELINE"),
+    MASTODON_TAG_TIMELINE("MastodonTagTimeline", "MASTODON_TAG_TIMELINE"),
     CALCKEY_RECOMMENDED_TIMELINE("CalckeyRecommendedTimeline", "CALCKEY_RECOMMENDED_TIMELINE"),
 
     CLIP_NOTES("ClipNotes", "CLIP_NOTES"),

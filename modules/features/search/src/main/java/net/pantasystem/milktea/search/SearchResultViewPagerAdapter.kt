@@ -33,7 +33,7 @@ class SearchResultViewPagerAdapter(
             SearchResultTabItem.Type.SearchMisskeyUsers -> SearchUserFragment.newInstance(item.query)
             SearchResultTabItem.Type.SearchMastodonPosts -> pageableFragmentFactory.create(Pageable.Mastodon.SearchTimeline(item.query))
             SearchResultTabItem.Type.SearchMastodonPostsByTag -> pageableFragmentFactory.create(
-                Pageable.Mastodon.SearchTimeline(item.query))
+                Pageable.Mastodon.TagTimeline(item.query))
             SearchResultTabItem.Type.SearchMastodonUsers -> SearchUserFragment.newInstance(item.query)
         }
     }

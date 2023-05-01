@@ -21,7 +21,6 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
-import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
@@ -44,8 +43,7 @@ class SearchResultActivity : AppCompatActivity() {
 
     private var mAccountRelation: Account? = null
     private val binding: ActivitySearchResultBinding by dataBinding()
-    val notesViewModel by viewModels<NotesViewModel>()
-    private val accountViewModel: AccountViewModel by viewModels()
+    private val notesViewModel by viewModels<NotesViewModel>()
 
     @Inject
     lateinit var settingStore: SettingStore
@@ -145,36 +143,7 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
     private fun searchAddToTab() {
-        val word = mSearchWord ?: return
-
-        val samePage = getSamePage()
-        if (samePage == null) {
-            val page = if (mIsTag == true) {
-                Page(
-                    mAccountRelation?.accountId ?: -1,
-                    word,
-                    0,
-                    pageable = Pageable.SearchByTag(
-                        tag = word.replace(
-                            "#",
-                            ""
-                        )
-                    )
-                )
-            } else {
-                Page(
-                    mAccountRelation?.accountId ?: -1,
-                    mSearchWord ?: "",
-                    -1,
-                    pageable = Pageable.Search(word)
-                )
-            }
-            accountViewModel.addPage(
-                page
-            )
-        } else {
-            accountViewModel.removePage(samePage)
-        }
+        searchResultViewModel.toggleAddToTab()
     }
 
     private fun isAddedPage(): Boolean {

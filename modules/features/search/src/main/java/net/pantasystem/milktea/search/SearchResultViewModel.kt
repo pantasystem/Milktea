@@ -2,18 +2,22 @@ package net.pantasystem.milktea.search
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.mapCancellableCatching
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.account.page.PageableTemplate
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchResultViewModel @Inject constructor(
-    private val accountRepository: AccountRepository,
     private val accountStore: AccountStore,
+    private val accountRepository: AccountRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     companion object {
@@ -35,6 +39,28 @@ class SearchResultViewModel @Inject constructor(
 
     fun setKeyword(q: String) {
         savedStateHandle[EXTRA_KEYWORD] = q
+    }
+
+    fun toggleAddToTab() {
+        viewModelScope.launch {
+            val keyword = savedStateHandle.get<String>(EXTRA_KEYWORD) ?: return@launch
+            accountRepository.getCurrentAccount().mapCancellableCatching { account ->
+                val exists = account.pages.firstOrNull {
+                    (it.pageParams.tag == keyword
+                            || it.pageParams.query == keyword)
+                }
+                if (exists == null) {
+                    val page = if (keyword.startsWith("#")) {
+                        PageableTemplate(account).tag(keyword)
+                    } else {
+                        PageableTemplate(account).search(keyword)
+                    }
+                    accountStore.addPage(page)
+                } else {
+                    accountStore.removePage(exists)
+                }
+            }
+        }
     }
 }
 
