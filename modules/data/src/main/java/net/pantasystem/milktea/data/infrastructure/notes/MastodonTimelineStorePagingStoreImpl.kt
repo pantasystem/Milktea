@@ -92,13 +92,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 }.getBodyOrFail()
             }
             is Pageable.Mastodon.SearchTimeline -> {
-                api.search(
-                    q = pageableTimeline.query,
-                    type = "statuses",
-                    minId = minId,
-                ).throwIfHasError().also {
-                    updateMinIdFrom(it)
-                }.body()?.statuses!!
+                return@runCancellableCatching emptyList()
             }
         }.let { list ->
             if (isShouldUseLinkHeader()) {
@@ -198,6 +192,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     q = pageableTimeline.query,
                     type = "statuses",
                     maxId = maxId,
+                    offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
                 }.body()?.statuses
@@ -230,7 +225,6 @@ internal class MastodonTimelineStorePagingStoreImpl(
     private fun isShouldUseLinkHeader(): Boolean {
         return pageableTimeline is Pageable.Mastodon.BookmarkTimeline
                 || pageableTimeline is Pageable.Mastodon.UserTimeline
-                || pageableTimeline is Pageable.Mastodon.SearchTimeline
     }
 
     /**
