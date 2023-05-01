@@ -53,26 +53,26 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.HashTagTimeline -> api.getHashtagTimeline(
                 pageableTimeline.hashtag,
                 minId = getSinceId(),
-            )
+            ).getBodyOrFail()
             Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
                 minId = getSinceId(),
                 listId = pageableTimeline.listId,
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
                 minId = getSinceId(),
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
                     accountId = pageableTimeline.userId,
@@ -82,16 +82,25 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     minId = getSinceId()
                 ).throwIfHasError().also {
                     updateMinIdFrom(it)
-                }
+                }.getBodyOrFail()
             }
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     minId = minId
                 ).throwIfHasError().also {
                     updateMinIdFrom(it)
-                }
+                }.getBodyOrFail()
             }
-        }.throwIfHasError().body()!!.let { list ->
+            is Pageable.Mastodon.SearchTimeline -> {
+                return@runCancellableCatching emptyList()
+            }
+            is Pageable.Mastodon.TagTimeline -> {
+                api.getHashtagTimeline(
+                    tag = pageableTimeline.tag,
+                    minId = minId,
+                ).throwIfHasError().body()!!
+            }
+        }.let { list ->
             if (isShouldUseLinkHeader()) {
                 filterNotExistsStatuses(list)
             } else {
@@ -146,26 +155,26 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 pageableTimeline.hashtag,
                 maxId = maxId,
                 onlyMedia = pageableTimeline.getOnlyMedia()
-            )
+            ).getBodyOrFail()
             Pageable.Mastodon.HomeTimeline -> api.getHomeTimeline(
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount())
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.ListTimeline -> api.getListTimeline(
                 maxId = maxId,
                 listId = pageableTimeline.listId,
-                )
+                ).getBodyOrFail()
             is Pageable.Mastodon.LocalTimeline -> api.getPublicTimeline(
                 local = true,
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.PublicTimeline -> api.getPublicTimeline(
                 maxId = maxId,
                 visibilities = getVisibilitiesParameter(getAccount()),
                 onlyMedia = pageableTimeline.getOnlyMedia()
-            )
+            ).getBodyOrFail()
             is Pageable.Mastodon.UserTimeline -> {
                 api.getAccountTimeline(
                     accountId = pageableTimeline.userId,
@@ -175,16 +184,32 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     maxId = maxId,
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
-                }
+                }.body()
             }
             Pageable.Mastodon.BookmarkTimeline -> {
                 api.getBookmarks(
                     maxId = maxId,
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
-                }
+                }.body()
             }
-        }.throwIfHasError().body()!!.let { list ->
+            is Pageable.Mastodon.SearchTimeline -> {
+                api.search(
+                    q = pageableTimeline.query,
+                    type = "statuses",
+                    maxId = maxId,
+                    offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
+                ).throwIfHasError().also {
+                    updateMaxIdFrom(it)
+                }.body()?.statuses
+            }
+            is Pageable.Mastodon.TagTimeline -> {
+                api.getHashtagTimeline(
+                    tag = pageableTimeline.tag,
+                    maxId = maxId,
+                ).getBodyOrFail()
+            }
+        }!!.let { list ->
             if (isShouldUseLinkHeader()) {
                 filterNotExistsStatuses(list)
             } else {
@@ -234,7 +259,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
      * responseのmaxIdがnullの場合は更新がキャンセルされる
      * minIdがnullの場合はresponseのminIdが指定される
      */
-    private fun updateMaxIdFrom(response: Response<List<TootStatusDTO>>) {
+    private fun updateMaxIdFrom(response: Response<*>) {
         val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
 
         // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
@@ -254,7 +279,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
      * responseのminIdがnullの場合は更新がキャンセルされる
      * maxIdがnullの場合はresponseのmaxIdが指定される
      */
-    private fun updateMinIdFrom(response: Response<List<TootStatusDTO>>) {
+    private fun updateMinIdFrom(response: Response<*>) {
         val decoder = MastodonLinkHeaderDecoder(response.headers()["link"])
 
         // NOTE: 次のページネーションのIdが取得できない場合は次のIdが取得できるまで同じIdを使い回し続ける
@@ -267,5 +292,9 @@ internal class MastodonTimelineStorePagingStoreImpl(
         if (maxId == null) {
             maxId = decoder.getMaxId()
         }
+    }
+
+    private fun Response<List<TootStatusDTO>>.getBodyOrFail(): List<TootStatusDTO> {
+        return requireNotNull(throwIfHasError().body())
     }
 }

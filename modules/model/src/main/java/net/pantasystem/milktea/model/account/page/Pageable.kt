@@ -480,6 +480,28 @@ sealed class Pageable : Serializable {
             }
         }
 
+        data class SearchTimeline(
+            val query: String
+        ) : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_SEARCH_TIMELINE,
+                    query = query
+                )
+            }
+        }
+
+        data class TagTimeline(
+            val tag: String,
+        ) : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+                    type = PageType.MASTODON_TAG_TIMELINE,
+                    tag = tag,
+                )
+            }
+        }
+
     }
 
     object CalckeyRecommendedTimeline : Pageable(), UntilPaginate, SincePaginate {
