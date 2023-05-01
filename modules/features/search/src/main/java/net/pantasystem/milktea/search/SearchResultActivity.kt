@@ -3,7 +3,6 @@
 package net.pantasystem.milktea.search
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -11,10 +10,14 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayoutMediator
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,10 +29,10 @@ import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.SearchNavigation
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
-import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -43,10 +46,6 @@ class SearchResultActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_SEARCH_WORLD =
             "net.pantasystem.milktea.search.SearchResultActivity.EXTRA_SEARCH_WORLD"
-
-        private const val SEARCH_NOTES = 0
-        private const val SEARCH_USERS = 1
-        private const val SEARCH_NOTES_WITH_FILES = 2
     }
 
     private var mSearchWord: String? = null
@@ -72,6 +71,8 @@ class SearchResultActivity : AppCompatActivity() {
     @Inject
     internal lateinit var applyMenuTint: ApplyMenuTint
 
+    private val searchResultViewModel: SearchResultViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
@@ -81,6 +82,8 @@ class SearchResultActivity : AppCompatActivity() {
 
         val keyword: String? = intent.getStringExtra(EXTRA_SEARCH_WORLD)
             ?: intent.data?.getQueryParameter("keyword")
+
+        searchResultViewModel.setKeyword(keyword ?: "")
 
         mSearchWord = keyword
 
@@ -93,9 +96,16 @@ class SearchResultActivity : AppCompatActivity() {
         val isTag = keyword.startsWith("#")
         mIsTag = isTag
 
-        val pager = PagerAdapter(this, supportFragmentManager, pageableFragmentFactory, keyword)
+        val pager = SearchResultViewPagerAdapter(this, pageableFragmentFactory)
         binding.searchResultPager.adapter = pager
-        binding.searchResultTab.setupWithViewPager(binding.searchResultPager)
+        TabLayoutMediator(
+            binding.searchResultTab,
+            binding.searchResultPager,
+        ) { tab, position ->
+            tab.text = pager.items[position].title.getString(this)
+        }.attach()
+
+
 
         net.pantasystem.milktea.note.view.ActionNoteHandler(
             this,
@@ -104,6 +114,10 @@ class SearchResultActivity : AppCompatActivity() {
             settingStore
         ).initViewModelListener()
         invalidateOptionsMenu()
+
+        searchResultViewModel.uiState.onEach {
+            pager.submitList(it.tabItems)
+        }.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).launchIn(lifecycleScope)
 
         accountStore.observeCurrentAccount.onEach { ar ->
             mAccountRelation = ar
@@ -193,65 +207,64 @@ class SearchResultActivity : AppCompatActivity() {
         }
     }
 
-    class PagerAdapter(
-        private val context: Context,
-        fragmentManager: FragmentManager,
-        private val pageableFragmentFactory: PageableFragmentFactory,
-        private val keyword: String,
-    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-        private val isTag = keyword.startsWith("#")
+}
 
-        val pages = ArrayList(listOf(SEARCH_NOTES, SEARCH_USERS)).apply {
-            if (isTag) {
-                add(SEARCH_NOTES_WITH_FILES)
-            }
-        }
+class SearchResultViewPagerAdapter(
+    activity: FragmentActivity,
+    private val pageableFragmentFactory: PageableFragmentFactory,
+) : FragmentStateAdapter(activity) {
 
-        override fun getCount(): Int {
-            return pages.size
-        }
+    var items: List<SearchResultTabItem> = emptyList()
+        private set
 
-        @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-        override fun getItem(position: Int): Fragment {
-            val isTag = keyword.startsWith("#")
 
-            return when (pages[position]) {
-                SEARCH_NOTES, SEARCH_NOTES_WITH_FILES -> {
-                    val request: Pageable = if (isTag) {
-                        if (pages[position] == SEARCH_NOTES) {
-                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = false)
-                        } else {
-                            Pageable.SearchByTag(tag = keyword.replace("#", ""), withFiles = true)
-                        }
-
-                    } else {
-                        Pageable.Search(query = keyword)
-                    }
-                    pageableFragmentFactory.create(request)
-                }
-                SEARCH_USERS -> {
-                    SearchUserFragment.newInstance(keyword)
-                }
-                else -> {
-                    pageableFragmentFactory.create(
-                        Pageable.Search(query = keyword)
-                    )
-                }
-            }
-        }
-
-        override fun getPageTitle(position: Int): CharSequence? {
-            return when (pages[position]) {
-                SEARCH_NOTES -> context.getString(R.string.timeline)
-                SEARCH_NOTES_WITH_FILES -> context.getString(R.string.media)
-                SEARCH_USERS -> context.getString(R.string.user)
-                else -> null
-            }
+    override fun createFragment(position: Int): Fragment {
+        val item = items[position]
+        return when(item.type) {
+            SearchResultTabItem.Type.SearchMisskeyPosts -> pageableFragmentFactory.create(
+                Pageable.Search(query = item.query)
+            )
+            SearchResultTabItem.Type.SearchMisskeyPostsByTag -> pageableFragmentFactory.create(
+                Pageable.SearchByTag(tag = item.query)
+            )
+            SearchResultTabItem.Type.SearchMisskeyPostsWithFilesByTag -> pageableFragmentFactory.create(
+                Pageable.SearchByTag(tag = item.query, withFiles = true)
+            )
+            SearchResultTabItem.Type.SearchMisskeyUsers -> SearchUserFragment.newInstance(item.query)
+            SearchResultTabItem.Type.SearchMastodonPosts -> pageableFragmentFactory.create(Pageable.Mastodon.SearchTimeline(item.query))
+            SearchResultTabItem.Type.SearchMastodonPostsByTag -> pageableFragmentFactory.create(Pageable.Mastodon.SearchTimeline(item.query))
+            SearchResultTabItem.Type.SearchMastodonUsers -> SearchUserFragment.newInstance(item.query)
         }
     }
 
+    override fun getItemCount(): Int {
+        return items.size
+    }
 
+    fun submitList(list: List<SearchResultTabItem>) {
+        val old = items
+        items = list
+        val callback = object : DiffUtil.Callback() {
+            override fun getNewListSize(): Int {
+                return list.size
+            }
+
+            override fun getOldListSize(): Int {
+                return old.size
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return old[oldItemPosition] == list[newItemPosition]
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return old[oldItemPosition] == list[newItemPosition]
+            }
+        }
+        val result = DiffUtil.calculateDiff(callback)
+        result.dispatchUpdatesTo(this)
+    }
 }
 
 class SearchNavigationImpl  @Inject constructor(

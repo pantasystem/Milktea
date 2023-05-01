@@ -11,15 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import net.pantasystem.milktea.user.UserCardListActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCardList
 import net.pantasystem.milktea.user.compose.UserDetailCardListAction
 import net.pantasystem.milktea.user.viewmodel.ToggleFollowViewModel
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SearchUserFragment : Fragment() {
 
