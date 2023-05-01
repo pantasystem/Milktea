@@ -275,6 +275,7 @@ interface MastodonAPI {
     @GET("api/v2/search")
     suspend fun search(
         @Query("q") q: String,
+        @Query("type") type: String? = null,
         @Query("resolve") resolve: Boolean = true,
         @Query("following") following: Boolean = false,
         @Query("account_id") accountId: String? = null,
