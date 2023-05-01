@@ -9,19 +9,13 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DiffUtil
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -38,7 +32,6 @@ import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.search.databinding.ActivitySearchResultBinding
-import net.pantasystem.milktea.user.search.SearchUserFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -138,7 +131,6 @@ class SearchResultActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> finish()
@@ -208,63 +200,6 @@ class SearchResultActivity : AppCompatActivity() {
     }
 
 
-}
-
-class SearchResultViewPagerAdapter(
-    activity: FragmentActivity,
-    private val pageableFragmentFactory: PageableFragmentFactory,
-) : FragmentStateAdapter(activity) {
-
-    var items: List<SearchResultTabItem> = emptyList()
-        private set
-
-
-    override fun createFragment(position: Int): Fragment {
-        val item = items[position]
-        return when(item.type) {
-            SearchResultTabItem.Type.SearchMisskeyPosts -> pageableFragmentFactory.create(
-                Pageable.Search(query = item.query)
-            )
-            SearchResultTabItem.Type.SearchMisskeyPostsByTag -> pageableFragmentFactory.create(
-                Pageable.SearchByTag(tag = item.query)
-            )
-            SearchResultTabItem.Type.SearchMisskeyPostsWithFilesByTag -> pageableFragmentFactory.create(
-                Pageable.SearchByTag(tag = item.query, withFiles = true)
-            )
-            SearchResultTabItem.Type.SearchMisskeyUsers -> SearchUserFragment.newInstance(item.query)
-            SearchResultTabItem.Type.SearchMastodonPosts -> pageableFragmentFactory.create(Pageable.Mastodon.SearchTimeline(item.query))
-            SearchResultTabItem.Type.SearchMastodonPostsByTag -> pageableFragmentFactory.create(Pageable.Mastodon.SearchTimeline(item.query))
-            SearchResultTabItem.Type.SearchMastodonUsers -> SearchUserFragment.newInstance(item.query)
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-    fun submitList(list: List<SearchResultTabItem>) {
-        val old = items
-        items = list
-        val callback = object : DiffUtil.Callback() {
-            override fun getNewListSize(): Int {
-                return list.size
-            }
-
-            override fun getOldListSize(): Int {
-                return old.size
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return old[oldItemPosition] == list[newItemPosition]
-            }
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return old[oldItemPosition] == list[newItemPosition]
-            }
-        }
-        val result = DiffUtil.calculateDiff(callback)
-        result.dispatchUpdatesTo(this)
-    }
 }
 
 class SearchNavigationImpl  @Inject constructor(
