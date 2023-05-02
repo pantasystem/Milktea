@@ -37,7 +37,7 @@ class CustomEmojiDecorator {
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
-                .override(min(view.textSize.toInt(), 640))
+                .override(min(view.textSize.toInt(), 20))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
         }
@@ -57,7 +57,7 @@ class CustomEmojiDecorator {
             val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
-                .override(min(view.textSize.toInt(), 640))
+                .override(min(view.textSize.toInt(), 20))
                 .load(it.result.getUrl(accountHost))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
@@ -79,7 +79,7 @@ class CustomEmojiDecorator {
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
-                .override(min(view.textSize.toInt(), 640))
+                .override(min(view.textSize.toInt(), 20))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
         }

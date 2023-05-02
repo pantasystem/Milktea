@@ -30,7 +30,7 @@ object InstanceInfoHelper {
             val iconDrawable = DrawableEmojiSpan(emojiAdapter, info?.faviconUrl)
             Glide.with(this)
                 .load(info!!.faviconUrl)
-                .override(min(this.textSize.toInt(), 640))
+                .override(min(this.textSize.toInt(), 20))
                 .into(iconDrawable.target)
             text =  SpannableStringBuilder(":${info.faviconUrl}:${info.name}").apply {
                 setSpan(iconDrawable, 0, ":${info.faviconUrl}:".length, 0)

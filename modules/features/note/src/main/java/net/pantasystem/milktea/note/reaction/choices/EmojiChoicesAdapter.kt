@@ -52,6 +52,7 @@ class EmojiChoicesAdapter(
                     .load(item.emoji.url ?: item.emoji.uri)
                         // FIXME: webpの場合うまく表示できなくなる
 //                    .centerCrop()
+                    .override(60)
                     .into(holder.binding.reactionImagePreview)
                 holder.binding.reactionStringPreview.setMemoVisibility(View.GONE)
                 holder.binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)
