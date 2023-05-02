@@ -77,12 +77,7 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
         val imageHeight = size.intrinsicHeight
 
         // 画像がテキストの高さよりも大きい場合、画像をテキストと同じ高さに縮小する
-        val scale = if (imageHeight > textHeight) {
-            textHeight / imageHeight.toFloat()
-        } else {
-            1.0f
-        }
-
+        val scale = textHeight / imageHeight.toFloat()
         // テキストの高さに合わせた画像の幅
         return (imageWidth * scale).toInt()
     }

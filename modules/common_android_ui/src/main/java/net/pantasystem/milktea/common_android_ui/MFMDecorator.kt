@@ -30,6 +30,7 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.lang.ref.WeakReference
 import kotlin.math.max
+import kotlin.math.min
 
 object MFMDecorator {
 
@@ -312,7 +313,7 @@ object MFMDecorator {
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
-                    .override(max(textView.textSize.toInt(), 10))
+                    .override(min(max(textView.textSize.toInt(), 10), 20))
                                         .addListener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
                             e: GlideException?,
@@ -322,7 +323,7 @@ object MFMDecorator {
                         ): Boolean {
                             val t = this@LazyEmojiDecorator.textView.get()
                             if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == lazyDecorateResult.sourceText) {
-                                if (retryCounter < 100) {
+                                if (retryCounter < 10) {
 
                                     t.text = decorate(
                                         t,
