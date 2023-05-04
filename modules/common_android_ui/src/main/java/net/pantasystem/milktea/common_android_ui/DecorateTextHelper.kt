@@ -20,6 +20,7 @@ import net.pantasystem.milktea.common_android.mfm.MFMParser
 import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiDecorator
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
+import net.pantasystem.milktea.common_navigation.SearchNavType
 import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -100,7 +101,11 @@ object DecorateTextHelper {
                         tag != null -> {
                             // FIXME: タグの場合うまく動作しないケースがある
                             // 原因としてTagオブジェクトに入っているURLとHTML上に表示されているURLが異なるから
-                            false
+                            val intent = navigationEntryPoint.searchNavigation().newIntent(SearchNavType.ResultScreen(
+                                searchWord = "#${tag.name}"
+                            ))
+                            context.startActivity(intent)
+                            true
                         }
                         mention != null -> {
                             val intent = navigationEntryPoint
