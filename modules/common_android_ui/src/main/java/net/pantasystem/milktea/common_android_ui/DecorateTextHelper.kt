@@ -78,13 +78,28 @@ object DecorateTextHelper {
         stopDrawableAnimations(this)
         when (textType) {
             is TextType.Mastodon -> {
-                this.text = CustomEmojiDecorator().decorate(
+                val decoratedText = CustomEmojiDecorator().decorate(
                     textType.html.spanned,
                     textType.html.accountHost,
                     textType.html.parserResult,
                     this
                 )
+                this.text = decoratedText
                 this.movementMethod = ClickListenableLinkMovementMethod { url ->
+
+                    // NOTE: クリックしたURLを探している
+                    val urlSpans = decoratedText.getSpans(0, decoratedText.length, URLSpan::class.java)
+                    var textHashTag: CharSequence? = null
+                    for (urlSpan in urlSpans) {
+                        val start = decoratedText.getSpanStart(urlSpan)
+                        val end = decoratedText.getSpanEnd(urlSpan)
+                        val spannedText = decoratedText.subSequence(start, end)
+                        if (spannedText.isNotEmpty() && spannedText[0] == '#') {
+                            if (urlSpan.url == url) {
+                                textHashTag = spannedText
+                            }
+                        }
+                    }
                     val tag = textType.tags.firstOrNull {
                         it.url == url || it.url == url.lowercase()
                     }
@@ -99,10 +114,15 @@ object DecorateTextHelper {
                     )
                     when {
                         tag != null -> {
-                            // FIXME: タグの場合うまく動作しないケースがある
-                            // 原因としてTagオブジェクトに入っているURLとHTML上に表示されているURLが異なるから
                             val intent = navigationEntryPoint.searchNavigation().newIntent(SearchNavType.ResultScreen(
                                 searchWord = "#${tag.name}"
+                            ))
+                            context.startActivity(intent)
+                            true
+                        }
+                        textHashTag != null -> {
+                            val intent = navigationEntryPoint.searchNavigation().newIntent(SearchNavType.ResultScreen(
+                                searchWord = textHashTag.toString()
                             ))
                             context.startActivity(intent)
                             true
