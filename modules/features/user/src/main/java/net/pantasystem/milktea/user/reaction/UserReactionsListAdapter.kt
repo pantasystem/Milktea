@@ -13,26 +13,29 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.user.R
 import net.pantasystem.milktea.user.databinding.ItemUserReactionBinding
 
 class UserReactionsListAdapter(
+    private val configRepository: LocalConfigRepository,
     private val lifecycleOwner: LifecycleOwner,
-    private val noteCardActionHandler: NoteCardActionListenerAdapter
+    private val noteCardActionHandler: NoteCardActionListenerAdapter,
 ) : ListAdapter<UserReactionBindingModel, UserReactionViewHolder>(
     object : DiffUtil.ItemCallback<UserReactionBindingModel>() {
         override fun areContentsTheSame(
             oldItem: UserReactionBindingModel,
-            newItem: UserReactionBindingModel
+            newItem: UserReactionBindingModel,
         ): Boolean {
             return oldItem.reaction == newItem.reaction
         }
 
         override fun areItemsTheSame(
             oldItem: UserReactionBindingModel,
-            newItem: UserReactionBindingModel
+            newItem: UserReactionBindingModel,
         ): Boolean {
             return oldItem.reaction.id == newItem.reaction.id
         }
@@ -43,7 +46,17 @@ class UserReactionsListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserReactionViewHolder {
-        val binding = DataBindingUtil.inflate<ItemUserReactionBinding>(LayoutInflater.from(parent.context), R.layout.item_user_reaction, parent, false)
+        val config = configRepository.get().getOrNull()
+        val binding = DataBindingUtil.inflate<ItemUserReactionBinding>(
+            LayoutInflater.from(parent.context),
+            R.layout.item_user_reaction,
+            parent,
+            false
+        )
+        NoteFontSizeBinder.from(binding.simpleNote).bind(
+            headerFontSize = config?.noteHeaderFontSize ?: 15f,
+            contentFontSize = config?.noteContentFontSize ?: 15f
+        )
         return UserReactionViewHolder(lifecycleOwner, binding, noteCardActionHandler)
     }
 }
