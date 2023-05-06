@@ -19,6 +19,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
@@ -256,7 +257,9 @@ class TimelineListAdapter(
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): TimelineListItemViewHolderBase {
-        val config = configRepository.get().getOrNull()
+        val config = configRepository.get().getOrElse {
+            DefaultConfig.config
+        }
         return when(ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
@@ -264,8 +267,8 @@ class TimelineListAdapter(
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
-                    headerFontSize = config?.noteHeaderFontSize ?: 15f,
-                    contentFontSize = config?.noteContentFontSize ?: 15f,
+                    headerFontSize = config.noteHeaderFontSize,
+                    contentFontSize = config.noteContentFontSize,
                 )
                 NoteViewHolder(binding)
             }
@@ -275,8 +278,8 @@ class TimelineListAdapter(
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
-                    headerFontSize = config?.noteHeaderFontSize ?: 15f,
-                    contentFontSize = config?.noteContentFontSize ?: 15f,
+                    headerFontSize = config.noteHeaderFontSize,
+                    contentFontSize = config.noteContentFontSize,
                 )
                 HasReplyToNoteViewHolder(binding)
             }

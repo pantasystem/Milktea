@@ -13,6 +13,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
@@ -46,7 +47,9 @@ class UserReactionsListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserReactionViewHolder {
-        val config = configRepository.get().getOrNull()
+        val config = configRepository.get().getOrElse {
+            DefaultConfig.config
+        }
         val binding = DataBindingUtil.inflate<ItemUserReactionBinding>(
             LayoutInflater.from(parent.context),
             R.layout.item_user_reaction,
@@ -54,8 +57,8 @@ class UserReactionsListAdapter(
             false
         )
         NoteFontSizeBinder.from(binding.simpleNote).bind(
-            headerFontSize = config?.noteHeaderFontSize ?: 15f,
-            contentFontSize = config?.noteContentFontSize ?: 15f
+            headerFontSize = config.noteHeaderFontSize,
+            contentFontSize = config.noteContentFontSize
         )
         return UserReactionViewHolder(lifecycleOwner, binding, noteCardActionHandler)
     }

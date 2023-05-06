@@ -14,6 +14,7 @@ import com.google.android.flexbox.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.DefaultConfig
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
 import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
@@ -116,10 +117,12 @@ class NotificationListAdapter constructor(
                     notificationViewModel,
                     noteCardActionListenerAdapter
                 ).also {
-                    val config = configRepository.get().getOrNull()
+                    val config = configRepository.get().getOrElse {
+                        DefaultConfig.config
+                    }
                     NoteFontSizeBinder.from(it.binding.simpleNote).bind(
-                        contentFontSize = config?.noteContentFontSize ?: 15f,
-                        headerFontSize = config?.noteHeaderFontSize ?: 15f,
+                        contentFontSize = config.noteContentFontSize,
+                        headerFontSize = config.noteHeaderFontSize,
                     )
                 }
             }
