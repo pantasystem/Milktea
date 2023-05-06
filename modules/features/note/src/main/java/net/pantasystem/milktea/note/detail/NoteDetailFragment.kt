@@ -23,6 +23,7 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.Note
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteDetailBinding
 import net.pantasystem.milktea.note.detail.viewmodel.NoteDetailViewModel
@@ -85,6 +86,9 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     @Inject
     lateinit var channelDetailNavigation: ChannelDetailNavigation
 
+    @Inject
+    lateinit var configRepository: LocalConfigRepository
+
     @Suppress("DEPRECATION")
     val page: Pageable.Show by lazy {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
@@ -108,6 +112,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = NoteDetailAdapter(
+            configRepository = configRepository,
             noteDetailViewModel = noteDetailViewModel,
             viewLifecycleOwner = viewLifecycleOwner
         ) {
