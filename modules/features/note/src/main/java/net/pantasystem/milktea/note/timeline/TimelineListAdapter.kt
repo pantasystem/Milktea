@@ -19,6 +19,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemHasReplyToNoteBinding
 import net.pantasystem.milktea.note.databinding.ItemNoteBinding
@@ -33,6 +34,7 @@ import net.pantasystem.milktea.note.viewmodel.HasReplyToNoteViewData
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class TimelineListAdapter(
+    private val configRepository: LocalConfigRepository,
     private val lifecycleOwner: LifecycleOwner,
     val onRefreshAction: () -> Unit,
     val onReauthenticateAction: () -> Unit,
@@ -254,6 +256,7 @@ class TimelineListAdapter(
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): TimelineListItemViewHolderBase {
+        val config = configRepository.get().getOrNull()
         return when(ViewHolderType.values()[p1]) {
             ViewHolderType.NormalNote -> {
                 val binding = DataBindingUtil.inflate<ItemNoteBinding>(LayoutInflater.from(p0.context), R.layout.item_note, p0, false)
@@ -261,8 +264,8 @@ class TimelineListAdapter(
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
-                    headerFontSize = 15f,
-                    contentFontSize = 15f,
+                    headerFontSize = config?.noteHeaderFontSize ?: 15f,
+                    contentFontSize = config?.noteContentFontSize ?: 15f,
                 )
                 NoteViewHolder(binding)
             }
@@ -272,8 +275,8 @@ class TimelineListAdapter(
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
                 NoteFontSizeBinder.from(binding.simpleNote).bind(
-                    headerFontSize = 15f,
-                    contentFontSize = 15f,
+                    headerFontSize = config?.noteHeaderFontSize ?: 15f,
+                    contentFontSize = config?.noteContentFontSize ?: 15f,
                 )
                 HasReplyToNoteViewHolder(binding)
             }
