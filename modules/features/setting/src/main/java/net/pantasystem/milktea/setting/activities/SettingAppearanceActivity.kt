@@ -280,7 +280,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             )
 
                             Text(
-                                "Note header font size(${currentConfigState.noteHeaderFontSize}sp)",
+                                stringResource(
+                                    id = R.string.settings_note_header_font_size,
+                                    currentConfigState.noteHeaderFontSize
+                                ),
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
                             Text(
@@ -300,7 +303,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             )
 
                             Text(
-                                "Note content font size(${currentConfigState.noteContentFontSize}sp)",
+                                stringResource(
+                                    id = R.string.settings_note_content_font_size,
+                                    currentConfigState.noteContentFontSize
+                                ),
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
                             Text(
