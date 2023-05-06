@@ -283,6 +283,12 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 "Note header font size(${currentConfigState.noteHeaderFontSize}sp)",
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
+                            )
                             Slider(
                                 value = currentConfigState.noteHeaderFontSize,
                                 valueRange = 10f..24f,
@@ -296,6 +302,12 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             Text(
                                 "Note content font size(${currentConfigState.noteContentFontSize}sp)",
                                 modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
                             )
                             Slider(
                                 value = currentConfigState.noteContentFontSize,
