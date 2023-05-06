@@ -48,6 +48,7 @@ class LocalConfigRepositoryImpl(
                         is PrefType.BoolPref -> putBoolean(it.key.str(), entry.value)
                         is PrefType.IntPref -> putInt(it.key.str(), entry.value)
                         is PrefType.StrPref -> putString(it.key.str(), entry.value)
+                        is PrefType.FloatPref -> putFloat(it.key.str(), entry.value)
                     }
                 }
             }

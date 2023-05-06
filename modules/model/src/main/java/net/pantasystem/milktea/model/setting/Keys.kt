@@ -29,6 +29,8 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsEnableNoteDivider,
         Keys.IsVisibleInstanceUrlInToolbar,
         Keys.IsHideMediaWhenMobileNetwork,
+        Keys.NoteHeaderFontSize,
+        Keys.NoteContentFontSize,
     )
 }
 
@@ -82,6 +84,10 @@ sealed interface Keys {
 
     object IsHideMediaWhenMobileNetwork : Keys
 
+    object NoteHeaderFontSize: Keys
+
+    object NoteContentFontSize: Keys
+
     companion object
 }
 
@@ -114,5 +120,7 @@ fun Keys.str(): String {
         is Keys.IsEnableNoteDivider -> "IsEnableNoteDivider"
         is Keys.IsVisibleInstanceUrlInToolbar -> "IsVisibleInstanceUrlInToolbar"
         is Keys.IsHideMediaWhenMobileNetwork -> "IsHideMediaWhenMobileNetwork"
+        is Keys.NoteContentFontSize -> "NoteContentFontSize"
+        is Keys.NoteHeaderFontSize -> "NoteContentFontSize"
     }
 }

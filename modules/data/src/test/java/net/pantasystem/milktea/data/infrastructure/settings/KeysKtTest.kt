@@ -100,6 +100,14 @@ class KeysKtTest {
                     "IsHideMediaWhenMobileNetwork",
                     key.str()
                 )
+                Keys.NoteContentFontSize -> Assertions.assertEquals(
+                    "NoteContentFontSize",
+                    key.str()
+                )
+                Keys.NoteHeaderFontSize -> Assertions.assertEquals(
+                    "NoteHeaderFontSize",
+                    key.str()
+                )
             }
         }
     }
@@ -107,8 +115,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(27, Keys.allKeys.size)
-        Assertions.assertEquals(27, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(29, Keys.allKeys.size)
+        Assertions.assertEquals(29, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 

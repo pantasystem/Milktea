@@ -117,7 +117,13 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: DefaultConfig.config.isVisibleInstanceUrlInToolbar,
         isHideMediaWhenMobileNetwork = map.getValue<PrefType.BoolPref>(
             Keys.IsHideMediaWhenMobileNetwork
-        )?.value ?: DefaultConfig.config.isHideMediaWhenMobileNetwork
+        )?.value ?: DefaultConfig.config.isHideMediaWhenMobileNetwork,
+        noteHeaderFontSize = map.getValue<PrefType.FloatPref>(
+            Keys.NoteHeaderFontSize
+        )?.value ?: DefaultConfig.config.noteHeaderFontSize,
+        noteContentFontSize = map.getValue<PrefType.FloatPref>(
+            Keys.NoteContentFontSize
+        )?.value ?: DefaultConfig.config.noteContentFontSize
     )
 }
 
@@ -213,6 +219,12 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsHideMediaWhenMobileNetwork -> {
             PrefType.BoolPref(isHideMediaWhenMobileNetwork)
+        }
+        Keys.NoteContentFontSize -> {
+            PrefType.FloatPref(noteContentFontSize)
+        }
+        Keys.NoteHeaderFontSize -> {
+            PrefType.FloatPref(noteHeaderFontSize)
         }
     }
 }

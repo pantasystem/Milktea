@@ -139,6 +139,14 @@ class ConfigKtTest {
                     config.isHideMediaWhenMobileNetwork,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.NoteContentFontSize -> Assertions.assertEquals(
+                    config.noteContentFontSize,
+                    (u as PrefType.FloatPref).value
+                )
+                Keys.NoteHeaderFontSize -> Assertions.assertEquals(
+                    config.noteHeaderFontSize,
+                    (u as PrefType.FloatPref).value
+                )
             }
         }
     }
