@@ -121,6 +121,6 @@ fun Keys.str(): String {
         is Keys.IsVisibleInstanceUrlInToolbar -> "IsVisibleInstanceUrlInToolbar"
         is Keys.IsHideMediaWhenMobileNetwork -> "IsHideMediaWhenMobileNetwork"
         is Keys.NoteContentFontSize -> "NoteContentFontSize"
-        is Keys.NoteHeaderFontSize -> "NoteContentFontSize"
+        is Keys.NoteHeaderFontSize -> "NoteHeaderFontSize"
     }
 }
