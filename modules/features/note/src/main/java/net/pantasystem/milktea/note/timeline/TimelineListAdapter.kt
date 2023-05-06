@@ -260,6 +260,10 @@ class TimelineListAdapter(
                 binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
+                NoteFontSizeBinder.from(binding.simpleNote).bind(
+                    headerFontSize = 15f,
+                    contentFontSize = 15f,
+                )
                 NoteViewHolder(binding)
             }
             ViewHolderType.HasReplyToNote -> {
@@ -267,6 +271,10 @@ class TimelineListAdapter(
                 binding.simpleNote.reactionView.setRecycledViewPool(reactionCounterRecyclerViewPool)
                 binding.simpleNote.urlPreviewList.setRecycledViewPool(urlPreviewListRecyclerViewPool)
                 binding.simpleNote.manyFilePreviewListView.setRecycledViewPool(manyFilePreviewListViewRecyclerViewPool)
+                NoteFontSizeBinder.from(binding.simpleNote).bind(
+                    headerFontSize = 15f,
+                    contentFontSize = 15f,
+                )
                 HasReplyToNoteViewHolder(binding)
             }
             ViewHolderType.Loading -> {
