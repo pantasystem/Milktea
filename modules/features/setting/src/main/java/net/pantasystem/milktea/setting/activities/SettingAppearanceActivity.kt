@@ -279,6 +279,35 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
 
+                            Text(
+                                "Note header font size(${currentConfigState.noteHeaderFontSize}sp)",
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Slider(
+                                value = currentConfigState.noteHeaderFontSize,
+                                valueRange = 10f..24f,
+                                onValueChange = {
+                                    currentConfigState =
+                                        currentConfigState.copy(noteHeaderFontSize = it)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            Text(
+                                "Note content font size(${currentConfigState.noteContentFontSize}sp)",
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Slider(
+                                value = currentConfigState.noteContentFontSize,
+                                valueRange = 10f..24f,
+                                onValueChange = {
+                                    currentConfigState =
+                                        currentConfigState.copy(noteContentFontSize = it)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+
                             SettingSwitchTile(
                                 checked = currentConfigState.isEnableNoteDivider,
                                 onChanged = {
