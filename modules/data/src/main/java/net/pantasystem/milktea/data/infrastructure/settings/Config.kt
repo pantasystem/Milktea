@@ -30,6 +30,9 @@ fun SharedPreferences.getPrefTypes(keys: Set<Keys> = Keys.allKeys): Map<Keys, Pr
                     Int::class -> {
                         PrefType.IntPref(value as Int)
                     }
+                    Float::class -> {
+                        PrefType.FloatPref(value as Float)
+                    }
                     else -> null
                 }
             }
