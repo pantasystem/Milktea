@@ -34,6 +34,7 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigation
 import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import net.pantasystem.milktea.notification.databinding.FragmentNotificationBinding
@@ -72,6 +73,9 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
     @Inject
     lateinit var applyMenuTint: ApplyMenuTint
 
+    @Inject
+    lateinit var configRepository: LocalConfigRepository
+
     private val mBinding: FragmentNotificationBinding by dataBinding()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,6 +84,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         mLinearLayoutManager = LinearLayoutManager(requireContext())
 
         val adapter = NotificationListAdapter(
+            configRepository,
             diffUtilItemCallBack,
             mViewModel,
             viewLifecycleOwner,

@@ -14,7 +14,9 @@ import com.google.android.flexbox.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -27,6 +29,7 @@ import net.pantasystem.milktea.notification.viewmodel.NotificationViewModel
 
 
 class NotificationListAdapter constructor(
+    private val configRepository: LocalConfigRepository,
     diffUtilCallBack: DiffUtil.ItemCallback<NotificationListItem>,
     val notificationViewModel: NotificationViewModel,
     private val lifecycleOwner: LifecycleOwner,
@@ -112,7 +115,13 @@ class NotificationListAdapter constructor(
                     lifecycleOwner,
                     notificationViewModel,
                     noteCardActionListenerAdapter
-                )
+                ).also {
+                    val config = configRepository.get().getOrNull()
+                    NoteFontSizeBinder.from(it.binding.simpleNote).bind(
+                        contentFontSize = config?.noteContentFontSize ?: 15f,
+                        headerFontSize = config?.noteHeaderFontSize ?: 15f,
+                    )
+                }
             }
         }
     }
