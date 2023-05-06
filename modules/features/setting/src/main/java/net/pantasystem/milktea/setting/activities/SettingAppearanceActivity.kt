@@ -279,6 +279,53 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
 
+                            Text(
+                                stringResource(
+                                    id = R.string.settings_note_header_font_size,
+                                    currentConfigState.noteHeaderFontSize
+                                ),
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
+                            )
+                            Slider(
+                                value = currentConfigState.noteHeaderFontSize,
+                                valueRange = 10f..24f,
+                                onValueChange = {
+                                    currentConfigState =
+                                        currentConfigState.copy(noteHeaderFontSize = it)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            Text(
+                                stringResource(
+                                    id = R.string.settings_note_content_font_size,
+                                    currentConfigState.noteContentFontSize
+                                ),
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
+                            )
+                            Slider(
+                                value = currentConfigState.noteContentFontSize,
+                                valueRange = 10f..24f,
+                                onValueChange = {
+                                    currentConfigState =
+                                        currentConfigState.copy(noteContentFontSize = it)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+
                             SettingSwitchTile(
                                 checked = currentConfigState.isEnableNoteDivider,
                                 onChanged = {

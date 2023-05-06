@@ -31,6 +31,7 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.ScrollToTopViewModel
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
 import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
@@ -108,6 +109,9 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     @Inject
     lateinit var channelDetailNavigation: ChannelDetailNavigation
 
+    @Inject
+    lateinit var configRepository: LocalConfigRepository
+
 
     private val mBinding: FragmentSwipeRefreshRecyclerViewBinding by dataBinding()
 
@@ -147,6 +151,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         val lm = LinearLayoutManager(this.requireContext())
         _linearLayoutManager = lm
         val adapter = TimelineListAdapter(
+            configRepository = configRepository,
             viewLifecycleOwner,
             onRefreshAction = {
                 mViewModel.loadInit()

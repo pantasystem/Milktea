@@ -14,14 +14,18 @@ import com.google.android.flexbox.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemSimpleNoteBinding
 import net.pantasystem.milktea.note.reaction.ReactionCountAdapter
+import net.pantasystem.milktea.note.timeline.NoteFontSizeBinder
 import net.pantasystem.milktea.note.view.NoteCardAction
 import net.pantasystem.milktea.note.view.NoteCardActionListenerAdapter
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 class NoteChildConversationAdapter(
+    val configRepository: LocalConfigRepository,
     val lifecycleOwner: LifecycleOwner,
     val onAction: (NoteCardAction) -> Unit,
 ) : ListAdapter<PlaneNoteViewData, NoteChildConversationAdapter.SimpleNoteHolder>(object : DiffUtil.ItemCallback<PlaneNoteViewData>(){
@@ -50,6 +54,11 @@ class NoteChildConversationAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleNoteHolder {
         val binding = DataBindingUtil.inflate<ItemSimpleNoteBinding>(LayoutInflater.from(parent.context), R.layout.item_simple_note, parent, false)
+        val config = configRepository.get().getOrNull() ?: DefaultConfig.config
+        NoteFontSizeBinder.from(binding).bind(
+            headerFontSize = config.noteHeaderFontSize,
+            contentFontSize = config.noteContentFontSize,
+        )
         return SimpleNoteHolder(binding)
     }
 

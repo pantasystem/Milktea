@@ -567,6 +567,9 @@
     <string name="settings_edit_tab_only_media">Only Media</string>
     <string name="settings_about_milktea">About Milktea</string>
     <string name="settings_about_milktea_source_code">Source code(GitHub)</string>
+    <string name="settings_note_content_font_size">Note content font size(%fsp)</string>
+    <string name="settings_note_header_font_size">Note header font size(%fsp)</string>
+
 
     <!-- Settings -->
 

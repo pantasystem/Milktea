@@ -50,6 +50,8 @@ data class IsAnalyticsCollectionEnabled(
  * @Param isEnableNoteDivider ノートの区切り線の有無 trueで有り falseで無し
  * @param isVisibleInstanceUrlInToolbar toolbar内にインスタンス情報を表示するか？
  * @param isHideMediaWhenMobileNetwork モバイルネットワークの時はメディアを表示しない
+ * @param noteHeaderFontSize ノートのヘッダー部分のテキストサイズ
+ * @param noteContentFontSize ノートのコンテンツ部分のテキストサイズ
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -77,6 +79,8 @@ data class Config(
     val isEnableNoteDivider: Boolean,
     val isVisibleInstanceUrlInToolbar: Boolean,
     val isHideMediaWhenMobileNetwork: Boolean,
+    val noteHeaderFontSize: Float,
+    val noteContentFontSize: Float,
 ) {
     companion object
 
@@ -131,7 +135,9 @@ object DefaultConfig {
         isEnableStreamingAPIAndNoteCapture = true,
         isEnableNoteDivider = true,
         isVisibleInstanceUrlInToolbar = true,
-        isHideMediaWhenMobileNetwork = false
+        isHideMediaWhenMobileNetwork = false,
+        noteContentFontSize = 15f,
+        noteHeaderFontSize = 15f,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
