@@ -1,8 +1,5 @@
-@file:Suppress("DEPRECATION")
-
 package net.pantasystem.milktea.search
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -12,13 +9,19 @@ import android.view.View
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayoutMediator
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import net.pantasystem.milktea.common.ui.ApplyMenuTint
 import net.pantasystem.milktea.common.ui.ToolbarSetter
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
@@ -42,12 +45,19 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
     @Inject
     internal lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    val viewModel: SearchTopViewModel by viewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val adapter = SearchPagerAdapterV2(pageableFragmentFactory, this)
 
-        mBinding.searchViewPager.adapter =
-            SearchPagerAdapter(this.childFragmentManager, requireContext(), pageableFragmentFactory)
-        mBinding.searchTabLayout.setupWithViewPager(mBinding.searchViewPager)
+        mBinding.searchViewPager.adapter = adapter
+        TabLayoutMediator(
+            mBinding.searchTabLayout,
+            mBinding.searchViewPager
+        ) { tab, position ->
+            tab.text = adapter.tabs[position].title.getString(requireContext())
+        }.attach()
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.search_top_menu, menu)
@@ -71,6 +81,10 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
                 return false
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        viewModel.uiState.onEach {
+            adapter.submitList(it.tabItems)
+        }.flowWithLifecycle(viewLifecycleOwner.lifecycle).launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
 
@@ -83,34 +97,51 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
         }
     }
 
+}
 
-    class SearchPagerAdapter(
-        supportFragmentManager: FragmentManager,
-        context: Context,
-        private val pageableFragmentFactory: PageableFragmentFactory,
-    ) : FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        private val tabList =
-            listOf(
-                context.getString(R.string.title_featured),
-                context.getString(R.string.explore),
-                context.getString(R.string.explore_fediverse)
-            )
+class SearchPagerAdapterV2(
+    private val pageableFragmentFactory: PageableFragmentFactory,
+    fragment: Fragment
+) : FragmentStateAdapter(fragment) {
 
-        override fun getCount(): Int {
-            return tabList.size
+    var tabs: List<SearchTopTabItem> = emptyList()
+        private set
+
+    override fun getItemCount(): Int {
+        return tabs.size
+    }
+
+    override fun createFragment(position: Int): Fragment {
+        val item = tabs[position]
+        return when(item.type) {
+            SearchTopTabItem.TabType.MisskeyFeatured -> pageableFragmentFactory.create(Pageable.Featured(null))
+            SearchTopTabItem.TabType.MastodonTrends ->  pageableFragmentFactory.create(Pageable.Featured(null))
+            SearchTopTabItem.TabType.MisskeyExploreUsers -> ExploreFragment.newInstance(ExploreType.Local)
+            SearchTopTabItem.TabType.MisskeyExploreFediverseUsers -> ExploreFragment.newInstance(ExploreType.Fediverse)
         }
+    }
 
-        override fun getItem(position: Int): Fragment {
-            return when (position) {
-                0 -> pageableFragmentFactory.create(Pageable.Featured(null))
-                1 -> ExploreFragment.newInstance(ExploreType.Local)
-                2 -> ExploreFragment.newInstance(ExploreType.Fediverse)
-                else -> throw IllegalArgumentException("range 0..1, list:$tabList")
+    fun submitList(list: List<SearchTopTabItem>) {
+        val old = tabs
+        tabs = list
+        val callback = object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int {
+                return old.size
+            }
+
+            override fun getNewListSize(): Int {
+                return list.size
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return old[oldItemPosition] == list[newItemPosition]
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return old[oldItemPosition] == list[newItemPosition]
             }
         }
-
-        override fun getPageTitle(position: Int): CharSequence {
-            return tabList[position]
-        }
+        val result = DiffUtil.calculateDiff(callback)
+        result.dispatchUpdatesTo(this)
     }
 }
