@@ -94,6 +94,9 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.SearchTimeline -> {
                 return@runCancellableCatching emptyList()
             }
+            is Pageable.Mastodon.TrendTimeline -> {
+                return@runCancellableCatching emptyList()
+            }
             is Pageable.Mastodon.TagTimeline -> {
                 api.getHashtagTimeline(
                     tag = pageableTimeline.tag,
@@ -202,6 +205,11 @@ internal class MastodonTimelineStorePagingStoreImpl(
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
                 }.body()?.statuses
+            }
+            is Pageable.Mastodon.TrendTimeline -> {
+                api.getTrendStatuses(
+                    offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
+                ).getBodyOrFail()
             }
             is Pageable.Mastodon.TagTimeline -> {
                 api.getHashtagTimeline(

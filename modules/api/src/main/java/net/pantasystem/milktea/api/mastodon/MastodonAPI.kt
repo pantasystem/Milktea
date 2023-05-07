@@ -27,6 +27,7 @@ import net.pantasystem.milktea.api.mastodon.search.SearchResponse
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.api.mastodon.tag.MastodonTagDTO
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -324,4 +325,16 @@ interface MastodonAPI {
         @Query("since_id") sinceId: String? = null,
         @Query("min_id") minId: String? = null,
     ): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/trends/statuses")
+    suspend fun getTrendStatuses(
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+    ): Response<List<TootStatusDTO>>
+
+    @GET("api/v1/trends/tags")
+    suspend fun getTagTrends(
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+    ): Response<List<MastodonTagDTO>>
 }

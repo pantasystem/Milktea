@@ -44,6 +44,7 @@ object PageTypeHelper{
             MASTODON_BOOKMARK_TIMELINE -> context.getString(R.string.bookmark)
             MASTODON_SEARCH_TIMELINE -> context.getString(R.string.search)
             MASTODON_TAG_TIMELINE -> context.getString(R.string.tag)
+            MASTODON_TREND_TIMELINE -> context.getString(R.string.featured)
         }
     }
 }

@@ -27,6 +27,7 @@ import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
 import net.pantasystem.milktea.api.misskey.register.WebClientRegistries
+import net.pantasystem.milktea.api.misskey.trend.HashtagTrend
 import net.pantasystem.milktea.api.misskey.users.*
 import net.pantasystem.milktea.api.misskey.users.renote.mute.CreateRenoteMuteRequest
 import net.pantasystem.milktea.api.misskey.users.renote.mute.DeleteRenoteMuteRequest
@@ -318,4 +319,7 @@ interface MisskeyAPI {
 
     @POST("api/renote-mute/delete")
     suspend fun deleteRenoteMute(@Body req: DeleteRenoteMuteRequest): Response<Unit>
+
+    @POST("api/hashtags/trend")
+    suspend fun getTrendingHashtags(@Body body: EmptyRequest): Response<List<HashtagTrend>>
 }
