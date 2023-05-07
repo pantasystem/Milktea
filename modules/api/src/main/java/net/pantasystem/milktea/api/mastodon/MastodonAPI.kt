@@ -324,4 +324,10 @@ interface MastodonAPI {
         @Query("since_id") sinceId: String? = null,
         @Query("min_id") minId: String? = null,
     ): Response<List<MastodonAccountDTO>>
+
+    @GET("api/v1/trends/statuses")
+    suspend fun getTrendStatuses(
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+    ): Response<List<TootStatusDTO>>
 }

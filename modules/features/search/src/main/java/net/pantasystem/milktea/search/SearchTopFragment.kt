@@ -115,7 +115,7 @@ class SearchPagerAdapterV2(
         val item = tabs[position]
         return when(item.type) {
             SearchTopTabItem.TabType.MisskeyFeatured -> pageableFragmentFactory.create(Pageable.Featured(null))
-            SearchTopTabItem.TabType.MastodonTrends ->  pageableFragmentFactory.create(Pageable.Featured(null))
+            SearchTopTabItem.TabType.MastodonTrends ->  pageableFragmentFactory.create(Pageable.Mastodon.TrendTimeline)
             SearchTopTabItem.TabType.MisskeyExploreUsers -> ExploreFragment.newInstance(ExploreType.Local)
             SearchTopTabItem.TabType.MisskeyExploreFediverseUsers -> ExploreFragment.newInstance(ExploreType.Fediverse)
         }
