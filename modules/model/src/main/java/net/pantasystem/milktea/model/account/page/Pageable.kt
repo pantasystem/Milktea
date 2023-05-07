@@ -502,6 +502,14 @@ sealed class Pageable : Serializable {
             }
         }
 
+        object TrendTimeline : Mastodon() {
+            override fun toParams(): PageParams {
+                return PageParams(
+
+                )
+            }
+        }
+
     }
 
     object CalckeyRecommendedTimeline : Pageable(), UntilPaginate, SincePaginate {
