@@ -38,6 +38,10 @@ class SearchTopViewModel @Inject constructor(
                         SearchTopTabItem(
                             StringSource(R.string.explore_fediverse),
                             SearchTopTabItem.TabType.MisskeyExploreFediverseUsers,
+                        ),
+                        SearchTopTabItem(
+                            StringSource(R.string.suggestion_users),
+                            SearchTopTabItem.TabType.UserSuggestionByReaction,
                         )
                     )
                 }
@@ -75,5 +79,6 @@ data class SearchTopTabItem(
         MastodonUserSuggestions,
         MisskeyExploreUsers,
         MisskeyExploreFediverseUsers,
+        UserSuggestionByReaction,
     }
 }

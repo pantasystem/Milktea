@@ -10,6 +10,7 @@ import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
+import net.pantasystem.milktea.data.infrastructure.notes.reaction.impl.history.ReactionHistoryDao
 import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -18,6 +19,7 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UserRepository
+import net.pantasystem.milktea.model.user.query.FindUsersFromFrequentlyReactionUsers
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
 import net.pantasystem.milktea.model.user.query.FindUsersQuery4Mastodon
 import net.pantasystem.milktea.model.user.query.FindUsersQuery4Misskey
@@ -33,6 +35,7 @@ internal class UserRepositoryImpl @Inject constructor(
     val userApiAdapter: UserApiAdapter,
     private val mastodonAPIProvider: MastodonAPIProvider,
     val userDTOEntityConverter: UserDTOEntityConverter,
+    private val reactionHistoryDao: ReactionHistoryDao,
     @IODispatcher val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
     private val logger: Logger by lazy {
@@ -185,6 +188,15 @@ internal class UserRepositoryImpl @Inject constructor(
                     }?.onEach {
                         userDataSource.add(it)
                     } ?: emptyList()
+                }
+                is FindUsersFromFrequentlyReactionUsers -> {
+                    val userIds = reactionHistoryDao.findFrequentlyReactionUserAndUnFollowed(
+                        accountId = accountId,
+                        limit = 20,
+                    ).map {
+                        it.targetUserId
+                    }
+                    userDataSource.getIn(accountId, userIds).getOrThrow()
                 }
             }
         }

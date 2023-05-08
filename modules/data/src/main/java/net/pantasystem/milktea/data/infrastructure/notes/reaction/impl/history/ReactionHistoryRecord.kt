@@ -11,7 +11,16 @@ data class ReactionHistoryRecord(
     val reaction: String,
 
     @ColumnInfo(name = "instance_domain")
-    val instanceDomain: String
+    val instanceDomain: String,
+
+    @ColumnInfo(name = "accountId")
+    val accountId: Long? = null,
+
+    @ColumnInfo(name = "target_post_id")
+    val targetPostId: String? = null,
+
+    @ColumnInfo(name = "target_user_id")
+    val targetUserId: String? = null,
 ){
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo("id")
@@ -22,6 +31,9 @@ data class ReactionHistoryRecord(
             return ReactionHistoryRecord(
                 reaction = history.reaction,
                 instanceDomain = history.instanceDomain,
+                targetUserId = history.targetUserId,
+                targetPostId = history.targetPostId,
+                accountId = history.accountId,
             ).apply {
                 id = history.id
             }
@@ -29,6 +41,13 @@ data class ReactionHistoryRecord(
     }
 
     fun toHistory(): ReactionHistory {
-        return ReactionHistory(reaction, instanceDomain, id)
+        return ReactionHistory(
+            reaction = reaction,
+            instanceDomain = instanceDomain,
+            accountId = accountId,
+            targetPostId = targetPostId,
+            targetUserId = targetUserId,
+            id = id,
+        )
     }
 }

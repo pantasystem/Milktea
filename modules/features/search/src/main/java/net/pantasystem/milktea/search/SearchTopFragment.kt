@@ -119,6 +119,7 @@ class SearchPagerAdapterV2(
             SearchTopTabItem.TabType.MisskeyExploreUsers -> ExploreFragment.newInstance(ExploreType.Local)
             SearchTopTabItem.TabType.MisskeyExploreFediverseUsers -> ExploreFragment.newInstance(ExploreType.Fediverse)
             SearchTopTabItem.TabType.MastodonUserSuggestions -> ExploreFragment.newInstance(ExploreType.MastodonUserSuggestions)
+            SearchTopTabItem.TabType.UserSuggestionByReaction -> ExploreFragment.newInstance(ExploreType.UserSuggestionsByReaction)
         }
     }
 

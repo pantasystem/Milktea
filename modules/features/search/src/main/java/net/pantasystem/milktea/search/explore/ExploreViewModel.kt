@@ -78,6 +78,14 @@ class ExploreViewModel @Inject constructor(
                     )
                 )
             }
+            ExploreType.UserSuggestionsByReaction -> {
+                listOf(
+                    ExploreItem(
+                        StringSource(R.string.suggestion_users),
+                        FindUsersFromFrequentlyReactionUsers,
+                    )
+                )
+            }
         }
     }
 

@@ -54,7 +54,10 @@ class ReactionHistoryRepositoryImpl @Inject constructor(
                 ReactionHistory(
                     instanceDomain = history.instanceDomain,
                     reaction = history.reaction,
-                    id = history.id
+                    id = history.id,
+                    accountId = history.accountId,
+                    targetPostId = history.targetPostId,
+                    targetUserId = history.targetUserId,
                 )
             }
         }.flowOn(Dispatchers.IO)

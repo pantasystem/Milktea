@@ -6,6 +6,8 @@ sealed interface FindUsersQuery4Mastodon : FindUsersQuery {
     data class SuggestUsers(val limit: Int? = null) : FindUsersQuery4Mastodon
 }
 
+object FindUsersFromFrequentlyReactionUsers : FindUsersQuery
+
 data class FindUsersQuery4Misskey(
     val origin: Origin?,
     val sort: OrderBy?,
