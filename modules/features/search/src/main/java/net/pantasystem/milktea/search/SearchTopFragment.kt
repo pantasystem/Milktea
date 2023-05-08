@@ -118,6 +118,7 @@ class SearchPagerAdapterV2(
             SearchTopTabItem.TabType.MastodonTrends ->  pageableFragmentFactory.create(Pageable.Mastodon.TrendTimeline)
             SearchTopTabItem.TabType.MisskeyExploreUsers -> ExploreFragment.newInstance(ExploreType.Local)
             SearchTopTabItem.TabType.MisskeyExploreFediverseUsers -> ExploreFragment.newInstance(ExploreType.Fediverse)
+            SearchTopTabItem.TabType.MastodonUserSuggestions -> ExploreFragment.newInstance(ExploreType.MastodonUserSuggestions)
         }
     }
 
