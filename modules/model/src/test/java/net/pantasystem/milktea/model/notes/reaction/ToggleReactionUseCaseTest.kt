@@ -97,6 +97,11 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(InstanceInfoType.Misskey(meta))
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
         runBlocking {
@@ -178,6 +183,11 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(InstanceInfoType.Misskey(meta))
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
         runBlocking {
@@ -267,6 +277,11 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(InstanceInfoType.Misskey(meta))
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
 
@@ -346,6 +361,11 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     findByName(any(), any())
                 } doReturn Result.success(emptyList())
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
 
@@ -427,6 +447,11 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     findByName(any(), any())
                 } doReturn Result.success(emptyList())
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
 
@@ -506,6 +531,11 @@ class ToggleReactionUseCaseTest {
                 onBlocking {
                     find(any())
                 } doReturn Result.success(InstanceInfoType.Misskey(meta))
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
 
@@ -609,6 +639,11 @@ class ToggleReactionUseCaseTest {
                         )
                     )
                 )
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
 
@@ -724,6 +759,11 @@ class ToggleReactionUseCaseTest {
                         )
                     )
                 )
+            },
+            userRepository = mock() {
+                onBlocking {
+                    sync(any())
+                } doReturn Result.success(Unit)
             }
         )
 
