@@ -41,15 +41,15 @@ class ExploreViewModel @Inject constructor(
                 listOf(
                     ExploreItem(
                         StringSource(R.string.trending_users),
-                        FindUsersQuery.trendingUser(),
+                        FindUsersQuery4Misskey.trendingUser(),
                     ),
                     ExploreItem(
                         StringSource(R.string.users_with_recent_activity),
-                        FindUsersQuery.usersWithRecentActivity(),
+                        FindUsersQuery4Misskey.usersWithRecentActivity(),
                     ),
                     ExploreItem(
                         StringSource(R.string.newly_joined_users),
-                        FindUsersQuery.newlyJoinedUsers()
+                        FindUsersQuery4Misskey.newlyJoinedUsers()
                     )
 
                 )
@@ -58,16 +58,24 @@ class ExploreViewModel @Inject constructor(
                 listOf(
                     ExploreItem(
                         StringSource(R.string.trending_users),
-                        FindUsersQuery.remoteTrendingUser()
+                        FindUsersQuery4Misskey.remoteTrendingUser()
                     ),
                     ExploreItem(
                         StringSource(R.string.users_with_recent_activity),
-                        FindUsersQuery.remoteUsersWithRecentActivity(),
+                        FindUsersQuery4Misskey.remoteUsersWithRecentActivity(),
                     ),
                     ExploreItem(
                         StringSource(R.string.newly_discovered_users),
-                        FindUsersQuery.newlyDiscoveredUsers()
+                        FindUsersQuery4Misskey.newlyDiscoveredUsers()
                     ),
+                )
+            }
+            ExploreType.MastodonUserSuggestions -> {
+                listOf(
+                    ExploreItem(
+                        StringSource("Suggestions"),
+                        FindUsersQuery4Mastodon.SuggestUsers()
+                    )
                 )
             }
         }
