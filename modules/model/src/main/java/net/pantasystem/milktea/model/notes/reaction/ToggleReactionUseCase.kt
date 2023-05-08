@@ -72,8 +72,11 @@ class ToggleReactionUseCase @Inject constructor(
             if (reactionRepository.create(CreateReaction(noteId, sendReaction)).getOrThrow()) {
                 reactionHistoryRepository.create(
                     ReactionHistory(
-                        sendReaction,
-                        account.normalizedInstanceUri
+                        reaction = sendReaction,
+                        instanceDomain = account.normalizedInstanceUri,
+                        accountId = account.accountId,
+                        targetPostId = noteId.noteId,
+                        targetUserId = note.userId.id,
                     )
                 )
             }

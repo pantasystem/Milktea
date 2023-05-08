@@ -190,11 +190,17 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory(":wakaranai:", "https://misskey.io"))
+            create(
+                ReactionHistory(
+                    reaction = ":wakaranai:",
+                    instanceDomain = "https://misskey.io",
+                    accountId = account.accountId,
+                    targetPostId = targetNote.id.noteId,
+                    targetUserId = targetNote.userId.id,
+                )
+            )
         }
     }
-
-
 
 
     @Test
@@ -260,7 +266,7 @@ class ToggleReactionUseCaseTest {
             instanceInfoService = mock() {
                 onBlocking {
                     find(any())
-                } doReturn  Result.success(InstanceInfoType.Misskey(meta))
+                } doReturn Result.success(InstanceInfoType.Misskey(meta))
             }
         )
 
@@ -272,7 +278,15 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory(":kawaii:", "https://misskey.io"))
+            create(
+                ReactionHistory(
+                    reaction = ":kawaii:",
+                    instanceDomain = "https://misskey.io",
+                    targetUserId = targetNote.userId.id,
+                    targetPostId = targetNote.id.noteId,
+                    accountId = account.accountId
+                )
+            )
         }
     }
 
@@ -296,7 +310,7 @@ class ToggleReactionUseCaseTest {
             } doReturn true
         }
 
-        val meta = Meta(uri = "https://misskey.io",)
+        val meta = Meta(uri = "https://misskey.io")
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
@@ -343,9 +357,18 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("👍", "https://misskey.io"))
+            create(
+                ReactionHistory(
+                    reaction = "👍",
+                    instanceDomain = "https://misskey.io",
+                    accountId = account.accountId,
+                    targetPostId = targetNote.id.noteId,
+                    targetUserId = targetNote.userId.id,
+                )
+            )
         }
     }
+
     @Test
     fun giveMultiByteEmoji() {
         val targetNote = generateEmptyNote().copy(
@@ -367,7 +390,7 @@ class ToggleReactionUseCaseTest {
             } doReturn true
         }
 
-        val meta = Meta(uri = "https://misskey.io",)
+        val meta = Meta(uri = "https://misskey.io")
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
@@ -415,7 +438,15 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("🥺", "https://misskey.io"))
+            create(
+                ReactionHistory(
+                    reaction = "🥺",
+                    instanceDomain = "https://misskey.io",
+                    accountId = account.accountId,
+                    targetUserId = targetNote.userId.id,
+                    targetPostId = targetNote.id.noteId,
+                )
+            )
         }
     }
 
@@ -439,7 +470,7 @@ class ToggleReactionUseCaseTest {
             } doReturn true
         }
 
-        val meta = Meta(uri = "https://misskey.io",)
+        val meta = Meta(uri = "https://misskey.io")
         val reactionHistoryDao = mock<ReactionHistoryRepository>()
         val account = Account(
             "testId",
@@ -486,7 +517,15 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("\uD83D\uDE06", "https://misskey.io"))
+            create(
+                ReactionHistory(
+                    reaction = "\uD83D\uDE06",
+                    instanceDomain = "https://misskey.io",
+                    accountId = account.accountId,
+                    targetPostId = targetNote.id.noteId,
+                    targetUserId = targetNote.userId.id,
+                )
+            )
         }
     }
 
@@ -581,7 +620,15 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("kawaii@misskey.io", "https://fedibird.com"))
+            create(
+                ReactionHistory(
+                    reaction = "kawaii@misskey.io",
+                    instanceDomain = "https://fedibird.com",
+                    accountId = account.accountId,
+                    targetUserId = targetNote.userId.id,
+                    targetPostId = targetNote.id.noteId,
+                )
+            )
         }
     }
 
@@ -688,7 +735,15 @@ class ToggleReactionUseCaseTest {
         }
 
         verifyBlocking(reactionHistoryDao) {
-            create(ReactionHistory("kawaii@misskey.io", "https://fedibird.com"))
+            create(
+                ReactionHistory(
+                    reaction = "kawaii@misskey.io",
+                    instanceDomain = "https://fedibird.com",
+                    targetPostId = targetNote.id.noteId,
+                    targetUserId = targetNote.userId.id,
+                    accountId = account.accountId,
+                )
+            )
         }
     }
 }
