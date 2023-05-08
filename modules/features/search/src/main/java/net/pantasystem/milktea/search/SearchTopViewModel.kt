@@ -44,7 +44,7 @@ class SearchTopViewModel @Inject constructor(
                             SearchTopTabItem.TabType.UserSuggestionByReaction,
                         ),
                         SearchTopTabItem(
-                            StringSource("Trends"),
+                            StringSource(R.string.trending_tag),
                             SearchTopTabItem.TabType.HashtagTrend,
                         )
                     )
@@ -60,7 +60,7 @@ class SearchTopViewModel @Inject constructor(
                             SearchTopTabItem.TabType.MastodonUserSuggestions,
                         ),
                         SearchTopTabItem(
-                            StringSource("Trends"),
+                            StringSource(R.string.trending_tag),
                             SearchTopTabItem.TabType.HashtagTrend,
                         )
                     )

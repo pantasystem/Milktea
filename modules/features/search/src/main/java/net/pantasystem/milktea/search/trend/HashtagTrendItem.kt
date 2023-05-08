@@ -8,10 +8,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.pantasystem.milktea.model.hashtag.HashTag
+import net.pantasystem.milktea.search.R
 
 @Composable
 fun HashtagTrendItem(
@@ -39,7 +41,7 @@ fun HashtagTrendItem(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text("${hashtag.usersCount}人が投稿")
+            Text(stringResource(id = R.string.trend_posted_person_count_msg, hashtag.usersCount))
         }
     }
 }
