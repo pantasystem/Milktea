@@ -7,7 +7,6 @@ import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.clip.*
 import net.pantasystem.milktea.api.misskey.drive.*
 import net.pantasystem.milktea.api.misskey.favorite.Favorite
-import net.pantasystem.milktea.api.misskey.hashtag.RequestHashTagList
 import net.pantasystem.milktea.api.misskey.hashtag.SearchHashtagRequest
 import net.pantasystem.milktea.api.misskey.list.*
 import net.pantasystem.milktea.api.misskey.messaging.MessageAction
@@ -36,7 +35,6 @@ import net.pantasystem.milktea.api.misskey.users.renote.mute.RenoteMutesRequest
 import net.pantasystem.milktea.api.misskey.users.report.ReportDTO
 import net.pantasystem.milktea.api.misskey.v13.EmojisResponse
 import net.pantasystem.milktea.model.drive.Directory
-import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.instance.RequestMeta
 import net.pantasystem.milktea.model.messaging.RequestMessageHistory
@@ -241,8 +239,6 @@ interface MisskeyAPI {
     @POST("api/mute/delete")
     suspend fun unmuteUser(@Body requestUser: RequestUser): Response<Unit>
 
-    @POST("api/hashtags/list")
-    suspend fun getHashTagList(@Body requestHashTagList: RequestHashTagList): Response<List<HashTag>>
 
     @POST("api/sw/register")
     suspend fun swRegister(@Body subscription: Subscription) : Response<SubscriptionState>
