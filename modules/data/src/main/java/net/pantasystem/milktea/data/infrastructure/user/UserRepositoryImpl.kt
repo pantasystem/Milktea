@@ -10,6 +10,7 @@ import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.converters.UserDTOEntityConverter
+import net.pantasystem.milktea.data.infrastructure.toUserRelated
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -18,6 +19,8 @@ import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserNotFoundException
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.model.user.query.FindUsersQuery
+import net.pantasystem.milktea.model.user.query.FindUsersQuery4Mastodon
+import net.pantasystem.milktea.model.user.query.FindUsersQuery4Misskey
 import javax.inject.Inject
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -149,14 +152,41 @@ internal class UserRepositoryImpl @Inject constructor(
     override suspend fun findUsers(accountId: Long, query: FindUsersQuery): List<User> {
         return withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
-            val request = RequestUser.from(query, account.token)
-            val res = misskeyAPIProvider.get(account).getUsers(request)
-                .throwIfHasError()
-            res.body()?.map {
-                userDTOEntityConverter.convert(account, it, true)
-            }?.onEach {
-                userDataSource.add(it)
-            } ?: emptyList()
+            when(query) {
+                is FindUsersQuery4Mastodon.SuggestUsers -> {
+                    val api = mastodonAPIProvider.get(account)
+                    val body = requireNotNull(api.getSuggestionUsers(
+                        limit = query.limit
+                    ).throwIfHasError().body())
+                    val accounts = body.map {
+                        it.account
+                    }
+                    val relationships = requireNotNull(
+                        api.getAccountRelationships(ids = accounts.map { it.id })
+                            .throwIfHasError()
+                            .body()
+                    ).let { list ->
+                        list.associateBy {
+                            it.id
+                        }
+                    }
+                    val models = accounts.map {
+                        it.toModel(account, relationships[it.id]?.toUserRelated())
+                    }
+                    userDataSource.addAll(models).getOrThrow()
+                    models
+                }
+                is FindUsersQuery4Misskey -> {
+                    val request = RequestUser.from(query, account.token)
+                    val res = misskeyAPIProvider.get(account).getUsers(request)
+                        .throwIfHasError()
+                    res.body()?.map {
+                        userDTOEntityConverter.convert(account, it, true)
+                    }?.onEach {
+                        userDataSource.add(it)
+                    } ?: emptyList()
+                }
+            }
         }
     }
 
