@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,7 +17,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,9 +24,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
 import dagger.hilt.android.AndroidEntryPoint
+import getStringFromStringSource
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.user.UserCardActionHandler
 import net.pantasystem.milktea.user.compose.UserDetailCard
 import net.pantasystem.milktea.user.compose.UserDetailCardAction
@@ -76,7 +74,7 @@ class ExploreFragment : Fragment() {
                                         .fillMaxWidth()
                                 ) {
                                     Text(
-                                        getString(item.title),
+                                        getStringFromStringSource(item.title),
                                         fontSize = 16.sp,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -132,7 +130,3 @@ enum class ExploreType {
     Local, Fediverse,
 }
 
-@Composable
-fun getString(src: StringSource): String {
-    return src.getString(LocalContext.current)
-}
