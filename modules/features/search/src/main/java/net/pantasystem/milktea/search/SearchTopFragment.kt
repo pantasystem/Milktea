@@ -29,6 +29,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.search.databinding.FragmentSearchTopBinding
 import net.pantasystem.milktea.search.explore.ExploreFragment
 import net.pantasystem.milktea.search.explore.ExploreType
+import net.pantasystem.milktea.search.trend.TrendFragment
 import javax.inject.Inject
 
 
@@ -120,6 +121,7 @@ class SearchPagerAdapterV2(
             SearchTopTabItem.TabType.MisskeyExploreFediverseUsers -> ExploreFragment.newInstance(ExploreType.Fediverse)
             SearchTopTabItem.TabType.MastodonUserSuggestions -> ExploreFragment.newInstance(ExploreType.MastodonUserSuggestions)
             SearchTopTabItem.TabType.UserSuggestionByReaction -> ExploreFragment.newInstance(ExploreType.UserSuggestionsByReaction)
+            SearchTopTabItem.TabType.HashtagTrend -> TrendFragment()
         }
     }
 

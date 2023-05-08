@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.api.misskey.trend
 
 import kotlinx.serialization.SerialName
-import net.pantasystem.milktea.model.hashtag.Hashtag
+import net.pantasystem.milktea.model.hashtag.HashTag
 
 @kotlinx.serialization.Serializable
 data class HashtagTrend(
@@ -9,8 +9,8 @@ data class HashtagTrend(
     @SerialName("chart") val chart: List<Int>,
     @SerialName("usesCount") val usesCount: Int,
 ) {
-    fun toModel(): Hashtag {
-        return Hashtag(
+    fun toModel(): HashTag {
+        return HashTag(
             tag,
             usesCount,
             chart

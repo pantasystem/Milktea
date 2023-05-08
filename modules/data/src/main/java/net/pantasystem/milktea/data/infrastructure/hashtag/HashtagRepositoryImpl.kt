@@ -11,7 +11,7 @@ import net.pantasystem.milktea.data.api.mastodon.MastodonAPIProvider
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
-import net.pantasystem.milktea.model.hashtag.Hashtag
+import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.hashtag.HashtagRepository
 import javax.inject.Inject
 
@@ -54,7 +54,7 @@ class HashtagRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun trends(accountId: Long): Result<List<Hashtag>> = runCancellableCatching {
+    override suspend fun trends(accountId: Long): Result<List<HashTag>> = runCancellableCatching {
         withContext(ioDispatcher) {
             val account = accountRepository.get(accountId).getOrThrow()
             when(account.instanceType) {

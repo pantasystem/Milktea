@@ -10,7 +10,7 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.hashtag.Hashtag
+import net.pantasystem.milktea.model.hashtag.HashTag
 import net.pantasystem.milktea.model.hashtag.HashtagRepository
 import javax.inject.Inject
 
@@ -54,5 +54,5 @@ class TrendViewModel @Inject constructor(
 
 data class TrendUiState(
     val currentAccount: Account?,
-    val trendTags: ResultState<List<Hashtag>>,
+    val trendTags: ResultState<List<HashTag>>,
 )
