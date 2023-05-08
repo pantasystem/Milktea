@@ -47,6 +47,10 @@ class SearchTopViewModel @Inject constructor(
                             StringSource(R.string.title_featured),
                             SearchTopTabItem.TabType.MastodonTrends,
                         ),
+                        SearchTopTabItem(
+                            StringSource(R.string.suggestion_users),
+                            SearchTopTabItem.TabType.MastodonUserSuggestions,
+                        )
                     )
                 }
                 null -> emptyList()
@@ -68,7 +72,8 @@ data class SearchTopTabItem(
     enum class TabType {
         MisskeyFeatured,
         MastodonTrends,
+        MastodonUserSuggestions,
         MisskeyExploreUsers,
-        MisskeyExploreFediverseUsers
+        MisskeyExploreFediverseUsers,
     }
 }
