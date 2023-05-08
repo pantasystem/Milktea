@@ -42,6 +42,10 @@ class SearchTopViewModel @Inject constructor(
                         SearchTopTabItem(
                             StringSource(R.string.suggestion_users),
                             SearchTopTabItem.TabType.UserSuggestionByReaction,
+                        ),
+                        SearchTopTabItem(
+                            StringSource(R.string.trending_tag),
+                            SearchTopTabItem.TabType.HashtagTrend,
                         )
                     )
                 }
@@ -54,6 +58,10 @@ class SearchTopViewModel @Inject constructor(
                         SearchTopTabItem(
                             StringSource(R.string.suggestion_users),
                             SearchTopTabItem.TabType.MastodonUserSuggestions,
+                        ),
+                        SearchTopTabItem(
+                            StringSource(R.string.trending_tag),
+                            SearchTopTabItem.TabType.HashtagTrend,
                         )
                     )
                 }
@@ -80,5 +88,6 @@ data class SearchTopTabItem(
         MisskeyExploreUsers,
         MisskeyExploreFediverseUsers,
         UserSuggestionByReaction,
+        HashtagTrend,
     }
 }
