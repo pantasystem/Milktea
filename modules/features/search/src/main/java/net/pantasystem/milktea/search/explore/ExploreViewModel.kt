@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.search.explore
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,10 +11,12 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository
-import net.pantasystem.milktea.model.user.query.FindUsersQuery
+import net.pantasystem.milktea.model.user.query.*
+import net.pantasystem.milktea.search.R
 import javax.inject.Inject
 
 
@@ -24,10 +27,51 @@ class ExploreViewModel @Inject constructor(
     val userDataSource: UserDataSource,
     val userRepository: UserRepository,
     loggerFactory: Logger.Factory,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val logger = loggerFactory.create("ExploreViewModel")
 
-    private val findUsers = MutableStateFlow<List<ExploreItem>>(emptyList())
+    private val type = savedStateHandle.getStateFlow("type", ExploreType.Local.ordinal).map {
+        ExploreType.values()[it]
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExploreType.Local)
+
+    private val findUsers = type.map {
+        when(it) {
+            ExploreType.Local -> {
+                listOf(
+                    ExploreItem(
+                        StringSource(R.string.trending_users),
+                        FindUsersQuery.trendingUser(),
+                    ),
+                    ExploreItem(
+                        StringSource(R.string.users_with_recent_activity),
+                        FindUsersQuery.usersWithRecentActivity(),
+                    ),
+                    ExploreItem(
+                        StringSource(R.string.newly_joined_users),
+                        FindUsersQuery.newlyJoinedUsers()
+                    )
+
+                )
+            }
+            ExploreType.Fediverse -> {
+                listOf(
+                    ExploreItem(
+                        StringSource(R.string.trending_users),
+                        FindUsersQuery.remoteTrendingUser()
+                    ),
+                    ExploreItem(
+                        StringSource(R.string.users_with_recent_activity),
+                        FindUsersQuery.remoteUsersWithRecentActivity(),
+                    ),
+                    ExploreItem(
+                        StringSource(R.string.newly_discovered_users),
+                        FindUsersQuery.newlyDiscoveredUsers()
+                    ),
+                )
+            }
+        }
+    }
 
     private val rawLoadingStates =
         accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
@@ -97,26 +141,21 @@ class ExploreViewModel @Inject constructor(
 
     val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    fun setExplores(list: List<ExploreItem>) {
-        findUsers.update {
-            list
-        }
-    }
 }
 
 data class ExploreItem(
-    val title: String,
+    val title: StringSource,
     val findUsersQuery: FindUsersQuery,
 )
 
 data class ExploreItemState(
-    val title: String,
+    val title: StringSource,
     val findUsersQuery: FindUsersQuery,
     val loadingState: ResultState<List<User.Detail>>
 )
 
 data class ExploreResultState(
-    val title: String,
+    val title: StringSource,
     val findUsersQuery: FindUsersQuery,
     val loadingState: ResultState<List<User.Id>>
 )
