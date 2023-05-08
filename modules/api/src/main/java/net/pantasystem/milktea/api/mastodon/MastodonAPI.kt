@@ -27,6 +27,7 @@ import net.pantasystem.milktea.api.mastodon.search.SearchResponse
 import net.pantasystem.milktea.api.mastodon.status.CreateStatus
 import net.pantasystem.milktea.api.mastodon.status.ScheduledStatus
 import net.pantasystem.milktea.api.mastodon.status.TootStatusDTO
+import net.pantasystem.milktea.api.mastodon.suggestion.SuggestionDTO
 import net.pantasystem.milktea.api.mastodon.tag.MastodonTagDTO
 import retrofit2.Response
 import retrofit2.http.*
@@ -337,4 +338,9 @@ interface MastodonAPI {
         @Query("limit") limit: Int? = null,
         @Query("offset") offset: Int? = null,
     ): Response<List<MastodonTagDTO>>
+
+    @GET("api/v2/suggestions")
+    suspend fun getSuggestionUsers(
+        @Query("limit") limit: Int? = null
+    ): Response<List<SuggestionDTO>>
 }
