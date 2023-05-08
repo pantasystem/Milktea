@@ -591,4 +591,6 @@
     <string name="suggestion_users">Suggestions</string>
     <!-- User -->
 
+
+    <string name="trend_posted_person_count_msg">%d people posting</string>
 </resources>

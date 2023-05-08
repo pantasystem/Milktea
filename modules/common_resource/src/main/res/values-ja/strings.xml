@@ -593,6 +593,7 @@
     <string name="settings_note_content_font_size">ノートコンテンツ文字サイズ(%fsp)</string>
     <string name="settings_note_header_font_size">ノートヘッダー文字サイズ(%fsp)</string>
     <string name="suggestion_users">おすすめユーザ</string>
+    <string name="trend_posted_person_count_msg">%d人が投稿</string>
     <!-- User -->
 
 
