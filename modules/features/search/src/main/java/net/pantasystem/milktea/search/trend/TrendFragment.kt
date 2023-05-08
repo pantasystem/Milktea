@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,9 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.composethemeadapter.MdcTheme
@@ -58,35 +54,15 @@ class TrendFragment : Fragment() {
                             is StateContent.Exist -> {
                                 items(content.rawContent.size) { index ->
                                     val item = content.rawContent[index]
-                                    Surface(
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .clickable {
-                                                requireActivity().startActivity(
-                                                    searchNavigation.newIntent(
-                                                        SearchNavType.ResultScreen(
-                                                            "#${item.name}"
-                                                        )
-                                                    )
+                                    HashtagTrendItem(hashtag = item, onClick = {
+                                        requireActivity().startActivity(
+                                            searchNavigation.newIntent(
+                                                SearchNavType.ResultScreen(
+                                                    "#${item.name}"
                                                 )
-                                            }
-                                    ) {
-                                        Column(
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .padding(
-                                                    vertical = 12.dp,
-                                                    horizontal = 14.dp
-                                                )
-                                        ) {
-                                            Text(
-                                                "#${item.name}",
-                                                fontSize = 18.sp,
-                                                fontWeight = FontWeight.Bold
                                             )
-                                            Text("${item.usersCount}人が投稿")
-                                        }
-                                    }
+                                        )
+                                    })
                                 }
                             }
                             is StateContent.NotExist -> {
