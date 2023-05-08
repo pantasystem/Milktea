@@ -7,12 +7,12 @@ import net.pantasystem.milktea.model.hashtag.HashTag
 data class HashtagTrend(
     @SerialName("tag") val tag: String,
     @SerialName("chart") val chart: List<Int>,
-    @SerialName("usesCount") val usesCount: Int,
+    @SerialName("usersCount") val usersCount: Int,
 ) {
     fun toModel(): HashTag {
         return HashTag(
             tag,
-            usesCount,
+            usersCount,
             chart
         )
     }
