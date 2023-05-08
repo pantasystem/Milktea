@@ -52,9 +52,9 @@ interface ReactionHistoryDao {
                     and r1.accountId = :accountId
                 group by r1.accountId, r1.target_user_id
                     order by count(r1.id) desc
-                limit 100
+                limit :limit
         """
     )
-    suspend fun findFrequentlyReactionUserAndUnFollowed(accountId: Long): List<FrequentlyReactionAndUnFollowedUserRecord>
+    suspend fun findFrequentlyReactionUserAndUnFollowed(accountId: Long, limit: Int): List<FrequentlyReactionAndUnFollowedUserRecord>
 }
 
