@@ -588,6 +588,7 @@
     <string name="user_mute_specify_time_indefinite_period">Indefinite perio</string>
     <string name="view_remotely">View remotely</string>
     <string name="follows_you">Follows you</string>
+    <string name="suggestion_users">Suggestions</string>
     <!-- User -->
 
 </resources>

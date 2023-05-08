@@ -592,6 +592,7 @@
     <string name="follows_you">フォローされています</string>
     <string name="settings_note_content_font_size">ノートコンテンツ文字サイズ(%fsp)</string>
     <string name="settings_note_header_font_size">ノートヘッダー文字サイズ(%fsp)</string>
+    <string name="suggestion_users">おすすめユーザ</string>
     <!-- User -->
 
 
