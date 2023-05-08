@@ -73,7 +73,7 @@ class ExploreViewModel @Inject constructor(
             ExploreType.MastodonUserSuggestions -> {
                 listOf(
                     ExploreItem(
-                        StringSource("Suggestions"),
+                        StringSource(R.string.suggestion_users),
                         FindUsersQuery4Mastodon.SuggestUsers()
                     )
                 )

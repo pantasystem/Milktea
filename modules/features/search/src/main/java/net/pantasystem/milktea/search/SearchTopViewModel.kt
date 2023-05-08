@@ -48,7 +48,7 @@ class SearchTopViewModel @Inject constructor(
                             SearchTopTabItem.TabType.MastodonTrends,
                         ),
                         SearchTopTabItem(
-                            StringSource("Suggestions"),
+                            StringSource(R.string.suggestion_users),
                             SearchTopTabItem.TabType.MastodonUserSuggestions,
                         )
                     )
