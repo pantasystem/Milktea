@@ -127,6 +127,6 @@ class ExploreFragment : Fragment() {
 }
 
 enum class ExploreType {
-    Local, Fediverse, MastodonUserSuggestions,
+    Local, Fediverse, MastodonUserSuggestions, UserSuggestionsByReaction
 }
 
