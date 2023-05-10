@@ -267,7 +267,7 @@
 
     <string name="success">成功しました</string>
     <string name="failure">失敗しました</string>
-    <string name="explore_fediverse">Explore Fediverse</string>
+    <string name="explore_fediverse">Fediverse</string>
     <string name="explore">見つける</string>
     <string name="trending_users">人気ユーザー</string>
     <string name="users_with_recent_activity">最近投稿したユーザー</string>
