@@ -266,7 +266,7 @@
 
     <string name="success">Success</string>
     <string name="failure">Failure</string>
-    <string name="explore_fediverse">Explore the Fediverse</string>
+    <string name="explore_fediverse">Fediverse</string>
     <string name="explore">Explore</string>
     <string name="trending_users">Trending users</string>
     <string name="users_with_recent_activity">Users with recent activity</string>
