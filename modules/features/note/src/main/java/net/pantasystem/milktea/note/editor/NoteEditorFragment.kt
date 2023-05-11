@@ -372,18 +372,23 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             onTextChanged = { text, start, _, count ->
                 val inputText = text?.substring(start, start + count)?: return@addTextChangedListener
                 if (UrlPatternChecker.isMatch(inputText)) {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setMessage(R.string.notes_confirm_attach_quote_note_by_url)
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            noteEditorViewModel.onPastePostUrl(
-                                text.toString(),
-                                start,
-                                text.removeRange(start, start + count).toString(),
-                                count,
-                            )
+                    lifecycleScope.launch {
+                        if (noteEditorViewModel.canQuote()) {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setMessage(R.string.notes_confirm_attach_quote_note_by_url)
+                                .setPositiveButton(android.R.string.ok) { _, _ ->
+                                    noteEditorViewModel.onPastePostUrl(
+                                        text.toString(),
+                                        start,
+                                        text.removeRange(start, start + count).toString(),
+                                        count,
+                                    )
+                                }
+                                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                                .show()
                         }
-                        .setNegativeButton(android.R.string.cancel) { _, _ -> }
-                        .show()
+                    }
+
                 }
             }
         ) { e ->
