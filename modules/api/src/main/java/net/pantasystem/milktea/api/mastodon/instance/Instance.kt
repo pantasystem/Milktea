@@ -31,6 +31,9 @@ data class Instance(
 
     @SerialName("pleroma")
     val pleroma: Pleroma? = null,
+
+    @SerialName("feature_quote")
+    val featureQuote: Boolean? = null,
 ) {
     @Serializable
     data class Configuration(
