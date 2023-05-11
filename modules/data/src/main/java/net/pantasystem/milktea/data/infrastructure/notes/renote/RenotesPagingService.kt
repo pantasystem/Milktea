@@ -15,8 +15,8 @@ import net.pantasystem.milktea.data.infrastructure.notes.NoteDataSourceAdder
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.Note
-import net.pantasystem.milktea.model.notes.renote.RenoteType
-import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.model.notes.repost.RenoteType
+import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
 import net.pantasystem.milktea.model.user.UserDataSource
 import javax.inject.Inject
 

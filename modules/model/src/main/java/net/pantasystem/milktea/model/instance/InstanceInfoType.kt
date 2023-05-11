@@ -54,4 +54,12 @@ sealed interface InstanceInfoType {
     val canMultipleReaction: Boolean get() {
         return maxReactionsPerAccount > 1
     }
+
+    val canQuote: Boolean get() {
+        return when(this) {
+            is Mastodon -> info.featureQuote
+            is Misskey -> true
+            is Pleroma -> true
+        }
+    }
 }

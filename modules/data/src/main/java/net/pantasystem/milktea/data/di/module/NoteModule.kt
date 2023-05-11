@@ -21,7 +21,7 @@ import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.ReplyStreaming
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
 import net.pantasystem.milktea.model.notes.draft.DraftNoteService
-import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
 import javax.inject.Singleton
 
 @Module

@@ -242,7 +242,14 @@ data class NoteRelation(
     val renote: NoteRelation?,
     val reply: NoteRelation?,
     val files: List<FileProperty>?,
-) : JSerializable
+) : JSerializable {
+
+    val contentNote: NoteRelation = if (note.isRenote() && !note.hasContent()) {
+        renote ?: this
+    } else {
+        this
+    }
+}
 
 fun Note.Companion.make(
     id: Note.Id,

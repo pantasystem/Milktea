@@ -737,6 +737,12 @@ class NoteEditorViewModel @Inject constructor(
     fun onPastePostUrl(text: String, start: Int, beforeText: String, count: Int) = viewModelScope.launch {
         val urlText = text.substring(start, start + count)
         val ca = currentAccount.value ?: return@launch
+        val canQuote = canQuote()
+
+        if (!canQuote) {
+            return@launch
+        }
+
         if (UrlPatternChecker.isMatch(urlText)) {
             apResolverRepository.resolve(ca.accountId, urlText).onSuccess {
                 when(it) {
@@ -757,6 +763,13 @@ class NoteEditorViewModel @Inject constructor(
 
     fun clear() {
         savedStateHandle.applyBy(NoteEditorUiState())
+    }
+
+    suspend fun canQuote(): Boolean {
+        val ca = currentAccount.value ?: return false
+        return instanceInfoService.find(ca.normalizedInstanceUri).map {
+            it.canQuote
+        }.getOrElse { false }
     }
 
     private fun setUpUserViewData(userId: User.Id): UserViewData {

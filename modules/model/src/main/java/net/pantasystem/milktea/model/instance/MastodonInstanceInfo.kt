@@ -54,6 +54,10 @@ data class MastodonInstanceInfo(
             ?: Int.MAX_VALUE.takeIf {
                 pleroma?.metadata?.features?.contains("pleroma_emoji_reactions") == true
             } ?: 0
+
+    val featureQuote: Boolean
+        get() = fedibirdCapabilities?.contains("feature_quote") == true
+
     data class Pleroma(
         val metadata: Metadata,
     ) {

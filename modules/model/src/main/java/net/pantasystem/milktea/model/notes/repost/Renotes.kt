@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes.renote
+package net.pantasystem.milktea.model.notes.repost
 
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User

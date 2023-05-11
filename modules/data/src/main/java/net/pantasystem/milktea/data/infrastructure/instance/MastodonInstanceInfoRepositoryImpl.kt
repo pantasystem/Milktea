@@ -60,13 +60,8 @@ class MastodonInstanceInfoRepositoryImpl @Inject constructor(
     override suspend fun sync(instanceDomain: String): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val model = mastodonAPIProvider.get(instanceDomain).getInstance().toModel()
-            val exists = mastodonInstanceInfoDAO.findBy(URL(instanceDomain).host)
             cache.put(instanceDomain, model)
-            if (exists == null) {
-                mastodonInstanceInfoDAO.insert(MastodonInstanceInfoRecord.from(model))
-            } else {
-                mastodonInstanceInfoDAO.update(MastodonInstanceInfoRecord.from(model))
-            }
+            upInsert(model)
         }
     }
 

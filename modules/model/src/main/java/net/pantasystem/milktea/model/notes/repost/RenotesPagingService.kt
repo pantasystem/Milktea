@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.notes.renote
+package net.pantasystem.milktea.model.notes.repost
 
 import kotlinx.coroutines.flow.Flow
 import net.pantasystem.milktea.common.PageableState
