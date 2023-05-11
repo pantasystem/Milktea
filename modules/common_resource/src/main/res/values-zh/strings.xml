@@ -588,6 +588,7 @@
     <string name="settings_note_header_font_size">Note header font size(%fsp)</string>
     <string name="suggestion_users">Suggestions</string>
     <string name="trend_posted_person_count_msg">%d people posting</string>
+    <string name="notes_confirm_attach_quote_note_by_url">Attach as a quote post?</string>
     <!-- User -->
 
 </resources>

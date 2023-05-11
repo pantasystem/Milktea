@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.*
 import com.google.android.material.composethemeadapter.MdcTheme
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.text.UrlPatternChecker
 import net.pantasystem.milktea.common_android.platform.PermissionUtil
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
@@ -366,8 +368,25 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.setCw(e?.toString())
         }
 
-        binding.inputMain.addTextChangedListener { e ->
-            logger.debug("text changed:$e")
+        binding.inputMain.addTextChangedListener(
+            onTextChanged = { text, start, _, count ->
+                val inputText = text?.substring(start, start + count)?: return@addTextChangedListener
+                if (UrlPatternChecker.isMatch(inputText)) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(R.string.notes_confirm_attach_quote_note_by_url)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            noteEditorViewModel.onPastePostUrl(
+                                text.toString(),
+                                start,
+                                text.removeRange(start, start + count).toString(),
+                                count,
+                            )
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                        .show()
+                }
+            }
+        ) { e ->
             noteEditorViewModel.setText((e?.toString() ?: ""))
         }
 
