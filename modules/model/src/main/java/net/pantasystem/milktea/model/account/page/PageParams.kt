@@ -194,7 +194,8 @@ data class PageParams(
                 }
                 MASTODON_SEARCH_TIMELINE -> {
                     Pageable.Mastodon.SearchTimeline(
-                        requireNotNull(query)
+                        query = requireNotNull(query),
+                        userId = userId,
                     )
                 }
                 MASTODON_TAG_TIMELINE -> {
