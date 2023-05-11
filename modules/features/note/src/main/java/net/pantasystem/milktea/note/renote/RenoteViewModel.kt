@@ -92,7 +92,7 @@ class RenoteViewModel @Inject constructor(
                 accountId = account.accountId,
                 user = user,
                 isSelected = selectedIds.any { id -> id == account.accountId },
-                isEnable = note?.canRenote(account, user) == true,
+                isEnable = note?.contentNote?.canRenote(account, user) == true,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -110,7 +110,7 @@ class RenoteViewModel @Inject constructor(
 
     private val _noteState = combine(note, _syncState) { n, s ->
         RenoteViewModelTargetNoteState(
-            note = n?.note,
+            note = n?.contentNote?.note,
             syncState = s
         )
     }.stateIn(
@@ -118,7 +118,7 @@ class RenoteViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5_000),
         RenoteViewModelTargetNoteState(
             _syncState.value,
-            note.value?.note,
+            note.value?.contentNote?.note,
         )
     )
 
