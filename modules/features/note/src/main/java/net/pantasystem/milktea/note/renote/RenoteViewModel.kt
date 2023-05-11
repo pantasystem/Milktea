@@ -15,7 +15,7 @@ import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.renote.CreateRenoteMultipleAccountUseCase
+import net.pantasystem.milktea.model.notes.repost.CreateRenoteMultipleAccountUseCase
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.model.user.UserRepository

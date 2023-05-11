@@ -13,8 +13,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.*
-import net.pantasystem.milktea.model.notes.renote.RenoteType
-import net.pantasystem.milktea.model.notes.renote.RenotesPagingService
+import net.pantasystem.milktea.model.notes.repost.RenoteType
+import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 
