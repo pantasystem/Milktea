@@ -11,11 +11,14 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.text.UrlPatternChecker
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
+import net.pantasystem.milktea.model.ap.ApResolver
+import net.pantasystem.milktea.model.ap.ApResolverRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelRepository
 import net.pantasystem.milktea.model.drive.DriveFileRepository
@@ -65,6 +68,7 @@ class NoteEditorViewModel @Inject constructor(
     private val noteRelationGetter: NoteRelationGetter,
     private val instanceInfoRepository: InstanceInfoRepository,
     private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
+    private val apResolverRepository: ApResolverRepository,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -726,6 +730,22 @@ class NoteEditorViewModel @Inject constructor(
                 isSaveNoteAsDraft.event = result.draftNoteId
             }.onFailure { e ->
                 logger.error("下書き保存に失敗した", e)
+            }
+        }
+    }
+
+    fun onPastePostUrl(text: String, start: Int, beforeText: String, count: Int) = viewModelScope.launch {
+        val urlText = text.substring(start, start + count)
+        val ca = currentAccount.value ?: return@launch
+        if (UrlPatternChecker.isMatch(urlText)) {
+            apResolverRepository.resolve(ca.accountId, urlText).onSuccess {
+                when(it) {
+                    is ApResolver.TypeNote -> {
+                        setRenoteTo(it.note.id)
+                        setText(beforeText)
+                    }
+                    is ApResolver.TypeUser -> return@launch
+                }
             }
         }
     }
