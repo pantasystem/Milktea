@@ -161,12 +161,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
     private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
         if (requireArguments().getLong(
-                EXTRA_ACCOUNT_ID,
-                -1
+                EXTRA_ACCOUNT_ID, -1
             ) == -1L
         ) null else requireArguments().getLong(
-            EXTRA_ACCOUNT_ID,
-            -1
+            EXTRA_ACCOUNT_ID, -1
         )
     }
     private val replyToNoteId by lazy(LazyThreadSafetyMode.NONE) {
@@ -247,8 +245,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         accountViewModel.switchAccountEvent.onEach {
             AccountSwitchingDialog().show(childFragmentManager, "tag")
         }.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         accountViewModel.showProfileEvent.onEach {
@@ -260,8 +257,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             intent.putActivity(Activities.ACTIVITY_IN_APP)
             startActivity(intent)
         }.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
@@ -272,16 +268,14 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }.distinctUntilChanged().onEach { emojis ->
             binding.inputMain.setAdapter(
                 CustomEmojiCompleteAdapter(
-                    emojis,
-                    requireContext()
+                    emojis, requireContext()
                 )
             )
             binding.inputMain.setTokenizer(CustomEmojiTokenizer())
 
             binding.cw.setAdapter(
                 CustomEmojiCompleteAdapter(
-                    emojis,
-                    requireContext()
+                    emojis, requireContext()
                 )
             )
             binding.cw.setTokenizer(CustomEmojiTokenizer())
@@ -302,26 +296,21 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         binding.filePreview.apply {
             setContent {
                 MdcTheme {
-                    NoteFilePreview(
-                        noteEditorViewModel = noteEditorViewModel,
-                        onShow = {
-                            val intent = mediaNavigation.newIntent(
-                                MediaNavigationArgs.AFile(
-                                    it
-                                )
+                    NoteFilePreview(noteEditorViewModel = noteEditorViewModel, onShow = {
+                        val intent = mediaNavigation.newIntent(
+                            MediaNavigationArgs.AFile(
+                                it
                             )
+                        )
 
-                            requireActivity().startActivity(intent)
-                        },
-                        onEditFileCaptionSelectionClicked = {
-                            EditFileCaptionDialog.newInstance(it.file, it.comment ?: "")
-                                .show(childFragmentManager, "editCaption")
-                        },
-                        onEditFileNameSelectionClicked = {
-                            EditFileNameDialog.newInstance(it.file, it.name)
-                                .show(childFragmentManager, "editFileName")
-                        }
-                    )
+                        requireActivity().startActivity(intent)
+                    }, onEditFileCaptionSelectionClicked = {
+                        EditFileCaptionDialog.newInstance(it.file, it.comment ?: "")
+                            .show(childFragmentManager, "editCaption")
+                    }, onEditFileNameSelectionClicked = {
+                        EditFileNameDialog.newInstance(it.file, it.name)
+                            .show(childFragmentManager, "editFileName")
+                    })
                 }
 
             }
@@ -330,8 +319,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             MdcTheme {
                 val state by noteEditorViewModel.enableFeatures.collectAsState()
                 val uiState by noteEditorViewModel.uiState.collectAsState()
-                NoteEditorUserActionMenuLayout(
-                    iconColor = getColor(color = R.attr.normalIconTint),
+                NoteEditorUserActionMenuLayout(iconColor = getColor(color = R.attr.normalIconTint),
                     isEnableDrive = state.contains(FeatureType.Drive),
                     isCw = uiState.formState.hasCw,
                     isPoll = uiState.poll != null,
@@ -355,8 +343,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     },
                     onToggleCwButtonClicked = {
                         noteEditorViewModel.changeCwEnabled()
-                    }
-                )
+                    })
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
@@ -451,15 +438,13 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 }
             }
         }.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
         confirmViewModel.confirmEvent.onEach {
             ConfirmDialog.newInstance(it).show(childFragmentManager, "confirm")
         }.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
+            viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
@@ -490,9 +475,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             noteEditorViewModel.fileSizeInvalidEvent.collect {
                 whenStarted {
                     NoteEditorFileSizeWarningDialog.newInstance(
-                        it.account.getHost(),
-                        it.instanceInfo.clientMaxBodyByteSize ?: 0,
-                        it.file
+                        it.account.getHost(), it.instanceInfo.clientMaxBodyByteSize ?: 0, it.file
                     ).show(childFragmentManager, "fileSizeInvalidDialog")
                 }
             }
@@ -679,8 +662,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             val upIntent = mainNavigation.newIntent(Unit)
             upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             if (requireActivity().shouldUpRecreateTask(upIntent)) {
-                TaskStackBuilder.create(requireActivity())
-                    .addNextIntentWithParentStack(upIntent)
+                TaskStackBuilder.create(requireActivity()).addNextIntentWithParentStack(upIntent)
                     .startActivities()
                 requireActivity().finish()
             } else {
@@ -690,56 +672,57 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     }
 
     @Suppress("DEPRECATION")
-    private val openDriveActivityResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val ids =
-                (result?.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
-                    it as? FileProperty.Id
-                }
-            logger.debug("result:${ids}")
-            val size = noteEditorViewModel.fileTotal()
-
-            if (ids != null && ids.isNotEmpty() && size + ids.size <= noteEditorViewModel.maxFileCount.value) {
-                noteEditorViewModel.addFilePropertyFromIds(ids)
+    private val openDriveActivityResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val ids =
+            (result?.data?.getSerializableExtra(EXTRA_SELECTED_FILE_PROPERTY_IDS) as List<*>?)?.mapNotNull {
+                it as? FileProperty.Id
             }
-        }
+        logger.debug("result:${ids}")
+        val size = noteEditorViewModel.fileTotal()
 
-    private val openLocalStorageResult = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-        uris?.map { uri ->
-            appendFile(uri)
+        if (ids != null && ids.isNotEmpty() && size + ids.size <= noteEditorViewModel.maxFileCount.value) {
+            noteEditorViewModel.addFilePropertyFromIds(ids)
         }
     }
 
-
-    private val requestReadStoragePermissionResult =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            if (it) {
-                showFileManager()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ",
-                    Toast.LENGTH_LONG
-                ).show()
+    private val openLocalStorageResult =
+        registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            uris?.map { uri ->
+                appendFile(uri)
             }
         }
 
-    private val requestReadMediasPermissionResult =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
-            if (results.any { it.value }) {
-                showFileManager()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+
+    private val requestReadStoragePermissionResult = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        if (it) {
+            showFileManager()
+        } else {
+            Toast.makeText(
+                requireContext(), "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG
+            ).show()
         }
+    }
+
+    private val requestReadMediasPermissionResult = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (results.any { it.value }) {
+            showFileManager()
+        } else {
+            Toast.makeText(
+                requireContext(), "ストレージへのアクセスを許可しないとファイルを読み込めないぽよ", Toast.LENGTH_LONG
+            ).show()
+        }
+    }
 
     @Suppress("DEPRECATION")
-    private val selectUserResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val selectUserResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
                 val changed =
                     result.data?.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
@@ -751,8 +734,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
     @Suppress("DEPRECATION")
-    private val selectMentionToUserResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val selectMentionToUserResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
                 val changed =
                     result.data?.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
@@ -765,8 +749,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
 
 
-    private val pickMultipleMedia =
-        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+    private val pickMultipleMedia = registerForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia()
+    ) { uris ->
             uris?.map {
                 appendFile(it)
             }
