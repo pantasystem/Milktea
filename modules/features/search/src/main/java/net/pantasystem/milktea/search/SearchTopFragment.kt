@@ -48,17 +48,21 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
 
     val viewModel: SearchTopViewModel by viewModels()
 
+    private var tabLayoutMediator: TabLayoutMediator? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = SearchPagerAdapterV2(pageableFragmentFactory, this)
 
         mBinding.searchViewPager.adapter = adapter
-        TabLayoutMediator(
+        tabLayoutMediator = TabLayoutMediator(
             mBinding.searchTabLayout,
             mBinding.searchViewPager
         ) { tab, position ->
             tab.text = adapter.tabs[position].title.getString(requireContext())
-        }.attach()
+        }
+        tabLayoutMediator?.attach()
+
         (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.search_top_menu, menu)
@@ -96,6 +100,13 @@ class SearchTopFragment : Fragment(R.layout.fragment_search_top) {
             setToolbar(mBinding.toolbar)
             setTitle(R.string.search)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        tabLayoutMediator?.detach()
+        tabLayoutMediator = null
     }
 
 }

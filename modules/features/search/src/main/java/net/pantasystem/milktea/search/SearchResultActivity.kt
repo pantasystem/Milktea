@@ -62,6 +62,8 @@ class SearchResultActivity : AppCompatActivity() {
 
     private val searchResultViewModel: SearchResultViewModel by viewModels()
 
+    private var tabLayoutMediator: TabLayoutMediator? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyTheme()
@@ -87,12 +89,13 @@ class SearchResultActivity : AppCompatActivity() {
 
         val pager = SearchResultViewPagerAdapter(this, pageableFragmentFactory)
         binding.searchResultPager.adapter = pager
-        TabLayoutMediator(
+        tabLayoutMediator = TabLayoutMediator(
             binding.searchResultTab,
             binding.searchResultPager,
         ) { tab, position ->
             tab.text = pager.items[position].title.getString(this)
-        }.attach()
+        }
+        tabLayoutMediator?.attach()
 
 
 
@@ -164,6 +167,13 @@ class SearchResultActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        tabLayoutMediator?.detach()
+        tabLayoutMediator = null
     }
 
 
