@@ -113,6 +113,9 @@ class UserDetailActivity : AppCompatActivity() {
     @Inject
     lateinit var pageableFragmentFactory: PageableFragmentFactory
 
+    @Inject
+    lateinit var searchNavigation: SearchNavigation
+
 
     @ExperimentalCoroutinesApi
     val mViewModel: UserDetailViewModel by viewModels {
@@ -400,6 +403,16 @@ class UserDetailActivity : AppCompatActivity() {
             R.id.renoteMute -> {
                 mViewModel.muteRenotes()
             }
+            R.id.nav_search_by_user -> {
+                startActivity(searchNavigation.newIntent(
+                    SearchNavType.SearchScreen(
+                        acct = mViewModel.userState.value?.let {
+                                "@${it.userName}@${it.host}"
+                            }
+                        )
+                    )
+                )
+            }
             else -> return false
 
         }
@@ -429,7 +442,7 @@ class UserDetailActivity : AppCompatActivity() {
 
     private fun applyRemoteUserStateLayoutBackgroundColor(
         binding: ActivityUserDetailBinding,
-        config: Config
+        config: Config,
     ) {
         val typed = TypedValue()
         if (config.theme is Theme.Bread) {
