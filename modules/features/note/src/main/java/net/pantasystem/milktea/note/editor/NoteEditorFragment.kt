@@ -373,8 +373,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                 val inputText = text?.substring(start, start + count)?: return@addTextChangedListener
                 if (UrlPatternChecker.isMatch(inputText)) {
                     MaterialAlertDialogBuilder(requireContext())
-                        .setMessage("引用として添付しますか?")
-                        .setPositiveButton("はい") { _, _ ->
+                        .setMessage(R.string.notes_confirm_attach_quote_note_by_url)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
                             noteEditorViewModel.onPastePostUrl(
                                 text.toString(),
                                 start,
@@ -382,7 +382,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                                 count,
                             )
                         }
-                        .setNegativeButton("いいえ") { _, _ -> }
+                        .setNegativeButton(android.R.string.cancel) { _, _ -> }
                         .show()
                 }
             }
