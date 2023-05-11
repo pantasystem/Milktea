@@ -58,6 +58,7 @@ import net.pantasystem.milktea.note.databinding.FragmentNoteEditorBinding
 import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
 import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
 import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
+import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorFocusEditTextType
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import net.pantasystem.milktea.note.emojis.CustomEmojiPickerDialog
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiSelection
@@ -339,6 +340,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         startMentionToSearchAndSelectUser()
                     },
                     onSelectEmojiButtonClicked = {
+                        binding.cw.isFocused
                         CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
                     },
                     onToggleCwButtonClicked = {
@@ -413,6 +415,17 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             ReservationPostTimePickerDialog().show(childFragmentManager, "Pick time")
         }
 
+        binding.cw.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                noteEditorViewModel.focusType = NoteEditorFocusEditTextType.Cw
+            }
+        }
+
+        binding.inputMain.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                noteEditorViewModel.focusType = NoteEditorFocusEditTextType.Text
+            }
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -492,20 +505,43 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
     override fun onSelect(emoji: Emoji) {
-        val pos = binding.inputMain.selectionEnd
-        noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
-            binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
-            binding.inputMain.setSelection(newPos)
-            logger.debug("入力されたデータ:${binding.inputMain.text}")
+        when(noteEditorViewModel.focusType) {
+            NoteEditorFocusEditTextType.Cw -> {
+                val pos = binding.cw.selectionEnd
+                noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
+                    binding.cw.setText(noteEditorViewModel.cw.value ?: "")
+                    binding.cw.setSelection(newPos)
+                }
+            }
+            NoteEditorFocusEditTextType.Text -> {
+                val pos = binding.inputMain.selectionEnd
+                noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
+                    binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
+                    binding.inputMain.setSelection(newPos)
+                }
+            }
         }
+
     }
 
     override fun onSelect(emoji: String) {
-        val pos = binding.inputMain.selectionEnd
-        noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
-            binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
-            binding.inputMain.setSelection(newPos)
+        when(noteEditorViewModel.focusType) {
+            NoteEditorFocusEditTextType.Cw -> {
+                val pos = binding.cw.selectionEnd
+                noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
+                    binding.cw.setText(noteEditorViewModel.cw.value ?: "")
+                    binding.cw.setSelection(newPos)
+                }
+            }
+            NoteEditorFocusEditTextType.Text -> {
+                val pos = binding.inputMain.selectionEnd
+                noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
+                    binding.inputMain.setText(noteEditorViewModel.text.value ?: "")
+                    binding.inputMain.setSelection(newPos)
+                }
+            }
         }
+
     }
 
     override fun onAttach(context: Context) {

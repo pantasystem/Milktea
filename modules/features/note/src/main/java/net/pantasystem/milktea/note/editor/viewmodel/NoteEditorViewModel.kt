@@ -321,6 +321,8 @@ class NoteEditorViewModel @Inject constructor(
 
     val isSaveNoteAsDraft = EventBus<Long?>()
 
+    var focusType: NoteEditorFocusEditTextType = NoteEditorFocusEditTextType.Text
+
     init {
         accountStore.observeCurrentAccount.filterNotNull().map {
             it to noteEditorSwitchAccountExecutor(
@@ -629,6 +631,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun setCw(text: String?) {
         savedStateHandle.setCw(text)
+        focusType = NoteEditorFocusEditTextType.Text
     }
 
     fun setVisibility(visibility: Visibility) {
@@ -682,11 +685,24 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun addEmoji(emoji: String, pos: Int): Int {
-        val builder = StringBuilder(savedStateHandle.getText() ?: "")
-        builder.insert(pos, emoji)
-        savedStateHandle.setText(builder.toString())
-        logger.debug("position:${pos + emoji.length - 1}")
-        return pos + emoji.length
+        when(focusType) {
+            NoteEditorFocusEditTextType.Cw -> {
+                val builder = StringBuilder(savedStateHandle.getCw() ?: "")
+                logger.debug("pos:$pos")
+                builder.insert(pos, emoji)
+                savedStateHandle.setCw(builder.toString())
+                logger.debug("position:${pos + emoji.length - 1}")
+                return pos + emoji.length
+            }
+            NoteEditorFocusEditTextType.Text -> {
+                val builder = StringBuilder(savedStateHandle.getText() ?: "")
+                builder.insert(pos, emoji)
+                savedStateHandle.setText(builder.toString())
+                logger.debug("position:${pos + emoji.length - 1}")
+                return pos + emoji.length
+            }
+        }
+
     }
 
     fun setSchedulePostAt(instant: Instant?) {
@@ -736,3 +752,7 @@ data class FileSizeInvalidEvent(
     val instanceInfo: InstanceInfo,
     val account: Account
 )
+
+enum class NoteEditorFocusEditTextType {
+    Cw, Text
+}
