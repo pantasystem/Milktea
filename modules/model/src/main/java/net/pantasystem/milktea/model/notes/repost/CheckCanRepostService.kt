@@ -30,10 +30,6 @@ class CheckCanRepostService @Inject constructor(
             return@runCancellableCatching true
         }
 
-        if (!note.canRenote(userId)) {
-            return@runCancellableCatching false
-        }
-
-        true
+        note.canRenote(userId)
     }
 }
