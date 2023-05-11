@@ -14,6 +14,8 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
+import net.pantasystem.milktea.model.instance.InstanceInfoService
+import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.repost.CreateRenoteMultipleAccountUseCase
 import net.pantasystem.milktea.model.user.User
@@ -30,6 +32,7 @@ class RenoteViewModel @Inject constructor(
     val userDataSource: UserDataSource,
     val renoteUseCase: CreateRenoteMultipleAccountUseCase,
     val noteRelationGetter: NoteRelationGetter,
+    val instanceInfoService: InstanceInfoService,
     loggerFactory: Logger.Factory
 ) : ViewModel() {
 
@@ -122,15 +125,25 @@ class RenoteViewModel @Inject constructor(
         )
     )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentAccountInstanceInfo = accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        instanceInfoService.observe(it.normalizedInstanceUri)
+    }.catch {
+        logger.error("observe current account error", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     val uiState = combine(
         _targetNoteId,
         _noteState,
-        accountWithUsers
-    ) { noteId, syncState, accounts ->
+        accountWithUsers,
+        currentAccountInstanceInfo,
+    ) { noteId, syncState, accounts, instanceInfo ->
         RenoteViewModelUiState(
             targetNoteId = noteId,
             noteState = syncState,
             accounts = accounts,
+            canQuote = instanceInfo is InstanceInfoType.Misskey
+                    || (instanceInfo as? InstanceInfoType.Mastodon)?.info?.featureQuote == true
         )
     }.stateIn(
         viewModelScope,
@@ -139,6 +152,7 @@ class RenoteViewModel @Inject constructor(
             _targetNoteId.value,
             _noteState.value,
             accountWithUsers.value,
+            true
         )
     )
 
@@ -196,6 +210,7 @@ data class RenoteViewModelUiState(
     val targetNoteId: Note.Id?,
     val noteState: RenoteViewModelTargetNoteState,
     val accounts: List<AccountWithUser>,
+    val canQuote: Boolean,
 )
 
 data class RenoteViewModelTargetNoteState(
