@@ -75,6 +75,8 @@ class SearchResultActivity : AppCompatActivity() {
             ?: intent.data?.getQueryParameter("keyword")
 
         searchResultViewModel.setKeyword(keyword ?: "")
+        searchResultViewModel.setAcct(intent.getStringExtra(SearchResultViewModel.EXTRA_ACCT))
+
 
         mSearchWord = keyword
 
