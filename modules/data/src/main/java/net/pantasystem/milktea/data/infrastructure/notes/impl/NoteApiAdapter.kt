@@ -94,6 +94,7 @@ class NoteApiAdapter @Inject constructor(
                                 }?.toInt() ?: (5 * 60),
                             )
                         },
+                        quoteId = createNote.renoteId?.noteId,
                     )
                 ).throwIfHasError().body()
                 NoteResultType.Mastodon(requireNotNull(body))
