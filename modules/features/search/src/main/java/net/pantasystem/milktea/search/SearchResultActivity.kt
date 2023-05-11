@@ -187,12 +187,18 @@ class SearchNavigationImpl  @Inject constructor(
             is SearchNavType.ResultScreen -> {
                 val intent = Intent(activity, SearchResultActivity::class.java)
                 intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, args.searchWord)
+                if (args.acct != null) {
+                    intent.putExtra(SearchResultViewModel.EXTRA_ACCT, args.acct)
+                }
                 intent
             }
             is SearchNavType.SearchScreen -> {
                 val intent = Intent(activity, SearchActivity::class.java)
                 if (args.searchWord != null) {
                     intent.putExtra(SearchActivity.EXTRA_SEARCH_WORD, args.searchWord)
+                }
+                if (args.acct != null) {
+                    intent.putExtra(SearchResultViewModel.EXTRA_ACCT, args.acct)
                 }
                 intent
             }
