@@ -24,5 +24,6 @@ fun PageParams.toNoteRequest(i: String?) : NoteRequest {
         offset = offset,
         markAsRead = markAsRead,
         channelId = channelId,
+        userId = userId
     )
 }

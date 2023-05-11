@@ -4,7 +4,8 @@ interface SearchNavigation : ActivityNavigation<SearchNavType>
 
 sealed interface SearchNavType {
     val searchWord: String?
-    data class ResultScreen(override val searchWord: String) : SearchNavType
-    data class SearchScreen(override val searchWord: String? = null) : SearchNavType
+    val acct: String?
+    data class ResultScreen(override val searchWord: String, override val acct: String? = null) : SearchNavType
+    data class SearchScreen(override val searchWord: String? = null, override val acct: String? = null) : SearchNavType
 
 }

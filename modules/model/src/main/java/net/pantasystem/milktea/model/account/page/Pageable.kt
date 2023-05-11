@@ -481,12 +481,14 @@ sealed class Pageable : Serializable {
         }
 
         data class SearchTimeline(
-            val query: String
+            val query: String,
+            val userId: String? = null,
         ) : Mastodon() {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_SEARCH_TIMELINE,
-                    query = query
+                    query = query,
+                    userId = userId,
                 )
             }
         }

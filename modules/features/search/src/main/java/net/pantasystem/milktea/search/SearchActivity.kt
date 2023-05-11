@@ -44,6 +44,7 @@ class SearchActivity : AppCompatActivity() {
     private var mSearchView: SearchView? = null
 
     private var mSearchWord: String? = null
+    private var mAcct: String? = null
 
     private val binding: ActivitySearchBinding by dataBinding()
 
@@ -60,6 +61,7 @@ class SearchActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayShowTitleEnabled(false)
         mSearchWord = intent.getStringExtra(EXTRA_SEARCH_WORD)
+        mAcct = intent.getStringExtra(SearchResultViewModel.EXTRA_ACCT)
 
         findViewById<ComposeView>(R.id.composeBase).setContent {
             MdcTheme {
@@ -154,6 +156,7 @@ class SearchActivity : AppCompatActivity() {
                 is SubmitResult.Search -> {
                     val intent = Intent(this@SearchActivity, SearchResultActivity::class.java)
                     intent.putExtra(SearchResultActivity.EXTRA_SEARCH_WORLD, searchWord)
+                    intent.putExtra(SearchResultViewModel.EXTRA_ACCT, mAcct)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     finish()

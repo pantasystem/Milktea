@@ -201,7 +201,8 @@ internal class MastodonTimelineStorePagingStoreImpl(
                     q = pageableTimeline.query,
                     type = "statuses",
                     maxId = maxId,
-                    offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
+                    offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0,
+                    accountId = pageableTimeline.userId
                 ).throwIfHasError().also {
                     updateMaxIdFrom(it)
                 }.body()?.statuses
