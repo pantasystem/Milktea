@@ -35,6 +35,4 @@ class EmojiPickerViewModel @Inject constructor(
     // 検索時の候補
     val uiState = uiStateService.uiState
 
-    val tabLabels = uiStateService.tabLabels
-
 }
