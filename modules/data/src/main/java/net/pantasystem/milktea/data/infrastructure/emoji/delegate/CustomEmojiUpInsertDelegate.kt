@@ -12,20 +12,22 @@ internal class CustomEmojiUpInsertDelegate @Inject constructor(
 ) {
 
     @Transaction
-    suspend operator fun invoke(host: String, emojis: List<Emoji>) {
+    suspend operator fun invoke(host: String, emojis: List<Emoji>, isReplace: Boolean = false) {
         val record = emojis.map {
             it.toRecord(host)
-        }
-        val exists = customEmojiDAO.findBy(host).associateBy {
-            it.emoji.name
         }
 
         val insertResults = customEmojiDAO.insertAll(record)
 
-        val removedEmojis = emojis.mapNotNull {
-            exists[it.name]?.emoji
+        if (isReplace) {
+            val exists = customEmojiDAO.findBy(host).associateBy {
+                it.emoji.name
+            }
+            val removedEmojis = emojis.mapNotNull {
+                exists[it.name]?.emoji
+            }
+            customEmojiDAO.deleteBy(removedEmojis)
         }
-        customEmojiDAO.deleteBy(removedEmojis)
 
         val ids = insertResults.mapIndexed { index, id ->
             if (id == -1L) {
