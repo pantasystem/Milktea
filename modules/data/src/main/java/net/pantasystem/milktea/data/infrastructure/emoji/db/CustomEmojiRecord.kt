@@ -81,6 +81,7 @@ data class CustomEmojiRelated(
             url = emoji.url,
             category = emoji.category,
             type = emoji.type,
+            host = emoji.emojiHost,
             aliases = aliases.map {
                 it.value
             },

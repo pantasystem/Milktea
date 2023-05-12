@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.emojis
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.fragment.app.Fragment
@@ -12,7 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ahmadhamwi.tabsync.TabbedListMediator
 import com.google.android.flexbox.AlignItems
@@ -23,14 +24,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
+import net.pantasystem.milktea.common_android.resource.convertDp2Px
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.note.EmojiListItemType
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentEmojiPickerBinding
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel
 import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
-import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesListAdapter
+import net.pantasystem.milktea.note.reaction.choices.EmojiListItemsAdapter
 import net.pantasystem.milktea.note.toTextReaction
 
 @AndroidEntryPoint
@@ -129,9 +132,8 @@ class EmojiSelectionBinder(
         searchSuggestionListView.adapter = searchedReactionAdapter
         searchSuggestionListView.layoutManager = flexBoxLayoutManager
 
-        val layoutManager = LinearLayoutManager(context)
 
-        val choicesAdapter = EmojiChoicesListAdapter(
+        val adapter = EmojiListItemsAdapter(
             onEmojiLongClicked = { emojiType ->
                 val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
                 if (!exists) {
@@ -146,15 +148,52 @@ class EmojiSelectionBinder(
                 onReactionSelected(it.toTextReaction())
             }
         )
-        recyclerView.adapter = choicesAdapter
 
+        val layoutManager = GridLayoutManager(context, 5)
+
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when(EmojiListItemsAdapter.ItemType.values()[adapter.getItemViewType(position)]) {
+                    EmojiListItemsAdapter.ItemType.Header -> 5
+                    EmojiListItemsAdapter.ItemType.Emoji -> 1
+                }
+            }
+
+        }
         recyclerView.layoutManager = layoutManager
+
+        fun calculateSpanCount(): Int {
+            val viewWidth = recyclerView.measuredWidth
+            val itemWidth = context.convertDp2Px(54f).toInt()
+            return viewWidth / itemWidth
+        }
+
+        val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val count = calculateSpanCount().coerceAtLeast(4)
+                val lm = GridLayoutManager(context, count)
+
+                lm.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        return when(EmojiListItemsAdapter.ItemType.values()[adapter.getItemViewType(position)]) {
+                            EmojiListItemsAdapter.ItemType.Header -> count
+                            EmojiListItemsAdapter.ItemType.Emoji -> 1
+                        }
+                    }
+                }
+                recyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                recyclerView.layoutManager = lm
+            }
+        }
+        recyclerView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+
+        recyclerView.adapter = adapter
 
 
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 emojiPickerViewModel.uiState.collect {
-                    choicesAdapter.submitList(it.segments)
+                    adapter.submitList(it.emojiListItems)
                     searchedReactionAdapter.submitList(it.searchFilteredEmojis)
                 }
             }
@@ -163,11 +202,12 @@ class EmojiSelectionBinder(
         var tabbedListMediator: TabbedListMediator? = null
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                emojiPickerViewModel.tabLabels.filterNot {
-                    it.isEmpty()
+                emojiPickerViewModel.uiState.filterNot {
+                    it.tabHeaderLabels.isEmpty()
                 }.collect {
                     tabLayout.removeAllTabs()
-                    it.map {
+                    val labels = it.tabHeaderLabels
+                    labels.map {
                         val tab = tabLayout.newTab().apply {
                             text = it.getString(context)
                         }
@@ -175,7 +215,12 @@ class EmojiSelectionBinder(
                     }
                     tabbedListMediator?.detach()
                     tabbedListMediator =
-                        TabbedListMediator(recyclerView, tabLayout, it.indices.toList())
+                        TabbedListMediator(recyclerView, tabLayout, it.emojiListItems.mapIndexedNotNull { index, emojiListItemType ->
+                            when(emojiListItemType) {
+                                is EmojiListItemType.EmojiItem -> null
+                                is EmojiListItemType.Header -> index
+                            }
+                        })
                     tabbedListMediator?.attach()
                 }
             }

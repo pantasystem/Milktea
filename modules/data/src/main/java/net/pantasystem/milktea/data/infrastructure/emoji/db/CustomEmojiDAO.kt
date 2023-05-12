@@ -32,11 +32,17 @@ interface CustomEmojiDAO {
     @Query("delete from custom_emoji_aliases where emojiId = :emojiId")
     suspend fun deleteAliasByEmojiId(emojiId: Long)
 
+    @Query("delete from custom_emoji_aliases where emojiId in (:emojiIds)")
+    suspend fun deleteAliasByEmojiIds(emojiIds: List<Long>)
+
     @Query("delete from custom_emojis where emojiHost = :host")
     suspend fun deleteByHost(host: String)
 
     @Query("delete from custom_emojis where emojiHost = :host and name in (:names)")
     suspend fun deleteByHostAndNames(host: String, names: List<String>)
+
+    @Delete
+    suspend fun deleteBy(list: List<CustomEmojiRecord>)
 
     @Update
     suspend fun update(customEmoji: CustomEmojiRecord)
