@@ -70,30 +70,39 @@ class CustomEmojiUpInsertDelegateTest {
         val existsData = listOf(
             Emoji(
                 name = "test1",
-                aliases = listOf("a", "b", "c")
+                aliases = listOf("a", "b", "c"),
+                host = "misskey.pantasystem.com"
             ),
             Emoji(
                 name = "test2",
-                aliases = listOf("a2`", "b2", "c2")
+                aliases = listOf("a2`", "b2", "c2"),
+                host = "misskey.pantasystem.com"
             ),
         )
 
         val emojis = listOf(
             Emoji(
                 name = "test1",
-                aliases = listOf("a", "b", "c")
+                aliases = listOf("a", "b", "c"),
+                host = "misskey.pantasystem.com"
+
             ),
             Emoji(
                 name = "test2",
-                aliases = listOf("a2`", "b2", "c2", "updated-alias")
+                aliases = listOf("a2`", "b2", "c2", "updated-alias"),
+                host = "misskey.pantasystem.com"
+
             ),
             Emoji(
                 name = "test3",
-                aliases = listOf("a3", "b3", "c3", "d4")
+                aliases = listOf("a3", "b3", "c3", "d4"),
+                host = "misskey.pantasystem.com"
+
             ),
             Emoji(
                 name = "test4",
-                aliases = listOf("")
+                aliases = listOf(""),
+                host = "misskey.pantasystem.com"
             )
         )
 
