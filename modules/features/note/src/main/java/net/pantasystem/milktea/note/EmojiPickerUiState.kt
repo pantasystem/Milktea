@@ -209,6 +209,10 @@ data class EmojiPickerUiState(
         LevenshteinDistance(it.emoji.name, keyword)
     }
 
+    val tabLabels = emojiListItems.mapNotNull {
+        (it as? EmojiListItemType.Header)?.label
+    }
+
     fun isExistsConfig(emojiType: EmojiType): Boolean {
         return userSettingEmojis.any {
             emojiType.areItemsTheSame(it)
