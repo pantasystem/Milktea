@@ -32,32 +32,29 @@ class EmojiPickerUiStateService(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val emojis = accountStore.observeCurrentAccount
         .filterNotNull()
-        .distinctUntilChanged()
         .flatMapLatest { ac ->
             customEmojiRepository.observeBy(ac.getHost())
         }.catch {
             logger.error("絵文字の取得に失敗", it)
         }.flowOn(Dispatchers.IO)
+        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val reactionCount = accountStore
         .observeCurrentAccount
         .filterNotNull()
-        .distinctUntilChanged()
         .flatMapLatest { ac ->
             reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceUri)
-                .distinctUntilChanged()
         }.catch {
             logger.error("リアクション履歴の取得に失敗", it)
         }.flowOn(Dispatchers.IO)
+        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val userSetting = accountStore.observeCurrentAccount
         .filterNotNull()
-        .distinctUntilChanged()
         .flatMapLatest { ac ->
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceUri)
-                .distinctUntilChanged()
         }.catch {
             logger.error("ユーザーリアクション設定情報の取得に失敗", it)
         }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -198,7 +195,7 @@ data class EmojiPickerUiState(
         LevenshteinDistance(it.emoji.name, keyword)
     }
 
-    val tabLabels = emojiListItems.mapNotNull {
+    val tabHeaderLabels = emojiListItems.mapNotNull {
         (it as? EmojiListItemType.Header)?.label
     }
 

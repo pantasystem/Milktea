@@ -203,10 +203,10 @@ class EmojiSelectionBinder(
         scope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 emojiPickerViewModel.uiState.filterNot {
-                    it.tabLabels.isEmpty()
+                    it.tabHeaderLabels.isEmpty()
                 }.collect {
                     tabLayout.removeAllTabs()
-                    val labels = it.tabLabels
+                    val labels = it.tabHeaderLabels
                     labels.map {
                         val tab = tabLayout.newTab().apply {
                             text = it.getString(context)
