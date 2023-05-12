@@ -57,7 +57,8 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             val emojis = fetch(nodeInfo).getOrThrow()
 
             customEmojiCache.put(host, emojis)
-            upInsert(nodeInfo.host, emojis, isReplace = true)
+            customEmojiDAO.deleteByHost(host)
+            upInsert(nodeInfo.host, emojis)
         }
     }
 

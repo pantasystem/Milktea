@@ -1,6 +1,5 @@
 package net.pantasystem.milktea.data.infrastructure.emoji.delegate
 
-import androidx.room.Transaction
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiAliasRecord
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.db.toRecord
@@ -11,23 +10,12 @@ internal class CustomEmojiUpInsertDelegate @Inject constructor(
     private val customEmojiDAO: CustomEmojiDAO,
 ) {
 
-    @Transaction
-    suspend operator fun invoke(host: String, emojis: List<Emoji>, isReplace: Boolean = false) {
+    suspend operator fun invoke(host: String, emojis: List<Emoji>) {
         val record = emojis.map {
             it.toRecord(host)
         }
 
         val insertResults = customEmojiDAO.insertAll(record)
-
-        if (isReplace) {
-            val exists = customEmojiDAO.findBy(host).associateBy {
-                it.emoji.name
-            }
-            val removedEmojis = emojis.mapNotNull {
-                exists[it.name]?.emoji
-            }
-            customEmojiDAO.deleteBy(removedEmojis)
-        }
 
         val ids = insertResults.mapIndexed { index, id ->
             if (id == -1L) {
