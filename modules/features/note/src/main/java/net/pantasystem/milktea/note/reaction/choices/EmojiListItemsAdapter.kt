@@ -60,7 +60,6 @@ class EmojiListItemsAdapter(
                         .load(item.emoji.url ?: item.emoji.uri)
                         // FIXME: webpの場合うまく表示できなくなる
 //                    .centerCrop()
-                        .override(60)
                         .into(binding.reactionImagePreview)
                     binding.reactionStringPreview.setMemoVisibility(View.GONE)
                     binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)
