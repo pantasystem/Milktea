@@ -187,6 +187,22 @@ data class EmojiPickerUiState(
         )
     }
 
+    val emojiListItems: List<EmojiListItemType> = listOf(
+        EmojiListItemType.Header(StringSource.invoke(R.string.user)),
+    ) + userSettingEmojis.map {
+        EmojiListItemType.EmojiItem(it)
+    } + EmojiListItemType.Header(StringSource.invoke(R.string.often_use)) + frequencyUsedReactionsV2.map {
+        EmojiListItemType.EmojiItem(it)
+    } + EmojiListItemType.Header(StringSource(R.string.recently_used)) + recentlyUsed.map {
+        EmojiListItemType.EmojiItem(it)
+    } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
+        EmojiListItemType.EmojiItem(it)
+    } + categories.map { category ->
+        listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(category).map {
+            EmojiListItemType.EmojiItem(it)
+        }
+    }.flatten()
+
     val searchFilteredEmojis = customEmojis.filterEmojiBy(keyword).map {
         EmojiType.CustomEmoji(it)
     }.sortedBy {
@@ -227,6 +243,12 @@ sealed interface SegmentType {
         override val label: StringSource
             get() = StringSource.invoke(R.string.recently_used)
     }
+}
+
+sealed interface EmojiListItemType {
+    data class EmojiItem(val emoji: EmojiType) : EmojiListItemType
+
+    data class Header(val label: StringSource) : EmojiListItemType
 }
 
 sealed interface EmojiType {
