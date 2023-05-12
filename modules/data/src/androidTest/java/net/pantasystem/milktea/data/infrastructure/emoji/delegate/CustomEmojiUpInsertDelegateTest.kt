@@ -56,7 +56,8 @@ class CustomEmojiUpInsertDelegateTest {
             emoji.copy(
                 aliases = emoji.aliases?.filterNot {
                     it.isBlank()
-                }
+                },
+                host = "misskey.pantasystem.com"
             )
         }
         Assert.assertEquals(
