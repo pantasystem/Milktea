@@ -25,7 +25,10 @@ internal class CustomEmojiUpInsertDelegate @Inject constructor(
             }
         }
 
-        customEmojiDAO.deleteAliasByEmojiIds(ids.filterNot { it == -1L })
+        ids.filterNot { it == -1L }.chunked(500).map {
+            customEmojiDAO.deleteAliasByEmojiIds(it)
+        }
+
         val aliasRecords = emojis.mapIndexedNotNull { index, emoji ->
             val id = ids[index]
             if (id == -1L) {
