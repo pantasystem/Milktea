@@ -18,10 +18,11 @@
     >
     <ImageView
         android:id="@+id/reactionImage"
-        android:layout_width="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginEnd="4dp"
         tools:ignore="ContentDescription"
+        android:adjustViewBounds="true"
         android:scaleType="fitCenter" />
     <TextView
         android:id="@+id/reactionText"
