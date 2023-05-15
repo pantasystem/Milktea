@@ -14,6 +14,7 @@ import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
+
 object NoteReactionViewHelper {
 
     @JvmStatic
@@ -39,9 +40,18 @@ object NoteReactionViewHelper {
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
+                .let {
+                    val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri)
+                    if (imageAspectRatio == null) {
+                        it
+                    } else {
+                        val metrics = context.resources.displayMetrics
+                        val imageViewHeightPx = 20 * metrics.density
+                        it.override((imageViewHeightPx * imageAspectRatio).toInt())
+                    }
+                }
 //                .override(min(max(reactionImageTypeView.height, 20), 120))
-                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
-//                .fitCenter()
+                .addListener(SaveImageAspectRequestListener(emoji.url ?: emoji.uri))
                 .into(reactionImageTypeView)
         }
     }
@@ -53,7 +63,7 @@ object NoteReactionViewHelper {
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
         reaction: String,
-        note: PlaneNoteViewData
+        note: PlaneNoteViewData,
     ) {
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
@@ -79,10 +89,10 @@ object NoteReactionViewHelper {
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
-                // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
-//                .fitCenter()
                 .into(reactionImageTypeView)
         }
 
     }
+
+
 }
