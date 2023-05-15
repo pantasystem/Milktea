@@ -13,6 +13,8 @@ import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
+import kotlin.math.max
+import kotlin.math.min
 
 object NoteReactionViewHelper {
 
@@ -39,6 +41,7 @@ object NoteReactionViewHelper {
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
+                .override(min(max(reactionImageTypeView.height, 20), 40))
                 // FIXME: webpの場合エラーが発生してうまく表示できなくなってしまう
 //                .fitCenter()
                 .into(reactionImageTypeView)
