@@ -215,13 +215,19 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
-    fun onPositionChanged(position: Int) {
+    fun onScrollPositionChanged(firstVisiblePosition: Int) {
+        if (firstVisiblePosition <= 3) {
+            onVisibleFirst()
+        } else {
+            // NOTE: 先頭を表示していない時はストリーミングを停止する
+            timelineStore.suspendStreaming()
+        }
         viewModelScope.launch {
-            timelineStore.releaseUnusedPages(position)
+            timelineStore.releaseUnusedPages(firstVisiblePosition)
         }
     }
 
-    fun onVisibleFirst() {
+    private fun onVisibleFirst() {
         viewModelScope.launch {
             if (this@TimelineViewModel.isActive
                 && !timelineStore.isActiveStreaming
