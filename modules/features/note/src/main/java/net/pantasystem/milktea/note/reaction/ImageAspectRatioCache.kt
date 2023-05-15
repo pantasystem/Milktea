@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.note.reaction
 
-object ImageAspectCache {
+object ImageAspectRatioCache {
 
     private var cache = mutableMapOf<String, Float>()
 

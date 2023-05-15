@@ -46,7 +46,7 @@ object NoteReactionViewHelper {
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
                 .let {
-                    val imageAspectRatio = ImageAspectCache.get(emoji.url ?: emoji.uri)
+                    val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri)
                     if (imageAspectRatio == null) {
                         it
                     } else {
@@ -75,7 +75,7 @@ object NoteReactionViewHelper {
                     ): Boolean {
                         resource ?: return false
                         val imageAspectRatio: Float = resource.intrinsicWidth.toFloat() / resource.intrinsicHeight
-                        ImageAspectCache.put(emoji.url ?: emoji.uri, imageAspectRatio)
+                        ImageAspectRatioCache.put(emoji.url ?: emoji.uri, imageAspectRatio)
                         return false
                     }
                 })
