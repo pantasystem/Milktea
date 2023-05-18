@@ -5,6 +5,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.emoji.TestNoteObject
+import net.pantasystem.milktea.api.misskey.emoji.TypeObjectValueType
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
 import net.pantasystem.milktea.model.emoji.Emoji
 import org.junit.jupiter.api.Assertions
@@ -869,7 +870,16 @@ class NoteDTOTest {
             [{"name": "hoge", "url": "https://example.com"}]
         """.trimIndent()
         val result = builder.decodeFromString<EmojisType>(json1)
-        Assertions.assertEquals(EmojisType.TypeArray(listOf(Emoji(name = "hoge", url = "https://example.com"))), result)
+        Assertions.assertEquals(
+            EmojisType.TypeArray(
+                listOf(
+                    Emoji(
+                        name = "hoge",
+                        url = "https://example.com"
+                    )
+                )
+            ), result
+        )
 
     }
 
@@ -883,7 +893,14 @@ class NoteDTOTest {
         """.trimIndent()
         val result = builder.decodeFromString<EmojisType>(json1)
 
-        Assertions.assertEquals(EmojisType.TypeObject(mapOf("hoge" to "https://example.com", "piyo" to "https://misskey.io")), result)
+        Assertions.assertEquals(
+            EmojisType.TypeObject(
+                mapOf(
+                    "hoge" to TypeObjectValueType.Value("https://example.com"),
+                    "piyo" to TypeObjectValueType.Value("https://misskey.io")
+                )
+            ), result
+        )
     }
 
     @Test
@@ -895,9 +912,13 @@ class NoteDTOTest {
             {"emojis": [{"name": "hoge", "url": "https://example.com"}]}
         """.trimIndent()
         val result = builder.decodeFromString<TestNoteObject>(json1)
-        Assertions.assertEquals(TestNoteObject(EmojisType.TypeArray(
-            listOf(Emoji(name = "hoge", url = "https://example.com"))
-        )), result)
+        Assertions.assertEquals(
+            TestNoteObject(
+                EmojisType.TypeArray(
+                    listOf(Emoji(name = "hoge", url = "https://example.com"))
+                )
+            ), result
+        )
     }
 
     @Test
