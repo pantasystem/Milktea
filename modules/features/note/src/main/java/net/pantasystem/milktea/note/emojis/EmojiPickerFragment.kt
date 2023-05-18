@@ -9,10 +9,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ahmadhamwi.tabsync.TabbedListMediator
@@ -22,7 +19,10 @@ import com.google.android.material.tabs.TabLayout
 import com.wada811.databinding.dataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common_android.resource.convertDp2Px
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
@@ -200,31 +200,33 @@ class EmojiSelectionBinder(
         }
 
         var tabbedListMediator: TabbedListMediator? = null
-        scope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                emojiPickerViewModel.uiState.filterNot {
-                    it.tabHeaderLabels.isEmpty()
-                }.collect {
-                    tabLayout.removeAllTabs()
-                    val labels = it.tabHeaderLabels
-                    labels.map {
-                        val tab = tabLayout.newTab().apply {
-                            text = it.getString(context)
-                        }
-                        tabLayout.addTab(tab)
-                    }
-                    tabbedListMediator?.detach()
-                    tabbedListMediator =
-                        TabbedListMediator(recyclerView, tabLayout, it.emojiListItems.mapIndexedNotNull { index, emojiListItemType ->
-                            when(emojiListItemType) {
-                                is EmojiListItemType.EmojiItem -> null
-                                is EmojiListItemType.Header -> index
-                            }
-                        })
-                    tabbedListMediator?.attach()
+        emojiPickerViewModel.uiState.filterNot {
+            it.tabHeaderLabels.isEmpty()
+        }.distinctUntilChangedBy {
+            it.emojiListItems
+        }.onEach {
+            tabLayout.removeAllTabs()
+            val labels = it.tabHeaderLabels
+            labels.forEach {
+                val tab = tabLayout.newTab().apply {
+                    text = it.getString(context)
                 }
+                tabLayout.addTab(tab)
             }
-        }
+            tabbedListMediator?.detach()
+            tabbedListMediator = TabbedListMediator(
+                recyclerView,
+                tabLayout,
+                it.emojiListItems.mapIndexedNotNull { index, emojiListItemType ->
+                    when(emojiListItemType) {
+                        is EmojiListItemType.EmojiItem -> null
+                        is EmojiListItemType.Header -> index
+                    }
+                }
+            )
+            tabbedListMediator?.attach()
+            recyclerView.scrollToPosition(0)
+        }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).launchIn(scope)
 
 
         searchWordTextField.setOnEditorActionListener { _, actionId, _ ->
