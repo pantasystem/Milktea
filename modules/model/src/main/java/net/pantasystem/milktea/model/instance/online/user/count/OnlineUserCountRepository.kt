@@ -1,4 +1,4 @@
-package net.pantasystem.milktea.model.user.online
+package net.pantasystem.milktea.model.instance.online.user.count
 
 interface OnlineUserCountRepository {
     suspend fun find(accountId: Long): Result<OnlineUserCountResult>
