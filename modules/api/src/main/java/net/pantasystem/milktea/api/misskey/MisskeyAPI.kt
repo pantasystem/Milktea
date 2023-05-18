@@ -22,6 +22,7 @@ import net.pantasystem.milktea.api.misskey.notes.translation.Translate
 import net.pantasystem.milktea.api.misskey.notes.translation.TranslationResult
 import net.pantasystem.milktea.api.misskey.notification.NotificationDTO
 import net.pantasystem.milktea.api.misskey.notification.NotificationRequest
+import net.pantasystem.milktea.api.misskey.online.user.OnlineUserCount
 import net.pantasystem.milktea.api.misskey.register.Subscription
 import net.pantasystem.milktea.api.misskey.register.UnSubscription
 import net.pantasystem.milktea.api.misskey.register.WebClientBaseRequest
@@ -318,4 +319,7 @@ interface MisskeyAPI {
 
     @POST("api/hashtags/trend")
     suspend fun getTrendingHashtags(@Body body: EmptyRequest): Response<List<HashtagTrend>>
+
+    @POST("api/get-online-users-count")
+    suspend fun getOnlineUsersCount(@Body body: EmptyRequest): Response<OnlineUserCount>
 }
