@@ -8,10 +8,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonContentPolymorphicSerializer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.*
 import net.pantasystem.milktea.model.emoji.Emoji
 
 
@@ -21,10 +18,20 @@ sealed interface EmojisType {
     data class TypeArray(val emojis: List<Emoji>) : EmojisType
 
     @kotlinx.serialization.Serializable(with = TypeObjectSerializer::class)
-    data class TypeObject(val emojis: Map<String, String>) : EmojisType
+    data class TypeObject(val emojis: Map<String, TypeObjectValueType>) : EmojisType
 
     @kotlinx.serialization.Serializable
     object None : EmojisType
+}
+
+@kotlinx.serialization.Serializable(with = TypeObjectValueTypeSerializer::class)
+sealed interface TypeObjectValueType {
+
+    @kotlinx.serialization.Serializable(with = TypeObjectValuesValueTypeSerializer::class)
+    data class Value(val value: String) : TypeObjectValueType
+
+    @kotlinx.serialization.Serializable(with = TypeObjectValuesObjectTypeSerializer::class)
+    data class Obj(val emoji: Emoji) : TypeObjectValueType
 }
 
 @kotlinx.serialization.Serializable
@@ -32,7 +39,15 @@ data class TestNoteObject(
     @kotlinx.serialization.Serializable(with = CustomEmojisTypeSerializer::class) val emojis: EmojisType
 )
 
+class TypeObjectValueTypeSerializer : JsonContentPolymorphicSerializer<TypeObjectValueType>(TypeObjectValueType::class) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out TypeObjectValueType> {
+        if (element is JsonObject) {
+            return TypeObjectValuesObjectTypeSerializer()
+        }
 
+        return TypeObjectValuesValueTypeSerializer()
+    }
+}
 
 class CustomEmojisTypeSerializer : JsonContentPolymorphicSerializer<EmojisType>(EmojisType::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out EmojisType> {
@@ -49,7 +64,7 @@ class CustomEmojisTypeSerializer : JsonContentPolymorphicSerializer<EmojisType>(
 }
 
 object TypeObjectSerializer : KSerializer<EmojisType.TypeObject> {
-    private val mapSerializer = MapSerializer(String.serializer(), String.serializer())
+    private val mapSerializer = MapSerializer(String.serializer(), TypeObjectValueType.serializer())
     override val descriptor: SerialDescriptor = mapSerializer.descriptor
     override fun deserialize(decoder: Decoder): EmojisType.TypeObject {
         return EmojisType.TypeObject(mapSerializer.deserialize(decoder))
@@ -73,3 +88,29 @@ class TypeArraySerializer : KSerializer<EmojisType.TypeArray> {
     }
 }
 
+class TypeObjectValuesValueTypeSerializer : KSerializer<TypeObjectValueType.Value> {
+    private  val strSerializer = JsonPrimitive.serializer()
+    override val descriptor: SerialDescriptor = strSerializer.descriptor
+
+    override fun deserialize(decoder: Decoder): TypeObjectValueType.Value {
+        return TypeObjectValueType.Value(strSerializer.deserialize(decoder).content)
+    }
+
+    override fun serialize(encoder: Encoder, value: TypeObjectValueType.Value) {
+        return strSerializer.serialize(encoder, JsonPrimitive(value.value))
+    }
+
+}
+
+class TypeObjectValuesObjectTypeSerializer : KSerializer<TypeObjectValueType.Obj> {
+    private val emojiSerializer = Emoji.serializer()
+    override val descriptor: SerialDescriptor = emojiSerializer.descriptor
+
+    override fun deserialize(decoder: Decoder): TypeObjectValueType.Obj {
+        return TypeObjectValueType.Obj(emojiSerializer.deserialize(decoder))
+    }
+
+    override fun serialize(encoder: Encoder, value: TypeObjectValueType.Obj) {
+        return emojiSerializer.serialize(encoder, value.emoji)
+    }
+}

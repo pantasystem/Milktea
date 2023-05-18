@@ -8,6 +8,7 @@ import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
 import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
 import net.pantasystem.milktea.api.misskey.emoji.EmojisType
+import net.pantasystem.milktea.api.misskey.emoji.TypeObjectValueType
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -126,7 +127,10 @@ data class NoteDTO(
         EmojisType.None -> emptyList()
         is EmojisType.TypeArray -> emojis.emojis
         is EmojisType.TypeObject -> emojis.emojis.map {
-            Emoji(name = it.key, url = it.value)
+            Emoji(name = it.key, url = when(val v = it.value){
+                is TypeObjectValueType.Obj -> v.emoji.url ?: v.emoji.uri
+                is TypeObjectValueType.Value -> v.value
+            })
         }
         null -> emptyList()
     }
@@ -134,7 +138,13 @@ data class NoteDTO(
         EmojisType.None -> emptyList()
         is EmojisType.TypeArray -> rawEmojis.emojis
         is EmojisType.TypeObject -> (rawEmojis.emojis).map {
-            Emoji(name = it.key, url = it.value, uri = it.value)
+            Emoji(name = it.key, url = when(val v = it.value) {
+                is TypeObjectValueType.Obj -> v.emoji.url
+                is TypeObjectValueType.Value -> v.value
+            }, uri = when(val v = it.value) {
+                is TypeObjectValueType.Obj -> v.emoji.uri
+                is TypeObjectValueType.Value -> v.value
+            })
         }
         null -> emptyList()
     } + reactionEmojiList
