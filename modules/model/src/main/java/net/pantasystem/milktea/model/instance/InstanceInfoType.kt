@@ -10,7 +10,7 @@ sealed interface InstanceInfoType {
         return when(this) {
             is Mastodon -> "https://${info.uri}/favicon.ico"
             is Pleroma -> "https://${info.uri}/favicon.ico"
-            is Misskey -> meta.iconUrl
+            is Misskey -> meta.iconUrl ?: "${meta.uri}/favicon.ico"
         }
     }
 
@@ -48,6 +48,14 @@ sealed interface InstanceInfoType {
             is Mastodon -> info.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0
             is Pleroma -> info.configuration?.emojiReactions?.maxReactionsPerAccount ?: 0
             is Misskey -> 1
+        }
+    }
+
+    val name: String get() {
+        return when(this) {
+            is Mastodon -> info.title
+            is Misskey -> meta.name ?: "Misskey"
+            is Pleroma -> info.title
         }
     }
 
