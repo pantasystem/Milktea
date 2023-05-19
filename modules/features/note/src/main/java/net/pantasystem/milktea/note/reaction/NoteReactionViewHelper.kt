@@ -43,7 +43,7 @@ object NoteReactionViewHelper {
                 .let {
                     val metrics = context.resources.displayMetrics
                     val imageViewHeightPx = 20 * metrics.density
-                    val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri)
+                    val imageAspectRatio = emoji.aspectRatio ?: ImageAspectRatioCache.get(emoji.url ?: emoji.uri)
                     if (imageAspectRatio == null) {
                         it
                     } else {
@@ -51,7 +51,7 @@ object NoteReactionViewHelper {
                     }
                 }
 //                .override(min(max(reactionImageTypeView.height, 20), 120))
-                .addListener(SaveImageAspectRequestListener(emoji.url ?: emoji.uri))
+                .addListener(SaveImageAspectRequestListener(emoji, context))
                 .into(reactionImageTypeView)
         }
     }

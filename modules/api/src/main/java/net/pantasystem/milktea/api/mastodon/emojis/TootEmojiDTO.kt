@@ -19,7 +19,13 @@ data class TootEmojiDTO(
     val category: String? = null,
 
     @SerialName("visible_in_picker")
-    val visibleInPicker: Boolean = true
+    val visibleInPicker: Boolean = true,
+
+    @SerialName("width")
+    val width: Int? = null,
+
+    @SerialName("height")
+    val height: Int? = null,
 ) {
 
     fun toEmoji(): Emoji {
@@ -27,6 +33,7 @@ data class TootEmojiDTO(
             name = shortcode,
             url = url,
             category = category,
+            aspectRatio = if (width == null || height == null) null else (width.toFloat() / height)
         )
     }
 }

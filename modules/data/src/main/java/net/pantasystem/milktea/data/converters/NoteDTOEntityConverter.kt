@@ -7,6 +7,7 @@ import net.pantasystem.milktea.api.misskey.notes.ReactionAcceptanceType
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -16,9 +17,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NoteDTOEntityConverter @Inject constructor() {
+class NoteDTOEntityConverter @Inject constructor(
+    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+) {
 
     suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
+        val emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList))
+        val aspects = customEmojiAspectRatioDataSource.findIn(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).getOrElse {
+            emptyList()
+        }.associate {
+            it.uri to it.aspectRatio
+        }
         val visibility = Visibility(
             noteDTO.visibility ?: NoteVisibilityType.Public,
             isLocalOnly = noteDTO.localOnly ?: false,
@@ -37,7 +48,11 @@ class NoteDTOEntityConverter @Inject constructor() {
             viaMobile = noteDTO.viaMobile,
             visibility = visibility,
             localOnly = noteDTO.localOnly,
-            emojis = noteDTO.emojiList + (noteDTO.reactionEmojiList),
+            emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList)).map {
+                it.copy(
+                    aspectRatio = aspects[it.url ?: it.uri]
+                )
+            },
             app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
             poll = noteDTO.poll?.toPoll(),
@@ -66,7 +81,7 @@ class NoteDTOEntityConverter @Inject constructor() {
                         name = it.name
                     )
                 },
-                isAcceptingOnlyLikeReaction = when(noteDTO.reactionAcceptance){
+                isAcceptingOnlyLikeReaction = when (noteDTO.reactionAcceptance) {
                     ReactionAcceptanceType.LikeOnly4Remote -> noteDTO.uri != null
                     ReactionAcceptanceType.LikeOnly -> true
                     null -> false
@@ -96,8 +111,12 @@ fun PollDTO?.toPoll(): Poll? {
 
 
 @Throws(IllegalArgumentException::class)
-fun Visibility(type: NoteVisibilityType, isLocalOnly: Boolean, visibleUserIds: List<User.Id>? = null): Visibility {
-    return when(type){
+fun Visibility(
+    type: NoteVisibilityType,
+    isLocalOnly: Boolean,
+    visibleUserIds: List<User.Id>? = null,
+): Visibility {
+    return when (type) {
         NoteVisibilityType.Public -> Visibility.Public(isLocalOnly)
         NoteVisibilityType.Followers -> Visibility.Followers(isLocalOnly)
         NoteVisibilityType.Home -> Visibility.Home(isLocalOnly)

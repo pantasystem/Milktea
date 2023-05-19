@@ -361,10 +361,36 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:5892387857597582401",
+      "lastPropertyId": "3:5250934048025398662",
+      "name": "CustomEmojiAspectRatioRecord",
+      "properties": [
+        {
+          "id": "1:27795029384995044",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6142530143329153194",
+          "name": "uri",
+          "indexId": "9:4038966684149214552",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:5250934048025398662",
+          "name": "aspectRatio",
+          "type": 7
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:1672123969377209864",
-  "lastIndexId": "8:2235427975397612884",
+  "lastEntityId": "4:5892387857597582401",
+  "lastIndexId": "9:4038966684149214552",
   "lastRelationId": "2:5971800600708341253",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
