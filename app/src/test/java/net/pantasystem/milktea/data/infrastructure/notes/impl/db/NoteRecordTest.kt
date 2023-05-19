@@ -294,7 +294,8 @@ internal class NoteRecordTest {
                     id = Channel.Id(0L, "ch1"),
                     name = "name1",
                 ),
-                isAcceptingOnlyLikeReaction = false
+                isAcceptingOnlyLikeReaction = false,
+                isNotAcceptingSensitiveReaction = true,
             )
         )
         record.applyModel(note)
@@ -309,6 +310,10 @@ internal class NoteRecordTest {
         Assertions.assertEquals(
             "name1",
             record.misskeyChannelName
+        )
+        Assertions.assertEquals(
+            true,
+            record.misskeyIsNotAcceptingSensitiveReaction
         )
     }
 
@@ -361,7 +366,7 @@ internal class NoteRecordTest {
             mastodonPureText = "test note",
             mastodonIsReactionAvailable = true,
             myReactions = mutableListOf("like"),
-            maxReactionsPerAccount = 3
+            maxReactionsPerAccount = 3,
         )
         val expectedNote = Note(
             id = Note.Id(accountId = 1, noteId = "note-id"),
