@@ -90,6 +90,7 @@ data class NoteRecord(
     var myReactions: MutableList<String>? = null,
     var maxReactionsPerAccount: Int = 0,
 
+    var customEmojiAspectRatioMap: MutableMap<String, String>? = null,
 ) {
 
     companion object {
@@ -170,6 +171,15 @@ data class NoteRecord(
                 misskeyIsAcceptingOnlyLikeReaction = t.isAcceptingOnlyLikeReaction
             }
         }
+        customEmojiAspectRatioMap = model.emojis?.mapNotNull {  emoji ->
+            val aspectRatio = emoji.aspectRatio
+            val uri = emoji.url ?: emoji.uri
+            if (aspectRatio == null || uri == null) {
+                null
+            } else {
+                uri to aspectRatio.toString()
+            }
+        }?.toMap()?.toMutableMap()
     }
 
     fun toModel(): Note {
@@ -197,7 +207,11 @@ data class NoteRecord(
                         it == entry.key
                     } ?: false
                 ) },
-            emojis = emojis?.map { Emoji(name = it.key, url = it.value) },
+            emojis = emojis?.map { Emoji(
+                name = it.key,
+                url = it.value,
+                aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull()
+            ) },
             repliesCount = repliesCount,
             fileIds = fileIds?.map { FileProperty.Id(accountId, it) },
             poll = getPoll(),

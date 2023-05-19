@@ -1,13 +1,18 @@
 package net.pantasystem.milktea.note.reaction
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import dagger.hilt.android.EntryPointAccessors
+import net.pantasystem.milktea.common_android_ui.BindingProvider
+import net.pantasystem.milktea.model.emoji.Emoji
 
 class SaveImageAspectRequestListener(
-    val url: String?
+    val emoji: Emoji,
+    val context: Context,
 ) : RequestListener<Drawable> {
     override fun onLoadFailed(
         e: GlideException?,
@@ -27,7 +32,14 @@ class SaveImageAspectRequestListener(
     ): Boolean {
         resource ?: return false
         val imageAspectRatio: Float = resource.intrinsicWidth.toFloat() / resource.intrinsicHeight
-        ImageAspectRatioCache.put(url, imageAspectRatio)
+        val navigationEntryPoint = EntryPointAccessors.fromApplication(
+            context,
+            BindingProvider::class.java
+        )
+        navigationEntryPoint.customEmojiAspectRatioStore().save(
+            emoji, imageAspectRatio
+        )
+
         return false
     }
 }

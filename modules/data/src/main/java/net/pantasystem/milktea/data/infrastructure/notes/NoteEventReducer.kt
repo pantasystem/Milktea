@@ -3,6 +3,7 @@ package net.pantasystem.milktea.data.infrastructure.notes
 import net.pantasystem.milktea.api_streaming.NoteUpdated
 import net.pantasystem.milktea.api_streaming.mastodon.EmojiReaction
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.reaction.ReactionCount
 
@@ -27,7 +28,7 @@ fun Note.onUnReacted(account: Account, e: NoteUpdated.Body.Unreacted): Note {
     )
 }
 
-fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
+fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted, aspectRatio: CustomEmojiAspectRatio?): Note {
     val hasItem = this.reactionCounts.any { count ->
         count.reaction == e.body.reaction
     }
@@ -43,7 +44,7 @@ fun Note.onReacted(account: Account, e: NoteUpdated.Body.Reacted): Note {
         list = list + ReactionCount(reaction = e.body.reaction, count = 1, me = false)
     }
 
-    val emojis = when (val emoji = e.body.emoji) {
+    val emojis = when (val emoji = e.body.emoji?.copy(aspectRatio = aspectRatio?.aspectRatio)) {
         null -> this.emojis
         else -> (this.emojis ?: emptyList()) + emoji
     }

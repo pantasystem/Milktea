@@ -5,17 +5,12 @@ import android.app.SearchManager
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.*
 import android.text.style.*
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import jp.panta.misskeyandroidclient.mfm.*
@@ -313,40 +308,40 @@ object MFMDecorator {
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
-                    .override(min(max(textView.textSize.toInt(), 10), 20))
-                                        .addListener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            val t = this@LazyEmojiDecorator.textView.get()
-                            if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == lazyDecorateResult.sourceText) {
-                                if (retryCounter < 10) {
-
-                                    t.text = decorate(
-                                        t,
-                                        lazyDecorateResult = lazyDecorateResult,
-                                        skipEmojis = skipEmojis.add(emojiElement.emoji),
-                                        retryCounter + 1
-                                    )
-                                }
-                            }
-
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
+                    .override(min(max(textView.textSize.toInt(), 10), 128))
+//                                        .addListener(object : RequestListener<Drawable> {
+//                        override fun onLoadFailed(
+//                            e: GlideException?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
+//                            val t = this@LazyEmojiDecorator.textView.get()
+//                            if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == lazyDecorateResult.sourceText) {
+//                                if (retryCounter < 10) {
+//
+//                                    t.text = decorate(
+//                                        t,
+//                                        lazyDecorateResult = lazyDecorateResult,
+//                                        skipEmojis = skipEmojis.add(emojiElement.emoji),
+//                                        retryCounter + 1
+//                                    )
+//                                }
+//                            }
+//
+//                            return false
+//                        }
+//
+//                        override fun onResourceReady(
+//                            resource: Drawable?,
+//                            model: Any?,
+//                            target: Target<Drawable>?,
+//                            dataSource: DataSource?,
+//                            isFirstResource: Boolean
+//                        ): Boolean {
+//                            return false
+//                        }
+//                    })
                     .into(emojiSpan.target)
             }
         }

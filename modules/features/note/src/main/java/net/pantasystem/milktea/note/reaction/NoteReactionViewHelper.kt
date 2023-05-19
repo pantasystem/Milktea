@@ -41,17 +41,17 @@ object NoteReactionViewHelper {
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
                 .let {
-                    val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri)
+                    val metrics = context.resources.displayMetrics
+                    val imageViewHeightPx = 20 * metrics.density
+                    val imageAspectRatio = emoji.aspectRatio
                     if (imageAspectRatio == null) {
                         it
                     } else {
-                        val metrics = context.resources.displayMetrics
-                        val imageViewHeightPx = 20 * metrics.density
                         it.override((imageViewHeightPx * imageAspectRatio).toInt())
                     }
                 }
 //                .override(min(max(reactionImageTypeView.height, 20), 120))
-                .addListener(SaveImageAspectRequestListener(emoji.url ?: emoji.uri))
+                .addListener(SaveImageAspectRequestListener(emoji, context))
                 .into(reactionImageTypeView)
         }
     }
