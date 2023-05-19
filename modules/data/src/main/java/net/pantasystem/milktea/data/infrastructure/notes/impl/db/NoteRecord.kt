@@ -86,6 +86,7 @@ data class NoteRecord(
     var misskeyChannelId: String? = null,
     var misskeyChannelName: String? = null,
     var misskeyIsAcceptingOnlyLikeReaction: Boolean = false,
+    var misskeyIsNotAcceptingSensitiveReaction: Boolean = false,
 
     var myReactions: MutableList<String>? = null,
     var maxReactionsPerAccount: Int = 0,
@@ -169,6 +170,7 @@ data class NoteRecord(
                 misskeyChannelId = t.channel?.id?.channelId
                 misskeyChannelName = t.channel?.name
                 misskeyIsAcceptingOnlyLikeReaction = t.isAcceptingOnlyLikeReaction
+                misskeyIsNotAcceptingSensitiveReaction = t.isNotAcceptingSensitiveReaction
             }
         }
         customEmojiAspectRatioMap = model.emojis?.mapNotNull {  emoji ->
@@ -227,7 +229,8 @@ data class NoteRecord(
                                 name = misskeyChannelName ?: ""
                             )
                         },
-                        isAcceptingOnlyLikeReaction = misskeyIsAcceptingOnlyLikeReaction
+                        isAcceptingOnlyLikeReaction = misskeyIsAcceptingOnlyLikeReaction,
+                        isNotAcceptingSensitiveReaction = misskeyIsNotAcceptingSensitiveReaction,
                     )
                 }
                 "mastodon" -> {

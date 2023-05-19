@@ -155,4 +155,6 @@ object NoteVisibilityTypeSerializer : EnumIgnoreUnknownSerializer<NoteVisibility
 enum class ReactionAcceptanceType {
     @SerialName("likeOnly") LikeOnly,
     @SerialName("likeOnlyForRemote") LikeOnly4Remote,
+    @SerialName("nonSensitiveOnly") NonSensitiveOnly,
+    @SerialName("nonSensitiveOnlyForLocalLikeOnlyForRemote") NonSensitiveOnly4LocalOnly4Remote
 }

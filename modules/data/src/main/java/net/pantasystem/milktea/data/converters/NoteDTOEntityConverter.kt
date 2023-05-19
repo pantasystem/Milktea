@@ -84,7 +84,14 @@ class NoteDTOEntityConverter @Inject constructor(
                 isAcceptingOnlyLikeReaction = when (noteDTO.reactionAcceptance) {
                     ReactionAcceptanceType.LikeOnly4Remote -> noteDTO.uri != null
                     ReactionAcceptanceType.LikeOnly -> true
+                    ReactionAcceptanceType.NonSensitiveOnly -> false
+                    ReactionAcceptanceType.NonSensitiveOnly4LocalOnly4Remote -> false
                     null -> false
+                },
+                isNotAcceptingSensitiveReaction = when (noteDTO.reactionAcceptance) {
+                    ReactionAcceptanceType.NonSensitiveOnly -> true
+                    ReactionAcceptanceType.NonSensitiveOnly4LocalOnly4Remote -> true
+                    else -> false
                 },
             ),
             maxReactionsPerAccount = 1
