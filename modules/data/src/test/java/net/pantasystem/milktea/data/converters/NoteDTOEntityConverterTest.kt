@@ -11,6 +11,9 @@ import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 class NoteDTOEntityConverterTest {
 
@@ -18,7 +21,13 @@ class NoteDTOEntityConverterTest {
     @Test
     fun convert() = runTest {
 
-        val converter = NoteDTOEntityConverter()
+        val converter = NoteDTOEntityConverter(
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            }
+        )
 
         val account = Account(
             remoteId = "test-id",
