@@ -43,7 +43,7 @@ object NoteReactionViewHelper {
                 .let {
                     val metrics = context.resources.displayMetrics
                     val imageViewHeightPx = 20 * metrics.density
-                    val imageAspectRatio = emoji.aspectRatio ?: ImageAspectRatioCache.get(emoji.url ?: emoji.uri)
+                    val imageAspectRatio = emoji.aspectRatio
                     if (imageAspectRatio == null) {
                         it
                     } else {

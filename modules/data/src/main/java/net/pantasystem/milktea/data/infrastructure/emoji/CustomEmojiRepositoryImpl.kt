@@ -9,6 +9,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.delegate.CustomEmojiUpInsertDelegate
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -21,6 +22,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val customEmojiApiAdapter: CustomEmojiApiAdapter,
     private val customEmojiCache: CustomEmojiCache,
     private val upInsert: CustomEmojiUpInsertDelegate,
+    private val aspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CustomEmojiRepository {
 
@@ -34,9 +36,20 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             emojis = customEmojiDAO.findBy(host).map {
                 it.toModel()
             }
+
             if (emojis.isEmpty()) {
                 emojis = fetch(nodeInfo).getOrThrow()
                 upInsert(nodeInfo.host, emojis)
+            }
+            val aspects = aspectRatioDataSource.findIn(emojis.mapNotNull {
+                it.url ?: it.uri
+            }).getOrElse { emptyList() }.associateBy {
+                it.uri
+            }
+            emojis = emojis.map {
+                it.copy(
+                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio
+                )
             }
             customEmojiCache.put(host, emojis)
             emojis
@@ -45,8 +58,19 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
 
     override suspend fun findByName(host: String, name: String): Result<List<Emoji>> = runCancellableCatching {
         withContext(ioDispatcher) {
-            customEmojiDAO.findBy(host, name).map {
-                it.toModel()
+            val dtoList = customEmojiDAO.findBy(host, name)
+            val aspects = aspectRatioDataSource.findIn(
+                dtoList.mapNotNull {
+                    it.emoji.url ?: it.emoji.uri
+                }
+            ).getOrElse { emptyList() }.associateBy {
+                it.uri
+            }
+            dtoList.map {
+                it.toModel(
+                    aspects[it.emoji.url ?: it.emoji.uri]?.aspectRatio
+                )
+
             }
         }
     }
@@ -54,7 +78,15 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     override suspend fun sync(host: String): Result<Unit> = runCancellableCatching {
         withContext(ioDispatcher) {
             val nodeInfo = nodeInfoRepository.find(host).getOrThrow()
-            val emojis = fetch(nodeInfo).getOrThrow()
+            var emojis = fetch(nodeInfo).getOrThrow()
+            val aspects = aspectRatioDataSource.findIn(emojis.mapNotNull {
+                it.url ?: it.uri
+            }).getOrElse { emptyList() }.associateBy {
+                it.uri
+            }
+            emojis = emojis.map {
+                it.copy(aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio)
+            }
 
             customEmojiCache.put(host, emojis)
             customEmojiDAO.deleteByHost(host)
@@ -69,8 +101,15 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             nodeInfoRepository.find(host).getOrThrow()
         }.asFlow().flatMapLatest {
             customEmojiDAO.observeBy(host).map { list ->
+                val aspects = aspectRatioDataSource.findIn(
+                    list.mapNotNull {
+                        it.emoji.url ?: it.emoji.uri
+                    }
+                ).getOrElse { emptyList() }.associateBy {
+                    it.uri
+                }
                 list.map {
-                    it.toModel()
+                    it.toModel(aspects[it.emoji.url ?: it.emoji.uri]?.aspectRatio)
                 }
             }
         }.onEach {

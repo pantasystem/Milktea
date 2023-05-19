@@ -48,7 +48,7 @@ class CustomEmojiAspectRatioDataSourceImpl @Inject constructor(
         } ?: throw NoSuchElementException()
     }
 
-    override suspend fun save(ratio: CustomEmojiAspectRatio): Result<Unit> = runCancellableCatching {
+    override suspend fun save(ratio: CustomEmojiAspectRatio): Result<CustomEmojiAspectRatio> = runCancellableCatching {
         boxStore.awaitCallInTx {
             val exists = aspectBox.query().equal(
                 CustomEmojiAspectRatioRecord_.uri,
@@ -61,6 +61,7 @@ class CustomEmojiAspectRatioDataSourceImpl @Inject constructor(
                 aspectBox.put(exists.copy(aspectRatio = ratio.aspectRatio))
             }
         }
+        findOne(ratio.uri).getOrThrow()
     }
 
     override suspend fun delete(ratio: CustomEmojiAspectRatio): Result<Unit> = runCancellableCatching {

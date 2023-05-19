@@ -1,7 +1,7 @@
 package net.pantasystem.milktea.model.emoji
 
 interface CustomEmojiAspectRatioDataSource {
-    suspend fun save(ratio: CustomEmojiAspectRatio): Result<Unit>
+    suspend fun save(ratio: CustomEmojiAspectRatio): Result<CustomEmojiAspectRatio>
 
     suspend fun findIn(uris: List<String>): Result<List<CustomEmojiAspectRatio>>
 

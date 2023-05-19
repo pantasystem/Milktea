@@ -18,16 +18,27 @@ class CustomEmojiAspectRatioStore  @Inject constructor(
     }
 
     fun save(emoji: Emoji, aspectRatio: Float) {
-        val url = emoji.url ?: emoji.uri ?: return
-        if (aspectRatio <= 0f) {
+        val url = (emoji.url ?: emoji.uri)
+        if (aspectRatio <= 0f || url == null) {
+            logger.debug {
+                "cancel save emoji aspect. emoji:$emoji, aspect:$aspectRatio"
+            }
             return
         }
         coroutineScope.launch {
+            val ratio = customEmojiAspectRatioDataSource.findOne(url).getOrNull()
+            if (ratio != null) {
+                return@launch
+            }
             customEmojiAspectRatioDataSource.save(CustomEmojiAspectRatio(
                 uri = url,
                 aspectRatio = aspectRatio,
             )).onFailure {
                 logger.error("save failure", it)
+            }.onSuccess {
+                logger.debug {
+                    "success save emoji aspect ratio:$emoji, $aspectRatio, $it"
+                }
             }
         }
     }

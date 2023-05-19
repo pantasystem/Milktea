@@ -15,6 +15,7 @@ import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemEmojiChoiceBinding
 import net.pantasystem.milktea.note.databinding.ItemEmojiListItemHeaderBinding
+import net.pantasystem.milktea.note.reaction.SaveImageAspectRequestListener
 
 class EmojiListItemsAdapter(
     private val onEmojiSelected: (EmojiType) -> Unit,
@@ -60,6 +61,12 @@ class EmojiListItemsAdapter(
                         .load(item.emoji.url ?: item.emoji.uri)
                         // FIXME: webpの場合うまく表示できなくなる
 //                    .centerCrop()
+                        .addListener(
+                            SaveImageAspectRequestListener(
+                                item.emoji,
+                                binding.root.context
+                            )
+                        )
                         .into(binding.reactionImagePreview)
                     binding.reactionStringPreview.setMemoVisibility(View.GONE)
                     binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)

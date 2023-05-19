@@ -36,14 +36,10 @@ class SaveImageAspectRequestListener(
             context,
             BindingProvider::class.java
         )
-        (emoji.url ?: emoji.uri)?.let {
-            navigationEntryPoint.customEmojiAspectRatioStore().save(
-                emoji, imageAspectRatio
-            )
+        navigationEntryPoint.customEmojiAspectRatioStore().save(
+            emoji, imageAspectRatio
+        )
 
-        }
-
-        ImageAspectRatioCache.put(emoji.url ?: emoji.uri, imageAspectRatio)
         return false
     }
 }
