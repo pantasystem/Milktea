@@ -14,7 +14,6 @@ import javax.inject.Singleton
 @Singleton
 class UserDTOEntityConverter @Inject constructor(
     private val customEmojiRepository: CustomEmojiRepository,
-    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
 ) {
 
     suspend fun convert(account: Account, userDTO: UserDTO, isDetail: Boolean = false): User {
@@ -28,15 +27,9 @@ class UserDTOEntityConverter @Inject constructor(
                 themeColor = it.themeColor
             )
         }
-        val aspects = customEmojiAspectRatioDataSource.findIn(
-            userDTO.emojiList?.mapNotNull {
-                it.url ?: it.uri
-            } ?: emptyList()
-        ).getOrNull()?.associateBy {
-            it.uri
-        }
+
         var emojis = userDTO.emojiList?.map {
-            it.toModel(aspects?.get(it.url ?: it.uri)?.aspectRatio)
+            it.toModel()
         } ?: emptyList()
         emojis = (emojis + CustomEmojiParser.parse(
             userDTO.host ?: account.getHost(),
