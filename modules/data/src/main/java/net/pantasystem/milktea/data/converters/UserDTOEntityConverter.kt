@@ -25,7 +25,9 @@ class UserDTOEntityConverter @Inject constructor() {
             return User.Detail(
                 id = User.Id(account.accountId, userDTO.id),
                 avatarUrl = userDTO.avatarUrl,
-                emojis = userDTO.emojiList ?: emptyList(),
+                emojis = userDTO.emojiList?.map {
+                    it.toModel()
+                } ?: emptyList(),
                 isBot = userDTO.isBot,
                 isCat = userDTO.isCat,
                 name = userDTO.name,
@@ -68,7 +70,7 @@ class UserDTOEntityConverter @Inject constructor() {
             return User.Simple(
                 id = User.Id(account.accountId, userDTO.id),
                 avatarUrl = userDTO.avatarUrl,
-                emojis = userDTO.emojiList ?: emptyList(),
+                emojis = userDTO.emojiList?.map { it.toModel() } ?: emptyList(),
                 isBot = userDTO.isBot,
                 isCat = userDTO.isCat,
                 name = userDTO.name,

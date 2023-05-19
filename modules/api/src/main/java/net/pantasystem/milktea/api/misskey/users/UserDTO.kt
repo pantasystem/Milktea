@@ -4,10 +4,10 @@ package net.pantasystem.milktea.api.misskey.users
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
 import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.notes.NoteDTO
-import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
 
 /**
@@ -141,11 +141,11 @@ data class UserDTO(
         val themeColor: String? = null,
     )
 
-    val emojiList: List<Emoji>? = when(rawEmojis) {
+    val emojiList: List<CustomEmojiNetworkDTO>? = when(rawEmojis) {
         EmojisType.None -> null
         is EmojisType.TypeArray -> rawEmojis.emojis
         is EmojisType.TypeObject -> rawEmojis.emojis.map {
-            Emoji(name = it.key, url = it.value, uri = it.value)
+            CustomEmojiNetworkDTO(name = it.key, url = it.value, uri = it.value)
         }
         null -> null
     }
