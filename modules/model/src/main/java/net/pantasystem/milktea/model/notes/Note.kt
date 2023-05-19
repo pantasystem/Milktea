@@ -82,6 +82,7 @@ data class Note(
         data class Misskey(
             val channel: SimpleChannelInfo? = null,
             val isAcceptingOnlyLikeReaction: Boolean = false,
+            val isNotAcceptingSensitiveReaction: Boolean = false,
         ) : Type {
             data class SimpleChannelInfo(val id: Channel.Id, val name: String)
 
