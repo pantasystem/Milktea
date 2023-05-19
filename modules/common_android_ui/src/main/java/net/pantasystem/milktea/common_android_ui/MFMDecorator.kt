@@ -313,7 +313,7 @@ object MFMDecorator {
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
-                    .override(min(max(textView.textSize.toInt(), 10), 20))
+                    .override(min(max(textView.textSize.toInt(), 10), 128))
                                         .addListener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
                             e: GlideException?,

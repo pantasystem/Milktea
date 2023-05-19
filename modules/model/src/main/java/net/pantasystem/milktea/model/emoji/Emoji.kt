@@ -12,8 +12,9 @@ data class Emoji(
     @SerialName("uri") val uri: String? = null,
     @SerialName("type") val type: String? = null,
     @SerialName("category") val category: String? = null,
-    @SerialName("aliases") val aliases: List<String>? = null
+    @SerialName("aliases") val aliases: List<String>? = null,
+    @kotlinx.serialization.Transient val aspectRatio: Float? = null,
 ): Serializable{
 
-    constructor(name: String) : this(null, name, null, null, null, null, null)
+    constructor(name: String) : this(null, name, null, null, null, null, null, null)
 }

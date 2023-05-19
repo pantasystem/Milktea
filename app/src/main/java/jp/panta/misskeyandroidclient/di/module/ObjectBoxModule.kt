@@ -7,7 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.objectbox.BoxStore
-import net.pantasystem.milktea.data.infrastructure.notes.MyObjectBox
+import net.pantasystem.milktea.data.infrastructure.MyObjectBox
 import javax.inject.Singleton
 
 @Module

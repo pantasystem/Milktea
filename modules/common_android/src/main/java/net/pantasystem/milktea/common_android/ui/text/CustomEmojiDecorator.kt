@@ -9,7 +9,6 @@ import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
 import net.pantasystem.milktea.model.instance.HostWithVersion
-import kotlin.math.min
 
 class CustomEmojiDecorator {
 
@@ -37,7 +36,7 @@ class CustomEmojiDecorator {
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
-                .override(min(view.textSize.toInt(), 20))
+                .override(view.textSize.toInt())
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
         }
@@ -57,7 +56,7 @@ class CustomEmojiDecorator {
             val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
             GlideApp.with(view)
                 .asDrawable()
-                .override(min(view.textSize.toInt(), 20))
+                .override(view.textSize.toInt())
                 .load(it.result.getUrl(accountHost))
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
@@ -79,7 +78,7 @@ class CustomEmojiDecorator {
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
-                .override(min(view.textSize.toInt(), 20))
+                .override(view.textSize.toInt())
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
         }
