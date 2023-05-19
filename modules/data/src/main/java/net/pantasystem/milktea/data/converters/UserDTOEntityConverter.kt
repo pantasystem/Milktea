@@ -2,13 +2,20 @@ package net.pantasystem.milktea.data.converters
 
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
+import net.pantasystem.milktea.model.emoji.CustomEmojiParser
+import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
+import net.pantasystem.milktea.model.emoji.EmojiResolvedType
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserDTOEntityConverter @Inject constructor() {
+class UserDTOEntityConverter @Inject constructor(
+    private val customEmojiRepository: CustomEmojiRepository,
+    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+) {
 
     suspend fun convert(account: Account, userDTO: UserDTO, isDetail: Boolean = false): User {
         val instanceInfo = userDTO.instance?.let {
@@ -21,13 +28,32 @@ class UserDTOEntityConverter @Inject constructor() {
                 themeColor = it.themeColor
             )
         }
+        val aspects = customEmojiAspectRatioDataSource.findIn(
+            userDTO.emojiList?.mapNotNull {
+                it.url ?: it.uri
+            } ?: emptyList()
+        ).getOrNull()?.associateBy {
+            it.uri
+        }
+        var emojis = userDTO.emojiList?.map {
+            it.toModel(aspects?.get(it.url ?: it.uri)?.aspectRatio)
+        } ?: emptyList()
+        emojis = (emojis + CustomEmojiParser.parse(
+            userDTO.host ?: account.getHost(),
+            emojis,
+            userDTO.name ?: userDTO.userName,
+            customEmojiRepository.getAndConvertToMap(account.getHost()),
+        ).emojis.mapNotNull {
+            (it.result as? EmojiResolvedType.Resolved)?.emoji
+        }).distinctBy {
+            it.name to it.host to it.url to it.uri
+        }
+
         if (isDetail) {
             return User.Detail(
                 id = User.Id(account.accountId, userDTO.id),
                 avatarUrl = userDTO.avatarUrl,
-                emojis = userDTO.emojiList?.map {
-                    it.toModel()
-                } ?: emptyList(),
+                emojis = emojis,
                 isBot = userDTO.isBot,
                 isCat = userDTO.isCat,
                 name = userDTO.name,
@@ -70,7 +96,7 @@ class UserDTOEntityConverter @Inject constructor() {
             return User.Simple(
                 id = User.Id(account.accountId, userDTO.id),
                 avatarUrl = userDTO.avatarUrl,
-                emojis = userDTO.emojiList?.map { it.toModel() } ?: emptyList(),
+                emojis = emojis,
                 isBot = userDTO.isBot,
                 isCat = userDTO.isCat,
                 name = userDTO.name,

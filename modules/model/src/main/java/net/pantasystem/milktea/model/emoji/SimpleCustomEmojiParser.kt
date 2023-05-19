@@ -3,7 +3,7 @@ package net.pantasystem.milktea.model.emoji
 object CustomEmojiParser {
 
 
-    fun parse(sourceHost: String?, emojis: List<Emoji>?, text: String): CustomEmojiParsedResult {
+    fun parse(sourceHost: String?, emojis: List<Emoji>?, text: String, instanceEmojis: Map<String, Emoji>? = null): CustomEmojiParsedResult {
         val emojiMap = emojis?.associateBy {
             it.name
         }
@@ -21,7 +21,7 @@ object CustomEmojiParser {
                     } else {
                         null
                     }
-                    var emoji: EmojiResolvedType? = emojiMap?.get(tag)?.let {
+                    var emoji: EmojiResolvedType? = (emojiMap?.get(tag) ?: instanceEmojis?.get(tag))?.let {
                         if (sourceHost == null) {
                             null
                         } else {
