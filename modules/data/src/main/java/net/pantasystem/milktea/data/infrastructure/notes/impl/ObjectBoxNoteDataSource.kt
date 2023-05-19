@@ -207,7 +207,7 @@ class ObjectBoxNoteDataSource @Inject constructor(
 
     override suspend fun clear(): Result<Unit> = runCancellableCatching {
         withContext(coroutineDispatcher) {
-
+            noteBox.removeAll()
         }
     }
 
