@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
@@ -16,6 +17,8 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 
 object NoteReactionViewHelper {
+
+    const val REACTION_IMAGE_WIDTH_SIZE_DP = 20
 
     @JvmStatic
     @BindingAdapter("reactionTextTypeView", "reactionImageTypeView", "reaction")
@@ -37,20 +40,25 @@ object NoteReactionViewHelper {
         } else {
             reactionImageTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.setMemoVisibility(View.GONE)
+            val metrics = context.resources.displayMetrics
+            val imageViewHeightPx = REACTION_IMAGE_WIDTH_SIZE_DP * metrics.density
+            val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri) ?: emoji.aspectRatio
+            val imageViewWidthPx = if (imageAspectRatio == null) {
+                imageViewHeightPx
+            } else {
+                (imageViewHeightPx * imageAspectRatio)
+            }
+
+            reactionImageTypeView.updateLayoutParams<LinearLayout.LayoutParams> {
+                this@updateLayoutParams.also {
+                    it.height = imageViewHeightPx.toInt()
+                    it.width = imageViewWidthPx.toInt()
+                }
+            }
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
-                .let {
-                    val metrics = context.resources.displayMetrics
-                    val imageViewHeightPx = 20 * metrics.density
-                    val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri) ?: emoji.aspectRatio
-                    if (imageAspectRatio == null) {
-                        it
-                    } else {
-                        it.override((imageViewHeightPx * imageAspectRatio).toInt())
-                    }
-                }
-//                .override(min(max(reactionImageTypeView.height, 20), 120))
+                .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
                 .addListener(SaveImageAspectRequestListener(emoji, context))
                 .into(reactionImageTypeView)
         }
