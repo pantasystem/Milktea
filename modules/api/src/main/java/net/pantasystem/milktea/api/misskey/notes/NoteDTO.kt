@@ -6,11 +6,11 @@ import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
 import net.pantasystem.milktea.api.misskey.auth.App
 import net.pantasystem.milktea.api.misskey.drive.FilePropertyDTO
+import net.pantasystem.milktea.api.misskey.emoji.CustomEmojiNetworkDTO
 import net.pantasystem.milktea.api.misskey.emoji.CustomEmojisTypeSerializer
 import net.pantasystem.milktea.api.misskey.emoji.EmojisType
 import net.pantasystem.milktea.api.misskey.users.UserDTO
 import net.pantasystem.milktea.common.serializations.EnumIgnoreUnknownSerializer
-import net.pantasystem.milktea.model.emoji.Emoji
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable
@@ -126,15 +126,15 @@ data class NoteDTO(
         EmojisType.None -> emptyList()
         is EmojisType.TypeArray -> emojis.emojis
         is EmojisType.TypeObject -> emojis.emojis.map {
-            Emoji(name = it.key, url = it.value)
+            CustomEmojiNetworkDTO(name = it.key, url = it.value)
         }
         null -> emptyList()
     }
-    val emojiList: List<Emoji> = when(rawEmojis) {
+    val emojiList: List<CustomEmojiNetworkDTO> = when(rawEmojis) {
         EmojisType.None -> emptyList()
         is EmojisType.TypeArray -> rawEmojis.emojis
         is EmojisType.TypeObject -> (rawEmojis.emojis).map {
-            Emoji(name = it.key, url = it.value, uri = it.value)
+            CustomEmojiNetworkDTO(name = it.key, url = it.value, uri = it.value)
         }
         null -> emptyList()
     } + reactionEmojiList

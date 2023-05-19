@@ -50,6 +50,8 @@ internal class CustomEmojiApiAdapterImpl @Inject constructor(
                             .throwIfHasError()
                             .body()
                     emojis?.emojis?.map {
+                        it.toModel()
+                    }?.map {
                         it.copy(
                             url = if (it.url == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.url,
                             uri = if (it.uri == null) V13EmojiUrlResolver.resolve(it, "https://${nodeInfo.host}") else it.uri,

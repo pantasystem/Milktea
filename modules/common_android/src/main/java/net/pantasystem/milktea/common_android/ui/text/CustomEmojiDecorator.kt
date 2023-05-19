@@ -8,7 +8,6 @@ import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
-import net.pantasystem.milktea.model.instance.HostWithVersion
 
 class CustomEmojiDecorator {
 
@@ -30,9 +29,13 @@ class CustomEmojiDecorator {
             text,
         )
         result.emojis.filter {
-            HostWithVersion.isOverV13(accountHost)  || it.result is EmojiResolvedType.Resolved
+            it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
+            val span = DrawableEmojiSpan(
+                emojiAdapter,
+                it.result.getUrl(accountHost),
+                (it.result as? EmojiResolvedType.Resolved)?.emoji?.aspectRatio
+            )
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
@@ -51,9 +54,13 @@ class CustomEmojiDecorator {
         val builder = SpannableStringBuilder(result.text)
 
         result.emojis.filter {
-            HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
+            it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
+            val span = DrawableEmojiSpan(
+                emojiAdapter,
+                it.result.getUrl(accountHost),
+                (it.result as? EmojiResolvedType.Resolved)?.emoji?.aspectRatio
+            )
             GlideApp.with(view)
                 .asDrawable()
                 .override(view.textSize.toInt())
@@ -66,15 +73,24 @@ class CustomEmojiDecorator {
         return builder
     }
 
-    fun decorate(spanned: Spanned, accountHost: String?, result: CustomEmojiParsedResult, view: TextView): Spanned {
+    fun decorate(
+        spanned: Spanned,
+        accountHost: String?,
+        result: CustomEmojiParsedResult,
+        view: TextView,
+    ): Spanned {
 
         val emojiAdapter = EmojiAdapter(view)
         val builder = SpannableStringBuilder(spanned)
 
         result.emojis.filter {
-            HostWithVersion.isOverV13(accountHost) || it.result is EmojiResolvedType.Resolved
+            it.result is EmojiResolvedType.Resolved
         }.map {
-            val span = DrawableEmojiSpan(emojiAdapter, it.result.getUrl(accountHost))
+            val span = DrawableEmojiSpan(
+                emojiAdapter,
+                it.result.getUrl(accountHost),
+                (it.result as? EmojiResolvedType.Resolved)?.emoji?.aspectRatio
+            )
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))

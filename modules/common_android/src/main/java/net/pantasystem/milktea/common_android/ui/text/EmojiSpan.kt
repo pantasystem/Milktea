@@ -7,7 +7,7 @@ import android.text.TextPaint
 import android.text.style.ReplacementSpan
 import kotlin.math.min
 
-abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
+abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : ReplacementSpan(){
 
     companion object {
         private val drawableSizeCache = mutableMapOf<Any, EmojiSizeCache>()
@@ -37,6 +37,8 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
+        val textHeight = paint.textSize
+
         val drawable = imageDrawable
         val size = key?.let {
             drawableSizeCache[key]
@@ -44,6 +46,11 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
             EmojiSizeCache(
                 intrinsicHeight = it.intrinsicHeight,
                 intrinsicWidth = it.intrinsicWidth
+            )
+        } ?: aspectRatio?.let {
+            EmojiSizeCache(
+                intrinsicHeight = textHeight.toInt(),
+                intrinsicWidth = (textHeight * aspectRatio).toInt()
             )
         }
         key?.run {
@@ -72,7 +79,6 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
 
         beforeTextSize = 0
 
-        val textHeight = paint.textSize
         val imageWidth = size.intrinsicWidth
         val imageHeight = size.intrinsicHeight
 
@@ -114,6 +120,7 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
 
 
     private fun updateImageDrawableSize(paint: Paint) {
+        val emojiHeight = min((paint.textSize).toInt(), 128)
         val drawable = imageDrawable
         val size = key?.let {
             drawableSizeCache[key]
@@ -122,20 +129,24 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
                 intrinsicWidth = it.intrinsicWidth,
                 intrinsicHeight = it.intrinsicHeight
             )
+        } ?: aspectRatio?.let {
+            EmojiSizeCache(
+                intrinsicHeight = emojiHeight,
+                intrinsicWidth = (emojiHeight.toFloat() * aspectRatio).toInt()
+            )
         } ?: return
         key?.run {
             drawableSizeCache[key] = size
         }
         val imageWidth = size.intrinsicWidth
         val imageHeight = size.intrinsicHeight
-        val emojiHeight = min((paint.textSize).toInt(), 640)
 
         val unknownEmojiSize = imageWidth <= 0 || imageHeight <= 0
         if (beforeTextSize != 0 && beforeTextSize != emojiHeight || unknownEmojiSize) {
             if (!isSizeComputed) {
                 beforeTextSize = emojiHeight
                 imageDrawable?.setBounds(0, 0, emojiHeight, emojiHeight)
-                isSizeComputed = true
+                isSizeComputed = imageDrawable != null
             }
             return
         }
@@ -147,7 +158,7 @@ abstract class EmojiSpan<T: Any?>(val key: T) : ReplacementSpan(){
         if (!isSizeComputed) {
             textHeight = emojiHeight
             textWidth = scaledImageWidth
-            isSizeComputed = true
+            isSizeComputed = imageDrawable != null
             imageDrawable?.setBounds(0, 0, scaledImageWidth, emojiHeight)
         }
     }

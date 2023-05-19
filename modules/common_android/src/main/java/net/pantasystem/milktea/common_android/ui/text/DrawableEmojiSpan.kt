@@ -9,7 +9,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.penfeizhou.animation.apng.APNGDrawable
 
-class DrawableEmojiSpan(var adapter: EmojiAdapter?, k: Any?) : EmojiSpan<Any?>(k){
+class DrawableEmojiSpan(var adapter: EmojiAdapter?, k: Any?, aspectRatio: Float? = null) : EmojiSpan<Any?>(k, aspectRatio = aspectRatio){
     //val weakReference: WeakReference<View> = WeakReference(view)
 
 

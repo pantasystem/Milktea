@@ -49,9 +49,7 @@ class NoteDTOEntityConverter @Inject constructor(
             visibility = visibility,
             localOnly = noteDTO.localOnly,
             emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList)).map {
-                it.copy(
-                    aspectRatio = aspects[it.url ?: it.uri]
-                )
+                it.toModel(aspects[it.url ?: it.uri])
             },
             app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },
