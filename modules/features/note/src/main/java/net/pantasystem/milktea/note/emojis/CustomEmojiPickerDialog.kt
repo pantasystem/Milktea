@@ -53,7 +53,6 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
         }else{
             mSelectionViewModel?.onSelect(emoji)
         }
-        dismiss()
     }
 
 }

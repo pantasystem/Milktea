@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +32,8 @@ fun NoteEditorUserActionMenuLayout(
     onTogglePollButtonClicked: () -> Unit,
     onSelectMentionUsersButtonClicked: () -> Unit,
     onSelectEmojiButtonClicked: () -> Unit,
-    onToggleCwButtonClicked: () -> Unit
+    onToggleCwButtonClicked: () -> Unit,
+    onSelectDraftNoteButtonClicked: () -> Unit,
 ) {
     var isShowFilePickerDropDownMenu: Boolean by remember {
         mutableStateOf(false)
@@ -124,6 +126,17 @@ fun NoteEditorUserActionMenuLayout(
                 )
             }
         }
+
+        MenuItemLayout {
+            IconButton(onClick = onSelectDraftNoteButtonClicked) {
+                Icon(
+                    Icons.Outlined.EditNote,
+                    contentDescription = null,
+                    tint = iconColor
+                )
+            }
+        }
+
         MenuItemLayout {
             IconButton(onClick = onSelectEmojiButtonClicked) {
                 Icon(
@@ -133,6 +146,7 @@ fun NoteEditorUserActionMenuLayout(
                 )
             }
         }
+
     }
 }
 
@@ -165,7 +179,8 @@ fun Preview_NoteEditorUserActionMenuLayout() {
             onTogglePollButtonClicked = {},
             onSelectMentionUsersButtonClicked = {},
             onSelectEmojiButtonClicked = {},
-            onToggleCwButtonClicked = {}
+            onToggleCwButtonClicked = {},
+            onSelectDraftNoteButtonClicked = {}
         )
     }
 }
