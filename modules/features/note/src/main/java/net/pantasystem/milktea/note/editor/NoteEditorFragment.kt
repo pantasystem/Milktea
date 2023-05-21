@@ -55,6 +55,7 @@ import net.pantasystem.milktea.model.instance.FeatureType
 import net.pantasystem.milktea.model.instance.MetaRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteEditorBinding
 import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
@@ -347,7 +348,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     },
                     onToggleCwButtonClicked = {
                         noteEditorViewModel.changeCwEnabled()
-                    })
+                    },
+                    onSelectDraftNoteButtonClicked = {
+                        startActivity(Intent(requireActivity(), DraftNotesActivity::class.java))
+                    }
+                )
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
