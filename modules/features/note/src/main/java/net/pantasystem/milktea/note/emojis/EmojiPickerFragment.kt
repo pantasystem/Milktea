@@ -211,7 +211,7 @@ class EmojiSelectionBinder(
                 val tab = tabLayout.newTab().apply {
                     text = it.getString(context)
                 }
-                tabLayout.addTab(tab)
+                tabLayout.addTab(tab, false)
             }
             tabbedListMediator?.detach()
             tabbedListMediator = TabbedListMediator(
@@ -225,7 +225,6 @@ class EmojiSelectionBinder(
                 }
             )
             tabbedListMediator?.attach()
-            recyclerView.scrollToPosition(0)
         }.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).launchIn(scope)
 
 
