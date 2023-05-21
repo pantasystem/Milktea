@@ -33,7 +33,7 @@ fun NoteEditorUserActionMenuLayout(
     onSelectMentionUsersButtonClicked: () -> Unit,
     onSelectEmojiButtonClicked: () -> Unit,
     onToggleCwButtonClicked: () -> Unit,
-    onSelectDraftNoteButtonClicked: () -> Unit
+    onSelectDraftNoteButtonClicked: () -> Unit,
 ) {
     var isShowFilePickerDropDownMenu: Boolean by remember {
         mutableStateOf(false)
@@ -126,6 +126,17 @@ fun NoteEditorUserActionMenuLayout(
                 )
             }
         }
+
+        MenuItemLayout {
+            IconButton(onClick = onSelectDraftNoteButtonClicked) {
+                Icon(
+                    Icons.Outlined.EditNote,
+                    contentDescription = null,
+                    tint = iconColor
+                )
+            }
+        }
+
         MenuItemLayout {
             IconButton(onClick = onSelectEmojiButtonClicked) {
                 Icon(
@@ -135,11 +146,7 @@ fun NoteEditorUserActionMenuLayout(
                 )
             }
         }
-        MenuItemLayout() {
-            IconButton(onClick = onSelectDraftNoteButtonClicked) {
-                Icon(Icons.Outlined.EditNote, contentDescription = null, tint = iconColor)
-            }
-        }
+
     }
 }
 
