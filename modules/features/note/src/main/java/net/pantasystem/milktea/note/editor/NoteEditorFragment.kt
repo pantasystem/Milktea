@@ -350,9 +350,14 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         noteEditorViewModel.changeCwEnabled()
                     },
                     onSelectDraftNoteButtonClicked = {
-                        startActivity(Intent(requireActivity(), DraftNotesActivity::class.java).also {
-                            it.action = Intent.ACTION_PICK
-                        })
+                        pickDraftNoteActivityResult.launch(
+                            Intent(
+                                requireActivity(),
+                                DraftNotesActivity::class.java
+                            ).also {
+                                it.action = Intent.ACTION_PICK
+                            },
+                        )
                     }
                 )
             }
@@ -377,7 +382,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         binding.inputMain.addTextChangedListener(
             onTextChanged = { text, start, _, count ->
-                val inputText = text?.substring(start, start + count)?: return@addTextChangedListener
+                val inputText =
+                    text?.substring(start, start + count) ?: return@addTextChangedListener
                 if (UrlPatternChecker.isMatch(inputText)) {
                     lifecycleScope.launch {
                         if (noteEditorViewModel.canQuote()) {
@@ -536,7 +542,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
     override fun onSelect(emoji: Emoji) {
-        when(noteEditorViewModel.focusType) {
+        when (noteEditorViewModel.focusType) {
             NoteEditorFocusEditTextType.Cw -> {
                 val pos = binding.cw.selectionEnd
                 noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
@@ -556,7 +562,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     }
 
     override fun onSelect(emoji: String) {
-        when(noteEditorViewModel.focusType) {
+        when (noteEditorViewModel.focusType) {
             NoteEditorFocusEditTextType.Cw -> {
                 val pos = binding.cw.selectionEnd
                 noteEditorViewModel.addEmoji(emoji, pos).let { newPos ->
@@ -754,6 +760,18 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         }
     }
 
+    private val pickDraftNoteActivityResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val draftNoteId =
+            result.data?.getLongExtra(DraftNotesActivity.EXTRA_DRAFT_NOTE_ID, -1)?.takeIf {
+                it > 0L
+            }
+        if (draftNoteId != null) {
+            noteEditorViewModel.setDraftNoteId(draftNoteId)
+        }
+    }
+
     private val openLocalStorageResult =
         registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
             uris?.map { uri ->
@@ -790,39 +808,39 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
     private val selectUserResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-            if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
-                val changed =
-                    result.data?.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
-                if (changed != null) {
-                    noteEditorViewModel.setAddress(changed.added, changed.removed)
-                }
+        if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
+            val changed =
+                result.data?.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
+            if (changed != null) {
+                noteEditorViewModel.setAddress(changed.added, changed.removed)
             }
         }
+    }
 
 
     @Suppress("DEPRECATION")
     private val selectMentionToUserResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-            if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
-                val changed =
-                    result.data?.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
+        if (result.resultCode == AppCompatActivity.RESULT_OK && result.data != null) {
+            val changed =
+                result.data?.getSerializableExtra(SearchAndSelectUserNavigation.EXTRA_SELECTED_USER_CHANGED_DIFF) as? ChangedDiffResult
 
-                if (changed != null) {
-                    addMentionUserNames(changed.selectedUserNames)
-                }
-
+            if (changed != null) {
+                addMentionUserNames(changed.selectedUserNames)
             }
+
         }
+    }
 
 
     private val pickMultipleMedia = registerForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia()
     ) { uris ->
-            uris?.map {
-                appendFile(it)
-            }
+        uris?.map {
+            appendFile(it)
         }
+    }
 
     private fun appendFile(uri: Uri) {
         // NOTE: 選択したファイルに対して永続的なアクセス権を得るようにしている

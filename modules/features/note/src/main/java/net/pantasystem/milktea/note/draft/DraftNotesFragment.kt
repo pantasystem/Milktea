@@ -17,6 +17,7 @@ import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.from
 import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
+import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.NoteEditorActivity
 import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 import javax.inject.Inject
@@ -81,7 +82,7 @@ class DraftNotesFragment : Fragment() {
                         },
                         onSelect = {
                             val intent = Intent()
-                            intent.putExtra("DRAFT_NOTE_ID", it.draftNoteId)
+                            intent.putExtra(DraftNotesActivity.EXTRA_DRAFT_NOTE_ID, it.draftNoteId)
                             requireActivity().setResult(RESULT_OK, intent)
                             requireActivity().finish()
                         }
