@@ -41,7 +41,11 @@ fun DraftNotesScreen(
                     }
                 },
                 title = {
-                    Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.draft_notes))
+                    if (isPickMode) {
+                        Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.select_draft_post))
+                    } else {
+                        Text(text = stringResource(id = net.pantasystem.milktea.common_resource.R.string.draft_notes))
+                    }
                 },
                 backgroundColor = MaterialTheme.colors.surface,
                 elevation = 0.dp
