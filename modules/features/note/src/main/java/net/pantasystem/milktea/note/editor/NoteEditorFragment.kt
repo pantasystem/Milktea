@@ -350,7 +350,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                         noteEditorViewModel.changeCwEnabled()
                     },
                     onSelectDraftNoteButtonClicked = {
-                        startActivity(Intent(requireActivity(), DraftNotesActivity::class.java))
+                        startActivity(Intent(requireActivity(), DraftNotesActivity::class.java).also {
+                            it.action = Intent.ACTION_PICK
+                        })
                     }
                 )
             }

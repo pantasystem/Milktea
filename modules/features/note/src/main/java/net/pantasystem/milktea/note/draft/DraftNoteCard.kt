@@ -18,14 +18,17 @@ import net.pantasystem.milktea.model.notes.draft.DraftNoteFile
 import net.pantasystem.milktea.note.R
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DraftNoteCard(
     draftNote: DraftNote,
     isVisibleContent: Boolean,
+    isPickMode: Boolean,
     onAction: (DraftNoteCardAction) -> Unit,
     onDetach: (DraftNoteFile) -> Unit,
     onShow: (DraftNoteFile) -> Unit,
     onToggleSensitive: (DraftNoteFile) -> Unit,
+    onSelect: (DraftNote) -> Unit,
 ) {
 
     var confirmDeleteDraftNoteId: Long? by remember {
@@ -53,6 +56,11 @@ fun DraftNoteCard(
             .padding(8.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
+        onClick = {
+            if (isPickMode) {
+                onSelect(draftNote)
+            }
+        }
     ) {
 
         Column(
@@ -95,25 +103,27 @@ fun DraftNoteCard(
                 )
             }
 
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                IconButton(onClick = { confirmDeleteDraftNoteId = draftNote.draftNoteId }) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = stringResource(id = R.string.delete_draft_note)
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                IconButton(onClick = {
-                    onAction(DraftNoteCardAction.Edit(draftNote))
-                }) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = stringResource(id = R.string.edit)
-                    )
+            if (!isPickMode) {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconButton(onClick = { confirmDeleteDraftNoteId = draftNote.draftNoteId }) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(id = R.string.delete_draft_note)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    IconButton(onClick = {
+                        onAction(DraftNoteCardAction.Edit(draftNote))
+                    }) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = stringResource(id = R.string.edit)
+                        )
+                    }
                 }
             }
 

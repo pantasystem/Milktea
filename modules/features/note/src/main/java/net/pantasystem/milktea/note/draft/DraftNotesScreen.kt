@@ -23,10 +23,12 @@ import net.pantasystem.milktea.note.draft.viewmodel.DraftNotesViewModel
 
 @Composable
 fun DraftNotesScreen(
+    isPickMode: Boolean,
     viewModel: DraftNotesViewModel,
     onShowFile: (DraftNoteFile) -> Unit,
     onNavigateUp: () -> Unit,
-    onEdit: (DraftNote) -> Unit
+    onEdit: (DraftNote) -> Unit,
+    onSelect: (DraftNote) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -64,6 +66,7 @@ fun DraftNotesScreen(
                                 DraftNoteCard(
                                     draftNote = item.draftNote,
                                     isVisibleContent = item.isVisibleContent,
+                                    isPickMode = isPickMode,
                                     onAction = { action ->
                                         when (action) {
                                             is DraftNoteCardAction.DeleteDraftNote -> {
@@ -81,7 +84,8 @@ fun DraftNotesScreen(
                                     },
                                     onToggleSensitive = { e ->
                                         viewModel.toggleSensitive(e)
-                                    }
+                                    },
+                                    onSelect = onSelect
                                 )
                             }
                         }
