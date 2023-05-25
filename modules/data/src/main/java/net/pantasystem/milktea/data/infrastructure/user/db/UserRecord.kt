@@ -266,6 +266,9 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "userId")
     val userId: Long,
 
+    @ColumnInfo(name = "aspectRatio")
+    val aspectRatio: Float? = null,
+
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
@@ -274,6 +277,7 @@ data class UserEmojiRecord(
             name = name,
             url = url,
             uri = uri,
+            aspectRatio = aspectRatio,
         )
     }
 }
