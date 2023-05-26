@@ -3,6 +3,7 @@ package net.pantasystem.milktea.note.reaction.choices
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,9 +16,12 @@ import net.pantasystem.milktea.note.EmojiType
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.ItemEmojiChoiceBinding
 import net.pantasystem.milktea.note.databinding.ItemEmojiListItemHeaderBinding
+import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.applySizeByAspectRatio
+import net.pantasystem.milktea.note.reaction.ImageAspectRatioCache
 import net.pantasystem.milktea.note.reaction.SaveImageAspectRequestListener
 
 class EmojiListItemsAdapter(
+    private val isApplyImageAspectRatio: Boolean,
     private val onEmojiSelected: (EmojiType) -> Unit,
     private val onEmojiLongClicked: (EmojiType) -> Boolean,
 ) : ListAdapter<EmojiListItemType, EmojiListItemsAdapter.VH>(
@@ -49,7 +53,7 @@ class EmojiListItemsAdapter(
     }
 
     sealed class VH(view: View) : RecyclerView.ViewHolder(view)
-    class EmojiVH(val binding: ItemEmojiChoiceBinding) : VH(binding.root) {
+    class EmojiVH(val binding: ItemEmojiChoiceBinding, private val isApplyImageAspectRatio: Boolean) : VH(binding.root) {
 
         fun onBind(
             item: EmojiType, onEmojiSelected: (EmojiType) -> Unit,
@@ -57,6 +61,14 @@ class EmojiListItemsAdapter(
         ) {
             when (item) {
                 is EmojiType.CustomEmoji -> {
+                    if (isApplyImageAspectRatio) {
+                        binding.reactionImagePreview.applySizeByAspectRatio<LinearLayout.LayoutParams>(
+                            20,
+                            item.emoji.aspectRatio ?: ImageAspectRatioCache.get(
+                                item.emoji.url ?: item.emoji.uri
+                            )
+                        )
+                    }
                     GlideApp.with(binding.reactionImagePreview)
                         .load(item.emoji.url ?: item.emoji.uri)
                         // FIXME: webpの場合うまく表示できなくなる
@@ -68,6 +80,7 @@ class EmojiListItemsAdapter(
                             )
                         )
                         .into(binding.reactionImagePreview)
+
                     binding.reactionStringPreview.setMemoVisibility(View.GONE)
                     binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)
                 }
@@ -122,7 +135,8 @@ class EmojiListItemsAdapter(
                         false
                     )
                 return EmojiVH(
-                    binding
+                    binding,
+                    isApplyImageAspectRatio
                 )
             }
         }

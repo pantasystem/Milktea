@@ -3,16 +3,13 @@ package net.pantasystem.milktea.note.emojis
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ahmadhamwi.tabsync.TabbedListMediator
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.material.tabs.TabLayout
@@ -24,7 +21,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import net.pantasystem.milktea.common_android.resource.convertDp2Px
+import net.pantasystem.milktea.common_android_ui.tab.TabbedFlexboxListMediator
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
@@ -134,6 +131,7 @@ class EmojiSelectionBinder(
 
 
         val adapter = EmojiListItemsAdapter(
+            isApplyImageAspectRatio = true,
             onEmojiLongClicked = { emojiType ->
                 val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
                 if (!exists) {
@@ -149,43 +147,14 @@ class EmojiSelectionBinder(
             }
         )
 
-        val layoutManager = GridLayoutManager(context, 5)
 
-        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when(EmojiListItemsAdapter.ItemType.values()[adapter.getItemViewType(position)]) {
-                    EmojiListItemsAdapter.ItemType.Header -> 5
-                    EmojiListItemsAdapter.ItemType.Emoji -> 1
-                }
-            }
-
+        val layoutManager by lazy {
+            val flexBoxLayoutManager = FlexboxLayoutManager(context)
+            flexBoxLayoutManager.alignItems = AlignItems.STRETCH
+            flexBoxLayoutManager
         }
+
         recyclerView.layoutManager = layoutManager
-
-        fun calculateSpanCount(): Int {
-            val viewWidth = recyclerView.measuredWidth
-            val itemWidth = context.convertDp2Px(54f).toInt()
-            return viewWidth / itemWidth
-        }
-
-        val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val count = calculateSpanCount().coerceAtLeast(4)
-                val lm = GridLayoutManager(context, count)
-
-                lm.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when(EmojiListItemsAdapter.ItemType.values()[adapter.getItemViewType(position)]) {
-                            EmojiListItemsAdapter.ItemType.Header -> count
-                            EmojiListItemsAdapter.ItemType.Emoji -> 1
-                        }
-                    }
-                }
-                recyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                recyclerView.layoutManager = lm
-            }
-        }
-        recyclerView.viewTreeObserver.addOnGlobalLayoutListener(listener)
 
         recyclerView.adapter = adapter
 
@@ -199,7 +168,7 @@ class EmojiSelectionBinder(
             }
         }
 
-        var tabbedListMediator: TabbedListMediator? = null
+        var tabbedListMediator: TabbedFlexboxListMediator? = null
         emojiPickerViewModel.uiState.filterNot {
             it.tabHeaderLabels.isEmpty()
         }.distinctUntilChangedBy {
@@ -214,7 +183,7 @@ class EmojiSelectionBinder(
                 tabLayout.addTab(tab, false)
             }
             tabbedListMediator?.detach()
-            tabbedListMediator = TabbedListMediator(
+            tabbedListMediator = TabbedFlexboxListMediator(
                 recyclerView,
                 tabLayout,
                 it.emojiListItems.mapIndexedNotNull { index, emojiListItemType ->

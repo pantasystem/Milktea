@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
@@ -13,6 +12,8 @@ import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibil
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
+import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.applySizeByAspectRatio
+import net.pantasystem.milktea.note.reaction.CustomEmojiImageViewSizeHelper.calculateImageWidthAndHeightSize
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 
@@ -40,21 +41,18 @@ object NoteReactionViewHelper {
         } else {
             reactionImageTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.setMemoVisibility(View.GONE)
-            val metrics = context.resources.displayMetrics
-            val imageViewHeightPx = REACTION_IMAGE_WIDTH_SIZE_DP * metrics.density
-            val imageAspectRatio = ImageAspectRatioCache.get(emoji.url ?: emoji.uri) ?: emoji.aspectRatio
-            val imageViewWidthPx = if (imageAspectRatio == null) {
-                imageViewHeightPx
-            } else {
-                (imageViewHeightPx * imageAspectRatio)
-            }
+            val imageAspectRatio =
+                ImageAspectRatioCache.get(emoji.url ?: emoji.uri) ?: emoji.aspectRatio
 
-            reactionImageTypeView.updateLayoutParams<LinearLayout.LayoutParams> {
-                this@updateLayoutParams.also {
-                    it.height = imageViewHeightPx.toInt()
-                    it.width = imageViewWidthPx.toInt()
-                }
-            }
+            val (imageViewWidthPx, imageViewHeightPx) = reactionImageTypeView.context.calculateImageWidthAndHeightSize(
+                REACTION_IMAGE_WIDTH_SIZE_DP,
+                imageAspectRatio
+            )
+            reactionImageTypeView.applySizeByAspectRatio<LinearLayout.LayoutParams>(
+                REACTION_IMAGE_WIDTH_SIZE_DP,
+                imageAspectRatio
+            )
+
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.url ?: emoji.uri)
@@ -63,7 +61,7 @@ object NoteReactionViewHelper {
                 .into(reactionImageTypeView)
         }
     }
-    
+
 
     @JvmStatic
     fun setReactionCount(
