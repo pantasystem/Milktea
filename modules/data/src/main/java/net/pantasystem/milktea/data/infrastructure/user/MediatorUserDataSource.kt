@@ -97,18 +97,7 @@ class MediatorUserDataSource @Inject constructor(
 
             memCache.put(user.id, user)
 
-            val newRecord = UserRecord(
-                accountId = user.id.accountId,
-                serverId = user.id.id,
-                avatarUrl = user.avatarUrl,
-                host = user.host,
-                isBot = user.isBot,
-                isCat = user.isCat,
-                isSameHost = user.isSameHost,
-                name = user.name,
-                userName = user.userName,
-                avatarBlurhash = user.avatarBlurhash,
-            )
+            val newRecord = UserRecord.from(user)
             val record = userDao.get(user.id.accountId, user.id.id)
             val result = if (record == null) AddResult.Created else AddResult.Updated
             val dbId = if (record == null) {

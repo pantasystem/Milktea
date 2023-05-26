@@ -64,7 +64,24 @@ data class UserRecord(
 
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-)
+) {
+    companion object {
+        fun from(user: User): UserRecord {
+            return UserRecord(
+                accountId = user.id.accountId,
+                serverId = user.id.id,
+                avatarUrl = user.avatarUrl,
+                host = user.host,
+                isBot = user.isBot,
+                isCat = user.isCat,
+                isSameHost = user.isSameHost,
+                name = user.name,
+                userName = user.userName,
+                avatarBlurhash = user.avatarBlurhash,
+            )
+        }
+    }
+}
 
 @Entity(
     tableName = "user_info_state",
