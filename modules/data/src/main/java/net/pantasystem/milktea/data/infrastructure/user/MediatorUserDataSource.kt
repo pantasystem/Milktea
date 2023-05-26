@@ -109,7 +109,7 @@ class MediatorUserDataSource @Inject constructor(
 
             // NOTE: 新たに追加される予定のオブジェクトと既にキャッシュしているオブジェクトの絵文字リストを比較している
             // NOTE: 比較した上で同一でなければキャッシュの更新処理を行う
-            if (record?.toModel()?.emojis?.toSet() != user.emojis.toSet()) {
+            if (!record?.emojis.isEqualToModels(user.emojis)) {
                 // NOTE: 既にキャッシュに存在していた場合一度全て剥がす
                 if (record != null) {
                     userDao.detachAllUserEmojis(dbId)

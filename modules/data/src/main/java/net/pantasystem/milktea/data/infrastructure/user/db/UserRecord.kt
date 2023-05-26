@@ -297,6 +297,25 @@ data class UserEmojiRecord(
             aspectRatio = aspectRatio,
         )
     }
+
+    fun isEqualToModel(model: Emoji): Boolean {
+        return name == model.name &&
+            url == model.url &&
+            uri == model.uri &&
+            aspectRatio == model.aspectRatio
+    }
+}
+
+fun List<UserEmojiRecord>?.isEqualToModels(models: List<Emoji>): Boolean {
+    if (this == null && models.isEmpty()) return true
+    if (this == null) return false
+    if (size != models.size) return false
+    val records = this.toSet()
+    return models.all {  model ->
+        records.any { record ->
+            record.isEqualToModel(model)
+        }
+    }
 }
 
 @Entity(
