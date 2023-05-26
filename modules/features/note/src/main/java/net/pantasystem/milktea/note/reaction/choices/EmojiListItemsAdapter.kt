@@ -63,7 +63,7 @@ class EmojiListItemsAdapter(
                 is EmojiType.CustomEmoji -> {
                     if (isApplyImageAspectRatio) {
                         binding.reactionImagePreview.applySizeByAspectRatio<LinearLayout.LayoutParams>(
-                            20,
+                            28,
                             item.emoji.aspectRatio ?: ImageAspectRatioCache.get(
                                 item.emoji.url ?: item.emoji.uri
                             )
