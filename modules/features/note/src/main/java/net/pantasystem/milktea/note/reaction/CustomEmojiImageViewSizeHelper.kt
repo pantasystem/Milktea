@@ -24,6 +24,6 @@ object CustomEmojiImageViewSizeHelper {
         } else {
             (heightPx * aspectRatio)
         }
-        return heightPx to imageViewWidthPx
+        return imageViewWidthPx to heightPx
     }
 }
