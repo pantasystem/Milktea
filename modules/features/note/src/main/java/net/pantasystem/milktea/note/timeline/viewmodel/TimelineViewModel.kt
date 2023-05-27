@@ -19,12 +19,12 @@ import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
-import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.notes.NoteStreaming
+import net.pantasystem.milktea.model.notes.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
@@ -41,17 +41,20 @@ class TimelineViewModel @AssistedInject constructor(
     private val timelineFilterServiceFactory: TimelineFilterService.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val configRepository: LocalConfigRepository,
-    @Assisted val account: Account?,
-    @Assisted val accountId: Long? = account?.accountId,
+    private val timelineScrollPositionRepository: TimelineScrollPositionRepository,
+    @Assisted val accountId: AccountId?,
+    @Assisted val pageId: PageId?,
     @Assisted val pageable: Pageable,
+    @Assisted val isSaveScrollPosition: Boolean,
 ) : ViewModel() {
 
     @AssistedFactory
     interface ViewModelAssistedFactory {
         fun create(
-            account: Account?,
-            accountId: Long?,
+            accountId: AccountId?,
+            pageId: PageId?,
             pageable: Pageable,
+            isSaveScrollPosition: Boolean,
         ): TimelineViewModel
     }
 
@@ -62,7 +65,7 @@ class TimelineViewModel @AssistedInject constructor(
 
     var position: Int = 0
     private val currentAccountWatcher = CurrentAccountWatcher(
-        if (accountId != null && accountId <= 0) null else accountId,
+        if (accountId?.value != null && accountId.value <= 0) null else accountId?.value,
         accountRepository
     )
 
@@ -156,12 +159,26 @@ class TimelineViewModel @AssistedInject constructor(
         }
     }
 
-    fun loadInit(initialUntilDate: Instant? = null) {
+    fun loadInit(initialUntilDate: Instant? = null, ignoreSavedScrollPosition: Boolean = false) {
         pagingCoroutineScope.cancel()
         pagingCoroutineScope.launch {
             cache.clear()
+
+            if (ignoreSavedScrollPosition) {
+                pageId?.let {
+                    timelineScrollPositionRepository.remove(it.value)
+                }
+            }
+            val savedScrollPositionId = pageId?.value?.let {
+                timelineScrollPositionRepository.get(it)
+            }?.takeIf {
+                !ignoreSavedScrollPosition
+            }
+
             timelineStore.clear(initialUntilDate?.let {
                 InitialLoadQuery.UntilDate(it)
+            } ?: savedScrollPositionId?.let {
+                InitialLoadQuery.UntilId(it)
             })
             timelineStore.loadPrevious().onFailure {
                 logger.error("load initial timeline failed", it)
@@ -212,6 +229,8 @@ class TimelineViewModel @AssistedInject constructor(
             if (config?.isStopNoteCaptureWhenBackground == true) {
                 cache.suspendNoteCapture()
             }
+
+            saveNowScrollPosition()
         }
     }
 
@@ -237,20 +256,44 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
     }
+
+    private suspend fun saveNowScrollPosition() {
+        if (isSaveScrollPosition && pageId != null) {
+            val listState = timelineListState.value
+            listState.filterIsInstance<TimelineListItem.Note>().getOrNull(position)?.note?.note?.note?.id?.let {
+                timelineScrollPositionRepository.save(
+                    pageId.value,
+                    it
+                )
+            }
+        }
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
 fun TimelineViewModel.Companion.provideViewModel(
     assistedFactory: TimelineViewModel.ViewModelAssistedFactory,
-    account: Account?,
-    accountId: Long? = account?.accountId,
+    accountId: AccountId?,
+    pageId: PageId?,
     pageable: Pageable,
+    isSaveScrollPosition: Boolean?,
 
     ) = object : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return assistedFactory.create(account, accountId, pageable) as T
+        return assistedFactory.create(
+            accountId = accountId,
+            pageId = pageId,
+            pageable,
+            isSaveScrollPosition ?: false,
+        ) as T
     }
 }
+
+
+class PageId(val value: Long)
+
+
+class AccountId(val value: Long)
 
 sealed interface TimelineListItem {
     object Loading : TimelineListItem
@@ -342,10 +385,10 @@ class NoteStreamingCollector(
                 .flatMapLatest {
                     noteStreaming.connect(currentAccountWatcher::getAccount, pageable)
                 }.map {
-                timelineStore.onReceiveNote(it.id)
-            }.catch {
-                logger.error("receive not error", it)
-            }.launchIn(coroutineScope + Dispatchers.IO)
+                    timelineStore.onReceiveNote(it.id)
+                }.catch {
+                    logger.error("receive not error", it)
+                }.launchIn(coroutineScope + Dispatchers.IO)
         }
 
     }
