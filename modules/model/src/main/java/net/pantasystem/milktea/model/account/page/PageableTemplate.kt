@@ -15,7 +15,7 @@ class PageableTemplate(val account: Account?) {
     fun localTimeline(title: String) =
         Page(account?.accountId?: - 1, title, 0, Pageable.LocalTimeline())
 
-    fun homeTimeline(title: String, withFiles: Boolean? = null) = Page(account?.accountId?: - 1, title, 0, Pageable.HomeTimeline(withFiles = withFiles))
+    fun homeTimeline(title: String, withFiles: Boolean? = null) = Page(account?.accountId?: - 1, title, 0, Pageable.HomeTimeline(withFiles = withFiles), isSavePagePosition = true)
 
     fun userListTimeline(listId: String) = Pageable.UserListTimeline(listId = listId)
 
@@ -83,7 +83,8 @@ class PageableTemplate(val account: Account?) {
             account?.accountId ?: -1,
             title,
             0,
-            Pageable.Mastodon.HomeTimeline
+            Pageable.Mastodon.HomeTimeline,
+            isSavePagePosition = true,
         )
     }
 
