@@ -596,7 +596,7 @@
     <string name="trend_posted_person_count_msg">%d人が投稿</string>
     <string name="notes_confirm_attach_quote_note_by_url">引用として添付しますか?</string>
     <string name="select_draft_post">下書き投稿を選択</string>
-    <string name="remember_scroll_position">Remember scroll position</string>
+    <string name="remember_scroll_position">スクロール位置を保持する</string>
     <!-- User -->
 
 
