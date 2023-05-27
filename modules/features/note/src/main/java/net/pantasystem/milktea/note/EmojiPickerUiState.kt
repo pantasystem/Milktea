@@ -173,27 +173,8 @@ data class EmojiPickerUiState(
     }
 
 
-    val emojiListItems: List<EmojiListItemType> = listOf(
-        EmojiListItemType.Header(StringSource.invoke(R.string.user)),
-    ) + userSettingEmojis.map {
-        EmojiListItemType.EmojiItem(it)
-    } + EmojiListItemType.Header(StringSource.invoke(R.string.often_use)) + frequencyUsedReactionsV2.map {
-        EmojiListItemType.EmojiItem(it)
-    } + EmojiListItemType.Header(StringSource(R.string.recently_used)) + recentlyUsed.map {
-        EmojiListItemType.EmojiItem(it)
-    } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
-        EmojiListItemType.EmojiItem(it)
-    } + categories.map { category ->
-        listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(category).map {
-            EmojiListItemType.EmojiItem(it)
-        }
-    }.flatten()
+    val emojiListItems: List<EmojiListItemType> = generateEmojiListItems()
 
-    val searchFilteredEmojis = customEmojis.filterEmojiBy(keyword).map {
-        EmojiType.CustomEmoji(it)
-    }.sortedBy {
-        LevenshteinDistance(it.emoji.name, keyword)
-    }
 
     val tabHeaderLabels = emojiListItems.mapNotNull {
         (it as? EmojiListItemType.Header)?.label
@@ -202,6 +183,34 @@ data class EmojiPickerUiState(
     fun isExistsConfig(emojiType: EmojiType): Boolean {
         return userSettingEmojis.any {
             emojiType.areItemsTheSame(it)
+        }
+    }
+
+    private fun generateEmojiListItems(): List<EmojiListItemType> {
+        return if (keyword.isBlank()) {
+            listOf(
+                EmojiListItemType.Header(StringSource.invoke(R.string.user)),
+            ) + userSettingEmojis.map {
+                EmojiListItemType.EmojiItem(it)
+            } + EmojiListItemType.Header(StringSource.invoke(R.string.often_use)) + frequencyUsedReactionsV2.map {
+                EmojiListItemType.EmojiItem(it)
+            } + EmojiListItemType.Header(StringSource(R.string.recently_used)) + recentlyUsed.map {
+                EmojiListItemType.EmojiItem(it)
+            } + EmojiListItemType.Header(StringSource.invoke(R.string.other)) + otherEmojis.map {
+                EmojiListItemType.EmojiItem(it)
+            } + categories.map { category ->
+                listOf(EmojiListItemType.Header(StringSource.invoke(category))) + getCategoryBy(category).map {
+                    EmojiListItemType.EmojiItem(it)
+                }
+            }.flatten()
+        } else {
+            customEmojis.filterEmojiBy(keyword).map {
+                EmojiType.CustomEmoji(it)
+            }.sortedBy {
+                LevenshteinDistance(it.emoji.name, keyword)
+            }.map {
+                EmojiListItemType.EmojiItem(it)
+            }
         }
     }
 }

@@ -29,7 +29,6 @@ import net.pantasystem.milktea.note.EmojiListItemType
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentEmojiPickerBinding
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel
-import net.pantasystem.milktea.note.reaction.choices.EmojiChoicesAdapter
 import net.pantasystem.milktea.note.reaction.choices.EmojiListItemsAdapter
 import net.pantasystem.milktea.note.toTextReaction
 
@@ -53,7 +52,6 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
             scope = viewLifecycleOwner.lifecycleScope,
             fragmentManager = childFragmentManager,
             lifecycleOwner = viewLifecycleOwner,
-            searchSuggestionListView = binding.searchSuggestionsView,
             tabLayout = binding.reactionChoicesTab,
             recyclerView = binding.reactionChoicesViewPager,
             searchWordTextField = binding.searchReactionEditText,
@@ -95,7 +93,6 @@ class EmojiSelectionBinder(
     val scope: CoroutineScope,
     val fragmentManager: FragmentManager,
     val lifecycleOwner: LifecycleOwner,
-    val searchSuggestionListView: RecyclerView,
     val tabLayout: TabLayout,
     val recyclerView: RecyclerView,
     val searchWordTextField: EditText,
@@ -104,30 +101,7 @@ class EmojiSelectionBinder(
     val onSearchEmojiTextFieldEntered: (String) -> Unit,
 ) {
 
-    private val flexBoxLayoutManager: FlexboxLayoutManager by lazy {
-        val flexBoxLayoutManager = FlexboxLayoutManager(context)
-        flexBoxLayoutManager.alignItems = AlignItems.STRETCH
-        flexBoxLayoutManager
-    }
-
     fun bind() {
-        val searchedReactionAdapter = EmojiChoicesAdapter(
-            onEmojiSelected = {
-                onReactionSelected(it.toTextReaction())
-            },
-            onEmojiLongClicked = { emojiType ->
-                val exists = emojiPickerViewModel.uiState.value.isExistsConfig(emojiType)
-                if (!exists) {
-                    AddEmojiToUserConfigDialog.newInstance(emojiType)
-                        .show(fragmentManager, "AddEmojiToUserConfigDialog")
-                    true
-                } else {
-                    false
-                }
-            }
-        )
-        searchSuggestionListView.adapter = searchedReactionAdapter
-        searchSuggestionListView.layoutManager = flexBoxLayoutManager
 
 
         val adapter = EmojiListItemsAdapter(
@@ -163,7 +137,6 @@ class EmojiSelectionBinder(
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 emojiPickerViewModel.uiState.collect {
                     adapter.submitList(it.emojiListItems)
-                    searchedReactionAdapter.submitList(it.searchFilteredEmojis)
                 }
             }
         }
