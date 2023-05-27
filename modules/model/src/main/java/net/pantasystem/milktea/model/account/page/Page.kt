@@ -11,11 +11,12 @@ data class Page(
     val title: String,
     var weight: Int,
     val pageParams: PageParams,
+    val isSavePagePosition: Boolean,
     var pageId: Long
 ) : Serializable, Parcelable {
 
-    constructor(accountId: Long, title: String, weight: Int, pageable: Pageable, pageId: Long = 0)
-            : this(accountId, title, weight, pageable.toParams(), pageId)
+    constructor(accountId: Long, title: String, weight: Int, pageable: Pageable, isSavePagePosition: Boolean = false, pageId: Long = 0)
+            : this(accountId, title, weight, pageable.toParams(), isSavePagePosition, pageId)
 
 
     fun pageable(): Pageable {

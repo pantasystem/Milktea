@@ -34,6 +34,7 @@ data class PageRecord(
                 title = page.title,
                 weight = page.weight,
                 pageParams = PageRecordParams.from(page.pageParams),
+                isSavePagePosition = page.isSavePagePosition,
                 pageId = page.pageId
             )
         }
@@ -45,7 +46,8 @@ data class PageRecord(
             title = title,
             weight = weight,
             pageParams = pageParams.toParams(),
-            pageId = pageId
+            pageId = pageId,
+            isSavePagePosition = isSavePagePosition ?: false
         )
     }
 }
