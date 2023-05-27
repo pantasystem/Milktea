@@ -369,7 +369,7 @@ sealed class Pageable : Serializable {
     sealed class Mastodon : Pageable() {
         data class PublicTimeline(
             val isOnlyMedia: Boolean? = null
-        ) : Mastodon(), CanOnlyMedia<PublicTimeline> {
+        ) : Mastodon(), CanOnlyMedia<PublicTimeline>, UntilPaginate, SincePaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_PUBLIC_TIMELINE,
@@ -390,7 +390,7 @@ sealed class Pageable : Serializable {
 
         data class LocalTimeline(
             val isOnlyMedia: Boolean? = null
-        ) : Mastodon(), CanOnlyMedia<LocalTimeline> {
+        ) : Mastodon(), CanOnlyMedia<LocalTimeline>, UntilPaginate, SincePaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_LOCAL_TIMELINE,
@@ -410,7 +410,7 @@ sealed class Pageable : Serializable {
         }
 
         data class HashTagTimeline(val hashtag: String, val isOnlyMedia: Boolean? = null) :
-            Mastodon(), CanOnlyMedia<HashTagTimeline> {
+            Mastodon(), CanOnlyMedia<HashTagTimeline>, SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_HASHTAG_TIMELINE,
@@ -430,7 +430,7 @@ sealed class Pageable : Serializable {
             }
         }
 
-        data class ListTimeline(val listId: String) : Mastodon() {
+        data class ListTimeline(val listId: String) : Mastodon(), SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_LIST_TIMELINE,
@@ -439,7 +439,7 @@ sealed class Pageable : Serializable {
             }
         }
 
-        object HomeTimeline : Mastodon() {
+        object HomeTimeline : Mastodon(), SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_HOME_TIMELINE,
@@ -452,7 +452,7 @@ sealed class Pageable : Serializable {
             val isOnlyMedia: Boolean? = null,
             val excludeReplies: Boolean? = null,
             val excludeReblogs: Boolean? = null,
-        ) : Mastodon(), CanOnlyMedia<UserTimeline> {
+        ) : Mastodon(), CanOnlyMedia<UserTimeline>, SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_USER_TIMELINE,
@@ -472,7 +472,7 @@ sealed class Pageable : Serializable {
             }
         }
 
-        object BookmarkTimeline : Mastodon() {
+        object BookmarkTimeline : Mastodon(), SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_BOOKMARK_TIMELINE
@@ -495,7 +495,7 @@ sealed class Pageable : Serializable {
 
         data class TagTimeline(
             val tag: String,
-        ) : Mastodon() {
+        ) : Mastodon(), SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
                     type = PageType.MASTODON_TAG_TIMELINE,
