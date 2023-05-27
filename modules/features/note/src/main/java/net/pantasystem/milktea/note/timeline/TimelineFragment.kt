@@ -34,9 +34,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentSwipeRefreshRecyclerViewBinding
-import net.pantasystem.milktea.note.timeline.viewmodel.TimeMachineEventViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.TimelineViewModel
-import net.pantasystem.milktea.note.timeline.viewmodel.provideViewModel
+import net.pantasystem.milktea.note.timeline.viewmodel.*
 import net.pantasystem.milktea.note.view.NoteCardActionHandler
 import net.pantasystem.milktea.note.viewmodel.NotesViewModel
 import javax.inject.Inject
@@ -81,9 +79,14 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private val mViewModel: TimelineViewModel by viewModels<TimelineViewModel> {
         TimelineViewModel.provideViewModel(
             timelineViewModelFactory,
-            null,
-            mPage?.accountId ?: accountId,
-            mPageable
+            accountId = (mPage?.accountId ?: accountId)?.let {
+                AccountId(it)
+            },
+            pageId = mPage?.pageId?.let {
+                PageId(it)
+            },
+            pageable = mPageable,
+            isSaveScrollPosition = mPage?.isSavePagePosition
         )
     }
 
@@ -236,7 +239,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
                     R.id.refresh_timeline -> {
-                        mViewModel.loadInit()
+                        mViewModel.loadInit(ignoreSavedScrollPosition = true)
                         return true
                     }
                     R.id.set_time_machine -> {
@@ -251,7 +254,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         viewLifecycleOwner.lifecycleScope.launch {
             whenResumed {
                 timeMachineEventViewModel.loadEvents.collect {
-                    mViewModel.loadInit(it)
+                    mViewModel.loadInit(it, ignoreSavedScrollPosition = true)
                 }
             }
         }
