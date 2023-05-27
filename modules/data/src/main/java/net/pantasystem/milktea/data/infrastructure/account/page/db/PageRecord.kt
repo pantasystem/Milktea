@@ -19,6 +19,9 @@ data class PageRecord(
 
     @Embedded val pageParams: PageRecordParams,
 
+    @ColumnInfo(name = "isSavePagePosition")
+    val isSavePagePosition: Boolean? = false,
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "pageId")
     var pageId: Long
