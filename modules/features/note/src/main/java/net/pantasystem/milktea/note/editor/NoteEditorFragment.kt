@@ -276,7 +276,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         ).launchIn(viewLifecycleOwner.lifecycleScope)
 
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        accountViewModel.currentAccount.filterNotNull().flatMapLatest {
             metaRepository.observe(it.normalizedInstanceUri)
         }.mapNotNull {
             it?.emojis
@@ -654,7 +654,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         val intent = driveNavigation.newIntent(
             DriveNavigationArgs(
                 selectableFileMaxSize = selectableMaxSize,
-                accountId = accountStore.currentAccountId,
+                accountId = noteEditorViewModel.currentAccount.value?.accountId,
             )
         )
 

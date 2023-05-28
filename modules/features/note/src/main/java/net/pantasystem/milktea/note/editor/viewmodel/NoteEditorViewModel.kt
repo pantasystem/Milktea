@@ -79,7 +79,8 @@ class NoteEditorViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("NoteEditorViewModel")
 
-    private val currentAccount = MutableStateFlow<Account?>(null)
+    private val _currentAccount = MutableStateFlow<Account?>(null)
+    val currentAccount = _currentAccount.asStateFlow()
 
     val text = savedStateHandle.getStateFlow<String?>(NoteEditorSavedStateKey.Text.name, null)
 
@@ -94,7 +95,7 @@ class NoteEditorViewModel @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfoType = currentAccount.filterNotNull().flatMapLatest {
+    val instanceInfoType = _currentAccount.filterNotNull().flatMapLatest {
         instanceInfoService.observe(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
@@ -146,7 +147,7 @@ class NoteEditorViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val maxTextLength =
-        currentAccount.filterNotNull().flatMapLatest { account ->
+        _currentAccount.filterNotNull().flatMapLatest { account ->
             instanceInfoService.observe(account.normalizedInstanceUri).filterNotNull()
                 .map { meta ->
                     meta.maxNoteTextLength
@@ -158,16 +159,16 @@ class NoteEditorViewModel @Inject constructor(
         )
 
 
-    val enableFeatures = currentAccount.filterNotNull().map {
+    val enableFeatures = _currentAccount.filterNotNull().map {
         featureEnables.enableFeatures(it.normalizedInstanceUri)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
-    val maxFileCount = currentAccount.filterNotNull().mapNotNull {
+    val maxFileCount = _currentAccount.filterNotNull().mapNotNull {
         instanceInfoService.find(it.normalizedInstanceUri).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfo = currentAccount.filterNotNull().flatMapLatest {
+    val instanceInfo = _currentAccount.filterNotNull().flatMapLatest {
         instanceInfoRepository.observeByHost(it.getHost())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
@@ -176,7 +177,7 @@ class NoteEditorViewModel @Inject constructor(
         NoteEditorSavedStateKey.Visibility.name,
         null
     )
-    val visibility = combine(_visibility, currentAccount.filterNotNull().map {
+    val visibility = combine(_visibility, _currentAccount.filterNotNull().map {
         localConfigRepository.getRememberVisibility(it.accountId).getOrElse {
             RememberVisibility.None
         }
@@ -231,7 +232,7 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Lazily, initialValue = 1500)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val channels = currentAccount.filterNotNull().flatMapLatest {
+    val channels = _currentAccount.filterNotNull().flatMapLatest {
         suspend {
             channelRepository.findFollowedChannels(it.accountId).onFailure {
                 logger.error("load channel error", it)
@@ -248,7 +249,7 @@ class NoteEditorViewModel @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val currentUser: StateFlow<UserViewData?> =
-        currentAccount.filterNotNull().map {
+        _currentAccount.filterNotNull().map {
             val userId = User.Id(it.accountId, it.remoteId)
             userViewDataFactory.create(
                 userId,
@@ -289,7 +290,7 @@ class NoteEditorViewModel @Inject constructor(
         noteEditorSendToState,
         filePreviewSources,
         poll,
-        currentAccount,
+        _currentAccount,
     ) { formState, sendToState, files, poll, account ->
         NoteEditorUiState(
             formState = formState,
@@ -305,7 +306,7 @@ class NoteEditorViewModel @Inject constructor(
     }.asLiveData()
 
     private val cache = planeNoteViewDataCacheFactory.create({
-        requireNotNull(currentAccount.value)
+        requireNotNull(_currentAccount.value)
     }, viewModelScope)
 
     val replyTo = replyId.map { id ->
@@ -317,7 +318,7 @@ class NoteEditorViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val accountUiState = AccountViewModelUiStateHelper(
-        currentAccount,
+        _currentAccount,
         accountStore,
         userDataSource,
         instanceInfoService,
@@ -386,7 +387,7 @@ class NoteEditorViewModel @Inject constructor(
                     currentAccount = account
                 )
             }.onSuccess { note ->
-                currentAccount.value = note.currentAccount
+                _currentAccount.value = note.currentAccount
                 savedStateHandle.applyBy(note)
             }
         }
@@ -430,7 +431,7 @@ class NoteEditorViewModel @Inject constructor(
 
 
     fun post() {
-        currentAccount.value?.let { account ->
+        _currentAccount.value?.let { account ->
             viewModelScope.launch {
                 val reservationPostingAt =
                     savedStateHandle.getNoteEditingUiState(
@@ -464,7 +465,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     fun toggleNsfw(appFile: AppFile) {
-        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+        if (_currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
             return
         }
         when (appFile) {
@@ -486,7 +487,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun toggleSensitive() {
         val sensitive = savedStateHandle.getSensitive()
-        if (currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
+        if (_currentAccount.value?.instanceType == Account.InstanceType.MASTODON) {
             viewModelScope.launch {
                 savedStateHandle.setFiles(
                     savedStateHandle.getFiles().mapNotNull { appFile ->
@@ -559,7 +560,7 @@ class NoteEditorViewModel @Inject constructor(
             file
         )
         savedStateHandle.setFiles(files)
-        val account = currentAccount.value ?: return@launch
+        val account = _currentAccount.value ?: return@launch
         val localFile = when (file) {
             is AppFile.Local -> file
             is AppFile.Remote -> return@launch
@@ -713,7 +714,7 @@ class NoteEditorViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            when (val account = currentAccount.value) {
+            when (val account = _currentAccount.value) {
                 null -> Result.failure(UnauthorizedException())
                 else -> Result.success(account)
             }.mapCancellableCatching { account ->
@@ -728,7 +729,7 @@ class NoteEditorViewModel @Inject constructor(
 
     fun onPastePostUrl(text: String, start: Int, beforeText: String, count: Int) = viewModelScope.launch {
         val urlText = text.substring(start, start + count)
-        val ca = currentAccount.value ?: return@launch
+        val ca = _currentAccount.value ?: return@launch
         val canQuote = canQuote()
 
         if (!canQuote) {
@@ -758,7 +759,7 @@ class NoteEditorViewModel @Inject constructor(
     }
 
     suspend fun canQuote(): Boolean {
-        val ca = currentAccount.value ?: return false
+        val ca = _currentAccount.value ?: return false
         return instanceInfoService.find(ca.normalizedInstanceUri).map {
             it.canQuote
         }.getOrElse { false }
@@ -795,23 +796,23 @@ class NoteEditorViewModel @Inject constructor(
 
     private suspend fun setAccount(account: Account) = runCancellableCatching<Unit> {
         val result = noteEditorSwitchAccountExecutor(
-            currentAccount.value,
+            _currentAccount.value,
             noteEditorSendToState.value,
             account,
         )
 
-        if (account.accountId != currentAccount.value?.accountId && currentAccount.value != null) {
+        if (account.accountId != _currentAccount.value?.accountId && _currentAccount.value != null) {
             savedStateHandle.setReplyId(result.replyId)
             savedStateHandle.setRenoteId(result.renoteId)
             savedStateHandle.setChannelId(result.channelId)
         }
-        if (currentAccount.value != null) {
+        if (_currentAccount.value != null) {
             savedStateHandle.setVisibility(null)
         }
         logger.debug {
             "currentAccount:${account.userName}@${account.getHost()}"
         }
-        currentAccount.value = account
+        _currentAccount.value = account
     }
 
 }
