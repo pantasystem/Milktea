@@ -23,6 +23,7 @@ import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
+import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteStreaming
 import net.pantasystem.milktea.model.notes.TimelineScrollPositionRepository
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
@@ -260,7 +261,14 @@ class TimelineViewModel @AssistedInject constructor(
     private suspend fun saveNowScrollPosition() {
         if (isSaveScrollPosition && pageId != null) {
             val listState = timelineListState.value
-            listState.filterIsInstance<TimelineListItem.Note>().getOrNull(position)?.note?.note?.note?.id?.let {
+            var savePos = position - 1
+            while(savePos < listState.size && listState.getOrNull(savePos) !is TimelineListItem.Note) {
+                savePos++
+            }
+            val savePosId: Note.Id? = listState.getOrNull(savePos)?.let {
+                (it as? TimelineListItem.Note)?.note?.note?.note?.id
+            }
+            savePosId?.also {
                 timelineScrollPositionRepository.save(
                     pageId.value,
                     it
