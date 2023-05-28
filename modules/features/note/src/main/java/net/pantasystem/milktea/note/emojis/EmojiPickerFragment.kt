@@ -26,6 +26,7 @@ import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
 import net.pantasystem.milktea.note.EmojiListItemType
+import net.pantasystem.milktea.note.EmojiPickerUiStateService
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentEmojiPickerBinding
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel
@@ -35,6 +36,15 @@ import net.pantasystem.milktea.note.toTextReaction
 @AndroidEntryPoint
 class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSelection {
 
+    companion object {
+        fun newInstance(accountId: Long?): EmojiPickerFragment {
+            return EmojiPickerFragment().also { fragment ->
+                fragment.arguments = Bundle().apply {
+                    putLong(EmojiPickerUiStateService.EXTRA_ACCOUNT_ID, accountId ?: -1L)
+                }
+            }
+        }
+    }
     interface OnEmojiSelectedListener {
         fun onSelect(emoji: String)
     }
