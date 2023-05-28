@@ -16,6 +16,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment.OnEmojiSelectedListener{
 
+    companion object {
+        fun newInstance(accountId: Long?): CustomEmojiPickerDialog {
+            return CustomEmojiPickerDialog().apply {
+                arguments = Bundle().apply {
+                    putLong("ACCOUNT_ID", accountId ?: -1)
+                }
+            }
+        }
+    }
+
     private var mSelectionViewModel: EmojiSelectionViewModel? = null
 
     @Inject
@@ -23,6 +33,12 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
 
     @Inject
     lateinit var metaRepository: MetaRepository
+
+    private val accountId: Long? by lazy(LazyThreadSafetyMode.NONE) {
+        requireArguments().getLong("ACCOUNT_ID").takeIf {
+            it > 0
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +52,7 @@ class CustomEmojiPickerDialog : BottomSheetDialogFragment(), EmojiPickerFragment
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null) {
             childFragmentManager.beginTransaction().also {
-                it.add(R.id.fragmentBaseContainer, EmojiPickerFragment())
+                it.add(R.id.fragmentBaseContainer, EmojiPickerFragment.newInstance(accountId))
             }.commit()
         }
     }
