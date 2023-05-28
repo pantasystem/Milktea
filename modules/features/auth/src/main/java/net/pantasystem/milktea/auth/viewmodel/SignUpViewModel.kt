@@ -3,8 +3,7 @@ package net.pantasystem.milktea.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
@@ -26,11 +25,28 @@ class SignUpViewModel @Inject constructor(
 
     @OptIn(FlowPreview::class)
     private val instancesInfosResponse = suspend {
-        requireNotNull(
-            instancesInfosAPIBuilder.build().getInstances()
-                .throwIfHasError()
-                .body()
-        )
+        coroutineScope {
+            listOf(
+                async {
+                    requireNotNull(
+                        instancesInfosAPIBuilder.buildCalckey().getInstances()
+                            .throwIfHasError()
+                            .body()
+                    )
+                },
+                async {
+                    requireNotNull(
+                        instancesInfosAPIBuilder.build().getInstances()
+                            .throwIfHasError()
+                            .body()
+                    )
+                },
+            ).awaitAll().map {
+                it.instancesInfos
+            }.flatten().distinctBy {
+                it.url
+            }
+        }
     }.asFlow().catch { 
         logger.error("インスタンス情報の取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -69,7 +85,7 @@ class SignUpViewModel @Inject constructor(
             keyword = keyword,
             selected,
             info,
-            infos,
+            infos ?: emptyList(),
         )
     }.stateIn(
         viewModelScope,
@@ -90,12 +106,12 @@ data class SignUpUiState(
     val keyword: String = "",
     val selectedUrl: String? = "misskey.io",
     val instanceInfo: ResultState<InstanceInfoType> = ResultState.Loading(StateContent.NotExist()),
-    val instancesInfosResponse: InstanceInfosResponse? = null
+    val instancesInfosResponse: List<InstanceInfosResponse.InstanceInfo> = emptyList(),
 ) {
 
-    val filteredInfos = (instancesInfosResponse?.instancesInfos?.filter {
+    val filteredInfos = instancesInfosResponse.filter {
         it.url.contains(keyword) || it.name.contains(keyword)
-    } ?: emptyList()).let { list ->
+    }.let { list ->
         val misskeyIo = list.firstOrNull {
             it.url == "misskey.io"
         }

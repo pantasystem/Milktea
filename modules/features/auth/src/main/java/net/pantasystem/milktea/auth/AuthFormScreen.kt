@@ -237,7 +237,7 @@ private fun FilteredInstances(
     onInputInstanceDomain: (String) -> Unit,
 ) {
     val instances = remember(uiState.misskeyInstanceInfosResponse, uiState.formState) {
-        uiState.misskeyInstanceInfosResponse?.instancesInfos?.filter {
+        uiState.misskeyInstanceInfosResponse.filter {
             it.meta.uri.contains(instanceDomain) || it.name.contains(instanceDomain)
         } ?: emptyList()
     }
@@ -289,7 +289,7 @@ fun Preview_AuthFormScreen() {
                     ),
                     metaState = ResultState.Loading(StateContent.NotExist()),
                     stateType = Authorization.BeforeAuthentication,
-                    misskeyInstanceInfosResponse = null
+                    misskeyInstanceInfosResponse = emptyList(),
                 ),
                 onShowPrivacyPolicy = {},
                 onShowTermsOfService = {},

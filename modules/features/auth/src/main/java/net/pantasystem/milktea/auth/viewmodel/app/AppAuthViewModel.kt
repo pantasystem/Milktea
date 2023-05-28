@@ -73,11 +73,29 @@ class AppAuthViewModel @Inject constructor(
     private val misskeyInstances = suspend {
         runCancellableCatching {
             withContext(Dispatchers.IO) {
-                requireNotNull(
-                    instancesInfoAPIBuilder.build().getInstances()
-                        .throwIfHasError()
-                        .body()
-                )
+                coroutineScope {
+                    val instances = listOf(
+                        async {
+                            requireNotNull(
+                                instancesInfoAPIBuilder.buildCalckey().getInstances()
+                                    .throwIfHasError()
+                                    .body()
+                            )
+                        },
+                        async {
+                            requireNotNull(
+                                instancesInfoAPIBuilder.build().getInstances()
+                                    .throwIfHasError()
+                                    .body()
+                            )
+                        }
+                    ).awaitAll()
+                    instances.map {
+                        it.instancesInfos
+                    }.flatten().distinctBy {
+                        it.url
+                    }
+                }
             }
         }
     }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -238,7 +256,9 @@ class AppAuthViewModel @Inject constructor(
             waiting4ApproveState = waiting4Approve,
             clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
             instances = instances,
-            misskeyInstanceInfosResponse = misskeyInstances?.getOrNull()
+            misskeyInstanceInfosResponse = misskeyInstances?.getOrElse {
+                emptyList()
+            } ?: emptyList()
         )
     }.stateIn(
         viewModelScope,
@@ -247,7 +267,7 @@ class AppAuthViewModel @Inject constructor(
             formState = authUserInputState.value,
             metaState = metaState.value,
             stateType = Authorization.BeforeAuthentication,
-            misskeyInstanceInfosResponse = null,
+            misskeyInstanceInfosResponse = emptyList(),
         )
     )
 
