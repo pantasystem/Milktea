@@ -11,19 +11,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.pantasystem.milktea.common_android_ui.account.page.PageTypeHelper
+import getStringFromStringSource
 import net.pantasystem.milktea.model.account.page.PageType
+import net.pantasystem.milktea.setting.viewmodel.page.PageCandidate
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TabItemSelectionDialog(
     modifier: Modifier = Modifier,
-    items: List<PageType>,
+    items: List<PageCandidate>,
     onClick: (PageType) -> Unit,
 ) {
     LazyColumn(
@@ -32,7 +32,7 @@ internal fun TabItemSelectionDialog(
         items(items) { pageType ->
             Surface(
                 onClick = {
-                    onClick(pageType)
+                    onClick(pageType.type)
                 },
             ) {
                 Box(
@@ -42,7 +42,7 @@ internal fun TabItemSelectionDialog(
                         .fillMaxWidth(),
                 ) {
                     Text(
-                        PageTypeHelper.nameByPageType(LocalContext.current, pageType),
+                        getStringFromStringSource(pageType.name),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )

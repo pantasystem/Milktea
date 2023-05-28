@@ -14,13 +14,14 @@ import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.setting.R
+import net.pantasystem.milktea.setting.viewmodel.page.PageCandidate
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TabItemsListScreen(
     dragDropState: DragAndDropState,
-    pageTypes: List<PageType>,
+    pageTypes: List<PageCandidate>,
     list: List<Page>,
     onSelectPage: (PageType) -> Unit,
     onOptionButtonClicked: (Page) -> Unit,

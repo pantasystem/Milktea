@@ -12,12 +12,9 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.app_store.setting.SettingStore
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.*
-import net.pantasystem.milktea.model.instance.Version
-import net.pantasystem.milktea.model.nodeinfo.NodeInfo
-import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
-import net.pantasystem.milktea.model.nodeinfo.getVersion
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import net.pantasystem.milktea.setting.PageTypeNameMap
@@ -29,12 +26,13 @@ class PageSettingViewModel @Inject constructor(
     private val pageTypeNameMap: PageTypeNameMap,
     private val userRepository: UserRepository,
     private val accountStore: AccountStore,
-    private val nodeInfoRepository: NodeInfoRepository,
+    private val pageCandidateGenerator: PageCandidateGenerator,
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
     val selectedPages = MutableStateFlow<List<Page>>(emptyList())
 
-    val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    val account =
+        accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val pageAddedEvent = EventBus<PageType>()
 
@@ -43,57 +41,7 @@ class PageSettingViewModel @Inject constructor(
     val pageOnUpdateEvent = EventBus<Page>()
 
     val pageTypes = account.filterNotNull().map {
-        val nodeInfo = nodeInfoRepository.find(it.getHost()).getOrNull()
-        val version = nodeInfo?.type?.getVersion() ?: Version("0")
-        val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
-        when(it.instanceType) {
-            Account.InstanceType.MISSKEY -> {
-                listOfNotNull(
-                    PageType.HOME,
-                    PageType.LOCAL,
-                    PageType.SOCIAL,
-                    PageType.GLOBAL,
-                    if (isCalckey) PageType.CALCKEY_RECOMMENDED_TIMELINE else null,
-                    if (version >= Version("12")) PageType.ANTENNA else null,
-                    PageType.NOTIFICATION,
-                    PageType.USER_LIST,
-                    PageType.MENTION,
-                    PageType.FAVORITE,
-                    if (version >= Version("12")) PageType.CHANNEL_TIMELINE else null,
-                    if (version >= Version("12")) PageType.CLIP_NOTES else null,
-                    PageType.SEARCH,
-                    PageType.SEARCH_HASH,
-                    PageType.USER,
-                    PageType.FEATURED,
-                    PageType.DETAIL,
-                ) + if (version >= Version("12.75.0")) {
-                    listOf(
-                        PageType.GALLERY_FEATURED,
-                        PageType.GALLERY_POPULAR,
-                        PageType.GALLERY_POSTS,
-                        PageType.USERS_GALLERY_POSTS,
-                        PageType.MY_GALLERY_POSTS,
-                        PageType.I_LIKED_GALLERY_POSTS,
-                    )
-                } else {
-                    emptyList()
-                }
-            }
-            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
-                listOf(
-                    PageType.MASTODON_HOME_TIMELINE,
-                    PageType.MASTODON_LOCAL_TIMELINE,
-                    PageType.MASTODON_PUBLIC_TIMELINE,
-//                    PageType.MASTODON_HASHTAG_TIMELINE,
-                    PageType.NOTIFICATION,
-                    PageType.FAVORITE,
-                    PageType.MASTODON_LIST_TIMELINE,
-                    PageType.MASTODON_BOOKMARK_TIMELINE,
-//                    PageType.MASTODON_USER_TIMELINE,
-
-                )
-            }
-        }
+        pageCandidateGenerator.createPageCandidates(it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
@@ -180,7 +128,7 @@ class PageSettingViewModel @Inject constructor(
     }
 
     fun addUsersGalleryByIds(userIds: List<User.Id>) {
-        viewModelScope.launch  {
+        viewModelScope.launch {
             runCancellableCatching {
                 userIds.map {
                     async {
@@ -298,3 +246,9 @@ class PageSettingViewModel @Inject constructor(
     }
 
 }
+
+data class PageCandidate(
+    val relatedAccount: Account,
+    val type: PageType,
+    val name: StringSource,
+)
