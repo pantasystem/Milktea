@@ -1,9 +1,6 @@
 package net.pantasystem.milktea.note.timeline.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -17,6 +14,7 @@ import net.pantasystem.milktea.common.APIError
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.coroutines.throttleLatest
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -129,6 +127,8 @@ class TimelineViewModel @AssistedInject constructor(
 
     private var isActive = true
 
+    private val saveScrollPositionScrolledEvent = MutableSharedFlow<Int>(extraBufferCapacity = 4)
+
     init {
 
         viewModelScope.launch {
@@ -141,6 +141,9 @@ class TimelineViewModel @AssistedInject constructor(
             }
         }
 
+        saveScrollPositionScrolledEvent.distinctUntilChanged().throttleLatest(500).onEach {
+            saveNowScrollPosition()
+        }.launchIn(viewModelScope)
     }
 
 
@@ -245,6 +248,7 @@ class TimelineViewModel @AssistedInject constructor(
         viewModelScope.launch {
             timelineStore.releaseUnusedPages(firstVisiblePosition)
         }
+        saveScrollPositionScrolledEvent.tryEmit(firstVisiblePosition)
     }
 
     private fun onVisibleFirst() {
