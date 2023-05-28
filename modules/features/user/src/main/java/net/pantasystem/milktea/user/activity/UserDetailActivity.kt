@@ -476,6 +476,7 @@ class UserTimelinePagerAdapterV2(
                 Pageable.Gallery.User(tab.userId.id),
             )
             is UserDetailTabType.Media -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     withFiles = true
@@ -484,46 +485,53 @@ class UserTimelinePagerAdapterV2(
             is UserDetailTabType.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
             is UserDetailTabType.Reactions -> UserReactionsFragment.newInstance(tab.userId)
             is UserDetailTabType.UserTimeline -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     includeReplies = false
                 )
             )
             is UserDetailTabType.UserTimelineWithReplies -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     includeReplies = true
                 )
             )
             is UserDetailTabType.MastodonMedia -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     isOnlyMedia = true,
                 )
             )
             is UserDetailTabType.MastodonUserTimeline -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     excludeReplies = true,
                 )
             )
             is UserDetailTabType.MastodonUserTimelineWithReplies -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     excludeReplies = false,
                 )
             )
             is UserDetailTabType.MastodonUserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.Mastodon.UserTimeline(
                     tab.userId.id,
                     excludeReblogs = true,
                 )
             )
             is UserDetailTabType.UserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                tab.userId.accountId,
                 Pageable.UserTimeline(
                     tab.userId.id,
                     includeMyRenotes = false,
-                )
+                ),
             )
         }
 

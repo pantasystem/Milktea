@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
@@ -30,18 +31,29 @@ class SearchResultViewModel @Inject constructor(
         const val EXTRA_KEYWORD =
             "net.pantasystem.milktea.search.SearchResultViewModel.EXTRA_KEYWORD"
         const val EXTRA_ACCT = "net.pantasystem.milktea.search.SearchResultActivity.EXTRA_ACCT"
-
+        const val EXTRA_ACCOUNT_ID = "net.pantasystem.milktea.search.SearchResultActivity.EXTRA_ACCOUNT_ID"
     }
 
     private val logger by lazy {
         loggerFactory.create("SearchResultVM")
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val account = savedStateHandle.getStateFlow(EXTRA_ACCOUNT_ID, - 1L).map {
+        it.takeIf { it > 0 }
+    }.flatMapLatest { acId ->
+        accountStore.state.map { state ->
+            acId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     private val keyword = savedStateHandle.getStateFlow(EXTRA_KEYWORD, "")
     private val acct = savedStateHandle.getStateFlow<String?>(EXTRA_ACCT, null)
     private val user = combine(
         acct,
-        accountStore.observeCurrentAccount.filterNotNull()
+        account.filterNotNull()
     ) { acct, ac ->
         userRepository.findByUserName(
             ac.accountId,
@@ -53,7 +65,7 @@ class SearchResultViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val uiState = combine(
-        accountStore.observeCurrentAccount,
+        account,
         keyword,
         acct,
         user

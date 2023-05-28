@@ -18,7 +18,8 @@ interface SearchAndSelectUserNavigation : ActivityNavigation<SearchAndSelectUser
 
 data class SearchAndSelectUserNavigationArgs(
     val selectableMaximumSize: Int = Int.MAX_VALUE,
-    val selectedUserIds: List<User.Id> = emptyList()
+    val selectedUserIds: List<User.Id> = emptyList(),
+    val accountId: Long? = null,
 )
 
 data class ChangedDiffResult(

@@ -168,7 +168,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
     override fun onResume() {
         super.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(Pageable.Notification())
+        currentPageableTimelineViewModel.setCurrentPageable(null, Pageable.Notification())
     }
 
     private val mScrollListener = object : RecyclerView.OnScrollListener() {

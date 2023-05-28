@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,12 +26,28 @@ class EmojiPickerUiStateService(
     private val reactionHistoryRepository: ReactionHistoryRepository,
     private val userEmojiConfigRepository: UserEmojiConfigRepository,
     private val logger: Logger,
+    savedStateHandle: SavedStateHandle,
     coroutineScope: CoroutineScope,
 ) {
-
+    companion object {
+        const val EXTRA_ACCOUNT_ID = "EmojiPickerViewModel.EXTRA_ACCOUNT_ID"
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val emojis = accountStore.observeCurrentAccount
+    val account = savedStateHandle.getStateFlow<Long>(EXTRA_ACCOUNT_ID, -1L).map {
+        it.takeIf {
+            it > 0
+        }
+    }.flatMapLatest { specifiedId ->
+        accountStore.state.map { state ->
+            specifiedId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val emojis = account
         .filterNotNull()
         .flatMapLatest { ac ->
             customEmojiRepository.observeBy(ac.getHost())
@@ -40,8 +57,7 @@ class EmojiPickerUiStateService(
         .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val reactionCount = accountStore
-        .observeCurrentAccount
+    private val reactionCount = account
         .filterNotNull()
         .flatMapLatest { ac ->
             reactionHistoryRepository.observeSumReactions(ac.normalizedInstanceUri)
@@ -51,7 +67,7 @@ class EmojiPickerUiStateService(
         .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val userSetting = accountStore.observeCurrentAccount
+    private val userSetting = account
         .filterNotNull()
         .flatMapLatest { ac ->
             userEmojiConfigRepository.observeByInstanceDomain(ac.normalizedInstanceUri)
@@ -70,7 +86,7 @@ class EmojiPickerUiStateService(
         Reactions(emptyList(), emptyList())
     )
 
-    private val baseInfo = combine(accountStore.observeCurrentAccount, emojis) { account, emojis ->
+    private val baseInfo = combine(account, emojis) { account, emojis ->
         BaseInfo(account, emojis)
     }.stateIn(
         coroutineScope,
@@ -80,7 +96,7 @@ class EmojiPickerUiStateService(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val recentlyUsedReactions =
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest {
+        account.filterNotNull().flatMapLatest {
             reactionHistoryRepository.observeRecentlyUsedBy(it.normalizedInstanceUri, limit = 20)
         }.catch {
             logger.error("絵文字の直近使用履歴の取得に失敗", it)

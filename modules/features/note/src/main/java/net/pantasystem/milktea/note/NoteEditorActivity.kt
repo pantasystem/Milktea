@@ -33,6 +33,7 @@ class NoteEditorActivity : AppCompatActivity() {
 
         private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
         private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
+        private const val EXTRA_SPECIFIED_ACCOUNT_ID = "EXTRA_SPECIFIED_ACCOUNT_ID"
 
         fun newBundle(
             context: Context,
@@ -41,6 +42,7 @@ class NoteEditorActivity : AppCompatActivity() {
             draftNoteId: Long? = null,
             mentions: List<String>? = null,
             channelId: Channel.Id? = null,
+            accountId: Long? = null,
         ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let {
@@ -65,6 +67,10 @@ class NoteEditorActivity : AppCompatActivity() {
                 channelId?.let {
                     putExtra(EXTRA_CHANNEL_ID, it.channelId)
                     putExtra(EXTRA_ACCOUNT_ID, it.accountId)
+                }
+
+                accountId?.let {
+                    putExtra(EXTRA_SPECIFIED_ACCOUNT_ID, it)
                 }
 
             }
@@ -125,6 +131,9 @@ class NoteEditorActivity : AppCompatActivity() {
             if (it == -1L) null else it
         }
 
+        val specifiedAccountId = intent.getLongExtra(EXTRA_SPECIFIED_ACCOUNT_ID, -1).takeIf {
+            it > 0
+        }
         if (savedInstanceState == null) {
             val mentions = intent.getStringArrayExtra(EXTRA_MENTIONS)?.toList()
             val fragment = NoteEditorFragment.newInstance(
@@ -133,7 +142,8 @@ class NoteEditorActivity : AppCompatActivity() {
                 draftNoteId = draftNoteId,
                 mentions = mentions,
                 channelId = channelId,
-                text = text
+                text = text,
+                specifiedAccountId = specifiedAccountId,
             )
             val ft = supportFragmentManager.beginTransaction()
             ft.replace(R.id.fragmentBase, fragment)
