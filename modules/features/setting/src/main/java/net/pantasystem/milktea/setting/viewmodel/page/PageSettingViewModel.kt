@@ -40,10 +40,6 @@ class PageSettingViewModel @Inject constructor(
 
     val pageOnUpdateEvent = EventBus<Page>()
 
-    val pageTypes = account.filterNotNull().map {
-        pageCandidateGenerator.createPageCandidates(it)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
     val pageTypesGroupedByAccount = combine(
         accountStore.observeCurrentAccount,
         accountStore.observeAccounts,
@@ -109,10 +105,18 @@ class PageSettingViewModel @Inject constructor(
 
     }
 
-    private fun addPage(page: Page) {
+    private fun addPage(page: Page, relatedAccount: Account?) {
+        val p = if (relatedAccount == null || page.accountId == relatedAccount.accountId) {
+            page
+        } else {
+            page.copy(
+                attachedAccountId = relatedAccount.accountId,
+                title = page.title + ("(@${relatedAccount.userName}@${relatedAccount.getHost()})")
+            )
+        }
         val list = ArrayList<Page>(selectedPages.value)
-        page.weight = list.size
-        list.add(page)
+        p.weight = list.size
+        list.add(p)
         setList(list)
     }
 
@@ -141,7 +145,7 @@ class PageSettingViewModel @Inject constructor(
             PageableTemplate(account.value!!)
                 .user(user.id.id, title = user.displayName)
         }
-        addPage(page)
+        addPage(page, null)
     }
 
     fun addUsersGalleryByIds(userIds: List<User.Id>) {
@@ -155,7 +159,9 @@ class PageSettingViewModel @Inject constructor(
                     val name =
                         if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName
                     account.value!!.newPage(Pageable.Gallery.User(userId = user.id.id), name = name)
-                }.forEach(::addPage)
+                }.forEach {
+                    addPage(it, null)
+                }
             }
         }
     }
@@ -167,89 +173,99 @@ class PageSettingViewModel @Inject constructor(
     }
 
 
-    override fun add(type: PageType) {
-        pageAddedEvent.event = type
-        val name = pageTypeNameMap.get(type)
-        when (type) {
+    override fun add(type: PageCandidate) {
+        pageAddedEvent.event = type.type
+        val name = pageTypeNameMap.get(type.type)
+        when (type.type) {
             PageType.GLOBAL -> {
-                addPage(PageableTemplate(account.value!!).globalTimeline(name))
+                addPage(PageableTemplate(account.value!!).globalTimeline(name), type.relatedAccount)
             }
             PageType.SOCIAL -> {
-                addPage(PageableTemplate(account.value!!).hybridTimeline(name))
+                addPage(PageableTemplate(account.value!!).hybridTimeline(name), type.relatedAccount)
             }
             PageType.LOCAL -> {
-                addPage(PageableTemplate(account.value!!).localTimeline(name))
+                addPage(PageableTemplate(account.value!!).localTimeline(name), type.relatedAccount)
             }
             PageType.HOME -> {
-                addPage(PageableTemplate(account.value!!).homeTimeline(name))
+                addPage(PageableTemplate(account.value!!).homeTimeline(name), type.relatedAccount)
             }
             PageType.NOTIFICATION -> {
-                addPage(PageableTemplate(account.value!!).notification(name))
+                addPage(PageableTemplate(account.value!!).notification(name), type.relatedAccount)
             }
             PageType.FAVORITE -> {
-                addPage(PageableTemplate(account.value!!).favorite(name))
+                addPage(PageableTemplate(account.value!!).favorite(name), type.relatedAccount)
             }
             PageType.FEATURED -> {
-                addPage(PageableTemplate(account.value!!).featured(name))
+                addPage(PageableTemplate(account.value!!).featured(name), type.relatedAccount)
             }
             PageType.MENTION -> {
-                addPage(PageableTemplate(account.value!!).mention(name))
+                addPage(PageableTemplate(account.value!!).mention(name), type.relatedAccount)
             }
             PageType.GALLERY_FEATURED -> addPage(
                 account.value!!.newPage(
                     Pageable.Gallery.Featured, name
-                )
+                ),
+                type.relatedAccount
             )
             PageType.GALLERY_POPULAR -> addPage(
                 account.value!!.newPage(
                     Pageable.Gallery.Popular, name
-                )
+                ),
+                type.relatedAccount
             )
             PageType.GALLERY_POSTS -> addPage(
                 account.value!!.newPage(
                     Pageable.Gallery.Posts, name
-                )
+                ),
+                type.relatedAccount
             )
             PageType.MY_GALLERY_POSTS -> addPage(
                 account.value!!.newPage(
                     Pageable.Gallery.MyPosts, name
-                )
+                ),
+                type.relatedAccount
             )
             PageType.I_LIKED_GALLERY_POSTS -> addPage(
                 account.value!!.newPage(
                     Pageable.Gallery.ILikedPosts,
                     name
-                )
+                ),
+                type.relatedAccount
             )
             PageType.MASTODON_HOME_TIMELINE -> addPage(
                 account.value!!.newPage(
                     Pageable.Mastodon.HomeTimeline,
                     name,
-                )
+                ),
+                type.relatedAccount
             )
             PageType.MASTODON_LOCAL_TIMELINE -> addPage(
                 account.value!!.newPage(
                     Pageable.Mastodon.LocalTimeline(),
                     name,
-                )
+                ),
+                type.relatedAccount
             )
             PageType.MASTODON_PUBLIC_TIMELINE -> addPage(
                 account.value!!.newPage(
                     Pageable.Mastodon.PublicTimeline(),
                     name,
-                )
+                ),
+                type.relatedAccount
             )
             PageType.CALCKEY_RECOMMENDED_TIMELINE -> addPage(
                 account.value!!.newPage(
                     Pageable.CalckeyRecommendedTimeline,
                     name,
-                )
+                ),
+                type.relatedAccount
             )
             PageType.MASTODON_BOOKMARK_TIMELINE -> addPage(
                 account.value!!.newPage(
                     Pageable.Mastodon.BookmarkTimeline,
                     name,
-                )
+                ),
+                type.relatedAccount
             )
             else -> {
                 Log.d("PageSettingViewModel", "管轄外な設定パターン:$type, name:$name")

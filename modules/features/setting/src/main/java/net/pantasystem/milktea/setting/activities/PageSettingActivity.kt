@@ -127,7 +127,7 @@ class PageSettingActivity : AppCompatActivity() {
                     pageTypes = pageTypes,
                     list = list,
                     onSelectPage = {
-                        mPageSettingViewModel.add(it.type)
+                        mPageSettingViewModel.add(it)
                     },
                     onOptionButtonClicked = {
                         mPageSettingViewModel.pageOnActionEvent.event = it
