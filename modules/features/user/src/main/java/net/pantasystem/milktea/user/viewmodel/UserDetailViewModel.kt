@@ -127,6 +127,7 @@ class UserDetailViewModel @AssistedInject constructor(
             Account.InstanceType.MISSKEY -> {
                 listOfNotNull(
                     UserDetailTabType.UserTimeline(user.id),
+                    UserDetailTabType.UserTimelineOnlyPosts(user.id),
                     UserDetailTabType.UserTimelineWithReplies(user.id),
                     UserDetailTabType.PinNote(user.id),
                     UserDetailTabType.Media(user.id),
@@ -139,6 +140,7 @@ class UserDetailViewModel @AssistedInject constructor(
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     UserDetailTabType.MastodonUserTimeline(user.id),
+                    UserDetailTabType.MastodonUserTimelineOnlyPosts(user.id),
                     UserDetailTabType.MastodonUserTimelineWithReplies(user.id),
                     UserDetailTabType.MastodonMedia(user.id)
                 )
@@ -374,6 +376,9 @@ sealed class UserDetailTabType(
 
     data class UserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
     data class UserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+
+    data class UserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
+
     data class PinNote(val userId: User.Id) : UserDetailTabType(R.string.pin)
     data class Gallery(val userId: User.Id, val accountId: Long) :
         UserDetailTabType(R.string.gallery)
@@ -383,5 +388,8 @@ sealed class UserDetailTabType(
 
     data class MastodonUserTimeline(val userId: User.Id) : UserDetailTabType(R.string.post)
     data class MastodonUserTimelineWithReplies(val userId: User.Id) : UserDetailTabType(R.string.notes_and_replies)
+
+    data class MastodonUserTimelineOnlyPosts(val userId: User.Id) : UserDetailTabType(R.string.post_only)
+
     data class MastodonMedia(val userId: User.Id) : UserDetailTabType(R.string.media)
 }

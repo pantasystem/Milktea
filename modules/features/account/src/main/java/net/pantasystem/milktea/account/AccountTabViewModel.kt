@@ -34,6 +34,7 @@ class AccountTabViewModel @Inject constructor(
                     if (isEnableMessaging) AccountTabTypes.Message else null,
                     AccountTabTypes.UserTimeline(userId),
                     AccountTabTypes.UserTimelineWithReplies(userId),
+                    AccountTabTypes.UserTimelineOnlyPosts(userId),
                     AccountTabTypes.PinNote(userId),
                     AccountTabTypes.Media(userId),
                     if (isEnableGallery) AccountTabTypes.Gallery(
@@ -47,6 +48,7 @@ class AccountTabViewModel @Inject constructor(
                     AccountTabTypes.Account,
                     AccountTabTypes.MastodonUserTimeline(userId),
                     AccountTabTypes.MastodonUserTimelineWithReplies(userId),
+                    AccountTabTypes.MastodonUserTimelineOnlyPosts(userId),
                     AccountTabTypes.MastodonMedia(userId)
                 )
             }
@@ -70,6 +72,8 @@ sealed class AccountTabTypes(
     data class UserTimelineWithReplies(val userId: User.Id) :
         AccountTabTypes(R.string.notes_and_replies)
 
+    data class UserTimelineOnlyPosts(val userId: User.Id) : AccountTabTypes(R.string.post_only)
+
     data class PinNote(val userId: User.Id) : AccountTabTypes(R.string.pin)
     data class Gallery(val userId: User.Id, val accountId: Long) :
         AccountTabTypes(R.string.gallery)
@@ -78,6 +82,8 @@ sealed class AccountTabTypes(
     data class Media(val userId: User.Id) : AccountTabTypes(R.string.media)
 
     data class MastodonUserTimeline(val userId: User.Id) : AccountTabTypes(R.string.post)
+
+    data class MastodonUserTimelineOnlyPosts(val userId: User.Id) : AccountTabTypes(R.string.post_only)
     data class MastodonUserTimelineWithReplies(val userId: User.Id) :
         AccountTabTypes(R.string.notes_and_replies)
 
