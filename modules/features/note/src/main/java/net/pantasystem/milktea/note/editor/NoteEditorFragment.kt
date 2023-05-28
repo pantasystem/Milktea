@@ -40,7 +40,6 @@ import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
-import net.pantasystem.milktea.common_android_ui.account.AccountSwitchingDialog
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_android_ui.confirm.ConfirmDialog
 import net.pantasystem.milktea.common_navigation.*
@@ -59,6 +58,7 @@ import net.pantasystem.milktea.note.DraftNotesActivity
 import net.pantasystem.milktea.note.R
 import net.pantasystem.milktea.note.databinding.FragmentNoteEditorBinding
 import net.pantasystem.milktea.note.databinding.ViewNoteEditorToolbarBinding
+import net.pantasystem.milktea.note.editor.account.NoteEditorSwitchAccountDialog
 import net.pantasystem.milktea.note.editor.file.EditFileCaptionDialog
 import net.pantasystem.milktea.note.editor.file.EditFileNameDialog
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorFocusEditTextType
@@ -81,6 +81,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         private const val EXTRA_MENTIONS = "EXTRA_MENTIONS"
         private const val EXTRA_CHANNEL_ID = "EXTRA_CHANNEL_ID"
         private const val EXTRA_TEXT = "EXTRA_TEXT"
+        private const val EXTRA_SPECIFIED_ACCOUNT_ID = "EXTRA_SPECIFIED_ACCOUNT_ID"
 
         fun newInstance(
             replyTo: Note.Id? = null,
@@ -89,6 +90,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
             mentions: List<String>? = null,
             channelId: Channel.Id? = null,
             text: String? = null,
+            specifiedAccountId: Long? = null,
         ): NoteEditorFragment {
             return NoteEditorFragment().apply {
                 arguments = Bundle().apply {
@@ -114,6 +116,10 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     }
                     if (text != null) {
                         putString(EXTRA_TEXT, text)
+                    }
+
+                    if (specifiedAccountId != null) {
+                        putLong(EXTRA_SPECIFIED_ACCOUNT_ID, specifiedAccountId)
                     }
                 }
             }
@@ -208,6 +214,11 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         requireArguments().getString(EXTRA_TEXT, null)
     }
 
+    private val specifiedAccountId by lazy(LazyThreadSafetyMode.NONE) {
+        requireArguments().getLong(EXTRA_SPECIFIED_ACCOUNT_ID, -1).takeIf {
+            it > 0
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -247,7 +258,7 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         noteEditorToolbar.viewModel = noteEditorViewModel
 
         accountViewModel.switchAccountEvent.onEach {
-            AccountSwitchingDialog().show(childFragmentManager, "tag")
+            NoteEditorSwitchAccountDialog().show(childFragmentManager, "tag")
         }.flowWithLifecycle(
             viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
         ).launchIn(viewLifecycleOwner.lifecycleScope)
@@ -439,6 +450,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
         emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner) {
             onSelect(it)
         }
+
+        noteEditorViewModel.setAccountId(specifiedAccountId)
 
         binding.addAddress.setOnClickListener {
             startSearchAndSelectUser()

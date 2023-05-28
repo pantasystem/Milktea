@@ -27,7 +27,7 @@ internal class FabClickHandler(
                 is CurrentPageType.Page -> {
                     when (val suitableType = type.pageable.suitableType()) {
                         is SuitableType.Other -> {
-                            startActivity(Intent(this, NoteEditorActivity::class.java))
+                            startActivity(NoteEditorActivity.newBundle(this, accountId = type.accountId))
                         }
                         is SuitableType.Gallery -> {
                             val intent = Intent(this, GalleryPostsActivity::class.java)
