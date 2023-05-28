@@ -31,6 +31,7 @@ class AccountTabPagerAdapter(
                     withFiles = true
                 )
             )
+
             is AccountTabTypes.PinNote -> userPinnedNotesFragmentFactory.create(tab.userId)
             is AccountTabTypes.Reactions -> UserReactionsFragment.newInstance(tab.userId)
             is AccountTabTypes.UserTimeline -> pageableFragmentFactory.create(
@@ -65,6 +66,18 @@ class AccountTabPagerAdapter(
             )
             AccountTabTypes.Account -> AccountFragment()
             AccountTabTypes.Message -> MessagingHistoryFragment()
+            is AccountTabTypes.MastodonUserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                Pageable.Mastodon.UserTimeline(
+                    tab.userId.id,
+                    excludeReblogs = true,
+                )
+            )
+            is AccountTabTypes.UserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                Pageable.UserTimeline(
+                    tab.userId.id,
+                    includeMyRenotes = false,
+                )
+            )
         }
 
     }

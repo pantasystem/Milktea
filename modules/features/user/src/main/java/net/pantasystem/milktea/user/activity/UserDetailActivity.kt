@@ -513,6 +513,18 @@ class UserTimelinePagerAdapterV2(
                     excludeReplies = false,
                 )
             )
+            is UserDetailTabType.MastodonUserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                Pageable.Mastodon.UserTimeline(
+                    tab.userId.id,
+                    excludeReblogs = true,
+                )
+            )
+            is UserDetailTabType.UserTimelineOnlyPosts -> pageableFragmentFactory.create(
+                Pageable.UserTimeline(
+                    tab.userId.id,
+                    includeMyRenotes = false,
+                )
+            )
         }
 
     }

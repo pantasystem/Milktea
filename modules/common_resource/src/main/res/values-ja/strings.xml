@@ -597,6 +597,7 @@
     <string name="notes_confirm_attach_quote_note_by_url">引用として添付しますか?</string>
     <string name="select_draft_post">下書き投稿を選択</string>
     <string name="remember_scroll_position">スクロール位置を保持する</string>
+    <string name="post_only">投稿のみ</string>
     <!-- User -->
 
 
