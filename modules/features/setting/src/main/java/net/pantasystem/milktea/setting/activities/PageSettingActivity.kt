@@ -111,7 +111,7 @@ class PageSettingActivity : AppCompatActivity() {
 
         setContent {
             MdcTheme {
-                val pageTypes by mPageSettingViewModel.pageTypes.collectAsState()
+                val pageTypes by mPageSettingViewModel.pageTypesGroupedByAccount.collectAsState()
                 val list by mPageSettingViewModel.selectedPages.collectAsState()
                 val scope = rememberCoroutineScope()
                 val dragAndDropState =
@@ -127,7 +127,7 @@ class PageSettingActivity : AppCompatActivity() {
                     pageTypes = pageTypes,
                     list = list,
                     onSelectPage = {
-                        mPageSettingViewModel.add(it)
+                        mPageSettingViewModel.add(it.type)
                     },
                     onOptionButtonClicked = {
                         mPageSettingViewModel.pageOnActionEvent.event = it

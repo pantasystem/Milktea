@@ -12,18 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.model.account.page.Page
-import net.pantasystem.milktea.model.account.page.PageType
 import net.pantasystem.milktea.setting.R
 import net.pantasystem.milktea.setting.viewmodel.page.PageCandidate
+import net.pantasystem.milktea.setting.viewmodel.page.PageCandidateGroup
 
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TabItemsListScreen(
     dragDropState: DragAndDropState,
-    pageTypes: List<PageCandidate>,
+    pageTypes: List<PageCandidateGroup>,
     list: List<Page>,
-    onSelectPage: (PageType) -> Unit,
+    onSelectPage: (PageCandidate) -> Unit,
     onOptionButtonClicked: (Page) -> Unit,
     onNavigateUp: () -> Unit
 

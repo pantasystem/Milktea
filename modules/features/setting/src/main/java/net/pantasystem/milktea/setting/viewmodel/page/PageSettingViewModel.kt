@@ -44,6 +44,23 @@ class PageSettingViewModel @Inject constructor(
         pageCandidateGenerator.createPageCandidates(it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    val pageTypesGroupedByAccount = combine(
+        accountStore.observeCurrentAccount,
+        accountStore.observeAccounts,
+    ) { ca, accounts ->
+        (listOfNotNull(
+            ca
+        ) + accounts.filterNot {
+            it.accountId == ca?.accountId
+        }).map {
+            PageCandidateGroup(
+                ca,
+                it,
+                pageCandidateGenerator.createPageCandidates(it)
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     init {
         viewModelScope.launch {
             account.collect {
@@ -251,4 +268,10 @@ data class PageCandidate(
     val relatedAccount: Account,
     val type: PageType,
     val name: StringSource,
+)
+
+data class PageCandidateGroup(
+    val currentAccount: Account?,
+    val relatedAccount: Account,
+    val candidates: List<PageCandidate>,
 )
