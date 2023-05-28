@@ -25,11 +25,11 @@ import javax.inject.Inject
 @Suppress("UNCHECKED_CAST")
 @HiltViewModel
 class AccountViewModel @Inject constructor(
+    loggerFactory: Logger.Factory,
+    instanceInfoService: InstanceInfoService,
     private val accountStore: AccountStore,
     private val userDataSource: UserDataSource,
-    loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
-    private val instanceInfoService: InstanceInfoService,
     private val signOutUseCase: SignOutUseCase,
     private val syncMetaExecutor: SyncMetaExecutor,
 ) : ViewModel() {
@@ -37,43 +37,16 @@ class AccountViewModel @Inject constructor(
     private val logger = loggerFactory.create("AccountViewModel")
 
 
-    private val users = accountStore.observeAccounts.flatMapLatest { accounts ->
-        val flows = accounts.map {
-            userDataSource.observe(User.Id(it.accountId, it.remoteId)).flowOn(Dispatchers.IO)
-        }
-        combine(flows) {
-            it.toList()
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    private val metaList = accountStore.observeAccounts.flatMapLatest { accounts ->
-        val flows = accounts.map {
-            instanceInfoService.observe(it.normalizedInstanceUri).flowOn(Dispatchers.IO)
-        }
-        combine(flows) {
-            it.toList()
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    private val accountWithUserList = combine(
-        accountStore.observeAccounts,
-        users,
+    private val uiStateHelper = AccountViewModelUiStateHelper(
         accountStore.observeCurrentAccount,
-        metaList,
-    ) { accounts, users, current, metaList ->
-        accounts.toAccountInfoList(current, metaList, users)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        accountStore,
+        userDataSource,
+        instanceInfoService,
+        viewModelScope
+    )
 
-    val uiState = combine(
-        accountStore.observeCurrentAccount,
-        accountWithUserList
-    ) { current, accounts ->
-        AccountViewModelUiState(
-            currentAccount = current,
-            accounts = accounts
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AccountViewModelUiState())
 
+    val uiState = uiStateHelper.uiState
     val currentAccount =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
