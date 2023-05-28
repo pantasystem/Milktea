@@ -192,6 +192,9 @@ class SearchNavigationImpl  @Inject constructor(
                 if (args.acct != null) {
                     intent.putExtra(SearchResultViewModel.EXTRA_ACCT, args.acct)
                 }
+                if (args.accountId != null) {
+                    intent.putExtra(SearchResultViewModel.EXTRA_ACCOUNT_ID, args.accountId)
+                }
                 intent
             }
             is SearchNavType.SearchScreen -> {
@@ -202,6 +205,11 @@ class SearchNavigationImpl  @Inject constructor(
                 if (args.acct != null) {
                     intent.putExtra(SearchResultViewModel.EXTRA_ACCT, args.acct)
                 }
+
+                if (args.accountId != null) {
+                    intent.putExtra(SearchViewModel.EXTRA_ACCOUNT_ID, args.accountId)
+                }
+
                 intent
             }
         }

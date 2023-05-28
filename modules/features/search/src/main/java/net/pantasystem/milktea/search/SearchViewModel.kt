@@ -35,12 +35,15 @@ class SearchViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    companion object {
+        const val EXTRA_ACCOUNT_ID = "net.pantasystem.milktea.search.SearchViewModel.EXTRA_ACCOUNT_ID"
+    }
     private val logger by lazy {
         loggerFactory.create("SearchViewModel")
     }
 
     val keyword = savedStateHandle.getStateFlow<String>("keyword", "")
-    private val currentAccountWatcher = CurrentAccountWatcher(null, accountRepository)
+    private val currentAccountWatcher = CurrentAccountWatcher(savedStateHandle[EXTRA_ACCOUNT_ID], accountRepository)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val hashtagResult = keyword.filter {
