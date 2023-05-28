@@ -355,7 +355,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
                     },
                     onSelectEmojiButtonClicked = {
                         binding.cw.isFocused
-                        CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+                        CustomEmojiPickerDialog.newInstance(
+                            uiState.currentAccount?.accountId
+                        ).show(childFragmentManager, "Editor")
                     },
                     onToggleCwButtonClicked = {
                         noteEditorViewModel.changeCwEnabled()
@@ -710,7 +712,8 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
         val intent = searchAndUserNavigation.newIntent(
             SearchAndSelectUserNavigationArgs(
-                selectedUserIds = selectedUserIds
+                selectedUserIds = selectedUserIds,
+                accountId = noteEditorViewModel.currentAccount.value?.accountId,
             )
         )
 
@@ -720,7 +723,9 @@ class NoteEditorFragment : Fragment(R.layout.fragment_note_editor), EmojiSelecti
 
 
     private fun startMentionToSearchAndSelectUser() {
-        val intent = searchAndUserNavigation.newIntent(SearchAndSelectUserNavigationArgs())
+        val intent = searchAndUserNavigation.newIntent(SearchAndSelectUserNavigationArgs(
+            accountId = noteEditorViewModel.currentAccount.value?.accountId,
+        ))
         selectMentionToUserResult.launch(intent)
     }
 

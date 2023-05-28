@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.user.search
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,16 +26,31 @@ class SearchUserViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val userRepository: UserRepository,
     userDataSource: UserDataSource,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    companion object {
+        const val EXTRA_ACCOUNT_ID = "SearchUserViewModel.EXTRA_ACCOUNT_ID"
+    }
 
     private val logger = loggerFactory.create("SearchUserViewModel")
 
 
     private val searchUserRequests = MutableStateFlow<SearchUser>(SearchUser("", null))
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val account = savedStateHandle.getStateFlow<Long?>(EXTRA_ACCOUNT_ID, null).flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val syncByUserNameLoadingState = accountStore.observeCurrentAccount.filterNotNull()
+    private val syncByUserNameLoadingState = account.filterNotNull()
         .flatMapLatest { account ->
             searchUserRequests.flatMapLatest { query ->
                 suspend {
@@ -72,7 +88,6 @@ class SearchUserViewModel @Inject constructor(
         )
     )
 
-    private val account = accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val uiState = combine(searchState, searchUserRequests, account) { state, request, a ->
         SearchUserUiState(request, state, a)
@@ -91,7 +106,7 @@ class SearchUserViewModel @Inject constructor(
         (it.content as? StateContent.Exist)?.rawContent
             ?: emptyList()
     }.flatMapLatest { ids ->
-        userDataSource.observeIn(accountStore.currentAccountId!!, ids.map { it.id }).map { users ->
+        userDataSource.observeIn(account.value?.accountId!!, ids.map { it.id }).map { users ->
             users.mapNotNull { user ->
                 user as? User.Detail?
             }
@@ -100,7 +115,7 @@ class SearchUserViewModel @Inject constructor(
         logger.error("observe error", it)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    val currentAccount = accountStore.observeCurrentAccount.stateIn(
+    val currentAccount = account.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
         null

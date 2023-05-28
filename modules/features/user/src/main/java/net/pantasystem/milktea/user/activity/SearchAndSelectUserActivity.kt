@@ -30,7 +30,8 @@ class SearchAndSelectUserNavigationImpl @Inject constructor(
         return SearchAndSelectUserActivity.newIntent(
             activity,
             args.selectableMaximumSize,
-            args.selectedUserIds
+            args.selectedUserIds,
+            args.accountId,
         )
     }
 }
@@ -50,11 +51,13 @@ class SearchAndSelectUserActivity : AppCompatActivity() {
         fun newIntent(
             context: Context,
             selectableMaximumSize: Int = Int.MAX_VALUE,
-            selectedUserIds: List<User.Id> = emptyList()
+            selectedUserIds: List<User.Id> = emptyList(),
+            accountId: Long? = null,
         ): Intent {
             return Intent(context, SearchAndSelectUserActivity::class.java).apply {
                 putExtra(EXTRA_SELECTABLE_MAXIMUM_SIZE, selectableMaximumSize)
                 putExtra(EXTRA_SELECTED_USER_IDS, ArrayList<Serializable>(selectedUserIds))
+                putExtra(SearchUserViewModel.EXTRA_ACCOUNT_ID, accountId)
             }
         }
     }
