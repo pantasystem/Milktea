@@ -81,7 +81,7 @@ data class AuthUiState(
     ),
     val clientId: String = "",
     val instances: List<InstanceInfo> = emptyList(),
-    val misskeyInstanceInfosResponse: InstanceInfosResponse?
+    val misskeyInstanceInfosResponse: List<InstanceInfosResponse.InstanceInfo>,
 ) {
     val isProgress by lazy {
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading

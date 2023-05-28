@@ -31,7 +31,20 @@ class InstanceInfoAPIBuilder @Inject constructor(val okHttpClientProvider: OkHtt
             .client(okHttpClientProvider.get())
             .build()
     }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private val calckeyRetrofitBuilder by lazy {
+        Retrofit.Builder()
+            .baseUrl("https://api.calckey.org")
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(okHttpClientProvider.get())
+            .build()
+    }
     fun build(): InstanceInfosAPI {
         return retrofitBuilder.create(InstanceInfosAPI::class.java)
+    }
+
+    fun buildCalckey(): InstanceInfosAPI {
+        return calckeyRetrofitBuilder.create(InstanceInfosAPI::class.java)
     }
 }
