@@ -94,10 +94,13 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
         (arguments?.getSerializable(EXTRA_PAGE) as? Page)?.pageable() as? Pageable.Show
             ?: Pageable.Show(arguments?.getString(EXTRA_NOTE_ID)!!)
     }
-    private val noteDetailViewModel: NoteDetailViewModel by viewModels {
-        val accountId = arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.let {
-            if (it == -1L) null else it
+
+    val accountId: Long? by lazy {
+        arguments?.getLong(EXTRA_ACCOUNT_ID, -1)?.takeIf {
+            it > 0
         }
+    }
+    private val noteDetailViewModel: NoteDetailViewModel by viewModels {
         NoteDetailViewModel.provideFactory(
             noteDetailViewModelAssistedFactory,
             page,
@@ -149,7 +152,7 @@ class NoteDetailFragment : Fragment(R.layout.fragment_note_detail) {
     override fun onResume() {
         super.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(page)
+        currentPageableTimelineViewModel.setCurrentPageable(accountId, page)
     }
 
     @MainThread

@@ -35,11 +35,11 @@ internal class FabClickHandler(
                             startActivity(intent)
                         }
                         is SuitableType.Channel -> {
-                            val accountId = accountStore.currentAccountId!!
+                            val accountId = type.accountId ?: accountStore.currentAccountId!!
                             startActivity(
                                 NoteEditorActivity.newBundle(
                                     this,
-                                    channelId = Channel.Id(accountId, suitableType.channelId)
+                                    channelId = Channel.Id(accountId, suitableType.channelId),
                                 )
                             )
                         }

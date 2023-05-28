@@ -292,7 +292,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
         isShowing = true
         mViewModel.onResume()
 
-        currentPageableTimelineViewModel.setCurrentPageable(mPageable)
+        currentPageableTimelineViewModel.setCurrentPageable(mViewModel.accountId?.value, mPageable)
         try {
             layoutManager.scrollToPosition(mViewModel.position)
         } catch (_: Exception) {
