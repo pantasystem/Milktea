@@ -15,7 +15,6 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.SignOutUseCase
 import net.pantasystem.milktea.model.account.page.Page
 import net.pantasystem.milktea.model.instance.InstanceInfoService
-import net.pantasystem.milktea.model.instance.InstanceInfoType
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
@@ -34,7 +33,6 @@ class AccountViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val syncMetaExecutor: SyncMetaExecutor,
 ) : ViewModel() {
-
 
     private val logger = loggerFactory.create("AccountViewModel")
 
@@ -63,20 +61,7 @@ class AccountViewModel @Inject constructor(
         accountStore.observeCurrentAccount,
         metaList,
     ) { accounts, users, current, metaList ->
-        val userMap = users.associateBy {
-            it.id.accountId
-        }
-        val metaMap = metaList.filterNotNull().associateBy {
-            it.uri
-        }
-        accounts.map {
-            AccountInfo(
-                it,
-                userMap[it.accountId],
-                metaMap[it.normalizedInstanceUri],
-                current?.accountId == it.accountId
-            )
-        }
+        accounts.toAccountInfoList(current, metaList, users)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val uiState = combine(
@@ -96,19 +81,35 @@ class AccountViewModel @Inject constructor(
         userDataSource.observe(User.Id(account.accountId, account.remoteId)).map {
             it as? User.Detail
         }
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    }.flowOn(Dispatchers.IO).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null,
+    )
 
-    private val _switchAccountEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _switchAccountEvent = MutableSharedFlow<Unit>(
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val switchAccountEvent = _switchAccountEvent.asSharedFlow()
 
 
-    private val _showFollowersEvent = MutableSharedFlow<User.Id>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _showFollowersEvent = MutableSharedFlow<User.Id>(
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val showFollowersEvent = _showFollowersEvent.asSharedFlow()
 
-    private val _showFollowingsEvent = MutableSharedFlow<User.Id>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _showFollowingsEvent = MutableSharedFlow<User.Id>(
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val showFollowingsEvent = _showFollowingsEvent.asSharedFlow()
 
-    private val _showProfileEvent = MutableSharedFlow<Account>(extraBufferCapacity = 10, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _showProfileEvent = MutableSharedFlow<Account>(
+        extraBufferCapacity = 10,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val showProfileEvent = _showProfileEvent.asSharedFlow()
 
 
@@ -172,32 +173,6 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun removePage(page: Page) {
-        viewModelScope.launch {
-            try {
-                accountStore.removePage(page)
-            } catch (e: Throwable) {
-                logger.error("pageの削除に失敗", e = e)
-            }
-        }
-    }
 
 }
 
-data class AccountInfo(
-    val account: Account,
-    val user: User?,
-    val instanceMeta: InstanceInfoType?,
-    val isCurrentAccount: Boolean
-)
-
-data class AccountViewModelUiState(
-    val currentAccount: Account? = null,
-    val accounts: List<AccountInfo> = emptyList(),
-) {
-    val currentAccountInfo: AccountInfo? by lazy {
-        accounts.firstOrNull {
-            it.account.accountId == currentAccount?.accountId
-        }
-    }
-}
