@@ -233,7 +233,7 @@ class UserDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             userState.value?.let { user ->
                 blockRepository.create(user.id).mapCancellableCatching {
-                    userRepository.sync(user.id)
+                    userRepository.sync(user.id).getOrThrow()
                 }.onFailure {
                     logger.error("block failed", it)
                     _errors.tryEmit(it)
@@ -311,7 +311,7 @@ class UserDetailViewModel @AssistedInject constructor(
             runCancellableCatching {
                 getUserId()
             }.mapCancellableCatching {
-                renoteMuteRepository.create(it)
+                renoteMuteRepository.create(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
             }
@@ -323,7 +323,7 @@ class UserDetailViewModel @AssistedInject constructor(
             runCancellableCatching {
                 getUserId()
             }.mapCancellableCatching {
-                renoteMuteRepository.delete(it)
+                renoteMuteRepository.delete(it).getOrThrow()
             }.onFailure {
                 _errors.tryEmit(it)
             }
