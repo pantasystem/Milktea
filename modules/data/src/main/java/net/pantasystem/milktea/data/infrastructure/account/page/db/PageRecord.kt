@@ -22,6 +22,9 @@ data class PageRecord(
     @ColumnInfo(name = "isSavePagePosition")
     val isSavePagePosition: Boolean? = false,
 
+    @ColumnInfo(name = "attachedAccountId")
+    val attachedAccountId: Long? = null,
+
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "pageId")
     var pageId: Long
@@ -35,6 +38,7 @@ data class PageRecord(
                 weight = page.weight,
                 pageParams = PageRecordParams.from(page.pageParams),
                 isSavePagePosition = page.isSavePagePosition,
+                attachedAccountId = page.attachedAccountId,
                 pageId = page.pageId
             )
         }
@@ -47,6 +51,7 @@ data class PageRecord(
             weight = weight,
             pageParams = pageParams.toParams(),
             pageId = pageId,
+            attachedAccountId = attachedAccountId,
             isSavePagePosition = isSavePagePosition ?: false
         )
     }
