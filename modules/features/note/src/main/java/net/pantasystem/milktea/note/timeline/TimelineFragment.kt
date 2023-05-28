@@ -79,7 +79,7 @@ class TimelineFragment : Fragment(R.layout.fragment_swipe_refresh_recycler_view)
     private val mViewModel: TimelineViewModel by viewModels<TimelineViewModel> {
         TimelineViewModel.provideViewModel(
             timelineViewModelFactory,
-            accountId = (mPage?.accountId ?: accountId)?.let {
+            accountId = (mPage?.attachedAccountId?: mPage?.accountId ?: accountId)?.let {
                 AccountId(it)
             },
             pageId = mPage?.pageId?.let {
