@@ -13,6 +13,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common.text.UrlPatternChecker
 import net.pantasystem.milktea.common_android.eventbus.EventBus
+import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModelUiStateHelper
 import net.pantasystem.milktea.common_viewmodel.UserViewData
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -40,6 +41,7 @@ import net.pantasystem.milktea.model.notes.reservation.NoteReservationPostExecut
 import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.setting.RememberVisibility
 import net.pantasystem.milktea.model.user.User
+import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import net.pantasystem.milktea.worker.note.CreateNoteWorkerExecutor
 import java.util.*
@@ -49,7 +51,8 @@ import javax.inject.Inject
 class NoteEditorViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
-    accountStore: AccountStore,
+    userDataSource: UserDataSource,
+    private val accountStore: AccountStore,
     private val getAllMentionUsersUseCase: GetAllMentionUsersUseCase,
     private val filePropertyDataSource: FilePropertyDataSource,
     private val instanceInfoService: InstanceInfoService,
@@ -313,6 +316,14 @@ class NoteEditorViewModel @Inject constructor(
         emit(null)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    val accountUiState = AccountViewModelUiStateHelper(
+        currentAccount,
+        accountStore,
+        userDataSource,
+        instanceInfoService,
+        viewModelScope,
+    ).uiState
+
     private val _fileSizeInvalidEvent =
         MutableSharedFlow<FileSizeInvalidEvent>(extraBufferCapacity = 10)
     val fileSizeInvalidEvent = _fileSizeInvalidEvent.asSharedFlow()
@@ -327,25 +338,6 @@ class NoteEditorViewModel @Inject constructor(
 
     var focusType: NoteEditorFocusEditTextType = NoteEditorFocusEditTextType.Text
 
-    init {
-        accountStore.observeCurrentAccount.filterNotNull().map {
-            it to noteEditorSwitchAccountExecutor(
-                currentAccount.value,
-                noteEditorSendToState.value,
-                it
-            )
-        }.onEach { (account, result) ->
-            if (account.accountId != currentAccount.value?.accountId && currentAccount.value != null) {
-                savedStateHandle.setReplyId(result.replyId)
-                savedStateHandle.setRenoteId(result.renoteId)
-                savedStateHandle.setChannelId(result.channelId)
-            }
-            if (currentAccount.value != null) {
-                savedStateHandle.setVisibility(null)
-            }
-            currentAccount.value = account
-        }.launchIn(viewModelScope + Dispatchers.IO)
-    }
 
     fun setRenoteTo(noteId: Note.Id?) {
         savedStateHandle.setRenoteId(noteId)
@@ -772,10 +764,55 @@ class NoteEditorViewModel @Inject constructor(
         }.getOrElse { false }
     }
 
+    fun setAccountId(accountId: Long?) {
+        viewModelScope.launch {
+            (accountId?.let {
+                accountRepository.get(accountId)
+            } ?: accountRepository.getCurrentAccount()).onSuccess {
+                setAccount(it)
+            }.onFailure {
+                logger.error("アカウントの取得に失敗した", it)
+            }
+        }
+    }
+
+    fun setAccountIdAndSwitchCurrentAccount(accountId: Long?) {
+        viewModelScope.launch {
+            (accountId?.let {
+                accountRepository.get(accountId)
+            } ?: accountRepository.getCurrentAccount()).onSuccess {
+                setAccount(it)
+                accountStore.setCurrent(it)
+            }.onFailure {
+                logger.error("アカウントの取得に失敗した", it)
+            }
+        }
+    }
+
     private fun setUpUserViewData(userId: User.Id): UserViewData {
         return userViewDataFactory.create(userId, viewModelScope, dispatcher)
     }
 
+    private suspend fun setAccount(account: Account) = runCancellableCatching<Unit> {
+        val result = noteEditorSwitchAccountExecutor(
+            currentAccount.value,
+            noteEditorSendToState.value,
+            account,
+        )
+
+        if (account.accountId != currentAccount.value?.accountId && currentAccount.value != null) {
+            savedStateHandle.setReplyId(result.replyId)
+            savedStateHandle.setRenoteId(result.renoteId)
+            savedStateHandle.setChannelId(result.channelId)
+        }
+        if (currentAccount.value != null) {
+            savedStateHandle.setVisibility(null)
+        }
+        logger.debug {
+            "currentAccount:${account.userName}@${account.getHost()}"
+        }
+        currentAccount.value = account
+    }
 
 }
 
