@@ -27,6 +27,8 @@ import net.pantasystem.milktea.common_android.ui.listview.applyFlexBoxLayout
 import net.pantasystem.milktea.common_android.ui.text.CustomEmojiTokenizer
 import net.pantasystem.milktea.common_android_ui.account.viewmodel.AccountViewModel
 import net.pantasystem.milktea.common_navigation.*
+import net.pantasystem.milktea.common_viewmodel.CurrentPageType
+import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.model.drive.DriveFileRepository
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.drive.FilePropertyDataSource
@@ -63,6 +65,8 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
     val accountViewModel: AccountViewModel by activityViewModels()
 
     val mViewModel: NoteEditorViewModel by activityViewModels()
+    private val currentPageableTimelineViewModel: CurrentPageableTimelineViewModel by activityViewModels()
+
     private val mBinding: FragmentSimpleEditorBinding by dataBinding()
 
     override val isShowEditorMenu: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -253,6 +257,22 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         emojiSelectionViewModel.selectedEmojiName.observe(viewLifecycleOwner, (::onSelect))
         emojiSelectionViewModel.selectedEmoji.observe(viewLifecycleOwner, (::onSelect))
 
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            accountViewModel.currentAccount.collect {
+                viewModel.setAccountId(it?.accountId)
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            currentPageableTimelineViewModel.currentType.collect {
+                when(it) {
+                    CurrentPageType.Account -> Unit
+                    is CurrentPageType.Page -> {
+                        viewModel.setAccountId(it.accountId)
+                    }
+                }
+            }
+        }
     }
 
 
