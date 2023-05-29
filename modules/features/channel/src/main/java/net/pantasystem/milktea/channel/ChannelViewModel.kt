@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.channel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import net.pantasystem.milktea.common.paginator.PreviousPagingController
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelListType
 import net.pantasystem.milktea.data.infrastructure.channel.ChannelPagingModel
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.account.page.newPage
@@ -28,7 +30,13 @@ class ChannelViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     channelPagingModelFactory: ChannelPagingModel.Factory,
     loggerFactory: Logger.Factory,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    companion object {
+        const val EXTRA_SPECIFIED_ACCOUNT_ID = "ChannelViewModel.EXTRA_SPECIFIED_ACCOUNT_ID"
+        const val EXTRA_ADD_TAB_TO_ACCOUNT_ID = "ChannelViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID"
+    }
 
     val logger: Logger by lazy {
         loggerFactory.create("ChannelViewModel")
@@ -37,16 +45,16 @@ class ChannelViewModel @Inject constructor(
 
     private val featuredChannelPagingModel =
         channelPagingModelFactory.create(ChannelListType.FEATURED) {
-            accountRepository.getCurrentAccount().getOrThrow()
+            getAccount()
         }
 
     private val followedChannelPagingModel =
         channelPagingModelFactory.create(ChannelListType.FOLLOWED) {
-            accountRepository.getCurrentAccount().getOrThrow()
+            getAccount()
         }
 
     private val ownedChannelPagingModel = channelPagingModelFactory.create(ChannelListType.OWNED) {
-        accountRepository.getCurrentAccount().getOrThrow()
+        getAccount()
     }
 
     val uiState = combine(
@@ -107,11 +115,13 @@ class ChannelViewModel @Inject constructor(
     fun toggleTab(channelId: Channel.Id) {
         viewModelScope.launch {
             runCancellableCatching {
-                val account = accountRepository.get(channelId.accountId).getOrThrow()
+                val account = getAddTabToAccount()
                 val channel = channelRepository.findOne(channelId).getOrThrow()
                 val page = account.newPage(
                     Pageable.ChannelTimeline(channelId = channelId.channelId),
-                    channel.name
+                    channel.name,
+                ).copy(
+                    attachedAccountId = getSpecifiedAccountId(),
                 )
                 val first =
                     account.pages.firstOrNull { (it.pageable() as? Pageable.ChannelTimeline)?.channelId == channelId.channelId }
@@ -122,6 +132,38 @@ class ChannelViewModel @Inject constructor(
                 }
             }
         }
+    }
+//
+//    fun setSpecifiedAccountId(accountId: Long) {
+//        savedStateHandle[EXTRA_SPECIFIED_ACCOUNT_ID] = accountId
+//    }
+//
+//    fun setAddTabToAccountId(accountId: Long) {
+//        savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID] = accountId
+//    }
+//
+    private fun getSpecifiedAccountId(): Long? {
+        return savedStateHandle[EXTRA_SPECIFIED_ACCOUNT_ID]
+    }
+
+    private fun getAddToTabAccountId(): Long? {
+        return savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID]
+    }
+
+    private suspend fun getAccount(): Account {
+        val accountId = getSpecifiedAccountId()
+        if (accountId != null) {
+            return accountRepository.get(accountId).getOrThrow()
+        }
+        return accountRepository.getCurrentAccount().getOrThrow()
+    }
+
+    private suspend fun getAddTabToAccount(): Account {
+        val accountId = getAddToTabAccountId()
+        if (accountId != null) {
+            return accountRepository.get(accountId).getOrThrow()
+        }
+        return accountRepository.getCurrentAccount().getOrThrow()
     }
 }
 
