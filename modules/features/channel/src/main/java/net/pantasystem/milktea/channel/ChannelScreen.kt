@@ -88,7 +88,6 @@ fun ChannelScreen(
             HorizontalPager(state = pagerState, modifier = Modifier.padding(padding)) {
                 ChannelListStateScreen(
                     listType = channelTypeWithTitleList[pagerState.currentPage].type,
-                    account = currentAccount!!,
                     viewModel = channelViewModel,
                     navigateToDetailView = onNavigateChannelDetail,
                     uiState = uiState
