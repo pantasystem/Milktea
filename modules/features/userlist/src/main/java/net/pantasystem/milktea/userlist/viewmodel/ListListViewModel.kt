@@ -18,7 +18,6 @@ import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class ListListViewModel @Inject constructor(
     val accountStore: AccountStore,
@@ -36,6 +35,7 @@ class ListListViewModel @Inject constructor(
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val currentAccount = savedStateHandle.getStateFlow<Long?>(
         EXTRA_SPECIFIED_ACCOUNT_ID,
         null
@@ -48,6 +48,7 @@ class ListListViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val addTabToAccount = savedStateHandle.getStateFlow<Long?>(
         EXTRA_ADD_TAB_TO_ACCOUNT_ID,
         null
@@ -59,11 +60,13 @@ class ListListViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val userListsFlow =
         currentAccount.filterNotNull().flatMapLatest { account ->
             userListRepository.observeByAccountId(account.accountId)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val userListsSyncState =
         currentAccount.filterNotNull().flatMapLatest {
             suspend {
@@ -90,7 +93,7 @@ class ListListViewModel @Inject constructor(
                     userList,
                     addTabToAccount?.pages?.any {
                         it.pageParams.listId == userList.userList.id.userListId
-                                || userList.userList.id.accountId == (it.attachedAccountId ?: it.accountId)
+                                && userList.userList.id.accountId == (it.attachedAccountId ?: it.accountId)
                     } ?: false,
                     isTargetUserAdded = userList.userList.userIds.any { id ->
                         id == addUser
