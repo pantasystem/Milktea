@@ -108,12 +108,14 @@ class ChannelActivity : AppCompatActivity() {
                                 startActivity(
                                     NoteEditorActivity.newBundle(
                                         this@ChannelActivity,
-                                        channelId = it
+                                        channelId = it,
+                                        accountId = it.accountId,
                                     )
                                 )
                             },
                             onUpdateFragment = { id, layout, channelId ->
                                 val fragment = pageableFragmentFactory.create(
+                                    channelId.accountId,
                                     Pageable.ChannelTimeline(channelId.channelId)
                                 )
                                 val ft = supportFragmentManager.beginTransaction()
