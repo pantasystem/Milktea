@@ -26,7 +26,6 @@ class PageCandidateGenerator @Inject constructor(
         val restrictionTypes = setOf(
             PageType.ANTENNA,
             PageType.NOTIFICATION,
-            PageType.USER_LIST,
             PageType.CLIP_NOTES,
             PageType.SEARCH,
             PageType.SEARCH,
@@ -39,7 +38,6 @@ class PageCandidateGenerator @Inject constructor(
             PageType.MY_GALLERY_POSTS,
             PageType.I_LIKED_GALLERY_POSTS,
             PageType.USERS_GALLERY_POSTS,
-            PageType.MASTODON_LIST_TIMELINE
         )
         return when (related.instanceType) {
             Account.InstanceType.MISSKEY -> {

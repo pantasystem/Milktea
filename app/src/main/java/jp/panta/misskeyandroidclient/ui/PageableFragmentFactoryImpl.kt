@@ -60,7 +60,7 @@ class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory
                 NotificationFragment()
             }
             is Pageable.Gallery -> {
-                return GalleryPostsFragment.newInstance(pageable, null)
+                return GalleryPostsFragment.newInstance(pageable, accountId)
             }
             else ->{
                 TimelineFragment.newInstance(pageable, accountId)

@@ -143,11 +143,17 @@ class ChannelViewModel @Inject constructor(
             runCancellableCatching {
                 val account = getAddTabToAccount()
                 val channel = channelRepository.findOne(channelId).getOrThrow()
+                val relatedAccount = accountRepository.get(channel.id.accountId).getOrThrow()
                 val page = account.newPage(
                     Pageable.ChannelTimeline(channelId = channelId.channelId),
                     channel.name,
                 ).copy(
                     attachedAccountId = getSpecifiedAccountId(),
+                    title = if (account.accountId == relatedAccount.accountId) {
+                        channel.name
+                    } else {
+                        "${channel.name}(${relatedAccount.getAcct()})"
+                    }
                 )
                 val first =
                     account.pages.firstOrNull { (it.pageable() as? Pageable.ChannelTimeline)?.channelId == channelId.channelId }

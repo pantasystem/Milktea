@@ -80,7 +80,10 @@ class PageSettingActivity : AppCompatActivity() {
                     launchSearchAndSelectUserForAddUserTimelineTab.launch(intent)
                 }
                 PageType.USER_LIST, PageType.MASTODON_LIST_TIMELINE -> startActivity(
-                    userListNavigation.newIntent(UserListArgs())
+                    userListNavigation.newIntent(UserListArgs(
+                        specifiedAccountId = pt.relatedAccount.accountId,
+                        addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                    ))
                 )
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
                 PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
@@ -93,7 +96,8 @@ class PageSettingActivity : AppCompatActivity() {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(
                             SearchAndSelectUserNavigationArgs(
-                                selectableMaximumSize = 1
+                                selectableMaximumSize = 1,
+                                accountId = pt.relatedAccount.accountId,
                             )
                         )
                     launchSearchAndSelectUserForAddGalleryTab.launch(intent)
