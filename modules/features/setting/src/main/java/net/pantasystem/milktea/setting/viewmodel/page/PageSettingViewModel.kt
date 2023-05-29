@@ -17,6 +17,7 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.model.account.Account
+import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.page.*
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
@@ -29,6 +30,7 @@ class PageSettingViewModel @Inject constructor(
     private val pageTypeNameMap: PageTypeNameMap,
     private val userRepository: UserRepository,
     private val accountStore: AccountStore,
+    private val accountRepository: AccountRepository,
     private val pageCandidateGenerator: PageCandidateGenerator,
 ) : ViewModel(), SelectPageTypeToAdd, PageSettingAction {
 
@@ -154,16 +156,22 @@ class PageSettingViewModel @Inject constructor(
     fun addUsersGalleryByIds(userIds: List<User.Id>) {
         viewModelScope.launch {
             runCancellableCatching {
+                val account = requireNotNull(account.value)
                 userIds.map {
                     async {
                         userRepository.find(it)
                     }
                 }.awaitAll().map { user ->
-                    val name =
-                        if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName
-                    account.value!!.newPage(Pageable.Gallery.User(userId = user.id.id), name = name)
-                }.forEach {
-                    addPage(it, null)
+                    val relatedAccount = accountRepository.get(user.id.accountId).getOrThrow()
+                    val name = if (settingStore.isUserNameDefault) user.shortDisplayName else user.displayName
+                    val title = if (relatedAccount.accountId == account.accountId) {
+                        name
+                    } else {
+                        "$name(${relatedAccount.getAcct()})"
+                    }
+                    account.newPage(Pageable.Gallery.User(userId = user.id.id), name = title) to relatedAccount
+                }.forEach { (page, relatedAccount) ->
+                    addPage(page, relatedAccount)
                 }
             }
         }

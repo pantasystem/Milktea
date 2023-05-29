@@ -96,7 +96,8 @@ class PageSettingActivity : AppCompatActivity() {
                     val intent =
                         searchAndSelectUserNavigation.newIntent(
                             SearchAndSelectUserNavigationArgs(
-                                selectableMaximumSize = 1
+                                selectableMaximumSize = 1,
+                                accountId = pt.relatedAccount.accountId,
                             )
                         )
                     launchSearchAndSelectUserForAddGalleryTab.launch(intent)
