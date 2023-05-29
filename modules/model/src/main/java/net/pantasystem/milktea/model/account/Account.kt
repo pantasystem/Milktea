@@ -56,6 +56,10 @@ data class Account(
         }
     }
 
+    fun getAcct(): String {
+        return "@$userName@${getHost()}}"
+    }
+
 }
 
 internal object UrlHelper {
