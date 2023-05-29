@@ -24,6 +24,7 @@ import net.pantasystem.milktea.common.ui.ApplyTheme
 import net.pantasystem.milktea.common_android_ui.PageableFragmentFactory
 import net.pantasystem.milktea.common_navigation.ChannelDetailNavigation
 import net.pantasystem.milktea.common_navigation.ChannelNavigation
+import net.pantasystem.milktea.common_navigation.ChannelNavigationArgs
 import net.pantasystem.milktea.common_viewmodel.confirm.ConfirmViewModel
 import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.channel.Channel
@@ -129,8 +130,11 @@ class ChannelActivity : AppCompatActivity() {
 
 
 class ChannelNavigationImpl @Inject constructor(val activity: Activity) : ChannelNavigation {
-    override fun newIntent(args: Unit): Intent {
-        return Intent(activity, ChannelActivity::class.java)
+    override fun newIntent(args: ChannelNavigationArgs): Intent {
+        return Intent(activity, ChannelActivity::class.java).also { intent ->
+            intent.putExtra(ChannelViewModel.EXTRA_SPECIFIED_ACCOUNT_ID, args.specifiedAccountId)
+            intent.putExtra(ChannelViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID, args.addTabToAccountId)
+        }
     }
 }
 
