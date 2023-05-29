@@ -14,137 +14,163 @@ class PageCandidateGenerator @Inject constructor(
     private val nodeInfoRepository: NodeInfoRepository,
 ) {
 
-    suspend fun createPageCandidates(account: Account): List<PageCandidate> {
-        val nodeInfo = nodeInfoRepository.find(account.getHost()).getOrNull()
+    suspend fun createPageCandidates(
+        related: Account,
+        currentAccount: Account?,
+    ): List<PageCandidate> {
+        val nodeInfo = nodeInfoRepository.find(related.getHost()).getOrNull()
         val version = nodeInfo?.type?.getVersion() ?: Version("0")
         val isCalckey = nodeInfo?.type is NodeInfo.SoftwareType.Misskey.Calckey
-        return when (account.instanceType) {
+
+        val isSameAccount = related.accountId == currentAccount?.accountId || currentAccount == null
+        val restrictionTypes = setOf(
+            PageType.ANTENNA,
+            PageType.NOTIFICATION,
+            PageType.USER_LIST,
+            PageType.CLIP_NOTES,
+            PageType.SEARCH,
+            PageType.SEARCH,
+            PageType.SEARCH_HASH,
+            PageType.USER,
+            PageType.DETAIL,
+            PageType.GALLERY_FEATURED,
+            PageType.GALLERY_POPULAR,
+            PageType.GALLERY_POSTS,
+            PageType.MY_GALLERY_POSTS,
+            PageType.I_LIKED_GALLERY_POSTS,
+            PageType.USERS_GALLERY_POSTS,
+            PageType.MASTODON_LIST_TIMELINE
+        )
+        return when (related.instanceType) {
             Account.InstanceType.MISSKEY -> {
                 listOfNotNull(
                     PageCandidate(
-                        account,
+                        related,
                         PageType.HOME,
                         StringSource(R.string.home_timeline)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.LOCAL,
                         StringSource(R.string.local_timeline)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.SOCIAL,
                         StringSource(R.string.hybrid_timeline)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.GLOBAL,
                         StringSource(R.string.global_timeline)
                     ),
                     if (isCalckey) PageCandidate(
-                        account,
+                        related,
                         PageType.CALCKEY_RECOMMENDED_TIMELINE,
                         StringSource(R.string.calckey_recomended_timeline)
                     ) else null,
                     if (version >= Version("12")) PageCandidate(
-                        account,
+                        related,
                         PageType.ANTENNA,
                         StringSource(R.string.antenna)
                     ) else null,
                     PageCandidate(
-                        account,
+                        related,
                         PageType.NOTIFICATION,
                         StringSource(R.string.notification)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.USER_LIST,
                         StringSource(R.string.user_list)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.MENTION,
                         StringSource(R.string.mention)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.FAVORITE,
                         StringSource(R.string.favorite)
                     ),
                     if (version >= Version("12")) PageCandidate(
-                        account,
+                        related,
                         PageType.CHANNEL_TIMELINE,
                         StringSource(R.string.channel)
                     ) else null,
                     if (version >= Version("12")) PageCandidate(
-                        account,
+                        related,
                         PageType.CLIP_NOTES,
                         StringSource(R.string.clip)
                     ) else null,
                     PageCandidate(
-                        account,
+                        related,
                         PageType.SEARCH,
                         StringSource(R.string.search)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.SEARCH_HASH,
                         StringSource(R.string.tag)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.FEATURED,
                         StringSource(R.string.featured)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.USER,
                         StringSource(R.string.user)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.DETAIL,
                         StringSource(R.string.detail)
                     ),
                 ) + if (version >= Version("12.75.0")) {
                     listOf(
                         PageCandidate(
-                            account,
+                            related,
                             PageType.GALLERY_FEATURED,
-                            StringSource(R.string.featured) + StringSource("(") + StringSource(R.string.gallery) + StringSource(")")
+                            StringSource(R.string.featured) + StringSource("(") + StringSource(R.string.gallery) + StringSource(
+                                ")"
+                            )
                         ),
                         PageCandidate(
-                            account,
+                            related,
                             PageType.GALLERY_POPULAR,
                             StringSource(R.string.popular_posts) + StringSource("(") + StringSource(
-                                R.string.gallery) + StringSource(")")
+                                R.string.gallery
+                            ) + StringSource(")")
                         ),
                         PageCandidate(
-                            account,
+                            related,
                             PageType.GALLERY_POSTS,
                             StringSource(R.string.gallery),
                         ),
                         PageCandidate(
-                            account,
+                            related,
                             PageType.MY_GALLERY_POSTS,
-                            StringSource(R.string.my_posts) + StringSource("(") + StringSource(R.string.gallery) + StringSource(")"),
+                            StringSource(R.string.my_posts) + StringSource("(") + StringSource(R.string.gallery) + StringSource(
+                                ")"
+                            ),
                         ),
                         PageCandidate(
-                            account,
+                            related,
                             PageType.USERS_GALLERY_POSTS,
                             StringSource(R.string.gallery) + StringSource("(User)")
                         ),
                         PageCandidate(
-                            account,
+                            related,
                             PageType.I_LIKED_GALLERY_POSTS,
-                            StringSource(R.string.my_liking) + StringSource("(") + StringSource(R.string.gallery) + StringSource(")"),
+                            StringSource(R.string.my_liking) + StringSource("(") + StringSource(R.string.gallery) + StringSource(
+                                ")"
+                            ),
                         ),
-                        PageCandidate(
-                            account,
-                            PageType.MY_GALLERY_POSTS,
-                            StringSource(R.string.my_posts) + StringSource("(") + StringSource(R.string.gallery) + StringSource(")"),
+
                         )
-                    )
                 } else {
                     emptyList()
                 }
@@ -152,43 +178,45 @@ class PageCandidateGenerator @Inject constructor(
             Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> {
                 listOf(
                     PageCandidate(
-                        account,
+                        related,
                         PageType.MASTODON_HOME_TIMELINE,
                         StringSource(R.string.home_timeline)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.MASTODON_LOCAL_TIMELINE,
                         StringSource(R.string.local_timeline)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.MASTODON_PUBLIC_TIMELINE,
                         StringSource(R.string.global_timeline),
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.NOTIFICATION,
                         StringSource(R.string.notification)
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.FAVORITE,
                         StringSource(R.string.favorite)
                     ),
 //                    PageType.MASTODON_HASHTAG_TIMELINE,
                     PageCandidate(
-                        account,
+                        related,
                         PageType.MASTODON_LIST_TIMELINE,
                         StringSource(R.string.list),
                     ),
                     PageCandidate(
-                        account,
+                        related,
                         PageType.MASTODON_BOOKMARK_TIMELINE,
                         StringSource(R.string.bookmark)
                     )
                 )
             }
+        }.filter {
+            isSameAccount || !restrictionTypes.contains(it.type)
         }
     }
 
