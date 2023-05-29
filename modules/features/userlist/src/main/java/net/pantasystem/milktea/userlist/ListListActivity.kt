@@ -25,17 +25,26 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ListListActivity : AppCompatActivity() {
 
-    companion object{
+    companion object {
 
         private const val EXTRA_ADD_USER_ID = "jp.panta.misskeyandroidclient.extra.ADD_USER_ID"
-        private const val EXTRA_ACCOUNT_ID = "jp.panta.misskeyandroidclient.extra.ADD_USERS_ACCOUNT_ID"
+        private const val EXTRA_ACCOUNT_ID =
+            "jp.panta.misskeyandroidclient.extra.ADD_USERS_ACCOUNT_ID"
 
-        fun newInstance(context: Context, addUserId: User.Id?): Intent {
+        fun newInstance(
+            context: Context,
+            addUserId: User.Id?,
+            specifiedAccountId: Long? = null,
+            addTabToAccountId: Long? = null,
+        ): Intent {
             return Intent(context, ListListActivity::class.java).apply {
                 addUserId?.let {
                     putExtra(EXTRA_ADD_USER_ID, addUserId.id)
                     putExtra(EXTRA_ACCOUNT_ID, addUserId.accountId)
                 }
+                putExtra(ListListViewModel.EXTRA_SPECIFIED_ACCOUNT_ID, specifiedAccountId)
+                putExtra(ListListViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID, addTabToAccountId)
+
             }
         }
     }
@@ -53,7 +62,7 @@ class ListListActivity : AppCompatActivity() {
 
     private val addUserId: User.Id? by lazy {
         val addUserIdSt = intent.getStringExtra(EXTRA_ADD_USER_ID)
-        val addUserAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, - 1L)
+        val addUserAccountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1L)
         if (addUserIdSt == null || addUserAccountId == -1L) {
             null
         } else {
@@ -73,7 +82,7 @@ class ListListActivity : AppCompatActivity() {
             val uiState by mListListViewModel.uiState.collectAsState()
             MdcTheme {
                 UserListCardScreen(uiState = uiState, onAction = { action ->
-                    when(action) {
+                    when (action) {
                         UserListCardScreenAction.OnNavigateUp -> {
                             finish()
                         }
@@ -98,14 +107,17 @@ class ListListActivity : AppCompatActivity() {
     }
 
 
-
-
 }
 
 class UserListNavigationImpl @Inject constructor(
-    val activity: Activity
+    val activity: Activity,
 ) : UserListNavigation {
     override fun newIntent(args: UserListArgs): Intent {
-        return ListListActivity.newInstance(activity, args.userId)
+        return ListListActivity.newInstance(
+            activity,
+            args.userId,
+            specifiedAccountId = args.specifiedAccountId,
+            addTabToAccountId = args.addTabToAccountId,
+        )
     }
 }
