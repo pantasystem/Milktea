@@ -66,7 +66,7 @@ class PageSettingActivity : AppCompatActivity() {
         }
 //
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
-            when (pt) {
+            when (pt.type) {
                 PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_HASHTAG_TIMELINE -> startActivity(
                     searchNavigation.newIntent(SearchNavType.SearchScreen())
                 )
@@ -99,7 +99,12 @@ class PageSettingActivity : AppCompatActivity() {
                     launchSearchAndSelectUserForAddGalleryTab.launch(intent)
                 }
                 PageType.CHANNEL_TIMELINE -> {
-                    val intent = channelNavigation.newIntent(Unit)
+                    val intent = channelNavigation.newIntent(
+                        ChannelNavigationArgs(
+                            specifiedAccountId = pt.relatedAccount.accountId,
+                            addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                        )
+                    )
                     startActivity(intent)
                 }
                 else -> {

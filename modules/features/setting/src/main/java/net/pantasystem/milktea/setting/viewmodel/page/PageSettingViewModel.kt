@@ -37,7 +37,7 @@ class PageSettingViewModel @Inject constructor(
     val account =
         accountStore.observeCurrentAccount.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val pageAddedEvent = EventBus<PageType>()
+    val pageAddedEvent = EventBus<PageCandidate>()
 
     val pageOnActionEvent = EventBus<Page>()
 
@@ -177,7 +177,7 @@ class PageSettingViewModel @Inject constructor(
 
 
     override fun add(type: PageCandidate) {
-        pageAddedEvent.event = type.type
+        pageAddedEvent.event = type
         val name = pageTypeNameMap.get(type.type)
         when (type.type) {
             PageType.GLOBAL -> {

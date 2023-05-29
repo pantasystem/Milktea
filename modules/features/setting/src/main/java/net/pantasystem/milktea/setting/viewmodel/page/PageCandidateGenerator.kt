@@ -27,7 +27,6 @@ class PageCandidateGenerator @Inject constructor(
             PageType.ANTENNA,
             PageType.NOTIFICATION,
             PageType.USER_LIST,
-            PageType.CHANNEL_TIMELINE,
             PageType.CLIP_NOTES,
             PageType.SEARCH,
             PageType.SEARCH,
