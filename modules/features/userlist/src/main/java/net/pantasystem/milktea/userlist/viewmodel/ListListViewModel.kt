@@ -43,8 +43,8 @@ class ListListViewModel @Inject constructor(
         accountStore.state.map { state ->
             accountId?.let {
                 state.get(it)
-                    ?: state.currentAccount
-            }
+
+            } ?: state.currentAccount
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
