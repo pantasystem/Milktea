@@ -17,20 +17,24 @@ class UserListTabToggleAddToTabUseCase @Inject constructor(
     private val accountService: AccountService,
 ): UseCase {
 
-    suspend operator fun invoke(listId: UserList.Id) = runCancellableCatching<Unit> {
-        val account = accountRepository.get(listId.accountId)
+    suspend operator fun invoke(listId: UserList.Id, addTabToAccountId: Long? = null) = runCancellableCatching<Unit> {
+        val account = accountRepository.get(addTabToAccountId ?: listId.accountId)
             .getOrThrow()
-        val page = account.pages.firstOrNull {
-            it.pageParams.listId == listId.userListId
+        val page = account.pages.firstOrNull { page ->
+            page.pageParams.listId == listId.userListId
+                    && listId.accountId == (page.attachedAccountId ?: page.accountId)
         }
+
+        val relatedAccount = accountRepository.get(listId.accountId).getOrThrow()
 
         if (page == null) {
             val userList = userListRepository.findOne(listId)
             accountService.add(
                 Page(
                     account.accountId,
-                    userList.name,
+                    if (addTabToAccountId == null) userList.name else "${userList.name}(${relatedAccount.getAcct()})",
                     weight = -1,
+                    attachedAccountId = if (addTabToAccountId == null) null else relatedAccount.accountId,
                     pageable = when(account.instanceType) {
                         Account.InstanceType.MISSKEY -> Pageable.UserListTimeline(
                             listId.userListId
