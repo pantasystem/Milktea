@@ -55,7 +55,7 @@ class PageSettingViewModel @Inject constructor(
             PageCandidateGroup(
                 ca,
                 it,
-                pageCandidateGenerator.createPageCandidates(it)
+                pageCandidateGenerator.createPageCandidates(it, ca)
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
