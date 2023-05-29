@@ -81,12 +81,11 @@ class ListListViewModel @Inject constructor(
     private val addTargetUserId = MutableStateFlow<User.Id?>(null)
 
     val uiState = combine(
-        currentAccount,
         addTabToAccount,
         userListsFlow,
         userListsSyncState,
         addTargetUserId
-    ) { ac, addTabToAccount, userLists, syncState, addUser ->
+    ) { addTabToAccount, userLists, syncState, addUser ->
         UserListsUiState(
             userLists.map { userList ->
                 UserListBindingModel(
@@ -165,6 +164,10 @@ class ListListViewModel @Inject constructor(
 
     fun setAddTargetUserId(userId: User.Id?) {
         addTargetUserId.value = userId
+    }
+
+    fun getAddTabToAccountId(): Long? {
+        return savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID]
     }
 
     private suspend fun syncUsers(accountId: Long) {

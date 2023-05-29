@@ -127,6 +127,7 @@ fun UserListDetailScreen(
                         },
                         update = { frameLayout ->
                             val fragment = pageableFragmentFactory.create(
+                                listId.accountId,
                                 when(instanceType) {
                                     Account.InstanceType.MASTODON -> Pageable.Mastodon.ListTimeline(listId.userListId)
                                     else -> Pageable.UserListTimeline(listId = listId.userListId)

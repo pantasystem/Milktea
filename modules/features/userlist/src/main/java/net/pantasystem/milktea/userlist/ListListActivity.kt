@@ -90,7 +90,11 @@ class ListListActivity : AppCompatActivity() {
                             mListListViewModel.toggleTab(action.userList)
                         }
                         is UserListCardScreenAction.OnUserListCardClicked -> {
-                            val intent = UserListDetailActivity.newIntent(this, action.userList.id)
+                            val intent = UserListDetailActivity.newIntent(
+                                this,
+                                action.userList.id,
+                                mListListViewModel.getAddTabToAccountId()
+                            )
                             startActivity(intent)
                         }
                         is UserListCardScreenAction.OnToggleAddUser -> {
