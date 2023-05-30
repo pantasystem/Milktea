@@ -9,28 +9,32 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.ResultState
-import net.pantasystem.milktea.common.StateContent
-import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.eventbus.EventBus
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.page.Pageable
-import net.pantasystem.milktea.model.account.page.PageableTemplate
 import net.pantasystem.milktea.model.antenna.Antenna
 import net.pantasystem.milktea.model.antenna.AntennaRepository
+import net.pantasystem.milktea.model.antenna.AntennaToggleAddToTabUseCase
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class AntennaListViewModel @Inject constructor(
+    loggerFactory: Logger.Factory,
     private val accountStore: AccountStore,
     private val antennaRepository: AntennaRepository,
+    private val antennaToggleAddToTabUseCase: AntennaToggleAddToTabUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
         const val EXTRA_SPECIFIED_ACCOUNT_ID = "AntennaListViewModel.EXTRA_SPECIFIED_ACCOUNT_ID"
         const val EXTRA_ADD_TAB_TO_ACCOUNT_ID = "AntennaListViewModel.EXTRA_ADD_TAB_TO_ACCOUNT_ID"
+    }
+
+    private val logger by lazy(LazyThreadSafetyMode.NONE) {
+        loggerFactory.create("AntennaListViewModel")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -99,7 +103,6 @@ class AntennaListViewModel @Inject constructor(
 
 
     private val mPagedAntennaIds = MutableLiveData<Set<Antenna.Id>>()
-    val pagedAntennaIds: LiveData<Set<Antenna.Id>> = mPagedAntennaIds
 
 
     init {
@@ -130,25 +133,13 @@ class AntennaListViewModel @Inject constructor(
         refreshAntennasEvents.tryEmit(Date().time)
     }
 
-    fun toggleTab(antenna: Antenna?) {
-        antenna ?: return
-        val paged = accountStore.currentAccount?.pages?.firstOrNull {
-
-            it.pageParams.antennaId == antenna.id.antennaId
+    fun toggleTab(antenna: Antenna?) = viewModelScope.launch {
+        antenna ?: return@launch
+        runCancellableCatching {
+            antennaToggleAddToTabUseCase(antenna, savedStateHandle[EXTRA_ADD_TAB_TO_ACCOUNT_ID])
+        }.onFailure {
+            logger.error("Failed to toggle tab", it)
         }
-        viewModelScope.launch {
-            if (paged == null) {
-                accountStore.addPage(
-                    PageableTemplate(accountStore.currentAccount!!)
-                        .antenna(
-                            antenna
-                        )
-                )
-            } else {
-                accountStore.removePage(paged)
-            }
-        }
-
     }
 
     fun confirmDeletionAntenna(antenna: Antenna?) {
