@@ -36,14 +36,14 @@ class AntennaListFragment : Fragment(R.layout.fragment_antenna_list){
         binding.antennaListView.adapter = adapter
         binding.antennaListView.layoutManager = layoutManager
 
-        antennaViewModel.antennasState.onEach {
-            val antennas = when(val content = it.content) {
+        antennaViewModel.uiState.onEach { uiState ->
+            val antennas = when(val content = uiState.antennas.content) {
                 is StateContent.Exist -> content.rawContent
                 is StateContent.NotExist -> emptyList()
             }
             adapter.submitList(antennas)
 
-            val isLoading = it is ResultState.Loading
+            val isLoading = uiState.antennas is ResultState.Loading
             binding.antennaListSwipeRefresh.isRefreshing = isLoading
         }.flowWithLifecycle(viewLifecycleOwner.lifecycle).launchIn(viewLifecycleOwner.lifecycleScope)
 

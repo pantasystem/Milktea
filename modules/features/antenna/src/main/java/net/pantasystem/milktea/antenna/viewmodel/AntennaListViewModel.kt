@@ -73,6 +73,24 @@ class AntennaListViewModel @Inject constructor(
         ResultState.Loading(StateContent.NotExist())
     )
 
+    val uiState = combine(currentAccount, addTabToAccount, antennasState) { ca, ata, state ->
+        AntennaListUiState(
+            currentAccount = ca,
+            addTabToAccount = ata,
+            antennas = state.convert { antennas ->
+                antennas.map { antenna ->
+                    AntennaListItem(
+                        antenna = antenna,
+                        isAddedToTab = (ata ?: ca)?.pages?.any { page ->
+                            page.pageParams.antennaId == antenna.id.antennaId
+                                    && (page.attachedAccountId ?: page.accountId) == antenna.id.accountId
+                        } ?: false
+                    )
+                }
+            }
+        )
+    }
+
     val editAntennaEvent = EventBus<Antenna>()
 
     val confirmDeletionAntennaEvent = EventBus<Antenna>()
