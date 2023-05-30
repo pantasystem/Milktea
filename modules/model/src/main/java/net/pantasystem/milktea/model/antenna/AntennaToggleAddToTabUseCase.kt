@@ -31,6 +31,7 @@ class AntennaToggleAddToTabUseCase @Inject constructor(
                     attachedAccountId = if (isSameAccount) null else relatedAccount.accountId,
                     title = title,
                     weight = -1,
+                    accountId = current.accountId,
                 )
             accountService.add(
                 page
