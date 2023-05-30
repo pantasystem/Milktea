@@ -57,7 +57,7 @@ data class Account(
     }
 
     fun getAcct(): String {
-        return "@$userName@${getHost()}}"
+        return "@$userName@${getHost()}"
     }
 
 }
