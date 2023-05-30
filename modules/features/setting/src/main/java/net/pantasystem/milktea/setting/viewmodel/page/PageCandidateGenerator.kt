@@ -24,7 +24,6 @@ class PageCandidateGenerator @Inject constructor(
 
         val isSameAccount = related.accountId == currentAccount?.accountId || currentAccount == null
         val restrictionTypes = setOf(
-            PageType.ANTENNA,
             PageType.NOTIFICATION,
             PageType.CLIP_NOTES,
             PageType.SEARCH,

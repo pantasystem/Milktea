@@ -86,7 +86,10 @@ class PageSettingActivity : AppCompatActivity() {
                     ))
                 )
                 PageType.DETAIL -> startActivity(searchNavigation.newIntent(SearchNavType.SearchScreen()))
-                PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(Unit))
+                PageType.ANTENNA -> startActivity(antennaNavigation.newIntent(AntennaNavigationArgs(
+                    specifiedAccountId = pt.relatedAccount.accountId,
+                    addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                )))
                 PageType.CLIP_NOTES -> startActivity(
                     clipListNavigation.newIntent(
                         ClipListNavigationArgs(mode = ClipListNavigationArgs.Mode.AddToTab)
