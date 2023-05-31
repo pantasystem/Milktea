@@ -6,7 +6,8 @@ interface ClipListNavigation : ActivityNavigation<ClipListNavigationArgs>
 
 data class ClipListNavigationArgs(
     val accountId: Long? = null,
-    val mode: Mode = Mode.View
+    val mode: Mode = Mode.View,
+    val addTabToAccountId: Long? = null,
 ) {
     enum class Mode {
         AddToTab,
