@@ -15,20 +15,35 @@ class ToggleClipAddToTabUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
 ) : UseCase {
 
-    suspend operator fun invoke(clip: Clip): Result<Unit> = runCancellableCatching {
-        val account = accountRepository.get(clip.id.accountId).getOrThrow()
+    suspend operator fun invoke(clip: Clip, addTabToAccountId: Long?): Result<Unit> = runCancellableCatching {
+        val account = addTabToAccountId?.let {
+            accountRepository.get(it).getOrThrow()
+        } ?: accountRepository.get(clip.id.accountId).getOrThrow()
         val existsPage = account.pages.firstOrNull {
             it.pageParams.clipId == clip.id.clipId
+                    && (it.attachedAccountId ?: it.accountId) == clip.id.accountId
+        }
+        val isSameAccount = account.accountId == clip.id.accountId
+        val relatedAccount = if (isSameAccount) {
+            account
+        } else {
+            accountRepository.get(clip.id.accountId).getOrThrow()
+        }
+        val title = if (isSameAccount) {
+            clip.name
+        } else {
+            "${clip.name}(${relatedAccount.getAcct()})"
         }
         if (existsPage == null) {
             accountService.add(
                 Page(
-                    title = clip.name,
+                    title = title,
                     weight = -1,
                     accountId = clip.id.accountId,
                     pageable = Pageable.ClipNotes(
                         clipId = clip.id.clipId,
-                    )
+                    ),
+                    attachedAccountId = if (isSameAccount) null else relatedAccount.accountId,
                 )
             )
         } else {

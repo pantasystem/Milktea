@@ -25,7 +25,7 @@ class ClipListViewModel @Inject constructor(
     private val clipRepository: ClipRepository,
     private val accountStore: AccountStore,
     private val toggleClipAddToTabUseCase: ToggleClipAddToTabUseCase,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val logger by lazy(LazyThreadSafetyMode.NONE) {
@@ -40,6 +40,15 @@ class ClipListViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    private val addTabToAccountId = savedStateHandle.getStateFlow<Long>(
+        ClipListNavigationImpl.EXTRA_ADD_TAB_TO_ACCOUNT_ID,
+        -1
+    ).map {
+        it.takeIf {
+            it > 0
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val currentAccount = accountId.flatMapLatest { accountId ->
         accountStore.state.map { state ->
@@ -48,7 +57,16 @@ class ClipListViewModel @Inject constructor(
             } ?: state.currentAccount
         }
     }.catch {
+        logger.error("currentAccount failed: $it", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val addTabToAccount = addTabToAccountId.flatMapLatest {
+        accountStore.state.map { state ->
+            it?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -66,11 +84,16 @@ class ClipListViewModel @Inject constructor(
         ResultState.Loading(StateContent.NotExist())
     )
 
-    private val clipItemStatuses = combine(clips, currentAccount) { clipsState, account ->
+    private val clipItemStatuses = combine(
+        clips,
+        addTabToAccount,
+        currentAccount
+    ) { clipsState, addTabToAccount, account ->
         clipsState.convert { clips ->
             clips.map { clip ->
-                val isAddedToTab = account?.pages?.any {
+                val isAddedToTab = (addTabToAccount ?: account)?.pages?.any {
                     clip.id.clipId == it.pageParams.clipId
+                            && (it.attachedAccountId ?: it.accountId) == account?.accountId
                 }
                 ClipItemState(clip, isAddedToTab ?: false)
             }
@@ -81,20 +104,24 @@ class ClipListViewModel @Inject constructor(
         ResultState.Loading(StateContent.NotExist())
     )
 
-    val uiState = combine(currentAccount, clipItemStatuses) { ac, statuses ->
+    val uiState = combine(
+        currentAccount,
+        addTabToAccount,
+        clipItemStatuses
+    ) { ac, addTabToAccount, statuses ->
         ClipListUiState(
-            ac,
-            statuses
+            ac, addTabToAccount, statuses
         )
     }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        ClipListUiState()
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), ClipListUiState()
     )
 
     fun onToggleAddToTabButtonClicked(clipItemState: ClipItemState) {
         viewModelScope.launch {
-            toggleClipAddToTabUseCase(clipItemState.clip)
+            toggleClipAddToTabUseCase(
+                clipItemState.clip,
+                savedStateHandle[ClipListNavigationImpl.EXTRA_ADD_TAB_TO_ACCOUNT_ID]
+            )
         }
     }
 
@@ -102,7 +129,7 @@ class ClipListViewModel @Inject constructor(
         val mode = savedStateHandle.get<String?>(ClipListNavigationImpl.EXTRA_MODE)?.let {
             ClipListNavigationArgs.Mode.valueOf(it)
         } ?: ClipListNavigationArgs.Mode.View
-        when(mode) {
+        when (mode) {
             ClipListNavigationArgs.Mode.AddToTab -> {
                 onToggleAddToTabButtonClicked(clipItemState)
             }
@@ -118,5 +145,6 @@ data class ClipItemState(
 
 data class ClipListUiState(
     val account: Account? = null,
+    val addToTabAccount: Account? = null,
     val clipStatusesState: ResultState<List<ClipItemState>> = ResultState.Loading(StateContent.NotExist()),
 )
