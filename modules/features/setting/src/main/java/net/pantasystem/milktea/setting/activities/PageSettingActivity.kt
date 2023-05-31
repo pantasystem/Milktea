@@ -92,7 +92,11 @@ class PageSettingActivity : AppCompatActivity() {
                 )))
                 PageType.CLIP_NOTES -> startActivity(
                     clipListNavigation.newIntent(
-                        ClipListNavigationArgs(mode = ClipListNavigationArgs.Mode.AddToTab)
+                        ClipListNavigationArgs(
+                            mode = ClipListNavigationArgs.Mode.AddToTab,
+                            accountId = pt.relatedAccount.accountId,
+                            addTabToAccountId = mPageSettingViewModel.account.value?.accountId
+                        )
                     )
                 )
                 PageType.USERS_GALLERY_POSTS -> {
