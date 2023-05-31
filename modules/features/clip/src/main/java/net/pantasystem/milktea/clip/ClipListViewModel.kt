@@ -14,7 +14,6 @@ import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
 import net.pantasystem.milktea.common_navigation.ClipListNavigationArgs
 import net.pantasystem.milktea.model.account.Account
-import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.clip.Clip
 import net.pantasystem.milktea.model.clip.ClipRepository
 import net.pantasystem.milktea.model.clip.ToggleClipAddToTabUseCase
@@ -24,7 +23,6 @@ import javax.inject.Inject
 class ClipListViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     private val clipRepository: ClipRepository,
-    private val accountRepository: AccountRepository,
     private val accountStore: AccountStore,
     private val toggleClipAddToTabUseCase: ToggleClipAddToTabUseCase,
     private val savedStateHandle: SavedStateHandle
@@ -43,17 +41,11 @@ class ClipListViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val currentAccount = accountId.map {
-        if (it == null) {
-            accountRepository.getCurrentAccount().getOrNull()
-        } else {
-            accountRepository.get(it).getOrNull()
-        }
-    }.filterNotNull().flatMapLatest { ac ->
-        accountStore.observeAccounts.map { accounts ->
-            accounts.firstOrNull {
-                ac.accountId == it.accountId
-            }
+    private val currentAccount = accountId.flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(it)
+            } ?: state.currentAccount
         }
     }.catch {
 
