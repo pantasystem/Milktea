@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.notification.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import net.pantasystem.milktea.app_store.account.AccountStore
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.common_android.resource.StringSource
 import net.pantasystem.milktea.common_android_ui.APIErrorStringConverter
+import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.UnauthorizedException
 import net.pantasystem.milktea.model.account.page.Pageable
@@ -36,16 +38,21 @@ class NotificationViewModel @Inject constructor(
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
-    notificationPagingStoreFactory: NotificationPagingStore.Factory
+    notificationPagingStoreFactory: NotificationPagingStore.Factory,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    companion object {
+        const val EXTRA_SPECIFIED_ACCOUNT_ID = "NotificationViewModel.EXTRA_SPECIFIED_ACCOUNT_ID"
+    }
 
     private val planeNoteViewDataCache: PlaneNoteViewDataCache =
         planeNoteViewDataCacheFactory.create({
-            accountRepository.getCurrentAccount().getOrThrow()
+            getCurrentAccount()
         }, viewModelScope)
 
     private val notificationPagingStore = notificationPagingStoreFactory.create {
-        accountRepository.getCurrentAccount().getOrThrow()
+        getCurrentAccount()
     }
 
     private val notificationPageableState = notificationPagingStore.notifications.map { state ->
@@ -87,13 +94,21 @@ class NotificationViewModel @Inject constructor(
 
     private val logger = loggerFactory.create("NotificationViewModel")
 
+    private val currentAccount = savedStateHandle.getStateFlow<Long?>(EXTRA_SPECIFIED_ACCOUNT_ID, null).flatMapLatest { accountId ->
+        accountStore.state.map { state ->
+            accountId?.let {
+                state.get(it)
+            } ?: state.currentAccount
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     init {
-        accountStore.observeCurrentAccount.filterNotNull().flowOn(Dispatchers.IO)
+        currentAccount.filterNotNull().flowOn(Dispatchers.IO)
             .onEach {
                 loadInit()
             }.launchIn(viewModelScope)
 
-        accountStore.observeCurrentAccount.filterNotNull().flatMapLatest { ac ->
+        currentAccount.filterNotNull().flatMapLatest { ac ->
             notificationStreaming.connect {
                 ac
             }.map {
@@ -192,7 +207,9 @@ class NotificationViewModel @Inject constructor(
 
     fun onMarkAsReadAllNotifications() {
         viewModelScope.launch {
-            accountRepository.getCurrentAccount().mapCancellableCatching {
+            runCancellableCatching {
+                getCurrentAccount()
+            }.mapCancellableCatching {
                 notificationRepository.markAsRead(it.accountId)
             }.onSuccess {
                 loadInit()
@@ -202,6 +219,13 @@ class NotificationViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun getCurrentAccount(): Account {
+        return savedStateHandle.get<Long>(EXTRA_SPECIFIED_ACCOUNT_ID)?.let { accountId ->
+            return accountRepository.get(accountId).getOrThrow()
+        } ?: accountRepository.getCurrentAccount().getOrThrow()
+    }
+
 
 }
 

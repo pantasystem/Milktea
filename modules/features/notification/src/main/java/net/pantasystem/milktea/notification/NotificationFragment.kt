@@ -46,6 +46,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
+    companion object {
+        fun newInstance(specifiedAccountId: Long? = null): NotificationFragment {
+            return NotificationFragment().apply {
+                arguments = Bundle().apply {
+                    specifiedAccountId?.also {
+                        putLong(NotificationViewModel.EXTRA_SPECIFIED_ACCOUNT_ID, it)
+                    }
+                }
+            }
+        }
+    }
+
 
     lateinit var mLinearLayoutManager: LinearLayoutManager
     private val mViewModel: NotificationViewModel by viewModels()

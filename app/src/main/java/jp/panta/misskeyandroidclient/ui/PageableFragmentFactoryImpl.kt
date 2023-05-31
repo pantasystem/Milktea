@@ -19,10 +19,10 @@ class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory
                 NoteDetailFragment.newInstance(page)
             }
             is Pageable.Notification ->{
-                NotificationFragment()
+                NotificationFragment.newInstance(page.attachedAccountId ?: page.accountId)
             }
             is Pageable.Gallery -> {
-                return GalleryPostsFragment.newInstance(pageable, page.accountId)
+                return GalleryPostsFragment.newInstance(pageable, page.attachedAccountId ?: page.accountId)
             }
             else ->{
                 TimelineFragment.newInstance(page)
@@ -57,7 +57,7 @@ class PageableFragmentFactoryImpl @Inject constructor(): PageableFragmentFactory
                 NoteDetailFragment.newInstance(pageable.noteId, accountId)
             }
             is Pageable.Notification ->{
-                NotificationFragment()
+                NotificationFragment.newInstance(accountId)
             }
             is Pageable.Gallery -> {
                 return GalleryPostsFragment.newInstance(pageable, accountId)
