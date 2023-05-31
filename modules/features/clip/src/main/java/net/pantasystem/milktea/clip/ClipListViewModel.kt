@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.asLoadingStateFlow
@@ -21,12 +22,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ClipListViewModel @Inject constructor(
+    loggerFactory: Logger.Factory,
     private val clipRepository: ClipRepository,
     private val accountRepository: AccountRepository,
     private val accountStore: AccountStore,
     private val toggleClipAddToTabUseCase: ToggleClipAddToTabUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val logger by lazy(LazyThreadSafetyMode.NONE) {
+        loggerFactory.create("ClipListViewModel")
+    }
 
     private val accountId = savedStateHandle.getStateFlow<Long>(
         ClipListNavigationImpl.EXTRA_ACCOUNT_ID, -1L
@@ -58,7 +64,9 @@ class ClipListViewModel @Inject constructor(
         it.accountId
     }.distinctUntilChanged().flatMapLatest { accountId ->
         suspend {
-            clipRepository.getMyClips(accountId).getOrThrow()
+            clipRepository.getMyClips(accountId).onFailure {
+                logger.error("getClips failed: $it", it)
+            }.getOrThrow()
         }.asLoadingStateFlow()
     }.stateIn(
         viewModelScope,
