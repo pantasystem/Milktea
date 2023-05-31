@@ -39,7 +39,7 @@ class ToggleClipAddToTabUseCase @Inject constructor(
                 Page(
                     title = title,
                     weight = -1,
-                    accountId = clip.id.accountId,
+                    accountId = addTabToAccountId ?: clip.id.accountId,
                     pageable = Pageable.ClipNotes(
                         clipId = clip.id.clipId,
                     ),
