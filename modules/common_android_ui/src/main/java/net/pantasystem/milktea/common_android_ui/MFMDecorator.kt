@@ -264,6 +264,15 @@ object MFMDecorator {
                     ElementType.SMALL -> {
                         setSpan(RelativeSizeSpan(0.6F))
                     }
+                    ElementType.FnX2 -> {
+                        setSpan(RelativeSizeSpan(2.0F))
+                    }
+                    ElementType.FnX3 -> {
+                        setSpan(RelativeSizeSpan(3.0F))
+                    }
+                    ElementType.FnX4 -> {
+                        setSpan(RelativeSizeSpan(4.0F))
+                    }
                     ElementType.ROOT -> {
 
                     }
