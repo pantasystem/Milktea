@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import androidx.viewpager.widget.ViewPager
 import com.github.chrisbanes.photoview.PhotoView
 import kotlin.math.abs
@@ -20,9 +21,9 @@ class PhotoViewViewPager : ViewPager {
 
     companion object {
 
-        private const val SWIPE_THRESHOLD = 100
+        private const val SWIPE_THRESHOLD = 150
 
-        private const val SWIPE_VELOCITY_THRESHOLD = 100
+        private const val SWIPE_VELOCITY_THRESHOLD = 150
     }
 
     constructor(context: Context) : super(context)
@@ -40,6 +41,12 @@ class PhotoViewViewPager : ViewPager {
         return try{
             if (ev?.action == MotionEvent.ACTION_DOWN) {
                 startY = ev.y
+            }
+            when(ev?.action) {
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    getPhotoView()?.animate()?.translationY(0f)?.rotation(0f)?.setDuration(200)?.start()
+                    totalTranslationY = 0f
+                }
             }
             if (ev != null) {
                 return gestureDetector.onTouchEvent(ev) || super.onInterceptTouchEvent(ev)
@@ -65,10 +72,14 @@ class PhotoViewViewPager : ViewPager {
             distanceX: Float,
             distanceY: Float
         ): Boolean {
-            totalTranslationY += e2.rawY - lastY
-            viewToMove()?.translationY = totalTranslationY
-            viewToMove()?.rotation = totalTranslationY / 10
-            lastY = e2.rawY
+
+            if (isNotScaled()) {
+                totalTranslationY += e2.rawY - lastY
+                viewToMove()?.translationY = totalTranslationY
+                viewToMove()?.rotation = totalTranslationY / 10
+                lastY = e2.rawY
+            }
+
             return super.onScroll(e1, e2, distanceX, distanceY)
         }
 
@@ -85,10 +96,8 @@ class PhotoViewViewPager : ViewPager {
             } catch (exception: Exception) {
                 exception.printStackTrace()
             }
-            if (!result) {
-                viewToMove()?.animate()?.translationY(0f)?.setDuration(200)?.start()
-                totalTranslationY = 0f
-            }
+            viewToMove()?.animate()?.translationY(0f)?.rotation(0f)?.setDuration(200)?.start()
+            totalTranslationY = 0f
             return result
         }
 
@@ -102,24 +111,36 @@ class PhotoViewViewPager : ViewPager {
 
 
     private fun onSwipeTop() {
-        val currentItemView = try {
-            findViewById<PhotoView>(R.id.imageView)
-        } catch (e: Exception) {
-            null
-        }
-        if (currentItemView == null || currentItemView.scale == 1.0F) {
+
+        if (isNotScaled()) {
             // Only close if not zoomed in
             onFinishEventListener?.onFinish()
 //            (context as? Activity)?.finish()
         }
     }
 
-    private fun viewToMove(): PhotoView? {
+    private fun getPhotoView(): PhotoView? {
         return try {
-            findViewById<PhotoView>(R.id.imageView)
+            findViewById(R.id.imageView)
         } catch (e: Exception) {
             null
         }
+    }
+
+    private fun getPlayerView(): View? {
+        return try {
+            findViewById(R.id.player_view)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun viewToMove(): View? {
+        return getPhotoView() ?: getPlayerView()
+    }
+
+    private fun isNotScaled(): Boolean {
+        return getPhotoView() == null || getPhotoView()?.scale == 1.0F
     }
 
 
