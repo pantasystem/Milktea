@@ -88,6 +88,7 @@ class MediaActivity : AppCompatActivity() {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_media)
         setSupportActionBar(mBinding.mediaToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = ""
 
         val file = intent.getSerializableExtra(MediaNavigationKeys.EXTRA_FILE) as File?
 
@@ -117,6 +118,9 @@ class MediaActivity : AppCompatActivity() {
 
         val pagerAdapter = MediaPagerAdapter(list)
         mBinding.mediaViewPager.adapter = pagerAdapter
+        mBinding.mediaViewPager.setOnFinishEventListener {
+            finish()
+        }
 
         mBinding.mediaViewPager.currentItem = fileCurrentIndex
     }
