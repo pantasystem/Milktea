@@ -26,6 +26,7 @@
                 android:theme="?attr/actionBarTheme"
                 android:layout_gravity="top"
                 android:backgroundTint="#00000000"
+                android:elevation="0dp"
                 />
 
     </FrameLayout>
