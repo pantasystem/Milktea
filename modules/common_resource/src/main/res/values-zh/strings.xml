@@ -592,6 +592,7 @@
     <string name="select_draft_post">Select draft post</string>
     <string name="remember_scroll_position">Remember scroll position</string>
     <string name="post_only">Post only</string>
+    <string name="settings_display_timestamps_as_absolute_dates">Display timestamps as absolute dates</string>
     <!-- User -->
 
 </resources>
