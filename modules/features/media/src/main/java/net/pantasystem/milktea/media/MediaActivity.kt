@@ -118,9 +118,6 @@ class MediaActivity : AppCompatActivity() {
 
         val pagerAdapter = MediaPagerAdapter(list)
         mBinding.mediaViewPager.adapter = pagerAdapter
-        mBinding.mediaViewPager.setOnFinishEventListener {
-            finish()
-        }
 
         mBinding.mediaViewPager.currentItem = fileCurrentIndex
     }

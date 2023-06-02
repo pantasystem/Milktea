@@ -56,6 +56,10 @@ class ImageFragment : Fragment(R.layout.fragment_image){
             return
         }
 
+        binding.swipeFinishLayout.setOnFinishEventListener {
+            requireActivity().finish()
+        }
+
         Glide.with(view.context).let {
             if (uri == null) {
                 it.load(url)

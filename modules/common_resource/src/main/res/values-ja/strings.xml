@@ -598,6 +598,7 @@
     <string name="select_draft_post">下書き投稿を選択</string>
     <string name="remember_scroll_position">スクロール位置を保持する</string>
     <string name="post_only">投稿のみ</string>
+    <string name="settings_display_timestamps_as_absolute_dates">タイムスタンプを絶対表示にする</string>
     <!-- User -->
 
 

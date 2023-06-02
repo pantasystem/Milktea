@@ -15,6 +15,8 @@ import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.repost.RenoteType
 import net.pantasystem.milktea.model.notes.repost.RenotesPagingService
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserRepository
 
@@ -24,6 +26,7 @@ class RenotesViewModel @AssistedInject constructor(
     private val noteRepository: NoteRepository,
     private val noteCaptureAPIAdapter: NoteCaptureAPIAdapter,
     private val userRepository: UserRepository,
+    configRepository: LocalConfigRepository,
     accountStore: AccountStore,
     loggerFactory: Logger.Factory,
     @Assisted val noteId: Note.Id,
@@ -42,6 +45,12 @@ class RenotesViewModel @AssistedInject constructor(
 
 
     private val logger = loggerFactory.create("RenotesVM")
+
+    val config = configRepository.observe().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        DefaultConfig.config,
+    )
 
     val renotes = renotesPagingService.state.map { state ->
         state.suspendConvert { renotes ->

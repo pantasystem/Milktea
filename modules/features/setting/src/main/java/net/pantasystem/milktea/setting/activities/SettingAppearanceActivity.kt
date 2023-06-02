@@ -207,6 +207,15 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             ) {
                                 Text(stringResource(id = R.string.settings_visible_instance_domain_in_toolbar))
                             }
+
+                            SettingSwitchTile(
+                                checked = currentConfigState.isDisplayTimestampsAsAbsoluteDates,
+                                onChanged = {
+                                    currentConfigState = currentConfigState.copy(isDisplayTimestampsAsAbsoluteDates = it)
+                                }
+                            ) {
+                                Text(stringResource(id = R.string.settings_display_timestamps_as_absolute_dates))
+                            }
                         }
                         SettingSection(
                             title = stringResource(id = R.string.background_image),

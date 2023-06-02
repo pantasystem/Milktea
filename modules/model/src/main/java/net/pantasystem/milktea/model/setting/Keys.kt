@@ -31,6 +31,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsHideMediaWhenMobileNetwork,
         Keys.NoteHeaderFontSize,
         Keys.NoteContentFontSize,
+        Keys.IsDisplayTimestampsAsAbsoluteDates,
     )
 }
 
@@ -88,6 +89,8 @@ sealed interface Keys {
 
     object NoteContentFontSize: Keys
 
+    object IsDisplayTimestampsAsAbsoluteDates: Keys
+
     companion object
 }
 
@@ -122,5 +125,6 @@ fun Keys.str(): String {
         is Keys.IsHideMediaWhenMobileNetwork -> "IsHideMediaWhenMobileNetwork"
         is Keys.NoteContentFontSize -> "NoteContentFontSize"
         is Keys.NoteHeaderFontSize -> "NoteHeaderFontSize"
+        is Keys.IsDisplayTimestampsAsAbsoluteDates -> "IsDisplayTimestampsAsAbsoluteDates"
     }
 }

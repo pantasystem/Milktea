@@ -81,6 +81,7 @@ data class Config(
     val isHideMediaWhenMobileNetwork: Boolean,
     val noteHeaderFontSize: Float,
     val noteContentFontSize: Float,
+    val isDisplayTimestampsAsAbsoluteDates: Boolean,
 ) {
     companion object
 
@@ -138,6 +139,7 @@ object DefaultConfig {
         isHideMediaWhenMobileNetwork = false,
         noteContentFontSize = 15f,
         noteHeaderFontSize = 15f,
+        isDisplayTimestampsAsAbsoluteDates = false,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
