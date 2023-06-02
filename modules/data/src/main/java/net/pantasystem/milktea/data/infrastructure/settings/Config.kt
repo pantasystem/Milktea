@@ -126,7 +126,10 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         )?.value ?: DefaultConfig.config.noteHeaderFontSize,
         noteContentFontSize = map.getValue<PrefType.FloatPref>(
             Keys.NoteContentFontSize
-        )?.value ?: DefaultConfig.config.noteContentFontSize
+        )?.value ?: DefaultConfig.config.noteContentFontSize,
+        isDisplayTimestampsAsAbsoluteDates = map.getValue<PrefType.BoolPref>(
+            Keys.IsDisplayTimestampsAsAbsoluteDates
+        )?.value ?: DefaultConfig.config.isDisplayTimestampsAsAbsoluteDates,
     )
 }
 
@@ -228,6 +231,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.NoteHeaderFontSize -> {
             PrefType.FloatPref(noteHeaderFontSize)
+        }
+        Keys.IsDisplayTimestampsAsAbsoluteDates -> {
+            PrefType.BoolPref(isDisplayTimestampsAsAbsoluteDates)
         }
     }
 }
