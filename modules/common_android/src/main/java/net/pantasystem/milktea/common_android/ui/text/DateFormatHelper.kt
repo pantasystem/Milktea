@@ -45,9 +45,9 @@ object DateFormatHelper {
         ).getString(context)
     }
 
-    @BindingAdapter("elapsedTime", "visibility")
+    @BindingAdapter("elapsedTime", "visibility", "isDisplayTimestampsAsAbsoluteDates")
     @JvmStatic
-    fun TextView.setElapsedTimeAndVisibility(elapsedTime: Instant?, visibility: Visibility?) {
+    fun TextView.setElapsedTimeAndVisibility(elapsedTime: Instant?, visibility: Visibility?, isDisplayTimestampsAsAbsoluteDates: Boolean?) {
         val visibilityIcon = when(visibility ?: Visibility.Public(false)) {
             is Visibility.Followers -> R.drawable.ic_lock_black_24dp
             is Visibility.Home -> R.drawable.ic_home_black_24dp
@@ -57,11 +57,19 @@ object DateFormatHelper {
             Visibility.Mutual -> R.drawable.ic_sync_alt_24px
             Visibility.Personal -> R.drawable.ic_person_black_24dp
         }
-        val text = GetElapsedTimeStringSource(
-            SimpleElapsedTime(
-                elapsedTime ?: Clock.System.now()
+        val text = if (isDisplayTimestampsAsAbsoluteDates == true) {
+            SimpleDateFormat.getDateTimeInstance().format(
+                elapsedTime?.let {
+                    Date(it.toEpochMilliseconds())
+                } ?: Date()
             )
-        ).getString(context)
+        } else {
+            GetElapsedTimeStringSource(
+                SimpleElapsedTime(
+                    elapsedTime ?: Clock.System.now()
+                )
+            ).getString(context)
+        }
 
         this.text = if (visibilityIcon == null) {
             text

@@ -95,6 +95,7 @@
                 android:ellipsize="end"
                 elapsedTime="@{note.toShowNote.note.createdAt}"
                 visibility="@{note.toShowNote.note.visibility}"
+                isDisplayTimestampsAsAbsoluteDates="@{note.config.displayTimestampsAsAbsoluteDates}"
 
                 android:layout_alignParentEnd="true"
                 android:gravity="end"
