@@ -39,6 +39,7 @@ fun RenoteUsersScreen(
 
     val myId by renotesViewModel.myId.collectAsState()
     val account by renotesViewModel.account.collectAsState()
+    val config by renotesViewModel.config.collectAsState()
 
     val renotes: PageableState<List<RenoteItemType>> by renotesViewModel.renotes.asLiveData()
         .observeAsState(
@@ -72,6 +73,7 @@ fun RenoteUsersScreen(
             onScrollState = onScrollState,
             myId = myId,
             accountHost = account?.getHost(),
+            isDisplayTimestampsAsAbsoluteDates = config.isDisplayTimestampsAsAbsoluteDates,
         )
     } else {
         Column(
@@ -103,6 +105,7 @@ fun RenoteUserList(
     notes: List<RenoteItemType>,
     myId: User.Id?,
     accountHost: String?,
+    isDisplayTimestampsAsAbsoluteDates: Boolean?,
     onAction: (ItemRenoteAction) -> Unit,
     onBottomReached: () -> Unit,
     onScrollState: (Boolean) -> Unit,
@@ -141,6 +144,7 @@ fun RenoteUserList(
                 onAction = onAction,
                 myId = myId,
                 accountHost = accountHost,
+                isDisplayTimestampsAsAbsoluteDates = isDisplayTimestampsAsAbsoluteDates ?: false,
             )
         }
     }

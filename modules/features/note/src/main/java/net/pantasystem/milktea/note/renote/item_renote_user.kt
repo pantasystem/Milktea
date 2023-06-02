@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.pantasystem.milktea.common_compose.CustomEmojiText
 import net.pantasystem.milktea.common_compose.getSimpleElapsedTime
 import net.pantasystem.milktea.model.user.User
+import java.text.SimpleDateFormat
+import java.util.*
 
 @ExperimentalCoroutinesApi
 @Composable
@@ -32,12 +35,22 @@ fun ItemRenoteUser(
     note: RenoteItemType,
     myId: User.Id?,
     accountHost: String?,
+    isDisplayTimestampsAsAbsoluteDates: Boolean,
     onAction: (ItemRenoteAction) -> Unit,
     isUserNameDefault: Boolean = false
 ) {
 
-    val createdAt = (note as? RenoteItemType.Renote)?.let {
-        getSimpleElapsedTime(time = it.note.note.createdAt)
+    val createdAt = (note as? RenoteItemType.Renote)?.let { renote ->
+        if (isDisplayTimestampsAsAbsoluteDates) {
+            remember(renote.note.note.createdAt) {
+                SimpleDateFormat.getDateTimeInstance().format(renote.note.note.createdAt.let {
+                    Date(it.toEpochMilliseconds())
+                })
+            }
+        } else {
+            getSimpleElapsedTime(time = renote.note.note.createdAt)
+        }
+
     }
 
     Card(
