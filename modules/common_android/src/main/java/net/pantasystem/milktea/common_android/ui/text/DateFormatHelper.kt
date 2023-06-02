@@ -34,15 +34,23 @@ object DateFormatHelper {
 
 
 
-    @BindingAdapter("elapsedTime")
+    @BindingAdapter("elapsedTime", "isDisplayTimestampsAsAbsoluteDates")
     @JvmStatic
-    fun TextView.setElapsedTime(elapsedTime: Instant?) {
+    fun TextView.setElapsedTime(elapsedTime: Instant?, isDisplayTimestampsAsAbsoluteDates: Boolean?) {
 
-        this.text = GetElapsedTimeStringSource(
-            SimpleElapsedTime(
-                elapsedTime ?: Clock.System.now()
+        this.text = if (isDisplayTimestampsAsAbsoluteDates == true) {
+            SimpleDateFormat.getDateTimeInstance().format(
+                elapsedTime?.let {
+                    Date(it.toEpochMilliseconds())
+                } ?: Date()
             )
-        ).getString(context)
+        } else {
+            GetElapsedTimeStringSource(
+                SimpleElapsedTime(
+                    elapsedTime ?: Clock.System.now()
+                )
+            ).getString(context)
+        }
     }
 
     @BindingAdapter("elapsedTime", "visibility", "isDisplayTimestampsAsAbsoluteDates")

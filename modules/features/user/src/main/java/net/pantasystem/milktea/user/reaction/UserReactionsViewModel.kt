@@ -13,6 +13,8 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.CurrentAccountWatcher
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.User
 import net.pantasystem.milktea.model.user.UserDataSource
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
@@ -26,6 +28,7 @@ class UserReactionsViewModel @Inject constructor(
     loggerFactory: Logger.Factory,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     private val savedStateHandle: SavedStateHandle,
+    configRepository: LocalConfigRepository,
 ) : ViewModel() {
     //    private val _userId = MutableStateFlow<User.Id?>(null)
     companion object {
@@ -48,6 +51,8 @@ class UserReactionsViewModel @Inject constructor(
 
     private val cache = planeNoteViewDataCacheFactory.create(currentAccountWatcher::getAccount, viewModelScope)
 
+    private val config = configRepository.observe().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000),  DefaultConfig.config)
+
 
     private val store = storeFactory.create(userId)
     val state = store.state.map { pageableState ->
@@ -57,7 +62,8 @@ class UserReactionsViewModel @Inject constructor(
                     reaction = it.reaction,
                     user = userDataSource.observe(it.user.id)
                         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), it.user),
-                    note = cache.get(it.note)
+                    note = cache.get(it.note),
+                    config = config,
                 )
             }
         }

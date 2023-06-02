@@ -22,6 +22,7 @@ import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.filter.WordFilterService
 import net.pantasystem.milktea.model.group.GroupRepository
 import net.pantasystem.milktea.model.notification.*
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.model.user.FollowRequestRepository
 import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewDataCache
 import javax.inject.Inject
@@ -35,6 +36,7 @@ class NotificationViewModel @Inject constructor(
     private val followRequestRepository: FollowRequestRepository,
     private val notificationRepository: NotificationRepository,
     private val noteWordFilterService: WordFilterService,
+    private val configRepository: LocalConfigRepository,
     planeNoteViewDataCacheFactory: PlaneNoteViewDataCache.Factory,
     loggerFactory: Logger.Factory,
     accountStore: AccountStore,
@@ -66,6 +68,8 @@ class NotificationViewModel @Inject constructor(
                 NotificationViewData(
                     n,
                     noteViewData,
+                    configRepository,
+                    viewModelScope,
                 )
             }
         }
