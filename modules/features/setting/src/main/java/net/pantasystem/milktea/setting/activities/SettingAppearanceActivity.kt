@@ -214,7 +214,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                     currentConfigState = currentConfigState.copy(isDisplayTimestampsAsAbsoluteDates = it)
                                 }
                             ) {
-                                Text("Display timestamps as absolute dates")
+                                Text(stringResource(id = R.string.settings_display_timestamps_as_absolute_dates))
                             }
                         }
                         SettingSection(
