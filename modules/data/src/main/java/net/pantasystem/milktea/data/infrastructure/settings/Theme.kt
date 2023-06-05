@@ -9,6 +9,7 @@ fun Theme.toInt(): Int {
         is Theme.Black -> 1
         is Theme.Dark -> 2
         is Theme.Bread -> 3
+        Theme.ElephantDark -> 4
     }
 }
 
@@ -18,6 +19,7 @@ fun Theme.Companion.from(n: Int): Theme {
         1 -> Theme.Black
         2 -> Theme.Dark
         3 -> Theme.Bread
+        4 -> Theme.ElephantDark
         else -> DefaultConfig.config.theme
     }
 }

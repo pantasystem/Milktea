@@ -90,6 +90,8 @@
     <string name="theme_black">ブラック</string>
     <string name="theme_dark">ダーク</string>
     <string name="theme_bread">パンケーキ</string>
+    <string name="theme_mastodon_dark">ダーク(🐘)</string>
+
 
     <string name="title_activity_media">MediaActivity</string>
     <string name="dummy_button">Dummy Button</string>

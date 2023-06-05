@@ -91,6 +91,7 @@
     <string name="theme_black">AMOLED</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_bread">Pancake</string>
+    <string name="theme_mastodon_dark">Elephant Dark</string>
 
     <string name="title_activity_media">MediaActivity</string>
     <string name="dummy_button">Dummy Button</string>
