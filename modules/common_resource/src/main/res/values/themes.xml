@@ -113,6 +113,7 @@
         <item name="bottomNavigationStyle">@style/BottomNavigationView4Dark</item>
         <item name="colorSelectedReactionCounterBackground">#FF8C8DFE</item>
         <item name="colorNormalReactionCounterBackground">#FF424859</item>
+        <item name="android:windowBackground">#FF191B22</item>
 
 <!--        <item name="android:navigationBarColor">@color/colorBreadPrimary</item>-->
 
