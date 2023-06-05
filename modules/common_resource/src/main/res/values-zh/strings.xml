@@ -90,6 +90,8 @@
     <string name="theme_black">黑色</string>
     <string name="theme_dark">暗色</string>
     <string name="theme_bread">薄饼</string>
+    <string name="theme_mastodon_dark">Elephant Dark</string>
+
 
     <string name="title_activity_media">媒体活动</string>
     <string name="dummy_button">虚拟按钮</string>

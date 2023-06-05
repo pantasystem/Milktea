@@ -91,6 +91,10 @@ class SettingAppearanceActivity : AppCompatActivity() {
             ThemeUiState(
                 Theme.Bread,
                 R.string.theme_bread,
+            ),
+            ThemeUiState(
+                Theme.ElephantDark,
+                R.string.theme_mastodon_dark,
             )
         )
     }

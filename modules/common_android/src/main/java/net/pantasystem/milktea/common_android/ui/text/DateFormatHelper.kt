@@ -103,4 +103,37 @@ object DateFormatHelper {
         val javaDate = Date(date.toEpochMilliseconds())
         this.text = SimpleDateFormat.getDateTimeInstance().format(javaDate)
     }
+
+    @BindingAdapter("createdAt", "visibility")
+    @JvmStatic
+    fun TextView.setCreatedAtWithVisibility(createdAt: Instant?, visibility: Visibility?) {
+        val date = createdAt ?: Clock.System.now()
+        val javaDate = Date(date.toEpochMilliseconds())
+        val visibilityIcon = when(visibility ?: Visibility.Public(false)) {
+            is Visibility.Followers -> R.drawable.ic_lock_black_24dp
+            is Visibility.Home -> R.drawable.ic_home_black_24dp
+            is Visibility.Public -> null
+            is Visibility.Specified -> R.drawable.ic_email_black_24dp
+            is Visibility.Limited -> R.drawable.ic_groups
+            Visibility.Mutual -> R.drawable.ic_sync_alt_24px
+            Visibility.Personal -> R.drawable.ic_person_black_24dp
+        }
+        val text = SimpleDateFormat.getDateTimeInstance().format(javaDate)
+
+        this.text = if (visibilityIcon == null) {
+            text
+        } else {
+            val target = "visibility $text"
+            SpannableStringBuilder(target).apply {
+                val drawable = ContextCompat.getDrawable(context, visibilityIcon)
+                drawable?.setTint(currentTextColor)
+                val span = DrawableEmojiSpan(EmojiAdapter(this@setCreatedAtWithVisibility), visibilityIcon)
+                setSpan(span, 0, "visibility".length,0)
+                GlideApp.with(this@setCreatedAtWithVisibility)
+                    .load(drawable)
+                    .override(min(textSize.toInt(), 640))
+                    .into(span.target)
+            }
+        }
+    }
 }
