@@ -429,6 +429,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 createdAt="@{note.toShowNote.note.createdAt}"
+                visibility="@{note.toShowNote.note.visibility}"
                 app:layout_constraintTop_toBottomOf="@id/expandAllReactionCounts"
                 app:layout_constraintStart_toEndOf="@id/avatarIcon"
                 tools:text="10秒前"
@@ -438,6 +439,7 @@
                 android:visibility="@{note.config.displayTimestampsAsAbsoluteDates ? View.VISIBLE : View.GONE}"
                 android:textColor="?attr/colorPrimary"
                 android:onClick="@{() -> noteCardActionListener.onNoteCardClicked(note.note.note)}"
+                android:layout_marginTop="2dp"
 
             />
 
