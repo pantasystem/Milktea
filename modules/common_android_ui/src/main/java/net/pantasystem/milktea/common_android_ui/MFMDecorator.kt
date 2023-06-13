@@ -25,7 +25,6 @@ import net.pantasystem.milktea.common_navigation.UserDetailNavigationArgs
 import net.pantasystem.milktea.model.emoji.Emoji
 import java.lang.ref.WeakReference
 import kotlin.math.max
-import kotlin.math.min
 
 object MFMDecorator {
 
@@ -36,7 +35,6 @@ object MFMDecorator {
         textView: TextView,
         lazyDecorateResult: LazyDecorateResult?,
         skipEmojis: SkipEmojiHolder = SkipEmojiHolder(),
-        retryCounter: Int = 0,
     ): Spanned? {
         lazyDecorateResult ?: return null
         val emojiAdapter = EmojiAdapter(textView)
@@ -47,7 +45,6 @@ object MFMDecorator {
             lazyDecorateResult,
             skipEmojis,
             emojiAdapter,
-            retryCounter,
         ).decorate()
     }
 
@@ -288,11 +285,10 @@ object MFMDecorator {
     }
 
     class LazyEmojiDecorator(
-        val textView: WeakReference<TextView>,
-        val lazyDecorateResult: LazyDecorateResult,
-        val skipEmojis: SkipEmojiHolder,
-        val emojiAdapter: EmojiAdapter,
-        val retryCounter: Int,
+        private val textView: WeakReference<TextView>,
+        private val lazyDecorateResult: LazyDecorateResult,
+        private val skipEmojis: SkipEmojiHolder,
+        private val emojiAdapter: EmojiAdapter,
     ) {
 
         private val spannableString = SpannableString(lazyDecorateResult.spanned)
@@ -315,42 +311,14 @@ object MFMDecorator {
             textView.get()?.let { textView ->
                 val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url, emojiElement.emoji.aspectRatio)
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
+                val height = max(textView.textSize * 0.75f, 10f)
+                val width = when(val aspectRatio = emojiElement.emoji.aspectRatio) {
+                    null -> height
+                    else -> height * aspectRatio
+                }
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
-                    .override(min(max(textView.textSize.toInt(), 10), 128))
-//                                        .addListener(object : RequestListener<Drawable> {
-//                        override fun onLoadFailed(
-//                            e: GlideException?,
-//                            model: Any?,
-//                            target: Target<Drawable>?,
-//                            isFirstResource: Boolean
-//                        ): Boolean {
-//                            val t = this@LazyEmojiDecorator.textView.get()
-//                            if (t != null && !skipEmojis.contains(emojiElement.emoji) && t.getTag(R.id.TEXT_VIEW_MFM_TAG_ID) == lazyDecorateResult.sourceText) {
-//                                if (retryCounter < 10) {
-//
-//                                    t.text = decorate(
-//                                        t,
-//                                        lazyDecorateResult = lazyDecorateResult,
-//                                        skipEmojis = skipEmojis.add(emojiElement.emoji),
-//                                        retryCounter + 1
-//                                    )
-//                                }
-//                            }
-//
-//                            return false
-//                        }
-//
-//                        override fun onResourceReady(
-//                            resource: Drawable?,
-//                            model: Any?,
-//                            target: Target<Drawable>?,
-//                            dataSource: DataSource?,
-//                            isFirstResource: Boolean
-//                        ): Boolean {
-//                            return false
-//                        }
-//                    })
+                    .override(width.toInt(), height.toInt())
                     .into(emojiSpan.target)
             }
         }
