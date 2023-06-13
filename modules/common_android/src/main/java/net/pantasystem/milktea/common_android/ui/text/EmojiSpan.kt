@@ -7,9 +7,16 @@ import android.text.TextPaint
 import android.text.style.ReplacementSpan
 import kotlin.math.min
 
+/**
+ * @param key 画像の種別を識別するためのキー値で、画像のURLなどが入る
+ * @param aspectRatio 画像の比率が入る
+ */
 abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : ReplacementSpan(){
 
     companion object {
+        /**
+         * 変数keyに対応するDrawableの画像サイズをここに保持している。
+         */
         private val drawableSizeCache = mutableMapOf<Any, EmojiSizeCache>()
     }
 
@@ -43,16 +50,20 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
         val size = key?.let {
             drawableSizeCache[key]
         } ?: drawable?.let {
+            // NOTE: drawableSizeCacheに画像のサイズが登録されていない場合は、drawableからサイズを取得する
             EmojiSizeCache(
                 intrinsicHeight = it.intrinsicHeight,
                 intrinsicWidth = it.intrinsicWidth
             )
         } ?: aspectRatio?.let {
+            // NOTE: drawableが読み込まれていない状態の時は、文字の高さと画像の比率から横幅のサイズを取得する
             EmojiSizeCache(
                 intrinsicHeight = textHeight.toInt(),
                 intrinsicWidth = (textHeight * aspectRatio).toInt()
             )
         }
+
+        // NOTE: keyが存在しかつdrawableが存在する場合は、drawableSizeCacheを更新する
         key?.run {
             drawableSizeCache[key] ?: drawable?.let {
                 EmojiSizeCache(
@@ -69,6 +80,7 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
             fm.bottom = metrics.bottom
         }
 
+        // NOTE: 画像のサイズが不明かつ初めてサイズを取得しようとした時は暫定的なサイズを返す
         if (size == null || beforeTextSize != 0) {
             beforeTextSize = (paint.textSize * 1.2).toInt()
             return beforeTextSize
@@ -77,6 +89,7 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
             drawableSizeCache[key] = size
         }
 
+        // NOTE: 暫定的なサイズではない場合はbeforeTextSizeを0にする必要性がある
         beforeTextSize = 0
 
         val imageWidth = size.intrinsicWidth
