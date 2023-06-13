@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.api.misskey
 
+import kotlinx.serialization.json.JsonObject
 import net.pantasystem.milktea.api.misskey.ap.ApResolveRequest
 import net.pantasystem.milktea.api.misskey.ap.ApResolveResult
 import net.pantasystem.milktea.api.misskey.app.CreateApp
@@ -198,7 +199,7 @@ interface MisskeyAPI {
     suspend fun getFiles(@Body fileRequest: RequestFile): Response<List<FilePropertyDTO>>
 
     @POST("api/drive/files/update")
-    suspend fun updateFile(@Body updateFileRequest: UpdateFileDTO): Response<FilePropertyDTO>
+    suspend fun updateFile(@Body updateFileRequest: JsonObject): Response<FilePropertyDTO>
 
     @POST("api/drive/files/delete")
     suspend fun deleteFile(@Body req: DeleteFileDTO): Response<Unit>
