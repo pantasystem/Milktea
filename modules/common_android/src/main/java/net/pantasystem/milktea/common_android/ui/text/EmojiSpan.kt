@@ -22,12 +22,11 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
 
     var imageDrawable: Drawable? = null
 
+
     /**
-     * imageDrawableにDrawableが代入されている時にupdateImageDrawableSizeが呼び出されるとここに絵文字のサイズが代入される。
-     * 画像は縦横比が異なることがあるので、それぞれの高さが代入される。
+     * 文字サイズなどのスケールに応じて画像サイズをDrawableに反映したorしてないの状態
+     * 反映済みの場合はtrueが入り、そうでない場合はfalseが入る
      */
-    private var textHeight: Int = 0
-    private var textWidth: Int = 0
     private var isSizeComputed = false
 
     /**
@@ -132,9 +131,16 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
     }
 
 
+    /**
+     * サイズが大きな画像をGPUのメモリに展開してしまうと、
+     * GPUに負荷がかかりフレーム落ちの原因につながる可能性があるので、
+     * Drawableのサイズを必要なサイズにリサイズを行う処理
+     */
     private fun updateImageDrawableSize(paint: Paint) {
         val emojiHeight = min((paint.textSize).toInt(), 128)
         val drawable = imageDrawable
+
+        // drawableSizeCacheあるいはdrawableあるいはaspectRatioと文字サイズから画像のwidth, heightを得る処理
         val size = key?.let {
             drawableSizeCache[key]
         } ?: drawable?.let {
@@ -154,7 +160,10 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
         val imageWidth = size.intrinsicWidth
         val imageHeight = size.intrinsicHeight
 
+        // 計算された画像サイズが適切なものかチェックする
         val unknownEmojiSize = imageWidth <= 0 || imageHeight <= 0
+
+        // 画像サイズが暫定的なサイズかつ、暫定的なサイズと画像のサイズが一致しない場合は処理を終了する
         if (beforeTextSize != 0 && beforeTextSize != emojiHeight || unknownEmojiSize) {
             if (!isSizeComputed) {
                 beforeTextSize = emojiHeight
@@ -169,8 +178,6 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
         val scaledImageWidth = (emojiHeight * ratio).toInt()
 
         if (!isSizeComputed) {
-            textHeight = emojiHeight
-            textWidth = scaledImageWidth
             isSizeComputed = imageDrawable != null
             imageDrawable?.setBounds(0, 0, scaledImageWidth, emojiHeight)
         }
