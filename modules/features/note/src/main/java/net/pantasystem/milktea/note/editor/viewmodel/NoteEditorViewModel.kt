@@ -22,10 +22,7 @@ import net.pantasystem.milktea.model.ap.ApResolver
 import net.pantasystem.milktea.model.ap.ApResolverRepository
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.channel.ChannelRepository
-import net.pantasystem.milktea.model.drive.DriveFileRepository
-import net.pantasystem.milktea.model.drive.FileProperty
-import net.pantasystem.milktea.model.drive.FilePropertyDataSource
-import net.pantasystem.milktea.model.drive.UpdateFileProperty
+import net.pantasystem.milktea.model.drive.*
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.file.AppFile
 import net.pantasystem.milktea.model.file.FilePreviewSource
@@ -513,10 +510,7 @@ class NoteEditorViewModel @Inject constructor(
                         driveFileRepository.update(
                             UpdateFileProperty(
                                 fileId = file.id,
-                                comment = file.comment,
-                                folderId = file.folderId,
-                                isSensitive = file.isSensitive,
-                                name = name
+                                name = ValueType.Some(name)
                             )
                         ).getOrThrow()
                     }.onFailure {
@@ -540,10 +534,7 @@ class NoteEditorViewModel @Inject constructor(
                         driveFileRepository.update(
                             UpdateFileProperty(
                                 fileId = file.id,
-                                comment = comment,
-                                folderId = file.folderId,
-                                isSensitive = file.isSensitive,
-                                name = file.name
+                                comment = ValueType.Some(comment),
                             )
                         ).getOrThrow()
                     }.onFailure {
