@@ -2,10 +2,10 @@ package net.pantasystem.milktea.model.drive
 
 data class UpdateFileProperty(
     val fileId: FileProperty.Id,
-    val folderId: String?,
-    val name: String,
-    val isSensitive: Boolean,
-    val comment: String?,
+    val folderId: ValueType<String>? = null,
+    val name: ValueType<String>? = null,
+    val isSensitive: ValueType<Boolean>? = null,
+    val comment: ValueType<String>? = null,
 )
 
 sealed interface ValueType<T> {
