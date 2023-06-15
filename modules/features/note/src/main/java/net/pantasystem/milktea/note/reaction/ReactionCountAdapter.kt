@@ -75,7 +75,7 @@ class ReactionHolder(val binding: ItemReactionBinding) : RecyclerView.ViewHolder
             binding.reactionText,
             binding.reactionImage,
             viewData,
-            note?.config?.value?.noteReactionCounterFontSize ?: 15f
+            (note?.config?.value?.noteReactionCounterFontSize ?: 15f) * 1.2f
         )
 
         binding.reactionCounter.text = viewData.reactionCount.count.toString()

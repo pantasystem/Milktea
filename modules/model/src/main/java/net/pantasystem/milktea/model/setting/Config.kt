@@ -142,7 +142,7 @@ object DefaultConfig {
         noteContentFontSize = 15f,
         noteHeaderFontSize = 15f,
         isDisplayTimestampsAsAbsoluteDates = false,
-        noteReactionCounterFontSize = 16f,
+        noteReactionCounterFontSize = 15f,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {
