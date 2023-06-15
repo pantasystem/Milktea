@@ -97,12 +97,7 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.TrendTimeline -> {
                 return@runCancellableCatching emptyList()
             }
-            is Pageable.Mastodon.TagTimeline -> {
-                api.getHashtagTimeline(
-                    tag = pageableTimeline.tag,
-                    minId = minId,
-                ).throwIfHasError().body()!!
-            }
+
         }.let { list ->
             if (isShouldUseLinkHeader()) {
                 filterNotExistsStatuses(list)
@@ -210,12 +205,6 @@ internal class MastodonTimelineStorePagingStoreImpl(
             is Pageable.Mastodon.TrendTimeline -> {
                 api.getTrendStatuses(
                     offset = (getState().content as? StateContent.Exist)?.rawContent?.size ?: 0
-                ).getBodyOrFail()
-            }
-            is Pageable.Mastodon.TagTimeline -> {
-                api.getHashtagTimeline(
-                    tag = pageableTimeline.tag,
-                    maxId = maxId,
                 ).getBodyOrFail()
             }
         }!!.let { list ->

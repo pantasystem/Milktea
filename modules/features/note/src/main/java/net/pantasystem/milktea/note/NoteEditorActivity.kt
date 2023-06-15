@@ -16,6 +16,7 @@ import net.pantasystem.milktea.model.file.toAppFile
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.note.databinding.ActivityNoteEditorBinding
 import net.pantasystem.milktea.note.editor.NoteEditorFragment
+import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorSavedStateKey
 import net.pantasystem.milktea.note.editor.viewmodel.NoteEditorViewModel
 import javax.inject.Inject
 
@@ -43,6 +44,7 @@ class NoteEditorActivity : AppCompatActivity() {
             mentions: List<String>? = null,
             channelId: Channel.Id? = null,
             accountId: Long? = null,
+            text: String? = null,
         ): Intent {
             return Intent(context, NoteEditorActivity::class.java).apply {
                 replyTo?.let {
@@ -73,6 +75,9 @@ class NoteEditorActivity : AppCompatActivity() {
                     putExtra(EXTRA_SPECIFIED_ACCOUNT_ID, it)
                 }
 
+                text?.let {
+                    putExtra(NoteEditorSavedStateKey.Text.name, it)
+                }
             }
         }
     }

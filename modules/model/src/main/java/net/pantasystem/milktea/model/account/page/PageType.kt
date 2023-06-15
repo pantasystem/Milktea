@@ -26,7 +26,6 @@ enum class PageType(val defaultName: String, val label: String){
     MASTODON_LOCAL_TIMELINE("MastodonLocalTimeline", "MASTODON_LOCAL_TIMELINE"),
     MASTODON_PUBLIC_TIMELINE("MastodonPublicTimeline", "MASTODON_PUBLIC_TIMELINE"),
     MASTODON_HOME_TIMELINE("MastodonHomeTimeline", "MASTODON_HOME_TIMELINE"),
-    MASTODON_HASHTAG_TIMELINE("MastodonHashtagTimeline", "MASTODON_HASHTAG_TIMELINE"),
     MASTODON_LIST_TIMELINE("MastodonListTimeline", "MASTODON_LIST_TIMELINE"),
     MASTODON_USER_TIMELINE("MastodonUserTimeline", "MASTODON_USER_TIMELINE"),
     MASTODON_BOOKMARK_TIMELINE("MastodonBookmarkTimeline", "MASTODON_BOOKMARK_TIMELINE"),

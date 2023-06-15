@@ -31,7 +31,7 @@ class PageableTemplate(val account: Account?) {
     }
     fun tag(tag: String): Page {
         return when(account?.instanceType) {
-            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> Page(account.accountId, tag, 0, Pageable.Mastodon.TagTimeline(tag.replace("#", "")))
+            Account.InstanceType.MASTODON, Account.InstanceType.PLEROMA -> Page(account.accountId, tag, 0, Pageable.Mastodon.HashTagTimeline(tag.replace("#", "")))
             else -> Page(account?.accountId?: - 1, tag, 0, Pageable.SearchByTag(tag.replace("#", "")))
         }
     }
