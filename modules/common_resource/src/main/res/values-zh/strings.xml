@@ -588,6 +588,7 @@
     <string name="follows_you">正在关注你</string>
     <string name="settings_note_content_font_size">Note content font size(%fsp)</string>
     <string name="settings_note_header_font_size">Note header font size(%fsp)</string>
+    <string name="settings_note_reaction_counter_font_size">Note reaction counter font size(%fsp)</string>
     <string name="suggestion_users">Suggestions</string>
     <string name="trend_posted_person_count_msg">%d people posting</string>
     <string name="notes_confirm_attach_quote_note_by_url">Attach as a quote post?</string>
