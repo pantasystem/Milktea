@@ -52,6 +52,7 @@ data class IsAnalyticsCollectionEnabled(
  * @param isHideMediaWhenMobileNetwork モバイルネットワークの時はメディアを表示しない
  * @param noteHeaderFontSize ノートのヘッダー部分のテキストサイズ
  * @param noteContentFontSize ノートのコンテンツ部分のテキストサイズ
+ * @param noteReactionCounterFontSize ノートのリアクションカウンターのカスタム絵文字、絵文字と件数表示のフォントサイズ
  */
 data class Config(
     val isSimpleEditorEnabled: Boolean,
@@ -82,6 +83,7 @@ data class Config(
     val noteHeaderFontSize: Float,
     val noteContentFontSize: Float,
     val isDisplayTimestampsAsAbsoluteDates: Boolean,
+    val noteReactionCounterFontSize: Float,
 ) {
     companion object
 
@@ -140,6 +142,7 @@ object DefaultConfig {
         noteContentFontSize = 15f,
         noteHeaderFontSize = 15f,
         isDisplayTimestampsAsAbsoluteDates = false,
+        noteReactionCounterFontSize = 15f,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

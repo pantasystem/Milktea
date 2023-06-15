@@ -32,6 +32,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.NoteHeaderFontSize,
         Keys.NoteContentFontSize,
         Keys.IsDisplayTimestampsAsAbsoluteDates,
+        Keys.NoteReactionCounterFontSize,
     )
 }
 
@@ -91,6 +92,8 @@ sealed interface Keys {
 
     object IsDisplayTimestampsAsAbsoluteDates: Keys
 
+    object NoteReactionCounterFontSize : Keys
+
     companion object
 }
 
@@ -126,5 +129,6 @@ fun Keys.str(): String {
         is Keys.NoteContentFontSize -> "NoteContentFontSize"
         is Keys.NoteHeaderFontSize -> "NoteHeaderFontSize"
         is Keys.IsDisplayTimestampsAsAbsoluteDates -> "IsDisplayTimestampsAsAbsoluteDates"
+        is Keys.NoteReactionCounterFontSize -> "NoteReactionCounterFontSize"
     }
 }

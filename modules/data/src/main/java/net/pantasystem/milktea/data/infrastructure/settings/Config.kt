@@ -130,6 +130,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         isDisplayTimestampsAsAbsoluteDates = map.getValue<PrefType.BoolPref>(
             Keys.IsDisplayTimestampsAsAbsoluteDates
         )?.value ?: DefaultConfig.config.isDisplayTimestampsAsAbsoluteDates,
+        noteReactionCounterFontSize = map.getValue<PrefType.FloatPref>(
+            Keys.NoteReactionCounterFontSize
+        )?.value ?: DefaultConfig.config.noteReactionCounterFontSize,
     )
 }
 
@@ -234,6 +237,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.IsDisplayTimestampsAsAbsoluteDates -> {
             PrefType.BoolPref(isDisplayTimestampsAsAbsoluteDates)
+        }
+        Keys.NoteReactionCounterFontSize -> {
+            PrefType.FloatPref(noteReactionCounterFontSize)
         }
     }
 }

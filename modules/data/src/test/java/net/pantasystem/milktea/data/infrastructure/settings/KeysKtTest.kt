@@ -112,6 +112,10 @@ class KeysKtTest {
                     "IsDisplayTimestampsAsAbsoluteDates",
                     key.str()
                 )
+                Keys.NoteReactionCounterFontSize -> Assertions.assertEquals(
+                    "NoteReactionCounterFontSize",
+                    key.str()
+                )
             }
         }
     }
@@ -119,8 +123,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(30, Keys.allKeys.size)
-        Assertions.assertEquals(30, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(31, Keys.allKeys.size)
+        Assertions.assertEquals(31, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
