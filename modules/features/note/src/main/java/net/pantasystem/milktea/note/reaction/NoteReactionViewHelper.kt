@@ -5,9 +5,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
 import dagger.hilt.android.EntryPointAccessors
 import net.pantasystem.milktea.common.glide.GlideApp
+import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontPxSize
 import net.pantasystem.milktea.common_android.ui.VisibilityHelper.setMemoVisibility
 import net.pantasystem.milktea.common_android_ui.BindingProvider
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
@@ -19,18 +19,19 @@ import net.pantasystem.milktea.note.viewmodel.PlaneNoteViewData
 
 object NoteReactionViewHelper {
 
-    const val REACTION_IMAGE_WIDTH_SIZE_DP = 20
+//    const val REACTION_IMAGE_WIDTH_SIZE_DP = 20
 
-    @JvmStatic
-    @BindingAdapter("reactionTextTypeView", "reactionImageTypeView", "reaction")
     fun LinearLayout.bindReactionCount(
         reactionTextTypeView: TextView,
         reactionImageTypeView: ImageView,
         reaction: ReactionViewData,
+        reactionBaseSizeSp: Float,
     ) {
         val textReaction = reaction.reaction
 
         val emoji = reaction.emoji
+
+        val baseHeightPx = context.resources.displayMetrics.scaledDensity * reactionBaseSizeSp
 
 
         if (emoji == null) {
@@ -38,18 +39,20 @@ object NoteReactionViewHelper {
 
             reactionTextTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.text = textReaction
+            reactionTextTypeView.setMemoFontPxSize(baseHeightPx)
         } else {
             reactionImageTypeView.setMemoVisibility(View.VISIBLE)
             reactionTextTypeView.setMemoVisibility(View.GONE)
+
             val imageAspectRatio =
                 ImageAspectRatioCache.get(emoji.url ?: emoji.uri) ?: emoji.aspectRatio
 
-            val (imageViewWidthPx, imageViewHeightPx) = reactionImageTypeView.context.calculateImageWidthAndHeightSize(
-                REACTION_IMAGE_WIDTH_SIZE_DP,
+            val (imageViewWidthPx, imageViewHeightPx) = calculateImageWidthAndHeightSize(
+                baseHeightPx,
                 imageAspectRatio
             )
             reactionImageTypeView.applySizeByAspectRatio<LinearLayout.LayoutParams>(
-                REACTION_IMAGE_WIDTH_SIZE_DP,
+                baseHeightPx,
                 imageAspectRatio
             )
 

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import net.pantasystem.milktea.common_android.ui.FontSizeHelper.setMemoFontSpSize
 import net.pantasystem.milktea.note.databinding.ItemReactionBinding
 import net.pantasystem.milktea.note.reaction.NoteReactionViewHelper.bindReactionCount
 import net.pantasystem.milktea.note.reaction.ReactionHelper.applyBackgroundColor
@@ -65,10 +66,12 @@ class ReactionHolder(val binding: ItemReactionBinding) : RecyclerView.ViewHolder
         binding.reactionLayout.bindReactionCount(
             binding.reactionText,
             binding.reactionImage,
-            viewData
+            viewData,
+            15f,
         )
 
         binding.reactionCounter.text = viewData.reactionCount.count.toString()
+        binding.reactionCounter.setMemoFontSpSize(15f)
         binding.root.setOnLongClickListener {
             val id = note?.toShowNote?.note?.id
             if (id != null) {
