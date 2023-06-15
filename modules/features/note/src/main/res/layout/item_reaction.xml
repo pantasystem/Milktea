@@ -12,7 +12,7 @@
     android:layout_marginBottom="2dp"
     android:layout_marginTop="2dp"
     tools:background="@drawable/shape_normal_reaction_backgruond"
-
+    android:gravity="center_vertical"
 
 
     >
