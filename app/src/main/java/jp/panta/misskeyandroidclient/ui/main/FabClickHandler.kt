@@ -9,6 +9,7 @@ import net.pantasystem.milktea.common_viewmodel.CurrentPageableTimelineViewModel
 import net.pantasystem.milktea.common_viewmodel.SuitableType
 import net.pantasystem.milktea.common_viewmodel.suitableType
 import net.pantasystem.milktea.gallery.GalleryPostsActivity
+import net.pantasystem.milktea.model.account.page.Pageable
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.note.NoteEditorActivity
 
@@ -20,14 +21,28 @@ internal class FabClickHandler(
 
     fun onClicked() {
         activity.apply {
-            when(val type = currentPageableTimelineViewModel.currentType.value) {
+            when (val type = currentPageableTimelineViewModel.currentType.value) {
                 CurrentPageType.Account -> {
-                    AccountSwitchingDialog().show(activity.supportFragmentManager, "AccountSwitchingDialog")
+                    AccountSwitchingDialog().show(
+                        activity.supportFragmentManager,
+                        "AccountSwitchingDialog"
+                    )
                 }
                 is CurrentPageType.Page -> {
                     when (val suitableType = type.pageable.suitableType()) {
                         is SuitableType.Other -> {
-                            startActivity(NoteEditorActivity.newBundle(this, accountId = type.accountId))
+                            val text = when (val pageable = type.pageable) {
+                                is Pageable.SearchByTag -> "#${pageable.tag}"
+                                is Pageable.Mastodon.HashTagTimeline -> "#${pageable.hashtag}"
+                                else -> ""
+                            }
+                            startActivity(
+                                NoteEditorActivity.newBundle(
+                                    this,
+                                    accountId = type.accountId,
+                                    text = text
+                                )
+                            )
                         }
                         is SuitableType.Gallery -> {
                             val intent = Intent(this, GalleryPostsActivity::class.java)
