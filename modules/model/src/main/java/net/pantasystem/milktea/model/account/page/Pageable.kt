@@ -413,7 +413,7 @@ sealed class Pageable : Serializable {
             Mastodon(), CanOnlyMedia<HashTagTimeline>, SincePaginate, UntilPaginate {
             override fun toParams(): PageParams {
                 return PageParams(
-                    type = PageType.MASTODON_HASHTAG_TIMELINE,
+                    type = PageType.MASTODON_TAG_TIMELINE,
                     tag = hashtag,
                     withFiles = isOnlyMedia
                 )
@@ -489,17 +489,6 @@ sealed class Pageable : Serializable {
                     type = PageType.MASTODON_SEARCH_TIMELINE,
                     query = query,
                     userId = userId,
-                )
-            }
-        }
-
-        data class TagTimeline(
-            val tag: String,
-        ) : Mastodon(), SincePaginate, UntilPaginate {
-            override fun toParams(): PageParams {
-                return PageParams(
-                    type = PageType.MASTODON_TAG_TIMELINE,
-                    tag = tag,
                 )
             }
         }

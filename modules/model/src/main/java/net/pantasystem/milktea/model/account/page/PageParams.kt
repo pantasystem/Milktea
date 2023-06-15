@@ -162,12 +162,6 @@ data class PageParams(
                 MASTODON_HOME_TIMELINE -> {
                     Pageable.Mastodon.HomeTimeline
                 }
-                MASTODON_HASHTAG_TIMELINE -> {
-                    Pageable.Mastodon.HashTagTimeline(
-                        requireNotNull(tag),
-                        isOnlyMedia = withFiles,
-                    )
-                }
                 MASTODON_LIST_TIMELINE -> {
                     Pageable.Mastodon.ListTimeline(
                         listId = requireNotNull(listId),
@@ -199,7 +193,7 @@ data class PageParams(
                     )
                 }
                 MASTODON_TAG_TIMELINE -> {
-                    Pageable.Mastodon.TagTimeline(
+                    Pageable.Mastodon.HashTagTimeline(
                         requireNotNull(tag)
                     )
                 }

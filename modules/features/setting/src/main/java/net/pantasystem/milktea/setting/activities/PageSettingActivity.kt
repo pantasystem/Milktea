@@ -67,7 +67,7 @@ class PageSettingActivity : AppCompatActivity() {
 //
         mPageSettingViewModel.pageAddedEvent.observe(this) { pt ->
             when (pt.type) {
-                PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_HASHTAG_TIMELINE -> startActivity(
+                PageType.SEARCH, PageType.SEARCH_HASH, PageType.MASTODON_TAG_TIMELINE -> startActivity(
                     searchNavigation.newIntent(SearchNavType.SearchScreen())
                 )
                 PageType.USER -> {
