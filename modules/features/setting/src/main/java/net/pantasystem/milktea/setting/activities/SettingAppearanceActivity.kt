@@ -206,7 +206,8 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             SettingSwitchTile(
                                 checked = currentConfigState.isVisibleInstanceUrlInToolbar,
                                 onChanged = {
-                                    currentConfigState = currentConfigState.copy(isVisibleInstanceUrlInToolbar = it)
+                                    currentConfigState =
+                                        currentConfigState.copy(isVisibleInstanceUrlInToolbar = it)
                                 }
                             ) {
                                 Text(stringResource(id = R.string.settings_visible_instance_domain_in_toolbar))
@@ -215,7 +216,8 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             SettingSwitchTile(
                                 checked = currentConfigState.isDisplayTimestampsAsAbsoluteDates,
                                 onChanged = {
-                                    currentConfigState = currentConfigState.copy(isDisplayTimestampsAsAbsoluteDates = it)
+                                    currentConfigState =
+                                        currentConfigState.copy(isDisplayTimestampsAsAbsoluteDates = it)
                                 }
                             ) {
                                 Text(stringResource(id = R.string.settings_display_timestamps_as_absolute_dates))
@@ -334,6 +336,29 @@ class SettingAppearanceActivity : AppCompatActivity() {
                                 onValueChange = {
                                     currentConfigState =
                                         currentConfigState.copy(noteContentFontSize = it)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            Text(
+                                stringResource(
+                                    id = R.string.settings_note_reaction_counter_font_size,
+                                    currentConfigState.noteReactionCounterFontSize
+                                ),
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
+                            )
+                            Slider(
+                                value = currentConfigState.noteReactionCounterFontSize,
+                                valueRange = 10f..24f,
+                                onValueChange = {
+                                    currentConfigState =
+                                        currentConfigState.copy(noteReactionCounterFontSize = it)
                                 },
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
