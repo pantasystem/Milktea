@@ -19,11 +19,23 @@ object CustomEmojiImageViewSizeHelper {
     fun Context.calculateImageWidthAndHeightSize(baseHeightDp: Int, aspectRatio: Float?): Pair<Float, Float> {
         val metrics = resources.displayMetrics
         val heightPx = baseHeightDp * metrics.density
+        return calculateImageWidthAndHeightSize(heightPx, aspectRatio)
+    }
+
+    fun<T: ViewGroup.LayoutParams> ImageView.applySizeByAspectRatio(baseHeightPx: Float, aspectRatio: Float?) {
+        val (imageViewWidthPx, imageViewHeightPx) = calculateImageWidthAndHeightSize(baseHeightPx, aspectRatio)
+        val params = layoutParams as T
+        params.height = imageViewHeightPx.toInt()
+        params.width = imageViewWidthPx.toInt()
+        layoutParams = params
+    }
+
+    fun calculateImageWidthAndHeightSize(baseHeightPx: Float, aspectRatio: Float?): Pair<Float, Float> {
         val imageViewWidthPx = if (aspectRatio == null) {
-            heightPx
+            baseHeightPx
         } else {
-            (heightPx * aspectRatio)
+            (baseHeightPx * aspectRatio)
         }
-        return imageViewWidthPx to heightPx
+        return imageViewWidthPx to baseHeightPx
     }
 }
