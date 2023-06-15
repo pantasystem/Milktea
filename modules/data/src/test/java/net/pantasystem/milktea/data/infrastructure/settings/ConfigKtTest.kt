@@ -151,6 +151,10 @@ class ConfigKtTest {
                     config.isDisplayTimestampsAsAbsoluteDates,
                     (u as PrefType.BoolPref).value
                 )
+                Keys.NoteReactionCounterFontSize -> Assertions.assertEquals(
+                    config.noteReactionCounterFontSize,
+                    (u as PrefType.FloatPref).value
+                )
             }
         }
     }
