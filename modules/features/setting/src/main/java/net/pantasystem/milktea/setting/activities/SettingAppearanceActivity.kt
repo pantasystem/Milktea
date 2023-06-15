@@ -343,6 +343,7 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             Text(
                                 stringResource(
                                     id = R.string.settings_note_reaction_counter_font_size,
+                                    currentConfigState.noteReactionCounterFontSize * 1.2f,
                                     currentConfigState.noteReactionCounterFontSize
                                 ),
                                 modifier = Modifier.padding(horizontal = 16.dp)
