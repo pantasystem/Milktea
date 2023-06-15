@@ -6,7 +6,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dp"
+    android:paddingHorizontal="6dp"
+    android:paddingVertical="4dp"
+
 
     android:layout_marginStart="4dp"
     android:layout_marginBottom="2dp"
