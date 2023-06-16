@@ -52,7 +52,7 @@ object NoteReactionViewHelper {
                 imageAspectRatio
             )
             reactionImageTypeView.applySizeByAspectRatio<LinearLayout.LayoutParams>(
-                baseHeightPx,
+                baseHeightPx * 1.2f,
                 imageAspectRatio
             )
 
