@@ -11,7 +11,7 @@ import kotlin.math.min
  * @param key 画像の種別を識別するためのキー値で、画像のURLなどが入る
  * @param aspectRatio 画像の比率が入る
  */
-abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : ReplacementSpan(){
+abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null, val emojiScale: Float = 1f) : ReplacementSpan(){
 
     companion object {
         /**
@@ -45,7 +45,7 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
     ): Int {
         val textHeight = paint.textSize
 
-        val size = calculateEmojiSize(textHeight)
+        val size = calculateEmojiSize(textHeight * emojiScale)
         val metrics = paint.fontMetricsInt
         if (fm != null) {
             fm.top = metrics.top
@@ -105,8 +105,8 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null) : 
      * Drawableのサイズを必要なサイズにリサイズを行う処理
      */
     private fun updateImageDrawableSize(paint: Paint) {
-        val emojiHeight = min((paint.textSize).toInt(), 128)
-        val size = calculateEmojiSize(min((paint.textSize), 128f))
+        val emojiHeight = min((paint.textSize * emojiScale).toInt(), 128)
+        val size = calculateEmojiSize(min((paint.textSize * emojiScale), 128f))
         val imageWidth = size?.first ?: -1f
         val imageHeight = size?.second?: -1f
 
