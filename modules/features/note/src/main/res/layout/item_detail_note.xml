@@ -161,6 +161,7 @@
                         android:textSize="@dimen/note_content_text_size"
                         android:visibility='@{note.text == null ? View.GONE : View.VISIBLE}'
                         textTypeSource="@{note.textNode}"
+                        customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                         tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw" />
 
                 <include
@@ -302,6 +303,7 @@
                             android:textSize="@dimen/note_content_text_size"
                             android:visibility="@{SafeUnbox.unboxBool(note.subContentFolding) ? View.GONE : View.VISIBLE }"
                             textTypeSource="@{note.subNoteTextNode}"
+                            customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                             tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe" />
 
                     <include
