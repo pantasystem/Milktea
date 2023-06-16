@@ -571,6 +571,7 @@
     <string name="settings_note_content_font_size">Note content font size(%fsp)</string>
     <string name="settings_note_header_font_size">Note header font size(%fsp)</string>
     <string name="settings_note_reaction_counter_font_size">Note reaction counter font size(%fsp, %fsp)</string>
+    <string name="settings_note_custom_emoji_scale_size_in_text">Magnification for custom emoji in text(%fX)</string>
 
 
     <!-- Settings -->

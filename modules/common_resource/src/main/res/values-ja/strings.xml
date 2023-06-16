@@ -595,6 +595,7 @@
     <string name="settings_note_content_font_size">ノートコンテンツ文字サイズ(%fsp)</string>
     <string name="settings_note_header_font_size">ノートヘッダー文字サイズ(%fsp)</string>
     <string name="settings_note_reaction_counter_font_size">ノートリアクション件数表示の絵文字および文字サイズ(%fsp, %fps)</string>
+    <string name="settings_note_custom_emoji_scale_size_in_text">ノートの本文中のカスタム絵文字の倍率(%f倍)</string>
     <string name="suggestion_users">おすすめユーザ</string>
     <string name="trend_posted_person_count_msg">%d人が投稿</string>
     <string name="notes_confirm_attach_quote_note_by_url">引用として添付しますか?</string>
