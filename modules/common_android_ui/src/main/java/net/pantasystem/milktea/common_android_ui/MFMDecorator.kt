@@ -312,8 +312,9 @@ object MFMDecorator {
                 return
             }
             textView.get()?.let { textView ->
-                val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url, emojiElement.emoji.aspectRatio, customEmojiScale)
+                val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url, emojiElement.emoji.aspectRatio)
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
+                spannableString.setSpan(RelativeSizeSpan(customEmojiScale), skippedEmoji.start, skippedEmoji.end, 0)
                 val height = max(textView.textSize * 0.75f, 10f)
                 val width = when(val aspectRatio = emojiElement.emoji.aspectRatio) {
                     null -> height

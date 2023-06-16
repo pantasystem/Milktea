@@ -2,6 +2,7 @@ package net.pantasystem.milktea.common_android.ui.text
 
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.RelativeSizeSpan
 import android.widget.TextView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
@@ -93,7 +94,6 @@ class CustomEmojiDecorator {
                 emojiAdapter,
                 it.result.getUrl(accountHost),
                 aspectRatio,
-                customEmojiScale,
             )
             val height = max(view.textSize * 0.75f, 10f)
             val width = when(aspectRatio) {
@@ -107,6 +107,7 @@ class CustomEmojiDecorator {
                 .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
+            builder.setSpan(RelativeSizeSpan(customEmojiScale), it.start, it.end, 0)
         }
 
 

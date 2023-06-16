@@ -365,6 +365,27 @@ class SettingAppearanceActivity : AppCompatActivity() {
                             )
 
 
+                            Text(
+                                "ノート本文中のカスタム絵文字のスケール",
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                            Text(
+                                stringResource(id = R.string.settings_app_restart_required),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colors.error,
+                                fontSize = 14.sp
+                            )
+                            Slider(
+                                value = currentConfigState.noteCustomEmojiScaleSizeInText,
+                                valueRange = 0.5f..2f,
+                                onValueChange = {
+                                    currentConfigState =
+                                        currentConfigState.copy(noteCustomEmojiScaleSizeInText = it)
+                                },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+
                             SettingSwitchTile(
                                 checked = currentConfigState.isEnableNoteDivider,
                                 onChanged = {
