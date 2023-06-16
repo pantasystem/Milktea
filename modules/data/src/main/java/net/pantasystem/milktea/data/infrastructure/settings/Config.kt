@@ -133,6 +133,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         noteReactionCounterFontSize = map.getValue<PrefType.FloatPref>(
             Keys.NoteReactionCounterFontSize
         )?.value ?: DefaultConfig.config.noteReactionCounterFontSize,
+        noteCustomEmojiScaleSizeInText = map.getValue<PrefType.FloatPref>(
+            Keys.NoteCustomEmojiScaleSizeInText
+        )?.value ?: DefaultConfig.config.noteCustomEmojiScaleSizeInText,
     )
 }
 
@@ -240,6 +243,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.NoteReactionCounterFontSize -> {
             PrefType.FloatPref(noteReactionCounterFontSize)
+        }
+        Keys.NoteCustomEmojiScaleSizeInText -> {
+            PrefType.FloatPref(noteCustomEmojiScaleSizeInText)
         }
     }
 }
