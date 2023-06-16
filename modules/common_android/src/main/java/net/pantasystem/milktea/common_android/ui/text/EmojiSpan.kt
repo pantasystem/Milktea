@@ -48,7 +48,7 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null, va
         val size = calculateEmojiSize(textHeight * emojiScale)
         val metrics = paint.fontMetricsInt
         if (fm != null) {
-            fm.top = metrics.top
+            fm.top = metrics.top - (textHeight * emojiScale - textHeight).toInt()
             fm.ascent = metrics.ascent
             fm.descent = metrics.descent
             fm.bottom = metrics.bottom
@@ -56,7 +56,7 @@ abstract class EmojiSpan<T: Any?>(val key: T, val aspectRatio: Float? = null, va
 
         // NOTE: 画像のサイズが不明かつ初めてサイズを取得しようとした時は暫定的なサイズを返す
         if (size == null || beforeTextSize != 0) {
-            beforeTextSize = (paint.textSize * 1.2).toInt()
+            beforeTextSize = (paint.textSize * emojiScale).toInt()
             return beforeTextSize
         }
 
