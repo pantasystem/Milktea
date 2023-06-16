@@ -84,6 +84,7 @@ data class Config(
     val noteContentFontSize: Float,
     val isDisplayTimestampsAsAbsoluteDates: Boolean,
     val noteReactionCounterFontSize: Float,
+    val noteCustomEmojiScaleSizeInText: Float,
 ) {
     companion object
 
@@ -143,6 +144,7 @@ object DefaultConfig {
         noteHeaderFontSize = 15f,
         isDisplayTimestampsAsAbsoluteDates = false,
         noteReactionCounterFontSize = 15f,
+        noteCustomEmojiScaleSizeInText = 1.2f,
     )
 
     fun getRememberVisibilityConfig(accountId: Long): RememberVisibility.Remember {

@@ -34,6 +34,7 @@ object MFMDecorator {
     fun decorate(
         textView: TextView,
         lazyDecorateResult: LazyDecorateResult?,
+        customEmojiScale: Float = 1f,
         skipEmojis: SkipEmojiHolder = SkipEmojiHolder(),
     ): Spanned? {
         lazyDecorateResult ?: return null
@@ -45,6 +46,7 @@ object MFMDecorator {
             lazyDecorateResult,
             skipEmojis,
             emojiAdapter,
+            customEmojiScale,
         ).decorate()
     }
 
@@ -289,6 +291,7 @@ object MFMDecorator {
         private val lazyDecorateResult: LazyDecorateResult,
         private val skipEmojis: SkipEmojiHolder,
         private val emojiAdapter: EmojiAdapter,
+        private val customEmojiScale: Float,
     ) {
 
         private val spannableString = SpannableString(lazyDecorateResult.spanned)
@@ -311,6 +314,7 @@ object MFMDecorator {
             textView.get()?.let { textView ->
                 val emojiSpan = DrawableEmojiSpan(emojiAdapter, emojiElement.emoji.url, emojiElement.emoji.aspectRatio)
                 spannableString.setSpan(emojiSpan, skippedEmoji.start, skippedEmoji.end, 0)
+                spannableString.setSpan(RelativeSizeSpan(customEmojiScale), skippedEmoji.start, skippedEmoji.end, 0)
                 val height = max(textView.textSize * 0.75f, 10f)
                 val width = when(val aspectRatio = emojiElement.emoji.aspectRatio) {
                     null -> height
@@ -318,7 +322,7 @@ object MFMDecorator {
                 }
                 GlideApp.with(textView)
                     .load(emojiElement.emoji.url)
-                    .override(width.toInt(), height.toInt())
+                    .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
                     .into(emojiSpan.target)
             }
         }

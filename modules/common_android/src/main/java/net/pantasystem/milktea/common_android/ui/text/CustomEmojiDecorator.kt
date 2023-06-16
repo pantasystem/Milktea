@@ -2,12 +2,14 @@ package net.pantasystem.milktea.common_android.ui.text
 
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.style.RelativeSizeSpan
 import android.widget.TextView
 import net.pantasystem.milktea.common.glide.GlideApp
 import net.pantasystem.milktea.model.emoji.CustomEmojiParsedResult
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.Emoji
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
+import kotlin.math.max
 
 class CustomEmojiDecorator {
 
@@ -78,6 +80,7 @@ class CustomEmojiDecorator {
         accountHost: String?,
         result: CustomEmojiParsedResult,
         view: TextView,
+        customEmojiScale: Float = 1f,
     ): Spanned {
 
         val emojiAdapter = EmojiAdapter(view)
@@ -86,17 +89,25 @@ class CustomEmojiDecorator {
         result.emojis.filter {
             it.result is EmojiResolvedType.Resolved
         }.map {
+            val aspectRatio = (it.result as? EmojiResolvedType.Resolved)?.emoji?.aspectRatio
             val span = DrawableEmojiSpan(
                 emojiAdapter,
                 it.result.getUrl(accountHost),
-                (it.result as? EmojiResolvedType.Resolved)?.emoji?.aspectRatio
+                aspectRatio,
             )
+            val height = max(view.textSize * 0.75f, 10f)
+            val width = when(aspectRatio) {
+                null -> height
+                else -> height * aspectRatio
+            }
+
             GlideApp.with(view)
                 .asDrawable()
                 .load(it.result.getUrl(accountHost))
-                .override(view.textSize.toInt())
+                .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
                 .into(span.target)
             builder.setSpan(span, it.start, it.end, 0)
+            builder.setSpan(RelativeSizeSpan(customEmojiScale), it.start, it.end, 0)
         }
 
 

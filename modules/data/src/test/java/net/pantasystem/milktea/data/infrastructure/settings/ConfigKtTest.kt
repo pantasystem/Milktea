@@ -155,6 +155,10 @@ class ConfigKtTest {
                     config.noteReactionCounterFontSize,
                     (u as PrefType.FloatPref).value
                 )
+                Keys.NoteCustomEmojiScaleSizeInText -> Assertions.assertEquals(
+                    config.noteCustomEmojiScaleSizeInText,
+                    (u as PrefType.FloatPref).value
+                )
             }
         }
     }

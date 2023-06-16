@@ -196,6 +196,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/note_content_text_size"
                             textTypeSource="@{note.textNode}"
+                            customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                             tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                             memoVisibility='@{note.text == null ? View.GONE : View.VISIBLE}'
 
@@ -354,6 +355,7 @@
                                 android:id="@+id/subNoteText"
                                 tools:text="aowjfoiwajehofijawioefjioawejfiowajeiofhawoifahwoiefwaioe"
                                 textTypeSource="@{note.subNoteTextNode}"
+                                customEmojiScale="@{note.config.noteCustomEmojiScaleSizeInText}"
                                 app:layout_constraintTop_toBottomOf="@id/subContentFoldingButton"
                                 app:layout_constraintStart_toStartOf="parent"
                                 memoVisibility="@{ note.subContentFolding || note.subNote.note.text == null ? View.GONE : View.VISIBLE }"/>

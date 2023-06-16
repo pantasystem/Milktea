@@ -71,18 +71,21 @@ object DecorateTextHelper {
         }
     }
 
-    @BindingAdapter("textTypeSource")
+    @BindingAdapter("textTypeSource", "customEmojiScale")
     @JvmStatic
-    fun TextView.decorate(textType: TextType?) {
+    fun TextView.decorate(textType: TextType?, customEmojiScale: Float?) {
         textType ?: return
         stopDrawableAnimations(this)
+
+        val emojiScale = customEmojiScale ?: 1.0f
         when (textType) {
             is TextType.Mastodon -> {
                 val decoratedText = CustomEmojiDecorator().decorate(
                     textType.html.spanned,
                     textType.html.accountHost,
                     textType.html.parserResult,
-                    this
+                    this,
+                    emojiScale,
                 )
                 this.text = decoratedText
                 this.movementMethod = ClickListenableLinkMovementMethod { url ->
@@ -141,7 +144,7 @@ object DecorateTextHelper {
             }
             is TextType.Misskey -> {
                 this.movementMethod = LinkMovementMethod.getInstance()
-                this.text = MFMDecorator.decorate(this, textType.lazyDecorateResult)
+                this.text = MFMDecorator.decorate(this, textType.lazyDecorateResult, emojiScale)
             }
         }
 

@@ -129,6 +129,7 @@
                                 tools:text="aoiwefjowiaejiowajefihawoefoiawehfioawheoifawoiefioawejfowaoeifjawoiejfoaw"
                                 android:visibility='@{hasReplyToNote.replyTo.text == null ? View.GONE : View.VISIBLE}'
                                 textTypeSource="@{hasReplyToNote.replyTo.textNode}"
+                                customEmojiScale="@{hasReplyToNote.config.noteCustomEmojiScaleSizeInText}"
                                 />
 
                     </RelativeLayout>
