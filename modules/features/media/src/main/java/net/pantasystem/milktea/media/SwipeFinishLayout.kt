@@ -92,7 +92,7 @@ class SwipeFinishLayout : FrameLayout {
             try {
                 val diffY = e2.y.minus(e1.y)
                 if (abs(diffY) > SWIPE_THRESHOLD && abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY <= 0) {
+                    if (abs(diffY) >= 0) {
                         onSwipeTop()
                         result = true
                     }
