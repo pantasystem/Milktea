@@ -20,7 +20,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:title="@string/reaction_picker"/>
+                app:title="@string/settings_emoji_picker"/>
 
         <ScrollView
                 android:layout_width="0dp"
