@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.reaction.choices
 
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -90,12 +91,14 @@ class EmojiListItemsAdapter(
                     binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)
                 }
                 is EmojiType.Legacy -> {
+                    binding.reactionStringPreview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, baseItemSizeDp * 0.8f)
                     binding.reactionImagePreview.setMemoVisibility(View.GONE)
                     binding.reactionStringPreview.setMemoVisibility(View.VISIBLE)
                     binding.reactionStringPreview.text =
                         requireNotNull(LegacyReaction.reactionMap[item.type])
                 }
                 is EmojiType.UtfEmoji -> {
+                    binding.reactionStringPreview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, baseItemSizeDp * 0.8f)
                     binding.reactionStringPreview.setMemoVisibility(View.VISIBLE)
                     binding.reactionImagePreview.setMemoVisibility(View.GONE)
                     binding.reactionStringPreview.text = item.code
