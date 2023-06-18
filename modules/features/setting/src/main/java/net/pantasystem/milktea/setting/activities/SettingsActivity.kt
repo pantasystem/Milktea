@@ -151,7 +151,7 @@ class SettingsActivity : AppCompatActivity() {
                                 )
                             }
                         ) {
-                            Text(stringResource(id = R.string.reaction))
+                            Text(stringResource(id = R.string.settings_emoji_picker))
                         }
 
                         SettingListTileLayout(

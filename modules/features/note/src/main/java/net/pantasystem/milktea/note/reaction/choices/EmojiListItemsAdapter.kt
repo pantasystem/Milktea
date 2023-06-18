@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.reaction.choices
 
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ class EmojiListItemsAdapter(
     private val isApplyImageAspectRatio: Boolean,
     private val onEmojiSelected: (EmojiType) -> Unit,
     private val onEmojiLongClicked: (EmojiType) -> Boolean,
+    private val baseItemSizeDp: Int = 28,
 ) : ListAdapter<EmojiListItemType, EmojiListItemsAdapter.VH>(
     DiffUtilItemCallback()
 ) {
@@ -53,7 +55,11 @@ class EmojiListItemsAdapter(
     }
 
     sealed class VH(view: View) : RecyclerView.ViewHolder(view)
-    class EmojiVH(val binding: ItemEmojiChoiceBinding, private val isApplyImageAspectRatio: Boolean) : VH(binding.root) {
+    class EmojiVH(
+        val binding: ItemEmojiChoiceBinding,
+        private val isApplyImageAspectRatio: Boolean,
+        private val baseItemSizeDp: Int,
+    ) : VH(binding.root) {
 
         fun onBind(
             item: EmojiType, onEmojiSelected: (EmojiType) -> Unit,
@@ -63,7 +69,7 @@ class EmojiListItemsAdapter(
                 is EmojiType.CustomEmoji -> {
                     if (isApplyImageAspectRatio) {
                         binding.reactionImagePreview.applySizeByAspectRatio<LinearLayout.LayoutParams>(
-                            28,
+                            baseItemSizeDp,
                             item.emoji.aspectRatio ?: ImageAspectRatioCache.get(
                                 item.emoji.url ?: item.emoji.uri
                             )
@@ -85,12 +91,14 @@ class EmojiListItemsAdapter(
                     binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)
                 }
                 is EmojiType.Legacy -> {
+                    binding.reactionStringPreview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, baseItemSizeDp * 0.8f)
                     binding.reactionImagePreview.setMemoVisibility(View.GONE)
                     binding.reactionStringPreview.setMemoVisibility(View.VISIBLE)
                     binding.reactionStringPreview.text =
                         requireNotNull(LegacyReaction.reactionMap[item.type])
                 }
                 is EmojiType.UtfEmoji -> {
+                    binding.reactionStringPreview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, baseItemSizeDp * 0.8f)
                     binding.reactionStringPreview.setMemoVisibility(View.VISIBLE)
                     binding.reactionImagePreview.setMemoVisibility(View.GONE)
                     binding.reactionStringPreview.text = item.code
@@ -136,7 +144,8 @@ class EmojiListItemsAdapter(
                     )
                 return EmojiVH(
                     binding,
-                    isApplyImageAspectRatio
+                    isApplyImageAspectRatio,
+                    baseItemSizeDp
                 )
             }
         }

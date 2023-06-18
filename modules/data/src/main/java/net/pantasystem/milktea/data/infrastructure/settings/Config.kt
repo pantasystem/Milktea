@@ -136,6 +136,9 @@ fun Config.Companion.from(map: Map<Keys, PrefType?>): Config {
         noteCustomEmojiScaleSizeInText = map.getValue<PrefType.FloatPref>(
             Keys.NoteCustomEmojiScaleSizeInText
         )?.value ?: DefaultConfig.config.noteCustomEmojiScaleSizeInText,
+        emojiPickerEmojiDisplaySize = map.getValue<PrefType.IntPref>(
+            Keys.EmojiPickerEmojiDisplaySize
+        )?.value ?: DefaultConfig.config.emojiPickerEmojiDisplaySize,
     )
 }
 
@@ -246,6 +249,9 @@ fun Config.pref(key: Keys): PrefType {
         }
         Keys.NoteCustomEmojiScaleSizeInText -> {
             PrefType.FloatPref(noteCustomEmojiScaleSizeInText)
+        }
+        Keys.EmojiPickerEmojiDisplaySize -> {
+            PrefType.IntPref(emojiPickerEmojiDisplaySize)
         }
     }
 }

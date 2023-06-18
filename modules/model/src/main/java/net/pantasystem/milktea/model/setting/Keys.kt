@@ -34,6 +34,7 @@ val Keys.Companion.allKeys by lazy {
         Keys.IsDisplayTimestampsAsAbsoluteDates,
         Keys.NoteReactionCounterFontSize,
         Keys.NoteCustomEmojiScaleSizeInText,
+        Keys.EmojiPickerEmojiDisplaySize,
     )
 }
 
@@ -97,6 +98,8 @@ sealed interface Keys {
 
     object NoteCustomEmojiScaleSizeInText : Keys
 
+    object EmojiPickerEmojiDisplaySize : Keys
+
     companion object
 }
 
@@ -134,5 +137,6 @@ fun Keys.str(): String {
         is Keys.IsDisplayTimestampsAsAbsoluteDates -> "IsDisplayTimestampsAsAbsoluteDates"
         is Keys.NoteReactionCounterFontSize -> "NoteReactionCounterFontSize"
         is Keys.NoteCustomEmojiScaleSizeInText -> "NoteCustomEmojiScaleSizeInText"
+        is Keys.EmojiPickerEmojiDisplaySize -> "EmojiPickerEmojiDisplaySize"
     }
 }

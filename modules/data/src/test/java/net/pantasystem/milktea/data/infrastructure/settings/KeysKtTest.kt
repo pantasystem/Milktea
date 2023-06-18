@@ -120,6 +120,10 @@ class KeysKtTest {
                     "NoteCustomEmojiScaleSizeInText",
                     key.str()
                 )
+                Keys.EmojiPickerEmojiDisplaySize -> Assertions.assertEquals(
+                    "EmojiPickerEmojiDisplaySize",
+                    key.str()
+                )
             }
         }
     }
@@ -127,8 +131,8 @@ class KeysKtTest {
 
     @Test
     fun checkAllKeysCount() {
-        Assertions.assertEquals(32, Keys.allKeys.size)
-        Assertions.assertEquals(32, Keys.allKeys.map { it.str() }.toSet().size)
+        Assertions.assertEquals(33, Keys.allKeys.size)
+        Assertions.assertEquals(33, Keys.allKeys.map { it.str() }.toSet().size)
     }
 
 
