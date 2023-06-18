@@ -576,6 +576,7 @@
     <string name="settings_about_milktea">Milkteaについて</string>
     <string name="settings_about_milktea_source_code">ソースコード(GitHub)</string>
     <string name="settings_emoji_picker">絵文字ピッカー</string>
+    <string name="settings_emoji_display_size">絵文字の表示サイズ</string>
     <!-- Settings -->
 
     <!-- User -->

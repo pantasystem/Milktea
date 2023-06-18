@@ -573,6 +573,7 @@
     <string name="settings_note_reaction_counter_font_size">Note reaction counter font size(%fsp, %fsp)</string>
     <string name="settings_note_custom_emoji_scale_size_in_text">Magnification for custom emoji in text(%fX)</string>
     <string name="settings_emoji_picker">Emoji picker</string>
+    <string name="settings_emoji_display_size">Emoji display size</string>
 
     <!-- Settings -->
 

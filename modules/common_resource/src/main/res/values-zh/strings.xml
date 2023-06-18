@@ -569,7 +569,7 @@
     <string name="settings_about_milktea">关于Milktea</string>
     <string name="settings_about_milktea_source_code">Source code(GitHub)</string>
     <string name="settings_emoji_picker">Emoji picker</string>
-
+    <string name="settings_emoji_display_size">Emoji display size</string>
 
     <!-- Settings -->
 
