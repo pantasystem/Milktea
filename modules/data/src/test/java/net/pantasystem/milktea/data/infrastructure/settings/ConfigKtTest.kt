@@ -159,6 +159,10 @@ class ConfigKtTest {
                     config.noteCustomEmojiScaleSizeInText,
                     (u as PrefType.FloatPref).value
                 )
+                Keys.EmojiPickerEmojiDisplaySize -> Assertions.assertEquals(
+                    config.emojiPickerEmojiDisplaySize,
+                    (u as PrefType.IntPref).value
+                )
             }
         }
     }
