@@ -25,6 +25,8 @@ import net.pantasystem.milktea.common_android_ui.tab.TabbedFlexboxListMediator
 import net.pantasystem.milktea.model.notes.reaction.LegacyReaction
 import net.pantasystem.milktea.model.notes.reaction.Reaction
 import net.pantasystem.milktea.model.notes.reaction.ReactionSelection
+import net.pantasystem.milktea.model.setting.DefaultConfig
+import net.pantasystem.milktea.model.setting.LocalConfigRepository
 import net.pantasystem.milktea.note.EmojiListItemType
 import net.pantasystem.milktea.note.EmojiPickerUiStateService
 import net.pantasystem.milktea.note.R
@@ -32,6 +34,7 @@ import net.pantasystem.milktea.note.databinding.FragmentEmojiPickerBinding
 import net.pantasystem.milktea.note.emojis.viewmodel.EmojiPickerViewModel
 import net.pantasystem.milktea.note.reaction.choices.EmojiListItemsAdapter
 import net.pantasystem.milktea.note.toTextReaction
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSelection {
@@ -52,6 +55,9 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
     private val binding: FragmentEmojiPickerBinding by dataBinding()
 
     private val emojiPickerViewModel: EmojiPickerViewModel by viewModels()
+
+    @Inject
+    internal lateinit var configRepository: LocalConfigRepository
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -77,6 +83,7 @@ class EmojiPickerFragment : Fragment(R.layout.fragment_emoji_picker), ReactionSe
                 onSelect(it)
             },
             emojiPickerViewModel = emojiPickerViewModel,
+            emojiPickerEmojiSize = configRepository.get().getOrElse { DefaultConfig.config }.emojiPickerEmojiDisplaySize
         )
         binder.bind()
 
@@ -109,6 +116,7 @@ class EmojiSelectionBinder(
     val emojiPickerViewModel: EmojiPickerViewModel,
     val onReactionSelected: (String) -> Unit,
     val onSearchEmojiTextFieldEntered: (String) -> Unit,
+    val emojiPickerEmojiSize: Int,
 ) {
 
     fun bind() {
@@ -128,7 +136,8 @@ class EmojiSelectionBinder(
             },
             onEmojiSelected = {
                 onReactionSelected(it.toTextReaction())
-            }
+            },
+            baseItemSizeDp = emojiPickerEmojiSize,
         )
 
 
