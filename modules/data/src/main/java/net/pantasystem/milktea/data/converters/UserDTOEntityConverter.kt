@@ -6,6 +6,7 @@ import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiParser
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.EmojiResolvedType
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.user.User
 import javax.inject.Inject
@@ -14,6 +15,8 @@ import javax.inject.Singleton
 @Singleton
 class UserDTOEntityConverter @Inject constructor(
     private val customEmojiRepository: CustomEmojiRepository,
+    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+    private val imageCacheRepository: ImageCacheRepository,
 ) {
 
     suspend fun convert(account: Account, userDTO: UserDTO, isDetail: Boolean = false): User {
@@ -28,8 +31,23 @@ class UserDTOEntityConverter @Inject constructor(
             )
         }
 
+        val urls = userDTO.emojiList?.mapNotNull {
+            it.url ?: it.uri
+        } ?: emptyList()
+        val aspects = customEmojiAspectRatioDataSource.findIn(urls).getOrElse {
+            emptyList()
+        }.associateBy {
+            it.uri
+        }
+        val fileCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
+            it.sourceUrl
+        }
+
         var emojis = userDTO.emojiList?.map {
-            it.toModel()
+            it.toModel(
+                aspects[it.url ?: it.uri]?.aspectRatio,
+                cachePath = fileCaches[it.url ?: it.uri]?.cachePath
+            )
         } ?: emptyList()
         emojis = (emojis + CustomEmojiParser.parse(
             userDTO.host ?: account.getHost(),
@@ -73,7 +91,7 @@ class UserDTOEntityConverter @Inject constructor(
                     updatedAt = userDTO.updatedAt,
                     fields = userDTO.fields?.map {
                         User.Field(it.name, it.value)
-                    }?: emptyList(),
+                    } ?: emptyList(),
                     isPublicReactions = userDTO.publicReactions ?: false,
                 ),
                 related = User.Related(
@@ -81,7 +99,8 @@ class UserDTOEntityConverter @Inject constructor(
                     isFollower = userDTO.isFollowed ?: false,
                     isBlocking = userDTO.isBlocking ?: false,
                     isMuting = userDTO.isMuted ?: false,
-                    hasPendingFollowRequestFromYou = userDTO.hasPendingFollowRequestFromYou ?: false,
+                    hasPendingFollowRequestFromYou = userDTO.hasPendingFollowRequestFromYou
+                        ?: false,
                     hasPendingFollowRequestToYou = userDTO.hasPendingFollowRequestToYou ?: false,
                 )
             )

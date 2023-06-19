@@ -25,6 +25,7 @@ import net.pantasystem.milktea.model.account.ClientIdRepository
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.worker.SyncNodeInfoCacheWorker
 import net.pantasystem.milktea.worker.drive.CleanupUnusedDriveCacheWorker
+import net.pantasystem.milktea.worker.emoji.cache.CacheCustomEmojiImageWorker
 import net.pantasystem.milktea.worker.filter.SyncMastodonFilterWorker
 import net.pantasystem.milktea.worker.instance.ScheduleAuthInstancesPostWorker
 import net.pantasystem.milktea.worker.instance.SyncInstanceInfoWorker
@@ -213,6 +214,12 @@ class MiApplication : Application(), Configuration.Provider {
                 ExistingPeriodicWorkPolicy.REPLACE,
                 SyncMastodonFilterWorker.createPeriodicWorkerRequest(),
             )
+            enqueueUniquePeriodicWork(
+                "cacheEmojiImages",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                CacheCustomEmojiImageWorker.createPeriodicWorkRequest(),
+            )
+
             enqueue(
                 SyncRenoteMutesWorker.createOneTimeWorkRequest()
             )

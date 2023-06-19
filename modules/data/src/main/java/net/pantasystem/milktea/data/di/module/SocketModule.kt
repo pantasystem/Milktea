@@ -21,6 +21,7 @@ import net.pantasystem.milktea.data.streaming.impl.SocketWithAccountProviderImpl
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.EmojiEventHandler
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
 import net.pantasystem.milktea.model.notification.NotificationStreaming
@@ -78,6 +79,7 @@ object SocketModule {
         noteDataSourceAdder: NoteDataSourceAdder,
         streamingAPIProvider: StreamingAPIProvider,
         customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+        imageCacheRepository: ImageCacheRepository,
     ): NoteCaptureAPIAdapter {
         return NoteCaptureAPIAdapterImpl(
             accountRepository = accountRepository,
@@ -88,7 +90,8 @@ object SocketModule {
             dispatcher = Dispatchers.IO,
             noteDataSourceAdder = noteDataSourceAdder,
             streamingAPIProvider = streamingAPIProvider,
-            customEmojiAspectRatioDataSource = customEmojiAspectRatioDataSource
+            customEmojiAspectRatioDataSource = customEmojiAspectRatioDataSource,
+            imageCacheRepository = imageCacheRepository,
         )
     }
 }

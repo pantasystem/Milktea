@@ -12,6 +12,7 @@ import net.pantasystem.milktea.data.infrastructure.emoji.delegate.CustomEmojiUpI
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
 import javax.inject.Inject
@@ -23,6 +24,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val customEmojiCache: CustomEmojiCache,
     private val upInsert: CustomEmojiUpInsertDelegate,
     private val aspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+    private val imageCacheRepository: ImageCacheRepository,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CustomEmojiRepository {
 
@@ -46,9 +48,16 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }).getOrElse { emptyList() }.associateBy {
                 it.uri
             }
+            val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
+                it.url ?: it.uri
+            }).associateBy {
+                it.sourceUrl
+            }
+
             emojis = emojis.map {
                 it.copy(
-                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio
+                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio,
+                    cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
                 )
             }
             customEmojiCache.put(host, emojis)
@@ -66,9 +75,15 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             ).getOrElse { emptyList() }.associateBy {
                 it.uri
             }
+            val fileCaches = imageCacheRepository.findBySourceUrls(dtoList.mapNotNull {
+                it.emoji.url ?: it.emoji.uri
+            }).associateBy {
+                it.sourceUrl
+            }
             dtoList.map {
                 it.toModel(
-                    aspects[it.emoji.url ?: it.emoji.uri]?.aspectRatio
+                    aspects[it.emoji.url ?: it.emoji.uri]?.aspectRatio,
+                    fileCaches[it.emoji.url ?: it.emoji.uri]?.cachePath,
                 )
 
             }
@@ -84,8 +99,16 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }).getOrElse { emptyList() }.associateBy {
                 it.uri
             }
+            val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
+                it.url ?: it.uri
+            }).associateBy {
+                it.sourceUrl
+            }
             emojis = emojis.map {
-                it.copy(aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio)
+                it.copy(
+                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio,
+                    cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
+                )
             }
 
             customEmojiCache.put(host, emojis)
@@ -108,8 +131,16 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
                 ).getOrElse { emptyList() }.associateBy {
                     it.uri
                 }
+                val fileCaches = imageCacheRepository.findBySourceUrls(list.mapNotNull {
+                    it.emoji.url ?: it.emoji.uri
+                }).associateBy {
+                    it.sourceUrl
+                }
                 list.map {
-                    it.toModel(aspects[it.emoji.url ?: it.emoji.uri]?.aspectRatio)
+                    it.toModel(
+                        aspects[it.emoji.url ?: it.emoji.uri]?.aspectRatio,
+                        fileCaches[it.emoji.url ?: it.emoji.uri]?.cachePath,
+                    )
                 }
             }
         }.onEach {

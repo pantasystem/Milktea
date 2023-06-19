@@ -197,7 +197,7 @@ data class TootStatusDTO(
             name
         }
         
-        fun getEmoji(): Emoji? {
+        fun getEmoji(cachePath: String? = null): Emoji? {
             if (!isCustomEmoji) {
                 return null
             }
@@ -213,7 +213,8 @@ data class TootStatusDTO(
                     null
                 } else {
                     width / height
-                }
+                },
+                cachePath = cachePath,
             )
         }
 

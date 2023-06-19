@@ -92,6 +92,7 @@ data class NoteRecord(
     var maxReactionsPerAccount: Int = 0,
 
     var customEmojiAspectRatioMap: MutableMap<String, String>? = null,
+    var customEmojiUrlAndCachePathMap: MutableMap<String, String?>? = null,
 ) {
 
     companion object {
@@ -182,6 +183,14 @@ data class NoteRecord(
                 uri to aspectRatio.toString()
             }
         }?.toMap()?.toMutableMap()
+        customEmojiUrlAndCachePathMap = model.emojis?.mapNotNull { emoji ->
+            val url = (emoji.url ?: emoji.uri)
+            if (emoji.cachePath == null || url == null) {
+                null
+            } else {
+                url to emoji.cachePath
+            }
+        }?.toMap()?.toMutableMap()
     }
 
     fun toModel(): Note {
@@ -212,7 +221,8 @@ data class NoteRecord(
             emojis = emojis?.map { Emoji(
                 name = it.key,
                 url = it.value,
-                aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull()
+                aspectRatio = customEmojiAspectRatioMap?.get(it.value)?.toFloatOrNull(),
+                cachePath = customEmojiUrlAndCachePathMap?.get(it.value)
             ) },
             repliesCount = repliesCount,
             fileIds = fileIds?.map { FileProperty.Id(accountId, it) },

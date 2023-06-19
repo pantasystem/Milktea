@@ -73,7 +73,7 @@ data class CustomEmojiRelated(
 ) {
 
     @Ignore
-    fun toModel(aspectRatio: Float? = null): Emoji {
+    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): Emoji {
         return Emoji(
             id = emoji.serverId,
             name = emoji.name,
@@ -85,8 +85,8 @@ data class CustomEmojiRelated(
             aliases = aliases.map {
                 it.value
             },
-            aspectRatio = aspectRatio
-
+            aspectRatio = aspectRatio,
+            cachePath = cachePath,
         )
     }
 }

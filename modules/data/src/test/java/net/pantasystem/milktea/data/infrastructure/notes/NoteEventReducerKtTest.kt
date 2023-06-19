@@ -32,6 +32,7 @@ class NoteEventReducerKtTest {
                     userId = "other"
                 )
             ),
+            null,
             null
         )
 
@@ -56,6 +57,7 @@ class NoteEventReducerKtTest {
                     userId = account.remoteId
                 )
             ),
+            null,
             null
         )
 
@@ -83,7 +85,9 @@ class NoteEventReducerKtTest {
                     userId = account.remoteId
                 )
             ),
+            null,
             null
+
         )
 
         Assertions.assertEquals(
@@ -112,6 +116,7 @@ class NoteEventReducerKtTest {
                     userId = account.remoteId
                 )
             ),
+            null,
             null
         )
 
@@ -217,6 +222,7 @@ class NoteEventReducerKtTest {
                     )
                 )
             ),
+            null,
             null
         )
         Assertions.assertEquals(
@@ -249,7 +255,8 @@ class NoteEventReducerKtTest {
                 domain = null,
                 accountIds = listOf("test"),
                 statusId = "1"
-            )
+            ),
+            null
         )
         Assertions.assertEquals("watasimo", updated.myReaction)
         Assertions.assertEquals(updated.reactionCounts, listOf(
@@ -277,7 +284,8 @@ class NoteEventReducerKtTest {
                 domain = null,
                 accountIds = listOf(),
                 statusId = "1"
-            )
+            ),
+            null
         )
         Assertions.assertEquals(null, updated.myReaction)
         Assertions.assertEquals(updated.reactionCounts, listOf(
@@ -305,7 +313,8 @@ class NoteEventReducerKtTest {
                 domain = null,
                 accountIds = listOf("test"),
                 statusId = "1"
-            )
+            ),
+            null
         )
         Assertions.assertEquals("watasimo", updated.myReaction)
         Assertions.assertEquals(updated.reactionCounts, listOf(

@@ -8,6 +8,7 @@ import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.channel.Channel
 import net.pantasystem.milktea.model.drive.FileProperty
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.Visibility
 import net.pantasystem.milktea.model.notes.poll.Poll
@@ -19,6 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class NoteDTOEntityConverter @Inject constructor(
     private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+    private val imageCacheRepository: ImageCacheRepository,
 ) {
 
     suspend fun convert(noteDTO: NoteDTO, account: Account): Note {
@@ -29,6 +31,11 @@ class NoteDTOEntityConverter @Inject constructor(
             emptyList()
         }.associate {
             it.uri to it.aspectRatio
+        }
+        val fileCaches = imageCacheRepository.findBySourceUrls(emojis.mapNotNull {
+            it.url ?: it.uri
+        }).associateBy {
+            it.sourceUrl
         }
         val visibility = Visibility(
             noteDTO.visibility ?: NoteVisibilityType.Public,
@@ -48,8 +55,8 @@ class NoteDTOEntityConverter @Inject constructor(
             viaMobile = noteDTO.viaMobile,
             visibility = visibility,
             localOnly = noteDTO.localOnly,
-            emojis = (noteDTO.emojiList + (noteDTO.reactionEmojiList)).map {
-                it.toModel(aspects[it.url ?: it.uri])
+            emojis = emojis.map {
+                it.toModel(aspects[it.url ?: it.uri], fileCaches[it.url ?: it.uri]?.cachePath)
             },
             app = null,
             fileIds = noteDTO.fileIds?.map { FileProperty.Id(account.accountId, it) },

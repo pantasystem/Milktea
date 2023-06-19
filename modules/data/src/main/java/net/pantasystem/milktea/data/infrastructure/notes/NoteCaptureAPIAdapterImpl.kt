@@ -12,6 +12,7 @@ import net.pantasystem.milktea.data.streaming.StreamingAPIProvider
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.notes.Note
 import net.pantasystem.milktea.model.notes.NoteCaptureAPIAdapter
 import net.pantasystem.milktea.model.notes.NoteDataSource
@@ -28,6 +29,7 @@ class NoteCaptureAPIAdapterImpl(
     private val streamingAPIProvider: StreamingAPIProvider,
     private val noteDataSourceAdder: NoteDataSourceAdder,
     private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
+    private val imageCacheRepository: ImageCacheRepository,
     loggerFactory: Logger.Factory,
     cs: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -141,8 +143,8 @@ class NoteCaptureAPIAdapterImpl(
                             .catch { e ->
                                 logger.error("ノート更新イベント受信中にエラー発生", e = e)
                             }.onEach {
-                            streamingEventDispatcher.tryEmit(account to it)
-                        }.launchIn(coroutineScope)
+                                streamingEventDispatcher.tryEmit(account to it)
+                            }.launchIn(coroutineScope)
                         noteIdWithJob[id] = job
                     }
                 }
@@ -243,7 +245,12 @@ class NoteCaptureAPIAdapterImpl(
                                 customEmojiAspectRatioDataSource.findOne(
                                     it
                                 ).getOrNull()
-                            }
+                            },
+                            imageCache = (e.body.emoji?.url ?: e.body.emoji?.url)?.let {
+                                imageCacheRepository.findBySourceUrl(
+                                    it
+                                )
+                            },
                         )
                     )
                 }
@@ -276,7 +283,14 @@ class NoteCaptureAPIAdapterImpl(
                     val noteId = Note.Id(account.accountId, e.reaction.statusId)
 
                     noteDataSource.get(noteId).mapCancellableCatching { note ->
-                        noteDataSource.add(note.onEmojiReacted(account, e.reaction))
+                        noteDataSource.add(
+                            note.onEmojiReacted(
+                                account, e.reaction,
+                                (e.reaction.url ?: e.reaction.staticUrl)?.let {
+                                    imageCacheRepository.findBySourceUrl(it)
+                                }
+                            ),
+                        )
                     }.getOrThrow()
 
                 }

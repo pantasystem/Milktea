@@ -58,7 +58,7 @@ object NoteReactionViewHelper {
 
 
             GlideApp.with(reactionImageTypeView.context)
-                .load(emoji.url ?: emoji.uri)
+                .load(emoji.getLoadUrl())
                 .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
                 .addListener(SaveImageAspectRequestListener(emoji, context))
                 .into(reactionImageTypeView)
@@ -97,7 +97,7 @@ object NoteReactionViewHelper {
             reactionTextTypeView.setMemoVisibility(View.GONE)
 
             GlideApp.with(reactionImageTypeView.context)
-                .load(emoji.url ?: emoji.uri)
+                .load(emoji.getLoadUrl())
                 .into(reactionImageTypeView)
         }
 
