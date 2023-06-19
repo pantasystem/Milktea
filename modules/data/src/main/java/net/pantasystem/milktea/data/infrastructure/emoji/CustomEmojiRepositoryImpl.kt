@@ -56,7 +56,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
 
             emojis = emojis.map {
                 it.copy(
-                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio,
+                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio ?: it.aspectRatio,
                     cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
                 )
             }
@@ -106,7 +106,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
             }
             emojis = emojis.map {
                 it.copy(
-                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio,
+                    aspectRatio = aspects[it.url ?: it.uri]?.aspectRatio ?: it.aspectRatio,
                     cachePath = fileCaches[it.url ?: it.uri]?.cachePath,
                 )
             }
