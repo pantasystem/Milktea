@@ -397,10 +397,41 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "5:192241672526547352",
+      "lastPropertyId": "4:2544401018528846153",
+      "name": "ImageCacheRecord",
+      "properties": [
+        {
+          "id": "1:6002315150189198372",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7274049216628202631",
+          "name": "sourceUrl",
+          "indexId": "10:5291013203713667470",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:3858052356230995928",
+          "name": "cachePath",
+          "type": 9
+        },
+        {
+          "id": "4:2544401018528846153",
+          "name": "cachedAt",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "4:5892387857597582401",
-  "lastIndexId": "9:4038966684149214552",
+  "lastEntityId": "5:192241672526547352",
+  "lastIndexId": "10:5291013203713667470",
   "lastRelationId": "2:5971800600708341253",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
