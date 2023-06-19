@@ -15,7 +15,7 @@ import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
 import java.util.*
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class AppAuthViewModel @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
-    private val instanceInfoRepository: InstanceInfoRepository,
+//    private val instanceInfoRepository: InstanceInfoRepository,
     private val syncMetaExecutor: SyncMetaExecutor,
     private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
 ) : ViewModel() {
@@ -65,9 +65,9 @@ class AppAuthViewModel @Inject constructor(
             StateContent.NotExist()
         )
     )
-
-    private val instances = instanceInfoRepository.observeAll()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+//
+//    private val instances = instanceInfoRepository.observeAll()
+//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     @OptIn(FlowPreview::class)
     private val misskeyInstances = suspend {
@@ -240,9 +240,8 @@ class AppAuthViewModel @Inject constructor(
     val state = combine(
         instanceInfo,
         combineStates,
-        instances,
         misskeyInstances,
-    ) { formState, (waiting4Approve, approved, finished, result), instances, misskeyInstances ->
+    ) { formState, (waiting4Approve, approved, finished, result), misskeyInstances ->
         AuthUiState(
             formState = formState.inputState,
             metaState = formState.meta,
@@ -255,7 +254,6 @@ class AppAuthViewModel @Inject constructor(
             },
             waiting4ApproveState = waiting4Approve,
             clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
-            instances = instances,
             misskeyInstanceInfosResponse = misskeyInstances?.getOrElse {
                 emptyList()
             } ?: emptyList()
@@ -330,11 +328,11 @@ class AppAuthViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            instanceInfoRepository.sync().onFailure {
-                logger.error("sync instance info error", it)
-            }
-        }
+//        viewModelScope.launch {
+//            instanceInfoRepository.sync().onFailure {
+//                logger.error("sync instance info error", it)
+//            }
+//        }
     }
 
     fun auth() {

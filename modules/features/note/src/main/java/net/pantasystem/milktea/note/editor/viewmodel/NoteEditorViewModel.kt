@@ -29,7 +29,7 @@ import net.pantasystem.milktea.model.file.FilePreviewSource
 import net.pantasystem.milktea.model.file.UpdateAppFileSensitiveUseCase
 import net.pantasystem.milktea.model.instance.FeatureEnables
 import net.pantasystem.milktea.model.instance.InstanceInfo
-import net.pantasystem.milktea.model.instance.InstanceInfoRepository
+//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.notes.*
 import net.pantasystem.milktea.model.notes.draft.DraftNoteRepository
@@ -66,7 +66,7 @@ class NoteEditorViewModel @Inject constructor(
     private val localConfigRepository: LocalConfigRepository,
     private val featureEnables: FeatureEnables,
     private val noteRelationGetter: NoteRelationGetter,
-    private val instanceInfoRepository: InstanceInfoRepository,
+//    private val instanceInfoRepository: InstanceInfoRepository,
     private val updateSensitiveUseCase: UpdateAppFileSensitiveUseCase,
     private val apResolverRepository: ApResolverRepository,
     private val savedStateHandle: SavedStateHandle,
@@ -164,10 +164,10 @@ class NoteEditorViewModel @Inject constructor(
         instanceInfoService.find(it.normalizedInstanceUri).getOrNull()?.maxFileCount
     }.stateIn(viewModelScope + Dispatchers.IO, started = SharingStarted.Eagerly, initialValue = 4)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val instanceInfo = _currentAccount.filterNotNull().flatMapLatest {
-        instanceInfoRepository.observeByHost(it.getHost())
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    val instanceInfo = _currentAccount.filterNotNull().flatMapLatest {
+//        instanceInfoRepository.observeByHost(it.getHost())
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 
     private val _visibility = savedStateHandle.getStateFlow<Visibility?>(
@@ -551,18 +551,18 @@ class NoteEditorViewModel @Inject constructor(
             file
         )
         savedStateHandle.setFiles(files)
-        val account = _currentAccount.value ?: return@launch
-        val localFile = when (file) {
-            is AppFile.Local -> file
-            is AppFile.Remote -> return@launch
-        }
-        val instanceInfo =
-            instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
-        val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
-
-        if (maxFileSize < (localFile.fileSize ?: 0)) {
-            _fileSizeInvalidEvent.tryEmit(FileSizeInvalidEvent(file, instanceInfo, account))
-        }
+//        val account = _currentAccount.value ?: return@launch
+//        val localFile = when (file) {
+//            is AppFile.Local -> file
+//            is AppFile.Remote -> return@launch
+//        }
+//        val instanceInfo =
+//            instanceInfoRepository.findByHost(account.getHost()).getOrNull() ?: return@launch
+//        val maxFileSize = instanceInfo.clientMaxBodyByteSize ?: return@launch
+//
+//        if (maxFileSize < (localFile.fileSize ?: 0)) {
+//            _fileSizeInvalidEvent.tryEmit(FileSizeInvalidEvent(file, instanceInfo, account))
+//        }
     }
 
 

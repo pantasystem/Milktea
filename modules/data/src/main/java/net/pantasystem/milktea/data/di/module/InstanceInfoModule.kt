@@ -5,10 +5,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import net.pantasystem.milktea.data.infrastructure.instance.FeatureEnablesImpl
-import net.pantasystem.milktea.data.infrastructure.instance.InstanceInfoRepositoryImpl
 import net.pantasystem.milktea.data.infrastructure.instance.online.user.count.OnlineUserCountRepositoryImpl
 import net.pantasystem.milktea.model.instance.FeatureEnables
-import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.online.user.count.OnlineUserCountRepository
 import javax.inject.Singleton
 
@@ -16,9 +14,9 @@ import javax.inject.Singleton
 @Module
 abstract class InstanceInfoBindModule {
 
-    @Binds
-    @Singleton
-    abstract fun bindInstanceInfoRepository(impl: InstanceInfoRepositoryImpl): InstanceInfoRepository
+//    @Binds
+//    @Singleton
+//    abstract fun bindInstanceInfoRepository(impl: InstanceInfoRepositoryImpl): InstanceInfoRepository
 
     @Binds
     @Singleton

@@ -5,7 +5,6 @@ import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
-import net.pantasystem.milktea.model.instance.InstanceInfo
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfo
 import net.pantasystem.milktea.model.instance.Meta
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
@@ -80,7 +79,6 @@ data class AuthUiState(
         StateContent.NotExist()
     ),
     val clientId: String = "",
-    val instances: List<InstanceInfo> = emptyList(),
     val misskeyInstanceInfosResponse: List<InstanceInfosResponse.InstanceInfo>,
 ) {
     val isProgress by lazy {
