@@ -1,6 +1,7 @@
 package net.pantasystem.milktea.data.infrastructure.image
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
@@ -12,6 +13,8 @@ import kotlinx.datetime.Clock
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
 import net.pantasystem.milktea.common.Hash
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatio
+import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.image.ImageCache
 import net.pantasystem.milktea.model.image.ImageCacheRepository
 import okhttp3.Request
@@ -19,9 +22,11 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
 
+
 class ImageCacheRepositoryImpl @Inject constructor(
     private val boxStore: BoxStore,
     private val okHttpClientProvider: OkHttpClientProvider,
+    private val customEmojiAspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     @ApplicationContext val context: Context,
     @IODispatcher val coroutineDispatcher: CoroutineDispatcher,
 ) : ImageCacheRepository {
@@ -37,29 +42,50 @@ class ImageCacheRepositoryImpl @Inject constructor(
     }
 
     override suspend fun save(url: String): ImageCache {
-        when(val cache = findBySourceUrl(url)) {
+        when (val cache = findBySourceUrl(url)) {
             null -> Unit
             else -> if (cache.cachedAt + cacheIgnoreUpdateDuration > Clock.System.now()) {
-                return cache
+                if (File(cache.cachePath).exists()) {
+                    return cache
+                }
             }
         }
         return withContext(coroutineDispatcher) {
             val req = Request.Builder().url(url).build()
             okHttpClientProvider.get().newCall(req)
             val fileName = Hash.sha256(url)
-            File(context.cacheDir, cacheDir).apply {
+            val file = File(context.filesDir, cacheDir).apply {
                 if (!exists()) {
                     mkdirs()
                 }
-            }.resolve(fileName).outputStream().use { out ->
+            }.resolve(fileName)
+
+            file.outputStream().use { out ->
+
                 okHttpClientProvider.get().newCall(req).execute().body?.byteStream()
                     ?.use { inStream ->
                         inStream.copyTo(out)
                     }
+                // bitmap
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeFile(
+                    File(
+                        context.filesDir,
+                        cacheDir
+                    ).resolve(fileName).absolutePath, options
+                )
+                val aspectRatio = options.outWidth.toFloat() / options.outHeight.toFloat()
+                customEmojiAspectRatioDataSource.save(
+                    CustomEmojiAspectRatio(
+                        uri = url,
+                        aspectRatio = aspectRatio,
+                    )
+                )
             }
             val cache = ImageCache(
                 sourceUrl = url,
-                cachePath = File(context.cacheDir, cacheDir).resolve(fileName).absolutePath,
+                cachePath = File(context.filesDir, cacheDir).resolve(fileName).absolutePath,
                 cachedAt = Clock.System.now()
             )
             val record = ImageCacheRecord.from(
@@ -95,7 +121,7 @@ class ImageCacheRepositoryImpl @Inject constructor(
                 imageCacheStore.remove(record)
                 null
             } else {
-                 model
+                model
             }
         }
     }
