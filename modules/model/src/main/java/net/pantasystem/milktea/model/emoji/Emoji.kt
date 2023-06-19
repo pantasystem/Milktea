@@ -18,4 +18,8 @@ data class Emoji(
 ): Serializable{
 
     constructor(name: String) : this(null, name, null, null, null, null, null, null)
+
+    fun getLoadUrl(): String? {
+        return cachePath ?: url ?: uri
+    }
 }
