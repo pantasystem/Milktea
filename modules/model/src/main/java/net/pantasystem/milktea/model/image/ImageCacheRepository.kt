@@ -5,4 +5,6 @@ interface ImageCacheRepository {
     suspend fun findBySourceUrl(url: String): ImageCache?
     suspend fun deleteExpiredCaches()
     suspend fun clear()
+
+    suspend fun findBySourceUrls(urls: List<String>): List<ImageCache>
 }

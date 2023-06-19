@@ -1,9 +1,11 @@
 package net.pantasystem.milktea.data.infrastructure.image
 
 import android.content.Context
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
+import io.objectbox.kotlin.inValues
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -28,6 +30,7 @@ class ImageCacheRepositoryImpl @Inject constructor(
     companion object {
         const val cacheDir = "milktea_image_caches"
         val cacheExpireDuration = 7.days
+        val cacheIgnoreUpdateDuration = 3.days
     }
 
     private val imageCacheStore by lazy {
@@ -35,6 +38,12 @@ class ImageCacheRepositoryImpl @Inject constructor(
     }
 
     override suspend fun save(url: String): ImageCache {
+        when(val cache = findBySourceUrl(url)) {
+            null -> Unit
+            else -> if (cache.cachedAt + cacheIgnoreUpdateDuration > Clock.System.now()) {
+                return cache
+            }
+        }
         return withContext(coroutineDispatcher) {
             val req = Request.Builder().url(url).build()
             okHttpClientProvider.get().newCall(req)
@@ -106,6 +115,27 @@ class ImageCacheRepositoryImpl @Inject constructor(
         withContext(coroutineDispatcher) {
             imageCacheStore.removeAll()
             File(context.cacheDir, cacheDir).deleteRecursively()
+        }
+    }
+
+    override suspend fun findBySourceUrls(urls: List<String>): List<ImageCache> {
+        return withContext(coroutineDispatcher) {
+            val now = Clock.System.now()
+            val records = imageCacheStore.query().inValues(
+                ImageCacheRecord_.sourceUrl,
+                urls.toTypedArray(),
+                QueryBuilder.StringOrder.CASE_SENSITIVE
+            ).build().find()
+            records.mapNotNull { record ->
+                val model = record.toModel()
+                if (now - model.cachedAt > cacheExpireDuration) {
+                    null
+                } else {
+                    model
+                }
+            }
+        }.also {
+            Log.d("ImageCacheRepository", "findBySourceUrls: ${it.size}")
         }
     }
 }

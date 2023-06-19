@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.delay
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -43,18 +44,21 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             val hosts = accountRepository.findAll().getOrThrow().map {
                 it.getHost()
             }.distinct()
-            val emojis = hosts.mapNotNull {
+            hosts.mapNotNull {
                 customEmojiRepository.findBy(it).getOrNull()
-            }.flatten()
-            emojis.mapNotNull { emoji ->
-                (emoji.url ?: emoji.uri)?.let {
-                    runCancellableCatching {
-                        imageCacheRepository.save(it)
-                    }.onFailure {
-                        logger.error("Failed to cache emoji image: ${emoji.url ?: emoji.uri}", it)
-                    }.getOrNull()
+            }.map { emojis ->
+                emojis.mapNotNull { emoji ->
+                    (emoji.url ?: emoji.uri)?.let {
+                        runCancellableCatching {
+                            imageCacheRepository.save(it)
+                        }.onFailure {
+                            logger.error("Failed to cache emoji image: ${emoji.url ?: emoji.uri}", it)
+                        }.getOrNull()
+                    }
                 }
+                delay(1000)
             }
+
             return Result.success()
         } catch (e: Exception) {
             logger.error("Failed to cache custom emoji images", e)

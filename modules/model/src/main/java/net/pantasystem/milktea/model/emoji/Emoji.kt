@@ -14,6 +14,7 @@ data class Emoji(
     @SerialName("category") val category: String? = null,
     @SerialName("aliases") val aliases: List<String>? = null,
     @kotlinx.serialization.Transient val aspectRatio: Float? = null,
+    @kotlinx.serialization.Transient val cachePath: String? = null,
 ): Serializable{
 
     constructor(name: String) : this(null, name, null, null, null, null, null, null)

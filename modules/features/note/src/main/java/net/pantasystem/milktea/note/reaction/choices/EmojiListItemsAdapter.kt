@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.note.reaction.choices
 
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -75,8 +76,9 @@ class EmojiListItemsAdapter(
                             )
                         )
                     }
+                    Log.d("EmojiListAdapter", "source:${item.emoji.cachePath ?: item.emoji.url ?: item.emoji.uri}")
                     GlideApp.with(binding.reactionImagePreview)
-                        .load(item.emoji.url ?: item.emoji.uri)
+                        .load(item.emoji.cachePath ?: item.emoji.url ?: item.emoji.uri)
                         // FIXME: webpの場合うまく表示できなくなる
 //                    .centerCrop()
                         .addListener(
