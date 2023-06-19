@@ -26,6 +26,11 @@ class NoteDTOEntityConverterTest {
                 onBlocking {
                     findIn(any())
                 } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
             }
         )
 

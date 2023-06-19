@@ -26,7 +26,16 @@ class UserDTOEntityConverterTest {
                     getAndConvertToMap(any())
                 } doReturn mapOf()
             },
-
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
+            }
         )
 
         val userDTO = UserDTO(
@@ -105,6 +114,16 @@ class UserDTOEntityConverterTest {
                     getAndConvertToMap(any())
                 } doReturn mapOf()
             },
+            mock() {
+                onBlocking {
+                    findIn(any())
+                } doReturn Result.success(emptyList())
+            },
+            mock() {
+                onBlocking {
+                    findBySourceUrls(any())
+                } doReturn emptyList()
+            }
         )
 
         val userDTO = UserDTO(
