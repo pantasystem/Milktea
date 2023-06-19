@@ -51,8 +51,6 @@ class ImageCacheRepositoryImpl @Inject constructor(
             }
         }
         return withContext(coroutineDispatcher) {
-            val req = Request.Builder().url(url).build()
-            okHttpClientProvider.get().newCall(req)
             val fileName = Hash.sha256(url)
             val file = File(context.filesDir, cacheDir).apply {
                 if (!exists()) {
@@ -60,50 +58,14 @@ class ImageCacheRepositoryImpl @Inject constructor(
                 }
             }.resolve(fileName)
 
-            file.outputStream().use { out ->
+            downloadAndSaveFile(url, file)
 
-                okHttpClientProvider.get().newCall(req).execute().body?.byteStream()
-                    ?.use { inStream ->
-                        inStream.copyTo(out)
-                    }
-                // bitmap
-                val options = BitmapFactory.Options()
-                options.inJustDecodeBounds = true
-                BitmapFactory.decodeFile(
-                    File(
-                        context.filesDir,
-                        cacheDir
-                    ).resolve(fileName).absolutePath, options
-                )
-                val aspectRatio = options.outWidth.toFloat() / options.outHeight.toFloat()
-                customEmojiAspectRatioDataSource.save(
-                    CustomEmojiAspectRatio(
-                        uri = url,
-                        aspectRatio = aspectRatio,
-                    )
-                )
-            }
             val cache = ImageCache(
                 sourceUrl = url,
                 cachePath = File(context.filesDir, cacheDir).resolve(fileName).absolutePath,
                 cachedAt = Clock.System.now()
             )
-            val record = ImageCacheRecord.from(
-                cache
-            )
-            boxStore.awaitCallInTx {
-                val existsRecord = imageCacheStore.query().equal(
-                    ImageCacheRecord_.sourceUrl,
-                    url,
-                    QueryBuilder.StringOrder.CASE_SENSITIVE
-                ).build().findFirst()
-                if (existsRecord == null) {
-                    imageCacheStore.put(record)
-                } else {
-                    existsRecord.applyModel(record.toModel())
-                    imageCacheStore.put(existsRecord)
-                }
-            }
+            upInsert(cache)
             return@withContext cache
         }
     }
@@ -159,6 +121,50 @@ class ImageCacheRepositoryImpl @Inject constructor(
                     model
                 }
             }
+        }
+    }
+
+    private suspend fun upInsert(cache: ImageCache) {
+        val record = ImageCacheRecord.from(
+            cache
+        )
+        boxStore.awaitCallInTx {
+            val existsRecord = imageCacheStore.query().equal(
+                ImageCacheRecord_.sourceUrl,
+                cache.sourceUrl,
+                QueryBuilder.StringOrder.CASE_SENSITIVE
+            ).build().findFirst()
+            if (existsRecord == null) {
+                imageCacheStore.put(record)
+            } else {
+                existsRecord.applyModel(record.toModel())
+                imageCacheStore.put(existsRecord)
+            }
+        }
+    }
+
+    private suspend fun downloadAndSaveFile(url: String, file: File) {
+        file.outputStream().use { out ->
+            val req = Request.Builder().url(url).build()
+            okHttpClientProvider.get().newCall(req).execute().body?.byteStream()
+                ?.use { inStream ->
+                    inStream.copyTo(out)
+                }
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            val bitmap = BitmapFactory.decodeFile(
+                file.absolutePath, options
+            )
+            if (bitmap != null) {
+                val aspectRatio = options.outWidth.toFloat() / options.outHeight.toFloat()
+                customEmojiAspectRatioDataSource.save(
+                    CustomEmojiAspectRatio(
+                        uri = url,
+                        aspectRatio = aspectRatio,
+                    )
+                )
+            }
+
         }
     }
 }
