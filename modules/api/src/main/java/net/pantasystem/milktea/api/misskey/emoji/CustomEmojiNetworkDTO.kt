@@ -16,7 +16,7 @@ data class CustomEmojiNetworkDTO(
     @SerialName("width") val width: Int? = null,
     @SerialName("height") val height: Int? = null,
 ) {
-    fun toModel(aspectRatio: Float? = null): Emoji {
+    fun toModel(aspectRatio: Float? = null, cachePath: String? = null): Emoji {
         return Emoji(
             id = id,
             name = name,
@@ -26,7 +26,8 @@ data class CustomEmojiNetworkDTO(
             type = type,
             category = category,
             aliases = aliases,
-            aspectRatio = aspectRatio ?: if (width == null || height == null || height <= 0) null else width.toFloat() / height
+            aspectRatio = aspectRatio ?: if (width == null || height == null || height <= 0) null else width.toFloat() / height,
+            cachePath = cachePath,
         )
     }
 }

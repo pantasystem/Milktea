@@ -28,12 +28,13 @@ data class TootEmojiDTO(
     val height: Int? = null,
 ) {
 
-    fun toEmoji(): Emoji {
+    fun toEmoji(cachePath: String? = null): Emoji {
         return Emoji(
             name = shortcode,
             url = url,
             category = category,
-            aspectRatio = if (width == null || height == null) null else (width.toFloat() / height)
+            aspectRatio = if (width == null || height == null) null else (width.toFloat() / height),
+            cachePath = cachePath,
         )
     }
 }

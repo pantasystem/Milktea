@@ -5,6 +5,7 @@ import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.data.infrastructure.toPoll
 import net.pantasystem.milktea.model.account.Account
 import net.pantasystem.milktea.model.drive.FileProperty
+import net.pantasystem.milktea.model.image.ImageCacheRepository
 import net.pantasystem.milktea.model.instance.MastodonInstanceInfoRepository
 import net.pantasystem.milktea.model.nodeinfo.NodeInfo
 import net.pantasystem.milktea.model.nodeinfo.NodeInfoRepository
@@ -18,6 +19,7 @@ import javax.inject.Singleton
 class TootDTOEntityConverter @Inject constructor(
     private val instanceInfoRepository: MastodonInstanceInfoRepository,
     private val nodeInfoRepository: NodeInfoRepository,
+    private val imageCacheRepository: ImageCacheRepository,
     private val loggerFactory: Logger.Factory,
 ) {
 
@@ -34,6 +36,15 @@ class TootDTOEntityConverter @Inject constructor(
             }
             .getOrNull()?.isReactionAvailable
             ?: false) || nodeInfo?.type is NodeInfo.SoftwareType.Mastodon.Fedibird
+
+        val urls = (statusDTO.emojiReactions?.mapNotNull {
+            it.url
+        }?: emptyList()) + (statusDTO.emojiReactions?.mapNotNull {
+            it.url
+        }?: emptyList())
+        val imageCaches = imageCacheRepository.findBySourceUrls(urls).associateBy {
+            it.sourceUrl
+        }
         return with(statusDTO) {
             Note(
                 id = Note.Id(account.accountId, id),
@@ -53,9 +64,9 @@ class TootDTOEntityConverter @Inject constructor(
                 ),
                 localOnly = null,
                 emojis = emojis.map {
-                    it.toEmoji()
+                    it.toEmoji(imageCaches[it.url]?.cachePath)
                 } + (emojiReactions?.mapNotNull {
-                    it.getEmoji()
+                    it.getEmoji(imageCaches[it.url]?.cachePath)
                 } ?: emptyList()),
                 app = null,
                 reactionCounts = emojiReactions?.map {
