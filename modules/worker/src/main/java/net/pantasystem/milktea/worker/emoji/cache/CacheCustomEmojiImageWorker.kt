@@ -5,7 +5,9 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.model.account.AccountRepository
@@ -21,7 +23,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
     private val loggerFactory: Logger.Factory,
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-) : CoroutineWorker(context, params){
+) : CoroutineWorker(context, params) {
 
     companion object {
         fun createPeriodicWorkRequest(): PeriodicWorkRequest {
@@ -44,20 +46,30 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
             val hosts = accountRepository.findAll().getOrThrow().map {
                 it.getHost()
             }.distinct()
-            hosts.mapNotNull {
-                customEmojiRepository.findBy(it).getOrNull()
-            }.map { emojis ->
-                emojis.mapNotNull { emoji ->
-                    (emoji.url ?: emoji.uri)?.let {
-                        runCancellableCatching {
-                            imageCacheRepository.save(it)
-                        }.onFailure {
-                            logger.error("Failed to cache emoji image: ${emoji.url ?: emoji.uri}", it)
-                        }.getOrNull()
+            coroutineScope {
+                hosts.mapNotNull {
+                    customEmojiRepository.findBy(it).getOrNull()
+                }.map { emojis ->
+                    launch {
+                        emojis.chunked(if (emojis.isEmpty()) 0 else ( emojis.size / 4)).forEach { emojis ->
+                            emojis.mapNotNull { emoji ->
+                                (emoji.url ?: emoji.uri)?.let {
+                                    runCancellableCatching {
+                                        imageCacheRepository.save(it)
+                                    }.onFailure {
+                                        logger.error(
+                                            "Failed to cache emoji image: ${emoji.url ?: emoji.uri}",
+                                            it
+                                        )
+                                    }.getOrNull()
+                                }
+                            }
+                        }
                     }
+                    delay(1000)
                 }
-                delay(1000)
             }
+
 
             return Result.success()
         } catch (e: Exception) {
