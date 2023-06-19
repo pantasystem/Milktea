@@ -1,7 +1,6 @@
 package net.pantasystem.milktea.data.infrastructure.image
 
 import android.content.Context
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
@@ -134,8 +133,6 @@ class ImageCacheRepositoryImpl @Inject constructor(
                     model
                 }
             }
-        }.also {
-            Log.d("ImageCacheRepository", "findBySourceUrls: ${it.size}")
         }
     }
 }
