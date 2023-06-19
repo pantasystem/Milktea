@@ -49,7 +49,7 @@ class EmojiChoicesAdapter(
         when(item) {
             is EmojiType.CustomEmoji -> {
                 GlideApp.with(holder.binding.reactionImagePreview)
-                    .load(item.emoji.url ?: item.emoji.uri)
+                    .load(item.emoji.getLoadUrl())
                         // FIXME: webpの場合うまく表示できなくなる
 //                    .centerCrop()
                     .override(60)

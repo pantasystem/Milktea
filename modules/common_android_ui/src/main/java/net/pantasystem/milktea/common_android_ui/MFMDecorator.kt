@@ -321,7 +321,7 @@ object MFMDecorator {
                     else -> height * aspectRatio
                 }
                 GlideApp.with(textView)
-                    .load(emojiElement.emoji.url)
+                    .load(emojiElement.emoji.getLoadUrl())
                     .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
                     .into(emojiSpan.target)
             }
