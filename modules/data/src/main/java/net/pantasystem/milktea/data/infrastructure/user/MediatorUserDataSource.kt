@@ -122,6 +122,7 @@ class MediatorUserDataSource @Inject constructor(
                             uri = it.uri,
                             url = it.url,
                             aspectRatio = it.aspectRatio,
+                            cachePath = it.cachePath
                         )
                     }
                 )

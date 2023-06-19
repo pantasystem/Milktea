@@ -286,6 +286,9 @@ data class UserEmojiRecord(
     @ColumnInfo(name = "aspectRatio")
     val aspectRatio: Float? = null,
 
+    @ColumnInfo(name = "cachePath")
+    val cachePath: String? = null,
+
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
@@ -295,6 +298,7 @@ data class UserEmojiRecord(
             url = url,
             uri = uri,
             aspectRatio = aspectRatio,
+            cachePath = cachePath,
         )
     }
 
@@ -302,7 +306,8 @@ data class UserEmojiRecord(
         return name == model.name &&
             url == model.url &&
             uri == model.uri &&
-            aspectRatio == model.aspectRatio
+            aspectRatio == model.aspectRatio &&
+            cachePath == model.cachePath
     }
 }
 
