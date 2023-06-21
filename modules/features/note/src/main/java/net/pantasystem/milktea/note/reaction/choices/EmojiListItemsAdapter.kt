@@ -75,7 +75,7 @@ class EmojiListItemsAdapter(
                             )
                         )
                     }
-                    GlideApp.with(binding.reactionImagePreview)
+                    GlideApp.with(binding.reactionImagePreview.context)
                         .load(item.emoji.getLoadUrl())
                         // FIXME: webpの場合うまく表示できなくなる
 //                    .centerCrop()

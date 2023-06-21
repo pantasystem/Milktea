@@ -101,6 +101,7 @@ class TimelineListAdapter(
 
         fun unbind() {
             job?.cancel()
+            reactionCountsView.itemAnimator?.endAnimations()
 
             mCurrentNote = null
         }
@@ -121,6 +122,7 @@ class TimelineListAdapter(
             reactionCountAdapter.submitList(reactionList)
             job = note.reactionCountsViewData.onEach { counts ->
                 if(reactionCountAdapter.note?.id == mCurrentNote?.id) {
+                    reactionCountsView.itemAnimator?.endAnimations()
                     bindReactionCountVisibility(counts)
                     reactionCountAdapter.submitList(counts)
                 }
@@ -324,6 +326,7 @@ class TimelineListAdapter(
             simpleNote.subNoteMediaPreview.thumbnailBottomRight,
 
         )
+        simpleNote.reactionView.itemAnimator?.endAnimations()
 
         imageViews.map {
             Glide.with(simpleNote.avatarIcon).clear(it)
