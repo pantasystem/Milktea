@@ -2,6 +2,7 @@ package net.pantasystem.milktea.data.infrastructure.emoji.objectbox
 
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
+import io.objectbox.annotation.Index
 import net.pantasystem.milktea.model.emoji.Emoji
 
 @Entity
@@ -9,9 +10,9 @@ data class CustomEmojiRecord(
     @Id var id: Long = 0L,
     var serverId: String? = null,
 
-    var name: String = "",
+    @Index var name: String = "",
 
-    var emojiHost: String = "",
+    @Index var emojiHost: String = "",
 
     var url: String? = null,
 
