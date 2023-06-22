@@ -3,12 +3,18 @@ package net.pantasystem.milktea.data.infrastructure.emoji
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import net.pantasystem.milktea.common.runCancellableCatching
 import net.pantasystem.milktea.common_android.hilt.IODispatcher
 import net.pantasystem.milktea.data.infrastructure.emoji.db.CustomEmojiDAO
 import net.pantasystem.milktea.data.infrastructure.emoji.delegate.CustomEmojiUpInsertDelegate
+import net.pantasystem.milktea.data.infrastructure.emoji.objectbox.ObjectBoxCustomEmojiRecordDAO
 import net.pantasystem.milktea.model.emoji.CustomEmojiAspectRatioDataSource
 import net.pantasystem.milktea.model.emoji.CustomEmojiRepository
 import net.pantasystem.milktea.model.emoji.Emoji
@@ -25,6 +31,7 @@ internal class CustomEmojiRepositoryImpl @Inject constructor(
     private val upInsert: CustomEmojiUpInsertDelegate,
     private val aspectRatioDataSource: CustomEmojiAspectRatioDataSource,
     private val imageCacheRepository: ImageCacheRepository,
+    private val objectBoxCustomEmojiDao: ObjectBoxCustomEmojiRecordDAO,
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CustomEmojiRepository {
 
