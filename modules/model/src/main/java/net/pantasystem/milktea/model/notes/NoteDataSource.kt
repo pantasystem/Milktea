@@ -94,5 +94,5 @@ interface NoteDataSource {
 
     fun observeNoteThreadContext(noteId: Note.Id): Flow<NoteThreadContext?>
 
-
+    suspend fun findLocalCount(): Result<Long>
 }

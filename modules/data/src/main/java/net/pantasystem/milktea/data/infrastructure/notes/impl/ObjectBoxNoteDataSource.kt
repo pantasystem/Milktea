@@ -296,6 +296,12 @@ class ObjectBoxNoteDataSource @Inject constructor(
         }
     }
 
+    override suspend fun findLocalCount(): Result<Long> = runCancellableCatching {
+        withContext(coroutineDispatcher) {
+            noteBox.count()
+        }
+    }
+
     private fun publish(ev: NoteDataSource.Event) = runBlocking {
         listenersLock.withLock {
             listeners.forEach {
