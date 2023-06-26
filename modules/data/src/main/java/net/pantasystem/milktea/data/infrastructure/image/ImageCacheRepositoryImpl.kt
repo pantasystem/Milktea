@@ -1,7 +1,9 @@
 package net.pantasystem.milktea.data.infrastructure.image
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
@@ -58,6 +60,10 @@ class ImageCacheRepositoryImpl @Inject constructor(
                 }
             }.resolve(fileName)
 
+            context.contentResolver.takePersistableUriPermission(
+                Uri.fromFile(file),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
             downloadAndSaveFile(url, file)
 
             val cache = ImageCache(

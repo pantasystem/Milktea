@@ -2,7 +2,12 @@ package net.pantasystem.milktea.worker.emoji.cache
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
@@ -31,7 +36,7 @@ class CacheCustomEmojiImageWorker @AssistedInject constructor(
                 .setRequiredNetworkType(NetworkType.UNMETERED) // Wi-Fi (or Ethernet etc) required
                 .build()
 
-            return PeriodicWorkRequestBuilder<CacheCustomEmojiImageWorker>(3, TimeUnit.DAYS)
+            return PeriodicWorkRequestBuilder<CacheCustomEmojiImageWorker>(1, TimeUnit.DAYS)
                 .setConstraints(constraints)
                 .build()
         }

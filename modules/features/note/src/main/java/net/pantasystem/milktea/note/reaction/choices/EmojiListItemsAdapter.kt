@@ -85,6 +85,7 @@ class EmojiListItemsAdapter(
                                 binding.root.context
                             )
                         )
+
                         .into(binding.reactionImagePreview)
 
                     binding.reactionStringPreview.setMemoVisibility(View.GONE)
