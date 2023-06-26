@@ -7,7 +7,6 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.objectbox.BoxStore
 import io.objectbox.kotlin.awaitCallInTx
-import io.objectbox.kotlin.inValues
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -35,7 +34,7 @@ class ImageCacheRepositoryImpl @Inject constructor(
 
     companion object {
         const val cacheDir = "milktea_image_caches"
-        val cacheExpireDuration = 7.days
+//        val cacheExpireDuration = 7.days
         val cacheIgnoreUpdateDuration = 3.days
     }
 
@@ -77,21 +76,22 @@ class ImageCacheRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findBySourceUrl(url: String): ImageCache? {
-        return withContext(coroutineDispatcher) {
-            val now = Clock.System.now()
-            val record = imageCacheStore.query().equal(
-                ImageCacheRecord_.sourceUrl,
-                url,
-                QueryBuilder.StringOrder.CASE_SENSITIVE
-            ).build().findFirst()
-            val model = record?.toModel()
-            if (model != null && now - model.cachedAt > cacheExpireDuration) {
-                imageCacheStore.remove(record)
-                null
-            } else {
-                model
-            }
-        }
+//        return withContext(coroutineDispatcher) {
+//            val now = Clock.System.now()
+//            val record = imageCacheStore.query().equal(
+//                ImageCacheRecord_.sourceUrl,
+//                url,
+//                QueryBuilder.StringOrder.CASE_SENSITIVE
+//            ).build().findFirst()
+//            val model = record?.toModel()
+//            if (model != null && now - model.cachedAt > cacheExpireDuration) {
+//                imageCacheStore.remove(record)
+//                null
+//            } else {
+//                model
+//            }
+//        }
+        return null
     }
 
     override suspend fun deleteExpiredCaches() {
@@ -112,22 +112,23 @@ class ImageCacheRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findBySourceUrls(urls: List<String>): List<ImageCache> {
-        return withContext(coroutineDispatcher) {
-            val now = Clock.System.now()
-            val records = imageCacheStore.query().inValues(
-                ImageCacheRecord_.sourceUrl,
-                urls.toTypedArray(),
-                QueryBuilder.StringOrder.CASE_SENSITIVE
-            ).build().find()
-            records.mapNotNull { record ->
-                val model = record.toModel()
-                if (now - model.cachedAt > cacheExpireDuration) {
-                    null
-                } else {
-                    model
-                }
-            }
-        }
+//        return withContext(coroutineDispatcher) {
+//            val now = Clock.System.now()
+//            val records = imageCacheStore.query().inValues(
+//                ImageCacheRecord_.sourceUrl,
+//                urls.toTypedArray(),
+//                QueryBuilder.StringOrder.CASE_SENSITIVE
+//            ).build().find()
+//            records.mapNotNull { record ->
+//                val model = record.toModel()
+//                if (now - model.cachedAt > cacheExpireDuration) {
+//                    null
+//                } else {
+//                    model
+//                }
+//            }
+//        }
+        return emptyList()
     }
 
     private suspend fun upInsert(cache: ImageCache) {
