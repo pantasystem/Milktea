@@ -75,28 +75,38 @@ class EmojiListItemsAdapter(
                             )
                         )
                     }
-                    GlideApp.with(binding.reactionImagePreview.context)
-                        .load(item.emoji.cachePath)
-                        // FIXME: webpの場合うまく表示できなくなる
-//                    .centerCrop()
-                        .addListener(
-                            SaveImageAspectRequestListener(
-                                item.emoji,
-                                binding.root.context
-                            )
-                        )
-                        .error(
-                            GlideApp.with(binding.reactionImagePreview.context)
-                                .load(item.emoji.url ?: item.emoji.uri)
-                                .addListener(
-                                    SaveImageAspectRequestListener(
-                                        item.emoji,
-                                        binding.root.context
-                                    )
+                    if (item.emoji.cachePath == null) {
+                        GlideApp.with(binding.reactionImagePreview.context)
+                            .load(item.emoji.url ?: item.emoji.uri)
+                            .addListener(
+                                SaveImageAspectRequestListener(
+                                    item.emoji,
+                                    binding.root.context
                                 )
-                        )
+                            )
+                            .into(binding.reactionImagePreview)
+                    } else {
+                        GlideApp.with(binding.reactionImagePreview.context)
+                            .load(item.emoji.cachePath)
+                            .addListener(
+                                SaveImageAspectRequestListener(
+                                    item.emoji,
+                                    binding.root.context
+                                )
+                            )
+                            .error(
+                                GlideApp.with(binding.reactionImagePreview.context)
+                                    .load(item.emoji.url ?: item.emoji.uri)
+                                    .addListener(
+                                        SaveImageAspectRequestListener(
+                                            item.emoji,
+                                            binding.root.context
+                                        )
+                                    )
+                            )
+                            .into(binding.reactionImagePreview)
 
-                        .into(binding.reactionImagePreview)
+                    }
 
                     binding.reactionStringPreview.setMemoVisibility(View.GONE)
                     binding.reactionImagePreview.setMemoVisibility(View.VISIBLE)

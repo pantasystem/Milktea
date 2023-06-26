@@ -57,17 +57,26 @@ object NoteReactionViewHelper {
             )
 
 
-            GlideApp.with(reactionImageTypeView.context)
-                .load(emoji.cachePath)
-                .error(
-                    GlideApp.with(reactionImageTypeView.context)
-                        .load(emoji.url ?: emoji.uri)
-                        .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
-                        .addListener(SaveImageAspectRequestListener(emoji, context))
-                )
-                .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
-                .addListener(SaveImageAspectRequestListener(emoji, context))
-                .into(reactionImageTypeView)
+            if (emoji.cachePath == null) {
+                GlideApp.with(reactionImageTypeView.context)
+                    .load(emoji.url ?: emoji.uri)
+                    .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                    .addListener(SaveImageAspectRequestListener(emoji, context))
+                    .into(reactionImageTypeView)
+            } else {
+                GlideApp.with(reactionImageTypeView.context)
+                    .load(emoji.cachePath)
+                    .error(
+                        GlideApp.with(reactionImageTypeView.context)
+                            .load(emoji.url ?: emoji.uri)
+                            .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                            .addListener(SaveImageAspectRequestListener(emoji, context))
+                    )
+                    .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                    .addListener(SaveImageAspectRequestListener(emoji, context))
+                    .into(reactionImageTypeView)
+            }
+
         }
     }
 
