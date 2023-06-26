@@ -141,12 +141,6 @@ class MiApplication : Application(), Configuration.Provider {
             }
         }
 
-        applicationScope.launch {
-            noteDataSource.clear().onFailure {
-                logger.error("NoteDataSourceの初期化に失敗", it)
-            }
-        }
-
         FirebaseAnalytics.getInstance(this).setUserId(
             clientIdRepository.getOrCreate().clientId
         )

@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.Modifier
@@ -180,6 +184,20 @@ class SettingsActivity : AppCompatActivity() {
                             }
                         ) {
                             Text(stringResource(id = R.string.settings_about_milktea))
+                        }
+
+                        SettingListTileLayout(
+                            verticalPadding = 12.dp,
+                            onClick = {
+                                startActivity(
+                                    Intent(
+                                        this@SettingsActivity,
+                                        CacheSettingActivity::class.java
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.settings_cache_config))
                         }
 
                         SettingListTileLayout(

@@ -602,4 +602,7 @@
     <string name="remember_scroll_position">Remember scroll position</string>
     <string name="post_only">Post only</string>
     <string name="settings_display_timestamps_as_absolute_dates">Display timestamps as absolute dates</string>
+    <string name="settings_cache_config">Cache settings</string>
+    <string name="settings_note_cache">Note cache</string>
+    <string name="settings_custom_emoji_cache">Custom emoji cache</string>
 </resources>
