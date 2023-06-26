@@ -6,16 +6,36 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
-import android.text.*
-import android.text.style.*
+import android.text.Layout
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.style.AlignmentSpan
+import android.text.style.BackgroundColorSpan
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.QuoteSpan
+import android.text.style.RelativeSizeSpan
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.internal.managers.FragmentComponentManager
-import jp.panta.misskeyandroidclient.mfm.*
+import jp.panta.misskeyandroidclient.mfm.EmojiElement
+import jp.panta.misskeyandroidclient.mfm.HashTag
+import jp.panta.misskeyandroidclient.mfm.Mention
+import jp.panta.misskeyandroidclient.mfm.Node
+import jp.panta.misskeyandroidclient.mfm.Search
+import jp.panta.misskeyandroidclient.mfm.Text
 import net.pantasystem.milktea.common.glide.GlideApp
-import net.pantasystem.milktea.common_android.mfm.*
+import net.pantasystem.milktea.common_android.mfm.Element
+import net.pantasystem.milktea.common_android.mfm.ElementType
+import net.pantasystem.milktea.common_android.mfm.Leaf
+import net.pantasystem.milktea.common_android.mfm.Link
+import net.pantasystem.milktea.common_android.mfm.Root
 import net.pantasystem.milktea.common_android.ui.Activities
 import net.pantasystem.milktea.common_android.ui.putActivity
 import net.pantasystem.milktea.common_android.ui.text.DrawableEmojiSpan
@@ -321,7 +341,12 @@ object MFMDecorator {
                     else -> height * aspectRatio
                 }
                 GlideApp.with(textView)
-                    .load(emojiElement.emoji.getLoadUrl())
+                    .load(emojiElement.emoji.cachePath)
+                    .error(
+                        GlideApp.with(textView)
+                            .load(emojiElement.emoji.url ?: emojiElement.emoji.uri)
+                            .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
+                    )
                     .override((width * customEmojiScale).toInt(), (height * customEmojiScale).toInt())
                     .into(emojiSpan.target)
             }

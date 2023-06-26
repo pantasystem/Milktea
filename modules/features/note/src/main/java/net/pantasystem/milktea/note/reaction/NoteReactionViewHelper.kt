@@ -58,7 +58,13 @@ object NoteReactionViewHelper {
 
 
             GlideApp.with(reactionImageTypeView.context)
-                .load(emoji.getLoadUrl())
+                .load(emoji.cachePath)
+                .error(
+                    GlideApp.with(reactionImageTypeView.context)
+                        .load(emoji.url ?: emoji.uri)
+                        .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
+                        .addListener(SaveImageAspectRequestListener(emoji, context))
+                )
                 .override(imageViewWidthPx.toInt(), imageViewHeightPx.toInt())
                 .addListener(SaveImageAspectRequestListener(emoji, context))
                 .into(reactionImageTypeView)
@@ -98,6 +104,10 @@ object NoteReactionViewHelper {
 
             GlideApp.with(reactionImageTypeView.context)
                 .load(emoji.getLoadUrl())
+                .error(
+                    GlideApp.with(reactionImageTypeView.context)
+                        .load(emoji.url ?: emoji.uri)
+                )
                 .into(reactionImageTypeView)
         }
 
