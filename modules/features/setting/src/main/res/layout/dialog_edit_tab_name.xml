@@ -13,7 +13,7 @@
                 android:textSize="24sp"
                 android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginBottom="8dp"
-                android:text="@string/edit_tab_name"
+                android:text="@string/edit_tab"
                 />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
@@ -41,7 +41,7 @@
                     android:id="@+id/editTabName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/edit_tab_name"
+                    android:hint="@string/edit_tab"
                     android:singleLine="true"/>
         </com.google.android.material.textfield.TextInputLayout>
 

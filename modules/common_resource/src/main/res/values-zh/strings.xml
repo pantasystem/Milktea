@@ -237,7 +237,7 @@
 
     <string name="update_timeline_in_background">在后台更新时间线</string>
 
-    <string name="edit_tab_name">编辑选项卡名称</string>
+    <string name="edit_tab">编辑选项卡名称</string>
 
     <string name="follow_request_accepted_by">关注请求已被 %s 接受</string>
     <string name="confirm_deletion">确认删除</string>

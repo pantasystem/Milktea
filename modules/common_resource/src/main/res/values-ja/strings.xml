@@ -239,7 +239,7 @@
     <string name="edit">編集</string>
     <string name="delete">削除</string>
 
-    <string name="edit_tab_name">タブ名を編集</string>
+    <string name="edit_tab">タブを編集</string>
     <string name="update_timeline_in_background">タイムラインをバックグラウンドで更新する(消費電力大)</string>
 
     <string name="follow_request_accepted_by">%sさんにフォローリクエストが承認されました</string>
