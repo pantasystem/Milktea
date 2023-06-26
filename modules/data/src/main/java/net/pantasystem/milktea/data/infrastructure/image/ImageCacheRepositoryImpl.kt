@@ -146,9 +146,14 @@ class ImageCacheRepositoryImpl @Inject constructor(
     private suspend fun downloadAndSaveFile(url: String, file: File) {
         file.outputStream().use { out ->
             val req = Request.Builder().url(url).build()
-            okHttpClientProvider.get().newCall(req).execute().body?.byteStream()
+            val response = okHttpClientProvider.get().newCall(req).execute()
+            val contentLength = response.header("Content-Length")?.toLongOrNull()
+            response.body?.byteStream()
                 ?.use { inStream ->
-                    inStream.copyTo(out)
+                    val bytesCopied = inStream.copyTo(out)
+                    if (contentLength != null && bytesCopied != contentLength) {
+                        throw Exception("Download failed: url=$url")
+                    }
                 }
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
