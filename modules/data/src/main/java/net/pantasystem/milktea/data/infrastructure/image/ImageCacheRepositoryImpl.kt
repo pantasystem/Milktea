@@ -172,4 +172,17 @@ class ImageCacheRepositoryImpl @Inject constructor(
 
         }
     }
+
+    override suspend fun findCachedFileCount(reality: Boolean): Long {
+        return if (reality) {
+            val dir = File(context.filesDir, cacheDir).apply {
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+            dir.listFiles()?.size?.toLong() ?: 0L
+        } else {
+            imageCacheStore.count()
+        }
+    }
 }

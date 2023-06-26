@@ -7,4 +7,6 @@ interface ImageCacheRepository {
     suspend fun clear()
 
     suspend fun findBySourceUrls(urls: List<String>): List<ImageCache>
+
+    suspend fun findCachedFileCount(reality: Boolean = false): Long
 }
