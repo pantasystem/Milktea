@@ -106,7 +106,6 @@ class TimelineListAdapter(
             mCurrentNote = null
         }
 
-        @Suppress("ObjectLiteralToLambda")
         private fun bindReactionCounter() {
             val reactionCountAdapter = ReactionCountAdapter {
                 noteCardActionListenerAdapter.onReactionCountAction(it)
@@ -115,7 +114,7 @@ class TimelineListAdapter(
             reactionCountAdapter.note = note
 
             val reactionList = note.reactionCountsViewData.value
-
+            reactionCountsView.itemAnimator = null
             reactionCountsView.layoutManager = getLayoutManager()
             reactionCountsView.adapter = reactionCountAdapter
             reactionCountsView.isNestedScrollingEnabled = false
