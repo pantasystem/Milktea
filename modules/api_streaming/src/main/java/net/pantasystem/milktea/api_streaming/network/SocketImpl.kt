@@ -21,7 +21,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
-    var isRequirePingPong: Boolean,
+    var isRequirePingPong: () -> Boolean,
     loggerFactory: Logger.Factory,
     okHttpClientProvider: OkHttpClientProvider,
 ) : Socket {
@@ -312,7 +312,7 @@ class SocketImpl(
             synchronized(this@SocketImpl) {
                 pollingJob.cancel()
                 pollingJob = PollingJob(this@SocketImpl).also {
-                    if (isRequirePingPong) {
+                    if (isRequirePingPong()) {
                         it.startPolling(4000, 900, 12000)
                     }
                 }

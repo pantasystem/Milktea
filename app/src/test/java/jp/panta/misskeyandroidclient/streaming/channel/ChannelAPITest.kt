@@ -26,7 +26,7 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val socket =
-            SocketImpl(wssURL, true, logger, DefaultOkHttpClientProvider())
+            SocketImpl(wssURL, {false}, logger, DefaultOkHttpClientProvider())
         socket.blockingConnect()
 
         var count = 0
@@ -51,7 +51,7 @@ class ChannelAPITest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val socket =
-            SocketImpl(wssURL, true, logger, DefaultOkHttpClientProvider())
+            SocketImpl(wssURL, {false}, logger, DefaultOkHttpClientProvider())
         val channelAPI = ChannelAPI(socket, logger)
         runBlocking {
 

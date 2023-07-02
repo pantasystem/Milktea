@@ -42,16 +42,12 @@ class SocketWithAccountProviderImpl @Inject constructor(
         if (account.instanceType == Account.InstanceType.MASTODON) {
             return null
         }
-        val isRequirePingPong = nodeInfoRepository.get(account.getHost())?.let {
-            !(it.type is NodeInfo.SoftwareType.Misskey.Normal && it.type.getVersion() >= Version("13.13.2"))
-        }
         synchronized(accountIdWithSocket) {
             var socket = accountIdWithSocket[account.accountId]
             if (socket != null) {
                 // NOTE: tokenが異なる場合は再認証された可能性があるので、再生成を行う
                 if (account.token == accountIdWithToken[account.accountId]) {
                     logger.debug { "すでにインスタンス化済み" }
-                    socket.isRequirePingPong = isRequirePingPong ?: true
                     return socket
                 } else {
                     socket.destroy()
@@ -70,7 +66,11 @@ class SocketWithAccountProviderImpl @Inject constructor(
 
             socket = SocketImpl(
                 url = uri,
-                isRequirePingPong = isRequirePingPong ?: true,
+                isRequirePingPong = {
+                    nodeInfoRepository.get(account.getHost())?.let {
+                        !(it.type is NodeInfo.SoftwareType.Misskey.Normal && it.type.getVersion() >= Version("13.13.2"))
+                    } ?: true
+                },
                 okHttpClientProvider = okHttpClientProvider,
                 loggerFactory = loggerFactory,
             )
