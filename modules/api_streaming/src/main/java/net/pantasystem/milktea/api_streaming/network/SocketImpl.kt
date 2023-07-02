@@ -3,19 +3,28 @@ package net.pantasystem.milktea.api_streaming.network
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.pantasystem.milktea.api.misskey.OkHttpClientProvider
-import net.pantasystem.milktea.api_streaming.*
+import net.pantasystem.milktea.api_streaming.PollingJob
+import net.pantasystem.milktea.api_streaming.Socket
+import net.pantasystem.milktea.api_streaming.SocketMessageEventListener
+import net.pantasystem.milktea.api_streaming.SocketStateEventListener
+import net.pantasystem.milktea.api_streaming.StreamingEvent
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.runCancellableCatching
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class SocketImpl(
     val url: String,
+    var isRequirePingPong: () -> Boolean,
     loggerFactory: Logger.Factory,
-    okHttpClientProvider: OkHttpClientProvider
-    ) : Socket {
+    okHttpClientProvider: OkHttpClientProvider,
+) : Socket {
     val logger = loggerFactory.create("SocketImpl")
 
     private val okHttpClient: OkHttpClient = okHttpClientProvider
@@ -269,8 +278,6 @@ class SocketImpl(
             super.onMessage(webSocket, text)
             runCancellableCatching {
                 pollingJob.onReceive(text)
-            }.onSuccess {
-                return
             }
             val e = runCancellableCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
                 logger.error("デコードエラー msg:$text", e = t)
@@ -305,7 +312,9 @@ class SocketImpl(
             synchronized(this@SocketImpl) {
                 pollingJob.cancel()
                 pollingJob = PollingJob(this@SocketImpl).also {
-                    it.startPolling(4000, 900, 12000)
+                    if (isRequirePingPong()) {
+                        it.startPolling(4000, 900, 12000)
+                    }
                 }
                 mState = Socket.State.Connected
             }

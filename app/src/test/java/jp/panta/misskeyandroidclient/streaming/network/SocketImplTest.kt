@@ -20,7 +20,7 @@ class SocketImplTest {
     fun testBlockingConnect() {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val socket = SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
+        val socket = SocketImpl(wssURL, {false} ,logger, DefaultOkHttpClientProvider())
         runBlocking {
             socket.blockingConnect()
             assertEquals(socket.state(), Socket.State.Connected)
@@ -33,7 +33,7 @@ class SocketImplTest {
 
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
-        val socket = SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
+        val socket = SocketImpl(wssURL, {false}, logger, DefaultOkHttpClientProvider())
 
         runBlocking {
 
@@ -55,7 +55,7 @@ class SocketImplTest {
         val wssURL = "wss://misskey.io/streaming"
         val logger = TestLogger.Factory()
         val socket =
-            SocketImpl(wssURL, logger, DefaultOkHttpClientProvider())
+            SocketImpl(wssURL, {false}, logger, DefaultOkHttpClientProvider())
 
         runBlocking {
 
