@@ -1,12 +1,19 @@
 package net.pantasystem.milktea.api_streaming
 
 import android.util.Log
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Clock
 
 const val TTL_COUNT = 3
@@ -40,7 +47,7 @@ internal class PollingJob(
                 try {
                     val pong = withTimeout(timeout) {
                         pongs.first {
-                            it == "pong"
+                            it.isNotBlank()
                         }
                     }
                     val resTime = Clock.System.now()
@@ -64,11 +71,7 @@ internal class PollingJob(
     }
 
     fun onReceive(msg: String) {
-        if (msg.lowercase() == "pong") {
-            pongs.tryEmit(msg)
-        } else {
-            throw IllegalArgumentException()
-        }
+        pongs.tryEmit(msg)
     }
 
     fun cancel() {
