@@ -43,7 +43,7 @@ class SocketWithAccountProviderImpl @Inject constructor(
             return null
         }
         val isRequirePingPong = nodeInfoRepository.get(account.getHost())?.let {
-            it.type is NodeInfo.SoftwareType.Misskey.Normal && it.type.getVersion() >= Version("13.13.2")
+            !(it.type is NodeInfo.SoftwareType.Misskey.Normal && it.type.getVersion() >= Version("13.13.2"))
         }
         synchronized(accountIdWithSocket) {
             var socket = accountIdWithSocket[account.accountId]
