@@ -279,6 +279,9 @@ class SocketImpl(
             runCancellableCatching {
                 pollingJob.onReceive(text)
             }
+            if (text.lowercase() == "pong") {
+                return
+            }
             val e = runCancellableCatching { json.decodeFromString<StreamingEvent>(text) }.onFailure { t ->
                 logger.error("デコードエラー msg:$text", e = t)
             }.getOrNull() ?: return
