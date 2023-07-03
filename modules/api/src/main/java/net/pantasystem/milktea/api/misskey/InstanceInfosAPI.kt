@@ -20,6 +20,7 @@ interface InstanceInfosAPI {
         @Query("name") name: String? = null,
         @Query("limit") limit: Int? = null,
         @Query("offset") offset: Int? = null,
+        @Query("lang") lang: String? = null,
     ): Response<List<SimpleInstanceInfo>>
 }
 

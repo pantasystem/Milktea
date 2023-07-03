@@ -1,5 +1,6 @@
 package net.pantasystem.milktea.auth.suggestions
 
+import androidx.compose.ui.text.intl.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -58,6 +59,7 @@ class InstanceSuggestionsPagingModel @Inject constructor(
             instancesInfoAPIBuilder.build().getInstances(
                 offset = _offset,
                 name = _name,
+                lang = Locale.current.language,
             ).throwIfHasError().body()!!.also {
                 _offset += it.size
             }
