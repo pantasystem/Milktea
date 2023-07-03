@@ -244,7 +244,7 @@ class SimpleEditorFragment : Fragment(R.layout.fragment_simple_editor), SimpleEd
         }
 
         mBinding.showEmojisButton.setOnClickListener {
-            CustomEmojiPickerDialog().show(childFragmentManager, "Editor")
+            CustomEmojiPickerDialog.newInstance(null).show(childFragmentManager, "Editor")
         }
 
 
