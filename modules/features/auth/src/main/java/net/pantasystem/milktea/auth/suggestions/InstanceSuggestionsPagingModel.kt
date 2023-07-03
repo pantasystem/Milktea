@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.paginator.EntityConverter
 import net.pantasystem.milktea.common.paginator.PaginationState
@@ -21,11 +22,15 @@ import javax.inject.Inject
 
 class InstanceSuggestionsPagingModel @Inject constructor(
     private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
+    private val loggerFactory: Logger.Factory,
 ) : StateLocker,
     PaginationState<InstanceInfosResponse.InstanceInfo>,
     PreviousLoader<InstanceInfosResponse.InstanceInfo>,
     EntityConverter<InstanceInfosResponse.InstanceInfo, InstanceInfosResponse.InstanceInfo> {
 
+    private val logger by lazy {
+        loggerFactory.create("InstanceSuggestionsPagingModel")
+    }
     private var _offset = 0
     private var _name: String = ""
     private val _state =
@@ -62,7 +67,7 @@ class InstanceSuggestionsPagingModel @Inject constructor(
         _job?.cancel()
         mutex.withLock {
             _name = name
-
+            _offset = 0
         }
         setState(PageableState.Loading.Init())
     }
@@ -79,7 +84,9 @@ class InstanceSuggestionsPagingModel @Inject constructor(
     fun onLoadNext(scope: CoroutineScope) {
         _job?.cancel()
         _job = scope.launch {
-            previousPagingController.loadPrevious()
+            previousPagingController.loadPrevious().onFailure {
+                logger.error("Failed to load previous", it)
+            }
         }
 
     }

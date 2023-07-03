@@ -84,7 +84,8 @@ fun AuthScreen(
                         onShowTermsOfService = onShowTermsOfService,
                         onShowPrivacyPolicy = onShowPrivacyPolicy,
                         onToggleAcceptMastodonAlphaTest = authViewModel::onToggleAcceptMastodonAlphaTest,
-                        onSignUpButtonClicked = onSignUpButtonClicked
+                        onSignUpButtonClicked = onSignUpButtonClicked,
+                        onBottomReached = authViewModel::onBottomReached
                     )
                 }
                 is Authorization.Waiting4UserAuthorization -> {

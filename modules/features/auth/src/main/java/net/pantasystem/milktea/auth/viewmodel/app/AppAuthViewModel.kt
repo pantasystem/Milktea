@@ -88,26 +88,7 @@ class AppAuthViewModel @Inject constructor(
             StateContent.NotExist()
         )
     )
-//
-//    private val instances = instanceInfoRepository.observeAll()
-//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-//    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-//    private val misskeyInstances = instanceDomain.flatMapLatest { name ->
-//        suspend {
-//            requireNotNull(
-//                instancesInfoAPIBuilder.build().getInstances(
-//                    name = name
-//                ).throwIfHasError()
-//                    .body()
-//            ).distinctBy {
-//                it.url
-//            }
-//        }.asFlow()
-//    }.catch {
-//        logger.error("インスタンス情報の取得に失敗", it)
-//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-//
     private val misskeyInstances = instanceSuggestionsPagingModel.state.map {
         (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
     }.stateIn(
@@ -346,11 +327,6 @@ class AppAuthViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-//        viewModelScope.launch {
-//            instanceInfoRepository.sync().onFailure {
-//                logger.error("sync instance info error", it)
-//            }
-//        }
     }
 
     fun auth() {
@@ -392,6 +368,9 @@ class AppAuthViewModel @Inject constructor(
         isAcceptMastodonAlphaTest.value = value
     }
 
+    fun onBottomReached() {
+        instanceSuggestionsPagingModel.onLoadNext(viewModelScope)
+    }
 
 }
 
