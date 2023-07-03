@@ -156,14 +156,14 @@ internal class MainActivityEventHandler(
             lifecycleOwner.whenResumed {
                 // NOTE: 通知音を再生する
                 mainViewModel.newNotifications.collect {
-                    if (ringtone.isPlaying) {
+                    if (ringtone?.isPlaying == true) {
                         ringtone.stop()
                     }
                     if (
                         configStore.configState.value.isEnableNotificationSound
                             && audioManager.ringerMode == AudioManager.RINGER_MODE_NORMAL
                     ) {
-                        ringtone.play()
+                        ringtone?.play()
                     }
                 }
             }
