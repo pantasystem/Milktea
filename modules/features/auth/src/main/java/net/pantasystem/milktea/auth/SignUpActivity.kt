@@ -42,6 +42,9 @@ class SignUpActivity : AppCompatActivity() {
                     onSelected = signUpViewModel::onSelected,
                     onNavigateUp = {
                         finish()
+                    },
+                    onBottomReached = {
+                        signUpViewModel.onBottomReached()
                     }
                 )
             }

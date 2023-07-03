@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.auth.suggestions.InstanceSuggestionsPagingModel
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.instance.InstanceInfoService
 import net.pantasystem.milktea.model.instance.InstanceInfoType
@@ -14,34 +14,37 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val instancesInfosAPIBuilder: InstanceInfoAPIBuilder,
     private val instanceInfoService: InstanceInfoService,
+    private val instancePagingModel: InstanceSuggestionsPagingModel,
     loggerFactory: Logger.Factory,
 ) : ViewModel() {
-    
-    private val logger by lazy {
-        loggerFactory.create("SignUpViewModel")
-    }
 
     private var _keyword = MutableStateFlow("")
     val keyword = _keyword.asStateFlow()
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private val instancesInfosResponse = keyword.flatMapLatest { name ->
-        suspend {
-            requireNotNull(
-                instancesInfosAPIBuilder.build().getInstances(
-                    name = name
-                ).throwIfHasError()
-                    .body()
-            ).distinctBy {
-                it.url
-            }
-        }.asFlow()
-    }.catch {
-        logger.error("インスタンス情報の取得に失敗", it)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+//    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+//    private val instancesInfosResponse = keyword.flatMapLatest { name ->
+//        suspend {
+//            requireNotNull(
+//                instancesInfosAPIBuilder.build().getInstances(
+//                    name = name
+//                ).throwIfHasError()
+//                    .body()
+//            ).distinctBy {
+//                it.url
+//            }
+//        }.asFlow()
+//    }.catch {
+//        logger.error("インスタンス情報の取得に失敗", it)
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
+    private val instancesInfosResponse = instancePagingModel.state.map {
+        (it.content as? StateContent.Exist)?.rawContent
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList(),
+    )
 
 
     private var _selectedInstanceUrl = MutableStateFlow<String?>("misskey.io")
@@ -83,12 +86,24 @@ class SignUpViewModel @Inject constructor(
         SignUpUiState()
     )
 
+    init {
+        instancePagingModel.onLoadNext(viewModelScope)
+    }
+
     fun onInputKeyword(value: String) {
-        _keyword.value = value
+        viewModelScope.launch {
+            _keyword.value = value
+            instancePagingModel.setQueryName(value)
+            instancePagingModel.onLoadNext(this)
+        }
     }
 
     fun onSelected(instancesInfosResponse: InstanceInfosResponse.InstanceInfo) {
         _selectedInstanceUrl.value = instancesInfosResponse.url
+    }
+
+    fun onBottomReached() {
+        instancePagingModel.onLoadNext(viewModelScope)
     }
 }
 

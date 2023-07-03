@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +26,10 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.app_store.account.AccountStore
+import net.pantasystem.milktea.auth.suggestions.InstanceSuggestionsPagingModel
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
@@ -61,7 +60,7 @@ class AppAuthViewModel @Inject constructor(
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
     private val syncMetaExecutor: SyncMetaExecutor,
-    private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
+    private val instanceSuggestionsPagingModel: InstanceSuggestionsPagingModel,
 ) : ViewModel() {
 
     private val logger = loggerFactory.create("AppAuthViewModel")
@@ -93,21 +92,29 @@ class AppAuthViewModel @Inject constructor(
 //    private val instances = instanceInfoRepository.observeAll()
 //        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private val misskeyInstances = instanceDomain.flatMapLatest { name ->
-        suspend {
-            requireNotNull(
-                instancesInfoAPIBuilder.build().getInstances(
-                    name = name
-                ).throwIfHasError()
-                    .body()
-            ).distinctBy {
-                it.url
-            }
-        }.asFlow()
-    }.catch {
-        logger.error("インスタンス情報の取得に失敗", it)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+//    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+//    private val misskeyInstances = instanceDomain.flatMapLatest { name ->
+//        suspend {
+//            requireNotNull(
+//                instancesInfoAPIBuilder.build().getInstances(
+//                    name = name
+//                ).throwIfHasError()
+//                    .body()
+//            ).distinctBy {
+//                it.url
+//            }
+//        }.asFlow()
+//    }.catch {
+//        logger.error("インスタンス情報の取得に失敗", it)
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+//
+    private val misskeyInstances = instanceSuggestionsPagingModel.state.map {
+        (it.content as? StateContent.Exist)?.rawContent ?: emptyList()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        emptyList()
+    )
 
     private val isPrivacyPolicyAgreement = MutableStateFlow(false)
     private val isTermsOfServiceAgreement = MutableStateFlow(false)
@@ -263,7 +270,7 @@ class AppAuthViewModel @Inject constructor(
             },
             waiting4ApproveState = waiting4Approve,
             clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
-            misskeyInstanceInfosResponse = misskeyInstances ?: emptyList(),
+            misskeyInstanceInfosResponse = misskeyInstances,
         )
     }.stateIn(
         viewModelScope,
@@ -278,6 +285,10 @@ class AppAuthViewModel @Inject constructor(
 
 
     init {
+        instanceDomain.onEach {
+            instanceSuggestionsPagingModel.setQueryName(it)
+            instanceSuggestionsPagingModel.onLoadNext(viewModelScope)
+        }.launchIn(viewModelScope)
 
         waiting4UserApprove.mapNotNull {
             (it.content as? StateContent.Exist)?.rawContent
