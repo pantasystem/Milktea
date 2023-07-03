@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -135,7 +134,6 @@ fun AuthFormScreen(
                 .fillMaxWidth()
                 .weight(1f),
             uiState = uiState,
-            instanceDomain = instanceDomain,
             onInputInstanceDomain = onInputInstanceDomain,
             onBottomReached = onBottomReached
         )
@@ -259,7 +257,6 @@ private fun AgreementLayout(
 private fun FilteredInstances(
     modifier: Modifier = Modifier,
     uiState: AuthUiState,
-    instanceDomain: String,
     onInputInstanceDomain: (String) -> Unit,
     onBottomReached: () -> Unit,
 ) {
@@ -273,11 +270,7 @@ private fun FilteredInstances(
             }
         }
     }
-    val instances = remember(uiState.misskeyInstanceInfosResponse, uiState.formState) {
-        uiState.misskeyInstanceInfosResponse.filter {
-            it.meta.uri.contains(instanceDomain) || it.name.contains(instanceDomain)
-        }
-    }
+    val instances = uiState.misskeyInstanceInfosResponse
     LazyColumn(
         modifier,
         state = listState,

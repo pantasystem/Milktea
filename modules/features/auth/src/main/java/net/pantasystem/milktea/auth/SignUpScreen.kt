@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.auth.viewmodel.SignUpUiState
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
@@ -42,7 +42,7 @@ fun SignUpScreen(
     uiState: SignUpUiState,
     onInputKeyword: (String) -> Unit,
     onNextButtonClicked: (InstanceInfoType) -> Unit,
-    onSelected: (InstanceInfosResponse.InstanceInfo) -> Unit,
+    onSelected: (SimpleInstanceInfo) -> Unit,
     onNavigateUp: () -> Unit,
     onBottomReached: () -> Unit,
 ) {

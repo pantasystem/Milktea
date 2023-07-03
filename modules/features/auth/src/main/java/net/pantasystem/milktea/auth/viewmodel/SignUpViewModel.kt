@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.auth.suggestions.InstanceSuggestionsPagingModel
 import net.pantasystem.milktea.common.*
 import net.pantasystem.milktea.model.instance.InstanceInfoService
@@ -16,7 +16,6 @@ import javax.inject.Inject
 class SignUpViewModel @Inject constructor(
     private val instanceInfoService: InstanceInfoService,
     private val instancePagingModel: InstanceSuggestionsPagingModel,
-    loggerFactory: Logger.Factory,
 ) : ViewModel() {
 
     private var _keyword = MutableStateFlow("")
@@ -98,7 +97,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun onSelected(instancesInfosResponse: InstanceInfosResponse.InstanceInfo) {
+    fun onSelected(instancesInfosResponse: SimpleInstanceInfo) {
         _selectedInstanceUrl.value = instancesInfosResponse.url
     }
 
@@ -111,7 +110,7 @@ data class SignUpUiState(
     val keyword: String = "",
     val selectedUrl: String? = "misskey.io",
     val instanceInfo: ResultState<InstanceInfoType> = ResultState.Loading(StateContent.NotExist()),
-    val instancesInfosResponse: List<InstanceInfosResponse.InstanceInfo> = emptyList(),
+    val instancesInfosResponse: List<SimpleInstanceInfo> = emptyList(),
 ) {
 
     val filteredInfos = instancesInfosResponse

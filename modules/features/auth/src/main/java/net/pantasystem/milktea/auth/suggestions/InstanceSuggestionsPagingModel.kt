@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.common.Logger
 import net.pantasystem.milktea.common.PageableState
 import net.pantasystem.milktea.common.paginator.EntityConverter
@@ -24,9 +24,9 @@ class InstanceSuggestionsPagingModel @Inject constructor(
     private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
     private val loggerFactory: Logger.Factory,
 ) : StateLocker,
-    PaginationState<InstanceInfosResponse.InstanceInfo>,
-    PreviousLoader<InstanceInfosResponse.InstanceInfo>,
-    EntityConverter<InstanceInfosResponse.InstanceInfo, InstanceInfosResponse.InstanceInfo> {
+    PaginationState<SimpleInstanceInfo>,
+    PreviousLoader<SimpleInstanceInfo>,
+    EntityConverter<SimpleInstanceInfo, SimpleInstanceInfo> {
 
     private val logger by lazy {
         loggerFactory.create("InstanceSuggestionsPagingModel")
@@ -34,26 +34,26 @@ class InstanceSuggestionsPagingModel @Inject constructor(
     private var _offset = 0
     private var _name: String = ""
     private val _state =
-        MutableStateFlow<PageableState<List<InstanceInfosResponse.InstanceInfo>>>(PageableState.Loading.Init())
+        MutableStateFlow<PageableState<List<SimpleInstanceInfo>>>(PageableState.Loading.Init())
 
     private var _job: Job? = null
 
-    override suspend fun convertAll(list: List<InstanceInfosResponse.InstanceInfo>): List<InstanceInfosResponse.InstanceInfo> {
+    override suspend fun convertAll(list: List<SimpleInstanceInfo>): List<SimpleInstanceInfo> {
         return list
     }
 
-    override val state: Flow<PageableState<List<InstanceInfosResponse.InstanceInfo>>>
+    override val state: Flow<PageableState<List<SimpleInstanceInfo>>>
         get() = _state
 
-    override fun getState(): PageableState<List<InstanceInfosResponse.InstanceInfo>> {
+    override fun getState(): PageableState<List<SimpleInstanceInfo>> {
         return _state.value
     }
 
-    override fun setState(state: PageableState<List<InstanceInfosResponse.InstanceInfo>>) {
+    override fun setState(state: PageableState<List<SimpleInstanceInfo>>) {
         _state.value = state
     }
 
-    override suspend fun loadPrevious(): Result<List<InstanceInfosResponse.InstanceInfo>> =
+    override suspend fun loadPrevious(): Result<List<SimpleInstanceInfo>> =
         runCancellableCatching {
             instancesInfoAPIBuilder.build().getInstances(
                 offset = _offset,

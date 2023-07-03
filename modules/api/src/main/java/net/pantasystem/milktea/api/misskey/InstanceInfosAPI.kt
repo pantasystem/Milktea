@@ -3,7 +3,7 @@ package net.pantasystem.milktea.api.misskey
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -20,7 +20,7 @@ interface InstanceInfosAPI {
         @Query("name") name: String? = null,
         @Query("limit") limit: Int? = null,
         @Query("offset") offset: Int? = null,
-    ): Response<List<InstanceInfosResponse.InstanceInfo>>
+    ): Response<List<SimpleInstanceInfo>>
 }
 
 @Singleton

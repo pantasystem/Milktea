@@ -1,6 +1,6 @@
 package net.pantasystem.milktea.auth.viewmodel.app
 
-import net.pantasystem.milktea.api.misskey.infos.InstanceInfosResponse
+import net.pantasystem.milktea.api.misskey.infos.SimpleInstanceInfo
 import net.pantasystem.milktea.common.ResultState
 import net.pantasystem.milktea.common.StateContent
 import net.pantasystem.milktea.common.runCancellableCatching
@@ -79,7 +79,7 @@ data class AuthUiState(
         StateContent.NotExist()
     ),
     val clientId: String = "",
-    val misskeyInstanceInfosResponse: List<InstanceInfosResponse.InstanceInfo>,
+    val misskeyInstanceInfosResponse: List<SimpleInstanceInfo>,
 ) {
     val isProgress by lazy {
         metaState is ResultState.Loading || waiting4ApproveState is ResultState.Loading
