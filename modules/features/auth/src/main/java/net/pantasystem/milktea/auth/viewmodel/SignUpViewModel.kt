@@ -23,36 +23,26 @@ class SignUpViewModel @Inject constructor(
         loggerFactory.create("SignUpViewModel")
     }
 
-    @OptIn(FlowPreview::class)
-    private val instancesInfosResponse = suspend {
-        coroutineScope {
-            listOf(
-                async {
-                    requireNotNull(
-                        instancesInfosAPIBuilder.buildCalckey().getInstances()
-                            .throwIfHasError()
-                            .body()
-                    )
-                },
-                async {
-                    requireNotNull(
-                        instancesInfosAPIBuilder.build().getInstances()
-                            .throwIfHasError()
-                            .body()
-                    )
-                },
-            ).awaitAll().map {
-                it.instancesInfos
-            }.flatten().distinctBy {
+    private var _keyword = MutableStateFlow("")
+    val keyword = _keyword.asStateFlow()
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private val instancesInfosResponse = keyword.flatMapLatest { name ->
+        suspend {
+            requireNotNull(
+                instancesInfosAPIBuilder.build().getInstances(
+                    name = name
+                ).throwIfHasError()
+                    .body()
+            ).distinctBy {
                 it.url
             }
-        }
-    }.asFlow().catch { 
+        }.asFlow()
+    }.catch {
         logger.error("インスタンス情報の取得に失敗", it)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    private var _keyword = MutableStateFlow("")
-    val keyword = _keyword.asStateFlow()
+
 
     private var _selectedInstanceUrl = MutableStateFlow<String?>("misskey.io")
 
@@ -109,15 +99,5 @@ data class SignUpUiState(
     val instancesInfosResponse: List<InstanceInfosResponse.InstanceInfo> = emptyList(),
 ) {
 
-    val filteredInfos = instancesInfosResponse.filter {
-        it.url.contains(keyword) || it.name.contains(keyword)
-    }.let { list ->
-        val misskeyIo = list.firstOrNull {
-            it.url == "misskey.io"
-        }
-        val otherInstances = list.filterNot {
-            it.url == "misskey.io"
-        }
-        listOfNotNull(misskeyIo) + otherInstances
-    }
+    val filteredInfos = instancesInfosResponse
 }

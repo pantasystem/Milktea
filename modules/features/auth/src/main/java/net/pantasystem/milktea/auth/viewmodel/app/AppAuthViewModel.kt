@@ -3,28 +3,53 @@ package net.pantasystem.milktea.auth.viewmodel.app
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import net.pantasystem.milktea.api.misskey.InstanceInfoAPIBuilder
 import net.pantasystem.milktea.api.misskey.MisskeyAPIServiceBuilder
 import net.pantasystem.milktea.api.misskey.auth.UserKey
 import net.pantasystem.milktea.app_store.account.AccountStore
-import net.pantasystem.milktea.common.*
+import net.pantasystem.milktea.common.Logger
+import net.pantasystem.milktea.common.ResultState
+import net.pantasystem.milktea.common.StateContent
+import net.pantasystem.milktea.common.asLoadingStateFlow
+import net.pantasystem.milktea.common.runCancellableCatching
+import net.pantasystem.milktea.common.throwIfHasError
 import net.pantasystem.milktea.data.api.misskey.MisskeyAPIProvider
 import net.pantasystem.milktea.data.infrastructure.auth.Authorization
 import net.pantasystem.milktea.data.infrastructure.auth.custom.toModel
 import net.pantasystem.milktea.model.account.AccountRepository
 import net.pantasystem.milktea.model.account.ClientIdRepository
-//import net.pantasystem.milktea.model.instance.InstanceInfoRepository
 import net.pantasystem.milktea.model.instance.SyncMetaExecutor
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 
 const val CALL_BACK_URL = "misskey://app_auth_callback"
 
 @ExperimentalCoroutinesApi
-@Suppress("UNCHECKED_CAST")
 @HiltViewModel
 class AppAuthViewModel @Inject constructor(
     private val authService: AuthStateHelper,
@@ -35,7 +60,6 @@ class AppAuthViewModel @Inject constructor(
     val misskeyAPIProvider: MisskeyAPIProvider,
     private val getAccessToken: GetAccessToken,
     private val clientIdRepository: ClientIdRepository,
-//    private val instanceInfoRepository: InstanceInfoRepository,
     private val syncMetaExecutor: SyncMetaExecutor,
     private val instancesInfoAPIBuilder: InstanceInfoAPIBuilder,
 ) : ViewModel() {
@@ -69,36 +93,21 @@ class AppAuthViewModel @Inject constructor(
 //    private val instances = instanceInfoRepository.observeAll()
 //        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    @OptIn(FlowPreview::class)
-    private val misskeyInstances = suspend {
-        runCancellableCatching {
-            withContext(Dispatchers.IO) {
-                coroutineScope {
-                    val instances = listOf(
-                        async {
-                            requireNotNull(
-                                instancesInfoAPIBuilder.buildCalckey().getInstances()
-                                    .throwIfHasError()
-                                    .body()
-                            )
-                        },
-                        async {
-                            requireNotNull(
-                                instancesInfoAPIBuilder.build().getInstances()
-                                    .throwIfHasError()
-                                    .body()
-                            )
-                        }
-                    ).awaitAll()
-                    instances.map {
-                        it.instancesInfos
-                    }.flatten().distinctBy {
-                        it.url
-                    }
-                }
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    private val misskeyInstances = instanceDomain.flatMapLatest { name ->
+        suspend {
+            requireNotNull(
+                instancesInfoAPIBuilder.build().getInstances(
+                    name = name
+                ).throwIfHasError()
+                    .body()
+            ).distinctBy {
+                it.url
             }
-        }
-    }.asFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+        }.asFlow()
+    }.catch {
+        logger.error("インスタンス情報の取得に失敗", it)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val isPrivacyPolicyAgreement = MutableStateFlow(false)
     private val isTermsOfServiceAgreement = MutableStateFlow(false)
@@ -254,9 +263,7 @@ class AppAuthViewModel @Inject constructor(
             },
             waiting4ApproveState = waiting4Approve,
             clientId = "clientId: ${clientIdRepository.getOrCreate().clientId}",
-            misskeyInstanceInfosResponse = misskeyInstances?.getOrElse {
-                emptyList()
-            } ?: emptyList()
+            misskeyInstanceInfosResponse = misskeyInstances ?: emptyList(),
         )
     }.stateIn(
         viewModelScope,

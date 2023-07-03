@@ -8,14 +8,19 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
 interface InstanceInfosAPI {
 
-    @GET("instances.json")
-    suspend fun getInstances(): Response<InstanceInfosResponse>
+    @GET("instances")
+    suspend fun getInstances(
+        @Query("name") name: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("offset") offset: Int? = null,
+    ): Response<List<InstanceInfosResponse.InstanceInfo>>
 }
 
 @Singleton
@@ -26,25 +31,15 @@ class InstanceInfoAPIBuilder @Inject constructor(val okHttpClientProvider: OkHtt
     @OptIn(ExperimentalSerializationApi::class)
     private val retrofitBuilder by lazy {
         Retrofit.Builder()
-            .baseUrl("https://instanceapp.misskey.page")
+            .baseUrl("https://milktea-instance-suggestions.milktea.workers.dev")
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(okHttpClientProvider.get())
             .build()
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
-    private val calckeyRetrofitBuilder by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://api.calckey.org")
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .client(okHttpClientProvider.get())
-            .build()
-    }
+
     fun build(): InstanceInfosAPI {
         return retrofitBuilder.create(InstanceInfosAPI::class.java)
     }
 
-    fun buildCalckey(): InstanceInfosAPI {
-        return calckeyRetrofitBuilder.create(InstanceInfosAPI::class.java)
-    }
 }
