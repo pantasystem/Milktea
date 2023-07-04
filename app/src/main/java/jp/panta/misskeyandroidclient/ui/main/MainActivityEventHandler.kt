@@ -77,7 +77,7 @@ internal class MainActivityEventHandler(
 
     private fun collectCrashlyticsCollectionState() {
         lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainViewModel.isShowFirebaseCrashlytics.collect {
                     if (it) {
                         ConfirmCrashlyticsDialog().show(
@@ -92,7 +92,7 @@ internal class MainActivityEventHandler(
 
     private fun collectConfirmGoogleAnalyticsState() {
         lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainViewModel.isShowGoogleAnalyticsDialog.collect {
                     if (it) {
                         ConfirmGoogleAnalyticsDialog().show(
